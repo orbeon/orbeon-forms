@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.saxon.om.NodeInfo;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an xforms:repeat container control.
@@ -38,8 +38,8 @@ public class XFormsRepeatControl extends XFormsControl implements XFormsContaine
 
     private int startIndex;
 
-    public XFormsRepeatControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsRepeatControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
 
         // Store initial repeat index information
         final String startIndexString = element.attributeValue("startindex");

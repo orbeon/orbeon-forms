@@ -20,10 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
@@ -47,8 +44,8 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     private boolean urlNorewrite;
 
-    public XFormsOutputControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsOutputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
         this.mediatypeAttribute = element.attributeValue("mediatype");
         this.valueAttribute = element.attributeValue("value");

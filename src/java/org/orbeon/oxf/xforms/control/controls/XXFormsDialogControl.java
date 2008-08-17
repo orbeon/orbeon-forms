@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.dom4j.Element;
+import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -35,8 +35,8 @@ public class XXFormsDialogControl extends XFormsControl implements XFormsContain
     private String neighborControlId;
     private boolean initiallyVisible;
 
-    public XXFormsDialogControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(containingDocument, parent, element, name, effectiveId);
+    public XXFormsDialogControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        super(container, parent, element, name, effectiveId);
         this.level = element.attributeValue("level");
         if (this.level == null)
             this.level = "modal";

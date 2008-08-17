@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.xml.sax.helpers.AttributesImpl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.xml.sax.helpers.AttributesImpl;
 
 public abstract class BaseControlsComparator implements ControlsComparator {
 

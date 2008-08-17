@@ -24,5 +24,5 @@ public interface XFormsEventHandlerContainer extends XFormsEventTarget {
     public String getId();
     public String getEffectiveId();
     public List getEventHandlers(XFormsContainingDocument containingDocument);
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument);
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument);
 }

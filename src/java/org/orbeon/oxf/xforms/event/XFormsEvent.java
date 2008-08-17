@@ -13,24 +13,24 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**

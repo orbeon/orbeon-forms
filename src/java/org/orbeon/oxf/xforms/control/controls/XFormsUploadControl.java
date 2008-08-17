@@ -52,8 +52,8 @@ public class XFormsUploadControl extends XFormsValueControl {
     private String filename;
 
 
-    public XFormsUploadControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsUploadControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
         mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
         filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
         sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);

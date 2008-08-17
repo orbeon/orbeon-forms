@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;

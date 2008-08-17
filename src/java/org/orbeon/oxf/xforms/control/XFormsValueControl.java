@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -37,8 +37,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
-    protected XFormsValueControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(containingDocument, parent, element, name, effectiveId);
+    protected XFormsValueControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        super(container, parent, element, name, effectiveId);
     }
 
     protected void evaluate(PipelineContext pipelineContext) {

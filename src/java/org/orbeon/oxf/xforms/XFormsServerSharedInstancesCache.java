@@ -13,19 +13,21 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.cache.*;
-import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Cache for shared and immutable XForms instances.

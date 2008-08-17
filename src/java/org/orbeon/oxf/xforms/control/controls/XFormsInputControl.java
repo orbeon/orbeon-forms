@@ -16,18 +16,15 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsItemUtils;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents an xforms:input control.
@@ -37,8 +34,8 @@ public class XFormsInputControl extends XFormsValueControl {
     // Optional display format
     private String format;
 
-    public XFormsInputControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsInputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
     }
 

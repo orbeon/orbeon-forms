@@ -13,15 +13,19 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.saxon.om.*;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.om.NameChecker;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.style.StandardNames;
-import org.dom4j.*;
 
 import java.util.*;
 

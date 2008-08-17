@@ -65,6 +65,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
 
+    // Container
+    private XFormsContainer container;
+
     // Containing document
     private XFormsContainingDocument containingDocument;
 
@@ -102,13 +105,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    public XFormsModel(Document modelDocument) {
+    public XFormsModel(Document modelDocument) {// legacy
         this(modelDocument.getRootElement().attributeValue("id"), modelDocument);
     }
 
-    public void setContainingDocument(XFormsContainingDocument containingDocument) {
+    public void setContainer(XFormsContainer container) {
 
-        this.containingDocument = containingDocument;
+        this.container = container;
+        this.containingDocument = container.getContainingDocument();
 
         final Element modelElement = modelDocument.getRootElement();
 
@@ -128,6 +132,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Create binds object
         binds = new XFormsModelBinds(this);
+    }
+
+    public XFormsContainer getContainer() {
+        return container;
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -251,7 +259,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -262,9 +270,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new XFormsInstance(modelEffectiveId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new SharedXFormsInstance(modelEffectiveId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -598,7 +606,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 // Get instance from shared cache if possible
                                 if (isApplicationSharedHint) {
-                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
+                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelEffectiveId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
                                     setInstance(sharedXFormsInstance, false);
                                     continue;
                                 }
@@ -677,7 +685,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
+                        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                     }
                 }
             }
@@ -1484,7 +1492,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         this.instanceConstructListener = instanceConstructListener;
     }
 
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
         return this.containingDocument;
     }
 

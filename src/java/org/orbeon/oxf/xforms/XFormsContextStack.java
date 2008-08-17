@@ -36,18 +36,29 @@ import java.util.*;
  */
 public class XFormsContextStack {
 
+    private XFormsContainer container;
     private XFormsContainingDocument containingDocument;
-    private Stack contextStack = new Stack();
     private XFormsFunction.Context functionContext;
 
-    public XFormsContextStack(XFormsContainingDocument containingDocument) {
-        this.containingDocument = containingDocument;
-        this.functionContext = new XFormsFunction.Context(containingDocument, this);
+    private BindingContext parentBindingContext;
+
+    private Stack contextStack = new Stack();
+
+    public XFormsContextStack(XFormsContainer container) {
+        this.container = container;
+        this.containingDocument = this.container.getContainingDocument();
+        this.functionContext = new XFormsFunction.Context(container, this);
+
+        parentBindingContext = container.getBindingContext();
     }
 
+    // Constructor for binds and submissions
     public XFormsContextStack(XFormsModel containingModel) {
-        this.containingDocument = containingModel.getContainingDocument();
+        this.container = containingModel.getContainer();
+        this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(containingModel, this);
+
+        parentBindingContext = container.getBindingContext();
     }
 
     public XFormsFunction.Context getFunctionContext() {
@@ -58,7 +69,7 @@ public class XFormsContextStack {
      * Reset the binding context to the root of the first model's first instance.
      */
     public void resetBindingContext(PipelineContext pipelineContext) {
-        resetBindingContext(pipelineContext, containingDocument.getDefaultModel());
+        resetBindingContext(pipelineContext, container.getDefaultModel());
     }
 
     /**
@@ -70,13 +81,19 @@ public class XFormsContextStack {
         contextStack.clear();
 
         if (xformsModel != null && xformsModel.getDefaultInstance() != null) {
-            // Push the default context
+            // Push the default context if there is a model with an instance
             final NodeInfo defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
             final List defaultNodeset = Arrays.asList(new Object[]{ defaultNode });
             contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, defaultNode));
         } else {
-            // Push empty context
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
+            // Push parent context
+            if (parentBindingContext != null) {
+                // This is the case where a component doesn't have local models; we decided to inherit the context of the parent
+                contextStack.push(parentBindingContext);
+            } else {
+                // Push empty context
+                contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
+            }
         }
 
         // Add model variables for default model
@@ -139,7 +156,7 @@ public class XFormsContextStack {
             // Odd case which can happen when a handler and control are in a removed iteration. Set an empty context.
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
-            final XFormsModel xformsModel = containingDocument.getDefaultModel();
+            final XFormsModel xformsModel = container.getDefaultModel();
             contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
         } else if (eventHandlerContainer instanceof XFormsControl) {
             setBinding((XFormsControl) eventHandlerContainer);
@@ -148,10 +165,10 @@ public class XFormsContextStack {
             resetBindingContext(pipelineContext, xformsModel);
         } else if (eventHandlerContainer instanceof XFormsInstance) {
             final XFormsInstance xformsInstance = (XFormsInstance) eventHandlerContainer;
-            resetBindingContext(pipelineContext, xformsInstance.getModel(containingDocument));
+            resetBindingContext(pipelineContext, xformsInstance.getModel(container));
         } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
             final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
-            final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer(containingDocument);
+            final XFormsModel xformsModel = (XFormsModel) submission.getModel();
             resetBindingContext(pipelineContext, xformsModel);
             pushBinding(pipelineContext, submission.getSubmissionElement());
         } else {
@@ -222,7 +239,7 @@ public class XFormsContextStack {
 
         // Get location data for error reporting
         final LocationData locationData = (bindingElement == null)
-                ? containingDocument.getLocationData()
+                ? container.getLocationData()
                 : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
 
         // Determine current context
@@ -232,7 +249,7 @@ public class XFormsContextStack {
         final XFormsModel newModel;
         final boolean isNewModel;
         if (modelId != null) {
-            newModel = (XFormsModel) containingDocument.resolveObjectById(null, modelId);// xxx use this? 
+            newModel = (XFormsModel) container.resolveObjectById(container.getPrefix(), modelId);
             if (newModel == null)
                 throw new ValidationException("Invalid model id: " + modelId, locationData);
             isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed
@@ -451,7 +468,7 @@ public class XFormsContextStack {
             return bindingContext.getNodeset();
 
         // If there is no default instance, return an empty node-set
-        final XFormsInstance defaultInstance = containingDocument.getModelByEffectiveId(effectiveModelId).getDefaultInstance();
+        final XFormsInstance defaultInstance = container.getModelByEffectiveId(effectiveModelId).getDefaultInstance();
         if (defaultInstance == null)
             return Collections.EMPTY_LIST;
 
@@ -666,7 +683,7 @@ public class XFormsContextStack {
             final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
 
             if (currentSingleNode != null)
-                return containingDocument.getInstanceForNode(currentSingleNode);
+                return container.getInstanceForNode(currentSingleNode);
         }
         return null;
     }

@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
-import java.util.StringTokenizer;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Base class for UI events.

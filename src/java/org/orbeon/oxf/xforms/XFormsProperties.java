@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.properties.Properties;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class XFormsProperties {
 

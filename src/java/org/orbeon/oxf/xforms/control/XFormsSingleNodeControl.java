@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.saxon.om.NodeInfo;
 import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
@@ -32,8 +32,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     private boolean valid;
     private String type;
 
-    public XFormsSingleNodeControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(containingDocument, parent, element, name, effectiveId);
+    public XFormsSingleNodeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        super(container, parent, element, name, effectiveId);
     }
 
     public boolean isReadonly() {

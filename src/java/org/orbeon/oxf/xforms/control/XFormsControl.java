@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.dom4j.*;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
-import org.xml.sax.SAXException;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import java.util.*;
 
@@ -35,6 +39,7 @@ import java.util.*;
  */
 public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHandlerContainer {
 
+    private XFormsContainer container;
     protected XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
@@ -77,8 +82,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     // this with inheritance?
     private List children;
 
-    public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        this.containingDocument = containingDocument;
+    public XFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        this.container = container;
+        this.containingDocument = (container != null) ? container.getContainingDocument() : null;// some special cases pass in null (bad, we know...)
         this.parent = parent;
         this.controlElement = element;
         this.name = name;
@@ -402,7 +408,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         getAlert(pipelineContext);
     }
 
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
         return parent;
     }
 

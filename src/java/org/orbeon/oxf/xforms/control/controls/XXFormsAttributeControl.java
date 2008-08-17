@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 
 import java.util.List;
 
@@ -34,8 +35,8 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String nameAttribute;
     private String valueAttribute;
 
-    public XXFormsAttributeControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(containingDocument, parent, element, name, effectiveId);
+    public XXFormsAttributeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        super(container, parent, element, name, effectiveId);
 
         // Remember attributes
         this.forAttribute = element.attributeValue("for");

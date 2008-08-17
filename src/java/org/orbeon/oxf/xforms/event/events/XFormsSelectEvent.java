@@ -18,9 +18,9 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;

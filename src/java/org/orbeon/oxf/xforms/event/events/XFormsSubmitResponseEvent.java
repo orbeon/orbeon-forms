@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.TransformerUtils;

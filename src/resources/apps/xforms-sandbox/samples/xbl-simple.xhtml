@@ -38,16 +38,35 @@
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="test-component" element="foo|test">
                 <xbl:template>
+                    <!-- Local models for testing-->
+                    <xforms:model id="my-nested-model-a">
+                        <xforms:instance id="my-nested-instance-a">
+                            <instance-a>nested value a</instance-a>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xforms:model id="my-nested-model-b">
+                        <xforms:instance id="my-nested-instance-b">
+                            <instance-b>nested value b</instance-b>
+                        </xforms:instance>
+                    </xforms:model>
+                    <!-- Controls -->
                     <xhtml:div class="test-class">
-                        <xforms:group xbl:attr="ref=myref">
-                            <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
-                            <xforms:input ref="date">
-                                <xforms:label>Value 2</xforms:label>
-                            </xforms:input>
-                            <xhtml:br/>
-                            <xforms:input ref="time">
-                                <xforms:label>Value 3</xforms:label>
-                            </xforms:input>
+                        <xforms:output value="."/>
+                        <xhtml:br/>
+                        <xforms:output model="my-nested-model-b" value="."/>
+                        <xhtml:br/>
+                        <xforms:group ref="xxforms:component-context()">
+
+                            <xforms:group xbl:attr="context=myref">
+                                <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
+                                <xforms:input ref="date">
+                                    <xforms:label>Value 2</xforms:label>
+                                </xforms:input>
+                                <xhtml:br/>
+                                <xforms:input ref="time">
+                                    <xforms:label>Value 3</xforms:label>
+                                </xforms:input>
+                            </xforms:group>
                         </xforms:group>
                     </xhtml:div>
                 </xbl:template>
@@ -63,6 +82,8 @@
         <!-- Instanciate components -->
         <foo:test id="my-test-1" myref="value1"/>
         <foo:test id="my-test-2" myref="value2"/>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </xhtml:body>
 </xhtml:html>

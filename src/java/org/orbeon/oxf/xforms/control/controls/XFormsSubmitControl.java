@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -28,8 +28,8 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
  * Represents an xforms:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
-    public XFormsSubmitControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsSubmitControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

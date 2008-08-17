@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -26,7 +28,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -34,7 +35,6 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 import org.xml.sax.ContentHandler;
-import org.apache.log4j.Logger;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
@@ -42,8 +42,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represent an XForms instance.
@@ -214,11 +214,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     /**
      * Return the model that contains this instance.
      *
-     * @param containingDocument    XFormsContainingDocument containing this instance
-     * @return XFormsModel          XFormsModel containing this instance
+     * @param container     XFormsContainer containing this instance
+     * @return XFormsModel  XFormsModel containing this instance
      */
-    public XFormsModel getModel(XFormsContainingDocument containingDocument) {
-        return containingDocument.getModelByEffectiveId(effectiveModelId);
+    public XFormsModel getModel(XFormsContainer container) {
+        return container.getModelByEffectiveId(effectiveModelId);
     }
 
     /**
@@ -505,7 +505,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         }
     }
 
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
         return getModel(containingDocument);
     }
 

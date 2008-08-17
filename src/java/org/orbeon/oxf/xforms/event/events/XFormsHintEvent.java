@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
  * 4.3.8 The xforms-help and xforms-hint Events

@@ -24,8 +24,8 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.QNameValue;
 import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.QNameValue;
 
 import java.util.Map;
 

@@ -13,11 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.dom4j.Element;
-
 /**
  * Marker interface for all container controls.
  */

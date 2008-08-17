@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.action;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.SequenceExtent;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Iterator;
 import java.util.Map;

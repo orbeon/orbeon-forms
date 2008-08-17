@@ -19,16 +19,16 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 

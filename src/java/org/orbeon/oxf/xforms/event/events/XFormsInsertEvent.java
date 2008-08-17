@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 
 /**

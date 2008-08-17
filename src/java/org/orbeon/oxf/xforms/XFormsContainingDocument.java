@@ -22,10 +22,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -36,7 +36,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.SequenceExtent;
 
@@ -52,7 +51,7 @@ import java.util.*;
  * o XForms controls
  * o Event handlers hierarchy
  */
-public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
+public class XFormsContainingDocument extends XFormsContainer {
 
     // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
@@ -74,10 +73,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     // Transient OutputStream for xforms:submission[@replace = 'all'], or null if not available
     private ExternalContext.Response response;
 
-    // A document contains models and controls
+    // A document refers to the static state and controls
     private XFormsStaticState xformsStaticState;
-    private List models = new ArrayList();
-    private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
 
     // Client state
@@ -164,8 +161,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState,
-                                    XFormsURIResolver uriResolver) {
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, XFormsURIResolver uriResolver) {
+
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", xformsStaticState.getLocationData(), null);
 
         logDebug("containing document", "creating new ContainingDocument (static state object provided).");
 
@@ -198,6 +196,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
 
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", xformsStaticState != null ? xformsStaticState.getLocationData() : null, null);
+
         if (xformsStaticState != null) {
             // Use passed static state object
             logDebug("containing document", "restoring containing document (static state object provided).");
@@ -207,6 +207,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
             logDebug("containing document", "restoring containing document (static state object not provided).");
             this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
+            setLocationData(this.xformsStaticState.getLocationData());
         }
 
         // Restore the containing document's dynamic state
@@ -240,12 +241,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Legacy constructor for XForms Classic.
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsModel xformsModel) {
-        this.models = Collections.singletonList(xformsModel);
-        this.xformsControls = new XFormsControls(this, null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
-        if (xformsModel.getEffectiveId() != null)
-            modelsMap.put(xformsModel.getEffectiveId(), xformsModel);
-        xformsModel.setContainingDocument(this);
+        addModel(xformsModel);
+
+        this.xformsControls = new XFormsControls(this, null, null);
+        xformsModel.setContainer(this);
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         this.legacyContainerType = externalContext.getRequest().getContainerType();
@@ -268,28 +269,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public boolean isInitializing() {
         return isInitializing;
-    }
-
-    /**
-     * Return model with the specified id, null if not found. If the id is the empty string, return
-     * the default model, i.e. the first model.
-     */
-    public XFormsModel getModelByEffectiveId(String modelEffectiveId) {
-        return (XFormsModel) ("".equals(modelEffectiveId) ? getDefaultModel() : modelsMap.get(modelEffectiveId));
-    }
-
-    public XFormsModel getDefaultModel() {
-        if (models != null && models.size() > 0)
-            return (XFormsModel) models.get(0);
-        else
-            return null;
-    }
-
-    /**
-     * Get a list of all the models in this document.
-     */
-    public List getModels() {
-        return models;
     }
 
     /**
@@ -383,10 +362,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public Object getObjectByEffectiveId(String effectiveId) {
 
-        // Search in models
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            XFormsModel model = (XFormsModel) i.next();
-            final Object resultObject = model.getObjectByEffectiveId(effectiveId);
+        // Search in parent (models and this)
+        {
+            final Object resultObject = super.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
@@ -397,10 +375,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (resultObject != null)
                 return resultObject;
         }
-
-        // Check containing document
-        if (effectiveId.equals(getEffectiveId()))
-            return this;
 
         return null;
     }
@@ -415,10 +389,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public Object resolveObjectById(String effectiveSourceId, String targetId) {
 
-        // Search in models
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            XFormsModel model = (XFormsModel) i.next();
-            final Object resultObject = model.resolveObjectById(effectiveSourceId, targetId);
+        // Search in parent (models and this)
+        {
+            final Object resultObject = super.resolveObjectById(effectiveSourceId, targetId);
             if (resultObject != null)
                 return resultObject;
         }
@@ -430,43 +403,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 return resultObject;
         }
 
-        // Check containing document
-        if (targetId.equals(getEffectiveId()))
-            return this;
-
-        return null;
-    }
-
-    /**
-     * Find the instance containing the specified node, in any model.
-     *
-     * @param nodeInfo  node contained in an instance
-     * @return      instance containing the node
-     */
-    public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
-            if (currentInstance != null)
-                return currentInstance;
-        }
-        // This should not happen if the node is currently in an instance!
-        return null;
-    }
-
-    /**
-     * Find the instance with the specified id, searching in any model.
-     *
-     * @param instanceId id of the instance to find
-     * @return      instance containing the node
-     */
-    public XFormsInstance findInstance(String instanceId) {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            final XFormsInstance currentInstance = currentModel.getInstance(instanceId);
-            if (currentInstance != null)
-                return currentInstance;
-        }
         return null;
     }
 
@@ -1134,26 +1070,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
-        return null;
-    }
-
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return null;
-    }
-
-    public String getId() {
-        return CONTAINING_DOCUMENT_PSEUDO_ID;
-    }
-
-    public String getEffectiveId() {
-        return getId();
-    }
-
-    public LocationData getLocationData() {
-        return (xformsStaticState != null) ? xformsStaticState.getLocationData() : null;
-    }
-
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
 
         final String eventName = event.getEventName();
@@ -1258,10 +1174,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final List containers = new ArrayList();
             {
                 XFormsEventHandlerContainer container
-                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer(this);
+                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentEventHandlerContainer(this);
                 while (container != null) {
                     containers.add(container);
-                    container = container.getParentContainer(this);
+                    container = container.getParentEventHandlerContainer(this);
 
                     // Stop propagation on component boundary
                     if (container instanceof XFormsComponentControl)
@@ -1655,47 +1571,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Create XForms controls and models
         createControlsAndModels(pipelineContext, null);
 
-        // 4.2 Initialization Events
-
-        // 1. Dispatch xforms-model-construct to all models
-        // 2. Dispatch xforms-model-construct-done to all models
-        // 3. Dispatch xforms-ready to all models
-
         // Before dispaching initialization events, remember that first refresh must be performed
         this.mustPerformInitializationFirstRefresh = true;
 
-        final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY, XFormsEvents.XXFORMS_READY };
-        for (int i = 0; i < eventsToDispatch.length; i++) {
-            if (i == 2) {
-                // Initialize controls after all the xforms-model-construct-done events have been sent
-                xformsControls.initialize(pipelineContext);
-            }
+        // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
+        // order to optimize events
+        // Perform deferred updates only for xforms-ready
+        startOutermostActionHandler();
 
-            // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
-            // order to optimize events
-            if (i == 1) {
-                // Performed deferred updates only for xforms-ready
-                startOutermostActionHandler();
-            }
+        // Initialize models
+        initializeModels(pipelineContext);
 
-            // Iterate over all the models
-            for (Iterator j = getModels().iterator(); j.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) j.next();
-
-                // Make sure there is at least one refresh
-                final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-                if (deferredActionContext != null) {
-                    deferredActionContext.refresh = true;
-                }
-
-                dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
-            }
-
-            if (i == 2) {
-                // Performed deferred updates only for xforms-ready
-                endOutermostActionHandler(pipelineContext);
-            }
-        }
+        // End deferred behavior
+        endOutermostActionHandler(pipelineContext);
 
         // In case there is no model or no controls, make sure the flag is cleared as it is only relevant during
         // initialization
@@ -1719,19 +1607,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Create XForms controls
             xformsControls = new XFormsControls(this, xformsStaticState, repeatIndexesElement);
 
-            // Create and index models
-            for (Iterator i = xformsStaticState.getModelDocuments().entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String prefixedId = (String) currentEntry.getKey();
-                final Document modelDocument = (Document) currentEntry.getValue();
-
-                final XFormsModel model = new XFormsModel(prefixedId, modelDocument);
-                model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument (really? should explain why)
-
-                this.models.add(model);
-                if (model.getEffectiveId() != null)
-                    this.modelsMap.put(model.getEffectiveId(), model);
-            }
+            // Add models
+            addAllModels();
         }
+    }
+
+    protected void initializeNestedControls(PipelineContext pipelineContext) {
+        // Call-back from super class models initialization
+        xformsControls.initialize(pipelineContext);
     }
 }

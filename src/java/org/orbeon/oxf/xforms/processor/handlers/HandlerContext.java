@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -23,11 +25,9 @@ import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.NetUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
-import org.apache.commons.lang.StringUtils;
+import org.xml.sax.SAXException;
 
 import java.util.Stack;
 

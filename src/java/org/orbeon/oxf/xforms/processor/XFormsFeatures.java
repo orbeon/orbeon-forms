@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.saxon.om.FastStringBuffer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XFormsFeatures {
 

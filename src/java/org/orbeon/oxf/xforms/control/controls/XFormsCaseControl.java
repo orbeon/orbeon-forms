@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.dom4j.Element;
 
 import java.util.Map;
 
@@ -26,8 +26,8 @@ import java.util.Map;
  * Represents an xforms:case pseudo-control.
  */
 public class XFormsCaseControl extends XFormsControl implements XFormsPseudoControl, XFormsContainerControl {
-    public XFormsCaseControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsCaseControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
     }
 
     public boolean isSelected() {

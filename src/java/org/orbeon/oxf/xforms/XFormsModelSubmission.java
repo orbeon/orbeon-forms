@@ -252,7 +252,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
+        return model;
+    }
+
+    public XFormsModel getModel() {
         return model;
     }
 

@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsContainer;
 
 /**
  * Control that represents a custom components.
  */
 public class XFormsComponentControl extends XFormsSingleNodeControl {
 
-    public XFormsComponentControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(containingDocument, parent, element, name, effectiveId);
+    public XFormsComponentControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+        super(container, parent, element, name, effectiveId);
     }
 }

@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
-import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
+import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;

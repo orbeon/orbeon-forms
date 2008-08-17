@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -63,6 +60,11 @@ abstract public class XFormsFunction extends SystemFunction {
         return null;
     }
 
+    public XFormsContainer getContainer(XPathContext xpathContext) {
+        final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
+        return functionContext.getContainer();
+    }
+
     public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
         final XFormsModel xformsModel = getContainingModel(xpathContext);
         if (xformsModel != null && xformsModel.getContainingDocument() != null)
@@ -90,12 +92,12 @@ abstract public class XFormsFunction extends SystemFunction {
 
     public static class Context implements XPathCache.FunctionContext {
 
-        private XFormsContainingDocument containingDocument;
+        private XFormsContainer container;
         private XFormsModel containingModel;
         private XFormsContextStack contextStack;
 
-        public Context(XFormsContainingDocument containingDocument, XFormsContextStack contextStack) {
-            this.containingDocument = containingDocument;
+        public Context(XFormsContainer container, XFormsContextStack contextStack) {
+            this.container = container;
             this.contextStack = contextStack;
         }
 
@@ -104,8 +106,12 @@ abstract public class XFormsFunction extends SystemFunction {
             this.contextStack = contextStack;
         }
 
+        public XFormsContainer getContainer() {
+            return (container != null) ? container : containingModel.getContainer();
+        }
+
         public XFormsContainingDocument getContainingDocument() {
-            return (containingDocument != null) ? containingDocument : containingModel.getContainingDocument();
+            return (container != null) ? container.getContainingDocument() : containingModel.getContainingDocument();
         }
 
         public XFormsControls getControls() {

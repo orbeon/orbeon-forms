@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.dom4j.Element;
 
 /**
  * Represents an xforms:trigger control.
@@ -24,8 +24,8 @@ import org.dom4j.Element;
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
-    public XFormsTriggerControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsTriggerControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
     }
 
     protected boolean isSupportHTMLHints() {

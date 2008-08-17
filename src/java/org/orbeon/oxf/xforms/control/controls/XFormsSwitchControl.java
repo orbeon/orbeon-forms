@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.dom4j.Element;
 
 /**
  * Represents an xforms:switch container control.
@@ -25,8 +25,8 @@ import org.dom4j.Element;
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
 public class XFormsSwitchControl extends XFormsSingleNodeControl implements XFormsContainerControl {
-    public XFormsSwitchControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsSwitchControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
     }
     
     public String getType() {

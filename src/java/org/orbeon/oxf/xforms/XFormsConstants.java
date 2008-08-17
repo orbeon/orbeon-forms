@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Constants useful for the XForms engine. 

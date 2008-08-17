@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.function.*;
-import org.orbeon.oxf.xforms.function.Context;
 import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
@@ -216,6 +215,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // xxforms:form-urlencode
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}form-urlencode", XXFormsFormURLEncode.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:component-context
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}component-context", XXFormsComponentContext.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // xxforms:sort
         // TODO: Support XSLT 2.0 enhancements and multiple sort keys

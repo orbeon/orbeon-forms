@@ -50,15 +50,14 @@ public class XFormsControls {
     private boolean dirtySinceLastRequest;
 
     private XFormsContainingDocument containingDocument;
-
-    private XFormsContextStack contextStack;
+    private XFormsContainer rootContainer;
     
     private Map constantItems;
 
     public XFormsControls(XFormsContainingDocument containingDocument, XFormsStaticState xformsStaticState, Element repeatIndexesElement) {
 
         this.containingDocument = containingDocument;
-        this.contextStack = new XFormsContextStack(containingDocument);
+        this.rootContainer = this.containingDocument;
 
         // Perform minimal initialization
         if (xformsStaticState != null) {
@@ -186,7 +185,7 @@ public class XFormsControls {
             initialControlsState.dirty = false;
         }
 
-        contextStack.resetBindingContext(pipelineContext);// not sure we actually need to do this
+        rootContainer.getContextStack().resetBindingContext(pipelineContext);// not sure we actually need to do this
 
         initialized = true;
     }
@@ -208,8 +207,9 @@ public class XFormsControls {
         return containingDocument;
     }
 
+    // TODO: Many callers of this won't get the proper context stack when dealing with components
     public XFormsContextStack getContextStack() {
-        return contextStack;
+        return rootContainer.getContextStack();
     }
 
     private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
@@ -236,10 +236,10 @@ public class XFormsControls {
 
             private XFormsControl currentControlsContainer = rootControl;
 
-            public void startVisitControl(Element controlElement, String effectiveControlId) {
+            public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
 
                 // Create XFormsControl with basic information
-                final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(containingDocument, currentControlsContainer, controlElement, effectiveControlId);
+                final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
                 effectiveIdsToControls.put(effectiveControlId, xformsControl);
 
                 final String controlName = xformsControl.getName();
@@ -278,7 +278,7 @@ public class XFormsControls {
                 }
 
                 // Set current binding for control element
-                final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
                 xformsControl.setBindingContext(currentBindingContext);
 
                 // Add to current controls container
@@ -325,7 +325,7 @@ public class XFormsControls {
                 }
             }
 
-            public void startRepeatIteration(int iteration, String effectiveIterationId) {
+            public void startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
 
                 final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration, effectiveIterationId);
                 effectiveIdsToControls.put(effectiveIterationId, repeatIterationControl);
@@ -334,7 +334,7 @@ public class XFormsControls {
                 currentControlsContainer = repeatIterationControl;
 
                 // Set current binding for control
-                final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
                 repeatIterationControl.setBindingContext(currentBindingContext);
             }
 
@@ -607,37 +607,41 @@ public class XFormsControls {
      * Visit all the effective controls elements.
      */
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
-        contextStack.resetBindingContext(pipelineContext);
+        rootContainer.getContextStack().resetBindingContext(pipelineContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
+        final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
+
         handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState(),
-                containingDocument.getStaticState().getControlsDocument().getRootElement(), "", "");
+                rootContainer, rootElement, "", "");
     }
 
     private void handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
-                                   boolean isOptimizeRelevance, XFormsStaticState staticState, Element containerElement, String idPrefix, String idPostfix) {
+                                    boolean isOptimizeRelevance, XFormsStaticState staticState, XFormsContainer currentContainer,
+                                    Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
+        final XFormsContextStack currentContextStack = currentContainer.getContextStack();
         for (Iterator i = containerElement.elements().iterator(); i.hasNext();) {
             final Element currentControlElement = (Element) i.next();
             final String currentControlName = currentControlElement.getName();
 
-            final String controlId = currentControlElement.attributeValue("id");
+            final String staticControlId = currentControlElement.attributeValue("id");
             final String effectiveControlId
-                    = idPrefix + controlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+                    = idPrefix + staticControlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
 
             if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
-                contextStack.pushBinding(pipelineContext, currentControlElement);
+                currentContextStack.pushBinding(pipelineContext, currentControlElement);
 
                 // Visit xforms:repeat element
-                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
 
                 // Iterate over current xforms:repeat nodeset
-                final List currentNodeSet = contextStack.getCurrentNodeset();
+                final List currentNodeSet = currentContextStack.getCurrentNodeset();
                 if (currentNodeSet != null) {
                     for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                         // Push "artificial" binding with just current node in nodeset
-                        contextStack.pushIteration(currentPosition);
+                        currentContextStack.pushIteration(currentPosition);
                         {
                             // Handle children of xforms:repeat
                             // TODO: handle isOptimizeRelevance()
@@ -647,23 +651,23 @@ public class XFormsControls {
                                     + (idPostfix.equals("") ? XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2)
                                     + currentPosition;
 
-                            controlElementVisitorListener.startRepeatIteration(currentPosition, iterationEffectiveId);
+                            controlElementVisitorListener.startRepeatIteration(currentContainer, currentPosition, iterationEffectiveId);
                             final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
                             handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentControlElement, idPrefix, newIdPostfix);
+                                    staticState, currentContainer, currentControlElement, idPrefix, newIdPostfix);
                             controlElementVisitorListener.endRepeatIteration(currentPosition);
                         }
-                        contextStack.popBinding();
+                        currentContextStack.popBinding();
                     }
                 }
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
-                contextStack.popBinding();
+                currentContextStack.popBinding();
             } else if (XFormsControlFactory.isContainerControl(currentControlName)) {
                 // Handle XForms grouping controls
-                contextStack.pushBinding(pipelineContext, currentControlElement);
-                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
-                final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                currentContextStack.pushBinding(pipelineContext, currentControlElement);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
+                final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
                     // Recurse into grouping control and components if we don't optimize relevance, OR if we do
                     // optimize and we are not bound to a node OR we are bound to a relevant node
@@ -678,38 +682,47 @@ public class XFormsControls {
                                  || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
                         handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                                staticState, currentControlElement, idPrefix, idPostfix);
+                                staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
                     }
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
-                contextStack.popBinding();
+                currentContextStack.popBinding();
             } else if (XFormsControlFactory.isCoreControl(currentControlName)) {
                 // Handle leaf control
-                contextStack.pushBinding(pipelineContext, currentControlElement);
-                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                currentContextStack.pushBinding(pipelineContext, currentControlElement);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
-                contextStack.popBinding();
+                currentContextStack.popBinding();
             } else if (currentControlName.equals("variable")) {
                 // Handle xxforms:variable specifically
 
                 // Create variable object
-                final Variable variable = new Variable(containingDocument, contextStack, currentControlElement);
+                final Variable variable = new Variable(containingDocument, currentContextStack, currentControlElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                contextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
                 variablesCount++;
             } else if (staticState.isComponent(currentControlElement.getQName())) {
                 // Handle components
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
-                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
                 {
-                    // Recurse into component
-                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(controlId);
+                    // Compute new id prefix for nested component
+                    final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
+
+                    // Create new container and initialize it
+                    final XFormsContainer newContainer = new XFormsContainer(staticControlId, effectiveControlId, newIdPrefix, XFormsUtils.getNodeLocationData(currentControlElement), currentContainer);
+                    newContainer.addAllModels();// NOTE: there may or may not be nested models
+                    newContainer.initializeModels(pipelineContext);
+                    newContainer.getContextStack().resetBindingContext(pipelineContext);
+
+                    // Recurse into component tree
+                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(staticControlId);
                     handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                            staticState, shadowTreeDocumentElement, idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
+                            staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
 
@@ -720,7 +733,7 @@ public class XFormsControls {
 
         // Unscope all variables
         for (int i = 0; i < variablesCount; i++)
-            contextStack.popBinding();
+            currentContextStack.popBinding();
     }
 
     /**
@@ -749,9 +762,9 @@ public class XFormsControls {
     }
 
     private static interface ControlElementVisitorListener {
-        public void startVisitControl(Element controlElement, String effectiveControlId);
+        public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId);
         public void endVisitControl(Element controlElement, String effectiveControlId);
-        public void startRepeatIteration(int iteration, String effectiveIterationId);
+        public void startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId);
         public void endRepeatIteration(int iteration);
     }
 

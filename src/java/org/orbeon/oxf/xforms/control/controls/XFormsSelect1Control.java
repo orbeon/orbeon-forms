@@ -17,16 +17,18 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an xforms:select1 control.
@@ -40,8 +42,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     private String xxformsRefresh;
     private List items;
 
-    public XFormsSelect1Control(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
+    public XFormsSelect1Control(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+        super(container, parent, element, name, id);
         this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
     }
 

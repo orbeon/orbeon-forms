@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.apache.commons.lang.StringUtils;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 
 import java.util.*;
 

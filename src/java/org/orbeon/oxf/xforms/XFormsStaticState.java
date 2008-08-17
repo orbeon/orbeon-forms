@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.collections.OrderedMap;
+import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -42,8 +44,6 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.apache.commons.collections.OrderedMap;
-import org.apache.commons.collections.map.LinkedMap;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
@@ -167,7 +167,7 @@ public class XFormsStaticState {
 
         final Element staticStateElement = staticStateDocument.getRootElement();
 
-//        System.out.println(Dom4jUtils.domToString(staticStateDocument));
+        System.out.println(Dom4jUtils.domToString(staticStateDocument));
 
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
@@ -388,8 +388,9 @@ public class XFormsStaticState {
 
                 if (!currentElementQName.equals(XFormsConstants.XFORMS_MODEL_QNAME)
                         && !currentElementQName.equals(XMLConstants.XHTML_HTML_QNAME)
+                        && !XFormsConstants.XBL_NAMESPACE_URI.equals(currentElement.getNamespaceURI())
                         && currentElement.getNamespaceURI() != null && !"".equals(currentElement.getNamespaceURI())) {
-                    // Any element in a namespace (xforms:*, xxforms:*, exforms:*) except xforms:model and xhtml:html
+                    // Any element in a namespace (xforms:*, xxforms:*, exforms:*, custom namespaces) except xforms:model, xhtml:html and xbl:*
 
                     // Copy the element because we may need it in staticStateDocument for encoding
                     controlsElement.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
@@ -403,7 +404,7 @@ public class XFormsStaticState {
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
-            final List extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, locationData);
+            final List extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
             for (Iterator i = extractedModels.iterator(); i.hasNext();) {
                 final Document currentModelDocument = (Document) i.next();
@@ -463,8 +464,8 @@ public class XFormsStaticState {
                         // Create and remember factory for this QName
                         componentsFactories.put(currentQNameMatch,
                             new XFormsControlFactory.Factory() {
-                                public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-                                    return new XFormsComponentControl(containingDocument, parent, element, name, effectiveId);
+                                public XFormsControl createXFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                                    return new XFormsComponentControl(container, parent, element, name, effectiveId);
                                 }
                             });
 
@@ -849,7 +850,7 @@ public class XFormsStaticState {
             // Iterate over models
             for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String prefixedId = (String) currentEntry.getKey();
+                //final String prefixedId = (String) currentEntry.getKey();
 
                 final Element modelElement; {
                 final Document modelDocument = (Document) currentEntry.getValue();
@@ -907,17 +908,12 @@ public class XFormsStaticState {
                         // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
 
                         // If the document has a template, recurse into it
-                        final Document shadowTreeDocument = generateXBLShadowContent(controlElement, bindingElement);
-                        if (shadowTreeDocument != null) {
-
-                            // Remember shadow tree for this static id
-                            fullShadowTrees.put(staticId, shadowTreeDocument);
-                            final Document compactShadowTreeDocument = filterShadowTree(shadowTreeDocument);
-                            compactShadowTrees.put(staticId, compactShadowTreeDocument);
+                        final Document fullShadowTreeDocument = generateXBLShadowContent(controlElement, bindingElement);
+                        if (fullShadowTreeDocument != null) {
 
                             // Extract models from components instances
-                            final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
-                            final List extractedModels = extractNestedModels(pipelineContext, compactShadowTreeWrapper, locationData);
+                            final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
+                            final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
 
                             for (Iterator i = extractedModels.iterator(); i.hasNext();) {
                                 final Document currentModelDocument = (Document) i.next();
@@ -927,10 +923,15 @@ public class XFormsStaticState {
 
                             XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
 
+                            // Remember full shadow tree for this static id
+                            fullShadowTrees.put(staticId, fullShadowTreeDocument);
+
+                            // Generate compact shadow tree for this static id
+                            final Document compactShadowTreeDocument = filterShadowTree(fullShadowTreeDocument);
+                            compactShadowTrees.put(staticId, compactShadowTreeDocument);
+
                             // TODO: the nested ids must be passed with prefix, right?
                             analyzeComponentTree(pipelineContext, xpathConfiguration, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
-
-                            // TODO: Extract models within XBL
                         }
                     }
                 }
@@ -1118,7 +1119,7 @@ public class XFormsStaticState {
         }
     }
 
-    private static List extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, LocationData locationData) {
+    private static List extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
 
         final List result = new ArrayList();
 
@@ -1130,11 +1131,17 @@ public class XFormsStaticState {
             for (Iterator i = modelElements.iterator(); i.hasNext();) {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                 final Element currentModelElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-                // Copy the element because we may need it in staticStateDocument for encoding
-                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement);
+
+                final Document modelDocument;
+                if (detach) {
+                    modelDocument = Dom4jUtils.createDocument();
+                    modelDocument.setRootElement((Element) currentModelElement.detach());
+                } else {
+                    // Copy the element because we may need it in staticStateDocument for encoding
+                    modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement);
+                }
 
                 result.add(modelDocument);
-                currentModelElement.detach();// the element is no longer needed within the controls
             }
         }
 

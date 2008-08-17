@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.NamespaceResolver;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.sort.SortExpression;
 import org.orbeon.saxon.sort.SortKeyDefinition;
 import org.orbeon.saxon.trans.IndependentContext;

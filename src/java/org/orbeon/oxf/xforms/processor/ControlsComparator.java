@@ -13,12 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-
 import java.util.List;
-import java.util.Map;
 
 public interface ControlsComparator {
     public void diff(List state1, List state2);

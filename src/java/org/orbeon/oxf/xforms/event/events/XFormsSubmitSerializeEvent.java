@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
-import org.dom4j.Element;
-import org.dom4j.Document;
 
 import java.util.Collections;
 

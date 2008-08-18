@@ -45,11 +45,11 @@ import java.util.*;
 /**
  * Represents an XForms containing document.
  *
- * The containing document includes:
+ * The containing document:
  *
- * o XForms models (including multiple instances)
- * o XForms controls
- * o Event handlers hierarchy
+ * o Is the container for root XForms models (including multiple instances)
+ * o Contains XForms controls
+ * o Handles event handlers hierarchy
  */
 public class XFormsContainingDocument extends XFormsContainer {
 
@@ -163,7 +163,8 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, XFormsURIResolver uriResolver) {
 
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", xformsStaticState.getLocationData(), null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
+        setLocationData(xformsStaticState.getLocationData());
 
         logDebug("containing document", "creating new ContainingDocument (static state object provided).");
 
@@ -196,7 +197,7 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
 
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", xformsStaticState != null ? xformsStaticState.getLocationData() : null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
 
         if (xformsStaticState != null) {
             // Use passed static state object
@@ -207,8 +208,10 @@ public class XFormsContainingDocument extends XFormsContainer {
             // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
             logDebug("containing document", "restoring containing document (static state object not provided).");
             this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
-            setLocationData(this.xformsStaticState.getLocationData());
         }
+
+        // Make sure there is location data
+        setLocationData(this.xformsStaticState.getLocationData());
 
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
@@ -241,7 +244,7 @@ public class XFormsContainingDocument extends XFormsContainer {
      * Legacy constructor for XForms Classic.
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsModel xformsModel) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
 
         addModel(xformsModel);
 
@@ -1049,27 +1052,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         return response;
     }
 
-    public void startOutermostActionHandler() {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.startOutermostActionHandler();
-        }
-    }
-
-    public void endOutermostActionHandler(PipelineContext pipelineContext) {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.endOutermostActionHandler(pipelineContext);
-        }
-    }
-
-    public void synchronizeInstanceDataEventState() {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.synchronizeInstanceDataEventState();
-        }
-    }
-
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
 
         final String eventName = event.getEventName();
@@ -1108,6 +1090,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Dispatch to all models
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
+            // TODO: Dispatch to children containers
             dispatchEvent(pipelineContext, new XXFormsOnlineEvent(currentModel));
         }
         this.goingOnline = true;
@@ -1142,6 +1125,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Dispatch xxforms-offline to all models
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
+            // TODO: Dispatch to children containers
             dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
         }
         this.goingOnline = false;

@@ -167,7 +167,7 @@ public class XFormsStaticState {
 
         final Element staticStateElement = staticStateDocument.getRootElement();
 
-        System.out.println(Dom4jUtils.domToString(staticStateDocument));
+//        System.out.println(Dom4jUtils.domToString(staticStateDocument));
 
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
@@ -193,8 +193,6 @@ public class XFormsStaticState {
         if (namespacesMap == null) {
             this.namespacesMap = new HashMap();
             try {
-//                System.out.println(Dom4jUtils.domToString(staticStateDocument));
-
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
                     // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?

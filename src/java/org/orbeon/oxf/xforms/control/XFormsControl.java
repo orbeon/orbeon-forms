@@ -500,6 +500,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         // XForms 1.1: "This action affects deferred updates by performing deferred update in its
                         // initialization and by setting the deferred update flags for recalculate, revalidate and
                         // refresh."
+                        // TODO: Nested containers?
                         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
                             final XFormsModel currentModel = (XFormsModel) i.next();
 

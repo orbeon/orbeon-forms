@@ -253,6 +253,7 @@ public class XFormsModelBinds {
         {
             boolean controlFound = false;
             // Iterate through models
+            // TODO: Nested containers
             for (Iterator h = containingDocument.getModels().iterator(); h.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) h.next();
                 final List offlineBinds = currentModel.getBinds().getOfflineBinds();
@@ -324,6 +325,7 @@ public class XFormsModelBinds {
         sb.append("},\"variables\": {");
         {
             // Iterate through models
+            // TODO: Nested containers
             for (Iterator h = containingDocument.getModels().iterator(); h.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) h.next();
 

@@ -32,7 +32,10 @@ import java.util.*;
  *
  * For now there is no nested component tree. There is a single components tree in XFormsControls.
  *
- * We may use this for nested repeat iterations as well.
+ * In the future:
+ *
+ * o We may use this for nested repeat iterations as well.
+ * o We may build nested component trees.
  */
 public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerContainer {
 
@@ -58,11 +61,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
     private List models = new ArrayList();  // List<XFormsModel>
     private Map modelsMap = new HashMap();  // Map<String, XFormsModel> of effective model id to model
 
-    protected XFormsContainer(String staticId, String effectiveId, String fullPrefix, LocationData locationData, XFormsContainer parentContainer) {
+    protected XFormsContainer(String staticId, String effectiveId, String fullPrefix, XFormsContainer parentContainer) {
         this.staticId = staticId;
         this.effectiveId = effectiveId;
         this.fullPrefix = fullPrefix;
-        this.locationData = locationData;
         this.parentContainer = parentContainer;
 
         if (parentContainer != null) {
@@ -121,8 +123,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         return (XFormsContainer) ((childrenContainers != null) ? childrenContainers.get(staticId) : null);
     }
 
-    public XFormsContainer createChildContainer(String staticId, String effectiveId, String prefix, LocationData locationData) {
-        return new XFormsContainer(staticId, effectiveId, prefix, locationData, this);
+    public XFormsContainer createChildContainer(String staticId, String effectiveId, String prefix) {
+        return new XFormsContainer(staticId, effectiveId, prefix, this);
     }
 
     /**
@@ -161,7 +163,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             }
 
             // Iterate over all the models
-            for (Iterator j = getModels().iterator(); j.hasNext();) {
+            for (Iterator j = models.iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
 
                 // Make sure there is at least one refresh
@@ -262,7 +264,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
      * @return      instance containing the node
      */
     public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
+        for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
             final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
             if (currentInstance != null)
@@ -279,7 +281,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
      * @return      instance containing the node
      */
     public XFormsInstance findInstance(String instanceId) {
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
+        for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
             final XFormsInstance currentInstance = currentModel.getInstance(instanceId);
             if (currentInstance != null)
@@ -291,7 +293,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
     protected void serializeInstances(Element instancesElement) {
 
         // Serialize this container's model's
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
+        for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
 
             if (currentModel.getInstances() != null) {
@@ -406,8 +408,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             XFormsContainer childContainer = getChildById(currentPart);
             if (childContainer == null) {
                 // Create container
-                // TODO: how is locationData set then?
-                childContainer = createChildContainer(currentPart, currentPrefix + currentPart, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR, null);
+                childContainer = createChildContainer(currentPart, currentPrefix + currentPart, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR);
                 childContainer.addAllModels();
             }
 
@@ -418,7 +419,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
     }
 
     protected void restoreModelsState(PipelineContext pipelineContext) {
-        // Restore models in this container
+        // Handle this container
         for (Iterator iterator = models.iterator(); iterator.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) iterator.next();
             currentModel.initializeState(pipelineContext);
@@ -428,6 +429,51 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
                 final XFormsContainer currentContainer = (XFormsContainer) i.next();
                 currentContainer.restoreModelsState(pipelineContext);
+            }
+        }
+    }
+
+    public void startOutermostActionHandler() {
+        // Handle this container
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.startOutermostActionHandler();
+        }
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.startOutermostActionHandler();
+            }
+        }
+    }
+
+    public void endOutermostActionHandler(PipelineContext pipelineContext) {
+        // Handle this container
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.endOutermostActionHandler(pipelineContext);
+        }
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.endOutermostActionHandler(pipelineContext);
+            }
+        }
+    }
+
+    public void synchronizeInstanceDataEventState() {
+        // Handle this container
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.synchronizeInstanceDataEventState();
+        }
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.synchronizeInstanceDataEventState();
             }
         }
     }

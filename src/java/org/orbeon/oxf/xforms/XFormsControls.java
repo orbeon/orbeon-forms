@@ -717,9 +717,7 @@ public class XFormsControls {
                     XFormsContainer newContainer = currentContainer.getChildById(staticControlId);
                     if (newContainer == null) {
                         // Container does not exist yet, create one
-                        newContainer = currentContainer.createChildContainer(staticControlId, effectiveControlId, newIdPrefix,
-                                XFormsUtils.getNodeLocationData(currentControlElement));
-
+                        newContainer = currentContainer.createChildContainer(staticControlId, effectiveControlId, newIdPrefix);
                         newContainer.addAllModels();// NOTE: there may or may not be nested models
                         newContainer.initializeModels(pipelineContext);
                     } else {
@@ -727,6 +725,9 @@ public class XFormsControls {
                         // o controls are rebuilt
                         // o containers have been restored from the dynamic state
                     }
+
+                    // Make sure there is location data
+                    newContainer.setLocationData(XFormsUtils.getNodeLocationData(currentControlElement));
 
                     // In all cases, reset the binding context as this is used for recursing in the tree below
                     newContainer.setBindingContext(currentContextStack.getCurrentBindingContext());

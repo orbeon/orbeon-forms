@@ -33,6 +33,7 @@ public class XXFormsListModels extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
+        // TODO: Nested containers
         final List models = containingDocument.getModels();
 
         if (models != null && models.size() > 0) {

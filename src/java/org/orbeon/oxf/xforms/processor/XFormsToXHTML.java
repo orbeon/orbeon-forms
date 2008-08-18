@@ -277,6 +277,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Set caching dependencies if the input was actually read
+        // TODO: Nested containers
         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
 

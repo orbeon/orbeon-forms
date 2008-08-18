@@ -169,7 +169,7 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 /* Table of contents */
-.fr-toc { color: #666699 }
+.fr-toc { color: #666699; padding: 0 1em 0 1em }
 
 /* Error summary */
 .fr-error-title {

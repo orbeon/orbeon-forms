@@ -160,7 +160,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-unsaved-data { color: red }
 
 /* Table of contents */
-.fr-toc { padding: 0 1em 0 1em }
+.fr-toc { }
 
 /* Error summary */
 .fr-error-summary {

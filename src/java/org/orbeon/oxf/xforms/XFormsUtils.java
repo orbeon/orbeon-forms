@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -24,6 +25,7 @@ import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
@@ -1353,6 +1355,18 @@ public class XFormsUtils {
             return effectiveId.substring(0, prefixIndex + 1);
         } else {
             return "";
+        }
+    }
+
+    public static String[] getEffectiveIdPrefixParts(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int prefixIndex = effectiveId.lastIndexOf(XFormsConstants.COMPONENT_SEPARATOR);
+        if (prefixIndex != -1) {
+            return StringUtils.split(effectiveId.substring(0, prefixIndex), XFormsConstants.COMPONENT_SEPARATOR);
+        } else {
+            return new String[0];
         }
     }
 }

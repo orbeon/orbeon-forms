@@ -1352,28 +1352,10 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         final Document dynamicStateDocument = Dom4jUtils.createDocument();
         final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-        // Output instances
+        // Output all instances
         {
             final Element instancesElement = dynamicStateElement.addElement("instances");
-            for (Iterator i = getModels().iterator(); i.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) i.next();
-
-                if (currentModel.getInstances() != null) {
-                    for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                        final XFormsInstance currentInstance = (XFormsInstance) j.next();
-
-                        // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
-
-                        if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
-                            // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
-                            instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
-
-                            // Log instance if needed
-                            currentInstance.logIfNeeded(this, "storing instance to dynamic state");
-                        }
-                    }
-                }
-            }
+            serializeInstances(instancesElement);
         }
 
         // Output divs information
@@ -1482,72 +1464,14 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         // Extract and restore instances
         {
-            // Get instances from dynamic state first
             final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
-            if (instancesElement != null) {
-                for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
-                    final Element instanceElement = (Element) i.next();
-
-                    // Create and set instance document on current model
-                    final XFormsInstance newInstance = new XFormsInstance(instanceElement);
-
-                    if (newInstance.getDocumentInfo() == null) {
-                        // Instance is not initialized yet
-
-                        // This means that the instance was application shared
-                        if (!newInstance.isApplicationShared())
-                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
-
-                        final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, newInstance.getEffectiveId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
-                        getModelByEffectiveId(sharedInstance.getEffectiveModelId()).setInstance(sharedInstance, false);
-
-                    } else {
-                        // Instance is initialized, just use it
-                        getModelByEffectiveId(newInstance.getEffectiveModelId()).setInstance(newInstance, newInstance.isReplaced());
-                    }
-
-                    // Log instance if needed
-                    newInstance.logIfNeeded(this, "restoring instance from dynamic state");
-                }
-            }
-
-            // Then get instances from static state if necessary
-            final Map staticInstancesMap = xformsStaticState.getSharedInstancesMap();
-            if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
-                for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
-
-                    if (findInstance(currentInstance.getEffectiveId()) == null) {
-                        // Instance was not set from dynamic state
-
-                        if (currentInstance.getDocumentInfo() == null) {
-                            // Instance is not initialized yet
-
-                            // This means that the instance was application shared
-                            if (!currentInstance.isApplicationShared())
-                                throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
-
-                            final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, currentInstance.getEffectiveId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
-                            getModelByEffectiveId(sharedInstance.getEffectiveModelId()).setInstance(sharedInstance, false);
-
-                        } else {
-                            // Instance is initialized, just use it
-                            getModelByEffectiveId(currentInstance.getEffectiveModelId()).setInstance(currentInstance, false);
-                        }
-                    }
-                }
-            }
+            restoreInstances(pipelineContext, instancesElement);
         }
 
         // Restore models state
-        for (Iterator j = getModels().iterator(); j.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) j.next();
-            currentModel.initializeState(pipelineContext);
-        }
+        restoreModelsState(pipelineContext);
 
-        // Restore controls
+        // Restore controls state
         final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
         xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement, true);
         xformsControls.evaluateAllControlsIfNeeded(pipelineContext);

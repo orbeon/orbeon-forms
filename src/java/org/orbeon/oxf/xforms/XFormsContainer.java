@@ -13,7 +13,11 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.collections.OrderedMap;
+import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.Document;
+import org.dom4j.Element;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -24,7 +28,7 @@ import java.util.*;
 /**
  * Represent a container of models and controls.
  *
- * This is used at the top-level (XFormsContainingDocument) and by component instances (XFormsComponentControl).
+ * This is used at the top-level (XFormsContainingDocument) and by component instances.
  *
  * For now there is no nested component tree. There is a single components tree in XFormsControls.
  *
@@ -34,32 +38,36 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
     // Static id of the control using this container, e.g. my-foo-bar
     private final String staticId;
-    // Effective id of the control using this container, e.g. my-foo-bar.2
+    // Effective id of the control using this container, e.g. my-stuff$my-foo-bar.2
     private final String effectiveId;
-    // "" for the root container, "my-foo-bar$", etc.
-    private final String prefix;
+    // "" for the root container, "my-stuff$my-foo-bar$", etc.
+    private final String fullPrefix;
 
     private LocationData locationData;
-    private final XFormsContainer parentContainer;
 
+    // Hierarchy of containers
+    private final XFormsContainer parentContainer;
+    private OrderedMap childrenContainers;  // Map<String, XFormsContainer> of static id to container
+
+    // Binding context for this container (may be null)
     private XFormsContextStack.BindingContext bindingContext; 
 
     private XFormsContainingDocument containingDocument;
     private final XFormsContextStack contextStack;
 
-    private List models = new ArrayList();
-    private Map modelsMap = new HashMap();
+    private List models = new ArrayList();  // List<XFormsModel>
+    private Map modelsMap = new HashMap();  // Map<String, XFormsModel> of effective model id to model
 
-    public XFormsContainer(String staticId, String effectiveId, String prefix, LocationData locationData, XFormsContainer parentContainer) {
+    protected XFormsContainer(String staticId, String effectiveId, String fullPrefix, LocationData locationData, XFormsContainer parentContainer) {
         this.staticId = staticId;
         this.effectiveId = effectiveId;
-        this.prefix = prefix;
+        this.fullPrefix = fullPrefix;
         this.locationData = locationData;
         this.parentContainer = parentContainer;
 
-        // Get container binding context
         if (parentContainer != null) {
-            bindingContext = parentContainer.getContextStack().getCurrentBindingContext();
+            // Tell parent it has a child
+            parentContainer.addChild(this);
         }
 
         // Search for containing document
@@ -75,12 +83,26 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         this.contextStack = new XFormsContextStack(this);
     }
 
-    public String getPrefix() {
-        return prefix;
+    public String getFullPrefix() {
+        return fullPrefix;
     }
 
     public XFormsContainer getParentContainer() {
         return parentContainer;
+    }
+
+    public void addChild(XFormsContainer container) {
+        if (childrenContainers == null)
+            childrenContainers = new LinkedMap();
+        childrenContainers.put(container.getId(), container);
+    }
+
+    public Map getChildrenContainers() {
+        return childrenContainers;
+    }
+
+    public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
+        this.bindingContext = bindingContext;
     }
 
     public XFormsContextStack.BindingContext getBindingContext() {
@@ -95,6 +117,14 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         return contextStack;
     }
 
+    public XFormsContainer getChildById(String staticId) {
+        return (XFormsContainer) ((childrenContainers != null) ? childrenContainers.get(staticId) : null);
+    }
+
+    public XFormsContainer createChildContainer(String staticId, String effectiveId, String prefix, LocationData locationData) {
+        return new XFormsContainer(staticId, effectiveId, prefix, locationData, this);
+    }
+
     /**
      * Create and index models corresponding to this container's scope.
      */
@@ -105,7 +135,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             final Document modelDocument = (Document) currentEntry.getValue();
 
             final String currentPrefix = XFormsUtils.getEffectiveIdPrefix(prefixedId);
-            if (prefix.equals(currentPrefix)) {
+            if (fullPrefix.equals(currentPrefix)) {
                 final XFormsModel model = new XFormsModel(prefixedId, modelDocument);
                 model.setContainer(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument (really? should explain why)
 
@@ -157,7 +187,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         return (XFormsModel) ("".equals(modelEffectiveId) ? getDefaultModel() : modelsMap.get(modelEffectiveId));
     }
 
-    protected void addModel(XFormsModel model) {
+    protected void addModel(XFormsModel model) {// move to private once legacy caller is gone
         this.models.add(model);
         if (model.getEffectiveId() != null)
             this.modelsMap.put(model.getEffectiveId(), model);
@@ -256,6 +286,150 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
                 return currentInstance;
         }
         return null;
+    }
+
+    protected void serializeInstances(Element instancesElement) {
+
+        // Serialize this container's model's
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+
+            if (currentModel.getInstances() != null) {
+                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+
+                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
+
+                    if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
+                        // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
+                        instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
+
+                        // Log instance if needed
+                        currentInstance.logIfNeeded(getContainingDocument(), "storing instance to dynamic state");
+                    }
+                }
+            }
+        }
+
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.serializeInstances(instancesElement);
+            }
+        }
+    }
+
+    protected void restoreInstances(PipelineContext pipelineContext, Element instancesElement) {
+        // Get instances from dynamic state first
+        if (instancesElement != null) {
+            for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
+                final Element instanceElement = (Element) i.next();
+
+                // Create and set instance document on current model
+                final XFormsInstance newInstance = new XFormsInstance(instanceElement);
+
+                if (newInstance.getDocumentInfo() == null) {
+                    // Instance is not initialized yet
+
+                    // This means that the instance was application shared
+                    if (!newInstance.isApplicationShared())
+                        throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
+
+                    final SharedXFormsInstance sharedInstance
+                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getEffectiveId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
+
+                    setInstance(sharedInstance, false);
+                } else {
+                    // Instance is initialized, just use it
+                    setInstance(newInstance, newInstance.isReplaced());
+                }
+
+                // Log instance if needed
+                newInstance.logIfNeeded(containingDocument, "restoring instance from dynamic state");
+            }
+        }
+
+        // Then get instances from static state if necessary
+        final Map staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
+        if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
+            for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
+                final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+
+                if (findInstance(currentInstance.getEffectiveId()) == null) {
+                    // Instance was not set from dynamic state
+
+                    if (currentInstance.getDocumentInfo() == null) {
+                        // Instance is not initialized yet
+
+                        // This means that the instance was application shared
+                        if (!currentInstance.isApplicationShared())
+                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
+
+                        final SharedXFormsInstance sharedInstance
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getEffectiveId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
+                        setInstance(sharedInstance, false);
+                    } else {
+                        // Instance is initialized, just use it
+                        setInstance(currentInstance, false);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Set an instance by creating nested containers if needed.
+     *
+     * @param instance  instance to set
+     * @param replaced  whether the instance was replaced
+     */
+    private void setInstance(XFormsInstance instance, boolean replaced) {
+        final String fullModelPrefix = XFormsUtils.getEffectiveIdPrefix(instance.getEffectiveModelId());
+        final List parts = new ArrayList(Arrays.asList(XFormsUtils.getEffectiveIdPrefixParts(instance.getEffectiveModelId())));
+        ((XFormsContainer) containingDocument).setInstance(fullModelPrefix, "", parts, instance, replaced);
+    }
+
+    private void setInstance(String fullModelPrefix, String currentPrefix, List remainingParts, XFormsInstance instance, boolean replaced) {
+
+        if (fullModelPrefix.equals(fullPrefix)) {
+            // The instance must be set within a model of this container
+            final XFormsModel model = (XFormsModel) modelsMap.get(instance.getEffectiveModelId()); // model must exist as addAllModels() must have been called
+            model.setInstance(instance, replaced);
+        } else {
+            // The instance must be set within a child container
+            if (remainingParts.size() == 0)
+                throw new ValidationException("Cannot set instance: " + instance.getEffectiveId(), getLocationData());
+
+            final String currentPart = (String) remainingParts.get(0);
+            // Make sure there is a child container
+            XFormsContainer childContainer = getChildById(currentPart);
+            if (childContainer == null) {
+                // Create container
+                // TODO: how is locationData set then?
+                childContainer = createChildContainer(currentPart, currentPrefix + currentPart, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR, null);
+                childContainer.addAllModels();
+            }
+
+            // Recurse into container
+            remainingParts.remove(0);
+            childContainer.setInstance(fullModelPrefix, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR, remainingParts, instance, replaced);
+        }
+    }
+
+    protected void restoreModelsState(PipelineContext pipelineContext) {
+        // Restore models in this container
+        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) iterator.next();
+            currentModel.initializeState(pipelineContext);
+        }
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.restoreModelsState(pipelineContext);
+            }
+        }
     }
 
     public String getId() {

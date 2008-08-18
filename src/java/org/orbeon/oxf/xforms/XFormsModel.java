@@ -302,7 +302,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             instancesMap = new HashMap(instanceIds.size());
         }
         // Prepare and set instance
-        final String instanceId = instance.getEffectiveId();
+        final String instanceId = instance.getId();// use static id as instanceIds contains static ids
         final int instancePosition = instanceIds.indexOf(instanceId);
 
         instances.set(instancePosition, instance);

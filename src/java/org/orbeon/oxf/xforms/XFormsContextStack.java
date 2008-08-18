@@ -40,16 +40,12 @@ public class XFormsContextStack {
     private XFormsContainingDocument containingDocument;
     private XFormsFunction.Context functionContext;
 
-    private BindingContext parentBindingContext;
-
     private Stack contextStack = new Stack();
 
     public XFormsContextStack(XFormsContainer container) {
         this.container = container;
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(container, this);
-
-        parentBindingContext = container.getBindingContext();
     }
 
     // Constructor for binds and submissions
@@ -57,8 +53,6 @@ public class XFormsContextStack {
         this.container = containingModel.getContainer();
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(containingModel, this);
-
-        parentBindingContext = container.getBindingContext();
     }
 
     public XFormsFunction.Context getFunctionContext() {
@@ -87,9 +81,10 @@ public class XFormsContextStack {
             contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, defaultNode));
         } else {
             // Push parent context
-            if (parentBindingContext != null) {
+            final XFormsContextStack.BindingContext containerBindingContext = container.getBindingContext();
+            if (containerBindingContext != null) {
                 // This is the case where a component doesn't have local models; we decided to inherit the context of the parent
-                contextStack.push(parentBindingContext);
+                contextStack.push(containerBindingContext);
             } else {
                 // Push empty context
                 contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
@@ -249,7 +244,7 @@ public class XFormsContextStack {
         final XFormsModel newModel;
         final boolean isNewModel;
         if (modelId != null) {
-            newModel = (XFormsModel) container.resolveObjectById(container.getPrefix(), modelId);
+            newModel = (XFormsModel) container.resolveObjectById(container.getFullPrefix(), modelId);
             if (newModel == null)
                 throw new ValidationException("Invalid model id: " + modelId, locationData);
             isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed

@@ -713,10 +713,23 @@ public class XFormsControls {
                     // Compute new id prefix for nested component
                     final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
 
-                    // Create new container and initialize it
-                    final XFormsContainer newContainer = new XFormsContainer(staticControlId, effectiveControlId, newIdPrefix, XFormsUtils.getNodeLocationData(currentControlElement), currentContainer);
-                    newContainer.addAllModels();// NOTE: there may or may not be nested models
-                    newContainer.initializeModels(pipelineContext);
+                    // Get container
+                    XFormsContainer newContainer = currentContainer.getChildById(staticControlId);
+                    if (newContainer == null) {
+                        // Container does not exist yet, create one
+                        newContainer = currentContainer.createChildContainer(staticControlId, effectiveControlId, newIdPrefix,
+                                XFormsUtils.getNodeLocationData(currentControlElement));
+
+                        newContainer.addAllModels();// NOTE: there may or may not be nested models
+                        newContainer.initializeModels(pipelineContext);
+                    } else {
+                        // Container exists
+                        // o controls are rebuilt
+                        // o containers have been restored from the dynamic state
+                    }
+
+                    // In all cases, reset the binding context as this is used for recursing in the tree below
+                    newContainer.setBindingContext(currentContextStack.getCurrentBindingContext());
                     newContainer.getContextStack().resetBindingContext(pipelineContext);
 
                     // Recurse into component tree

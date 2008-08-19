@@ -169,18 +169,20 @@
                                             <xhtml:td>
                                                 <fr:repeat nodeset="response/headers/header" id="fb-response-headers-repeat"
                                                            columns="2" appearance="xxforms:table" readonly="true">
-                                                    <xhtml:tr>
-                                                        <xhtml:td class="fb-nowrap">
-                                                            <xforms:output value="name">
-                                                                <xforms:label>Name</xforms:label>
-                                                            </xforms:output>
-                                                        </xhtml:td>
-                                                        <xhtml:td>
-                                                            <xforms:output value="string-join(value, ', ')">
-                                                                <xforms:label>Value(s)</xforms:label>
-                                                            </xforms:output>
-                                                        </xhtml:td>
-                                                    </xhtml:tr>
+                                                    <fr:body>
+                                                        <xhtml:tr>
+                                                            <xhtml:td class="fb-nowrap">
+                                                                <xforms:output value="name">
+                                                                    <xforms:label>Name</xforms:label>
+                                                                </xforms:output>
+                                                            </xhtml:td>
+                                                            <xhtml:td>
+                                                                <xforms:output value="string-join(value, ', ')">
+                                                                    <xforms:label>Value(s)</xforms:label>
+                                                                </xforms:output>
+                                                            </xhtml:td>
+                                                        </xhtml:tr>
+                                                    </fr:body>
                                                 </fr:repeat>
                                             </xhtml:td>
                                         </xhtml:tr>

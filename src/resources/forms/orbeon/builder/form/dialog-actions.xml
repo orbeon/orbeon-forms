@@ -83,124 +83,132 @@
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label>Set Service Request Values</xforms:label>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                    <xforms:label>Source Control</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>[Select...]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input ref="xxforms:variable[@name = 'path']/@select">
-                                    <xforms:label>Destination XPath Expression</xforms:label>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
+                        <fr:body>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
+                                        <xforms:label>Source Control</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                            <!-- Try to build a reasonably user-friendly label -->
+                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input ref="xxforms:variable[@name = 'path']/@select">
+                                        <xforms:label>Destination XPath Expression</xforms:label>
+                                    </xforms:input>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </fr:body>
                     </fr:repeat>
                 </xforms:group>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label>Set Database Service Parameters</xforms:label>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                    <xforms:label>Source Control</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>[Select...]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input ref="xxforms:variable[@name = 'parameter']/@select">
-                                    <xforms:label>Parameter Number</xforms:label>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
+                        <fr:body>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
+                                        <xforms:label>Source Control</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                            <!-- Try to build a reasonably user-friendly label -->
+                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input ref="xxforms:variable[@name = 'parameter']/@select">
+                                        <xforms:label>Parameter Number</xforms:label>
+                                    </xforms:input>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </fr:body>
                     </fr:repeat>
                 </xforms:group>
                 <!-- Set control values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done']">
                     <xforms:label>Set Response Control Values</xforms:label>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']" columns="2" appearance="xxforms:table">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                    <xforms:label>Destination Control</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>[Select...]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <xforms:label value="substring-before(@id, '-control')"/>
-                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input ref="xxforms:variable[@name = 'control-value']/@select">
-                                    <xforms:label>Source XPath Expression</xforms:label>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
+                        <fr:body>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
+                                        <xforms:label>Destination Control</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                            <xforms:label value="substring-before(@id, '-control')"/>
+                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input ref="xxforms:variable[@name = 'control-value']/@select">
+                                        <xforms:label>Source XPath Expression</xforms:label>
+                                    </xforms:input>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </fr:body>
                     </fr:repeat>
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($body//(xforms:select | xforms:select1))]">
                     <xforms:label>Set Response Selection Control Items</xforms:label>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <!-- Only list selection controls -->
-                                <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                    <xforms:label>Destination Control</xforms:label>
-                                    <xforms:hint>Selection control</xforms:hint>
-                                    <xforms:item>
-                                        <xforms:label>[Select...]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="$body//(xforms:select | xforms:select1)[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <!-- Only display this if a selection control is picked -->
-                                <xforms:group ref=".[xxforms:variable[@name = 'control-name']/@select != '']">
-                                    <xforms:label>Itemset</xforms:label>
-                                    <xforms:hint>XPath expressions to build a new itemset</xforms:hint>
-                                    <xhtml:div class="fb-parameters">
-                                        <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
-                                            <xforms:label>Items</xforms:label>
-                                            <xforms:hint>XPath expression returning all response item nodes</xforms:hint>
-                                        </xforms:input>
-                                        <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
-                                            <xforms:label>Label</xforms:label>
-                                            <xforms:hint>XPath expression relative to an item node</xforms:hint>
-                                        </xforms:input>
-                                        <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
-                                            <xforms:label>Value</xforms:label>
-                                            <xforms:hint>XPath expression relative to an item node</xforms:hint>
-                                        </xforms:input>
-                                    </xhtml:div>
-                                </xforms:group>
-                            </xhtml:td>
-                        </xhtml:tr>
+                        <fr:body>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <!-- Only list selection controls -->
+                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
+                                        <xforms:label>Destination Control</xforms:label>
+                                        <xforms:hint>Selection control</xforms:hint>
+                                        <xforms:item>
+                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="$body//(xforms:select | xforms:select1)[(@ref or @bind) and ends-with(@id, '-control')]">
+                                            <!-- Try to build a reasonably user-friendly label -->
+                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <!-- Only display this if a selection control is picked -->
+                                    <xforms:group ref=".[xxforms:variable[@name = 'control-name']/@select != '']">
+                                        <xforms:label>Itemset</xforms:label>
+                                        <xforms:hint>XPath expressions to build a new itemset</xforms:hint>
+                                        <xhtml:div class="fb-parameters">
+                                            <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
+                                                <xforms:label>Items</xforms:label>
+                                                <xforms:hint>XPath expression returning all response item nodes</xforms:hint>
+                                            </xforms:input>
+                                            <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
+                                                <xforms:label>Label</xforms:label>
+                                                <xforms:hint>XPath expression relative to an item node</xforms:hint>
+                                            </xforms:input>
+                                            <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
+                                                <xforms:label>Value</xforms:label>
+                                                <xforms:hint>XPath expression relative to an item node</xforms:hint>
+                                            </xforms:input>
+                                        </xhtml:div>
+                                    </xforms:group>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </fr:body>
                     </fr:repeat>
                 </xforms:group>
             </xforms:group>

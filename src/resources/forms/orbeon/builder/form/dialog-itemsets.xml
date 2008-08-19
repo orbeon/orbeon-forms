@@ -23,13 +23,13 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-itemset-editor-dialog" appearance="minimal">
-
+      id="fb-itemset-editor-dialog" appearance="minimal" model="fb-itemset-model">
     <xforms:label>Itemset Editor</xforms:label>
+
     <xhtml:div class="fb-dialog-body">
 
         <xforms:group class="fb-language-choice fb-hide-alert">
-            <xforms:select1 appearance="minimal" ref="$variables/itemset-lang">
+            <xforms:select1 appearance="minimal" ref="$itemset-lang">
                 <xforms:label class="xforms-disabled">Resources Language</xforms:label>
                 <xforms:itemset nodeset="$resources/resource">
                     <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
@@ -38,32 +38,34 @@
             </xforms:select1>
         </xforms:group>
 
-        <xforms:group context="instance('fb-itemset-instance')" appearance="xxforms:internal">
+        <xforms:group context="instance('fb-items-instance')" appearance="xxforms:internal">
             <fr:repeat nodeset="item" id="fb-itemset-repeat" origin="instance('fb-item-template')" columns="2" appearance="xxforms:table">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="label[@xml:lang = $variables/itemset-lang]" id="fb-itemset-label-input">
-                            <xforms:label>Label</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
-                                <xforms:setfocus control="fb-itemset-label-input"/>
-                            </xforms:action>
-                        </xforms:input>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="value">
-                            <xforms:label>Value</xforms:label>
-                            <!-- Propose default value upon focus -->
-                            <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
-                                <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $variables/itemset-lang]), '\s') return lower-case($w), '-')"/>
-                            </xforms:action>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
-                                <xforms:setfocus control="fb-itemset-label-input"/>
-                            </xforms:action>
-                        </xforms:input>
-                    </xhtml:td>
-                </xhtml:tr>
+                <fr:body>
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input ref="label[@xml:lang = $itemset-lang]" id="fb-itemset-label-input">
+                                <xforms:label>Label</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
+                                    <xforms:setfocus control="fb-itemset-label-input"/>
+                                </xforms:action>
+                            </xforms:input>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:input ref="value">
+                                <xforms:label>Value</xforms:label>
+                                <!-- Propose default value upon focus -->
+                                <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
+                                    <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s') return lower-case($w), '-')"/>
+                                </xforms:action>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
+                                    <xforms:setfocus control="fb-itemset-label-input"/>
+                                </xforms:action>
+                            </xforms:input>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </fr:body>
             </fr:repeat>
         </xforms:group>
         
@@ -88,16 +90,18 @@
 
         <!-- Build itemset with all languages -->
 
+        <xxforms:variable name="resource-id" select="event('fb:resource-id')"/>
+        <xforms:setvalue ref="itemset-resource-id" value="$resource-id"/>
+
         <!-- Clear itemset instance -->
-        <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
+        <xforms:delete context="instance('fb-items-instance')" while="*" nodeset="*"/>
 
         <!-- Iterate over all of the current language's items -->
-        <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
         <xforms:action xxforms:iterate="$current-resources/*[name() = $resource-id]/item">
             <xxforms:variable name="item" select="."/>
             <!-- Insert the current language's item and add xml:lang attribute on label -->
-            <xforms:insert context="instance('fb-itemset-instance')" nodeset="item" origin="$item"/>
-            <xforms:insert context="instance('fb-itemset-instance')/item[last()]/label" origin="$current-resources/@xml:lang"/>
+            <xforms:insert context="instance('fb-items-instance')" nodeset="item" origin="$item"/>
+            <xforms:insert context="instance('fb-items-instance')/item[last()]/label" origin="$current-resources/@xml:lang"/>
             <!-- Iterate over all the other languages  -->
             <xforms:action xxforms:iterate="$resources/resource[@xml:lang != $fb-lang]">
                 <xxforms:variable name="other-resource" select="."/>
@@ -105,15 +109,18 @@
 
                 <!-- Insert the label for the other language and add xml:lang attribute -->
                 <xforms:action if="exists($other-item/label)">
-                    <xforms:insert nodeset="instance('fb-itemset-instance')/item[last()]/label" origin="$other-item/label"/>
-                    <xforms:insert context="instance('fb-itemset-instance')/item[last()]/label[last()]" origin="$other-resource/@xml:lang"/>
+                    <xforms:insert nodeset="instance('fb-items-instance')/item[last()]/label" origin="$other-item/label"/>
                 </xforms:action>
+                <xforms:action if="not(exists($other-item/label))">
+                    <xforms:insert nodeset="instance('fb-items-instance')/item[last()]/label" origin="xxforms:element('label')"/>
+                </xforms:action>
+                <xforms:insert context="instance('fb-items-instance')/item[last()]/label[last()]" origin="$other-resource/@xml:lang"/>
             </xforms:action>
         </xforms:action>
 
         <!-- Insert new blank item if there were no items -->
-        <xforms:action if="not(exists(instance('fb-itemset-instance')/item))">
-            <xforms:insert context="instance('fb-itemset-instance')"
+        <xforms:action if="not(exists(instance('fb-items-instance')/item))">
+            <xforms:insert context="instance('fb-items-instance')"
                            origin="xxforms:element('item', (xxforms:element('label', xxforms:attribute('xml:lang', $fb-lang)), xxforms:element('value')))"/>
         </xforms:action>
 
@@ -127,7 +134,7 @@
         <xforms:insert context="instance('fb-item-template')" nodeset="label" origin="xxforms:element('value')"/>
 
         <!-- Start with current language -->
-        <xforms:setvalue ref="$variables/itemset-lang" value="$fb-lang"/>
+        <xforms:setvalue ref="$itemset-lang" value="$fb-lang"/>
 
         <!-- Set focus when the dialog open  -->
         <xforms:setfocus control="fb-itemset-label-input"/>
@@ -138,7 +145,7 @@
 
         <!-- Copy back the items to all languages -->
 
-        <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
+        <xxforms:variable name="resource-id" select="itemset-resource-id" as="xs:string"/>
         <xforms:action xxforms:iterate="$resources/resource">
             <xxforms:variable name="current-lang" select="@xml:lang"/>
             <xxforms:variable name="current-resource" select="*[name() = $resource-id]"/>
@@ -148,7 +155,7 @@
                 <xforms:delete while="item" nodeset="item"/>
 
                 <!-- Copy all the new items (after existing elements if any) -->
-                <xforms:insert context="." nodeset="*" origin="instance('fb-itemset-instance')/item"/>
+                <xforms:insert context="." nodeset="*" origin="instance('fb-items-instance')/item"/>
 
                 <!-- Delete all labels with a different language -->
                 <xforms:delete xxforms:iterate="item/label[@xml:lang != $current-lang]" nodeset="."/>
@@ -160,7 +167,41 @@
         </xforms:action>
 
         <!-- Clear itemset instance -->
-        <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
+        <xforms:delete context="instance('fb-items-instance')" while="*" nodeset="*"/>
     </xforms:action>
+
+    <!-- Local model -->
+    <xforms:model id="fb-itemset-model">
+        <xforms:instance id="fb-itemset-instance">
+            <instance>
+                <!-- Itemset editor dialog -->
+                <itemset-resource-id/>
+                <itemset-lang/>
+            </instance>
+        </xforms:instance>
+        <xxforms:variable name="itemset-lang" select="itemset-lang" as="element(itemset-lang)"/>
+
+        <!-- Instance for the itemset editor -->
+        <xforms:instance id="fb-items-instance" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
+            <itemset>
+                <!-- Content will be like this -->
+                <!--<item>-->
+                    <!--<label xml:lang="en"/>-->
+                    <!--<label xml:lang="fr"/>-->
+                    <!--<value/>-->
+                <!--</item>-->
+            </itemset>
+        </xforms:instance>
+
+        <!-- Item template for the itemset editor -->
+        <xforms:instance id="fb-item-template" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
+            <item>
+                <!-- Content will be like this -->
+                <!--<label xml:lang="en"/>-->
+                <!--<label xml:lang="fr"/>-->
+                <!--<value/>-->
+            </item>
+        </xforms:instance>
+    </xforms:model>
 
 </xxforms:dialog>

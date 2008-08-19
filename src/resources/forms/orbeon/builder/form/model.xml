@@ -231,11 +231,6 @@
         <variables>
             <done/>
 
-            <!-- Itemset editor dialog -->
-            <!-- TODO: This can be refactored to a local model -->
-            <itemset-resource-id/>
-            <itemset-lang/>
-
             <!-- Currently open in-place editor -->
             <inplace-id/>
             <inplace-repeat-indexes/>
@@ -614,28 +609,6 @@
     <xforms:instance id="fb-components-instance">
         <!-- This will contain the default component available for the currently edited form -->
         <xbl:xbl/>
-    </xforms:instance>
-
-    <!-- Instance for the itemset editor -->
-    <xforms:instance id="fb-itemset-instance" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
-        <itemset>
-            <!-- Content will be like this -->
-            <!--<item>-->
-                <!--<label xml:lang="en"/>-->
-                <!--<label xml:lang="fr"/>-->
-                <!--<value/>-->
-            <!--</item>-->
-        </itemset>
-    </xforms:instance>
-
-    <!-- Item template for the itemset editor -->
-    <xforms:instance id="fb-item-template" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
-        <item>
-            <!-- Content will be like this -->
-            <!--<label xml:lang="en"/>-->
-            <!--<label xml:lang="fr"/>-->
-            <!--<value/>-->
-        </item>
     </xforms:instance>
 
     <!-- Template for outer bind -->

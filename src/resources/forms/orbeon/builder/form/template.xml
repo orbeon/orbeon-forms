@@ -97,6 +97,7 @@
             <fr:body>
                 <fr:section id="section-1-section" context="section-1">
                     <xforms:label ref="$form-resources/section-1/label"/>
+                    <xforms:help ref="$form-resources/section-1/help"/>
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>

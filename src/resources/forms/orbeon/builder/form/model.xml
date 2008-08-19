@@ -676,6 +676,7 @@
     <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi xxforms fb saxon xbl exforms">
         <fr:section id="" bind="">
             <xforms:label ref=""/>
+            <xforms:help ref=""/>
             <fr:grid columns="1">
                 <xhtml:tr>
                     <xhtml:td/>

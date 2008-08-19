@@ -97,8 +97,9 @@
                                     <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
                                     <xxforms:variable name="new-section-name" select="concat('section-', $next-section-id)"/>
 
-                                    <!-- Set xforms:label @ref value -->
+                                    <!-- Set xforms:label and xforms:help @ref values -->
                                     <xforms:setvalue ref="$new-section/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
+                                    <xforms:setvalue ref="$new-section/xforms:help/@ref" value="concat('$form-resources/section-', $next-section-id, '/help')"/>
 
                                     <!-- Set @id value -->
                                     <xforms:setvalue ref="$new-section/@id" value="concat($new-section-name, '-section')"/>

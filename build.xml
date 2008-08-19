@@ -194,13 +194,6 @@
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
-            <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
-            <exclude name="org/orbeon/oxf/processor/bpel/**/*.java"/>
-            <exclude name="org/orbeon/oxf/processor/IMProcessor*"/>
-            <exclude name="org/orbeon/oxf/processor/generator/Struts*.java"/>
-            <exclude name="org/orbeon/oxf/struts/**/*.java"/>
-            <exclude name="org/orbeon/oxf/util/Struts*.java"/>
-            <exclude name="org/orbeon/oxf/resources/Cache*"/>
         </javac>
     </target>
 
@@ -407,7 +400,6 @@
         <zip zipfile="${build.distrib.dir}/${project.name}-src.zip">
             <zipfileset dir="${build.root}">
                 <exclude name="build/**"/>
-                <exclude name="oxfmark/**"/>
                 <exclude name="src/examples/**"/>
                 <exclude name="tools/*.zip"/>
                 <exclude name="tools/*.sh"/>

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.collections.OrderedMap;
-import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
@@ -50,7 +48,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
     // Hierarchy of containers
     private final XFormsContainer parentContainer;
-    private OrderedMap childrenContainers;  // Map<String, XFormsContainer> of static id to container
+    private LinkedHashMap childrenContainers;  // Map<String, XFormsContainer> of static id to container
 
     // Binding context for this container (may be null)
     private XFormsContextStack.BindingContext bindingContext; 
@@ -95,7 +93,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
     public void addChild(XFormsContainer container) {
         if (childrenContainers == null)
-            childrenContainers = new LinkedMap();
+            childrenContainers = new LinkedHashMap();
         childrenContainers.put(container.getId(), container);
     }
 

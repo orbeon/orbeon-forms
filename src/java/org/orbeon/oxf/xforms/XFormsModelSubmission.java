@@ -19,10 +19,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -79,6 +76,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
 
     private String target;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
+    private String avtMode;
 
     private String avtVersion;
     private String avtEncoding;
@@ -164,6 +162,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
 
             target = submissionElement.attributeValue("target");
+
+            avtMode = submissionElement.attributeValue("mode");
 
             avtVersion = submissionElement.attributeValue("version");
 
@@ -444,6 +444,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Evaluate late AVTs
                 final String resolvedSerialization;
                 final String resolvedMediatype;
+                final String resolvedMode;
                 final String resolvedVersion;
                 final String resolvedEncoding;
                 final String resolvedSeparator;
@@ -461,6 +462,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
                     resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
                     resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
                     resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
                     resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
@@ -501,6 +503,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         throw new XFormsSubmissionException("xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
                                 "checking read-only and shared hints");
                 }
+
+                /* ************************************* Serialization ************************************* */
 
                 final Document documentToSubmit;
                 if (serialize) {
@@ -665,6 +669,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     defaultMediatypeForSerialization = null;
                 }
 
+                /* ************************************* Execute submission ************************************* */
+
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Get URL type
@@ -688,6 +694,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Actual request mediatype
                 final String actualRequestMediatype = (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype;
+
+                // Get async/sync
+                // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
+                final boolean isAsyncSubmission = isReplaceNone && "asynchronous".equals(resolvedMode);// for now we only support this with replace="none"
 
                 // Result information
                 ConnectionResult connectionResult = null;
@@ -726,6 +736,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                && !fURLNorewrite
                                && !isNoscript // This SHOULD work with isNoscript as well, but it turns out we get exceptions related to content handlers, so disable for now
                                && headerNames == null
+                               && !isAsyncSubmission // for now we don't handle optimized async; could be optimized in the future
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
                                         && XFormsProperties.isOptimizeLocalSubmission(containingDocument)
@@ -811,12 +822,47 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             // Compute absolute submission URL
                             final URL submissionURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
                             // Open connection
-                            connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
-                                    actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
-                                    actualRequestMediatype, messageBody,
-                                    headerNames, headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                            if (isAsyncSubmission) {
+
+                                // Gather remaining information to process the request
+                                final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+                                final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
+                                final Map headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
+                                            resolvedXXFormsUsername,  headerNames, headerNameValues, forwardSubmissionHeaders);
+
+                                // Pack call into a Runnable
+                                final Runnable runnable = new Runnable() {
+
+                                    public void run() {
+
+                                        // Here we just want to run the submission and not touch the HttpRequest or
+                                        // XFCD. Remember, we can't change XFCD because it may get out of the caches
+                                        // and not be picked up by further incoming Ajax requests.
+                                        NetUtils.openConnection(indentedLogger,
+                                            actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                            actualRequestMediatype, messageBody, headersMap);
+
+                                        // NOTE: In this very basic level of support, we don't support xforms-submit-done / xforms-submit-error handlers
+
+                                        // TODO: Do something with result, e.g. log?
+                                        // final ConnectionResult connectionResult = ...
+                                    }
+                                };
+
+                                // Tell XFCD that we have one more Runnable
+                                containingDocument.addAsynchronousSubmission(runnable);
+
+                            } else {
+                                // Just run it now
+                                connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
+                                        actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                        actualRequestMediatype, messageBody,
+                                        headerNames, headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                            }
                         }
                     }
+
+                    /* ************************************* Submission response ************************************* */
 
                     if (connectionResult != null && !connectionResult.dontHandleResponse) {
                         // Handle response

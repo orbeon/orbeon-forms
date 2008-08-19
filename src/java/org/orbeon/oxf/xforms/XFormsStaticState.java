@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.collections.OrderedMap;
-import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -79,7 +77,7 @@ public class XFormsStaticState {
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
     private Document controlsDocument;                  // controls cocument
-    private OrderedMap modelDocuments = new LinkedMap();// Map<String, Document> of model prefixed ids) to model documents
+    private LinkedHashMap modelDocuments = new LinkedHashMap();// Map<String, Document> of model prefixed ids) to model documents
     private SAXStore xhtmlDocument;                     // entire XHTML document for noscript mode only
 
     private Map xxformsScripts;                         // Map<String, String> of id to script content

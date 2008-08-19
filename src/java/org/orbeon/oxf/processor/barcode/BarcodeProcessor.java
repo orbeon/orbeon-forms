@@ -27,7 +27,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
+import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -37,7 +37,7 @@ import org.dom4j.Document;
 /**
  * This processor wraps around barcode4j.
  */
-public class BarcodeProcessor extends HttpBinarySerializer {
+public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is supposedly deprecated
 
     public static String DEFAULT_CONTENT_TYPE = "image/png";
 

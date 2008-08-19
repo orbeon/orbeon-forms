@@ -140,7 +140,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 // We return a ResultStore
                 final boolean[] read = new boolean[1];
                 final ExtendedResultStoreOutputStream resultStore = (ExtendedResultStoreOutputStream) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+                    public Object read(PipelineContext pipelineContext, ProcessorInput input) {
                         read[0] = true;
                         if (logger.isDebugEnabled())
                             logger.debug("Output not cached");
@@ -148,7 +148,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             final ExtendedResultStoreOutputStream resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream);
                             // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
                             // Other headers are set above 
-                            readInput(context, new ResponseWrapper(response) {
+                            readInput(pipelineContext, new ResponseWrapper(response) {
                                 public void setContentType(String contentType) {
                                     resultStoreOutputStream.setContentType(contentType);
                                     super.setContentType(contentType);

@@ -21,7 +21,6 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.xml.sax.*;
 
 import java.io.OutputStream;

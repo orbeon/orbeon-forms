@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
+import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPathCache;
@@ -44,7 +44,7 @@ import java.net.URL;
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
  */
-public class PDFTemplateProcessor extends HttpBinarySerializer {
+public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is supposedly deprecated
 
 //    static private Logger logger = LoggerFactory.createLogger(PDFTemplateProcessor.class);
 
@@ -82,7 +82,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 if (inputName != null) {
                     // Read the input
                     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, false, null, false, false, null, false));
+                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, true, false, null, false, false, null, false));
 
                     // Create the reader
                     reader = new PdfReader(os.toByteArray());
@@ -418,7 +418,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 if (inputName != null) {
                     // Read the input
                     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, false, null, false, false, null, false));
+                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, true, false, null, false, false, null, false));
 
                     // Create the image
                     image = Image.getInstance(os.toByteArray());

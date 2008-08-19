@@ -15,10 +15,8 @@ package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.serializer.HttpTextSerializer;
-import org.orbeon.oxf.processor.serializer.SerializerContentHandler;
+import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
 
 import javax.xml.transform.sax.TransformerHandler;

@@ -80,6 +80,7 @@ public class XFormsContainingDocument extends XFormsContainer {
     // Client state
     private boolean dirtySinceLastRequest;
     private XFormsModelSubmission activeSubmission;
+    private List asynchronousSubmissions;// List<Runnable>
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
@@ -426,6 +427,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         this.gotSubmission = false;
         this.gotSubmissionSecondPass = false;
         this.gotSubmissionReplaceAll = false;
+        this.asynchronousSubmissions = null;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -489,6 +491,26 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     public boolean isGotSubmissionReplaceAll() {
         return gotSubmissionReplaceAll;
+    }
+
+    /**
+     * Add an asynchronous submission to run after sending the Ajax response.
+     *
+     * @param runnable  Runnable that will execute the submission
+     */
+    public void addAsynchronousSubmission(Runnable runnable) {
+        if (asynchronousSubmissions == null)
+            asynchronousSubmissions = new ArrayList();
+        asynchronousSubmissions.add(runnable);
+    }
+
+    /**
+     * Get the list of asynchronous submission if any.
+     *
+     * @return List of asynchronous submission or null
+     */
+    public List getAsynchronousSubmissions() {
+        return asynchronousSubmissions;
     }
 
     /**

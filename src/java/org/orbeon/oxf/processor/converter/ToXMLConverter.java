@@ -64,7 +64,7 @@ public class ToXMLConverter extends ProcessorImpl {
                     // TODO: Can we avoid writing to a FileItem?
 
                     // Read to OutputStream
-                    readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextContentHandler(null, fileItem.getOutputStream(), false, null, false, false, null, false));
+                    readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextContentHandler(null, fileItem.getOutputStream(), true, false, null, false, false, null, false));
 
                     // Create parser
                     final XMLReader reader = XMLUtils.newXMLReader(config.validating, config.handleXInclude);

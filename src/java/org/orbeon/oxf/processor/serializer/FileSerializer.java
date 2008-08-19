@@ -13,30 +13,28 @@
  */
 package org.orbeon.oxf.processor.serializer;
 
-import org.apache.log4j.Logger;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.xml.sax.ContentHandler;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * The File Serializer serializes text and binary documents to files on disk.
@@ -240,7 +238,7 @@ public class FileSerializer extends ProcessorImpl {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-                            readInputAsSAX(context, input, new BinaryTextContentHandler(null, resultStoreOutputStream,
+                            readInputAsSAX(context, input, new BinaryTextContentHandler(null, resultStoreOutputStream, true,
                                     config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                                     config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
                             resultStoreOutputStream.close();
@@ -259,7 +257,7 @@ public class FileSerializer extends ProcessorImpl {
                 }
             } else {
                 // Caching is not enabled
-                readInputAsSAX(context, dataInput, new BinaryTextContentHandler(null, fileOutputStream,
+                readInputAsSAX(context, dataInput, new BinaryTextContentHandler(null, fileOutputStream, true,
                         config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                         config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
 

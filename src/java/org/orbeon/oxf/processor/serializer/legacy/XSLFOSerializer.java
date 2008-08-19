@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.util.LoggerFactory;
 
 import java.io.OutputStream;

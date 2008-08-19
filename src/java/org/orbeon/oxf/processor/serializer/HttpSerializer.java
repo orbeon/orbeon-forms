@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 
-import java.io.*;
+import java.io.OutputStream;
 
 /**
  * This serializer is a generic HTTP serializer able to serialize text as well as binary.
@@ -39,7 +39,7 @@ public class HttpSerializer extends HttpSerializerBase {
         try {
             final Config httpConfig = (Config) config;
 
-            readInputAsSAX(context, input, new BinaryTextContentHandler(response, outputStream,
+            readInputAsSAX(context, input, new BinaryTextContentHandler(response, outputStream, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
                     httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding));
 

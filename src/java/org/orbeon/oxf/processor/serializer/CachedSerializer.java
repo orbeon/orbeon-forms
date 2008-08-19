@@ -21,8 +21,6 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.TransformerUtils;
 
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.List;
 
 public abstract class CachedSerializer extends ProcessorImpl {
 

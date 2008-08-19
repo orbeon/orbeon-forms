@@ -22,14 +22,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;

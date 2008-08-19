@@ -940,8 +940,103 @@ public class NetUtils {
      * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
      */
     public static ConnectionResult openConnection(ExternalContext externalContext, IndentedLogger indentedLogger,
-                                                                   String httpMethod, final URL connectionURL, String username, String password, String contentType,
-                                                                   byte[] messageBody, List headerNames, Map headerNameValues, String headersToForward) {
+                                                  String httpMethod, final URL connectionURL, String username, String password, String contentType,
+                                                  byte[] messageBody, List headerNames, Map headerNameValues, String headersToForward) {
+
+        // Get  the headers to forward if any
+        final Map headersMap = getHeadersMap(externalContext, indentedLogger, username, headerNames, headerNameValues, headersToForward);
+        // Open the connection
+        return openConnection(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
+    }
+
+    /**
+     * Get header names and values to send given:
+     *
+     * o the incoming request
+     * o a list of headers names and values to set
+     * o authentication information including username
+     * o a list of headers to forward
+     */
+    public static Map getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
+                                    List headerNames, Map headerNameValues, String headersToForward) {
+        // Resulting header names and values to set
+        final LinkedHashMap headersMap = new LinkedHashMap();
+
+        // Get header forwarding information
+        final Map headersToForwardMap = getHeadersToForward(headersToForward);
+
+        // Set headers if provided
+        if (headerNames != null && headerNames.size() > 0) {
+            for (Iterator i = headerNames.iterator(); i.hasNext();) {
+                final String currentHeaderName = (String) i.next();
+                final String currentHeaderValue = (String) headerNameValues.get(currentHeaderName);
+                // Set header
+                headersMap.put(currentHeaderName, currentHeaderValue);
+                // Remove from list of headers to forward below
+                if (headersToForwardMap != null)
+                    headersToForwardMap.remove(currentHeaderName.toLowerCase());
+            }
+        }
+
+        // Forward cookies for session handling
+        if (username == null) {
+
+            final ExternalContext.Session session = externalContext.getSession(false);
+            if (session != null) {
+                indentedLogger.logDebug("connection", "setting cookie",
+                    new String[] { "JSESSIONID", session.getId() });
+
+                headersMap.put("Cookie", "JSESSIONID=" + session.getId());
+            }
+
+            // TODO: ExternalContext must provide direct access to cookies
+            final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
+            if (cookies != null) {
+                for (int i = 0; i < cookies.length; i++) {
+                    final String cookie = cookies[i];
+                    // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
+                    if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
+                        indentedLogger.logDebug("connection", "forwarding cookie",
+                            new String[] { "cookie", cookie });
+                        headersMap.put("Cookie", cookie);
+                    }
+                }
+            }
+        }
+
+        // Forward headers if needed
+        if (headersToForwardMap != null) {
+            final Map requestHeadersMap = externalContext.getRequest().getHeaderMap();
+            for (Iterator i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String currentHeaderName = (String) currentEntry.getValue();
+                final String currentHeaderNameLowercase = (String) currentEntry.getKey();
+
+                // Get incoming header value (Map contains values in lowercase!)
+                final String currentIncomingHeaderValue = (String) requestHeadersMap.get(currentHeaderNameLowercase);
+                // Forward header if present
+                if (currentIncomingHeaderValue != null) {
+                    final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
+                    if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
+                        // Only forward Authorization header if there is no username provided
+                        indentedLogger.logDebug("connection", "forwarding header",
+                            new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
+                        headersMap.put(currentHeaderName, currentIncomingHeaderValue);
+                    } else {
+                        // Just log this information
+                        indentedLogger.logDebug("connection",
+                                "not forwarding Authorization header because username is present");
+                    }
+                }
+            }
+        }
+
+        return headersMap;
+    }
+
+    public static ConnectionResult openConnection(IndentedLogger indentedLogger,
+                                                   String httpMethod, final URL connectionURL, String username, String password,
+                                                   String contentType, byte[] messageBody, Map headersMap) {
 
         // Perform connection
         final String scheme = connectionURL.getProtocol();
@@ -1048,72 +1143,14 @@ public class NetUtils {
                     }
                 }
 
-                // Get header forwarding information
-                final Map headersToForwardMap = getHeadersToForward(headersToForward);
-
                 // Set headers if provided
-                if (headerNames != null && headerNames.size() > 0) {
-                    for (Iterator i = headerNames.iterator(); i.hasNext();) {
-                        final String currentHeaderName = (String) i.next();
-                        final String currentHeaderValue = (String) headerNameValues.get(currentHeaderName);
+                if (headersMap != null && headersMap.size() > 0) {
+                    for (Iterator i = headersMap.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        final String currentHeaderName = (String) currentEntry.getKey();
+                        final String currentHeaderValue = (String) currentEntry.getValue();
                         // Set header
                         urlConnection.setRequestProperty(currentHeaderName, currentHeaderValue);
-                        // Remove from list of headers to forward below
-                        if (headersToForwardMap != null)
-                            headersToForwardMap.remove(currentHeaderName.toLowerCase());
-                    }
-                }
-
-                // Forward cookies for session handling
-                if (username == null) {
-
-                    final ExternalContext.Session session = externalContext.getSession(false);
-                    if (session != null) {
-                        indentedLogger.logDebug("connection", "setting cookie",
-                            new String[] { "JSESSIONID", session.getId() });
-
-                        urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
-                    }
-
-                    // TODO: ExternalContext must provide direct access to cookies
-                    final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-                    if (cookies != null) {
-                        for (int i = 0; i < cookies.length; i++) {
-                            final String cookie = cookies[i];
-                            // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
-                            if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
-                                indentedLogger.logDebug("connection", "forwarding cookie",
-                                    new String[] { "cookie", cookie });
-                                urlConnection.setRequestProperty("Cookie", cookie);
-                            }
-                        }
-                    }
-                }
-
-                // Forward headers if needed
-                if (headersToForwardMap != null) {
-                    final Map headersMap = externalContext.getRequest().getHeaderMap();
-                    for (Iterator i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                        final String currentHeaderName = (String) currentEntry.getValue();
-                        final String currentHeaderNameLowercase = (String) currentEntry.getKey();
-
-                        // Get incoming header value (Map contains values in lowercase!)
-                        final String currentIncomingHeaderValue = (String) headersMap.get(currentHeaderNameLowercase);
-                        // Forward header if present
-                        if (currentIncomingHeaderValue != null) {
-                            final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
-                            if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
-                                // Only forward Authorization header if there is no username provided
-                                indentedLogger.logDebug("connection", "forwarding header",
-                                    new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
-                                urlConnection.setRequestProperty(currentHeaderName, currentIncomingHeaderValue);
-                            } else {
-                                // Just log this information
-                                indentedLogger.logDebug("connection",
-                                        "not forwarding Authorization header because username is present");
-                            }
-                        }
                     }
                 }
 

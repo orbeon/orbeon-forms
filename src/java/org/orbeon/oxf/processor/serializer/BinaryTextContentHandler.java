@@ -18,8 +18,8 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Base64ContentHandler;
-import org.orbeon.oxf.util.TextContentHandler;
 import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.TextContentHandler;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
@@ -39,7 +39,9 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
     public static final String DEFAULT_TEXT_CONTENT_TYPE = "text/plain";
 
     private ExternalContext.Response response;
+
     private OutputStream outputStream;
+    private boolean isCloseStream;
 
     private boolean forceContentType;
     private String requestedContentType;
@@ -59,6 +61,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
      *
      * @param response                      optional ExternalContext.Response used to set content-type
      * @param outputStream                  where the resulting data is written
+     * @param isCloseStream                 whether to close the stream upon endDocument()
      * @param forceContentType
      * @param requestedContentType
      * @param ignoreDocumentContentType
@@ -66,10 +69,11 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
      * @param requestedEncoding
      * @param ignoreDocumentEncoding
      */
-    public BinaryTextContentHandler(ExternalContext.Response response, OutputStream outputStream,
+    public BinaryTextContentHandler(ExternalContext.Response response, OutputStream outputStream, boolean isCloseStream,
                                     boolean forceContentType, String requestedContentType, boolean ignoreDocumentContentType,
                                     boolean forceEncoding, String requestedEncoding, boolean ignoreDocumentEncoding) {
         this.outputStream = outputStream;
+        this.isCloseStream = isCloseStream;
         this.response = response;
         this.forceContentType = forceContentType;
         this.requestedContentType = requestedContentType;
@@ -175,9 +179,16 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
 
     public void endDocument() {
         try {
+            // Flush writer into output stream if needed
             if (writer != null)
                 writer.flush();
+
+            // Flush stream
             outputStream.flush();
+
+            // Close stream if needed
+            if (isCloseStream)
+                outputStream.close();
         } catch (IOException e) {
             throw new OXFException(e);
         }

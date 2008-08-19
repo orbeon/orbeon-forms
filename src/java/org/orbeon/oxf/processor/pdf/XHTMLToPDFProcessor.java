@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
+import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.w3c.dom.Document;
@@ -34,7 +34,7 @@ import java.net.URL;
 /**
  * XHTML to PDF converter using the Flying Saucer library.
  */
-public class XHTMLToPDFProcessor extends HttpBinarySerializer {
+public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is supposedly deprecated
 
     public static String DEFAULT_CONTENT_TYPE = "application/pdf";
 

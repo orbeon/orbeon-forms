@@ -58,16 +58,25 @@
             </p:processor>
 
             <!-- Generate response -->
-            <p:processor name="oxf:xml-serializer">
-                <p:input name="data" href="#xml-response"/>
+            <p:processor name="oxf:xml-converter">
                 <p:input name="config">
                     <config>
-                        <content-type>application/xml</content-type>
+                        <encoding>utf-8</encoding>
+                        <indent>false</indent>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xml-response"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
                         <cache-control>
                             <use-local-cache>false</use-local-cache>
                         </cache-control>
                     </config>
                 </p:input>
+                <p:input name="data" href="#converted"/>
             </p:processor>
         </p:when>
         <p:when test="/request/method = 'GET'">
@@ -146,16 +155,30 @@
             </p:processor>
 
             <!-- Generate response -->
-            <p:processor name="oxf:html-serializer">
-                <p:input name="data" href="#html-response"/>
+            <p:processor name="oxf:html-converter">
                 <p:input name="config">
                     <config>
-                        <content-type>text/html</content-type>
+                        <config>
+                            <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                            <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
+                            <version>4.01</version>
+                            <encoding>utf-8</encoding>
+                            <indent>false</indent>
+                        </config>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#html-response"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
                         <cache-control>
                             <use-local-cache>false</use-local-cache>
                         </cache-control>
                     </config>
                 </p:input>
+                <p:input name="data" href="#converted"/>
             </p:processor>
 
         </p:otherwise>

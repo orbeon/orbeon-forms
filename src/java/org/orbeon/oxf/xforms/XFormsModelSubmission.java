@@ -851,6 +851,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                 // Tell XFCD that we have one more Runnable
                                 containingDocument.addAsynchronousSubmission(runnable);
+                                connectionResult = null;
 
                             } else {
                                 // Just run it now
@@ -1146,6 +1147,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
     }
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+        // NOP
+    }
 
     private String getRequestedSerialization(String submissionSerializationAttribute, String submissionMethodAttribute) {
         final String actualSerialization;
@@ -1227,7 +1231,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // the remainder of the submit process. "
             if (currentNode instanceof Element) {
                 // Create subset of document
-                documentToSubmit = Dom4jUtils.createDocumentCopyElement((Element) currentNode);
+                documentToSubmit = Dom4jUtils.createDocumentCopyParentNamespaces((Element) currentNode);
             } else {
                 // Use entire instance document
                 documentToSubmit = Dom4jUtils.createDocumentCopyElement(currentNode.getDocument().getRootElement());

@@ -108,32 +108,32 @@
                         <xml-source border="false">
                             <comment> Declare and configure the Orbeon Forms XForms filter </comment>
                             <filter>
-                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-name>orbeon-xforms-filter</filter-name>
                                 <filter-class>
                                     org.orbeon.oxf.servlet.OPSXFormsFilter
                                 </filter-class>
                                 <init-param>
                                     <param-name>oxf.xforms.renderer.context</param-name>
-                                    <param-value>/ops</param-value>
+                                    <param-value>/orbeon</param-value>
                                 </init-param>
                             </filter>
 
                             <comment> Any web resource under /xforms-jsp is processed by the XForms engine </comment>
                             <filter-mapping>
-                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-name>orbeon-xforms-filter</filter-name>
                                 <url-pattern>/xforms-jsp/*</url-pattern>
                             </filter-mapping>
 
                             <comment> This is necessary so that XForms engine resources can be served appropriately </comment>
                             <filter-mapping>
-                                <filter-name>ops-xforms-filter</filter-name>
-                                <url-pattern>/ops/*</url-pattern>
+                                <filter-name>orbeon-xforms-filter</filter-name>
+                                <url-pattern>/orbeon/*</url-pattern>
                             </filter-mapping>
                         </xml-source>
                         <p>
                             The value of the <code>oxf.xforms.renderer.context</code> parameter specifies the context
                             into which you have deployed Orbeon Forms. By default, Orbeon forms deploys to
-                            <code>/ops</code> so this value is usually safe. If you deploy Orbeon Forms to another
+                            <code>/orbeon</code> so this value is usually safe. If you deploy Orbeon Forms to another
                             context, you need to change this value accordingly.
                         </p>
                         <p>
@@ -144,9 +144,9 @@
                         </p>
                         <p>
                             The <code>&lt;url-pattern></code> defined under the second <code>&lt;filter-mapping></code>
-                            has the value <code>/ops/*</code>. This is necessary to allow for all Orbeon Forms
+                            has the value <code>/orbeon/*</code>. This is necessary to allow for all Orbeon Forms
                             resources, such as JavaScript, CSS, and Ajax server, to be accessible. This
-                            <code>/ops/*</code> value is related to the default context into which you deploy Orbeon
+                            <code>/orbeon/*</code> value is related to the default context into which you deploy Orbeon
                             Forms: if you change you context, you change this value as well.
                         </p>
                     </td>
@@ -156,13 +156,13 @@
                         </p>
                         <xml-source border="false">
                             <filter>
-                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-name>orbeon-xforms-filter</filter-name>
                                 <filter-class>
                                     org.orbeon.oxf.servlet.OPSXFormsFilter
                                 </filter-class>
                             </filter>
                             <filter-mapping>
-                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-name>orbeon-xforms-filter</filter-name>
                                 <url-pattern>/xforms-jsp/*</url-pattern>
                             </filter-mapping>
                         </xml-source>
@@ -200,7 +200,7 @@
                             <code>url-mapping</code> configuration.
                         </p>
                         <p>
-                            You must <b>not</b> deploy resources under the <code>/ops/</code> directory, as that
+                            You must <b>not</b> deploy resources under the <code>/orbeon/</code> directory, as that
                             directory is reserved for Orbeon Forms resources.
                         </p>
                     </td>
@@ -275,7 +275,7 @@
             <ol>
                 <li>
                     <p>
-                        Deploy Orbeon Forms as usual, typically in the <code>/ops</code> context. Follow the <a
+                        Deploy Orbeon Forms as usual, typically in the <code>/orbeon</code> context. Follow the <a
                         href="intro-install">installation instructions</a> and the <a href="intro-tutorial">Orbeon Forms
                         Tutorial</a> if needed.
                     </p>

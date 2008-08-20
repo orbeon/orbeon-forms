@@ -387,20 +387,8 @@ public class XFormsServer extends ProcessorImpl {
                         outputNoscriptResponse(containingDocument, pipelineContext, contentHandler, xformsDecodedClientState, allEvents, externalContext);
                     }
 
-                    // Check and process asynchronous submissions
-                    final List asynchronousSubmissions = containingDocument.getAsynchronousSubmissions();
-                    if (asynchronousSubmissions != null && asynchronousSubmissions.size() > 0) {
-                        for (Iterator i = asynchronousSubmissions.iterator(); i.hasNext();) {
-                            final Runnable currentRunnable = (Runnable) i.next();
-                            try {
-                                // Run submission
-                                currentRunnable.run();
-                            } catch (RuntimeException e) {
-                                // Something happened but we keep going
-                                logger.debug("XForms - asynchronous submissions: throwable caught.", e);
-                            }
-                        }
-                    }
+                    // Process asynchronous submissions
+                    containingDocument.processAsynchronousSubmissions();
                 } else {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.

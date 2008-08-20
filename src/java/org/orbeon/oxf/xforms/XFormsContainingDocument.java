@@ -505,12 +505,24 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     /**
-     * Get the list of asynchronous submission if any.
-     *
-     * @return List of asynchronous submission or null
+     * Process pending asynchronous submissions.
      */
-    public List getAsynchronousSubmissions() {
-        return asynchronousSubmissions;
+    public void processAsynchronousSubmissions() {
+        // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
+        if (asynchronousSubmissions != null && asynchronousSubmissions.size() > 0) {
+            for (Iterator i = asynchronousSubmissions.iterator(); i.hasNext();) {
+                final Runnable currentRunnable = (Runnable) i.next();
+                try {
+                    // Run submission
+                    currentRunnable.run();
+                } catch (RuntimeException e) {
+                    // Something happened but we keep going
+                    XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
+                }
+                // Remove submission from list of submission so we can gc the Runnable
+                i.remove();
+            }
+        }
     }
 
     /**

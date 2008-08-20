@@ -480,6 +480,12 @@ public class XFormsToXHTML extends ProcessorImpl {
                     throw new OXFException(e);// this should not happen
             }
         });
+
+
+        // Process asynchronous submissions
+        // NOTE: Given the complexity of the epilogue, this could cause the page to stop loading until all submissions
+        // are processed.
+        containingDocument.processAsynchronousSubmissions();
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,

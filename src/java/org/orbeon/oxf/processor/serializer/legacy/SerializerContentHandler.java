@@ -24,8 +24,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
- * A forwarding content handler that flushed the output when receiving a
- * given processing instruction.
+ * A forwarding content handler that flushes the output when receiving a given processing instruction.
  *
  * Also clean invalid XML 1.0 namespace declarations if needed.
  */

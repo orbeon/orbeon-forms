@@ -13,21 +13,58 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.legacy.TextSerializer;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.SimpleForwardingContentHandler;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import java.io.Writer;
 
 /**
  * Converts XML into text according to the XSLT Text output method.
  *
  * See http://www.w3.org/TR/xslt#section-Text-Output-Method
  */
-public class TextConverter extends TextSerializer {
+public class TextConverter extends TextConverterBase {
+
+    public static String DEFAULT_CONTENT_TYPE = "text/plain";
+    public static String DEFAULT_METHOD = "text";
 
     public TextConverter() {
-        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    protected String getConfigSchemaNamespaceURI() {
-        return XMLConverter.STANDARD_TEXT_CONVERTER_CONFIG_NAMESPACE_URI;
+    protected String getDefaultContentType() {
+        return DEFAULT_CONTENT_TYPE;
+    }
+
+    protected boolean readInput(PipelineContext context, final ContentHandler contentHandler, ProcessorInput input, Config config, Writer writer) {
+
+        // Create an identity transformer and start the transformation
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        TransformerUtils.applyOutputProperties(identity.getTransformer(),
+                config.method != null ? config.method : DEFAULT_METHOD,
+                null,
+                null,
+                null,
+                getEncoding(config, DEFAULT_ENCODING),
+                true,
+                null,
+                false,
+                DEFAULT_INDENT_AMOUNT);
+        identity.setResult(new StreamResult(writer));
+        final boolean[] didEndDocument = new boolean[1];
+        readInputAsSAX(context, INPUT_DATA,  new SimpleForwardingContentHandler(identity) {
+            public void endDocument() throws SAXException {
+                super.endDocument();
+                sendEndDocument(contentHandler);
+                didEndDocument[0] = true;
+            }
+        });
+
+        return didEndDocument[0];
     }
 }

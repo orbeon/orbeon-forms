@@ -338,10 +338,9 @@
             <section>
                 <title><code>serialization</code> Attribute on <code>&lt;xforms:submission></code></title>
                 <p>
-                    Orbeon Forms partially supports the XForms 1.1 <code>serialization</code> on
-                    <code>&lt;xforms:submission></code>: when the value of this attribute is set to <code>none</code>, no
-                    serialization of the data takes place. This is particularly useful for the <code>get</code>
-                    method:
+                    Orbeon Forms supports the XForms 1.1 <code>serialization</code> on
+                    <code>&lt;xforms:submission></code>. This is particularly useful to specify the value
+                    <code>none</code> with a <code>get</code> method:
                 </p>
                 <xml-source>
                     <xforms:submission id="my-submission" method="get" serialization="none" resource="http://example.org/document.xml"
@@ -351,6 +350,50 @@
                     For more information, please visit the <a
                     href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
                 </p>
+            </section>
+            <a name="asynchronous-submissions"/>
+            <section>
+                <title>Preliminary support for asynchronous handling of <code>&lt;xforms:submission></code></title>
+                <p>
+                    Orbeon Forms partially supports the XForms 1.1 <code>mode="asynchronous"</code> attribute on
+                    <code>&lt;xforms:submission></code>. The limitations are:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Asynchronous submissions in an Ajax request are delayed until after everything else in the
+                            request has run (including other submissions).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Asynchronous submissions are "fire and forget": they only work with
+                            <code>replace="none"</code> and no <code>xforms-submit-done</code> /
+                            <code>xforms-submit-error</code> events are dispatched.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            All asynchronous submissions started during a given Ajax request run serially.
+                        </p>
+                    </li>
+                </ul>
+                <xml-source>
+                    <xforms:submission id="test-submission" mode="asynchronous"
+                        ref="." method="put" resource="http://my.service.com/"
+                        replace="none"/>
+                </xml-source>
+                <p>
+                    For more information, please visit the <a
+                    href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
+                </p>
+                <note>
+                    <p>
+                        XForms 1.1 specifies that <code>mode="asynchronous"</code> should be the default, but due to the
+                        client-server nature of the Orbeon Forms XForms engine, Orbeon Forms still defaults to
+                        <code>mode="synchronous"</code>.
+                    </p>
+                </note>
             </section>
             <a name="xforms11-if-while"/>
             <section>

@@ -159,7 +159,7 @@
 
             <xsl:comment> All JSP files under /xforms-jsp go through the XForms filter </xsl:comment>
             <filter>
-                <filter-name>ops-xforms-filter</filter-name>
+                <filter-name>orbeon-xforms-filter</filter-name>
                 <filter-class>org.orbeon.oxf.servlet.OPSXFormsFilter</filter-class>
                 <xsl:call-template name="comment">
                     <xsl:with-param name="caption" select="'separate WAR deployment'"/>
@@ -167,13 +167,13 @@
                     <xsl:with-param name="content">
                         <init-param>
                             <param-name>oxf.xforms.renderer.context</param-name>
-                            <param-value>/ops</param-value>
+                            <param-value>/orbeon</param-value>
                         </init-param>
                     </xsl:with-param>
                 </xsl:call-template>
             </filter>
             <filter-mapping>
-                <filter-name>ops-xforms-filter</filter-name>
+                <filter-name>orbeon-xforms-filter</filter-name>
                 <url-pattern>/xforms-jsp/*</url-pattern>
             </filter-mapping>
 
@@ -193,7 +193,7 @@
 
             <!--
             <servlet>
-                <servlet-name>ops-xhtml-xforms-servlet</servlet-name>
+                <servlet-name>orbeon-xhtml-xforms-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -215,14 +215,14 @@
             </servlet>
 
             <servlet-mapping>
-                <servlet-name>ops-xhtml-xforms-servlet</servlet-name>
+                <servlet-name>orbeon-xhtml-xforms-servlet</servlet-name>
                 <url-pattern>/test/*</url-pattern>
             </servlet-mapping>
             -->
 
             <xsl:comment> This is the main Orbeon Forms servlet </xsl:comment>
             <servlet>
-                <servlet-name>ops-main-servlet</servlet-name>
+                <servlet-name>orbeon-main-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
@@ -275,7 +275,7 @@
 
             <xsl:comment> This is the XForms Server servlet </xsl:comment>
             <servlet>
-                <servlet-name>ops-xforms-server-servlet</servlet-name>
+                <servlet-name>orbeon-xforms-server-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
@@ -300,7 +300,7 @@
 
             <xsl:comment> This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR </xsl:comment>
             <servlet>
-                <servlet-name>ops-renderer-servlet</servlet-name>
+                <servlet-name>orbeon-renderer-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
@@ -386,17 +386,17 @@
             </xsl:call-template>
 
             <servlet-mapping>
-                <servlet-name>ops-main-servlet</servlet-name>
+                <servlet-name>orbeon-main-servlet</servlet-name>
                 <url-pattern>/</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>
-                <servlet-name>ops-xforms-server-servlet</servlet-name>
+                <servlet-name>orbeon-xforms-server-servlet</servlet-name>
                 <url-pattern>/xforms-server/*</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>
-                <servlet-name>ops-renderer-servlet</servlet-name>
+                <servlet-name>orbeon-renderer-servlet</servlet-name>
                 <url-pattern>/xforms-renderer</url-pattern>
             </servlet-mapping>
 

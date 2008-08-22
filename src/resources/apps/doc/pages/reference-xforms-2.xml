@@ -1399,6 +1399,9 @@
                                     <code>relevant</code>
                                 </li>
                                 <li>
+                                    <code>mode</code>
+                                </li>
+                                <li>
                                     <code>xxforms:target</code>
                                 </li>
                                 <li>

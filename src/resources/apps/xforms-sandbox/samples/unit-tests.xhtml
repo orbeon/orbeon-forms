@@ -24,48 +24,20 @@
         <xhtml:title>Unit Tests</xhtml:title>
         <xforms:model id="main-model" xxforms:external-events="restore-instance">
 
-            <!-- Instance used at run-time -->
-            <xforms:instance id="instance">
-                <instance/>
-            </xforms:instance>
-
-            <!-- Copy of the original instance, so we can restore it as tests are running -->
-            <xforms:instance id="initial-instance">
-                <instance>
-                    <input>
-                        <type>string</type>
-                        <field>gaga</field>
-                        <copy/>
-                        <time>20:12:21</time>
-                        <date>2008-09-01</date>
-                        <date-time>2008-09-01T20:12:21</date-time>
-                    </input>
-                </instance>
-            </xforms:instance>
-
-            <xforms:bind nodeset="/instance">
-                <xforms:bind nodeset="input">
-                    <xforms:bind nodeset="field[../type = 'date']" type="xs:date"/>
-                    <xforms:bind nodeset="field[../type = 'time']" type="xs:time"/>
-                    <xforms:bind nodeset="field[../type = 'date-time']" type="xs:dateTime"/>
-                    <xforms:bind nodeset="copy" calculate="context()/field"/>
-                    <xforms:bind nodeset="time" type="xs:time"/>
-                    <xforms:bind nodeset="date" type="xs:date"/>
-                    <xforms:bind nodeset="date-time" type="xs:dateTime"/>
-                </xforms:bind>
-            </xforms:bind>
+            <xforms:instance id="default-instance"><dummy/></xforms:instance>
 
             <!-- Restore initial instance, used between tests -->
             <xforms:action ev:event="restore-instance">
-                <xforms:insert nodeset="instance('instance')" origin="instance('initial-instance')"/>
+                <xforms:insert nodeset="xxforms:instance('input-instance')" origin="xxforms:instance('input-initial-instance')"/>
+                <xforms:insert nodeset="xxforms:instance('output-instance')" origin="xxforms:instance('output-initial-instance')"/>
             </xforms:action>
 
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:dispatch name="restore-instance" target="main-model"/>
             </xforms:action>
 
-
         </xforms:model>
+
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/calendar/assets/calendar.css"/>
         <xhtml:style type="text/css">
@@ -83,32 +55,86 @@
         </xhtml:script>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group ref="/instance">
-            <xforms:group ref="input">
-                <xhtml:h1>xforms:input</xhtml:h1>
-                <xforms:input ref="type" id="input-type">
-                    <xforms:label>type</xforms:label>
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xforms:rebuild/>
-                        <xforms:recalculate/>
-                        <xforms:revalidate/>
-                        <xforms:refresh/>
-                    </xforms:action>
-                </xforms:input>
-                <xforms:input ref="field" id="input-field">
-                    <xforms:label>field</xforms:label>
-                </xforms:input>
-                <xforms:input ref="time" id="input-time">
-                    <xforms:label>time</xforms:label>
-                </xforms:input>
-                <xforms:input ref="date" id="input-date">
-                    <xforms:label>date</xforms:label>
-                </xforms:input>
-                <xforms:input ref="date-time" id="input-date-time">
-                    <xforms:label>date-time</xforms:label>
-                </xforms:input>
-            </xforms:group>
+
+        <!-- Input field -->
+        <xforms:model id="input-model">
+            <xforms:instance id="input-instance">
+                <instance/>
+            </xforms:instance>
+            <xforms:instance id="input-initial-instance">
+                <instance>
+                    <type>string</type>
+                    <field>gaga</field>
+                    <copy/>
+                    <time>20:12:21</time>
+                    <date>2008-09-01</date>
+                    <date-time>2008-09-01T20:12:21</date-time>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="/instance">
+                <xforms:bind nodeset="field[../type = 'date']" type="xs:date"/>
+                <xforms:bind nodeset="field[../type = 'time']" type="xs:time"/>
+                <xforms:bind nodeset="field[../type = 'date-time']" type="xs:dateTime"/>
+                <xforms:bind nodeset="copy" calculate="context()/field"/>
+                <xforms:bind nodeset="time" type="xs:time"/>
+                <xforms:bind nodeset="date" type="xs:date"/>
+                <xforms:bind nodeset="date-time" type="xs:dateTime"/>
+            </xforms:bind>
+        </xforms:model>
+        <xhtml:h1>xforms:input</xhtml:h1>
+        <xforms:group ref="/instance" model="input-model">
+            <xforms:input ref="type" id="input-type">
+                <xforms:label>type</xforms:label>
+                <xforms:action ev:event="xforms-value-changed">
+                    <xforms:rebuild/>
+                    <xforms:recalculate/>
+                    <xforms:revalidate/>
+                    <xforms:refresh/>
+                </xforms:action>
+            </xforms:input>
+            <xforms:input ref="field" id="input-field">
+                <xforms:label>field</xforms:label>
+            </xforms:input>
+            <xforms:input ref="time" id="input-time">
+                <xforms:label>time</xforms:label>
+            </xforms:input>
+            <xforms:input ref="date" id="input-date">
+                <xforms:label>date</xforms:label>
+            </xforms:input>
+            <xforms:input ref="date-time" id="input-date-time">
+                <xforms:label>date-time</xforms:label>
+            </xforms:input>
         </xforms:group>
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
+        <!-- Output field -->
+        <xforms:model id="output-model">
+            <xforms:instance id="output-instance">
+                <instance/>
+            </xforms:instance>
+            <xforms:instance id="output-initial-instance">
+                <instance>
+                    <field>foo</field>
+                    <valid>false</valid>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="/instance">
+                <xforms:bind nodeset="field" type="xs:integer"/>
+            </xforms:bind>
+        </xforms:model>
+        <xhtml:h1>xforms:output</xhtml:h1>
+        <xforms:group ref="/instance" model="output-model">
+            <xforms:output ref="field" id="output-field">
+                <xforms:label>field output</xforms:label>
+            </xforms:output>
+            <xforms:input ref="field" id="output-field-input">
+                <xforms:label>field input</xforms:label>
+            </xforms:input>
+            <xforms:input ref="valid" id="output-valid">
+                <xforms:label>valid</xforms:label>
+            </xforms:input>
+        </xforms:group>
+        
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </xhtml:body>
 </xhtml:html>

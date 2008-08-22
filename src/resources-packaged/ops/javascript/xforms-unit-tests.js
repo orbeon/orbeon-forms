@@ -83,7 +83,6 @@ ORBEON.testcases = {
         setUp: function() {
             // Save properties as they are at the beginning of a test.
             this.opsXFormsProperties = window.opsXFormsProperties;
-            //ORBEON.testing.restoreInstance(this);
         },
 
         tearDown: function() {
@@ -215,6 +214,29 @@ ORBEON.testcases = {
                         YAHOO.util.Assert.areEqual("aTb", firstInput.value);
                         YAHOO.util.Assert.areEqual("cTd", secondInput.value);
                     });
+                });
+            });
+        }
+    }),
+
+    outputTestCase: new YAHOO.tool.TestCase({
+
+        name: "XForms Output",
+
+        // Check that an invalid field has the class xforms-invalid right away and then receives
+        // the class xforms-invalid-visited once its value changed.
+        testValidVisited: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var field = ORBEON.util.Dom.getElementById("output-field");
+                YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(field, "xforms-invalid"));
+                YAHOO.util.Assert.isTrue(!ORBEON.util.Dom.hasClass(field, "xforms-visited"));
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    var input = ORBEON.util.Dom.getElementById();
+                    ORBEON.xforms.Document.setValue("output-field-input", "bar");
+                }, function() {
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(field, "xforms-invalid"));
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(field, "xforms-visited"));
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(field, "xforms-invalid-visited"));
                 });
             });
         }

@@ -1324,6 +1324,10 @@ ORBEON.xforms.Controls = {
             } else {
                 ORBEON.util.Dom.setStringValue(control, newOutputControlValue);
             }
+            
+            ORBEON.util.Dom.addClass(control, "xforms-visited");
+            if (ORBEON.util.Dom.hasClass(control, "xforms-invalid")) 
+                ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:
             // so don't try to update it

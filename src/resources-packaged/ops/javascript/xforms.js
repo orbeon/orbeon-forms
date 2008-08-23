@@ -2282,6 +2282,8 @@ ORBEON.xforms.Events = {
                         : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
             if (ORBEON.widgets.JSCalendar.appliesToControl(target)) {
                 ORBEON.widgets.JSCalendar.keydown(event, target);
+            } else if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
+                ORBEON.widgets.YUICalendar.keydown(event, target);
             }
         }
     },
@@ -2903,6 +2905,7 @@ ORBEON.widgets.JSCalendar = function() {
         blur: function(event, target) {},
 
         keydown: function(event, target) {
+            // Close calendar when user starts typing
             calendar.hide();
         }
     }
@@ -3016,6 +3019,11 @@ ORBEON.widgets.YUICalendar = function() {
             } else {
                 closeCalendar();
             }
+        },
+
+        keydown: function(event, target) {
+            // Close calendar when user starts typing
+            closeCalendar();
         }
     }
 }();

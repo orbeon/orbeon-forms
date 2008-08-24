@@ -216,6 +216,64 @@ ORBEON.testcases = {
                     });
                 });
             });
+        },
+
+        // Text input to be readonly
+        testReadonlyTextInput: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-is-readonly", "true");
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(control, "xforms-readonly"));
+                    YAHOO.util.Assert.isTrue(firstInput.disabled);
+                });
+            });
+        },
+
+        // Date input to be readonly
+        testReadonlyDateInput: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-is-readonly", "true");
+                    ORBEON.xforms.Document.setValue("input-type", "date");
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(control, "xforms-readonly"));
+                    YAHOO.util.Assert.isTrue(firstInput.disabled);
+                });
+            });
+        },
+
+        // Date-time input to be readonly
+        testReadonlyDateInput: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-is-readonly", "true");
+                    ORBEON.xforms.Document.setValue("input-type", "date-time");
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                    var secondInput = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(control, "xforms-readonly"));
+                    YAHOO.util.Assert.isTrue(firstInput.disabled);
+                    YAHOO.util.Assert.isTrue(secondInput.disabled);
+                });
+            });
+        },
+
+        // Make non-relevant
+        testNonRelevantInput: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-is-relevant", "false");
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(control, "xforms-disabled"));
+                });
+            });
         }
     }),
 

@@ -63,18 +63,21 @@
             </xforms:instance>
             <xforms:instance id="input-initial-instance">
                 <instance>
-                    <type>string</type>
                     <field>gaga</field>
+                    <type>string</type>
                     <copy/>
                     <time>20:12:21</time>
                     <date>2008-09-01</date>
                     <date-time>2008-09-01T20:12:21</date-time>
+                    <is-readonly>false</is-readonly>
+                    <is-relevant>true</is-relevant>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance">
                 <xforms:bind nodeset="field[../type = 'date']" type="xs:date"/>
                 <xforms:bind nodeset="field[../type = 'time']" type="xs:time"/>
                 <xforms:bind nodeset="field[../type = 'date-time']" type="xs:dateTime"/>
+                <xforms:bind nodeset="field" readonly="context()/is-readonly = 'true'" relevant="context()/is-relevant = 'true'"/>
                 <xforms:bind nodeset="copy" calculate="context()/field"/>
                 <xforms:bind nodeset="time" type="xs:time"/>
                 <xforms:bind nodeset="date" type="xs:date"/>
@@ -83,6 +86,9 @@
         </xforms:model>
         <xhtml:h1>xforms:input</xhtml:h1>
         <xforms:group ref="/instance" model="input-model">
+            <xforms:input ref="field" id="input-field">
+                <xforms:label>field</xforms:label>
+            </xforms:input>
             <xforms:input ref="type" id="input-type">
                 <xforms:label>type</xforms:label>
                 <xforms:action ev:event="xforms-value-changed">
@@ -92,9 +98,6 @@
                     <xforms:refresh/>
                 </xforms:action>
             </xforms:input>
-            <xforms:input ref="field" id="input-field">
-                <xforms:label>field</xforms:label>
-            </xforms:input>
             <xforms:input ref="time" id="input-time">
                 <xforms:label>time</xforms:label>
             </xforms:input>
@@ -103,6 +106,12 @@
             </xforms:input>
             <xforms:input ref="date-time" id="input-date-time">
                 <xforms:label>date-time</xforms:label>
+            </xforms:input>
+            <xforms:input ref="is-readonly" id="input-is-readonly">
+                <xforms:label>is-readonly</xforms:label>
+            </xforms:input>
+            <xforms:input ref="is-relevant" id="input-is-relevant">
+                <xforms:label>is-relevant</xforms:label>
             </xforms:input>
         </xforms:group>
 

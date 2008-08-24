@@ -1702,22 +1702,19 @@ ORBEON.xforms.Controls = {
             }
         }
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-            // XForms input
-            // Display value
-            var displaySpan = control.firstChild;
-            while (displaySpan.nodeType != ELEMENT_TYPE) displaySpan = displaySpan.nextSibling;
-            if (isReadonly) ORBEON.util.Dom.addClass(displaySpan, "xforms-readonly");
-            else ORBEON.util.Dom.removeClass(displaySpan, "xforms-readonly");
-            // Text field
-            var textField = displaySpan.nextSibling;
-            while (textField.nodeType != ELEMENT_TYPE) textField = textField.nextSibling;
-            if (isReadonly) textField.setAttribute("disabled", "disabled");
-            else textField.removeAttribute("disabled");
-            // Calendar picker
-            var showCalendar = textField.nextSibling;
-            while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
-            if (isReadonly) ORBEON.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
-            else ORBEON.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
+            // Add/remove xforms-readonly on span
+            if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-readonly");
+            else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
+            // XForms input: set/remove disabled attribute on first input
+            var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            if (isReadonly) firstInput.setAttribute("disabled", "disabled");
+            else firstInput.removeAttribute("disabled");
+            // XForms input for date-time: set/remove disabled attribute on first input
+            if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+                var secondInput = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                if (isReadonly) secondInput.setAttribute("disabled", "disabled");
+                else secondInput.removeAttribute("disabled");
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
@@ -4456,10 +4453,6 @@ ORBEON.xforms.Server = {
                                             else ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
                                         }
 
-                                        // Handle readonly
-                                        if (readonly != null && !isStaticReadonly)
-                                            ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
-
                                         // Update input control type
                                         if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date"
@@ -4497,6 +4490,10 @@ ORBEON.xforms.Server = {
                                                 documentElement.appendChild(secondInput);
                                             }
                                         }
+
+                                        // Handle readonly
+                                        if (readonly != null && !isStaticReadonly)
+                                            ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
 
                                         // Update value
                                         if (isControl) {

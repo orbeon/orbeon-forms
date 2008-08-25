@@ -29,12 +29,12 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon Forms 3.7!
+                Welcome to Orbeon Forms 3.7 beta 1!
             </p>
             <p>
-                Orbeon Forms 3.7 features over <a href="#changes-37-full">180 improvements</a> since <a
-                href="home-changes-36">Orbeon Forms 3.6</a>, including, in the areas of schema validation, session
-                handling, caching, core XForms engine enhancements, and application server support.
+                Orbeon Forms 3.7 features over <a href="#changes-37-full">200 improvements</a> since <a
+                href="home-changes-36">Orbeon Forms 3.6</a>, including in the areas of performance, core XForms engine
+                enhancements, schema validation, session handling, caching, and application server support.
             </p>
             <p>
                 This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.
@@ -47,20 +47,40 @@
         <a name="changes-37"/>
         <section>
             <title>Changes in Version 3.7</title>
-            <p>
-                Orbeon Forms 3.7 is an update to Orbeon Forms 3.6. It features over <a href="#changes-37-full">180
-                improvements</a> since version 3.6.
-            </p>
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
                     <li>
                         <p>
-                            The XForms engine now supports a new mode called <i>noscript</i>, an accessible,
-                            JavaScript-free rendering mode.
+                            <b>Noscript mode.</b> The "noscript mode" in Orbeon Forms allows you to use a single
+                            XHTML+XForms description of a page and to target browser that have JavaScript disabled. This
+                            is now integrated into Form Runner, which means you don’t need JavaScript on the client to
+                            fill-out forms created by Form Builder. This is also the basis for the accessibility
+                            features we are working on (including WCAG AA compliance).
                         </p>
                         <p>
                             [TODO: how to enable, etc.]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Improved date and time controls.</b> You can now type in dates, and the date picker is by
+                            default the YUI date picker. We have also added controls for <code>xs:time</code> and
+                            <code>xs:dateTime</code> types.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Access request and session directly from XForms.</b> In the past, accessing request and
+                            session information from XForms required using the page flow controller or possibly a page
+                            model written in XPL. Now, you can use <a
+                            href="http://www.orbeon.com/ops/doc/reference-xforms-functions#orbeon-extensions">XPath
+                            functions</a> to do so.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>New YUI.</b> Orbeon Forms now uses YUI 2.5.2.
                         </p>
                     </li>
                     <li>
@@ -317,6 +337,52 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310869&amp;group_id=168&amp;atid=350207">
+                            #310869: Regression: In XForms Controls example, instance inspector's "Evaluate XPath" causes JS error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309637&amp;group_id=168&amp;atid=350207">
+                            #309637: Regression: Flickr Resize example no longer sets images' style attribute with
+                            Firefox and Safari
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310855&amp;group_id=168&amp;atid=350207">
+                            #310855: Regression: To-Do Lists example: add new list and get a JS exception
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310908&amp;group_id=168&amp;atid=350207">
+                            #310908: Namespace not correctly in submissions with ref="instance('gaga')/foo"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310894&amp;group_id=168&amp;atid=350207">
+                            #310894: RFE: Implement minimal support for asynchronous submissions
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308781&amp;group_id=168&amp;atid=350207">
+                            #308781: Check excludes in build.xml and remove obsolete source files
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310856&amp;group_id=168&amp;atid=350207">
+                            #310856: xforms:group does not use xxforms:order property
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310831&amp;group_id=168&amp;atid=350207">
+                            #310831: Regression: HTML area (FCKeditor) fails within a YUI dialog
+                        </a>
+                    </li>
+
+
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304973&amp;group_id=168&amp;atid=350207">
                             #304973: Hints are ignored with triggers
@@ -1360,7 +1426,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 <title>Legacy Classic XForms Engine</title>
                 <p>
                     The <a href="home-faq#xforms-classic-ng">legacy Classic XForms engine</a> has been deprecated for
-                    several releases now, and is expected to be removed entirely in the next version of Orbeon Forms.
+                    several releases now, and should not be expected to work in Orbeon 3.7.
                 </p>
                 <p>
                     This is particularly appropriate now that the XForms engine support the <i>noscript</i> mode, an

@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.6.1, February 2008
+Last updated for Orbeon Forms 3.7 beta 1, August 2008
 
 This README.TXT file covers the following topics:
 
@@ -37,6 +37,7 @@ trees and menus.
 For more information about Orbeon Forms, please visit:
 
   http://www.orbeon.com/
+  http://www.orbeon.com/ops/doc/home-faq
 
 
 ****************************************
@@ -80,11 +81,11 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-36
+  http://www.orbeon.com/ops/doc/home-changes-37
 
 or in this distribution under:
 
-  doc/home-changes-36.html
+  doc/home-changes-37.html
 
 
 ****************************************

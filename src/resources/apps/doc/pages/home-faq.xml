@@ -349,24 +349,17 @@
                 <ul>
                     <li>
                         <p>
-                            All <b>open</b> issues <a
-                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=open_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
-                            ordered by descending opening date</a>
+                            <a href="http://tinyurl.com/kycl3">Issues by highest priority</a> (9 is highest - we use levels 9, 7, 5, and 3)
                         </p>
                     </li>
                     <li>
                         <p>
-                            All <b>open</b> issues <a
-                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
-                            ordered by descending priority</a>
+                            <a href="http://tinyurl.com/3adybv">Recently open issues</a>
                         </p>
                     </li>
                     <li>
                         <p>
-                            All <b>closed</b> issues
-                            <a
-                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=2&amp;_category=100&amp;_group=100&amp;_sort_col=close_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
-                            ordered by descending closing date</a>
+                            <a href="http://tinyurl.com/yr44jw">Recently closed issues</a>
                         </p>
                     </li>
                 </ul>

@@ -168,7 +168,7 @@
 
                             <xxforms:variable name="top-level-block" select="."/>
                             <xxforms:variable name="top-level-position" select="position()"/>
-                            <xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>
+                            <!--<xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>-->
 
                             <xhtml:div class="fb-top-level-content">
                                 <!-- Top-level section -->
@@ -263,8 +263,8 @@
                                         <!-- Section content -->
                                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="none">
                                             <xxforms:variable name="section-content-position" select="position()"/>
-                                            <xxforms:variable name="is-section-content-current"
-                                                              select="$is-top-level-current and $section-content-position = index('fb-section-content-repeat')"/>
+                                            <!--<xxforms:variable name="is-section-content-current"-->
+                                                              <!--select="$is-top-level-current and $section-content-position = index('fb-section-content-repeat')"/>-->
 
                                             <xhtml:div class="fb-section-content">
                                                 <!-- Grid within top-level section -->

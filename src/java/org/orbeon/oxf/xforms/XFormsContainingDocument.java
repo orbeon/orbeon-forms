@@ -289,14 +289,14 @@ public class XFormsContainingDocument extends XFormsContainer {
      * Return a map of script id -> script text.
      */
     public Map getScripts() {
-        return (xformsStaticState == null) ? null : xformsStaticState.getScripts();
+        return xformsStaticState.getScripts();
     }
 
     /**
      * Return the document base URI.
      */
     public String getBaseURI() {
-        return (xformsStaticState == null) ? null : xformsStaticState.getBaseURI();
+        return xformsStaticState.getBaseURI();
     }
 
     /**
@@ -314,17 +314,14 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     public Map getNamespaceMappings(Element element) {
-        if (xformsStaticState != null)
-            return xformsStaticState.getNamespaceMappings(element);
-        else // should happen only with the legacy XForms engine
-            return Dom4jUtils.getNamespaceContextNoDefault(element);
+        return xformsStaticState.getNamespaceMappings(element);
     }
 
     /**
      * Return external-events configuration attribute.
      */
     private Map getExternalEventsMap() {
-        return (xformsStaticState == null) ? null : xformsStaticState.getExternalEventsMap();
+        return xformsStaticState.getExternalEventsMap();
     }
 
     /**
@@ -1454,24 +1451,21 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     private void createControlsAndModels(PipelineContext pipelineContext) {
 
-        if (xformsStaticState != null) {
-
-            // Gather static analysis information
-            final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-            final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
-            if (XFormsServer.logger.isDebugEnabled()) {
-                if (analyzed)
-                    logDebug("containing document", "performed static analysis", new String[] { "time", Long.toString(System.currentTimeMillis() - startTime) });
-                else
-                    logDebug("containing document", "static analysis already available");
-            }
-
-            // Create XForms controls
-            xformsControls = new XFormsControls(this);
-
-            // Add models
-            addAllModels();
+        // Gather static analysis information
+        final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+        final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
+        if (XFormsServer.logger.isDebugEnabled()) {
+            if (analyzed)
+                logDebug("containing document", "performed static analysis", new String[] { "time", Long.toString(System.currentTimeMillis() - startTime) });
+            else
+                logDebug("containing document", "static analysis already available");
         }
+
+        // Create XForms controls
+        xformsControls = new XFormsControls(this);
+
+        // Add models
+        addAllModels();
     }
 
     protected void initializeNestedControls(PipelineContext pipelineContext) {

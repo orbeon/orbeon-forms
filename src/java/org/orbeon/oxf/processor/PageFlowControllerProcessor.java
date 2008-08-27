@@ -1118,9 +1118,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 if (isTransformedInstance) {
                     parametersOutput = new ASTOutput(null, "parameters");
                     // Pass parameters only if needed
-                    final QName instanceToParametersProcessor = (otherXForms != null)
-                            ? XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME
-                            : XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR2_QNAME;
+                    final QName instanceToParametersProcessor = XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME;
                     when.addStatement(new ASTProcessorCall(instanceToParametersProcessor) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NULL_DOCUMENT));

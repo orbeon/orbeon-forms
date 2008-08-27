@@ -443,23 +443,14 @@ public class XFormsProperties {
     }
 
     private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument != null && containingDocument.getStaticState() != null)
-            return containingDocument.getStaticState().getBooleanProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return Properties.instance().getPropertySet().getBoolean(XFORMS_PROPERTY_PREFIX + propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
+        return containingDocument.getStaticState().getBooleanProperty(propertyName);
     }
 
     private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument != null && containingDocument.getStaticState() != null)
-            return containingDocument.getStaticState().getStringProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return Properties.instance().getPropertySet().getString(XFORMS_PROPERTY_PREFIX + propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
+        return containingDocument.getStaticState().getStringProperty(propertyName);
     }
 
     private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument != null && containingDocument.getStaticState() != null)
-            return containingDocument.getStaticState().getIntegerProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
+        return containingDocument.getStaticState().getIntegerProperty(propertyName);
     }
 }

@@ -30,7 +30,7 @@
     <!-- ==== Pages ==== -->
 
     <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          path-info="/fr/([^/]+)/([^/]+)(/list/)?" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -38,7 +38,7 @@
     </page>
 
     <!-- New document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(new)(/)?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(new)/" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"
           model="detail/read-form.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>

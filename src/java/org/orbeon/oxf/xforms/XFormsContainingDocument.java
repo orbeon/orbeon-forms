@@ -95,10 +95,6 @@ public class XFormsContainingDocument extends XFormsContainer {
     // Global flag used during initialization only
     private boolean mustPerformInitializationFirstRefresh;
 
-    // Legacy information
-    private String legacyContainerType;
-    private String legacyContainerNamespace;
-
     // Event information
     private static final Map ignoredXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedXFormsOutputExternalEvents = new HashMap();
@@ -307,14 +303,14 @@ public class XFormsContainingDocument extends XFormsContainer {
      * Return the container type that generate the XForms page, either "servlet" or "portlet".
      */
     public String getContainerType() {
-        return (xformsStaticState == null) ? legacyContainerType : xformsStaticState.getContainerType();
+        return xformsStaticState.getContainerType();
     }
 
     /**
      * Return the container namespace that generate the XForms page. Always "" for servlets.
      */
     public String getContainerNamespace() {
-        return (xformsStaticState == null) ? legacyContainerNamespace : xformsStaticState.getContainerNamespace();
+        return xformsStaticState.getContainerNamespace();
     }
 
     public Map getNamespaceMappings(Element element) {

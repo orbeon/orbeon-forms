@@ -1436,14 +1436,31 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
             <section>
                 <title><code>&lt;xforms:delete></code> Action</title>
                 <p>
-                    The <code>&lt;xforms:delete></code>, when omitting the <code>at</code> attribute, now deletes all
-                    the nodes referred to by the <code>nodeset</code> attribute. This is as per the <a
+                    The <code>&lt;xforms:delete></code> action, when omitting the <code>at</code> attribute, now
+                    deletes all the nodes referred to by the <code>nodeset</code> attribute. This is as per the <a
                     href="http://www.w3.org/TR/xforms11/#action-delete">XForms 1.1 specification</a>. Previously, this
                     would only delete the first node of the node-set.
                 </p>
                 <xml-source>
                     <comment> Delete all employee elements under the current context node </comment>
                     <xforms:delete nodeset="employee"/>
+                </xml-source>
+                <p>
+                    You may have to modify your code if you relied on the older behavior. You can easily delete only the
+                    first node by writing:
+                </p>
+                <xml-source>
+                    <comment> Delete the first employee element under the current context node </comment>
+                    <xforms:delete nodeset="employee[1]"/>
+                </xml-source>
+                <p>
+                    Previous workarounds still work, but they are no longer needed:
+                </p>
+                <xml-source>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete xxforms:iterate="employee" nodeset="."/>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete while="employee" nodeset="employee"/>
                 </xml-source>
             </section>
             <section>

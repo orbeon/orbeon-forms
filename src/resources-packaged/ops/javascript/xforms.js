@@ -4073,15 +4073,13 @@ ORBEON.xforms.Server = {
                                                 if (templateNode.nodeType == ELEMENT_TYPE) {
                                                     // Save tag name to be used for delimiter
                                                     delimiterTagName = templateNode.tagName;
-                                                         // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
-                                                        templateNode.id.indexOf("repeat-begin-") == 0)
+                                                    // Decrement nestedRepeatLevel when we we exit a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-begin-") == 0)
                                                         nestedRepeatLevel--;
-                                                         // Increment nestedRepeatLevel when we enter a nested repeat
-                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
-                                                        templateNode.id.indexOf("repeat-end-") == 0)
+                                                    // Increment nestedRepeatLevel when we enter a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
                                                         nestedRepeatLevel++;
-                                                         // Remove "xforms-repeat-template" from classes on copy of element
+                                                    // Remove "xforms-repeat-template" from classes on copy of element
                                                     var nodeCopyClasses = nodeCopy.className.split(" ");
                                                     var nodeCopyNewClasses = new Array();
                                                     for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
@@ -4094,11 +4092,11 @@ ORBEON.xforms.Server = {
                                                 templateNodes.push(nodeCopy);
                                                 templateNode = templateNode.previousSibling;
                                             }
-                                                // Add a delimiter
+                                            // Add a delimiter
                                             var newDelimiter = document.createElement(delimiterTagName);
                                             newDelimiter.className = "xforms-repeat-delimiter";
                                             templateNodes.push(newDelimiter);
-                                                // Reverse nodes as they were inserted in reverse order
+                                            // Reverse nodes as they were inserted in reverse order
                                             templateNodes = templateNodes.reverse();
                                         }
                                         // Find element after insertion point
@@ -4121,8 +4119,8 @@ ORBEON.xforms.Server = {
                                             }
                                         }
                                         // Insert copy of template nodes
-
                                         for (var suffix = startSuffix; suffix <= endSuffix; suffix++) {
+                                            var nestedRepeatLevel = 0;
                                             for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
                                                 var templateNode = templateNodes[templateNodeIndex];
 
@@ -4135,8 +4133,15 @@ ORBEON.xforms.Server = {
                                                     // Clone again
                                                     newTemplateNode = templateNodes[templateNodeIndex].cloneNode(true)
                                                 }
-                                                xformsAddSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
-
+                                                if (newTemplateNode.nodeType == ELEMENT_TYPE) {
+                                                    // Decrement nestedRepeatLevel when we we exit a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
+                                                        nestedRepeatLevel--;
+                                                    xformsAddSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
+                                                    // Increment nestedRepeatLevel when we enter a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-begin-") == 0)
+                                                        nestedRepeatLevel++;
+                                                }
                                                 afterInsertionPoint.parentNode.insertBefore(newTemplateNode, afterInsertionPoint);
                                                 ORBEON.xforms.Init.insertedElement(newTemplateNode);
                                             }
@@ -5734,26 +5739,26 @@ function xformsAppendRepeatSuffix(id, suffix) {
  * @param repeatId      Can be either a pure repeat ID, such as "todo" or an ID that contains information of its
  *                      position relative to its parents, such as "todo.1". The former happens when we handle an
  *                      event such as <xxf:repeat-index id="todo" old-index="4" new-index="6"/>. In this case
- *                      "todo" means the "current todo". The latter happens when we handle an event such as
- *                      <xxf:repeat-iteration id="todo.1" relevant="false" iteration="10"/>, which does not
- *                      necessarily apply to the current "todo".
+ *                      "todo" means the "todo at 'index' in the current todo list". The latter happens when we handle
+ *                      an event such as <xxf:repeat-iteration id="todo.1" relevant="false" iteration="10"/>, which
+ *                      does not necessarily apply to the current "todo".
  * @param index
  */
 function xformsFindRepeatDelimiter(repeatId, index) {
 
     // Find id of repeat begin for the current repeatId
     var parentRepeatIndexes = "";
-{
-    var currentId = repeatId;
-    while (true) {
-        var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
-        if (parent == null) break;
-        var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-        parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
-                + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
-        currentId = parent;
+    {
+        var currentId = repeatId;
+        while (true) {
+            var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
+            if (parent == null) break;
+            var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
+            parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
+                    + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
+            currentId = parent;
+        }
     }
-}
 
     var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
     var beginElement = ORBEON.util.Dom.getElementById(beginElementId);

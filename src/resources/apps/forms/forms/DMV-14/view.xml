@@ -303,7 +303,7 @@
                                 <xforms:group ref="instance('triggers-instance')/remove-vehicle-trigger">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:delete nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
-                                        <xforms:delete context="instance('plates-instance')" nodeset="plate"/>
+                                        <xforms:delete context="instance('plates-instance')" nodeset="plate" at="index('vehicles-repeat')"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>

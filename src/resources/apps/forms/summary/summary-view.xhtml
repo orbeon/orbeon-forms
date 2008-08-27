@@ -30,7 +30,7 @@
         <!-- Main XForms model -->
         <xforms:model id="common-model">
             
-            <xforms:action ev:event="xforms-ready">
+            <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Set summary query -->
                 <xforms:insert nodeset="xxforms:instance('list-documents-query')"
                                origin="doc(concat('oxf:/apps/forms/forms/', instance('parameters-instance')/form-id, '/summary-query.xml'))"/>

@@ -31,8 +31,8 @@
         <xforms:model id="common-model" xxforms:state-handling="server"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
 
-            <!-- This is called when the XForms engine is ready -->
-            <xforms:action ev:event="xforms-ready">
+            <!-- This is called when the model is constructed -->
+            <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Load document if specified -->
                 <xforms:send if="instance('parameters-instance')/document-id != ''" submission="load-submission"/>
                 <!-- Create document id if not specified -->
@@ -217,8 +217,8 @@
                     <xforms:action ev:event="xforms-invalid" if="normalize-space(event('xxforms:alert')) != ''">
                         <xforms:action if="not(instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')])">
                             <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
-                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('xxforms:target')"/>
-                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[last()]/@id" value="event('xxforms:target')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[last()]/@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
                         </xforms:action>
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@alert" value="event('xxforms:alert')"/>
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@label" value="event('xxforms:label')"/>
@@ -238,7 +238,7 @@
 
         </xforms:group>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </body>
 </html>

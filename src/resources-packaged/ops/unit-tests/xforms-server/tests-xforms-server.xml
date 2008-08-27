@@ -1609,6 +1609,82 @@
         </output>
     </test>
 
+    <test description="Index initialization" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                    <xforms:instance>
+                                       <instance model-id="main-model">
+                                           <r1/>
+                                           <r1>
+                                               <r2/>
+                                               <r2/>
+                                           </r1>
+                                           <r1/>
+                                           <r3/>
+                                           <r4/>
+                                           <r4>
+                                               <r5/>
+                                               <r5/>
+                                           </r4>
+                                           <r4/>
+                                       </instance>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Check startindex in bounds, out of bounds, and 0 -->
+                                <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
+                                    <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
+                                    </xforms:repeat>
+                                </xforms:repeat>
+                                <xforms:repeat nodeset="r3" id="repeat3">
+                                </xforms:repeat>
+                                <xforms:repeat nodeset="r4" id="repeat4">
+                                    <xforms:repeat nodeset="r5" id="repeat5"/>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" id="repeat-response"/>
+                </p:processor>
+
+                <!-- Just return repeat information -->
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="data" href="#repeat-response"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="//controls"/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <controls>
+                <control effective-id="repeat1" index="2"/>
+                <control effective-id="repeat2·1" index="0"/>
+                <control effective-id="repeat2·2" index="2"/>
+                <control effective-id="repeat2·3" index="0"/>
+                <control effective-id="repeat3" index="1"/>
+                <control effective-id="repeat4" index="1"/>
+                <control effective-id="repeat5·1" index="0"/>
+                <control effective-id="repeat5·2" index="1"/>
+                <control effective-id="repeat5·3" index="0"/>
+            </controls>
+        </output>
+    </test>
+
     <test description="Submitting required but empty values fails submission" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

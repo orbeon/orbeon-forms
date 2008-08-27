@@ -96,12 +96,9 @@
                                 </equation>
                             </instance>
                         </instances>
-                        <divs>
-                            <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
-                            <xxf:div switch-id="23a" case-id="subtract" visibility="hidden"/>
-                            <xxf:div switch-id="23a" case-id="multiply" visibility="hidden"/>
-                            <xxf:div switch-id="23a" case-id="divide" visibility="hidden"/>
-                        </divs>
+                        <controls>
+                            <control effective-id="23a" case-id="add"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -166,12 +163,9 @@
                                 </equation>
                             </instance>
                         </instances>
-                        <divs>
-                            <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
-                            <xxf:div switch-id="23a" case-id="subtract" visibility="hidden"/>
-                            <xxf:div switch-id="23a" case-id="multiply" visibility="hidden"/>
-                            <xxf:div switch-id="23a" case-id="divide" visibility="hidden"/>
-                        </divs>
+                        <controls>
+                            <control effective-id="23a" case-id="add"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -574,7 +568,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" xxforms:state-handling="client">
+                                <xforms:model xxforms:state-handling="client">
                                     <xforms:instance>
                                         <form>
                                             <departments>
@@ -654,10 +648,12 @@
                                 </form>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="id123" index="1"/>
-                            <repeat-index id="id124" index="2"/>
-                        </repeat-indexes>
+                        <controls>
+                        <control effective-id="id123" index="1"/>
+                            <control effective-id="id124·1" index="2"/>
+                            <control effective-id="id124·2" index="1"/>
+                            <control effective-id="id124·3" index="2"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -680,14 +676,6 @@
                         <xxf:control id="id125·3-4">f34</xxf:control>
                         <xxf:control id="id126·3-4">l34</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeats>
-                        <xxf:repeat-index id="id123" index="1"/>
-                        <xxf:repeat-index id="id124" index="2"/>
-                        <xxf:repeat-iteration id="id123" occurs="3"/>
-                        <xxf:repeat-iteration id="id124·2" occurs="1"/>
-                        <xxf:repeat-iteration id="id124·3" occurs="4"/>
-                        <xxf:repeat-iteration id="id124·1" occurs="2"/>
-                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -746,10 +734,13 @@
                                 </form>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="id123" index="3"/>
-                            <repeat-index id="id124" index="2"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="id123" index="3"/>
+                            <control effective-id="id124·1" index="3"/>
+                            <control effective-id="id124·2" index="1"/>
+                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124·4" index="2"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -845,10 +836,12 @@
                                 </form>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="id123" index="1"/>
-                            <repeat-index id="id124" index="1"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="id123" index="1"/>
+                            <control effective-id="id124·1" index="1"/>
+                            <control effective-id="id124·2" index="1"/>
+                            <control effective-id="id124·3" index="2"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -928,10 +921,12 @@
                                 </form>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="id123" index="3"/>
-                            <repeat-index id="id124" index="4"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="id123" index="3"/>
+                            <control effective-id="id124·1" index="1"/>
+                            <control effective-id="id124·2" index="1"/>
+                            <control effective-id="id124·3" index="4"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1003,10 +998,12 @@
                                 </form>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="id123" index="3"/>
-                            <repeat-index id="id124" index="2"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="id123" index="3"/>
+                            <control effective-id="id124·1" index="1"/>
+                            <control effective-id="id124·2" index="1"/>
+                            <control effective-id="id124·3" index="2"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1267,87 +1264,6 @@
         </output>
     </test>
 
-    <test description="Index initialization" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
-                                    <xforms:instance>
-                                       <instance model-id="main-model">
-                                           <r1/>
-                                           <r1>
-                                               <r2/>
-                                               <r2/>
-                                           </r1>
-                                           <r1/>
-                                           <r3/>
-                                           <r4/>
-                                           <r4>
-                                               <r5/>
-                                               <r5/>
-                                           </r4>
-                                           <r4/>
-                                       </instance>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <!-- Check startindex in bounds, out of bounds, and 0 -->
-                                <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
-                                    <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
-                                    </xforms:repeat>
-                                </xforms:repeat>
-                                <xforms:repeat nodeset="r3" id="repeat3">
-                                </xforms:repeat>
-                                <xforms:repeat nodeset="r4" id="repeat4">
-                                    <xforms:repeat nodeset="r5" id="repeat5"/>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" id="repeat-response"/>
-                </p:processor>
-
-                <!-- Just return repeat information -->
-                <p:processor name="oxf:unsafe-xslt">
-                    <p:input name="data" href="#repeat-response"/>
-                    <p:input name="config">
-                        <xsl:stylesheet version="2.0">
-                            <xsl:template match="/">
-                                <xsl:copy-of select="//xxforms:repeats"/>
-                            </xsl:template>
-                        </xsl:stylesheet>
-                    </p:input>
-                    <p:output name="data" ref="response"/>
-                </p:processor>
-
-            </p:config>
-        </input>
-        <output name="response">
-            <xxf:repeats xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:repeat-index id="repeat1" index="2"/>
-                <xxf:repeat-index id="repeat2" index="2"/>
-                <xxf:repeat-index id="repeat4" index="1"/>
-                <xxf:repeat-index id="repeat3" index="1"/>
-                <xxf:repeat-index id="repeat5" index="0"/>
-                <xxf:repeat-iteration id="repeat1" occurs="3"/>
-                <xxf:repeat-iteration id="repeat5·2" occurs="2"/>
-                <xxf:repeat-iteration id="repeat5·1" occurs="0"/>
-                <xxf:repeat-iteration id="repeat2·2" occurs="2"/>
-                <xxf:repeat-iteration id="repeat2·1" occurs="0"/>
-                <xxf:repeat-iteration id="repeat4" occurs="3"/>
-                <xxf:repeat-iteration id="repeat5·3" occurs="0"/>
-                <xxf:repeat-iteration id="repeat2·3" occurs="0"/>
-                <xxf:repeat-iteration id="repeat3" occurs="1"/>
-            </xxf:repeats>
-        </output>
-    </test>
-
     <test description="Instance replacement with index updates" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -1474,13 +1390,17 @@
                                 </instance>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="repeat1" index="2"/>
-                            <repeat-index id="repeat2" index="1"/>
-                            <repeat-index id="repeat4" index="1"/>
-                            <repeat-index id="repeat3" index="0"/>
-                            <repeat-index id="repeat5" index="1"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="repeat1" index="2"/>
+                            <control effective-id="repeat2·1" index="0"/>
+                            <control effective-id="repeat2·2" index="1"/>
+                            <control effective-id="repeat2·3" index="0"/>
+                            <control effective-id="repeat3" index="0"/>
+                            <control effective-id="repeat4" index="1"/>
+                            <control effective-id="repeat5·1" index="1"/>
+                            <control effective-id="repeat5·2" index="1"/>
+                            <control effective-id="repeat5·3" index="0"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1669,9 +1589,9 @@
                                 </employee>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="employee-repeat" index="2"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="employee-repeat" index="2"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1825,9 +1745,9 @@
                                 </instance>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="xforms-element-6" index="1"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="xforms-element-6" index="1"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1840,10 +1760,6 @@
                         <xxf:control id="title-control·3" required="true" label="Title">Childhood's End</xxf:control>
                         <xxf:control id="author-control·3" required="true" label="Author">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeats>
-                        <xxf:repeat-index id="xforms-element-6" index="1"/>
-                        <xxf:repeat-iteration id="xforms-element-6" occurs="3"/>
-                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2039,9 +1955,9 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances/>
-                        <repeat-indexes>
-                            <repeat-index id="xforms-element-3" index="1"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="xforms-element-3" index="1"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -2054,10 +1970,6 @@
                         <xxf:control id="xforms-element-4·3" label="City: ">San Diego</xxf:control>
                         <xxf:control id="xforms-element-6·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeats>
-                        <xxf:repeat-index id="xforms-element-3" index="1"/>
-                        <xxf:repeat-iteration id="xforms-element-3" occurs="3"/>
-                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2201,9 +2113,9 @@
                                 </items>
                             </instance>
                         </instances>
-                        <repeat-indexes>
-                            <repeat-index id="items-repeat" index="3"/>
-                        </repeat-indexes>
+                         <controls>
+                            <control effective-id="items-repeat" index="3"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -2213,10 +2125,6 @@
                         <xxf:control id="my-count·2" label="Two:">5</xxf:control>
                         <xxf:control id="my-count·3" label="Three:">6</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeats>
-                        <xxf:repeat-index id="items-repeat" index="3"/>
-                        <xxf:repeat-iteration id="items-repeat" occurs="3"/>
-                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2446,9 +2354,9 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances/>
-                        <repeat-indexes>
-                            <repeat-index id="my-repeat" index="5"/>
-                        </repeat-indexes>
+                        <controls>
+                            <control effective-id="my-repeat" index="5"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -2503,10 +2411,6 @@
                         <xxf:control id="repeat-context-1·8">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·8">yellow</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeats>
-                        <xxf:repeat-index id="my-repeat" index="5"/>
-                        <xxf:repeat-iteration id="my-repeat" occurs="8"/>
-                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>

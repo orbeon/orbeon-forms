@@ -29,8 +29,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -334,7 +332,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                                     // Remember new event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
@@ -348,12 +346,12 @@ public class XFormsServer extends ProcessorImpl {
 
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }
                                 // Send new event
-                                executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd);
+                                containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd);
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -368,7 +366,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Flush stored event if needed
                     if (lastSourceControlId != null) {
                         // Send old event
-                        executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                        containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                     }
 
                     // End external events
@@ -449,23 +447,6 @@ public class XFormsServer extends ProcessorImpl {
             XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, xhtmlDocument,
                     containingDocument, contentHandler, encodedClientState);
         }
-    }
-
-    /**
-     * Execute an external event and ensure deferred event handling.
-     *
-     * @param pipelineContext       current PipelineContext
-     * @param containingDocument    XFormsContainingDocument to which events must be dispatched
-     * @param eventName             name of the event
-     * @param controlId             effective control id to dispatch to
-     * @param otherControlId        other effective control id if any
-     * @param valueString           optional context string
-     * @param filesElement          optional files elements for upload
-     */
-    private void executeExternalEventHandleDeferredEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
-        containingDocument.startOutermostActionHandler();
-        containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, valueString, filesElement, dndStart, dndEnd);
-        containingDocument.endOutermostActionHandler(pipelineContext);
     }
 
     public static void outputAjaxResponse(XFormsContainingDocument containingDocument, Map valueChangeControlIds,
@@ -612,8 +593,6 @@ public class XFormsServer extends ProcessorImpl {
                                 diffIndexState(ch, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(),
                                         xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex());
                             }
-                        } else {
-                            testOutputInitialRepeatInfo(ch, xformsControls);
                         }
                     } else {
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
@@ -753,47 +732,6 @@ public class XFormsServer extends ProcessorImpl {
             }
             if (found)
                 ch.endElement();
-        }
-    }
-
-    private static void testOutputInitialRepeatInfo(final ContentHandlerHelper ch, XFormsControls xformsControls) {
-
-        ControlTree controlTree = xformsControls.getCurrentControlTree();
-        final Map initialRepeatIdToIndex = controlTree.getMinimalRepeatIdToIndex();
-
-        if (initialRepeatIdToIndex.size() != 0) {
-
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
-
-            // Output repeat index information
-
-            if (initialRepeatIdToIndex != null) {
-                for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String repeatId = (String) currentEntry.getKey();
-                    final Integer index = (Integer) currentEntry.getValue();
-
-                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                        new String[]{"id", repeatId, "index", index.toString()});
-                }
-            }
-
-            // Output repeat iteration information
-            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                public void startVisitControl(XFormsControl control) {
-                    if (control instanceof XFormsRepeatControl) {
-                        // Found xforms:repeat, set/adjust its index
-                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
-                            new String[]{"id", repeatControl.getEffectiveId(), "occurs", Integer.toString(repeatControl.getSize()) });
-                    }
-                }
-
-                public void endVisitControl(XFormsControl control) {}
-            });
-
-            ch.endElement();
         }
     }
 

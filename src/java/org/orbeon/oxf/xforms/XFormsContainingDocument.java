@@ -741,20 +741,29 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     /**
-     * Execute an external event on element with id targetElementId and event eventName.
+     * Execute an external event and ensure deferred event handling.
+     *
+     * @param pipelineContext           current PipelineContext
+     * @param eventName                 name of the event
+     * @param controlEffectiveId        effective control id to dispatch to
+     * @param otherControlEffectiveId   other effective control id if any
+     * @param valueString               optional context string
+     * @param filesElement              optional files elements for upload
+     * @param dndStart                  optional DnD start information
+     * @param dndEnd                    optional DnD end information
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String effectiveControlId, String effectiveOtherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlEffectiveId, String otherControlEffectiveId, String valueString, Element filesElement, String dndStart, String dndEnd) {
 
         // Get event target object
         XFormsEventTarget eventTarget;
         {
-            final Object eventTargetObject = getObjectByEffectiveId(effectiveControlId);
+            final Object eventTargetObject = getObjectByEffectiveId(controlEffectiveId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                    throw new ValidationException("Event target id '" + effectiveControlId + "' is not an XFormsEventTarget.", getLocationData());
+                    throw new ValidationException("Event target id '" + controlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", effectiveControlId, "event name", eventName });
+                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", controlEffectiveId, "event name", eventName });
                     }
                     return;
                 }
@@ -769,15 +778,15 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
-            final Object otherEventTargetObject = (effectiveOtherControlId == null) ? null : getObjectByEffectiveId(effectiveOtherControlId);
+            final Object otherEventTargetObject = (otherControlEffectiveId == null) ? null : getObjectByEffectiveId(otherControlEffectiveId);
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                    throw new ValidationException("Other event target id '" + effectiveOtherControlId + "' is not an XFormsEventTarget.", getLocationData());
+                    throw new ValidationException("Other event target id '" + otherControlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", effectiveControlId, "event name", eventName, "second control id", effectiveOtherControlId });
+                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", controlEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId });
                     }
                     return;
                 }
@@ -828,116 +837,126 @@ public class XFormsContainingDocument extends XFormsContainer {
 //            }
 //        }
 
-        // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
-                true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
+        // Ensure deferred event handling
+        startOutermostActionHandler();
+        {
+            // Create event
+            final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
+                    true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
-        // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-        if (effectiveControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
-                && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
+            // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
+            if (controlEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
+                    && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
 
-            // Check if the value to set will be different from the current value
-            if (eventTarget instanceof XFormsValueControl && xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
-                final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
-                if (valueChangeWithFocusChangeEvent.getOtherTargetObject() == null) {
-                    // We only get a value change with this event
-                    final String currentExternalValue = ((XFormsValueControl) eventTarget).getExternalValue(pipelineContext);
-                    if (currentExternalValue != null) {
-                        // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
-                        final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
-                        if (isIgnoreValueChangeEvent) {
-                            logDebug("containing document", "ignoring value change event as value is the same",
-                                    new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName, "value", currentExternalValue });
-                            return;
+                // Check if the value to set will be different from the current value
+                if (eventTarget instanceof XFormsValueControl && xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
+                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
+                    if (valueChangeWithFocusChangeEvent.getOtherTargetObject() == null) {
+                        // We only get a value change with this event
+                        final String currentExternalValue = ((XFormsValueControl) eventTarget).getExternalValue(pipelineContext);
+                        if (currentExternalValue != null) {
+                            // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
+                            final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
+                            if (isIgnoreValueChangeEvent) {
+                                logDebug("containing document", "ignoring value change event as value is the same",
+                                        new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName, "value", currentExternalValue });
+
+                                // Ensure deferred event handling
+                                // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
+                                endOutermostActionHandler(pipelineContext);
+                                return;
+                            }
+                        } else {
+                            // shouldn't happen really, but just in case let's log this
+                            logDebug("containing document", "got null currentExternalValue", new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName });
                         }
                     } else {
-                        // shouldn't happen really, but just in case let's log this
-                        logDebug("containing document", "got null currentExternalValue", new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName });
+                        // There will be a focus event too, so don't ignore
                     }
-                } else {
-                    // There will be a focus event too, so don't ignore
+                }
+
+                // Dispatch repeat focus event
+                {
+                    // The event target is in a repeated structure, so make sure it gets repeat focus
+                    dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
+                    // Get a fresh reference
+                    eventTarget = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
                 }
             }
 
-            // Dispatch repeat focus event
-            {
-                // The event target is in a repeated structure, so make sure it gets repeat focus
-                dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
-                // Get a fresh reference
-                eventTarget = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
+            // Interpret event
+            if (eventTarget instanceof XFormsOutputControl) {
+                // Special xforms:output case
+
+                if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
+
+                    // First, dispatch DOMFocusIn
+                    dispatchEvent(pipelineContext, xformsEvent);
+
+                    // Then, dispatch DOMActivate unless the control is read-only
+                    final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
+                    if (!xformsOutputControl.isReadonly()) {
+                        dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
+                    }
+                } else if (!ignoredXFormsOutputExternalEvents.equals(eventName)) {
+                    // Dispatch other event
+                    dispatchEvent(pipelineContext, xformsEvent);
+                }
+            } else if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
+                // 4.6.7 Sequence: Value Change
+
+                // What we want to do here is set the value on the initial controls tree, as the value has already been
+                // changed on the client. This means that this event(s) must be the first to come!
+
+                final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
+
+                // 1. xforms-recalculate
+                // 2. xforms-revalidate
+                // 3. xforms-refresh performs reevaluation of UI binding expressions then dispatches
+                // these events according to value changes, model item property changes and validity
+                // changes
+                // [n] xforms-value-changed, [n] xforms-valid or xforms-invalid, [n] xforms-enabled or
+                // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
+                // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
+
+                {
+                    // Store value into instance data through the control
+                    final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
+                    valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
+                }
+
+                {
+                    // NOTE: Recalculate and revalidate are done with the automatic deferred updates
+
+                    // Handle focus change DOMFocusOut / DOMFocusIn
+                    if (valueChangeWithFocusChangeEvent.getOtherTargetObject() != null) {
+
+                        // We have a focus change (otherwise, the focus is assumed to remain the same)
+
+                        // Dispatch DOMFocusOut
+                        // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
+                        // dispatched, so we get the control again to have a fresh reference
+                        final XFormsControl sourceXFormsControl = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
+                        if (sourceXFormsControl != null)
+                            dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
+
+                        // Dispatch DOMFocusIn
+                        final XFormsControl otherTargetXFormsControl
+                            = (XFormsControl) getObjectByEffectiveId(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
+                        if (otherTargetXFormsControl != null)
+                            dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
+                    }
+
+                    // NOTE: Refresh is done with the automatic deferred updates
+                }
+
+            } else {
+                // Dispatch any other allowed event
+                dispatchEvent(pipelineContext, xformsEvent);
             }
         }
-
-        // Interpret event
-        if (eventTarget instanceof XFormsOutputControl) {
-            // Special xforms:output case
-
-            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
-
-                // First, dispatch DOMFocusIn
-                dispatchEvent(pipelineContext, xformsEvent);
-
-                // Then, dispatch DOMActivate unless the control is read-only
-                final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
-                if (!xformsOutputControl.isReadonly()) {
-                    dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
-                }
-            } else if (!ignoredXFormsOutputExternalEvents.equals(eventName)) {
-                // Dispatch other event
-                dispatchEvent(pipelineContext, xformsEvent);
-            }
-        } else if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
-            // 4.6.7 Sequence: Value Change
-
-            // What we want to do here is set the value on the initial controls tree, as the value has already been
-            // changed on the client. This means that this event(s) must be the first to come!
-
-            final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
-
-            // 1. xforms-recalculate
-            // 2. xforms-revalidate
-            // 3. xforms-refresh performs reevaluation of UI binding expressions then dispatches
-            // these events according to value changes, model item property changes and validity
-            // changes
-            // [n] xforms-value-changed, [n] xforms-valid or xforms-invalid, [n] xforms-enabled or
-            // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
-            // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
-
-            {
-                // Store value into instance data through the control
-                final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
-                valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
-            }
-
-            {
-                // NOTE: Recalculate and revalidate are done with the automatic deferred updates
-
-                // Handle focus change DOMFocusOut / DOMFocusIn
-                if (valueChangeWithFocusChangeEvent.getOtherTargetObject() != null) {
-
-                    // We have a focus change (otherwise, the focus is assumed to remain the same)
-
-                    // Dispatch DOMFocusOut
-                    // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
-                    // dispatched, so we get the control again to have a fresh reference
-                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
-                    if (sourceXFormsControl != null)
-                        dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
-
-                    // Dispatch DOMFocusIn
-                    final XFormsControl otherTargetXFormsControl
-                        = (XFormsControl) getObjectByEffectiveId(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
-                    if (otherTargetXFormsControl != null)
-                        dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
-                }
-
-                // NOTE: Refresh is done with the automatic deferred updates
-            }
-
-        } else {
-            // Dispatch any other allowed event
-            dispatchEvent(pipelineContext, xformsEvent);
-        }
+        // Ensure deferred event handling
+        endOutermostActionHandler(pipelineContext);
     }
 
     /**

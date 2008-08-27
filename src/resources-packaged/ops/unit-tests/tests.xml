@@ -26,7 +26,6 @@
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="tests-xpl.xml"/>
-    <xi:include href="tests-xforms.xml"/>
     <xi:include href="xforms-server/tests-xforms-server.xml"/>
     <xi:include href="tests-qname-converter.xml"/>
     <xi:include href="tests-xupdate.xml"/>

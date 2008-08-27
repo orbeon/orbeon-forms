@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
@@ -137,7 +138,7 @@ public class XFormsControls {
      * @param dynamicStateElement
      */
     public void serializeControls(Element dynamicStateElement) {
-        final Element controlsElement = dynamicStateElement.addElement("controls");
+        final Element controlsElement = Dom4jUtils.createElement("controls");
         visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
                 final Map nameValues = control.serializeLocal();
@@ -151,6 +152,9 @@ public class XFormsControls {
                 }
             }
         });
+        // Only add the element if necessary
+        if (controlsElement.hasContent())
+            dynamicStateElement.add(controlsElement);
     }
 
     /**
@@ -230,10 +234,12 @@ public class XFormsControls {
         {
             final Map effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
             // Evaluate all controls
-            for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
-                currentControl.evaluateIfNeeded(pipelineContext);
+            if (effectiveIdsToControls != null) {
+                for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+                    currentControl.evaluateIfNeeded(pipelineContext);
+                }
             }
         }
         containingDocument.endHandleOperation();

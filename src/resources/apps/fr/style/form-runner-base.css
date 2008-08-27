@@ -97,7 +97,7 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; padding: 2px }
-.xforms-upload-mediatype, xforms-upload-size { padding-left: 1em }
+.xforms-upload-mediatype, .xforms-upload-size { padding-left: 1em }
 .xforms-upload-remove { vertical-align: top }
 
 /* No default highlight for repeated items */

@@ -134,10 +134,20 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public void setThrowable(Throwable throwable) {
         this.throwable = throwable;
 
-        // Log exception at error level
+        if (errorType == ErrorType.VALIDATION_ERROR) {
+            // Don't log validation errors as actual errors
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
+        } else {
+            // Everything else gets logged as an error
+            XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
+        }
+    }
+
+    private static String throwableToString(Throwable throwable) {
         final CharArrayWriter writer = new CharArrayWriter();
         OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
-        XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + writer.toString());
+        return writer.toString();
     }
 
     public DocumentInfo getBodyDocument() {

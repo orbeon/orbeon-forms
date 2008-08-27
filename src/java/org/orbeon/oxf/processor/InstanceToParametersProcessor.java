@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -57,16 +57,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
     private static final String INPUT_INSTANCE = "instance";
     private static final String INPUT_FILTER = "filter";
 
-    private boolean removeXXFormsAttributes;
-
-    public InstanceToParametersProcessor() {
-        this(true);
-    }
-
-    protected InstanceToParametersProcessor(boolean removeXXFormsAttributes) {
-
-        this.removeXXFormsAttributes = removeXXFormsAttributes;
-
+    protected InstanceToParametersProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_FILTER));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -118,8 +109,6 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
-                        if (removeXXFormsAttributes)
-                            XFormsUtils.removeInstanceAttributes(instanceWrapper);
                         outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance, false), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);

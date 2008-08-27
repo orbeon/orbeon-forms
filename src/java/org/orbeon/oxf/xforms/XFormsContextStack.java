@@ -684,13 +684,6 @@ public class XFormsContextStack {
         return null;
     }
 
-    /**
-     * Do not use. Only called by legacy XForms engine.
-     */
-    public Stack legacyGetStack() {
-        return contextStack;
-    }
-
     public static class BindingContext {
         private BindingContext parent;
         private XFormsModel model;

@@ -484,19 +484,6 @@
         </instantiation>
     </processor>
 
-    <!-- Legacy XForms processors -->
-    <processor name="oxf:xforms-input">
-        <class name="org.orbeon.oxf.processor.xforms.input.XFormsInput"/>
-    </processor>
-
-    <processor name="oxf:xforms-output">
-        <class name="org.orbeon.oxf.processor.xforms.output.XFormsOutput"/>
-    </processor>
-
-    <processor name="oxf:xforms-annotate">
-        <class name="org.orbeon.oxf.processor.xforms.validation.XFormsAnnotate"/>
-    </processor>
-
     <!-- Other processors -->
     <processor name="oxf:delegation">
         <class name="org.orbeon.oxf.processor.DelegationProcessor"/>
@@ -720,10 +707,6 @@
 
     <processor name="oxf:instance-to-parameters">
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
-    </processor>
-
-    <processor name="oxf:instance-to-parameters-2">
-        <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor2"/>
     </processor>
 
     <!-- No longer supported processors -->

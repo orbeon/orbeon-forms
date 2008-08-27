@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -70,25 +69,11 @@ public class InstanceData {
 
     private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData();
 
-    // For XForms Classic only
-    private static final boolean DEFAULT_XXFORMS_GENERATED = false;
-    private static final boolean DEFAULT_XXFORMS_EXTERNALIZE = false;
-    private boolean xxformsGenerated = DEFAULT_XXFORMS_GENERATED;
-    private boolean xxformsExternalize = DEFAULT_XXFORMS_EXTERNALIZE;
-    private int id = -1;
-    private Map idToNodeMap; // this is only used on the root element with XForms Classic
-
     private InstanceData() {
     }
 
     private InstanceData(LocationData locationData) {
         this.locationData = locationData;
-    }
-
-    // For XForms Classic only
-    private InstanceData(LocationData locationData, int id) {
-        this.locationData = locationData;
-        this.id = id;
     }
 
     public LocationData getLocationData() {
@@ -273,79 +258,9 @@ public class InstanceData {
         }
     }
 
-    public static void setXXFormsGenerated(NodeInfo nodeInfo, boolean generated) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (generated == DEFAULT_XXFORMS_GENERATED) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.xxformsGenerated = generated;
-            }
-        } else {
-            existingInstanceData.xxformsGenerated = generated;
-        }
-    }
-
-    public static boolean getXXFormsGenerated(Node node) {
-        final InstanceData existingInstanceData = getLocalInstanceData(node);
-        return (existingInstanceData == null) ? DEFAULT_XXFORMS_GENERATED: existingInstanceData.xxformsGenerated;
-    }
-
-    public static void setXXFormsExternalize(NodeInfo nodeInfo, boolean xxformsExternalize) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (xxformsExternalize == DEFAULT_XXFORMS_EXTERNALIZE) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.xxformsExternalize = xxformsExternalize;
-            }
-        } else {
-            existingInstanceData.xxformsExternalize = xxformsExternalize;
-        }
-    }
-
-    public static boolean getXXFormsExternalize(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_XXFORMS_EXTERNALIZE : existingInstanceData.xxformsExternalize;
-    }
-
     public static String getInvalidBindIds(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
         return (existingInstanceData == null) ? null : existingInstanceData.invalidBindIds;
-    }
-
-    // For XForms Classic only
-    public static String getId(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        if (existingInstanceData == null) {
-            return null;
-        } else {
-            if (existingInstanceData.id == -1)
-                throw new OXFException("InstanceData id is in invalid state.");
-            return Integer.toString(existingInstanceData.id);
-        }
-    }
-
-    // For XForms Classic only
-    public static Map getIdToNodeMap(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            final Node node = XFormsUtils.getNodeFromNodeInfo(nodeInfo, "");
-            return getLocalInstanceData(node.getDocument().getRootElement()).idToNodeMap;
-        } else {
-            // TODO: check how we proceed for TinyTree: should we return something anyway?
-            return null;
-        }
-    }
-
-    // For XForms Classic only
-    public static void setIdToNodeMap(Node node, Map idToNodeMap) {
-        getLocalInstanceData(node).idToNodeMap = idToNodeMap;
     }
 
     public static void addSchemaError(NodeInfo nodeInfo, final String schemaError, final String stringValue, String modelBindId) {
@@ -667,126 +582,6 @@ public class InstanceData {
             return new InstanceData(((InstanceData) existingData).getLocationData());
         } else {
             return new InstanceData(null);
-        }
-    }
-
-    // For XForms Classic only
-    private static InstanceData newInstanceData(Object existingData, int id) {
-        if (existingData instanceof LocationData) {
-            return new InstanceData((LocationData) existingData, id);
-        } else if (existingData instanceof InstanceData) {
-            return new InstanceData(((InstanceData) existingData).getLocationData(), id);
-        } else {
-            return new InstanceData(null, id);
-        }
-    }
-
-    /**
-     * Reconcile "DOM InstanceData annotations" with "attribute annotations".
-     *
-     * For XForms Classic only.
-     *
-     * @param elementNodeInfo element NodeInfo to annotate
-     */
-    public static void addInstanceAttributes(final NodeInfo elementNodeInfo) {
-
-        // Don't do anything if we have a read-only document
-        if (!(elementNodeInfo instanceof NodeWrapper))
-            return;
-
-        {
-            final Element element = (Element) XFormsUtils.getNodeFromNodeInfo(elementNodeInfo, "");
-            final String invalidBindIds = InstanceData.getInvalidBindIds(elementNodeInfo);
-            updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBindIds, null);
-
-            // Reconcile boolean model item properties
-            reconcileBoolean(getInheritedReadonly(elementNodeInfo), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, DEFAULT_READONLY);
-            reconcileBoolean(getInheritedRelevant(elementNodeInfo), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, DEFAULT_RELEVANT);
-            reconcileBoolean(getRequired(elementNodeInfo), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, DEFAULT_REQUIRED);
-            reconcileBoolean(getValid(elementNodeInfo), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, DEFAULT_VALID);
-        }
-
-        final List elements = XFormsUtils.getChildrenElements(elementNodeInfo);
-        for (Iterator i = elements.iterator(); i.hasNext();) {
-            final NodeInfo currentElementNodeInfo = (NodeInfo) i.next();
-            addInstanceAttributes(currentElementNodeInfo);
-        }
-    }
-
-    private static void reconcileBoolean(final boolean currentValue, final Element element, final QName qName, final boolean defaultValue) {
-        final String currentBooleanValue;
-        if (currentValue != defaultValue) {
-            currentBooleanValue = Boolean.toString(currentValue);
-        } else {
-            currentBooleanValue = null;
-        }
-        updateAttribute(element, qName, currentBooleanValue, Boolean.toString(defaultValue));
-    }
-
-    private static void updateAttribute(final Element element, final QName qName, final String currentValue, final String defaultValue) {
-        Attribute attribute = element.attribute(qName);
-        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attribute != null) {
-            element.remove(attribute);
-        } else if (currentValue != null && !currentValue.equals(defaultValue)) {
-            // Add a namespace declaration if necessary
-            final String prefix = qName.getNamespacePrefix();
-            final String uri = qName.getNamespaceURI();
-            final Namespace namespace = element.getNamespaceForPrefix(prefix);
-            final String nsURI = namespace == null ? null : namespace.getURI();
-            if (namespace == null) {
-                element.addNamespace(prefix, uri);
-            } else if (!nsURI.equals(uri)) {
-                final LocationData locationData = XFormsUtils.getNodeLocationData(element);
-                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
-                        + " as the prefix is already mapped to another URI", locationData);
-            }
-            // Add attribute
-            if (attribute == null) {
-                attribute = Dom4jUtils.createAttribute(qName, currentValue);
-                element.add(attribute);
-            } else {
-                attribute.setValue(currentValue);
-            }
-        }
-    }
-
-    /**
-     * Recursively decorate all the elements and attributes with default InstanceData.
-     *
-     * For XForms Classic only.
-     *
-     * @param document Document to decorate
-     */
-    public static void setInitialDecoration(Document document) {
-        final Element rootElement = document.getRootElement();
-        final Map idToNodeMap = new HashMap();
-        setInitialDecorationWorker(rootElement, new int[]{-1}, idToNodeMap);
-        InstanceData.setIdToNodeMap(rootElement, idToNodeMap);
-    }
-
-    private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
-        // NOTE: ids are only used by the legacy XForms engine
-        int elementId = (currentId != null) ? ++currentId[0] : -1;
-        if (idToNodeMap != null) {
-            idToNodeMap.put(new Integer(elementId), element);
-        }
-
-        element.setData(InstanceData.newInstanceData(element.getData(), elementId));
-
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
-                // NOTE: ids are only used by the legacy XForms engine
-                int attributeId = (currentId != null) ? ++currentId[0] : -1;
-                if (idToNodeMap != null) {
-                    idToNodeMap.put(new Integer(attributeId), attribute);
-                }
-                attribute.setData(InstanceData.newInstanceData(attribute.getData(), attributeId));
-            }
-        }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            setInitialDecorationWorker(child, currentId, idToNodeMap);
         }
     }
 }

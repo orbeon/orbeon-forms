@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
@@ -36,15 +35,8 @@ public class Index extends XFormsFunction {
 
         final String repeatId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
 
-        if (getControls(xpathContext) instanceof XFormsElementContext) {
-            // Legacy implementation
-            XFormsElementContext xFormsElementContext = (XFormsElementContext) getControls(xpathContext);
-
-            return new IntegerValue(((Integer) xFormsElementContext.getRepeatIdToIndex().get(repeatId)).intValue());
-        } else {
-            // New implementation
-            return findIndexForRepeatId(xpathContext, repeatId);
-        }
+        // New implementation
+        return findIndexForRepeatId(xpathContext, repeatId);
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatId) {

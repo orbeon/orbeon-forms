@@ -594,24 +594,6 @@ public class XFormsModelBinds {
             // Mark node
             InstanceData.setReadonly(currentNodeInfo, true);
         }
-
-        // Handle xxforms:externalize bind
-        if (bind.getXXFormsExternalize() != null) {
-            // The bind has an xxforms:externalize attribute
-            // Evaluate "externalize" XPath expression on this node
-            try {
-                final String xpath = "boolean(" + bind.getXXFormsExternalize() + ")";
-                boolean xxformsExternalize = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
-
-                // Mark node
-                InstanceData.setXXFormsExternalize(currentNodeInfo, xxformsExternalize);
-            } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms xxforms:externalize bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getXXFormsExternalize() }));
-            }
-        }
     }
 
     private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {

@@ -246,10 +246,6 @@ public class XFormsProperties {
     private static final String CACHE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.application.size";
     private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
-    // Legacy XForms Classic properties
-    private static final String ENCRYPT_NAMES_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-names";
-    private static final String ENCRYPT_HIDDEN_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-hidden";
-
     /**
      * Return a PropertyDefinition given a property nam.
      *
@@ -275,10 +271,7 @@ public class XFormsProperties {
     }
 
     public static String getXFormsPassword() {
-        if (isHiddenEncryptionEnabled())
-            return Properties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
-        else
-            return null;// TODO: is this needed?
+        return Properties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
     }
 
     public static boolean isCacheDocument() {
@@ -468,21 +461,5 @@ public class XFormsProperties {
             return containingDocument.getStaticState().getIntegerProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
             return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
-    }
-
-    /**
-     * @return  whether name encryption is enabled (legacy XForms engine only).
-     */
-    public static boolean isNameEncryptionEnabled() {
-        return Properties.instance().getPropertySet().getBoolean
-                (ENCRYPT_NAMES_PROPERTY, false).booleanValue();
-    }
-
-    /**
-     * @return  whether hidden fields encryption is enabled (legacy XForms engine only).
-     */
-    public static boolean isHiddenEncryptionEnabled() {
-        return Properties.instance().getPropertySet().getBoolean
-                (ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 }

@@ -430,21 +430,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      */
     public void read(ContentHandler contentHandler) {
         try {
-            if (documentInfo instanceof DocumentWrapper) {
-                InstanceData.addInstanceAttributes(getInstanceRootElementInfo());
-            }
-
             final Transformer identity = TransformerUtils.getIdentityTransformer();
             identity.transform(documentInfo, new SAXResult(contentHandler));
-
-//            LocationSAXWriter saxw = new LocationSAXWriter();
-//            saxw.setContentHandler(contentHandler);
-//            saxw.write(instanceDocument);
-
-            if (documentInfo instanceof DocumentWrapper) {
-                XFormsUtils.removeInstanceAttributes(getInstanceRootElementInfo());
-            }
-
         } catch (Exception e) {
             throw new OXFException(e);
         }

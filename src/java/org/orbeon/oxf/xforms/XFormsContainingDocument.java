@@ -240,24 +240,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         this(pipelineContext, xformsState,  null);
     }
 
-    /**
-     * Legacy constructor for XForms Classic.
-     */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsModel xformsModel) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
-
-        addModel(xformsModel);
-
-        this.xformsControls = new XFormsControls(this);
-        xformsModel.setContainer(this);
-
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        this.legacyContainerType = externalContext.getRequest().getContainerType();
-        this.legacyContainerNamespace = externalContext.getRequest().getContainerNamespace();
-
-        initialize(pipelineContext);
-    }
-
     public void setSourceObjectPool(ObjectPool sourceObjectPool) {
         this.sourceObjectPool = sourceObjectPool;
     }

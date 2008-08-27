@@ -1,21 +1,8 @@
-<!--
-    Copyright (C) 2004 Orbeon, Inc.
-  
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-  
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-  
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
 <!-- Note this schema is NOT the normative structures schema. -->
 <!-- The prose copy in the structures REC is the normative -->
 <!-- version (which shouldn't differ from this one except for -->
 <!-- this comment and entity expansions, but just in case -->
-
+        
 <xs:schema targetNamespace="http://www.w3.org/2001/XMLSchema" blockDefault="#all" elementFormDefault="qualified" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="EN" xmlns:hfp="http://www.w3.org/2001/XMLSchema-hasFacetAndProperty">
  <xs:annotation>
   <xs:documentation>

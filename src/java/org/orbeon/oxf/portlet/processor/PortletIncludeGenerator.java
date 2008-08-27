@@ -25,7 +25,6 @@ import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xforms.InstanceData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -99,7 +98,6 @@ public class PortletIncludeGenerator extends ProcessorImpl {
                 {
                     // This is the XForms instance document of the portal. It is used later on to rewrite portlet URLs.
                     Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                    InstanceData.setInitialDecoration(instanceDocument);
                     externalContext.getRequest().getAttributesMap().put(REQUEST_PORTAL_INSTANCE_DOCUMENT, instanceDocument);
                 }
 

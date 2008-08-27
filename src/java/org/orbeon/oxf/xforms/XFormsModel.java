@@ -72,10 +72,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     // Containing document
     private XFormsContainingDocument containingDocument;
 
-    // For legacy XForms engine
-    private InstanceConstructListener instanceConstructListener;
-
-
     public XFormsModel(String prefixedId, Document modelDocument) {
         this.modelDocument = modelDocument;
 
@@ -686,18 +682,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Set instance and associated information if everything went well
                         setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                     }
-                }
-            }
-
-            // Call special listener to update instance
-            if (instanceConstructListener != null && getInstances() != null) {
-                int position = 0;
-                final InstanceConstructListener listener = instanceConstructListener;
-                // Make sure we don't keep a reference on this in case this is cache (legacy XForms engine)
-                instanceConstructListener = null;
-                // Use listener to update instances
-                for (Iterator i = getInstances().iterator(); i.hasNext(); position++) {
-                    listener.updateInstance(position, (XFormsInstance) i.next());
                 }
             }
 
@@ -1483,10 +1467,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public static interface InstanceConstructListener {
         public void updateInstance(int position, XFormsInstance instance);
-    }
-
-    public void setInstanceConstructListener(InstanceConstructListener instanceConstructListener) {
-        this.instanceConstructListener = instanceConstructListener;
     }
 
     public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {

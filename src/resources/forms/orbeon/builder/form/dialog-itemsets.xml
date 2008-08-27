@@ -94,7 +94,7 @@
         <xforms:setvalue ref="itemset-resource-id" value="$resource-id"/>
 
         <!-- Clear itemset instance -->
-        <xforms:delete context="instance('fb-items-instance')" while="*" nodeset="*"/>
+        <xforms:delete context="instance('fb-items-instance')" nodeset="*"/>
 
         <!-- Iterate over all of the current language's items -->
         <xforms:action xxforms:iterate="$current-resources/*[name() = $resource-id]/item">
@@ -125,7 +125,7 @@
         </xforms:action>
 
         <!-- Prepare insert template -->
-        <xforms:delete context="instance('fb-item-template')" while="*" nodeset="*"/>
+        <xforms:delete context="instance('fb-item-template')" nodeset="*"/>
         <xforms:action xxforms:iterate="$resources/resource">
             <xxforms:variable name="current-lang" select="@xml:lang"/>
             <xforms:insert context="instance('fb-item-template')" nodeset="label" origin="xxforms:element('label')"/>
@@ -152,22 +152,22 @@
 
             <xforms:action context="$current-resource">
                 <!-- Delete all the existing items -->
-                <xforms:delete while="item" nodeset="item"/>
+                <xforms:delete nodeset="item"/>
 
                 <!-- Copy all the new items (after existing elements if any) -->
                 <xforms:insert context="." nodeset="*" origin="instance('fb-items-instance')/item"/>
 
                 <!-- Delete all labels with a different language -->
-                <xforms:delete xxforms:iterate="item/label[@xml:lang != $current-lang]" nodeset="."/>
+                <xforms:delete nodeset="item/label[@xml:lang != $current-lang]"/>
 
                 <!-- Delete all xml:lang attributes -->
-                <xforms:delete xxforms:iterate="item/label/@xml:lang" nodeset="."/>
+                <xforms:delete nodeset="item/label/@xml:lang"/>
             </xforms:action>
 
         </xforms:action>
 
         <!-- Clear itemset instance -->
-        <xforms:delete context="instance('fb-items-instance')" while="*" nodeset="*"/>
+        <xforms:delete context="instance('fb-items-instance')" nodeset="*"/>
     </xforms:action>
 
     <!-- Local model -->

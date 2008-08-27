@@ -58,7 +58,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
                     <xforms:setvalue xxforms:iterate="response/*[not(*)]" ref="."/>
-                    <xforms:delete xxforms:iterate="response/headers/header" nodeset="."/>
+                    <xforms:delete nodeset="response/headers/header"/>
 
                     <!-- Toggle back response submission -->
                     <xforms:toggle case="fb-service-dialog-none"/>
@@ -73,7 +73,7 @@
                     <xforms:action context="response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete xxforms:iterate="headers/header" nodeset="."/>
+                        <xforms:delete nodeset="headers/header"/>
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xxforms:variable name="error-body" select="event('response-body')"/>

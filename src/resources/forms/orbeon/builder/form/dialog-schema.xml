@@ -108,7 +108,7 @@
                                 <xforms:action if="$schema-element/(xs:import | xs:include)">
                                     <xforms:message>Your schema contains imports or includes. These will be disabled.</xforms:message>
                                     <!-- Delete inclusions -->
-                                    <xforms:delete xxforms:iterate="$schema-element/(xs:import | xs:include)" nodeset="."/>
+                                    <xforms:delete nodeset="$schema-element/(xs:import | xs:include)"/>
                                 </xforms:action>
 
                             </xforms:action>

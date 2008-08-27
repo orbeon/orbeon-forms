@@ -243,13 +243,13 @@
                                             <!-- Delete holder element for section -->
                                             <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>
                                             <!-- Delete resources for section -->
-                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = $section-name]" nodeset="."/>
+                                            <xforms:delete nodeset="$resources/resource/*[name() = $section-name]"/>
 
                                             <!-- Delete holder element and resources for control -->
                                             <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
                                                 <xforms:action if="exists(*)">
                                                     <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
-                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/*/@ref]" nodeset="."/>
+                                                    <xforms:delete nodeset="$resources/resource/*[name() = context()/*/@ref]"/>
                                                 </xforms:action>
                                             </xforms:action>
 

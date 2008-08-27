@@ -187,7 +187,7 @@
 
         <!-- Prepare span grid -->
         <xxforms:variable name="tmp" select="instance('fb-span-grid-instance')"/>
-        <xforms:delete xxforms:iterate="instance('fb-span-grid-instance')/*" nodeset="."/>
+        <xforms:delete nodeset="instance('fb-span-grid-instance')/*"/>
         <xforms:insert context="instance('fb-span-grid-instance')" nodeset="*"
                        origin="for $r in $grid/xhtml:tr return xxforms:element('r', for $c in (1 to $grid/@columns) return xxforms:element('c'))"/>
 
@@ -314,7 +314,7 @@
         <!-- Delete instance holder -->
         <xforms:delete nodeset="$form-instance/*[name() = $section-name]/*[name() = $control-name]"/>
         <!-- Delete resources -->
-        <xforms:delete xxforms:iterate="$resources/resource/*[name() = $control-name]" nodeset="."/>
+        <xforms:delete nodeset="$resources/resource/*[name() = $control-name]"/>
         <!-- Delete bind if any -->
         <xforms:delete nodeset="$bind"/>
     </xforms:action>
@@ -382,7 +382,7 @@
 
             <!-- Clear clipboard -->
             <xforms:action xxforms:iterate="$xcv/*">
-                <xforms:delete while="*" nodeset="*"/>
+                <xforms:delete nodeset="*"/>
             </xforms:action>
 
             <!-- Copy control -->

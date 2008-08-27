@@ -212,7 +212,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
                     <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]" ref="."/>
-                    <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
+                    <xforms:delete nodeset="$instance/response/headers/header"/>
 
                     <!-- Toggle back response submission -->
                     <xforms:toggle case="fb-service-dialog-none"/>
@@ -227,7 +227,7 @@
                     <xforms:action context="$instance/response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete xxforms:iterate="headers/header" nodeset="."/>
+                        <xforms:delete nodeset="headers/header"/>
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xxforms:variable name="error-body" select="event('response-body')"/>
@@ -318,7 +318,7 @@
         <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
         <xforms:setvalue ref="$instance/request/serialization" value="instance('fb-submission-template')/@serialization"/>
         <!--<xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>-->
-        <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
+        <xforms:delete nodeset="$instance/response/headers/header"/>
 
         <!-- Toggle back response submission -->
         <xforms:toggle case="fb-service-dialog-none"/>

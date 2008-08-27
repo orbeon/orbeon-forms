@@ -327,7 +327,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Make sure we have up to date controls before creating state below
             final XFormsControls xformsControls = containingDocument[0].getXFormsControls();
-            xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+            xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
             // This is the state after XForms initialization
             xformsState[0] = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
@@ -350,8 +350,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Make sure we have up to date controls (should already be the case)
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
-        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
+        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
         // Register handlers on controller (the other handlers are registered by the body handler)
         {
@@ -493,8 +493,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Make sure we have up to date controls
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
-        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
+        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);

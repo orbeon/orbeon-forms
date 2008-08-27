@@ -34,7 +34,6 @@ public class XFormsToggleAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
         final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
@@ -51,10 +50,17 @@ public class XFormsToggleAction extends XFormsAction {
             caseId = caseAttribute;
         }
 
-        final XFormsCaseControl effectiveCase = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), caseId, actionElement);
-        if (effectiveCase != null) { // can be null if the switch is not relevant
-            // Update xforms:switch info and dispatch events
-            xformsControls.activateCase(pipelineContext, effectiveCase.getEffectiveId());
+        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), caseId, actionElement);
+        if (caseControl != null) { // can be null if the switch is not relevant
+            // Found control
+            if (!caseControl.isSelected()) {
+                // This case is not currently selected
+
+                // Actually toogle the xforms:case
+                final XFormsControls controls = containingDocument.getXFormsControls();
+                controls.markDirtySinceLastRequest(false);
+                caseControl.toggle(pipelineContext);// this will dispatch events
+            }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

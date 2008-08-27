@@ -16,24 +16,45 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainer;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents an extension xxforms:dialog control.
  */
-public class XXFormsDialogControl extends XFormsControl implements XFormsContainerControl {
+public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     private String level;
     private boolean close;
     private boolean draggable;
-    private String neighborControlId;
+    private String defaultNeighborControlId;
     private boolean initiallyVisible;
+
+    public static class XXFormsDialogControlLocal extends XFormsControlLocal {
+        private boolean visible;
+        private boolean constrainToViewport;
+        private String neighborControlId;
+
+        private XXFormsDialogControlLocal(boolean visible) {
+            this.visible = visible;
+        }
+
+        private XXFormsDialogControlLocal(boolean visible, boolean constrainToViewport, String neighborControlId) {
+            this.visible = visible;
+            this.constrainToViewport = constrainToViewport;
+            this.neighborControlId = neighborControlId;
+        }
+
+        public boolean isVisible() {
+            return visible;
+        }
+    }
 
     public XXFormsDialogControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -42,8 +63,11 @@ public class XXFormsDialogControl extends XFormsControl implements XFormsContain
             this.level = "modal";
         this.close = !"false".equals(element.attributeValue("close"));
         this.draggable = !"false".equals(element.attributeValue("draggable"));
-        this.neighborControlId = element.attributeValue("neighbor");
+        this.defaultNeighborControlId = element.attributeValue("neighbor");
         this.initiallyVisible = "true".equals(element.attributeValue("visible"));
+
+        // Initial local state
+        setLocal(new XXFormsDialogControlLocal(initiallyVisible));
     }
 
     public boolean hasJavaScriptInitialization() {
@@ -62,8 +86,19 @@ public class XXFormsDialogControl extends XFormsControl implements XFormsContain
         return draggable;
     }
 
+    public boolean isVisible() {
+        final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
+        return local.visible;
+    }
+
     public String getNeighborControlId() {
-        return neighborControlId;
+        final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
+        return (local.neighborControlId != null) ? local.neighborControlId : defaultNeighborControlId;
+    }
+
+    public boolean isConstrainToViewport() {
+        final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
+        return local.constrainToViewport;
     }
 
     public boolean isInitiallyVisible() {
@@ -73,19 +108,45 @@ public class XXFormsDialogControl extends XFormsControl implements XFormsContain
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getEventName())) {
             // Close the dialog
-            final XXFormsDialogCloseEvent dialogCloseEvent = (XXFormsDialogCloseEvent) event;
-            final XXFormsDialogControl dialogControl = (XXFormsDialogControl) dialogCloseEvent.getTargetObject();
 
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.showHideDialog(dialogControl.getEffectiveId(), false, null, false);
+            final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
+            localForUpdate.visible = false;
+            containingDocument.getXFormsControls().markDirtySinceLastRequest(false);
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getEventName())) {
             // Open the dialog
-            final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;
-            final XXFormsDialogControl dialogControl = (XXFormsDialogControl) dialogOpenEvent.getTargetObject();
 
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.showHideDialog(dialogControl.getEffectiveId(), true, dialogOpenEvent.getNeighbor(), dialogOpenEvent.isConstrainToViewport());
+            final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;
+
+            final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
+            localForUpdate.visible = true;
+            localForUpdate.neighborControlId = dialogOpenEvent.getNeighbor();
+            localForUpdate.constrainToViewport = dialogOpenEvent.isConstrainToViewport();
+
+            containingDocument.getXFormsControls().markDirtySinceLastRequest(false);
         }
         super.performDefaultAction(pipelineContext, event);
+    }
+
+    public Map serializeLocal() {
+        // Serialize
+        final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
+        final Map result = new HashMap(3);
+        result.put("visible", Boolean.toString(local.visible));
+        if (local.visible) {
+            result.put("constrain", Boolean.toString(local.constrainToViewport));
+            result.put("neighbor", local.neighborControlId);
+        }
+
+        return result;
+    }
+
+    public void deserializeLocal(Element element) {
+        // Deserialize
+
+        // NOTE: Don't use setSelectedCase() as we don't want to cause initialLocal != currentLocal
+        final String visibleString = element.attributeValue("visible");
+        setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
+                "true".equals(element.attributeValue("constrain")),
+                element.attributeValue("neighbor")));
     }
 }

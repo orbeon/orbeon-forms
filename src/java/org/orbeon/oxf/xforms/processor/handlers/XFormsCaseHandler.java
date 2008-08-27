@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.*;
@@ -43,11 +43,11 @@ public class XFormsCaseHandler extends HandlerBase {
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 
-        final XFormsControls.ControlsState controlsState = containingDocument.getXFormsControls().getCurrentControlsState();
+        final ControlTree controlTree = containingDocument.getXFormsControls().getCurrentControlTree();
 
         final boolean isVisible;
         if (!handlerContext.isTemplate()) {
-            final XFormsCaseControl caseControl = (XFormsCaseControl) controlsState.getEffectiveIdsToControls().get(currentCaseEffectiveId);
+            final XFormsCaseControl caseControl = (XFormsCaseControl) controlTree.getEffectiveIdsToControls().get(currentCaseEffectiveId);
 
             // This case is visible if it is selected or if the switch is read-only and we display read-only as static
             isVisible = caseControl.isVisible();

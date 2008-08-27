@@ -43,10 +43,6 @@ public class XFormsInputControl extends XFormsValueControl {
         return format;
     }
 
-//    public void evaluateDisplayValue(PipelineContext pipelineContext) {
-//        getValueUseFormat(pipelineContext, format);
-//    }
-
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
 
         final String internalValue = getValue(pipelineContext);

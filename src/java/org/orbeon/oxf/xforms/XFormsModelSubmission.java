@@ -333,9 +333,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 boolean hasBoundRelevantUploadControl = false;
                 if (currentInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
                     final XFormsControls xformsControls = containingDocument.getXFormsControls();
-                    final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
+                    final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
                     if (uploadControls != null) {
-                        for (Iterator i = uploadControls.iterator(); i.hasNext();) {
+                        for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
                             final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
                             if (currentControl.isRelevant()) {
                                 final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();

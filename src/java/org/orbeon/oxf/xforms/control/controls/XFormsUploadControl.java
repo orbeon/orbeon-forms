@@ -51,14 +51,12 @@ public class XFormsUploadControl extends XFormsValueControl {
     private boolean isFilenameEvaluated;
     private String filename;
 
-
     public XFormsUploadControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
         filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
         sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
     }
-
 
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
@@ -67,6 +65,14 @@ public class XFormsUploadControl extends XFormsValueControl {
         getFileMediatype(pipelineContext);
         getFileName(pipelineContext);
         getFileSize(pipelineContext);
+    }
+
+    public void markDirty() {
+        super.markDirty();
+        isStateEvaluated = false;
+        isMediatypeEvaluated = false;
+        isSizeEvaluated = false;
+        isFilenameEvaluated = false;
     }
 
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {

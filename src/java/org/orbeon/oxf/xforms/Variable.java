@@ -15,6 +15,7 @@ import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.style.XSLVariable;
 
 import java.util.List;
 
@@ -92,6 +93,11 @@ public class Variable {
 
     public LocationData getLocationData() {
         return (element != null) ? (LocationData) element.getData() : null;
+    }
+
+    public void testAs() {
+//        final String testAs = "element(foobar)";
+//        new XSLVariable().makeSequenceType(testAs);
     }
 
     /**

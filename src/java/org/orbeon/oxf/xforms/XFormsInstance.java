@@ -19,11 +19,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -42,8 +45,10 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represent an XForms instance.
@@ -522,6 +527,65 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     /**
+     * Action run when the event reaches the target.
+     *
+     * @param pipelineContext       pipeline context
+     * @param containingDocument    containing document
+     * @param event                 event being dispatched
+     */
+    public void performTargetAction(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+        final String eventName = event.getEventName();
+        if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
+            // New nodes were just inserted
+            final XFormsInsertEvent insertEvent = (XFormsInsertEvent) event;
+
+            // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
+            // inserted.
+
+            // Find affected repeats
+            final List insertedNodeInfos = insertEvent.getInsertedNodeInfos();
+
+            final boolean didInsertNodes = insertedNodeInfos.size() != 0;
+            final boolean mustAdjustIndexes = didInsertNodes && insertEvent.isAdjustIndexes();// isAdjustIndexes() used for offline mode optimizations
+
+            if (mustAdjustIndexes) {
+                // Perform the adjustments
+
+                // Find affected repeats and update their node-sets and indexes
+                final XFormsControls controls = containingDocument.getXFormsControls();
+                updateRepeatNodeset(pipelineContext, controls, insertedNodeInfos);
+            }
+        } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
+            // New nodes were just deleted
+            final XFormsDeleteEvent deleteEvent = (XFormsDeleteEvent) event;
+
+            final List deletedNodeInfos = deleteEvent.getDeletedNodeInfos();
+            final boolean didDeleteNodes = deletedNodeInfos.size() != 0;
+            if (didDeleteNodes) {
+                // Find affected repeats and update them
+                final XFormsControls controls = containingDocument.getXFormsControls();
+                updateRepeatNodeset(pipelineContext, controls, null);
+            }
+        }
+    }
+
+    private void updateRepeatNodeset(PipelineContext pipelineContext, XFormsControls controls, List insertedNodeInfos) {
+        final Map repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
+        if (repeatControlsMap != null) {
+            // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
+            final List repeatControls = new ArrayList(repeatControlsMap.values());
+            for (Iterator i = repeatControls.iterator(); i.hasNext();) {
+                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) i.next();
+                // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
+                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
+                // Update node-set
+                if (newRepeatControl != null)
+                    newRepeatControl.updateNodeset(pipelineContext, insertedNodeInfos);
+            }
+        }
+    }
+
+    /**
      * Return the instance document as a dom4j Document.
      *
      * NOTE: Should use getInstanceDocumentInfo() whenever possible.
@@ -600,5 +664,4 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()) } );
         }
     }
-
 }

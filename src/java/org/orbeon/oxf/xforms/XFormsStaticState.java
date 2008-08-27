@@ -25,7 +25,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xml.*;
@@ -99,7 +98,6 @@ public class XFormsStaticState {
     private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
     private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
     private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
-    private Map defaultRepeatIdToIndex;     // Map<String, Integer> of repeat id to default repeat index
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
     private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
@@ -716,10 +714,6 @@ public class XFormsStaticState {
         }
     }
 
-    public Map getDefaultRepeatIdToIndex() {
-        return defaultRepeatIdToIndex;
-    }
-
     public String getRepeatHierarchyString() {
         return repeatHierarchyString;
     }
@@ -831,7 +825,6 @@ public class XFormsStaticState {
             eventNamesMap = new HashMap();
             eventHandlersMap = new HashMap();
             controlInfoMap = new HashMap();
-            defaultRepeatIdToIndex = new HashMap();
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
 
@@ -974,15 +967,6 @@ public class XFormsStaticState {
 
                 // Gather xforms:repeat information
                 if (controlName.equals("repeat")) {
-                    // Find initial indexes
-                    {
-                        // Create control without parent, just to hold iterations
-                        final XFormsRepeatControl repeatControl
-                                = new XFormsRepeatControl(null, null, controlElement, controlElement.getName(), controlId);
-
-                        // Remember initial index
-                        defaultRepeatIdToIndex.put(repeatControl.getRepeatId(), new Integer(repeatControl.getStartIndex()));
-                    }
                     // Find repeat parents
                     {
                         // Create repeat hierarchy string
@@ -1030,6 +1014,10 @@ public class XFormsStaticState {
                     if (itemsInfoMap == null)
                         itemsInfoMap = new HashMap();
                     itemsInfoMap.put(controlId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
+                } else if (controlName.equals("case")) {
+                    // TODO: Check that xforms:case is within: switch
+//                    if (!(currentControlsContainer.getName().equals("switch")))
+//                        throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
                 }
             }
 

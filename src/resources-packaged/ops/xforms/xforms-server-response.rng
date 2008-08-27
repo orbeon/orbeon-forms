@@ -150,32 +150,26 @@
                                         </attribute>
                                         <ref name="model-item-properties"/>
                                     </element>
-                                </choice>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:divs">
-                            <zeroOrMore>
-                                <element name="xxforms:div">
-                                    <attribute name="id"/>
-                                    <attribute name="visibility">
-                                        <choice>
-                                            <value>hidden</value>
-                                            <value>visible</value>
-                                        </choice>
-                                    </attribute>
-                                    <!-- For dialog positioning -->
-                                    <optional>
-                                        <attribute name="neighbor"/>
-                                    </optional>
-                                    <!-- For constraining to viewport -->
-                                    <optional>
-                                        <attribute name="constrain">
-                                            <data type="boolean"/>
+                                    <element name="xxforms:div">
+                                        <attribute name="id"/>
+                                        <attribute name="visibility">
+                                            <choice>
+                                                <value>hidden</value>
+                                                <value>visible</value>
+                                            </choice>
                                         </attribute>
-                                    </optional>
-                                </element>
+                                        <!-- For dialog positioning -->
+                                        <optional>
+                                            <attribute name="neighbor"/>
+                                        </optional>
+                                        <!-- For constraining to viewport -->
+                                        <optional>
+                                            <attribute name="constrain">
+                                                <data type="boolean"/>
+                                            </attribute>
+                                        </optional>
+                                    </element>
+                                </choice>
                             </zeroOrMore>
                         </element>
                     </optional>

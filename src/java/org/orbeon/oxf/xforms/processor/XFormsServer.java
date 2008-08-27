@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -529,9 +529,9 @@ public class XFormsServer extends ProcessorImpl {
 
             // Rebuild and evaluate controls if needed, before we compute the dynamic state
             // NOTE: This is in case rebuilding controls modifies repeat indexes. We want the indexes to be included in the state further down.that
-            if (allEvents || xformsControls.isDirtySinceLastRequest() || testOutputAllActions) {// TODO: Why do we rebuild anyway in case of allEvents?
-                xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
-                xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+            if (allEvents || containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {// TODO: Why do we rebuild anyway in case of allEvents?
+                xformsControls.updateControlBindingsIfNeeded(pipelineContext);
+                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
             }
 
             // Get encoded state to send to the client (unless computing the list of offline events)
@@ -588,55 +588,43 @@ public class XFormsServer extends ProcessorImpl {
                         // Common case
 
                         // Only output changes if needed
-                        if (xformsControls.isDirtySinceLastRequest() || testOutputAllActions) {
-                            final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-                            diffControls(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        if (containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
+                            final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
+                            diffControls(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlTree().getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
-                        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-                        final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
-                        diffControls(pipelineContext, ch, containingDocument, initialControlsState.getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
+                        final ControlTree initialControlTree = initialContainingDocument.getXFormsControls().getCurrentControlTree();
+                        diffControls(pipelineContext, ch, containingDocument, initialControlTree.getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
                 }
 
-                // Output divs information
-                {
-                    if (!allEvents) {
-                        if (containingDocument.isDirtySinceLastRequest()) {
-                            // Only diff if we are dirty
-                            diffDivs(ch, xformsControls, testOutputAllActions ? null : xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(), xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
-                        }
-                    } else {
-                        diffDivs(ch, xformsControls, initialContainingDocument.getXFormsControls().getCurrentSwitchState(), xformsControls.getCurrentSwitchState(),
-                                initialContainingDocument.getXFormsControls().getCurrentDialogState(), xformsControls.getCurrentDialogState());
-                    }
-                }
-
                 // Output repeat indexes information
                 {
                     // Output index updates
-                    // TODO: move index state out of ControlsState + handle diffs
                     if (!allEvents) {
                         if (!testOutputAllActions) {
-                            if (xformsControls.isDirtySinceLastRequest()) {
+                            if (containingDocument.isDirtySinceLastRequest()) {
                                 // Only diff if controls are dirty
-                                diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                                diffIndexState(ch, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(),
+                                        xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex());
                             }
                         } else {
-                            testOutputInitialRepeatInfo(ch, xformsControls.getCurrentControlsState());
+                            testOutputInitialRepeatInfo(ch, xformsControls);
                         }
                     } else {
-                        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-                        final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
-                        diffIndexState(ch, initialControlsState.getRepeatIdToIndex(), currentControlsState.getRepeatIdToIndex());
+                        final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
+                        final ControlTree initialControlTree = initialContainingDocument.getXFormsControls().getCurrentControlTree();
+                        diffIndexState(ch, initialControlTree.getInitialMinimalRepeatIdToIndex(),
+                                currentControlTree.getMinimalRepeatIdToIndex());
                     }
                 }
 
                 // Output itemset information
-                if (allEvents || xformsControls.isDirtySinceLastRequest()) {
+                if (allEvents || containingDocument.isDirtySinceLastRequest()) {
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: Handle allEvents case. Something wrong here?
@@ -652,7 +640,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Check if we want to require the client to perform a form submission
                 if (requireClientSubmission) {
-                    outputSubmissionInfo(externalContext, ch, containingDocument.getClientActiveSubmission());
+                    outputSubmissionInfo(ch, containingDocument.getClientActiveSubmission());
                 }
 
                 // TODO: the following should be ordered in the order they were requested
@@ -768,13 +756,12 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void testOutputInitialRepeatInfo(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
+    private static void testOutputInitialRepeatInfo(final ContentHandlerHelper ch, XFormsControls xformsControls) {
 
+        ControlTree controlTree = xformsControls.getCurrentControlTree();
+        final Map initialRepeatIdToIndex = controlTree.getMinimalRepeatIdToIndex();
 
-        final Map initialRepeatIdToIndex = controlsState.getRepeatIdToIndex();
-        final Map effectiveRepeatIdToIterations = controlsState.getEffectiveRepeatIdToIterations();
-
-        if (initialRepeatIdToIndex.size() != 0 || effectiveRepeatIdToIterations != null) {
+        if (initialRepeatIdToIndex.size() != 0) {
 
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
 
@@ -792,17 +779,19 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // Output repeat iteration information
+            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
+                public void startVisitControl(XFormsControl control) {
+                    if (control instanceof XFormsRepeatControl) {
+                        // Found xforms:repeat, set/adjust its index
+                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
 
-            if (effectiveRepeatIdToIterations != null) {
-                for (Iterator i = effectiveRepeatIdToIterations.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String effectiveRepeatId = (String) currentEntry.getKey();
-                    final Integer iterations = (Integer) currentEntry.getValue();
-
-                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
-                        new String[]{"id", effectiveRepeatId, "occurs", iterations.toString()});
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
+                            new String[]{"id", repeatControl.getEffectiveId(), "occurs", Integer.toString(repeatControl.getSize()) });
+                    }
                 }
-            }
+
+                public void endVisitControl(XFormsControl control) {}
+            });
 
             ch.endElement();
         }
@@ -843,7 +832,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
+    private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
 //        final String clientSubmisssionURL;
         final String target;
         if ("all".equals(activeSubmission.getReplace())) {
@@ -931,119 +920,5 @@ public class XFormsServer extends ProcessorImpl {
             }
             ch.endElement();
         }
-    }
-
-    public static void diffDivs(ContentHandlerHelper ch, XFormsControls xformsControls, XFormsControls.SwitchState switchState1, XFormsControls.SwitchState switchState2,
-                                XFormsControls.DialogState dialogState1, XFormsControls.DialogState dialogState2) {
-
-        boolean found = false;
-        {
-            final Map switchIdToSelectedCaseIdMap2 = switchState2.getSwitchIdToSelectedCaseIdMap();
-            if (switchIdToSelectedCaseIdMap2 != null) {
-                // There are some xforms:switch/xforms:case controls
-
-                // Obtain previous state
-                final Map switchIdToSelectedCaseIdMap1 = (switchState1 == null) ? new HashMap(): switchState1.getSwitchIdToSelectedCaseIdMap();
-
-                // Iterate over all the switches
-                for (Iterator i = switchIdToSelectedCaseIdMap2.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String switchId = (String) currentEntry.getKey();
-                    final String selectedCaseId = (String) currentEntry.getValue();
-
-                    // Only output the information if it has changed
-                    final String previousSelectedCaseId = (String) switchIdToSelectedCaseIdMap1.get(switchId);
-                    if (!selectedCaseId.equals(previousSelectedCaseId)) {
-
-                        if (!found) {
-                            // Open xxf:divs element
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                            found = true;
-                        }
-
-                        // Output selected case id
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                "id", selectedCaseId,
-                                "visibility", "visible"
-                        });
-
-                        if (previousSelectedCaseId != null) {
-                            // Output deselected case ids
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                    "id", previousSelectedCaseId,
-                                    "visibility", "hidden"}
-                            );
-                        } else {
-                            // This is a new switch (can happen with repeat), send all deselected to be sure
-                            final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
-                            final List children = switchXFormsControl.getChildren();
-                            if (children != null && children.size() > 0) {
-                                for (Iterator j = children.iterator(); j.hasNext();) {
-                                    final XFormsControl caseXFormsControl = (XFormsControl) j.next();
-
-                                    if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                                "id", caseXFormsControl.getEffectiveId(),
-                                                "visibility", "hidden"
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        {
-            final Map dialogIdToVisibleMap2 = dialogState2.getDialogIdToVisibleMap();
-            if (dialogIdToVisibleMap2 != null) {
-                // There are some xxforms:dialog controls
-
-                // Obtain previous state
-                final Map dialogIdToVisibleMap1 = dialogState1.getDialogIdToVisibleMap();
-
-                // Iterate over all the dialogs
-                for (Iterator i = dialogIdToVisibleMap2.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String dialogId = (String) currentEntry.getKey();
-
-                    final XFormsControls.DialogState.DialogInfo newDialogInfo
-                            = (XFormsControls.DialogState.DialogInfo) currentEntry.getValue();
-
-                    // Only output the information if it has changed
-                    final XFormsControls.DialogState.DialogInfo previousDialogInfo
-                            = (XFormsControls.DialogState.DialogInfo) dialogIdToVisibleMap1.get(dialogId);
-
-                    if (newDialogInfo.isShow() != previousDialogInfo.isShow()) {// NOTE: We only compare on show as we con't support just changing the neighbor
-                        // There is a difference
-
-                        if (!found) {
-                            // Open xxf:divs element
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                            found = true;
-                        }
-
-                        // Find neighbor if any, first on xxforms:show, then on xxforms:dialog
-                        final XXFormsDialogControl dialogControl = newDialogInfo.isShow() ? (XXFormsDialogControl) xformsControls.getObjectByEffectiveId(dialogId) : null;
-                        final String neighbor = !newDialogInfo.isShow()
-                                ? null : (newDialogInfo.getNeighbor() != null)
-                                ? newDialogInfo.getNeighbor() : (dialogControl != null) ? dialogControl.getNeighborControlId() : null;
-                        final boolean constrainToViewport = newDialogInfo.isConstrainToViewport();
-
-                        // Output element
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
-                                "id", dialogId,
-                                "visibility", newDialogInfo.isShow() ? "visible" : "hidden",
-                                (neighbor != null) ? "neighbor" : null, neighbor,
-                                "constrain", Boolean.toString(constrainToViewport)
-                        });
-                    }
-                }
-            }
-        }
-
-        // Close xxf:divs element if needed
-        if (found)
-            ch.endElement();
     }
 }

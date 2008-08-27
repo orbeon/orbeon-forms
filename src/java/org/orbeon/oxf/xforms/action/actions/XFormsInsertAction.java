@@ -167,7 +167,7 @@ public class XFormsInsertAction extends XFormsAction {
     }
 
     public static void doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute,
-                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originObjects, int insertionIndex) {
+                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -177,7 +177,7 @@ public class XFormsInsertAction extends XFormsAction {
         final List clonedNodes;
         {
             final List clonedNodesTemp;
-            if (originObjects == null) {
+            if (originItems == null) {
                 // There are no explicitly specified origin objects, use node from Node Set Binding node-set
 
                 // "If the origin attribute is not given and the Node Set Binding node-set is empty, then the origin
@@ -198,12 +198,12 @@ public class XFormsInsertAction extends XFormsAction {
                 sourceNodes = Collections.singletonList(singleSourceNode);
                 clonedNodesTemp = Collections.singletonList(singleClonedNode);
 
-                originObjects = null;
+                originItems = null;
             } else {
                 // There are explicitly specified origin objects
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
-                if (originObjects.size() == 0) {
+                if (originItems.size() == 0) {
                     if (XFormsServer.logger.isDebugEnabled())
                         containingDocument.logDebug("xforms:insert", "origin node-set is empty, terminating");
                     return;
@@ -211,10 +211,10 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
 
-                sourceNodes = new ArrayList(originObjects.size()); // set to max possible size
-                clonedNodesTemp = new ArrayList(originObjects.size());
+                sourceNodes = new ArrayList(originItems.size()); // set to max possible size
+                clonedNodesTemp = new ArrayList(originItems.size());
 
-                for (Iterator i = originObjects.iterator(); i.hasNext();) {
+                for (Iterator i = originItems.iterator(); i.hasNext();) {
                     final Object currentObject = i.next();
 
                     if (currentObject instanceof NodeInfo) {
@@ -295,7 +295,9 @@ public class XFormsInsertAction extends XFormsAction {
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
             }
         } else {
-            // HACK used to improve performance when going offline: when!isAdjustIndexes, always insert at the end of the node-set
+            // One or more nodes were inserted
+
+            // HACK used to improve performance when going offline: when !isAdjustIndexes, always insert at the end of the node-set
             insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(isAdjustIndexes ? insertionIndex - 1 : collectionToBeUpdated.size() - 1);
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
@@ -369,6 +371,7 @@ public class XFormsInsertAction extends XFormsAction {
         // Whether some nodes were inserted
         final boolean didInsertNodes = insertedNodes != null && insertedNodes.size() > 0;
 
+        // Log stuff
         if (XFormsServer.logger.isDebugEnabled()) {
             if (didInsertNodes)
                 containingDocument.logDebug("xforms:insert", "inserted nodes",
@@ -377,38 +380,14 @@ public class XFormsInsertAction extends XFormsAction {
                 containingDocument.logDebug("xforms:insert", "no node inserted");
         }
 
-        // Whether indexes must be adjusted (used for offline mode optimizations)
-        final boolean mustAdjustIndexesAndSwitches = didInsertNodes && isAdjustIndexes;
-
-        if (mustAdjustIndexesAndSwitches) {
-
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-            // Prepare switches
-            // NOTE: It shouldn't matter that we already inserted nodes into the instance, as we haven't rebuilt controls yet
-            for (int i = 0; i < sourceNodes.size(); i++) {
-                final Node sourceNode = (Node) sourceNodes.get(i);
-                // 1) may be null when source is an item 2) may be null when source is from a read-only instance
-                //  && InstanceData.getLocalInstanceData(sourceNode) != null
-                // TODO: How could this come from a read-only instance since we have a Node? Remove this and the above comment when we have made sure this is fine.
-                if (sourceNode != null) {
-                    final Node clonedNode = (Node) clonedNodes.get(i);
-                    XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
-                }
-            }
-
-            // Rebuild ControlsState (we know we are dirty)
-            xformsControls.rebuildCurrentControlsState(pipelineContext);
-            final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-
-            // Update repeat indexes
-            XFormsIndexUtils.adjustIndexesAfterInsert(xformsControls, currentControlsState, clonedNodes);
-
-            // Update switches
-            XFormsSwitchUtils.updateSwitches(xformsControls);
+        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+        if (didInsertNodes) {
+            modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
+            containingDocument.getXFormsControls().markDirtySinceLastRequest(true);
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."
+        // XFormsInstance handles index and repeat items updates 
         {
             final List insertedNodeInfos;
             if (didInsertNodes) {
@@ -417,17 +396,12 @@ public class XFormsInsertAction extends XFormsAction {
                 for (Iterator i = insertedNodes.iterator(); i.hasNext();)
                     insertedNodeInfos.add(documentWrapper.wrap(i.next()));
             } else {
-                insertedNodeInfos = null;
+                insertedNodeInfos = Collections.EMPTY_LIST;
             }
 
             containingDocument.dispatchEvent(pipelineContext,
-                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originObjects, insertLocationNodeInfo, positionAttribute == null ? "after" : positionAttribute));
-        }
-
-        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        if (didInsertNodes) {
-            modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-            containingDocument.getXFormsControls().markDirtySinceLastRequest();
+                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
+                            positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
         }
     }
 

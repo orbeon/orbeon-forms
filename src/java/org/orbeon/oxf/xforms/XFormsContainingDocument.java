@@ -78,7 +78,6 @@ public class XFormsContainingDocument extends XFormsContainer {
     private XFormsControls xformsControls;
 
     // Client state
-    private boolean dirtySinceLastRequest;
     private XFormsModelSubmission activeSubmission;
     private List asynchronousSubmissions;// List<Runnable>
     private boolean gotSubmission;
@@ -221,7 +220,7 @@ public class XFormsContainingDocument extends XFormsContainer {
             if (encodedDynamicState == null || encodedDynamicState.equals("")) {
                 // Just for tests, we allow the dynamic state to be empty
                 initialize(pipelineContext);
-                xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
             } else {
                 // Regular case
                 restoreDynamicState(pipelineContext, encodedDynamicState);
@@ -249,7 +248,7 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         addModel(xformsModel);
 
-        this.xformsControls = new XFormsControls(this, null, null);
+        this.xformsControls = new XFormsControls(this);
         xformsModel.setContainer(this);
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -276,6 +275,16 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     /**
+     * Whether the document is currently in a mode where it must handle differences. This is the case when the document
+     * is initializing and producing the initial output.
+     *
+     * @return  true iif the document must handle differences
+     */
+    public boolean isHandleDifferences() {
+        return !isInitializing;
+    }
+
+    /**
      * Return the XForms controls.
      */
     public XFormsControls getXFormsControls() {
@@ -288,15 +297,7 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @return  whether the document is dirty since the last request
      */
     public boolean isDirtySinceLastRequest() {
-        return dirtySinceLastRequest || xformsControls == null || xformsControls.isDirtySinceLastRequest();
-    }
-
-    public void markCleanSinceLastRequest() {
-        this.dirtySinceLastRequest = false;
-    }
-
-    public void markDirtySinceLastRequest() {
-        this.dirtySinceLastRequest = true;
+        return xformsControls.isDirtySinceLastRequest();
     }
 
     /**
@@ -888,9 +889,8 @@ public class XFormsContainingDocument extends XFormsContainer {
         } else if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
             // 4.6.7 Sequence: Value Change
 
-            // What we want to do here is set the value on the initial controls state, as the value
-            // has already been changed on the client. This means that this event(s) must be the
-            // first to come!
+            // What we want to do here is set the value on the initial controls tree, as the value has already been
+            // changed on the client. This means that this event(s) must be the first to come!
 
             final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
 
@@ -1218,6 +1218,7 @@ public class XFormsContainingDocument extends XFormsContainer {
                     if (container != targetObject) {
                         // Event listeners on the target which are in capture mode are not called
 
+                        // Process event handlers
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
@@ -1251,6 +1252,13 @@ public class XFormsContainingDocument extends XFormsContainer {
                     final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
                     final List eventHandlers = container.getEventHandlers(this);
 
+                    // Process "action at target"
+                    // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
+                    if (container == targetObject) {
+                        container.performTargetAction(pipelineContext, XFormsContainingDocument.this, event);
+                    }
+
+                    // Process event handlers
                     if (eventHandlers != null) {
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
@@ -1304,6 +1312,10 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     public void startHandleOperation() {
         indentedLogger.startHandleOperation();
+    }
+
+    public void startHandleOperation(String type, String message) {
+        indentedLogger.startHandleOperation(type, message);
     }
 
     public void endHandleOperation() {
@@ -1366,106 +1378,18 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     private Document createDynamicStateDocument() {
 
-        final XFormsControls.ControlsState currentControlsState = getXFormsControls().getCurrentControlsState();
-
         final Document dynamicStateDocument = Dom4jUtils.createDocument();
         final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-        // Output all instances
+        // Serialize instances
         {
             final Element instancesElement = dynamicStateElement.addElement("instances");
             serializeInstances(instancesElement);
         }
 
-        // Output divs information
-        {
-            final Element divsElement = Dom4jUtils.createElement("divs");
-            outputSwitchesDialogs(divsElement, getXFormsControls());
+        // Serialize controls
+        xformsControls.serializeControls(dynamicStateElement);
 
-            if (divsElement.hasContent())
-                dynamicStateElement.add(divsElement);
-        }
-
-        // Output repeat index information
-        {
-            final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-            if (repeatIdToIndex.size() != 0) {
-                final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
-                for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String repeatId = (String) currentEntry.getKey();
-                    final Integer index = (Integer) currentEntry.getValue();
-                    final Element newElement = repeatIndexesElement.addElement("repeat-index");
-                    newElement.addAttribute("id", repeatId);
-                    newElement.addAttribute("index", index.toString());
-                }
-            }
-        }
         return dynamicStateDocument;
-    }
-
-    public static void outputSwitchesDialogs(Element divsElement, XFormsControls xformsControls) {
-        {
-            final Map switchIdToSelectedCaseIdMap = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
-            if (switchIdToSelectedCaseIdMap != null) {
-                // There are some xforms:switch/xforms:case controls
-
-                for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String switchId = (String) currentEntry.getKey();
-                    final String selectedCaseId = (String) currentEntry.getValue();
-
-                    // Output selected ids
-                    {
-                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("switch-id", switchId);
-                        divElement.addAttribute("case-id", selectedCaseId);
-                        divElement.addAttribute("visibility", "visible");
-                    }
-
-                    // Output deselected ids
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
-                    final List children = switchXFormsControl.getChildren();
-                    if (children != null && children.size() > 0) {
-                        for (Iterator j = children.iterator(); j.hasNext();) {
-                            final XFormsControl caseXFormsControl = (XFormsControl) j.next();
-
-                            if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                                final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                divElement.addAttribute("switch-id", switchId);
-                                divElement.addAttribute("case-id", caseXFormsControl.getEffectiveId());
-                                divElement.addAttribute("visibility", "hidden");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        {
-            final Map dialogIdToVisibleMap = xformsControls.getCurrentDialogState().getDialogIdToVisibleMap();
-            if (dialogIdToVisibleMap != null) {
-                // There are some xxforms:dialog controls
-                for (Iterator i = dialogIdToVisibleMap.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String dialogId = (String) currentEntry.getKey();
-
-                    final XFormsControls.DialogState.DialogInfo dialogInfo
-                            = (XFormsControls.DialogState.DialogInfo) currentEntry.getValue();
-
-                    // Output element and attributes
-                    {
-                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("dialog-id", dialogId);
-                        divElement.addAttribute("visibility", dialogInfo.isShow() ? "visible" : "hidden");
-                        if (dialogInfo.isShow()) {
-                            if (dialogInfo.getNeighbor() != null)
-                                divElement.addAttribute("neighbor", dialogInfo.getNeighbor());
-                            if (dialogInfo.isConstrainToViewport())
-                                divElement.addAttribute("constrain", Boolean.toString(dialogInfo.isConstrainToViewport()));
-                        }
-                    }
-                }
-            }
-        }
     }
 
 
@@ -1474,11 +1398,8 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Get dynamic state document
         final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
 
-        // Get repeat indexes from dynamic state
-        final Element repeatIndexesElement = dynamicStateDocument.getRootElement().element("repeat-indexes");
-
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext, repeatIndexesElement);
+        createControlsAndModels(pipelineContext);
 
         // Extract and restore instances
         {
@@ -1490,9 +1411,11 @@ public class XFormsContainingDocument extends XFormsContainer {
         restoreModelsState(pipelineContext);
 
         // Restore controls state
-        final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
-        xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement, true);
-        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+        {
+            xformsControls.initializeState(pipelineContext, true);
+            xformsControls.deserializeControls(dynamicStateDocument.getRootElement());
+            xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
+        }
     }
 
     /**
@@ -1511,7 +1434,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         // This is called upon the first creation of the XForms engine only
 
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext, null);
+        createControlsAndModels(pipelineContext);
 
         // Before dispaching initialization events, remember that first refresh must be performed
         this.mustPerformInitializationFirstRefresh = true;
@@ -1532,7 +1455,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         this.mustPerformInitializationFirstRefresh = false;
     }
 
-    private void createControlsAndModels(PipelineContext pipelineContext, Element repeatIndexesElement) {
+    private void createControlsAndModels(PipelineContext pipelineContext) {
 
         if (xformsStaticState != null) {
 
@@ -1547,7 +1470,7 @@ public class XFormsContainingDocument extends XFormsContainer {
             }
 
             // Create XForms controls
-            xformsControls = new XFormsControls(this, xformsStaticState, repeatIndexesElement);
+            xformsControls = new XFormsControls(this);
 
             // Add models
             addAllModels();

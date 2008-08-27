@@ -30,20 +30,8 @@ import java.util.Map;
 
 public class OldControlsComparator extends BaseControlsComparator {
 
-    private PipelineContext pipelineContext;
-    private ContentHandlerHelper ch;
-    private XFormsContainingDocument containingDocument;
-    private Map itemsetsFull1;
-    private Map itemsetsFull2;
-    private Map valueChangeControlIds;
-
     public OldControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
-        this.pipelineContext = pipelineContext;
-        this.ch = ch;
-        this.containingDocument = containingDocument;
-        this.itemsetsFull1 = itemsetsFull1;
-        this.itemsetsFull2 = itemsetsFull2;
-        this.valueChangeControlIds = valueChangeControlIds;
+        super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
     public void diff(List state1, List state2) {
@@ -66,347 +54,333 @@ public class OldControlsComparator extends BaseControlsComparator {
 
             // 1: Check current control
             if (xformsControl2 instanceof XFormsSingleNodeControl) {
-                // xforms:repeat doesn't need to be handled independently, iterations do it
+                // NOTE: xforms:repeat doesn't need to be handled independently, iterations do it
 
                 final XFormsSingleNodeControl xformsSingleNodeControl1 = (XFormsSingleNodeControl) xformsControl1;
                 final XFormsSingleNodeControl xformsSingleNodeControl2 = (XFormsSingleNodeControl) xformsControl2;
 
-                // Output diffs between controlInfo1 and controlInfo2
-                final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
-                if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)
-                        && !(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
-                        && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
-                    // Don't send anything if nothing has changed
-                    // But we force a change for controls whose values changed in the request
-                    // Also, we don't output anything for triggers in static readonly mode
+                if (!(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
+                            && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
+                    // Output diffs between controlInfo1 and controlInfo2
+                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
+                    if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)) {
+                        // Don't send anything if nothing has changed
+                        // But we force a change for controls whose values changed in the request
+                        // Also, we don't output anything for triggers in static readonly mode
 
-                    attributesImpl.clear();
+                        attributesImpl.clear();
 
-                    // Whether it is necessary to output information about this control
-                    // TODO: distinction between new iteration AND control just becoming relevant
-                    final boolean isNewRepeatIteration = xformsSingleNodeControl1 == null;
+                        // Whether it is necessary to output information about this control
+                        // TODO: distinction between new iteration AND control just becoming relevant
+                        final boolean isNewRepeatIteration = xformsSingleNodeControl1 == null;
 
-                    // Whether it is necessary to output information about this control
-                    boolean doOutputElement = false;
+                        // Whether it is necessary to output information about this control
+                        boolean doOutputElement = false;
 
-                    // Control children values
-                    final boolean isRepeatIterationControl = xformsSingleNodeControl2 instanceof RepeatIterationControl;
-                    final boolean isAttributeControl = xformsSingleNodeControl2 instanceof XXFormsAttributeControl;
-                    final boolean isTextControl = xformsSingleNodeControl2 instanceof XXFormsTextControl;
-                    if (!(isRepeatIterationControl || isAttributeControl || isTextControl)) {
-                        // Anything but a repeat iteration, an attribute or a text
+                        // Control children values
+                        final boolean isRepeatIterationControl = xformsSingleNodeControl2 instanceof XFormsRepeatIterationControl;
+                        final boolean isAttributeControl = xformsSingleNodeControl2 instanceof XXFormsAttributeControl;
+                        final boolean isTextControl = xformsSingleNodeControl2 instanceof XXFormsTextControl;
+                        if (!(isRepeatIterationControl || isAttributeControl || isTextControl)) {
+                            // Anything but a repeat iteration, an attribute or a text
 
-                        // Control id
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
+                            // Control id
+                            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
 
-                        // Model item properties
-                        if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isReadonly() != xformsSingleNodeControl2.isReadonly()) {
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                    XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isReadonly()));
-                            doOutputElement = true;
-                        }
-                        if (isNewRepeatIteration && xformsSingleNodeControl2.isRequired()
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRequired() != xformsSingleNodeControl2.isRequired()) {
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                    XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRequired()));
-                            doOutputElement = true;
-                        }
-
-
-                        // Default for relevance
-                        final boolean relevantDefault = isNewRepeatIteration;
-
-                        if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() != relevantDefault
-                                //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                    XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
-                            doOutputElement = true;
-                        }
-                        if (isNewRepeatIteration && !xformsSingleNodeControl2.isValid()
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isValid() != xformsSingleNodeControl2.isValid()) {
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                    XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isValid()));
-                            doOutputElement = true;
-                        }
-
-                        // Type attribute
-                        {
-
-                            final String typeValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getType();
-                            final String typeValue2 = xformsSingleNodeControl2.getType();
-
-                            if (isNewRepeatIteration || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
-                                final String attributeValue = typeValue2 != null ? typeValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                            // Model item properties
+                            if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
+                                    || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isReadonly() != xformsSingleNodeControl2.isReadonly()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isReadonly()));
+                                doOutputElement = true;
                             }
-                        }
-
-                        // Label, help, hint, alert, etc.
-                        {
-                            final String labelValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
-                            final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
-
-                            if (!XFormsUtils.compareStrings(labelValue1, labelValue2)) {
-                                final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
-                                final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                            if (isNewRepeatIteration && xformsSingleNodeControl2.isRequired()
+                                    || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRequired() != xformsSingleNodeControl2.isRequired()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRequired()));
+                                doOutputElement = true;
                             }
-                        }
 
-                        {
-                            final String helpValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
-                            final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
-                            if (!XFormsUtils.compareStrings(helpValue1, helpValue2)) {
-                                final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
-                                final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                            // Default for relevance
+                            final boolean relevantDefault = isNewRepeatIteration;
+
+                            if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() != relevantDefault
+                                    //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
+                                    || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
+                                doOutputElement = true;
                             }
-                        }
-
-                        {
-                            final String hintValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHint(pipelineContext);
-                            final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
-
-                            if (!XFormsUtils.compareStrings(hintValue1, hintValue2)) {
-                                final String escapedHintValue2 = xformsSingleNodeControl2.getEscapedHint(pipelineContext);
-                                final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                            if (isNewRepeatIteration && !xformsSingleNodeControl2.isValid()
+                                    || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isValid() != xformsSingleNodeControl2.isValid()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isValid()));
+                                doOutputElement = true;
                             }
-                        }
 
-                        {
-                            final String alertValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
-                            final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
-
-                            if (!XFormsUtils.compareStrings(alertValue1, alertValue2)) {
-                                final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
-                                final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                            }
-                        }
-
-                        if (xformsSingleNodeControl2 instanceof XFormsOutputControl) {
-                            // Output xforms:output-specific information
-                            final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsSingleNodeControl1;
-                            final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsSingleNodeControl2;
-
-                            // Mediatype
-                            final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
-                            final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
-
-                            if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
-                                final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                            }
-                        } else if (xformsSingleNodeControl2 instanceof XFormsUploadControl) {
-                            // Output xforms:upload-specific information
-                            final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsSingleNodeControl1;
-                            final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsSingleNodeControl2;
-
+                            // Type attribute
                             {
-                                // State
-                                final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
-                                final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
 
-                                if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
-                                    final String attributeValue = stateValue2 != null ? stateValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                final String typeValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getType();
+                                final String typeValue2 = xformsSingleNodeControl2.getType();
+
+                                if (isNewRepeatIteration || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
+                                    final String attributeValue = typeValue2 != null ? typeValue2 : "";
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
                                 }
                             }
-                            {
-                                // Mediatype
-                                final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
-                                final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
 
-                                if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
+                            // Label, help, hint, alert, etc.
+                            {
+                                final String labelValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
+                                final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
+
+                                if (!XFormsUtils.compareStrings(labelValue1, labelValue2)) {
+                                    final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
+                                    final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                }
+                            }
+
+                            {
+                                final String helpValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
+                                final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
+
+                                if (!XFormsUtils.compareStrings(helpValue1, helpValue2)) {
+                                    final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
+                                    final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                }
+                            }
+
+                            {
+                                final String hintValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHint(pipelineContext);
+                                final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
+
+                                if (!XFormsUtils.compareStrings(hintValue1, hintValue2)) {
+                                    final String escapedHintValue2 = xformsSingleNodeControl2.getEscapedHint(pipelineContext);
+                                    final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                }
+                            }
+
+                            {
+                                final String alertValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
+                                final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
+
+                                if (!XFormsUtils.compareStrings(alertValue1, alertValue2)) {
+                                    final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
+                                    final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                }
+                            }
+
+                            if (xformsSingleNodeControl2 instanceof XFormsOutputControl) {
+                                // Output xforms:output-specific information
+                                final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsSingleNodeControl1;
+                                final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsSingleNodeControl2;
+
+                                // Mediatype
+                                final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
+                                final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
+
+                                if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
                                     final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
                                     doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
                                 }
-                            }
-                            {
-                                // Filename
-                                final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
-                                final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
+                            } else if (xformsSingleNodeControl2 instanceof XFormsUploadControl) {
+                                // Output xforms:upload-specific information
+                                final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsSingleNodeControl1;
+                                final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsSingleNodeControl2;
 
-                                if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
-                                    final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                {
+                                    // State
+                                    final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
+                                    final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
+
+                                    if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
+                                        final String attributeValue = stateValue2 != null ? stateValue2 : "";
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    }
+                                }
+                                {
+                                    // Mediatype
+                                    final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
+                                    final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
+
+                                    if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
+                                        final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    }
+                                }
+                                {
+                                    // Filename
+                                    final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
+                                    final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
+
+                                    if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
+                                        final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    }
+                                }
+                                {
+                                    // Size
+                                    final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
+                                    final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
+
+                                    if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
+                                        final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    }
                                 }
                             }
-                            {
-                                // Size
-                                final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
-                                final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
 
-                                if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
-                                    final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                            // Get current value if possible for this control
+                            // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
+                            // client not to update the value, unlike with attributes which can be omitted
+                            if (xformsSingleNodeControl2 instanceof XFormsValueControl && !(xformsSingleNodeControl2 instanceof XFormsUploadControl)) {
+
+                                // TODO: Output value only when changed
+
+                                final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
+
+                                // Check if a "display-value" attribute must be added
+    //                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
+    //                            if (displayValue != null) {
+    //                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
+    //                            }
+
+                                // Create element with text value
+                                final String value;
+                                {
+                                    // Value may become null when controls are unbound
+                                    final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
+                                    value = (tempValue == null) ? "" : tempValue;
                                 }
+                                if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                                    ch.text(value);
+                                    ch.endElement();
+                                }
+                            } else {
+                                // No value, just output element with no content (but there may be attributes)
+                                if (doOutputElement)
+                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                             }
-                        }
+                        } else if (isAttributeControl) {
+                            // Attribute control
+                            final XXFormsAttributeControl attributeControlInfo2 = (XXFormsAttributeControl) xformsSingleNodeControl2;
 
-                        // Get current value if possible for this control
-                        // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
-                        // client not to update the value, unlike with attributes which can be omitted
-                        if (xformsSingleNodeControl2 instanceof XFormsValueControl && !(xformsSingleNodeControl2 instanceof XFormsUploadControl)) {
+                            // Control id
+                            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
 
-                            // TODO: Output value only when changed
+                            // The client does not store an HTML representation of the xxforms:attribute control, so we
+                            // have to output these attributes.
+                            {
+                                // HTML element id
+                                final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
+                            }
+
+                            {
+                                // Attribute name
+                                final String name2 = attributeControlInfo2.getNameAttribute();
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2, isNewRepeatIteration, false);
+                            }
 
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                            // Check if a "display-value" attribute must be added
-//                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-//                            if (displayValue != null) {
-//                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-//                            }
 
                             // Create element with text value
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
+                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
-                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
+                                ch.text(value);
+                                ch.endElement();
+                            }
+                        } else if (isTextControl) {
+                            // Text control
+                            final XXFormsTextControl txtControlInfo2 = (XXFormsTextControl) xformsSingleNodeControl2;
+
+                            // Control id
+                            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
+
+                            // The client does not store an HTML representation of the xxforms:text control, so we
+                            // have to output these attributes.
+                            {
+                                // HTML element id
+                                final String effectiveFor2 = txtControlInfo2.getEffectiveForAttribute();
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
+                            }
+
+                            final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
+
+                            // Create element with text value
+                            final String value;
+                            {
+                                // Value may become null when controls are unbound
+                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
+                                value = (tempValue == null) ? "" : tempValue;
+                            }
+                            if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
                                 ch.text(value);
                                 ch.endElement();
                             }
                         } else {
-                            // No value, just output element with no content (but there may be attributes)
-                            if (doOutputElement)
-                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                        }
-                    } else if (isAttributeControl) {
-                        // Attribute control
-                        final XXFormsAttributeControl attributeControlInfo2 = (XXFormsAttributeControl) xformsSingleNodeControl2;
+                            // Repeat iteration only handles relevance
 
-                        // Control id
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
+                            // Use the effective id of the parent repeat
+                            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
 
-                        // The client does not store an HTML representation of the xxforms:attribute control, so we
-                        // have to output these attributes.
-                        {
-                            // HTML element id
-                            final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
-                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
-                        }
+                            if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
+                                    //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
+                                    || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
+                                doOutputElement = true;
+                            }
 
-                        {
-                            // Attribute name
-                            final String name2 = attributeControlInfo2.getNameAttribute();
-                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2, isNewRepeatIteration, false);
-                        }
+                            // Repeat iteration
+                            if (doOutputElement) {
+                                final XFormsRepeatIterationControl repeatIterationInfo = (XFormsRepeatIterationControl) xformsSingleNodeControl2;
+                                attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIterationIndex()));
 
-                        final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                        // Create element with text value
-                        final String value;
-                        {
-                            // Value may become null when controls are unbound
-                            final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
-                            value = (tempValue == null) ? "" : tempValue;
-                        }
-                        if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
-                            ch.text(value);
-                            ch.endElement();
-                        }
-                    } else if (isTextControl) {
-                        // Text control
-                        final XXFormsTextControl txtControlInfo2 = (XXFormsTextControl) xformsSingleNodeControl2;
-
-                        // Control id
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
-
-                        // The client does not store an HTML representation of the xxforms:text control, so we
-                        // have to output these attributes.
-                        {
-                            // HTML element id
-                            final String effectiveFor2 = txtControlInfo2.getEffectiveForAttribute();
-                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
-                        }
-
-                        final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                        // Create element with text value
-                        final String value;
-                        {
-                            // Value may become null when controls are unbound
-                            final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
-                            value = (tempValue == null) ? "" : tempValue;
-                        }
-                        if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
-                            ch.text(value);
-                            ch.endElement();
-                        }
-                    } else {
-                        // Repeat iteration only handles relevance
-
-                        // Use the effective id of the parent repeat
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
-
-                        if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
-                                //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                    XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
-                            doOutputElement = true;
-                        }
-
-                        // Repeat iteration
-                        if (doOutputElement) {
-                            final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) xformsSingleNodeControl2;
-                            attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
-    
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
+                            }
                         }
                     }
+
+                    // Handle out of band differences
+                    diffOutOfBand(xformsControl1, xformsControl2);
                 }
+            } else if (xformsControl2 instanceof XXFormsDialogControl) {
+                // Out of band xxforms:dialog differences
 
-                // Handle itemsets
-                if (xformsSingleNodeControl2 instanceof XFormsSelect1Control) {
-                    final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsSingleNodeControl1;
-                    final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsSingleNodeControl2;// not null
+                final XXFormsDialogControl dialogControl1 = (XXFormsDialogControl) xformsControl1;
+                final XXFormsDialogControl dialogControl2 = (XXFormsDialogControl) xformsControl2;
 
-                    // Try to get static itemset info
-                    final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsSingleNodeControl2.getId());
-                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
-                        // There is no need to send an update:
-                        //
-                        // 1. Items are static...
-                        // 2. ...and they have been outputted statically in the HTML page, directly or in repeat template
-                    } else {
-                        // There is a possible change
-                        if (itemsetsFull1 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1)) {
-                            final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
-                            if (items != null)
-                                itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
-                        }
-
-                        if (itemsetsFull2 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control2)) {
-                            final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
-                            if (items != null)
-                                itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
-                        }
-                    }
-                }
+                diffDialogs(dialogControl1, dialogControl2);
             }
 
             // 2: Check children if any
-            if (xformsControl2 instanceof XFormsContainerControl || xformsControl2 instanceof RepeatIterationControl) {
+            if (xformsControl2 instanceof XFormsContainerControl) {
 
-                final List children1 = (xformsControl1 == null) ? null : xformsControl1.getChildren();
-                final List children2 = (xformsControl2.getChildren() == null) ? Collections.EMPTY_LIST : xformsControl2.getChildren();
+                final XFormsContainerControl containerControl1 = (XFormsContainerControl) xformsControl1;
+                final XFormsContainerControl containerControl2 = (XFormsContainerControl) xformsControl2;
+
+                final List children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
+                final List children2 = (containerControl2.getChildren() == null) ? Collections.EMPTY_LIST : containerControl2.getChildren();
 
                 // Repeat grouping control
                 if (xformsControl2 instanceof XFormsRepeatControl && children1 != null) {
@@ -420,7 +394,7 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diff(children1, xformsControl2.getChildren());
+                        diff(children1, children2);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -440,6 +414,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                         // Diff the remaining subset
                         diff(children1.subList(0, size2), children2);
                     }
+
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;

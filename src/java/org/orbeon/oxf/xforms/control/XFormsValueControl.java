@@ -32,8 +32,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     private boolean isValueEvaluated;
     private String value;
-//    private boolean isDisplayValueEvaluated;
-//    private String displayValue;
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
@@ -52,6 +50,11 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         getExternalValue(pipelineContext);
     }
 
+    public void markDirty() {
+        super.markDirty();
+        isValueEvaluated = false;
+        isExternalValueEvaluated = false;
+    }
 
     protected void evaluateValue(PipelineContext pipelineContext) {
         // Just get the value from the bound node
@@ -61,11 +64,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         setValue(XFormsInstance.getValueForNodeInfo(boundNode));
     }
-
-//    protected void evaluateDisplayValue(PipelineContext pipelineContext) {
-//        // No display value for most controls
-//        setDisplayValue(null);
-//    }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
         // By default, same as value
@@ -146,17 +144,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         }
         return value;
     }
-
-    /**
-     * Return a formatted display value of the control value, null if there is no such display value.
-     */
-//    public final String getDisplayValue(PipelineContext pipelineContext) {
-//        if (!isDisplayValueEvaluated) {
-//            evaluateDisplayValue(pipelineContext);
-//            isDisplayValueEvaluated = true;
-//        }
-//        return displayValue;
-//    }
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.

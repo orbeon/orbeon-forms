@@ -17,7 +17,8 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
+import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -27,6 +28,7 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
@@ -37,7 +39,7 @@ import java.util.*;
 /**
  * Represents an XForms control.
  */
-public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHandlerContainer {
+public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHandlerContainer, Cloneable {
 
     private XFormsContainer container;
     protected XFormsContainingDocument containingDocument;
@@ -58,7 +60,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     protected XFormsContextStack.BindingContext bindingContext;
     private NodeInfo boundNode;
 
-    private boolean evaluated;
+    private boolean isEvaluated;
 
     private String label;
     private boolean isLabelEvaluated;
@@ -78,13 +80,22 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     final boolean[] tempContainsHTML = new boolean[1];// temporary holder
 
-    // TODO: this should be handled in a subclass (e.g. XFormsContainerControl, but that is an interface. Can we do
-    // this with inheritance?
-    private List children;
+    private XFormsControlLocal initialLocal;
+    private XFormsControlLocal currentLocal;
+
+    public static class XFormsControlLocal implements Cloneable {
+        protected Object clone() {
+            try {
+                return super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new OXFException(e);
+            }
+        }
+    }
 
     public XFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         this.container = container;
-        this.containingDocument = (container != null) ? container.getContainingDocument() : null;// some special cases pass in null (bad, we know...)
+        this.containingDocument = (container != null) ? container.getContainingDocument() : null;// some special cases pass null (bad, we know...)
         this.parent = parent;
         this.controlElement = element;
         this.name = name;
@@ -95,30 +106,43 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         }
     }
 
-    protected XFormsContextStack getContextStack() {
-        return containingDocument.getXFormsControls().getContextStack();
+    public XFormsContainer getContainer() {
+        return container;
     }
 
-    public void addChild(XFormsControl XFormsControl) {
-        if (children == null)
-            children = new ArrayList();
-        children.add(XFormsControl);
+    protected XFormsContextStack getContextStack() {
+        return containingDocument.getXFormsControls().getContextStack();
     }
 
     public String getId() {
         return id;
     }
 
+    /**
+     * Update this control's effective id based on the parent's effective id.
+     */
+    public void updateEffectiveId() {
+        final String parentEffectiveId = getParent().getEffectiveId();
+        final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId);
+
+        if (!parentSuffix.equals("")) {
+            // Update effective id
+            effectiveId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
+        } else {
+            // Nothing to do as we are not in repeated content
+        }
+    }
+
     public String getEffectiveId() {
         return effectiveId;
     }
 
-    public LocationData getLocationData() {
-        return (controlElement != null) ? (LocationData) controlElement.getData() : null;
+    protected void setEffectiveId(String effectiveId) {
+        this.effectiveId = effectiveId;
     }
 
-    public List getChildren() {
-        return children;
+    public LocationData getLocationData() {
+        return (controlElement != null) ? (LocationData) controlElement.getData() : null;
     }
 
     public String getAlert(PipelineContext pipelineContext) {
@@ -237,6 +261,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public XFormsControl getParent() {
         return parent;
+    }
+
+    protected void setParent(XFormsControl parent) {
+        this.parent = parent;
     }
 
     public void detach() {
@@ -373,7 +401,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.bindingContext = bindingContext;
 
         // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
-        if (bindingContext.isNewBind())
+        if (bindingContext.isNewBind())// TODO: this must be done in XFormsSingleNodeControl
             this.boundNode = bindingContext.getSingleNode();
     }
 
@@ -391,14 +419,23 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      * @return bound node or null
      */
     public NodeInfo getBoundNode() {
+        // TODO: this must be done in XFormsSingleNodeControl
         return boundNode;
     }
 
     public final void evaluateIfNeeded(PipelineContext pipelineContext) {
-        if (!evaluated) {
-            evaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
+        if (!isEvaluated) {
+            isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
             evaluate(pipelineContext);
         }
+    }
+
+    public void markDirty() {
+        isEvaluated = false;
+        isLabelEvaluated = false;
+        isHelpEvaluated = false;
+        isHintEvaluated = false;
+        isAlertEvaluated = false;
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
@@ -421,103 +458,41 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
             // Try to update xforms:repeat indices based on this
             {
-                XFormsRepeatControl firstAncestorRepeatControlInfo = null;
-                final List ancestorRepeatsIds = new ArrayList();
-                final Map ancestorRepeatsIterationMap = new HashMap();
-
                 // Find current path through ancestor xforms:repeat elements, if any
+                final List repeatIterationsToModify = new ArrayList();
                 {
                     XFormsControl currentXFormsControl = XFormsControl.this; // start with this, as we can be a RepeatIteration
                     while (currentXFormsControl != null) {
 
-                        if (currentXFormsControl instanceof RepeatIterationControl) {
-                            final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) currentXFormsControl;
-                            final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
-                            final int iteration = repeatIterationInfo.getIteration();
-                            final String repeatId = repeatControlInfo.getRepeatId();
+                        if (currentXFormsControl instanceof XFormsRepeatIterationControl) {
+                            final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) currentXFormsControl;
+                            final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
 
-                            if (firstAncestorRepeatControlInfo == null)
-                                firstAncestorRepeatControlInfo = repeatControlInfo;
-                            ancestorRepeatsIds.add(repeatId);
-                            ancestorRepeatsIterationMap.put(repeatId,  new Integer(iteration));
+                            // Check whether the index selection changes
+                            if (repeatControl.getIndex() != repeatIterationControl.getIterationIndex()) {
+                                // Store the id because the controls may be cloned below
+                                repeatIterationsToModify.add(repeatIterationControl.getEffectiveId());
+                            }
                         }
 
                         currentXFormsControl = currentXFormsControl.getParent();
                     }
                 }
 
-                if (ancestorRepeatsIds.size() > 0) {
+                if (repeatIterationsToModify.size() > 0) {
+                    final XFormsControls controls = containingDocument.getXFormsControls();
 
-                    final XFormsControls xformsControls = containingDocument.getXFormsControls();
+                    // Find all repeat iterations and controls again
+                    for (Iterator i = repeatIterationsToModify.iterator(); i.hasNext();) {
+                        final String repeatIterationEffectiveId = (String) i.next();
+                        final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) controls.getObjectByEffectiveId(repeatIterationEffectiveId);
+                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
 
-                    // Check whether this changes the index selection
-                    boolean doUpdate = false;
-                    {
-                        final Map currentRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-                        for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
-                            final String repeatId = (String) i.next();
-                            final Integer newIteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
-                            final Integer currentIteration = (Integer) currentRepeatIdToIndex.get(repeatId);
-                            if (!newIteration.equals(currentIteration)) {
-                                doUpdate = true;
-                                break;
-                            }
-                        }
+                        repeatControl.setIndex(repeatIterationControl.getIterationIndex());
                     }
-
-                    // Only update if the index selection has changed
-                    if (doUpdate) {
-
-                        // Update ControlsState if needed as we are going to make some changes
-                        xformsControls.rebuildCurrentControlsState(pipelineContext);
-
-                        // Iterate from root to leaf
-                        Collections.reverse(ancestorRepeatsIds);
-                        for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
-                            final String repeatId = (String) i.next();
-                            final Integer iteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
-
-    //                            XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, iteration.toString());
-                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, iteration.intValue());
-                        }
-
-                        // Update children xforms:repeat indexes if any
-                        xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                            public void startVisitControl(XFormsControl control) {
-                                if (control instanceof XFormsRepeatControl) {
-                                    // Found child repeat
-                                    xformsControls.getCurrentControlsState().updateRepeatIndex(((XFormsRepeatControl) control).getRepeatId(), 1);
-                                }
-                            }
-
-                            public void endVisitControl(XFormsControl XFormsControl) {
-                            }
-                        }, firstAncestorRepeatControlInfo);
-
-                        // Adjust controls ids that could have gone out of bounds
-                        XFormsIndexUtils.adjustRepeatIndexes(xformsControls, null);
-
-                        // XForms 1.1: "This action affects deferred updates by performing deferred update in its
-                        // initialization and by setting the deferred update flags for recalculate, revalidate and
-                        // refresh."
-                        // TODO: Nested containers?
-                        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                            final XFormsModel currentModel = (XFormsModel) i.next();
-
-                            // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
-                            //currentModel.getBinds().rebuild(pipelineContext);
-
-                            final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-                            if (deferredActionContext != null) {
-                                deferredActionContext.recalculate = true;
-                                deferredActionContext.revalidate = true;
-                                deferredActionContext.refresh = true;
-                            }
-                        }
-                        // TODO: Should try to use the code of the <setindex> action
-
-                        containingDocument.getXFormsControls().markDirtySinceLastRequest();
-                    }
+                    
+                    controls.markDirtySinceLastRequest(true);
+                    XFormsSetindexAction.setDeferredFlagsForSetindex(containingDocument);
                 }
 
                 // Store new focus information for client
@@ -528,6 +503,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         } else if (XFormsEvents.XFORMS_HELP.equals(event.getEventName())) {
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId());
         }
+    }
+
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+        // NOP
     }
 
     public boolean isStaticReadonly() {
@@ -602,5 +581,89 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             result = rawValue;
         }
         return result;
+    }
+
+    /**
+     * Serialize this control's information which cannot be reconstructed from instances. The result is null if no
+     * serialization is needed, or a map of name/value pairs otherwise.
+     *
+     * @return  map<String name, String value>
+     */
+    public Map serializeLocal() {
+        return null;
+    }
+
+    /**
+     * Deserialize this control's information which cannot be reconstructed from instances.
+     *
+     * @param element containing attributes which can be used by the control
+     */
+    public void deserializeLocal(Element element) {
+        // NOP
+    }
+
+    /**
+     * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls
+     * before updates that may change control bindings. Also, it is important to understand that we clone "back", that
+     * is the new clone will be used as the reference copy for the difference engine.
+     *
+     * @return  new XFormsControl
+     */
+    public Object clone() {
+        // NOTE: this.parent is handled by subclasses
+        final XFormsControl cloned;
+        try {
+            cloned = (XFormsControl) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new OXFException(e);
+        }
+
+        if (this.currentLocal != null) {
+            // There is some local data
+            if (this.currentLocal != this.initialLocal) {
+                // The trees don't keep wastefull references
+                cloned.currentLocal = cloned.initialLocal;
+                this.initialLocal = this.currentLocal;
+            } else {
+                // The new tree must have its own copy
+                // NOTE: We could implement a copy-on-write flag here
+                cloned.initialLocal = cloned.currentLocal = (XFormsControlLocal) this.currentLocal.clone();
+            }
+        }
+
+        return cloned;
+    }
+
+    protected void setLocal(XFormsControlLocal local) {
+        this.initialLocal = this.currentLocal = local;
+    }
+
+    protected XFormsControlLocal getLocalForUpdate() {
+        if (containingDocument.isHandleDifferences()) {
+            // Happening during a client request where we need to handle diffs
+            final XFormsControls controls =  containingDocument.getXFormsControls();
+            if (controls.getInitialControlTree() != controls.getCurrentControlTree()) {
+                if (currentLocal != initialLocal)
+                    throw new OXFException("currentLocal != initialLocal");
+            } else if (initialLocal == currentLocal) {
+                currentLocal = (XFormsControlLocal) initialLocal.clone();
+            }
+        } else {
+            // Happening during initialization
+            // NOP: Don't modify currentLocal
+        }
+        return currentLocal;
+    }
+
+    public XFormsControlLocal getInitialLocal() {
+        return initialLocal;
+    }
+
+    public XFormsControlLocal getCurrentLocal() {
+        return currentLocal;
+    }
+
+    public void resetLocal() {
+        initialLocal = currentLocal;
     }
 }

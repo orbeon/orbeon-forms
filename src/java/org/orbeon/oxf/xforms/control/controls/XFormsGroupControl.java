@@ -19,12 +19,13 @@ import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
  * Represents an xforms:group container control.
  */
-public class XFormsGroupControl extends XFormsSingleNodeControl implements XFormsContainerControl {
+public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
 
     public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
 

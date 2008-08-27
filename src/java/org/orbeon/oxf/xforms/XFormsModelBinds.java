@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -241,9 +241,10 @@ public class XFormsModelBinds {
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
 
+        // TODO: use containingDocument.startHandleOperation()
         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
-        final Map effectiveIdsToControls = containingDocument.getXFormsControls().getCurrentControlsState().getEffectiveIdsToControls();
+        final Map effectiveIdsToControls = containingDocument.getXFormsControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
         final Map nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
@@ -411,7 +412,7 @@ public class XFormsModelBinds {
             final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
 
             if (currentControl instanceof XFormsSingleNodeControl
-                    && (currentControl instanceof RepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
+                    && (currentControl instanceof XFormsRepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
                 // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
                 // But also support repeat iterations, as their MIPs
                 final NodeInfo boundNode = currentControl.getBoundNode();

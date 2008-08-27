@@ -30,21 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 public class NewControlsComparator extends BaseControlsComparator {
-
-    private PipelineContext pipelineContext;
-    private ContentHandlerHelper ch;
-    private XFormsContainingDocument containingDocument;
-    private Map itemsetsFull1;
-    private Map itemsetsFull2;
-    private Map valueChangeControlIds;
-
+    
     public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
-        this.pipelineContext = pipelineContext;
-        this.ch = ch;
-        this.containingDocument = containingDocument;
-        this.itemsetsFull1 = itemsetsFull1;
-        this.itemsetsFull2 = itemsetsFull2;
-        this.valueChangeControlIds = valueChangeControlIds;
+        super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
     public void diff(List state1, List state2) {
@@ -110,7 +98,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                             // Whether it is necessary to output information about this control
                             boolean doOutputElement = false;
 
-                            if (!(xformsSingleNodeControl2 instanceof RepeatIterationControl)) {
+                            if (!(xformsSingleNodeControl2 instanceof XFormsRepeatIterationControl)) {
                                 // Anything but a repeat iteration
 
                                 // Control id
@@ -316,31 +304,16 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                 // Repeat iteration
                                 if (doOutputElement) {
-                                    final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) xformsSingleNodeControl2;
-                                    attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
+                                    final XFormsRepeatIterationControl repeatIterationInfo = (XFormsRepeatIterationControl) xformsSingleNodeControl2;
+                                    attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIterationIndex()));
 
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
                                 }
                             }
                         }
 
-                        // Handle itemsets
-                        if (xformsSingleNodeControl2 instanceof XFormsSelect1Control) {
-                            final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsSingleNodeControl1;
-                            final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsSingleNodeControl2;
-
-                            if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
-                                final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
-                                if (items != null)
-                                    itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
-                            }
-
-                            if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
-                                final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
-                                if (items != null)
-                                    itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
-                            }
-                        }
+                        // Handle out of band differences
+                        diffOutOfBand(xformsControl1, xformsControl2);
                     } else {
                         // xformsControl2 == null (&& xformsControl1 != null)
                         // We went from an existing control to a non-relevant control
@@ -354,24 +327,34 @@ public class NewControlsComparator extends BaseControlsComparator {
                                         XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                         ContentHandlerHelper.CDATA, Boolean.toString(false));
 
-                            if (!(xformsSingleNodeControl1 instanceof RepeatIterationControl)) {
+                            if (!(xformsSingleNodeControl1 instanceof XFormsRepeatIterationControl)) {
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                             } else {
-                                final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) xformsSingleNodeControl1;
-                                attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
+                                final XFormsRepeatIterationControl repeatIterationInfo = (XFormsRepeatIterationControl) xformsSingleNodeControl1;
+                                attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIterationIndex()));
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
                             }
                         }
                     }
+                } else if (xformsControl2 instanceof XXFormsDialogControl) {
+                    // Out of band xxforms:dialog differences
+
+                    final XXFormsDialogControl dialogControl1 = (XXFormsDialogControl) xformsControl1;
+                    final XXFormsDialogControl dialogControl2 = (XXFormsDialogControl) xformsControl2;
+
+                    diffDialogs(dialogControl1, dialogControl2);
                 }
 
                 // 2: Check children if any
-                if (leadingControl instanceof XFormsContainerControl || leadingControl instanceof RepeatIterationControl) {
+                if (leadingControl instanceof XFormsContainerControl) {
 
                     final boolean isRepeatControl = leadingControl instanceof XFormsRepeatControl;
 
-                    final List children1 = (xformsControl1 == null) ? null : (xformsControl1.getChildren() != null && xformsControl1.getChildren().size() == 0) ? null : xformsControl1.getChildren();
-                    final List children2 = (xformsControl2 == null) ? null : (xformsControl2.getChildren() != null && xformsControl2.getChildren().size() == 0) ? null : xformsControl2.getChildren();
+                    final XFormsContainerControl containerControl1 = (XFormsContainerControl) xformsControl1;
+                    final XFormsContainerControl containerControl2 = (XFormsContainerControl) xformsControl2;
+
+                    final List children1 = (containerControl1 == null) ? null : (containerControl1.getChildren() != null && containerControl1.getChildren().size() == 0) ? null : containerControl1.getChildren();
+                    final List children2 = (containerControl2 == null) ? null : (containerControl2.getChildren() != null && containerControl2.getChildren().size() == 0) ? null : containerControl2.getChildren();
 
                     if (isRepeatControl) {
 

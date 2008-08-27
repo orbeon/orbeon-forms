@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ *  Copyright (C) 2006 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,17 +11,17 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.control;
+package org.orbeon.oxf.xforms.control.controls;
 
-import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 
 /**
- * Control that represents a custom components.
+ * Temporarily represents a root for other controls.
  */
-public class XFormsComponentControl extends XFormsSingleNodeControl {// TODO: this is not really a single-node control, is it?
-
-    public XFormsComponentControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(container, parent, element, name, effectiveId);
+public class XXFormsRootControl extends XFormsNoSingleNodeContainerControl implements XFormsPseudoControl {
+    public XXFormsRootControl(XFormsContainingDocument containingDocument) {
+        super(containingDocument, null, null, "root", null);
     }
 }

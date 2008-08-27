@@ -15,20 +15,19 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
@@ -38,14 +37,8 @@ public class XFormsControls {
     private Locator locator;
 
     private boolean initialized;
-    private ControlsState initialControlsState;
-    private ControlsState currentControlsState;
-
-    private SwitchState initialSwitchState;
-    private SwitchState currentSwitchState;
-
-    private DialogState initialDialogState;
-    private DialogState currentDialogState;
+    private ControlTree initialControlTree;
+    private ControlTree currentControlTree;
 
     private boolean dirtySinceLastRequest;
 
@@ -54,35 +47,25 @@ public class XFormsControls {
     
     private Map constantItems;
 
-    public XFormsControls(XFormsContainingDocument containingDocument, XFormsStaticState xformsStaticState, Element repeatIndexesElement) {
+    public XFormsControls(XFormsContainingDocument containingDocument) {
 
         this.containingDocument = containingDocument;
         this.rootContainer = this.containingDocument;
 
-        // Perform minimal initialization
-        if (xformsStaticState != null) {
-
-            // Set default repeat index information only
-            final ControlsState result = new ControlsState();
-            result.setDefaultRepeatIdToIndex(xformsStaticState.getDefaultRepeatIdToIndex());
-            initialControlsState = result;
-            currentControlsState = initialControlsState;
-            
-            // Set incoming repeat index state if any
-            setRepeatIndexState(repeatIndexesElement);
-        }
+        // Create minimal tree
+        initialControlTree = new ControlTree();
+        currentControlTree = initialControlTree;
     }
 
     public boolean isDirtySinceLastRequest() {
         return dirtySinceLastRequest;
     }
     
-    public void markDirtySinceLastRequest() {
+    public void markDirtySinceLastRequest(boolean bindingsAffected) {
         dirtySinceLastRequest = true;
-        if (this.currentControlsState != null)// can be null for legacy XForms engine
-            this.currentControlsState.markDirty();
+        if (bindingsAffected)
+            currentControlTree.markBindingsDirty();
     }
-
 
     /**
      * Returns whether there is any event handler registered anywhere in the controls for the given event name.
@@ -104,7 +87,7 @@ public class XFormsControls {
      * @param pipelineContext   current PipelineContext
      */
     public void initialize(PipelineContext pipelineContext) {
-        initializeState(pipelineContext, null, null, false);
+        initializeState(pipelineContext, false);
     }
 
     /**
@@ -112,77 +95,34 @@ public class XFormsControls {
      * needs to be rebuilt.
      *
      * @param pipelineContext       current PipelineContext
-     * @param divsElement           current div elements, or null
-     * @param repeatIndexesElement  current repeat indexes, or null
+     * @param evaluateItemsets      whether to evaluateItemsets (for dynamic state restoration)
      */
-    public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement, boolean evaluateItemsets) {
+    public void initializeState(PipelineContext pipelineContext, boolean evaluateItemsets) {
 
         final XFormsStaticState staticState = containingDocument.getStaticState();
         if (staticState != null && staticState.getControlsDocument() != null) {
 
             if (initialized) {
-                // Use existing controls state
-                initialControlsState = currentControlsState;
-                initialSwitchState = currentSwitchState;
-                initialDialogState = currentDialogState;
-            } else {
-                // Build controls state
+                // Use existing controls tree
 
-                // Get initial controls state information
-                initialControlsState = buildControlsState(pipelineContext, evaluateItemsets);
-                currentControlsState = initialControlsState;
+                initialControlTree = currentControlTree;
 
-                initialSwitchState = new SwitchState(initialControlsState.getSwitchIdToSelectedCaseIdMap());
-                currentSwitchState = initialSwitchState;
-
-                initialDialogState = new DialogState(initialControlsState.getDialogIdToVisibleMap());
-                currentDialogState = initialDialogState;
-
-                // Set switch state if necessary
-                if (divsElement != null) {
-                    for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
-                        final Element divElement = (Element) i.next();
-
-                        final String dialogId = divElement.attributeValue("dialog-id");
-                        final boolean isShow;
-                        {
-                            final String visibilityString = divElement.attributeValue("visibility");
-                            isShow = "visible".equals(visibilityString);
-                        }
-
-                        if (dialogId != null) {
-                            // xxforms:dialog
-                            final String neighbor = divElement.attributeValue("neighbor");
-                            final boolean constrainToViewport = "true".equals(divElement.attributeValue("constrain"));
-                            currentDialogState.showHide(dialogId, isShow, isShow ? neighbor : null, constrainToViewport);
-                        } else {
-                            // xforms:switch/xforms:case
-                            final String switchId = divElement.attributeValue("switch-id");
-                            final String caseId = divElement.attributeValue("case-id");
-                            currentSwitchState.initializeState(switchId, caseId, isShow);
-                        }
+                // Need to make sure that current == initial within controls
+                visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+                    public void startVisitControl(XFormsControl control) {
+                        control.resetLocal();
                     }
-                }
+                });
 
-                // Handle repeat indexes if needed
-                final boolean hasRepeat = staticState.hasControlByName("repeat");
-                if (hasRepeat) {
-
-                    // Set default repeat index information
-                    initialControlsState.setDefaultRepeatIdToIndex(containingDocument.getStaticState().getDefaultRepeatIdToIndex());
-
-                    // Set external updates
-                    setRepeatIndexState(repeatIndexesElement);
-
-                    // Adjust repeat indexes
-                    XFormsIndexUtils.adjustIndexes(initialControlsState);
-                }
+            } else {
+                // Create new controls tree
+                initialControlTree = createControlsTree(pipelineContext, evaluateItemsets);
+                currentControlTree = initialControlTree;
             }
 
             // We are now clean
-            containingDocument.markCleanSinceLastRequest();
             dirtySinceLastRequest = false;
-            initialControlsState.dirty = false;
+            initialControlTree.markBindingsClean();
         }
 
         rootContainer.getContextStack().resetBindingContext(pipelineContext);// not sure we actually need to do this
@@ -190,15 +130,42 @@ public class XFormsControls {
         initialized = true;
     }
 
-    private void setRepeatIndexState(Element repeatIndexesElement) {
-        if (repeatIndexesElement != null) {
-            for (Iterator i = repeatIndexesElement.elements().iterator(); i.hasNext();) {
-                final Element repeatIndexElement = (Element) i.next();
+    /**
+     * Serialize controls into the dynamic state. Only the information that cannot be rebuilt from the instances is
+     * serialized.
+     *
+     * @param dynamicStateElement
+     */
+    public void serializeControls(Element dynamicStateElement) {
+        final Element controlsElement = dynamicStateElement.addElement("controls");
+        visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+            public void startVisitControl(XFormsControl control) {
+                final Map nameValues = control.serializeLocal();
+                if (nameValues != null) {
+                    final Element controlElement = controlsElement.addElement("control");
+                    controlElement.addAttribute("effective-id", control.getEffectiveId());
+                    for (Iterator i = nameValues.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
+                    }
+                }
+            }
+        });
+    }
 
-                final String repeatId = repeatIndexElement.attributeValue("id");
-                final String index = repeatIndexElement.attributeValue("index");
-
-                initialControlsState.updateRepeatIndex(repeatId, Integer.parseInt(index));
+    /**
+     * Deserialize controls from the dynamic state. Only the information that cannot be rebuilt from the instances is
+     * deserialized.
+     *
+     * @param dynamicStateElement
+     */
+    public void deserializeControls(Element dynamicStateElement) {
+        final Element controlsElement = dynamicStateElement.element("controls");
+        if (controlsElement != null) {
+            for (Iterator i = controlsElement.elements("control").iterator(); i.hasNext();) {
+                final Element currentControlElement = (Element) i.next();
+                final XFormsControl currentControl = (XFormsControl) getObjectByEffectiveId(currentControlElement.attributeValue("effective-id"));
+                currentControl.deserializeLocal(currentControlElement);
             }
         }
     }
@@ -212,158 +179,43 @@ public class XFormsControls {
         return rootContainer.getContextStack();
     }
 
-    private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
+    /**
+     * Build the entire tree of controls and associated information.
+     *
+     * @param pipelineContext   pipeline context
+     * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
+     * @return                  controls tree
+     */
+    private ControlTree createControlsTree(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
 
-        final long startTime;
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "start building");
-            startTime = System.currentTimeMillis();
-        } else {
-            startTime = 0;
-        }
-
-        containingDocument.startHandleOperation();
-
-        final ControlsState result = new ControlsState();
-
-        final XFormsControl rootControl = new RootControl(containingDocument);// this is temporary and won't be stored
-        final Map effectiveIdsToControls = new HashMap();
-
-        final Map switchIdToSelectedCaseIdMap = new HashMap();
-        final Map dialogIdToVisibleMap = new HashMap();
-
-        visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
-
-            private XFormsControl currentControlsContainer = rootControl;
-
-            public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
-
-                // Create XFormsControl with basic information
-                final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
-                effectiveIdsToControls.put(effectiveControlId, xformsControl);
-
-                final String controlName = xformsControl.getName();
-                // Control type-specific handling
-                {
-                    if (controlName.equals("case")) {
-                        // Handle xforms:case
-                        if (!(currentControlsContainer.getName().equals("switch")))
-                            throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
-                        final String switchId = currentControlsContainer.getEffectiveId();
-
-                        if (switchIdToSelectedCaseIdMap.get(switchId) == null) {
-                            // If case is not already selected for this switch and there is a select attribute, set it
-                            final String selectedAttribute = controlElement.attributeValue("selected");
-                            if ("true".equals(selectedAttribute))
-                                switchIdToSelectedCaseIdMap.put(switchId, effectiveControlId);
-                        }
-                    } else if (controlName.equals("dialog")) {
-                        // Handle xxforms:dialog
-                        // TODO: Handle initial visibility. Do this here?
-//                        final XXFormsDialogControl dialogControl = (XXFormsDialogControl) xformsControl;
-                        dialogIdToVisibleMap.put(effectiveControlId, new DialogState.DialogInfo(false, null, false));
-                    } else if (xformsControl instanceof XFormsSelectControl || xformsControl instanceof XFormsSelect1Control) {
-                        // Handle xforms:itemset
-                        final XFormsSelect1Control select1Control = ((XFormsSelect1Control) xformsControl);
-                        // Evaluate itemsets only if specified (case of restoring dynamic state)
-                        if (evaluateItemsets)
-                            select1Control.getItemset(pipelineContext, false);
-                    } else if (xformsControl instanceof XFormsUploadControl) {
-                        // Handle xforms:upload
-                        result.addUploadControl((XFormsUploadControl) xformsControl);
-                    } else if (xformsControl instanceof XXFormsAttributeControl) {
-                        // Handle xxforms:attribute
-                        result.addAttributeControl((XXFormsAttributeControl) xformsControl);
-                    }
-                }
-
-                // Set current binding for control element
-                final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-                xformsControl.setBindingContext(currentBindingContext);
-
-                // Add to current controls container
-                currentControlsContainer.addChild(xformsControl);
-
-                // Current grouping control becomes the current controls container
-                if (XFormsControlFactory.isContainerControl(controlName)) {
-                    currentControlsContainer = xformsControl;
-                }
-            }
-            
-            public void endVisitControl(Element controlElement, String effectiveControlId) {
-
-                final String controlName = controlElement.getName();
-
-                if (XFormsControlFactory.isContainerControl(controlName)) {
-                    // Handle grouping controls
-
-                    if (controlName.equals("switch")) {
-                        // Handle xforms:switch
-                        if (switchIdToSelectedCaseIdMap.get(effectiveControlId) == null) {
-                            // No case was selected, select first case id
-                            final List children = currentControlsContainer.getChildren();
-                            if (children != null && children.size() > 0)
-                                switchIdToSelectedCaseIdMap.put(effectiveControlId, ((XFormsControl) children.get(0)).getEffectiveId());
-                        }
-                    } else if (controlName.equals("repeat")) {
-                        // Handle xforms:repeat
-
-                        // Store number of repeat iterations for the effective id
-                        final List children = currentControlsContainer.getChildren();
-
-                        if (children == null || children.size() == 0) {
-                            // Current index is 0
-                            result.setRepeatIterations(effectiveControlId, 0);
-                        } else {
-                            // Number of iterations is number of children
-                            result.setRepeatIterations(effectiveControlId, children.size());
-                        }
-                    }
-
-                    // Go back up to parent
-                    currentControlsContainer = currentControlsContainer.getParent();
-                }
-            }
-
-            public void startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
-
-                final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration, effectiveIterationId);
-                effectiveIdsToControls.put(effectiveIterationId, repeatIterationControl);
-
-                currentControlsContainer.addChild(repeatIterationControl);
-                currentControlsContainer = repeatIterationControl;
-
-                // Set current binding for control
-                final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-                repeatIterationControl.setBindingContext(currentBindingContext);
-            }
-
-            public void endRepeatIteration(int iteration) {
-                currentControlsContainer = currentControlsContainer.getParent();
-            }
-        });
-
-        // Make it so that all the root XFormsControl don't have a parent
-        final List rootChildren = rootControl.getChildren();
-        if (rootChildren != null) {
-            for (Iterator i = rootChildren.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-                currentXFormsControl.detach();
-            }
-        }
-
-        result.setChildren(rootChildren);
-        result.setEffectiveIdsToControls(effectiveIdsToControls);
-        result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
-        result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
-
+        containingDocument.startHandleOperation("controls", "building");
+        final ControlTree result = new ControlTree(pipelineContext, containingDocument, rootContainer, evaluateItemsets);
         containingDocument.endHandleOperation();
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "end building", new String[] { "time (ms)", Long.toString((System.currentTimeMillis() - startTime)) });
-        }
-
         return result;
+    }
+
+    /**
+     * Create a new repeat iteration for insertion into the current tree of controls.
+     *
+     * WARNING: The binding context must be set to the current iteration before calling.
+     *
+     * @param pipelineContext   pipeline context
+     * @param repeatControl     repeat control
+     * @param iterationIndex    new iteration to repeat (1..repeat size + 1)
+     */
+    public XFormsRepeatIterationControl createRepeatIterationTree(final PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext,
+                                                                  XFormsRepeatControl repeatControl, int iterationIndex) {
+
+        if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences())
+            throw new OXFException("Cannot call insertRepeatIteration() when initialControlTree == currentControlTree");
+
+        final XFormsRepeatIterationControl repeatIterationControl;
+        containingDocument.startHandleOperation("controls", "adding iteration");
+        repeatIterationControl = currentControlTree.createRepeatIterationTree(pipelineContext, bindingContext, repeatControl, iterationIndex);
+        containingDocument.endHandleOperation();
+
+        return repeatIterationControl;
     }
 
     /**
@@ -372,201 +224,107 @@ public class XFormsControls {
      *
      * @param pipelineContext   current PipelineContext
      */
-    public void evaluateAllControlsIfNeeded(PipelineContext pipelineContext) {
+    public void evaluateControlValuesIfNeeded(PipelineContext pipelineContext) {
 
-        final long startTime;
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "start evaluating");
-            startTime = System.currentTimeMillis();
-        } else {
-            startTime = 0;
+        containingDocument.startHandleOperation("controls", "evaluating");
+        {
+            final Map effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
+            // Evaluate all controls
+            for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+                currentControl.evaluateIfNeeded(pipelineContext);
+            }
         }
-
-        final Map effectiveIdsToControls = getCurrentControlsState().getEffectiveIdsToControls();
-        // Evaluate all controls
-        for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
-            currentControl.evaluateIfNeeded(pipelineContext);
-        }
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "end evaluating",
-                    new String[] { "time (ms)", Long.toString(System.currentTimeMillis() - startTime)});
-        }
+        containingDocument.endHandleOperation();
     }
 
     /**
-     * Get the ControlsState computed in the initialize() method.
+     * Get the ControlTree computed in the initialize() method.
      */
-    public ControlsState getInitialControlsState() {
-        return initialControlsState;
+    public ControlTree getInitialControlTree() {
+        return initialControlTree;
     }
 
     /**
-     * Get the last computed ControlsState.
+     * Get the last computed ControlTree.
      */
-    public ControlsState getCurrentControlsState() {
-        return currentControlsState;
+    public ControlTree getCurrentControlTree() {
+        return currentControlTree;
     }
 
     /**
-     * Get the SwitchState computed in the initialize() method.
-     */
-    public SwitchState getInitialSwitchState() {
-        return initialSwitchState;
-    }
-
-    /**
-     * Get the last computed SwitchState.
-     */
-    public SwitchState getCurrentSwitchState() {
-        return currentSwitchState;
-    }
-
-
-    public DialogState getInitialDialogState() {
-        return initialDialogState;
-    }
-
-    public DialogState getCurrentDialogState() {
-        return currentDialogState;
-    }
-
-    /**
-     * Activate a switch case by case id.
+     * Clone the current controls tree if:
      *
-     * @param pipelineContext   current PipelineContext
-     * @param caseId            case id to activate
+     * 1. it hasn't yet been cloned
+     * 2. we are not during the XForms engine initialization
+     *
+     * The rationale for #2 is that there is no controls comparison needed during initialization. Only during further
+     * client requests do the controls need to be compared.
      */
-    public void activateCase(PipelineContext pipelineContext, String caseId) {
-
-        if (initialSwitchState == currentSwitchState)
-            currentSwitchState = new SwitchState(new HashMap(initialSwitchState.getSwitchIdToSelectedCaseIdMap()));
-
-        // TODO: if switch state changes AND we optimize relevance, then mark controls as dirty
-
-        getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
-        containingDocument.markDirtySinceLastRequest();
-    }
-
-
-    public void showHideDialog(String dialogId, boolean show, String neighbor, boolean constrainToViewport) {
-
-        // Make sure the id refers to an existing xxforms:dialog
-        final Object object = getObjectByEffectiveId(dialogId);
-        if (object == null || !(object instanceof XXFormsDialogControl))
-            return;
-
-        // Update state
-        if (initialDialogState == currentDialogState)
-            currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
-
-        currentDialogState.showHide(dialogId, show, neighbor, constrainToViewport);
-        containingDocument.markDirtySinceLastRequest();
+    public void cloneInitialStateIfNeeded() {
+        if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences()) {
+            containingDocument.startHandleOperation("controls", "cloning");
+            {
+                try {
+                    // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
+                    // if we started working with controls in the initial tree, we can keep using those references safely.
+                    initialControlTree = (ControlTree) currentControlTree.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new OXFException(e);
+                }
+            }
+            containingDocument.endHandleOperation();
+        }
     }
 
     /**
-     * Rebuild the current controls state information if needed.
+     * Rebuild the controls tree bindings if needed.
      */
-    public boolean rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
+    public boolean updateControlBindingsIfNeeded(final PipelineContext pipelineContext) {
 
         if (!initialized) {
             return false;
         } else {
             // This is the regular case
 
-            // Don't do anything if we are clean
-            if (!currentControlsState.isDirty())
+            // Don't do anything if bindings are clean
+            if (!currentControlTree.isBindingsDirty())
                 return false;
 
-            // Rebuild
-            rebuildCurrentControlsState(pipelineContext);
+            // Clone if needed
+            cloneInitialStateIfNeeded();
 
-            // Everything is clean
-            initialControlsState.dirty = false;
-            currentControlsState.dirty = false;
+            containingDocument.startHandleOperation("controls", "updating bindings");
+            {
+                // Visit all controls and update their bindings
+                visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer,
+                        new UpdateBindingsListener(pipelineContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch()));
+            }
+            containingDocument.endHandleOperation();
+
+            // Controls are clean
+            initialControlTree.markBindingsClean();
+            currentControlTree.markBindingsClean();
 
             return true;
         }
     }
 
     /**
-     * Rebuild the current controls state information.
-     */
-    public void rebuildCurrentControlsState(PipelineContext pipelineContext) {
-
-        // If we haven't been initialized yet, don't do anything
-        if (!initialized)
-            return;
-
-        // Remember current state
-        final ControlsState currentControlsState = this.currentControlsState;
-
-        // Create new controls state
-        final ControlsState result = buildControlsState(pipelineContext, false);
-
-        // Transfer some of the previous information
-        final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-        if (currentRepeatIdToIndex.size() != 0) {
-            // Keep repeat index information
-            result.setRepeatIdToIndex(currentRepeatIdToIndex);
-            // Adjust repeat indexes if necessary
-            XFormsIndexUtils.adjustIndexes(result);
-        }
-
-        // Update xforms;switch information: use new values, except where old values are available
-        final Map oldSwitchIdToSelectedCaseIdMap = getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
-        final Map newSwitchIdToSelectedCaseIdMap = result.getSwitchIdToSelectedCaseIdMap();
-        {
-            for (Iterator i = newSwitchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry entry = (Map.Entry) i.next();
-                final String switchId =  (String) entry.getKey();
-
-                // Keep old switch state
-                final String oldSelectedCaseId = (String) oldSwitchIdToSelectedCaseIdMap.get(switchId);
-                if (oldSelectedCaseId != null) {
-                    entry.setValue(oldSelectedCaseId);
-                }
-            }
-
-            this.currentSwitchState = new SwitchState(newSwitchIdToSelectedCaseIdMap);
-        }
-
-        // Update xxforms:dialog information
-        // NOP!
-
-        // Update current state
-        this.currentControlsState = result;
-
-        // Handle relevance of controls that are no longer bound to instance data nodes
-        final Map[] eventsToDispatch = new Map[] { currentControlsState.getEventsToDispatch() } ;
-        findSpecialRelevanceChanges(currentControlsState.getChildren(), result.getChildren(), eventsToDispatch);
-        this.currentControlsState.setEventsToDispatch(eventsToDispatch[0]);
-    }
-
-    /**
-     * Perform a refresh of the controls for a given model
-     */
-//    public void refreshForModel(final PipelineContext pipelineContext, final XFormsModel model) {
-//        // NOP
-//    }
-
-    /**
      * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
      */
-    public int getRepeatIdIndex(String repeatId) {
-        final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-        final Integer currentIndex = (Integer) repeatIdToIndex.get(repeatId);
-
-        if (currentIndex != null) {
-            return currentIndex.intValue();
+    public int getRepeatIndex(String repeatId) {
+        // TODO: pass sourceId
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(null, repeatId);
+        if (repeatControl != null) {
+            // Found
+            return repeatControl.getIndex();
+        } else if (containingDocument.getStaticState().getControlInfoMap().get(repeatId) != null) {
+            // A repeat element does exist for this id, but it has zero iterations
+            return 0;
         } else {
-            // If the controls are not initialized, then we give the caller a chance and return 0. This will make sure
-            // that index() used in a calculate MIP will return something during the recalculate at the end of
-            // xforms-model-construct, instead of throwing an exception. Ideally, we should still return -1 if there is
-            // no xforms:repeat with the id provided.
-            return (initialized) ? -1 : 0;
+            return -1;
         }
     }
 
@@ -586,7 +344,7 @@ public class XFormsControls {
      */
     public Object getObjectByEffectiveId(String effectiveId) {
         // Until xforms-ready is dispatched, ids map may be null
-        final Map effectiveIdsToControls = currentControlsState.getEffectiveIdsToControls();
+        final Map effectiveIdsToControls = currentControlTree.getEffectiveIdsToControls();
         return (effectiveIdsToControls != null) ? effectiveIdsToControls.get(effectiveId) : null;
     }
 
@@ -599,25 +357,43 @@ public class XFormsControls {
      * @return                   object, or null if not found
      */
     public Object resolveObjectById(String effectiveSourceId, String targetId) {
-        final String effectiveControlId = getCurrentControlsState().findEffectiveControlId(effectiveSourceId, targetId);
+        final String effectiveControlId = getCurrentControlTree().findEffectiveControlId(effectiveSourceId, targetId);
         return (effectiveControlId != null) ? getObjectByEffectiveId(effectiveControlId) : null;
     }
 
     /**
-     * Visit all the effective controls elements.
+     * Visit all the controls elements by following repeats to allow creating the actual control.
      */
-    public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
+    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContainer rootContainer, ControlElementVisitorListener controlElementVisitorListener) {
         rootContainer.getContextStack().resetBindingContext(pipelineContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
 
-        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState(),
-                rootContainer, rootElement, "", "");
+        visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                containingDocument.getStaticState(), rootContainer, rootElement, "", "");
     }
 
-    private void handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
-                                    boolean isOptimizeRelevance, XFormsStaticState staticState, XFormsContainer currentContainer,
-                                    Element containerElement, String idPrefix, String idPostfix) {
+    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsRepeatControl enclosingRepeatControl, int iterationIndex, XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+
+        final XFormsContainingDocument containingDocument = enclosingRepeatControl.getContainer().getContainingDocument();
+        final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
+
+        // Set binding context on the particular repeat iteration
+        final XFormsContextStack contextStack = enclosingRepeatControl.getContainer().getContextStack();
+        contextStack.setBinding(enclosingRepeatControl);
+        contextStack.pushIteration(iterationIndex);
+
+        // Start visiting children of the xforms:repeat element
+        final Element repeatControlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getId())).getElement();
+        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                containingDocument.getStaticState(), enclosingRepeatControl.getContainer(), repeatControlElement,
+                XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
+                XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)));
+    }
+
+    private static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
+                                                    boolean isOptimizeRelevance, XFormsStaticState staticState, XFormsContainer currentContainer,
+                                                    Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
         final XFormsContextStack currentContextStack = currentContainer.getContextStack();
@@ -639,23 +415,25 @@ public class XFormsControls {
                 // Iterate over current xforms:repeat nodeset
                 final List currentNodeSet = currentContextStack.getCurrentNodeset();
                 if (currentNodeSet != null) {
-                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
+                    for (int iterationIndex = 1; iterationIndex <= currentNodeSet.size(); iterationIndex++) {
                         // Push "artificial" binding with just current node in nodeset
-                        currentContextStack.pushIteration(currentPosition);
+                        currentContextStack.pushIteration(iterationIndex);
                         {
                             // Handle children of xforms:repeat
                             // TODO: handle isOptimizeRelevance()
 
                             // Compute repeat iteration id
-                            final String iterationEffectiveId = effectiveControlId
-                                    + (idPostfix.equals("") ? XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2)
-                                    + currentPosition;
+                            final String iterationEffectiveId = XFormsUtils.getIterationEffectiveId(effectiveControlId, iterationIndex);
 
-                            controlElementVisitorListener.startRepeatIteration(currentContainer, currentPosition, iterationEffectiveId);
-                            final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
-                            handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentContainer, currentControlElement, idPrefix, newIdPostfix);
-                            controlElementVisitorListener.endRepeatIteration(currentPosition);
+                            final boolean recurse = controlElementVisitorListener.startRepeatIteration(currentContainer, iterationIndex, iterationEffectiveId);
+                            if (recurse) {
+                                // When updating controls, the callee has the option of disabling recursion into an
+                                // iteration. This is used for handling new iterations.
+                                final String newIdPostfix = idPostfix.equals("") ? Integer.toString(iterationIndex) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex);
+                                visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                        staticState, currentContainer, currentControlElement, idPrefix, newIdPostfix);
+                            }
+                            controlElementVisitorListener.endRepeatIteration(iterationIndex);
                         }
                         currentContextStack.popBinding();
                     }
@@ -681,7 +459,7 @@ public class XFormsControls {
                             || (!currentBindingContext.isNewBind()
                                  || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
-                        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                        visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                                 staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
                     }
                 }
@@ -697,7 +475,7 @@ public class XFormsControls {
                 // Handle xxforms:variable specifically
 
                 // Create variable object
-                final Variable variable = new Variable(containingDocument, currentContextStack, currentControlElement);
+                final Variable variable = new Variable(currentContainer.getContainingDocument(), currentContextStack, currentControlElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
@@ -735,7 +513,7 @@ public class XFormsControls {
 
                     // Recurse into component tree
                     final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(staticControlId);
-                    handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                    visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                             staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
@@ -754,31 +532,13 @@ public class XFormsControls {
      * Visit all the current XFormsControls.
      */
     public void visitAllControls(XFormsControlVisitorListener xformsControlVisitorListener) {
-        handleControl(xformsControlVisitorListener, currentControlsState.getChildren());
+        currentControlTree.visitAllControls(xformsControlVisitorListener);
     }
 
-    /**
-     * Visit all the children of the given XFormsControl.
-     */
-    public void visitAllControls(XFormsControlVisitorListener xformsControlVisitorListener, XFormsControl currentXFormsControl) {
-        handleControl(xformsControlVisitorListener, currentXFormsControl.getChildren());
-    }
-
-    private void handleControl(XFormsControlVisitorListener xformsControlVisitorListener, List children) {
-        if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl XFormsControl = (XFormsControl) i.next();
-                xformsControlVisitorListener.startVisitControl(XFormsControl);
-                handleControl(xformsControlVisitorListener, XFormsControl.getChildren());
-                xformsControlVisitorListener.endVisitControl(XFormsControl);
-            }
-        }
-    }
-
-    private static interface ControlElementVisitorListener {
+    public static interface ControlElementVisitorListener {
         public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId);
         public void endVisitControl(Element controlElement, String effectiveControlId);
-        public void startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId);
+        public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId);
         public void endRepeatIteration(int iteration);
     }
 
@@ -787,516 +547,9 @@ public class XFormsControls {
         public void endVisitControl(XFormsControl control);
     }
 
-    /**
-     * Represents the state of repeat indexes.
-     */
-//    public static class RepeatIndexesState {
-//        public RepeatIndexesState() {
-//        }
-//
-//
-//    }
-
-    /**
-     * Represents the state of switches.
-     */
-    public static class SwitchState {
-
-        private Map switchIdToSelectedCaseIdMap;
-
-        public SwitchState(Map switchIdToSelectedCaseIdMap) {
-            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
-        }
-
-        public Map getSwitchIdToSelectedCaseIdMap() {
-            return switchIdToSelectedCaseIdMap;
-        }
-
-        /**
-         * Update xforms:switch/xforms:case information with newly selected case id.
-         */
-        public void updateSwitchInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ControlsState controlsState, String selectedCaseId) {
-
-            // Find SwitchXFormsControl
-            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getEffectiveIdsToControls().get(selectedCaseId);
-            if (caseXFormsControl == null) {
-                // NOTE: we used to throw here, but really we mustn't
-                if (XFormsServer.logger.isDebugEnabled()) {
-                    containingDocument.logDebug("controls", "No XFormsControl found for case",
-                            new String[] { "case id", selectedCaseId });
-                }
-                return;
-            }
-            final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
-            if (switchXFormsControl == null) {
-                // NOTE: we used to throw here, but really we mustn't
-                if (XFormsServer.logger.isDebugEnabled()) {
-                    containingDocument.logDebug("controls", "No XFormsControl found for case",
-                            new String[] { "case id", selectedCaseId });
-                }
-                return;
-            }
-
-            final String currentSelectedCaseId = (String) getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getEffectiveId());
-            if (!selectedCaseId.equals(currentSelectedCaseId)) {
-                // A new selection occurred on this switch
-
-                // "This action adjusts all selected attributes on the affected cases to reflect the
-                // new state, and then performs the following:"
-                getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
-
-                // "1. Dispatching an xforms-deselect event to the currently selected case."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getEffectiveIdsToControls().get(currentSelectedCaseId)));
-
-                // "2. Dispatching an xform-select event to the case to be selected."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getEffectiveIdsToControls().get(selectedCaseId)));
-            }
-        }
-
-        /**
-         * Update switch info state for the given case id.
-         */
-        public void initializeState(String switchId, String caseId, boolean visible) {
-            // Update currently selected case id
-            if (visible) {
-                getSwitchIdToSelectedCaseIdMap().put(switchId, caseId);
-            }
-        }
-    }
-
-    /**
-     * Represents the state of dialogs.
-     */
-    public static class DialogState {
-        private Map dialogIdToVisibleMap;
-
-        public DialogState(Map dialogIdToVisibleMap) {
-            this.dialogIdToVisibleMap = dialogIdToVisibleMap;
-        }
-
-        public Map getDialogIdToVisibleMap() {
-            return dialogIdToVisibleMap;
-        }
-
-        public void showHide(String dialogId, boolean show, String neighbor, boolean constrainToViewport) {
-            dialogIdToVisibleMap.put(dialogId, new DialogInfo(show, neighbor, constrainToViewport));
-        }
-
-        public static class DialogInfo {
-            public boolean show;
-            public String neighbor;
-            public boolean constrainToViewport;
-
-            public DialogInfo(boolean show, String neighbor, boolean constrainToViewport) {
-                this.show = show;
-                this.neighbor = neighbor;
-                this.constrainToViewport = constrainToViewport;
-            }
-
-            public boolean isShow() {
-                return show;
-            }
-
-            public String getNeighbor() {
-                return neighbor;
-            }
-
-            public boolean isConstrainToViewport() {
-                return constrainToViewport;
-            }
-        }
-    }
-
-    /**
-     * Represents the state of a tree of XForms controls.
-     */
-    public static class ControlsState {
-        private List children;
-        private Map effectiveIdsToControls;
-        private Map defaultRepeatIdToIndex;
-        private Map repeatIdToIndex;
-        private Map effectiveRepeatIdToIterations;
-
-        private Map switchIdToSelectedCaseIdMap;
-        private Map dialogIdToVisibleMap;
-
-        private List uploadControlsList;
-
-        private boolean dirty;
-
-        private Map eventsToDispatch;
-
-        public ControlsState() {
-        }
-
-        public boolean isDirty() {
-            return dirty;
-        }
-
-        public void markDirty() {
-            this.dirty = true;
-        }
-
-        public Map getEventsToDispatch() {
-            return eventsToDispatch;
-        }
-
-        public void setEventsToDispatch(Map eventsToDispatch) {
-            this.eventsToDispatch = eventsToDispatch;
-        }
-
-        public void setChildren(List children) {
-            this.children = children;
-        }
-
-        public void setEffectiveIdsToControls(Map idsToXFormsControls) {
-            this.effectiveIdsToControls = idsToXFormsControls;
-        }
-
-        public Map getDefaultRepeatIdToIndex() {
-            return defaultRepeatIdToIndex;
-        }
-
-        public void setDefaultRepeatIdToIndex(Map defaultRepeatIdToIndex) {
-            this.defaultRepeatIdToIndex = defaultRepeatIdToIndex;
-        }
-
-        public void updateRepeatIndex(String controlId, int index) {
-            if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
-                throw new OXFException("Invalid repeat id provided: " + controlId);
-            if (repeatIdToIndex == null)
-                repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
-            repeatIdToIndex.put(controlId, new Integer(index));
-        }
-
-        public void setRepeatIdToIndex(Map repeatIdToIndex) {
-            this.repeatIdToIndex = new HashMap(repeatIdToIndex);
-        }
-
-        public void setRepeatIterations(String effectiveControlId, int iterations) {
-            if (effectiveRepeatIdToIterations == null)
-                effectiveRepeatIdToIterations = new HashMap();
-            effectiveRepeatIdToIterations.put(effectiveControlId, new Integer(iterations));
-        }
-
-        public List getChildren() {
-            return children;
-        }
-
-        public Map getEffectiveIdsToControls() {
-            return effectiveIdsToControls;
-        }
-
-        public Map getRepeatIdToIndex() {
-            if (repeatIdToIndex == null){
-                if (defaultRepeatIdToIndex != null)
-                    repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
-                else // In this case there is no repeat
-                    return Collections.EMPTY_MAP;
-            }
-            return repeatIdToIndex;
-        }
-
-        public Map getEffectiveRepeatIdToIterations() {
-            return effectiveRepeatIdToIterations;
-        }
-
-        public Map getSwitchIdToSelectedCaseIdMap() {
-            return switchIdToSelectedCaseIdMap;
-        }
-
-        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
-            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
-        }
-
-
-        public Map getDialogIdToVisibleMap() {
-            return dialogIdToVisibleMap;
-        }
-
-        public void setDialogIdToVisibleMap(Map dialogIdToVisibleMap) {
-            this.dialogIdToVisibleMap = dialogIdToVisibleMap;
-        }
-
-        public void addUploadControl(XFormsUploadControl uploadControl) {
-            if (uploadControlsList == null)
-                uploadControlsList = new ArrayList();
-            uploadControlsList.add(uploadControl);
-        }
-
-        public List getUploadControls() {
-            return uploadControlsList;
-        }
-
-        private Map attributeControls;
-
-        public void addAttributeControl(XXFormsAttributeControl attributeControl) {
-            final String effectiveForAttribute = attributeControl.getEffectiveForAttribute();
-            if (attributeControls == null) {
-                attributeControls = new HashMap();
-                final Map mapForId = new HashMap();
-                attributeControls.put(effectiveForAttribute, mapForId);
-                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
-            } else {
-                Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
-                if (mapForId == null) {
-                    mapForId = new HashMap();
-                    attributeControls.put(effectiveForAttribute, mapForId);
-                }
-                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
-            }
-        }
-
-        public boolean hasAttributeControl(String effectiveForAttribute) {
-            return attributeControls != null && attributeControls.get(effectiveForAttribute) != null;
-        }
-
-        public XXFormsAttributeControl getAttributeControl(String effectiveForAttribute, String attributeName) {
-            final Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
-            return (mapForId != null) ? (XXFormsAttributeControl) mapForId.get(attributeName) : null;
-        }
-
-        /**
-         * Return a map of repeat ids -> RepeatXFormsControl objects, following the branches of the
-         * current indexes of the repeat elements.
-         */
-        public Map getRepeatIdToRepeatXFormsControl() {
-            final Map result = new HashMap();
-            visitRepeatHierarchy(result, this.children);
-            return result;
-        }
-
-        private void visitRepeatHierarchy(Map result, List children) {
-            if (children != null) {
-                for (Iterator i = children.iterator(); i.hasNext();) {
-                    final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-
-                    if (currentXFormsControl instanceof XFormsRepeatControl) {
-                        final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
-                        final String repeatId = currentRepeatXFormsControl.getRepeatId();
-                        final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
-
-                        result.put(repeatId, currentXFormsControl);
-
-                        if (index > 0) {
-                            final List newChildren = currentXFormsControl.getChildren();
-                            if (newChildren != null && newChildren.size() > 0)
-                                visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
-                        }
-
-                    } else {
-                        visitRepeatHierarchy(result, currentXFormsControl.getChildren());
-                    }
-                }
-            }
-        }
-
-        /**
-         * Visit all the XFormsControl elements by following the current repeat indexes.
-         */
-        public void visitControlsFollowRepeats(XFormsControlVisitorListener xformsControlVisitorListener) {
-            // Don't iterate if we don't have controls
-            if (this.children == null)
-                return;
-
-            visitControlsFollowRepeats(this.children, xformsControlVisitorListener);
-        }
-
-        private void visitControlsFollowRepeats(List children, XFormsControlVisitorListener xformsControlVisitorListener) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-
-                xformsControlVisitorListener.startVisitControl(currentXFormsControl);
-                {
-                    if (currentXFormsControl instanceof XFormsRepeatControl) {
-                        final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
-                        final String repeatId = currentRepeatXFormsControl.getRepeatId();
-                        final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
-
-                        if (index > 0) {
-                            final List newChildren = currentXFormsControl.getChildren();
-                            if (newChildren != null && newChildren.size() > 0)
-                                visitControlsFollowRepeats(Collections.singletonList(newChildren.get(index - 1)), xformsControlVisitorListener);
-                        }
-
-                    } else {
-                        final List newChildren = currentXFormsControl.getChildren();
-                        if (newChildren != null)
-                            visitControlsFollowRepeats(newChildren, xformsControlVisitorListener);
-                    }
-                }
-                xformsControlVisitorListener.endVisitControl(currentXFormsControl);
-            }
-        }
-
-        /**
-         * Find an effective control id based on a control id, following the branches of the
-         * current indexes of the repeat elements.
-         */
-        public String findEffectiveControlId(String sourceId, String targetId) {
-            // Don't iterate if we don't have controls
-            if (this.children == null)
-                return null;
-
-            return findEffectiveControlId(sourceId, targetId, this.children);
-        }
-
-        private String findEffectiveControlId(String sourceId, String targetId, List children) {
-            // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-                final String originalControlId = currentXFormsControl.getId();
-
-                if (targetId.equals(originalControlId)) {
-                    return currentXFormsControl.getEffectiveId();
-                } else if (currentXFormsControl instanceof XFormsRepeatControl) {
-                    final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
-                    final String repeatId = currentRepeatXFormsControl.getRepeatId();
-                    final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
-
-                    if (index > 0) {
-                        final List newChildren = currentXFormsControl.getChildren();
-                        if (newChildren != null && newChildren.size() > 0) {
-                            final String result = findEffectiveControlId(sourceId, targetId, Collections.singletonList(newChildren.get(index - 1)));
-                            if (result != null)
-                                return result;
-                        }
-                    }
-
-                } else {
-                    final List newChildren = currentXFormsControl.getChildren();
-                    if (newChildren != null) {
-                        final String result = findEffectiveControlId(sourceId, targetId, newChildren);
-                        if (result != null)
-                            return result;
-                    }
-                }
-            }
-            // Not found
-            return null;
-        }
-    }
-
-    /**
-     * Analyze differences of relevance for controls getting bound and unbound to nodes.
-     */
-    private void findSpecialRelevanceChanges(List state1, List state2, Map[] eventsToDispatch) {
-
-        // Trivial case
-        if (state1 == null && state2 == null)
-            return;
-
-        // Both lists must have the same size if present; state1 can be null
-        if (state1 != null && state2 != null && state1.size() != state2.size()) {
-            throw new IllegalStateException("Illegal state when comparing controls.");
-        }
-
-        final Iterator j = (state1 == null) ? null : state1.iterator();
-        final Iterator i = (state2 == null) ? null : state2.iterator();
-        final Iterator leadingIterator = (i != null) ? i : j;
-        while (leadingIterator.hasNext()) {
-            final XFormsControl xformsControl1 = (state1 == null) ? null : (XFormsControl) j.next();
-            final XFormsControl xformsControl2 = (state2 == null) ? null : (XFormsControl) i.next();
-
-            final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1; // never null
-
-            // 1: Check current control
-            if (leadingControl instanceof XFormsSingleNodeControl) {
-                // xforms:repeat doesn't need to be handled independently, iterations do it
-
-                final XFormsSingleNodeControl xformsSingleNodeControl1 = (XFormsSingleNodeControl) xformsControl1;
-                final XFormsSingleNodeControl xformsSingleNodeControl2 = (XFormsSingleNodeControl) xformsControl2;
-
-                String foundControlId = null;
-                XFormsControl targetControl = null;
-                int eventType = 0;
-                if (xformsControl1 != null && xformsControl2 != null) {
-                    final NodeInfo boundNode1 = xformsControl1.getBoundNode();
-                    final NodeInfo boundNode2 = xformsControl2.getBoundNode();
-
-                    if (boundNode1 != null && xformsSingleNodeControl1.isRelevant() && boundNode2 == null) {
-                        // A control was bound to a node and relevant, but has become no longer bound to a node
-                        foundControlId = xformsControl2.getEffectiveId();
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    } else if (boundNode1 == null && boundNode2 != null && xformsSingleNodeControl2.isRelevant()) {
-                        // A control was not bound to a node, but has now become bound and relevant
-                        foundControlId = xformsControl2.getEffectiveId();
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    } else if (boundNode1 != null && boundNode2 != null && !boundNode1.isSameNodeInfo(boundNode2)) {
-                        // The control is now bound to a different node
-                        // In this case, we schedule the control to dispatch all the events
-
-                        // NOTE: This is not really proper according to the spec, but it does help applications to
-                        // force dispatching in such cases
-                        foundControlId = xformsControl2.getEffectiveId();
-                        eventType = XFormsModel.EventSchedule.ALL;
-                    }
-                } else if (xformsControl2 != null) {
-                    final NodeInfo boundNode2 = xformsControl2.getBoundNode();
-                    if (boundNode2 != null && xformsSingleNodeControl2.isRelevant()) {
-                        // A control was not bound to a node, but has now become bound and relevant
-                        foundControlId = xformsControl2.getEffectiveId();
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    }
-                } else if (xformsControl1 != null) {
-                    final NodeInfo boundNode1 = xformsControl1.getBoundNode();
-                    if (boundNode1 != null && xformsSingleNodeControl1.isRelevant()) {
-                        // A control was bound to a node and relevant, but has become no longer bound to a node
-                        foundControlId = xformsControl1.getEffectiveId();
-                        // NOTE: This is the only case where we must dispatch the event to an obsolete control
-                        targetControl = xformsControl1;
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    }
-                }
-
-                // Remember that we need to dispatch information about this control
-                if (foundControlId != null) {
-                    if (eventsToDispatch[0] == null)
-                        eventsToDispatch[0] = new HashMap();
-                    eventsToDispatch[0].put(foundControlId,
-                            new XFormsModel.EventSchedule(foundControlId, eventType, targetControl));
-                }
-            }
-
-            // 2: Check children if any
-            if (XFormsControlFactory.isContainerControl(leadingControl.getName()) || leadingControl instanceof RepeatIterationControl) {
-
-                final List children1 = (xformsControl1 == null) ? null : xformsControl1.getChildren();
-                final List children2 = (xformsControl2 == null) ? null : xformsControl2.getChildren();
-
-                final int size1 = children1 == null ? 0 : children1.size();
-                final int size2 = children2 == null ? 0 : children2.size();
-
-                if (leadingControl instanceof XFormsRepeatControl) {
-                    // Special case of repeat update
-
-                    if (size1 == size2) {
-                        // No add or remove of children
-                        findSpecialRelevanceChanges(children1, children2, eventsToDispatch);
-                    } else if (size2 > size1) {
-                        // Size has grown
-
-                        // Diff the common subset
-                        findSpecialRelevanceChanges(children1, children2.subList(0, size1), eventsToDispatch);
-
-                        // Issue new values for new iterations
-                        findSpecialRelevanceChanges(null, children2.subList(size1, size2), eventsToDispatch);
-
-                    } else if (size2 < size1) {
-                        // Size has shrunk
-
-                        // Diff the common subset
-                        findSpecialRelevanceChanges(children1.subList(0, size2), children2, eventsToDispatch);
-
-                        // Issue new values for new iterations
-                        findSpecialRelevanceChanges(children1.subList(size2, size1), null, eventsToDispatch);
-                    }
-                } else {
-                    // Other grouping controls
-                    findSpecialRelevanceChanges(size1 == 0 ? null : children1, size2 == 0 ? null : children2, eventsToDispatch);
-                }
-            }
-        }
+    public static class XFormsControlVisitorAdapter implements XFormsControlVisitorListener {
+        public void startVisitControl(XFormsControl control) {}
+        public void endVisitControl(XFormsControl control) {}
     }
 
     /**
@@ -1315,12 +568,105 @@ public class XFormsControls {
     /**
      * Set the items for a given control id. This is not an effective id, but an original control id.
      *
-     * @param controlId     original control id
-     * @param items         List of Item
+     * @param controlId     static control id
+     * @param items         List<Item>
      */
     public void setConstantItems(String controlId, List items) {
         if (constantItems == null)
             constantItems = new HashMap();
         constantItems.put(controlId, items);
+    }
+
+    private static class UpdateBindingsListener implements ControlElementVisitorListener {
+
+        private final PipelineContext pipelineContext;
+        private final Map effectiveIdsToControls;
+        private final Map eventsToDispatch;
+
+        private UpdateBindingsListener(PipelineContext pipelineContext, Map effectiveIdsToControls, Map eventsToDispatch) {
+            this.pipelineContext = pipelineContext;
+            this.effectiveIdsToControls = effectiveIdsToControls;
+            this.eventsToDispatch = eventsToDispatch;
+        }
+
+        private Map newIterationsMap = new HashMap();
+
+        public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
+            final XFormsControl control = (XFormsControl) effectiveIdsToControls.get(effectiveControlId);
+
+            final XFormsContextStack.BindingContext oldBindingContext = control.getBindingContext();
+            final XFormsContextStack.BindingContext newBindingContext = container.getContextStack().getCurrentBindingContext();
+
+            // Handle special relevance events
+            {
+                if (control instanceof XFormsSingleNodeControl) {
+                    final NodeInfo boundNode1 = control.getBoundNode();
+                    final NodeInfo boundNode2 = newBindingContext.getSingleNode();
+
+                    boolean found = false;
+                    int eventType = 0;
+                    if (boundNode1 != null && InstanceData.getInheritedRelevant(boundNode1) && boundNode2 == null) {
+                        // A control was bound to a node and relevant, but has become no longer bound to a node
+                        found = true;
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                    } else if (boundNode1 == null && boundNode2 != null && InstanceData.getInheritedRelevant(boundNode2)) {
+                        // A control was not bound to a node, but has now become bound and relevant
+                        found = true;
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                    } else if (boundNode1 != null && boundNode2 != null && !boundNode1.isSameNodeInfo(boundNode2)) {
+                        // The control is now bound to a different node
+                        // In this case, we schedule the control to dispatch all the events
+
+                        // NOTE: This is not really proper according to the spec, but it does help applications to
+                        // force dispatching in such cases
+                        found = true;
+                        eventType = XFormsModel.EventSchedule.ALL;
+                    }
+
+                    // Remember that we need to dispatch information about this control
+                    if (found) {
+                        eventsToDispatch.put(control.getEffectiveId(),
+                                new XFormsModel.EventSchedule(control.getEffectiveId(), eventType, control));
+                    }
+                }
+            }
+
+            if (control instanceof XFormsRepeatControl) {
+                // Get old nodeset
+                final List oldRepeatNodeset = oldBindingContext.getNodeset();
+
+                // Get new nodeset
+                final List newRepeatNodeset = newBindingContext.getNodeset();
+
+                // Set new current binding for control element
+                control.setBindingContext(newBindingContext);
+
+                // Update iterations
+                final List newIterations = ((XFormsRepeatControl) control).updateIterations(pipelineContext, oldRepeatNodeset, newRepeatNodeset, null);
+
+                // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
+                for (Iterator i = newIterations.iterator(); i.hasNext();) {
+                    final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl)i.next();
+                    newIterationsMap.put(repeatIterationControl.getEffectiveId(), repeatIterationControl);
+                }
+            } else {
+                // Set new current binding for control element
+                control.setBindingContext(newBindingContext);
+            }
+
+            // Mark the control as dirty so it gets reevaluated
+            control.markDirty();
+        }
+
+        public void endVisitControl(Element controlElement, String effectiveControlId) {
+        }
+
+        public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
+            // Allow recursing into this iteration only if it is not a newly created iteration
+            return newIterationsMap.get(effectiveIterationId) == null;
+        }
+
+        public void endRepeatIteration(int iteration) {
+        }
     }
 }

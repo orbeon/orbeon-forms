@@ -21,17 +21,12 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
-import org.orbeon.oxf.xforms.event.events.XFormsScrollFirstEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsScrollLastEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 9.3.7 The setindex Element
@@ -60,88 +55,56 @@ public class XFormsSetindexAction extends XFormsAction {
 
         containingDocument.logDebug("xforms:setindex", "setting index", new String[] { "index", indexString });
 
-        executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
+        executeSetindexAction(containingDocument, repeatId, indexString);
     }
 
-    public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {
+    protected static void executeSetindexAction(XFormsContainingDocument containingDocument, String repeatId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;
         }
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.rebuildCurrentControlsState(pipelineContext);
-        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+        final XFormsControls controls = containingDocument.getXFormsControls();
 
-        final int index = Integer.parseInt(indexString);
-
-        final Map repeatIdToRepeatControl = currentControlsState.getRepeatIdToRepeatXFormsControl();
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIdToRepeatControl.get(repeatId);
-
-        if (repeatControl != null) {
-            // Found control for repeat id
-            if (index <= 0) {
-                // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
-                // and the index is set to 1."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControl));
-                currentControlsState.updateRepeatIndex(repeatId, 1);
-            } else {
-                final List children = repeatControl.getChildren();
-
-                if (children != null && index > children.size()) {
-                    // "If the selected index is greater than the index of the last repeat
-                    // item, an xforms-scroll-last event is dispatched and the index is set to
-                    // that of the last item."
-
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControl));
-                    currentControlsState.updateRepeatIndex(repeatId, children.size());
-                } else {
-                    // Otherwise just set the index
-                    currentControlsState.updateRepeatIndex(repeatId, index);
-                }
+        // Find repeat control
+        final Object control = controls.resolveObjectById(null, repeatId);// TODO: pass sourceId
+        if (control instanceof XFormsRepeatControl) {
+            // Set its new index
+            final int newIndex = Integer.parseInt(indexString);
+            final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
+            if (repeatControl.getIndex() != newIndex) {
+                // Get new reference as the controls may have been rebuilt
+                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
+                newRepeatControl.setIndex(newIndex);
+                
+                controls.markDirtySinceLastRequest(true);// NOTE: currently, bindings are not really supposed to contain index() anymore, but control values may change still
+                setDeferredFlagsForSetindex(containingDocument);
             }
-
-            // "The indexes for inner nested repeat collections are re-initialized to startindex."
-            {
-                // First step: set all children indexes to 0
-                final List nestedRepeatIds = containingDocument.getStaticState().getNestedRepeatIds(repeatId);
-                final Map nestedRepeatIdsMap = new HashMap();
-                if (nestedRepeatIds != null) {
-                    for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
-                        final String currentRepeatId = (String) i.next();
-                        nestedRepeatIdsMap.put(currentRepeatId, "");
-                        currentControlsState.updateRepeatIndex(currentRepeatId, 0);
-                    }
-                }
-
-                // Adjust controls ids that could have gone out of bounds
-                XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIdsMap);
-            }
-
-            // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization
-            // and by setting the deferred update flags for recalculate, revalidate and refresh."
-            // TODO: Nested containers?
-            for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) i.next();
-
-                // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
-                //currentModel.getBinds().rebuild(pipelineContext);
-
-                final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-                if (deferredActionContext != null) {
-                    deferredActionContext.recalculate = true;
-                    deferredActionContext.revalidate = true;
-                    deferredActionContext.refresh = true;
-                }
-            }
-
-            containingDocument.getXFormsControls().markDirtySinceLastRequest();
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action",
                         new String[] { "repeat id", repeatId } );
+        }
+    }
+
+    public static void setDeferredFlagsForSetindex(XFormsContainingDocument containingDocument) {
+        // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by
+        // setting the deferred update flags for recalculate, revalidate and refresh."
+        // TODO: Nested containers?
+        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+
+            // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
+            //currentModel.getBinds().rebuild(pipelineContext);
+
+            final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
+            if (deferredActionContext != null) {
+                deferredActionContext.recalculate = true;
+                deferredActionContext.revalidate = true;
+                deferredActionContext.refresh = true;
+            }
         }
     }
 }

@@ -925,8 +925,6 @@ public class NetUtils {
         return resultURL;
     }
 
-//    public interface LoggerXxx
-
     /**
      * Perform a connection to the given URL with the given parameters.
      *

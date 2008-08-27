@@ -15,34 +15,56 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainer;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-
-import java.util.Map;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
  * Represents an xforms:case pseudo-control.
+ *
+ * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xforms:switch holds this information.
  */
-public class XFormsCaseControl extends XFormsControl implements XFormsPseudoControl, XFormsContainerControl {
+public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implements XFormsPseudoControl {
+
+    private boolean defaultSelected;
+
     public XFormsCaseControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
+
+        // Just keep the value
+        final String selectedAttribute = element.attributeValue("selected");
+        this.defaultSelected = "true".equals(selectedAttribute);
     }
 
+    /**
+     * Return whether this case has selected="true".
+     */
+    public boolean isDefaultSelected() {
+        return defaultSelected;
+    }
+
+    /**
+     * Return whether this is the currently selected case within the current switch.
+     */
     public boolean isSelected() {
-
-        final XFormsControl switchControl = getParent();
-        final XFormsControls.SwitchState switchState = containingDocument.getXFormsControls().getCurrentSwitchState();
-
-        final Map switchIdToSelectedCaseIdMap = switchState.getSwitchIdToSelectedCaseIdMap();
-        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getEffectiveId());
-
-        return getEffectiveId().equals(selectedCaseId);
+        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
+        return switchControl.getSelectedCase() == this;
     }
 
+    /**
+     * Return whether to show this case.
+     */
     public boolean isVisible() {
-        final XFormsControl switchControl = getParent();
+        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
         return isSelected() || switchControl.isStaticReadonly();
+    }
+
+    /**
+     * Toggle to this case and dispatch events if this causes a change in selected cases.
+     */
+    public void toggle(PipelineContext pipelineContext) {
+        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
+        switchControl.setSelectedCase(pipelineContext, this);
     }
 }

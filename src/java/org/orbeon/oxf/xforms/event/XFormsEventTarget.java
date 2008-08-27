@@ -25,5 +25,6 @@ public interface XFormsEventTarget {
     public String getEffectiveId();
     public LocationData getLocationData();
     public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument);
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event);
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event);
 }

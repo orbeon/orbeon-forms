@@ -13,8 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control;
 
+import java.util.List;
+
 /**
  * Marker interface for all container controls.
  */
 public interface XFormsContainerControl {
+    public void addChild(XFormsControl XFormsControl);
+    public List getChildren();
+    public int getSize();
+    public void childrenAdded();
 }

@@ -127,7 +127,7 @@ public class XFormsSetvalueAction extends XFormsAction {
                 }
             }
 
-            containingDocument.getXFormsControls().markDirtySinceLastRequest();
+            containingDocument.getXFormsControls().markDirtySinceLastRequest(true);
 
             return true;
         } else {

@@ -293,16 +293,17 @@ public class XFormsContextStack {
                     variableInfo = null;
                 }
 
-                // Evaluate new XPath in context
                 final BindingContext contextBindingContext = getCurrentBindingContext();
-
                 if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
+                    // Evaluate new XPath in context if the current contex is not empty
+
                     pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the context() function
                     newNodeset = XPathCache.evaluateKeepItems(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
                             ref != null ? ref : nodeset, bindingElementNamespaceContext, contextBindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                             functionContext, null, locationData);
                     popBinding();
                 } else {
+                    // Otherwise we consider we can't evaluate
                     newNodeset = Collections.EMPTY_LIST;
                 }
 

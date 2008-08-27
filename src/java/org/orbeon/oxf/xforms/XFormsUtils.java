@@ -1346,6 +1346,12 @@ public class XFormsUtils {
         return org.apache.commons.lang.StringUtils.replace(org.apache.commons.lang.StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\"");
     }
 
+    /**
+     * Return the prefix of an effective id, e.g. "" or "foo$bar$". The prefix returned does end with a separator.
+     *
+     * @param effectiveId   effective id to check
+     * @return              prefix if any, "" if none, null if effectiveId was null
+     */
     public static String getEffectiveIdPrefix(String effectiveId) {
         if (effectiveId == null)
             return null;
@@ -1358,6 +1364,48 @@ public class XFormsUtils {
         }
     }
 
+    /**
+     * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned does not start with a separator.
+     *
+     * @param effectiveId   effective id to check
+     * @return              postfix if any, "" if none, null if effectiveId was null
+     */
+    public static String getEffectiveIdSuffix(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            return effectiveId.substring(suffixIndex + 1);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Return an effective id without its suffix, e.g. "foo$bar$my-input" or "my-textarea".
+     *
+     * @param effectiveId   effective id to check
+     * @return              effective id without its suffix, null if effectiveId was null
+     */
+    public static String getEffectiveIdNoSuffix(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            return effectiveId.substring(0, suffixIndex);
+        } else {
+            return effectiveId;
+        }
+    }
+
+    /**
+     * Return the parts of an effective id prefix, e.g. for $foo$bar return new String[] { "foo", "bar" }
+     *
+     * @param effectiveId   effective id to check
+     * @return              array of parts, empty array if no parts, null if effectiveId was null
+     */
     public static String[] getEffectiveIdPrefixParts(String effectiveId) {
         if (effectiveId == null)
             return null;
@@ -1367,6 +1415,24 @@ public class XFormsUtils {
             return StringUtils.split(effectiveId.substring(0, prefixIndex), XFormsConstants.COMPONENT_SEPARATOR);
         } else {
             return new String[0];
+        }
+    }
+
+    /**
+     * Given a repeat control's effective id, compute the effective id of an iteration.
+     *
+     * @param repeatEffectiveId     repeat control effective id
+     * @param iterationIndex        repeat iteration
+     * @return                      repeat iteration effective id
+     */
+    public static String getIterationEffectiveId(String repeatEffectiveId, int iterationIndex) {
+        final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(repeatEffectiveId);
+        if (parentSuffix.equals("")) {
+            // E.g. foobar -> foobar.3
+            return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iterationIndex;
+        } else {
+            // E.g. foobar.3-7 -> foobar.3-7-2
+            return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
         }
     }
 }

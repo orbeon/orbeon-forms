@@ -500,6 +500,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         // NOP
     }
 
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+        // NOP
+    }
+
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return null;
     }

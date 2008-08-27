@@ -15,9 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
@@ -26,8 +25,6 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.util.Map;
 
 /**
  * Handle xforms:repeat.
@@ -41,17 +38,12 @@ public class XFormsRepeatHandler extends HandlerBase {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        final String repeatId = handlerContext.getId(attributes);
         final String effectiveId = handlerContext.getEffectiveId(attributes);
 
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
         final boolean isMustGenerateTemplate = handlerContext.isTemplate() || isTopLevelRepeat;
         final int currentIteration = handlerContext.getCurrentIteration();
-
-        final XFormsControls.ControlsState currentControlState = containingDocument.getXFormsControls().getCurrentControlsState();
-        final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
-        final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
         final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(effectiveId);
         final boolean isConcreteControl = repeatControl != null;
@@ -75,8 +67,8 @@ public class XFormsRepeatHandler extends HandlerBase {
 
         if (isConcreteControl && (isTopLevelRepeat || !isMustGenerateTemplate)) {
 
-            final int currentRepeatIndex = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) repeatIdToIndex.get(repeatId)).intValue();
-            final int currentRepeatIterations = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) effectiveRepeatIdToIterations.get(effectiveId)).intValue();
+            final int currentRepeatIndex = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : repeatControl.getIndex();
+            final int currentRepeatIterations = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : repeatControl.getSize();
 
             // Unroll repeat
             for (int i = 1; i <= currentRepeatIterations; i++) {
@@ -88,7 +80,7 @@ public class XFormsRepeatHandler extends HandlerBase {
 
                 // Is the current iteration selected?
                 final boolean isCurrentIterationSelected = isRepeatSelected && i == currentRepeatIndex;
-                final boolean isCurrentIterationRelevant = ((RepeatIterationControl) repeatControl.getChildren().get(i - 1)).isRelevant();
+                final boolean isCurrentIterationRelevant = ((XFormsRepeatIterationControl) repeatControl.getChildren().get(i - 1)).isRelevant();
                 final int numberOfParentRepeats = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters

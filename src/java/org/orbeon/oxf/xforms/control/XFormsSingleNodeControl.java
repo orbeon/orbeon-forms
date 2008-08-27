@@ -36,6 +36,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         super(container, parent, element, name, effectiveId);
     }
 
+    public void markDirty() {
+        super.markDirty();
+        mipsRead = false;
+    }
+
     public boolean isReadonly() {
         getMIPsIfNeeded();
         return readonly;

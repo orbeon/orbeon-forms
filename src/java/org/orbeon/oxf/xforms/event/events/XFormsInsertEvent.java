@@ -35,31 +35,41 @@ import java.util.List;
 public class XFormsInsertEvent extends XFormsEvent {
 
     private List insertedNodeInfos;
-    private List originObjects;
+    private List originItems;
     private NodeInfo insertLocationNodeInfo;
     private String position;
+
+    // Extension attributes
+    private List sourceNodes;
+    private List clonedNodes;
+    private boolean isAdjustIndexes;
 
     public XFormsInsertEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
     }
 
     public XFormsInsertEvent(XFormsEventTarget targetObject,
-                             List insertedNodes, List originObjects,
-                             NodeInfo insertLocationNodeInfo, String position) {
+                             List insertedNodes, List originItems,
+                             NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes, boolean isAdjustIndexes) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
+        
         this.insertedNodeInfos = insertedNodes;
-        this.originObjects = originObjects;
+        this.originItems = originItems;
         this.insertLocationNodeInfo = insertLocationNodeInfo;
         this.position = position;
+
+        this.sourceNodes = sourceNodes;
+        this.clonedNodes = clonedNodes;
+        this.isAdjustIndexes = isAdjustIndexes;
     }
 
     public SequenceIterator getAttribute(String name) {
         if ("inserted-nodes".equals(name)) {
             // "The instance data nodes inserted."
-            return (insertedNodeInfos == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(insertedNodeInfos);
+            return new ListIterator(insertedNodeInfos);
         } else if ("origin-nodes".equals(name)) {
             // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
-            return (originObjects == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(originObjects);
+            return (originItems == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(originItems);
         } else if ("insert-location-node".equals(name)) {
             // "The insert location node as defined by the insert action."
             return new ListIterator(Collections.singletonList(insertLocationNodeInfo));
@@ -69,5 +79,21 @@ public class XFormsInsertEvent extends XFormsEvent {
         } else {
             return super.getAttribute(name);
         }
+    }
+
+    public List getInsertedNodeInfos() {
+        return insertedNodeInfos;
+    }
+
+    public List getSourceNodes() {
+        return sourceNodes;
+    }
+
+    public List getClonedNodes() {
+        return clonedNodes;
+    }
+
+    public boolean isAdjustIndexes() {
+        return isAdjustIndexes;
     }
 }

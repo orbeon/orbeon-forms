@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -37,7 +37,7 @@ public class XHTMLElementHandler extends HandlerBase {
         if (id != null) {
             final String effectiveId = handlerContext.getEffectiveId(attributes);
 
-            final XFormsControls.ControlsState controlState = containingDocument.getXFormsControls().getCurrentControlsState();
+            final ControlTree controlState = containingDocument.getXFormsControls().getCurrentControlTree();
             final boolean hasAVT = controlState.hasAttributeControl(effectiveId);
             if (hasAVT) {
                 // This XHTML element has at least one AVT so process its attributes

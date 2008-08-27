@@ -1434,6 +1434,19 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 </p>
             </section>
             <section>
+                <title><code>&lt;xforms:delete></code> Action</title>
+                <p>
+                    The <code>&lt;xforms:delete></code>, when omitting the <code>at</code> attribute, now deletes all
+                    the nodes referred to by the <code>nodeset</code> attribute. This is as per the <a
+                    href="http://www.w3.org/TR/xforms11/#action-delete">XForms 1.1 specification</a>. Previously, this
+                    would only delete the first node of the node-set.
+                </p>
+                <xml-source>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete nodeset="employee"/>
+                </xml-source>
+            </section>
+            <section>
                 <title>Binds Evaluation</title>
                 <p>
                     With Orbeon Forms 3.6 and earlier, <code>&lt;xforms:bind></code> node-sets were re-evaluated

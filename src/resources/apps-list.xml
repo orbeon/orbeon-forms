@@ -16,8 +16,8 @@
         <application id="welcome" label="Welcome"/>
     </section>
     <section label="Form Builder (ALPHA)">
-        <application id="fr/orbeon/builder/list/" label="Form Builder (ALPHA)"/>
-        <application id="fr/orbeon/bookcast/list/" label="Bookcast Form"/>
+        <application id="fr/orbeon/builder/summary/" label="Form Builder (ALPHA)"/>
+        <application id="fr/orbeon/bookcast/summary/" label="Bookcast Form"/>
     </section>
     <section label="XForms Tutorial Apps">
         <application id="xforms-hello" label="XForms Hello"/>

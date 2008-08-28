@@ -30,7 +30,7 @@
     <!-- ==== Pages ==== -->
 
     <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)(/list/)?" matcher="oxf:perl5-matcher"
+          path-info="/fr/([^/]+)/([^/]+)(/summary/)?" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>

@@ -14,7 +14,12 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.servlet.OPSXFormsFilter;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -90,8 +95,18 @@ public class XHTMLBodyHandler extends HandlerBase {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        // Submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that
-        final String xformsSubmissionPath = externalContext.getRequest().getRequestPath();
+        final String xformsSubmissionPath;
+        {
+            final String requestPath = externalContext.getRequest().getRequestPath();
+            final boolean isForwarded = OPSXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
+            if (isForwarded) {
+                // This is the case where the request was forwarded to us (separate deployment)
+                xformsSubmissionPath = "/xforms-server-submit";// TODO: read property!
+            } else {
+                // Submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that
+                xformsSubmissionPath = requestPath;
+            }
+        }
 
         // Create xhtml:form element
         final boolean hasUpload = staticState.hasControlByName("upload");

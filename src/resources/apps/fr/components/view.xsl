@@ -232,6 +232,12 @@
                                             <xforms:case id="fr-message-fatal-error">
                                                 <xhtml:p class="fr-message-fatal-error">
                                                     <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                    <!-- We can't show the dialog in noscript mode so don't show the trigger then -->
+                                                    <xforms:trigger ref=".[not(property('xxforms:noscript')) and normalize-space(instance('fr-persistence-instance')/error) != '']" appearance="minimal">
+                                                        <!-- TODO: i18n -->
+                                                        <xforms:label>[Details]</xforms:label>
+                                                        <xxforms:show ev:event="DOMActivate" dialog="fr-error-details-dialog"/>
+                                                    </xforms:trigger>
                                                 </xhtml:p>
                                             </xforms:case>
                                         </xforms:switch>
@@ -335,6 +341,27 @@
         </xhtml:div>
         <xi:include href="../import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
         <xi:include href="../includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
+
+        <!-- Error Details dialog -->
+        <xxforms:dialog id="fr-error-details-dialog">
+            <xforms:label>Error Details</xforms:label>
+            <xhtml:div>
+                <xhtml:div class="fr-dialog-message">
+                    <xforms:output mediatype="text/html" model="fr-persistence-model" value="instance('fr-persistence-instance')/error"/>
+                </xhtml:div>
+            </xhtml:div>
+            <xhtml:div class="fr-dialog-buttons">
+                <xforms:group>
+                    <xxforms:hide ev:event="DOMActivate" dialog="fr-error-details-dialog"/>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
+                        </xforms:label>
+                    </xforms:trigger>
+                </xforms:group>
+            </xhtml:div>
+        </xxforms:dialog>
 
         <xhtml:span class="fr-hidden">
             <!-- Hidden field to communicate to the client the current section to collapse or expand -->

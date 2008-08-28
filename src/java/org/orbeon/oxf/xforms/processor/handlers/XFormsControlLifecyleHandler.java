@@ -32,7 +32,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * Outputting the control is split into two parts: handleControlStart() and handleControlEnd(). In most cases, only
  * handleControlStart() is used, but container controls will use handleControlEnd().
  */
-public abstract class XFormsControlLifecyleHandler extends HandlerBase {
+public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     private String staticId;
     private String effectiveId;

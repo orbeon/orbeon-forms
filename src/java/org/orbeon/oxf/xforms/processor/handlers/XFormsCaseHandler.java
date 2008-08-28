@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:case.
  */
-public class XFormsCaseHandler extends HandlerBase {
+public class XFormsCaseHandler extends XFormsBaseHandler {
 
     private DeferredContentHandler currentSavedOutput;
     private OutputInterceptor currentOutputInterceptor;

@@ -290,6 +290,8 @@ a.xforms-readonly { color: gray; cursor: default }
     display: none;
 }
 
+#wait .bd { background-color: white }
+
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
 a.ygtvlabel { cursor: pointer; }
 

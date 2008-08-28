@@ -947,7 +947,7 @@ ORBEON.util.Utils = {
         if (!ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel =
             new YAHOO.widget.Panel("wait", {
-                width:"50px",
+                width:"60px",
                 fixedcenter:true,
                 close:false,
                 draggable:false,

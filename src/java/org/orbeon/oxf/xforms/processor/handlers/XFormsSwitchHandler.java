@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle xforms:switch.
  */
-public class XFormsSwitchHandler extends HandlerBase {
+public class XFormsSwitchHandler extends XFormsBaseHandler {
 
     protected String effectiveSwitchId;
 

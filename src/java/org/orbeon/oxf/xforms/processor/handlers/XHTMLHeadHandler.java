@@ -37,7 +37,7 @@ import java.util.*;
 /**
  * Handle xhtml:head.
  */
-public class XHTMLHeadHandler extends HandlerBase {
+public class XHTMLHeadHandler extends XFormsBaseHandler {
 
     private String formattingPrefix;
 

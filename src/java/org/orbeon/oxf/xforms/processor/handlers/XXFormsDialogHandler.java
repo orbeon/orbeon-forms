@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle xxforms:dialog.
  */
-public class XXFormsDialogHandler extends HandlerBase {
+public class XXFormsDialogHandler extends XFormsBaseHandler {
 
     private boolean isMinimalAppearance;
 

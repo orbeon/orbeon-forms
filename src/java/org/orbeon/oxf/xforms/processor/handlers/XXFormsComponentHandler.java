@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle elements to which custom components are bound.
  */
-public class XXFormsComponentHandler extends HandlerBase {
+public class XXFormsComponentHandler extends XFormsBaseHandler {
 
     public XXFormsComponentHandler() {
         // Don't forward, we must instead feed the handlers with the shadow content

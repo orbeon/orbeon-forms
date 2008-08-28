@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle xforms:repeat.
  */
-public class XFormsRepeatHandler extends HandlerBase {
+public class XFormsRepeatHandler extends XFormsBaseHandler {
 
     public XFormsRepeatHandler() {
         // This is a repeating element

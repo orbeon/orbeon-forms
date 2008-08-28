@@ -14,27 +14,24 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.servlet.OPSXFormsFilter;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Handle xhtml:body.
  */
-public class XHTMLBodyHandler extends HandlerBase {
+public class XHTMLBodyHandler extends XFormsBaseHandler {
 
     private ContentHandlerHelper helper;
 
@@ -201,6 +198,11 @@ public class XHTMLBodyHandler extends HandlerBase {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$noscript", "value", "true"
             });
+
+            // Add help section
+//            final List help
+//
+//            xxx
         }
     }
 

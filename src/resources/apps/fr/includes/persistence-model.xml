@@ -54,7 +54,7 @@
         <!-- A document id is provided -->
         <xforms:action if="$parameters/document != ''">
             <!-- Display document with that id -->
-            <xforms:send submission="get-document-submission"/>
+            <xforms:send submission="fr-get-document-submission"/>
         </xforms:action>
         <!-- No document id is provided and we are not in print view -->
         <xxforms:variable name="is-new-document" select="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf'))"/>
@@ -80,6 +80,11 @@
         <!-- Set the initial data status -->
         <!--<xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>-->
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+    </xforms:action>
+
+    <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
+    <xforms:action ev:event="xforms-ready">
+        <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
     </xforms:action>
 
     <!-- Clear operation -->
@@ -247,7 +252,7 @@
             replace="none"/>
 
     <!-- Get document -->
-    <xforms:submission id="get-document-submission"
+    <xforms:submission id="fr-get-document-submission"
             method="get" serialization="none"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data.xml"
             replace="instance" xxforms:instance="fr-form-instance"/>
@@ -310,18 +315,18 @@
     </xforms:action>
 
     <!-- React to failed submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-update-submission fr-create-update-attachment-submission">
+    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-error-form"/>
+                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
         <xforms:action if="event('error-type') != 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                    value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-error-form"/>
+                    value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
     </xforms:action>
@@ -347,6 +352,7 @@
     <xforms:action ev:observer="fr-form-group" ev:event="DOMFocusIn">
         <xforms:toggle case="fr-message-none"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
     </xforms:action>
 
     <!-- Perform background submission upon xforms-sepect #fr-form-group for xforms:upload -->

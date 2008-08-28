@@ -1,0 +1,497 @@
+/**
+ *  Copyright (C) 2005 Orbeon, Inc.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the
+ *  GNU Lesser General Public License as published by the Free Software Foundation; either version
+ *  2.1 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
+ *
+ *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.xforms.processor.handlers;
+
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandler;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Base class for all XHTML and XForms element handlers.
+ */
+public abstract class XFormsBaseHandler extends ElementHandler {
+
+    // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
+    // cannot be used; those should probably be in the XHTML namespace
+    private static final String[] XHTML_ATTRIBUTES_TO_COPY = { "style", "onchange" };
+
+    private boolean repeating;
+    private boolean forwarding;
+
+    protected HandlerContext handlerContext;
+    protected PipelineContext pipelineContext;
+    protected XFormsContainingDocument containingDocument;
+    protected ExternalContext externalContext;
+    protected List pathMatchers;
+    protected boolean isNoscript;
+
+    protected AttributesImpl reusableAttributes = new AttributesImpl();
+
+    protected XFormsBaseHandler(boolean repeating, boolean forwarding) {
+        this.repeating = repeating;
+        this.forwarding = forwarding;
+    }
+
+    public void setContext(Object context) {
+        this.handlerContext = (HandlerContext) context;
+
+        this.pipelineContext = handlerContext.getPipelineContext();
+        this.containingDocument = handlerContext.getContainingDocument();
+        this.externalContext = handlerContext.getExternalContext();
+
+        // This is used for URL rewriting
+        pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+
+        // Cache this property as it is used often
+        isNoscript = XFormsProperties.isNoscript(containingDocument);
+
+        super.setContext(context);
+    }
+
+    public boolean isRepeating() {
+        return repeating;
+    }
+
+    public boolean isForwarding() {
+        return forwarding;
+    }
+
+    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
+        if (xformsControl != null && xformsControl.isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument)) {
+            // @disabled="disabled"
+            newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
+        }
+    }
+
+    public void handleMIPClasses(FastStringBuffer sb, String controlId, XFormsSingleNodeControl xformsControl) {
+
+        // Output MIP classes only having a binding
+        final boolean hasBinding = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(controlId)).hasBinding();
+        if (hasBinding) {
+            if (xformsControl != null) {
+                // The case of a concrete control
+                if (!xformsControl.isRelevant()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-disabled");
+                }
+                if (!xformsControl.isValid()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-invalid");
+                }
+                if (xformsControl.isReadonly()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-readonly");
+                }
+                if (xformsControl.isRequired()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-required");
+                    if (xformsControl instanceof XFormsValueControl) {
+                        if (isEmpty(xformsControl))
+                            sb.append(" xforms-required-empty");
+                        else
+                            sb.append(" xforms-required-filled");
+                    }
+                }
+                final String typeName = xformsControl.getBuiltinTypeName();
+                if (typeName != null) {
+                    // Control is bound to built-in schema type
+                    if (sb.length() > 0)
+                        sb.append(' ');
+
+                    sb.append("xforms-type-");
+                    sb.append(typeName);
+                }
+            } else if (!handlerContext.isTemplate()) {
+                // Case of a non-concrete control - simply mark the control as disabled
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-disabled");
+            }
+        }
+    }
+
+    private boolean isEmpty(XFormsControl xformsControl) {
+        // TODO: Configure meaning of "empty" through property (trimming vs. no strict) 
+        return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue(pipelineContext));
+    }
+
+    protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
+        // Handle "tabindex"
+        {
+            String value = srcAttributes.getValue("navindex");// This is the standard XForms attribute
+            if (value == null)
+                value = srcAttributes.getValue("tabindex");// This is the XHTML attribute
+            if (value != null)
+                destAttributes.addAttribute("", "tabindex", "tabindex", ContentHandlerHelper.CDATA, value);
+        }
+        // Handle "accesskey"
+        {
+            final String value = srcAttributes.getValue("accesskey");
+            if (value != null)
+                destAttributes.addAttribute("", "accesskey", "accesskey", ContentHandlerHelper.CDATA, value);
+        }
+    }
+
+    protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String id) {
+        reusableAttributes.clear();
+
+        // Copy "id"
+        if (id != null) {
+            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, id);
+        }
+        // Copy common attributes
+        for (int i = 0; i < XHTML_ATTRIBUTES_TO_COPY.length; i++) {
+            final String name = XHTML_ATTRIBUTES_TO_COPY[i];
+            final String value = elementAttributes.getValue(name);
+            if (value != null)
+                reusableAttributes.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
+        }
+        // Create "class" attribute if necessary
+        {
+            final FastStringBuffer sb = new FastStringBuffer(100);
+            // User-defined classes go first
+            {
+                final String value = elementAttributes.getValue("class");
+                if (value != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(value);
+                }
+            }
+            {
+                final String value = elementAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
+                if (value != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(value);
+                }
+            }
+            // XForms engine classes go next
+            {
+                if (classes != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(classes);
+                }
+            }
+            if (sb.length() > 0) {
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, sb.toString());
+            }
+        }
+        // Copy attributes in the xhtml namespace to no namespace
+        for (int i = 0; i < elementAttributes.getLength(); i++) {
+            if (XMLConstants.XHTML_NAMESPACE_URI.equals(elementAttributes.getURI(i))) {
+                final String name = elementAttributes.getLocalName(i);
+                if (!"class".equals(name)) {
+                    reusableAttributes.addAttribute("", name, name, ContentHandlerHelper.CDATA, elementAttributes.getValue(i));
+                }
+            }
+        }
+
+        return reusableAttributes;
+    }
+
+    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
+        return getInitialClasses(controlName, controlAttributes, xformsControl, null, false);
+    }
+
+    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
+
+        // Control name
+        final FastStringBuffer sb;
+        {
+            // We only call xforms-control the actual controls as per the spec
+            // TODO: no longer, XForms 1.1 has core and container controls
+            if (!XFormsControlFactory.isContainerControl(controlName))
+                sb = new FastStringBuffer("xforms-control xforms-");
+            else
+                sb = new FastStringBuffer("xforms-");
+            sb.append(controlName);
+        }
+        {
+            // Class for incremental mode
+            final String value = controlAttributes.getValue("incremental");
+            // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
+            // default is incremental and the user did not explicitly set it to false
+            if ((!incrementalDefault && "true".equals(value)) || (incrementalDefault && !"false".equals(value))) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-incremental");
+            }
+        }
+        {
+            // Class for appearance
+            if (appearance == null)
+                appearance = getAppearance(controlAttributes);
+            
+            if (appearance != null) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-");
+                sb.append(controlName);
+                sb.append("-appearance-");
+                // Allow xxforms:* and *
+                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearance.getNamespace().getURI()))
+                    sb.append("xxforms-");
+                else if (!"".equals(appearance.getNamespace().getURI()))
+                    throw new ValidationException("Invalid appearance namespace URI: " + appearance.getNamespace().getURI(), handlerContext.getLocationData());
+                sb.append(appearance.getName());
+            }
+        }
+        {
+            // Class for mediatype
+            final String mediatypeValue = controlAttributes.getValue("mediatype");
+            if (mediatypeValue != null) {
+
+                // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
+                final int slashIndex = mediatypeValue.indexOf('/');
+                if (slashIndex == -1)
+                    throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, handlerContext.getLocationData());
+
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-mediatype-");
+                if (mediatypeValue.endsWith("/*")) {
+                    // Add class with just type: "image/*" -> "xforms-mediatype-image"
+                    sb.append(mediatypeValue.substring(0, mediatypeValue.length() - 2));
+                } else {
+                    // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
+                    sb.append(mediatypeValue.replace('/', '-'));
+                    // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
+                    sb.append(" xforms-mediatype-");
+                    sb.append(mediatypeValue.substring(0, slashIndex));
+                }
+            }
+        }
+
+        // Static read-only
+        if (isStaticReadonly(xformsControl))
+            sb.append(" xforms-static");
+
+        return sb;
+    }
+
+    protected String uriFromQName(String qName) {
+        return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
+    }
+
+    protected boolean isStaticReadonly(XFormsControl xformsControl) {
+        return xformsControl != null && xformsControl.isStaticReadonly();
+    }
+
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        handleLabelHintHelpAlert(forId, forEffectiveId, type, xformsControl, isTemplate, true);
+    }
+
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl xformsControl, boolean isTemplate, boolean placeholder) throws SAXException {
+
+        final boolean isHint = type.equals("hint");
+        final boolean isAlert = type.equals("alert");
+
+        // Don't handle alerts and help in read-only mode
+        // TODO: Removing hints and help could be optional depending on appearance
+        if (isStaticReadonly(xformsControl) && (isAlert || isHint))
+            return;
+
+        final boolean isLabel = type.equals("label");
+        final boolean isHelp = type.equals("help");
+
+        final String labelHintHelpAlertValue;
+        final boolean mustOutputHTMLFragment;
+        if (xformsControl != null) {
+            // Get actual value from control
+            if (isLabel) {
+                labelHintHelpAlertValue = xformsControl.getLabel(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
+            } else if (isHelp) {
+                // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
+                // case because it is stored as escaped HTML within a <label> element.
+                labelHintHelpAlertValue = xformsControl.getEscapedHelp(pipelineContext);
+                mustOutputHTMLFragment = false;
+            } else if (isHint) {
+                labelHintHelpAlertValue = xformsControl.getHint(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLHint(pipelineContext);
+            } else if (isAlert) {
+                labelHintHelpAlertValue = xformsControl.getAlert(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLAlert(pipelineContext);
+            } else {
+                throw new IllegalStateException("Illegal type requested");
+            }
+        } else {
+            // Placeholder
+            labelHintHelpAlertValue = null;
+            mustOutputHTMLFragment = false;
+        }
+
+        final Attributes labelHintHelpAlertAttributes;
+        {
+            // Statically obtain attributes information
+            final Map controlInfoMap = containingDocument.getStaticState().getControlInfoMap();
+            final Element controlElement = ((XFormsStaticState.ControlInfo) controlInfoMap.get(forId)).getElement();
+            final Element nestedElement;
+            if (isLabel) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+            } else if (isHelp) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_HELP_QNAME);
+            } else if (isHint) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_HINT_QNAME);
+            } else if (isAlert) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME);
+            } else {
+                throw new IllegalStateException("Illegal type requested");
+            }
+
+            labelHintHelpAlertAttributes = (nestedElement != null) ? XMLUtils.convertAttributes(nestedElement) : null;
+        }
+
+        if (labelHintHelpAlertAttributes != null || isAlert) {
+            // If no attributes were found, there is no such label / help / hint / alert
+
+            final StringBuffer classes = new StringBuffer();
+
+            // Handle alert state
+            // TODO: Once we have the new HTML layout, this won't be needed anymore
+            if (isAlert) {
+                if (xformsControl != null && (!xformsControl.isValid() || xformsControl.isRequired() && isEmpty(xformsControl)))
+                    classes.append(" xforms-alert-active");
+                else
+                    classes.append(" xforms-alert-inactive");
+            }
+
+            // Handle visibility
+            // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
+            if (xformsControl != null) {
+                if (isAlert || isLabel) {
+                    // Allow empty labels and alerts
+                    if (!xformsControl.isRelevant())
+                        classes.append(" xforms-disabled");
+                } else {
+                    // For help and hint, consider "non-relevant" if empty
+                    final boolean isHintHelpRelevant = xformsControl.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
+                    if (!isHintHelpRelevant) {
+                        classes.append(" xforms-disabled");
+                    }
+                }
+            } else if (!isTemplate || isHelp) {
+                // Null control outside of template OR help within template
+                classes.append(" xforms-disabled");
+            }
+
+            classes.append(" xforms-");
+            classes.append(type);
+
+            final String labelClasses = classes.toString();
+
+            if (isHelp) {
+                // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
+                // background images way too often.
+
+                classes.append("-image"); // xforms-help-image class
+                final String helpImageClasses = classes.toString();
+
+                final AttributesImpl imgAttributes = new AttributesImpl();
+                imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
+                imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
+                imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// however it seems that we don't need an alt since the help content is there
+
+                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+            }
+
+            // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
+            final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
+            if (newAttributes != null) {
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, labelHintHelpAlertValue, mustOutputHTMLFragment);
+            }
+        }
+    }
+
+    protected static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forEffectiveId, String value, boolean mustOutputHTMLFragment) throws SAXException {
+        attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
+
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
+        // Only output content when there value is non-empty
+        if (value != null && !value.equals("")) {
+            if (mustOutputHTMLFragment) {
+                XFormsUtils.streamHTMLFragment(contentHandler, value, null, xhtmlPrefix);
+            } else {
+                contentHandler.characters(value.toCharArray(), 0, value.length());
+            }
+        }
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
+    }
+
+    protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
+        // Only output content when there value is non-empty
+        if (value != null && !value.equals("")) {
+            if (mustOutputHTMLFragment)
+                XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
+            else
+                contentHandler.characters(value.toCharArray(), 0, value.length());
+        }
+    }
+
+    protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {
+        for (int i = 0; i < sourceAttributeLocalNames.length; i++) {
+            final String attributeName = sourceAttributeLocalNames[i];
+            final String attributeValue = sourceAttributes.getValue(sourceNamespaceURI, attributeName);
+            if (attributeValue != null)
+                destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
+        }
+    }
+
+    protected QName getAppearance(Attributes controlAttributes) {
+        final String appearanceValue = controlAttributes.getValue("appearance");
+        if (appearanceValue == null)
+            return null;
+
+        final String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
+        final String appearancePrefix = XMLUtils.prefixFromQName(appearanceValue);
+        final String appearanceURI = uriFromQName(appearanceValue);
+
+        return new QName(appearanceLocalname, new Namespace(appearancePrefix, appearanceURI));
+    }
+}

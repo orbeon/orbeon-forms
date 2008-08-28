@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle xhtml:* when AVTs are turned on.
  */
-public class XHTMLElementHandler extends HandlerBase {
+public class XHTMLElementHandler extends XFormsBaseHandler {
     public XHTMLElementHandler() {
         super(false, true);
     }

@@ -158,6 +158,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-message-validation-error { color: orange }
 .fr-message-fatal-error { color: red }
 .fr-unsaved-data { color: red }
+.fr-message-fatal-error .xforms-trigger { margin-left: .5em }
 
 /* Table of contents */
 .fr-toc { }

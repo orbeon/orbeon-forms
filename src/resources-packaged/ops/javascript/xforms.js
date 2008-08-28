@@ -468,8 +468,9 @@ ORBEON.util.Dom = {
         newInputElement.setAttribute("type", inputElement.type);
         newInputElement.setAttribute("name", inputElement.name);
         newInputElement.setAttribute("size", inputElement.size);
+        newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
         parentElement.replaceChild(newInputElement, inputElement);
-        // For non-w3c compliant browsers we must re-register listeners on the new upload element we just created
+        // For non-W3C compliant browsers we must re-register listeners on the new upload element we just created
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             ORBEON.xforms.Init.registerListenersOnFormElement(newInputElement);
         }
@@ -1480,7 +1481,7 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-empty")
                 ORBEON.util.Dom.addClass(control, "xforms-upload-state-file")
 
-                        // Clear upload input by replacing the control
+                // Clear upload input by replacing the control
                 ORBEON.util.Dom.clearUploadControl(control);
             }
             if (uploadFilename != null)
@@ -4613,79 +4614,76 @@ ORBEON.xforms.Server = {
                                         if (relevant != null)
                                             ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatId, iteration, relevant == "true" ? true : false);
                                     }
-                                    break;
-                                }
 
-                                // Display or hide divs
-                                case "divs": {
-                                    var divsElement = actionElement.childNodes[actionIndex];
-                                    for (var j = 0; j < divsElement.childNodes.length; j++) {
-                                        if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
-                                            var divElement = divsElement.childNodes[j];
-                                            var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
-                                            var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
-                                            var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+                                    // "div" elements for xforms:switch and xxforms:dialog
+                                    var divsElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "div", xmlNamespace);
+                                    var divElementslength = divsElements.length;
+                                    for (var j = 0; j < divElementslength; j++) {
+                                        var divElement = divsElements[j];
 
-                                            var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
-                                            var children = new Array();// elements that are being shown
-                                            if (yuiDialog == null) {
-                                                // This is a case
-                                                var caseBeginId = "xforms-case-begin-" + controlId;
-                                                var caseBegin = ORBEON.util.Dom.getElementById(caseBeginId);
-                                                var caseBeginParent = caseBegin.parentNode;
-                                                var foundCaseBegin = false;
-                                                for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
-                                                    var cursor = caseBeginParent.childNodes[childId];
-                                                    if (!foundCaseBegin) {
-                                                        if (cursor.id == caseBegin.id) foundCaseBegin = true;
-                                                        else continue;
-                                                    }
-                                                    if (cursor.nodeType == ELEMENT_TYPE) {
-                                                        if (cursor.id == "xforms-case-end-" + controlId) break;
-                                                        ORBEON.util.Dom.addClass(cursor, visible ? "xforms-case-selected" : "xforms-case-deselected");
-                                                        ORBEON.util.Dom.removeClass(cursor, visible ? "xforms-case-deselected" : "xforms-case-selected");
+                                        var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
+                                        var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                        var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
 
-                                                        children[children.length] = cursor;
-                                                    }
+                                        var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+                                        var children = new Array();// elements that are being shown
+                                        if (yuiDialog == null) {
+                                            // This is a case
+                                            var caseBeginId = "xforms-case-begin-" + controlId;
+                                            var caseBegin = ORBEON.util.Dom.getElementById(caseBeginId);
+                                            var caseBeginParent = caseBegin.parentNode;
+                                            var foundCaseBegin = false;
+                                            for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
+                                                var cursor = caseBeginParent.childNodes[childId];
+                                                if (!foundCaseBegin) {
+                                                    if (cursor.id == caseBegin.id) foundCaseBegin = true;
+                                                    else continue;
                                                 }
-                                            } else {
-                                                // This is a dialog
-                                                if (visible) {
-                                                    ORBEON.xforms.Controls.showDialog(controlId, neighbor);
-                                                    children[0] = ORBEON.util.Dom.getElementById(controlId);
-                                                } else {
-                                                    yuiDialog.hide();
-                                                    // Fixes cursor Firefox issue; more on this in dialog init code
-                                                    yuiDialog.element.style.display = "none";
-                                                    // Remember the server knows that this dialog is closed so we don't close it again later
-                                                    if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id])
-                                                        ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
+                                                if (cursor.nodeType == ELEMENT_TYPE) {
+                                                    if (cursor.id == "xforms-case-end-" + controlId) break;
+                                                    ORBEON.util.Dom.addClass(cursor, visible ? "xforms-case-selected" : "xforms-case-deselected");
+                                                    ORBEON.util.Dom.removeClass(cursor, visible ? "xforms-case-deselected" : "xforms-case-selected");
+
+                                                    children[children.length] = cursor;
                                                 }
                                             }
+                                        } else {
+                                            // This is a dialog
+                                            if (visible) {
+                                                ORBEON.xforms.Controls.showDialog(controlId, neighbor);
+                                                children[0] = ORBEON.util.Dom.getElementById(controlId);
+                                            } else {
+                                                yuiDialog.hide();
+                                                // Fixes cursor Firefox issue; more on this in dialog init code
+                                                yuiDialog.element.style.display = "none";
+                                                // Remember the server knows that this dialog is closed so we don't close it again later
+                                                if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id])
+                                                    ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
+                                            }
+                                        }
 
-                                            // After we display divs, we must re-enable the HTML editors.
-                                            // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
-                                            // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                            if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3
-                                                    && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
+                                        // After we display divs, we must re-enable the HTML editors.
+                                        // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
+                                        // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
+                                        if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3
+                                                && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
 
-                                                for (var childIndex = 0; childIndex < children.length; childIndex++) {
-                                                    var child = children[childIndex];
-                                                    var textHTMLElements = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", null, child);
+                                            for (var childIndex = 0; childIndex < children.length; childIndex++) {
+                                                var child = children[childIndex];
+                                                var textHTMLElements = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", null, child);
 
-                                                    // Below we try to find elements with both xforms-mediatype-text-html and xforms-textarea
-                                                    if (textHTMLElements != null && textHTMLElements.length > 0) {
-                                                        for (var htmlElementIndex = 0; htmlElementIndex < textHTMLElements.length; htmlElementIndex++) {
-                                                            var htmlElement = textHTMLElements[htmlElementIndex];
-                                                            // The code below tries to make sure we are getting an HTML form element
-                                                            if (htmlElement.name != null && htmlElement.name != "" && ORBEON.util.Dom.hasClass(htmlElement, "xforms-textarea")) {
-                                                                var editor = FCKeditorAPI.GetInstance(htmlElement.name);
-                                                                if (editor != null) {
-                                                                    try {
-                                                                        editor.EditorDocument.designMode = "on";
-                                                                    } catch (e) {
-                                                                        // Nop
-                                                                    }
+                                                // Below we try to find elements with both xforms-mediatype-text-html and xforms-textarea
+                                                if (textHTMLElements != null && textHTMLElements.length > 0) {
+                                                    for (var htmlElementIndex = 0; htmlElementIndex < textHTMLElements.length; htmlElementIndex++) {
+                                                        var htmlElement = textHTMLElements[htmlElementIndex];
+                                                        // The code below tries to make sure we are getting an HTML form element
+                                                        if (htmlElement.name != null && htmlElement.name != "" && ORBEON.util.Dom.hasClass(htmlElement, "xforms-textarea")) {
+                                                            var editor = FCKeditorAPI.GetInstance(htmlElement.name);
+                                                            if (editor != null) {
+                                                                try {
+                                                                    editor.EditorDocument.designMode = "on";
+                                                                } catch (e) {
+                                                                    // Nop
                                                                 }
                                                             }
                                                         }

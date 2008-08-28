@@ -144,7 +144,6 @@
                 action="/source-viewer/service/format" replace="instance" instance="source-response-instance"/>
 
             <xforms:action ev:event="ops-format-source">
-                <xforms:recalculate/>
                 <xforms:setvalue ref="instance('control-instance')/current-index" value="index('files-repeat')"/>
                 <xforms:send submission="request-source-submission"/>
                 <xforms:setindex repeat="files-repeat" index="instance('control-instance')/current-index"/>
@@ -217,7 +216,7 @@
                 <td style="vertical-align: top">
                     <table>
                         <xforms:group>
-                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" target="main-model"/>
+                            <xforms:dispatch ev:event="DOMFocusIn" name="ops-format-source" target="main-model"/>
                             <xforms:repeat nodeset="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">

@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -488,7 +489,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) controls.getObjectByEffectiveId(repeatIterationEffectiveId);
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
 
-                        repeatControl.setIndex(repeatIterationControl.getIterationIndex());
+                        final int newRepeatIndex = repeatIterationControl.getIterationIndex();
+
+                        if (XFormsServer.logger.isDebugEnabled()) {
+                            containingDocument.logDebug("repeat", "setting index upon focus change",
+                                    new String[] { "new index", Integer.toString(newRepeatIndex)});
+                        }
+
+                        repeatControl.setIndex(newRepeatIndex);
                     }
                     
                     controls.markDirtySinceLastRequest(true);

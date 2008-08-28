@@ -70,12 +70,16 @@ public class XFormsSetindexAction extends XFormsAction {
         final Object control = controls.resolveObjectById(null, repeatId);// TODO: pass sourceId
         if (control instanceof XFormsRepeatControl) {
             // Set its new index
-            final int newIndex = Integer.parseInt(indexString);
+            final int newRepeatIndex = Integer.parseInt(indexString);
             final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-            if (repeatControl.getIndex() != newIndex) {
-                // Get new reference as the controls may have been rebuilt
-                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
-                newRepeatControl.setIndex(newIndex);
+            if (repeatControl.getIndex() != newRepeatIndex) {
+
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    containingDocument.logDebug("repeat", "setting index upon xforms:setfocus",
+                            new String[] { "new index", Integer.toString(newRepeatIndex)});
+                }
+
+                repeatControl.setIndex(newRepeatIndex);
                 
                 controls.markDirtySinceLastRequest(true);// NOTE: currently, bindings are not really supposed to contain index() anymore, but control values may change still
                 setDeferredFlagsForSetindex(containingDocument);

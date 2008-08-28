@@ -134,11 +134,15 @@ public class ServletContextExternalContext implements ExternalContext {
     }
 
     public ExternalContext.Session getSession(boolean create) {
+        // Return null if we were not provided with a session. This allows detecting whether the session is available or not.
         if (httpSession == null)
-            throw new UnsupportedOperationException();
+            return null;
+
+        // Create the session wrapper if not already done
         if (session == null) {
             session = new Session(httpSession);
         }
+        
         return session;
     }
 

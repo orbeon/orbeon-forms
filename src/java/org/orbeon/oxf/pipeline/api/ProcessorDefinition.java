@@ -28,7 +28,6 @@ import java.util.Iterator;
  */
 public class ProcessorDefinition {
     private QName name;
-    private String uri;
     private Map entries = new HashMap();
 
     public ProcessorDefinition() {
@@ -41,13 +40,6 @@ public class ProcessorDefinition {
      */
     public void setName(QName name) {
         this.name = name;
-    }
-
-    /**
-     * @deprecated
-     */
-    public void setUri(String uri) {
-        this.uri = uri;
     }
 
     /**
@@ -98,13 +90,6 @@ public class ProcessorDefinition {
      */
     public QName getName() {
         return name;
-    }
-
-    /**
-     * @deprecated
-     */
-    public String getUri() {
-        return uri;
     }
 
     public String toString() {

@@ -76,7 +76,7 @@ public class ServletContextExternalContext implements ExternalContext {
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Object getNativeContext() {
@@ -87,16 +87,16 @@ public class ServletContextExternalContext implements ExternalContext {
     }
 
     public Object getNativeRequest() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Object getNativeResponse() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Object getNativeSession(boolean flag) {
         if (session == null)
-            throw new UnsupportedOperationException();
+            return null;
         return session;
     }
 
@@ -122,15 +122,15 @@ public class ServletContextExternalContext implements ExternalContext {
     }
 
     public Request getRequest() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public Response getResponse() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public ExternalContext.Session getSession(boolean create) {
@@ -148,7 +148,7 @@ public class ServletContextExternalContext implements ExternalContext {
 
     public ExternalContext.Application getApplication() {
         if (servletContext == null)
-            throw new UnsupportedOperationException();
+            return null;
         if (application == null)
             application = new Application(servletContext);
 

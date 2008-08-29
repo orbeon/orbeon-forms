@@ -942,7 +942,8 @@ public class NetUtils {
                                                   byte[] messageBody, List headerNames, Map headerNameValues, String headersToForward) {
 
         // Get  the headers to forward if any
-        final Map headersMap = getHeadersMap(externalContext, indentedLogger, username, headerNames, headerNameValues, headersToForward);
+        final Map headersMap = (externalContext.getRequest() != null) ?
+                getHeadersMap(externalContext, indentedLogger, username, headerNames, headerNameValues, headersToForward) : null;
         // Open the connection
         return openConnection(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
     }

@@ -14,12 +14,12 @@
 package org.orbeon.oxf.pipeline;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.dom4j.Document;
+import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheStatistics;
 import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -34,12 +34,14 @@ import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -63,19 +65,14 @@ public class InitUtils {
     public static void runProcessor(Processor processor, ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception {
 
         // Record start time for this request
-        long tsBegin = logger.isInfoEnabled() ? System.currentTimeMillis() : 0;
-        String requestPath = null;
-        try {
-            ExternalContext.Request request = externalContext.getRequest();
-            requestPath = request.getRequestPath();
-        } catch (UnsupportedOperationException e) {
-            // Don't do anything
-        }
+        final long tsBegin = logger.isInfoEnabled() ? System.currentTimeMillis() : 0;
+        final ExternalContext.Request request = externalContext.getRequest();
+        final String requestPath = (request != null) ? request.getRequestPath() : null;
 
         // Set ExternalContext
         if (externalContext != null) {
             if (logger.isInfoEnabled()) {
-                String startLoggerString = externalContext.getStartLoggerString();
+                final String startLoggerString = externalContext.getStartLoggerString();
                 if (startLoggerString != null && startLoggerString.length() > 0)
                     logger.info(startLoggerString);
             }
@@ -86,7 +83,7 @@ public class InitUtils {
 
         try {
             // Set cache size
-            Integer cacheMaxSize = Properties.instance().getPropertySet().getInteger(CACHE_SIZE_PROPERTY);
+            final Integer cacheMaxSize = Properties.instance().getPropertySet().getInteger(CACHE_SIZE_PROPERTY);
             if (cacheMaxSize != null)
                 ObjectCache.instance().setMaxSize(pipelineContext, cacheMaxSize.intValue());
 
@@ -102,9 +99,9 @@ public class InitUtils {
             } catch (Throwable f) {
                 logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
             }
-            LocationData locationData = ValidationException.getRootLocationData(e);
-            Throwable throwable = OXFException.getRootThrowable(e);
-            String message = locationData == null
+            final LocationData locationData = ValidationException.getRootLocationData(e);
+            final Throwable throwable = OXFException.getRootThrowable(e);
+            final String message = locationData == null
                     ? "Exception with no location data"
                     : "Exception at " + locationData.toString();
             logger.error(message, throwable);
@@ -171,13 +168,8 @@ public class InitUtils {
      * Create a processor and connect its inputs to static URLs.
      */
     public static Processor createProcessor(ProcessorDefinition processorDefinition) {
-        Processor processor;
-        if (processorDefinition.getName() != null) {
-            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName()).createInstance();
-        } else {
-            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getUri()).createInstance();
-        }
-        for (java.util.Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
+        final Processor processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName()).createInstance();
+        for (Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
             final String inputName = (String) i.next();
             final Object o = processorDefinition.getEntries().get(inputName);
 
@@ -288,7 +280,7 @@ public class InitUtils {
                     registry.start(pipelineContext);
 
                     // If user defines a PROLOGUE_PROPERTY, overrides the defaults
-                    String prologueSrc = Properties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
+                    final String prologueSrc = Properties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
                     if (prologueSrc != null) {
                         processorDefinitions = PipelineUtils.createURLGenerator(prologueSrc, true);
                         registry = new XMLProcessorRegistry();
@@ -306,10 +298,10 @@ public class InitUtils {
         }
     }
 
-    public static java.util.Map getContextInitParametersMap(ServletContext servletContext) {
-        java.util.Map contextInitParameters = new java.util.HashMap();
+    public static Map getContextInitParametersMap(ServletContext servletContext) {
+        final Map contextInitParameters = new HashMap();
         for (java.util.Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
+            final String name = (String) e.nextElement();
             contextInitParameters.put(name, servletContext.getInitParameter(name));
         }
         return java.util.Collections.unmodifiableMap(contextInitParameters);
@@ -326,22 +318,21 @@ public class InitUtils {
     /**
      * Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used.
      */
-    public static ProcessorDefinition getDefinitionFromMap(java.util.Map map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
+    public static ProcessorDefinition getDefinitionFromMap(Map map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
         ProcessorDefinition processorDefinition = null;
-        String processorURI = (String) map.get(uriNamePropertyPrefix + "uri");
-        Object processorName = map.get(uriNamePropertyPrefix + "name");
+        final String processorURI = (String) map.get(uriNamePropertyPrefix + "uri");
+        final Object processorName = map.get(uriNamePropertyPrefix + "name");
 
         if (processorURI != null || processorName != null) {
             processorDefinition = new ProcessorDefinition();
-            processorDefinition.setUri(processorURI);
             // Support both xs:string or xs:QName for processor name
             processorDefinition.setName((processorName instanceof String) ? Dom4jUtils.explodedQNameToQName((String) processorName) : (QName) processorName);
-            for (java.util.Iterator i = map.keySet().iterator(); i.hasNext();) {
-                String name = (String) i.next();
+            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
+                final String name = (String) i.next();
                 if (name.startsWith(inputPropertyPrefix)) {
-                    Object value = map.get(name);
+                    final Object value = map.get(name);
                     // Support both xs:string and xs:anyURI for processor input
-                    String stringValue = (value instanceof String) ? (String) value : ((java.net.URL) value).toExternalForm();
+                    final String stringValue = (value instanceof String) ? (String) value : ((java.net.URL) value).toExternalForm();
                     processorDefinition.addInput(name.substring(inputPropertyPrefix.length()), stringValue);
                 }
             }
@@ -448,5 +439,4 @@ public class InitUtils {
             });
         }
     }
-
 }

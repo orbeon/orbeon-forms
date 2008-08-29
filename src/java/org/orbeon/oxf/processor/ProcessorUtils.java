@@ -192,7 +192,7 @@ public class ProcessorUtils {
     }
 
     /**
-     * Generate a "standard" OPS text document.
+     * Generate a "standard" Orbeon text document.
      *
      * @param is                    InputStream to read from
      * @param encoding              character encoding to use, or null for default
@@ -228,7 +228,7 @@ public class ProcessorUtils {
     }
 
     /**
-     * Generate a "standard" OPS binary document.
+     * Generate a "standard" Orbeon binary document.
      *
      * @param is            InputStream to read from
      * @param output        output ContentHandler to write binary document to

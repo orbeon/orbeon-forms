@@ -709,6 +709,14 @@
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
     </processor>
 
+    <processor name="oxf:unzip">
+        <class name="org.orbeon.oxf.processor.zip.UnzipProcessor"/>
+    </processor>
+
+    <processor name="oxf:zip">
+        <class name="org.orbeon.oxf.processor.zip.ZipProcessor"/>
+    </processor>
+
     <!-- No longer supported processors -->
 
 </processors>

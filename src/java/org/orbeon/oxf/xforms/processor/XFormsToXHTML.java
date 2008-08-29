@@ -326,7 +326,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsStaticState, uriResolver);
 
             // Make sure we have up to date controls before creating state below
-            final XFormsControls xformsControls = containingDocument[0].getXFormsControls();
+            final XFormsControls xformsControls = containingDocument[0].getControls();
             xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
             // This is the state after XForms initialization
@@ -349,7 +349,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         final ElementHandlerController controller = new ElementHandlerController();
 
         // Make sure we have up to date controls (should already be the case)
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
         xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
@@ -492,7 +492,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                                          final ContentHandler contentHandler, final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState) throws SAXException {
 
         // Make sure we have up to date controls
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
         xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 

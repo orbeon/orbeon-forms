@@ -539,7 +539,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
                 // Perform the adjustments
 
                 // Find affected repeats and update their node-sets and indexes
-                final XFormsControls controls = containingDocument.getXFormsControls();
+                final XFormsControls controls = containingDocument.getControls();
                 updateRepeatNodeset(pipelineContext, controls, insertedNodeInfos);
             }
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
@@ -550,7 +550,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             final boolean didDeleteNodes = deletedNodeInfos.size() != 0;
             if (didDeleteNodes) {
                 // Find affected repeats and update them
-                final XFormsControls controls = containingDocument.getXFormsControls();
+                final XFormsControls controls = containingDocument.getControls();
                 updateRepeatNodeset(pipelineContext, controls, null);
             }
         }

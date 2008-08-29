@@ -258,7 +258,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // Class for appearance
             if (appearance == null)
                 appearance = getAppearance(controlAttributes);
-            
+
             if (appearance != null) {
                 if (sb.length() > 0)
                     sb.append(' ');
@@ -318,14 +318,14 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         handleLabelHintHelpAlert(forId, forEffectiveId, type, xformsControl, isTemplate, true);
     }
 
-    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl xformsControl, boolean isTemplate, boolean placeholder) throws SAXException {
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl control, boolean isTemplate, boolean placeholder) throws SAXException {
 
         final boolean isHint = type.equals("hint");
         final boolean isAlert = type.equals("alert");
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
-        if (isStaticReadonly(xformsControl) && (isAlert || isHint))
+        if (isStaticReadonly(control) && (isAlert || isHint))
             return;
 
         final boolean isLabel = type.equals("label");
@@ -333,22 +333,22 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         final String labelHintHelpAlertValue;
         final boolean mustOutputHTMLFragment;
-        if (xformsControl != null) {
+        if (control != null) {
             // Get actual value from control
             if (isLabel) {
-                labelHintHelpAlertValue = xformsControl.getLabel(pipelineContext);
-                mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
+                labelHintHelpAlertValue = control.getLabel(pipelineContext);
+                mustOutputHTMLFragment = control.isHTMLLabel(pipelineContext);
             } else if (isHelp) {
                 // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
                 // case because it is stored as escaped HTML within a <label> element.
-                labelHintHelpAlertValue = xformsControl.getEscapedHelp(pipelineContext);
+                labelHintHelpAlertValue = control.getEscapedHelp(pipelineContext);
                 mustOutputHTMLFragment = false;
             } else if (isHint) {
-                labelHintHelpAlertValue = xformsControl.getHint(pipelineContext);
-                mustOutputHTMLFragment = xformsControl.isHTMLHint(pipelineContext);
+                labelHintHelpAlertValue = control.getHint(pipelineContext);
+                mustOutputHTMLFragment = control.isHTMLHint(pipelineContext);
             } else if (isAlert) {
-                labelHintHelpAlertValue = xformsControl.getAlert(pipelineContext);
-                mustOutputHTMLFragment = xformsControl.isHTMLAlert(pipelineContext);
+                labelHintHelpAlertValue = control.getAlert(pipelineContext);
+                mustOutputHTMLFragment = control.isHTMLAlert(pipelineContext);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
@@ -387,7 +387,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // Handle alert state
             // TODO: Once we have the new HTML layout, this won't be needed anymore
             if (isAlert) {
-                if (xformsControl != null && (!xformsControl.isValid() || xformsControl.isRequired() && isEmpty(xformsControl)))
+                if (control != null && (!control.isValid() || control.isRequired() && isEmpty(control)))
                     classes.append(" xforms-alert-active");
                 else
                     classes.append(" xforms-alert-inactive");
@@ -395,14 +395,14 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
             // Handle visibility
             // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-            if (xformsControl != null) {
+            if (control != null) {
                 if (isAlert || isLabel) {
                     // Allow empty labels and alerts
-                    if (!xformsControl.isRelevant())
+                    if (!control.isRelevant())
                         classes.append(" xforms-disabled");
                 } else {
                     // For help and hint, consider "non-relevant" if empty
-                    final boolean isHintHelpRelevant = xformsControl.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
+                    final boolean isHintHelpRelevant = control.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
                     if (!isHintHelpRelevant) {
                         classes.append(" xforms-disabled");
                     }
@@ -421,6 +421,20 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
                 // background images way too often.
 
+                final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+
+                if (isNoscript && control != null) {
+                    // Start <a href="#my-control-id-help">
+
+                    final AttributesImpl aAttributes = new AttributesImpl();
+                    aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#" + control.getEffectiveId() + "-help");
+                    aAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-help-anchor");
+
+                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
+                }
+
                 classes.append("-image"); // xforms-help-image class
                 final String helpImageClasses = classes.toString();
 
@@ -430,11 +444,15 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
                 imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// however it seems that we don't need an alt since the help content is there
 
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+
+                if (isNoscript && control != null) {
+                    // End </a>
+                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+                }
             }
 
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert

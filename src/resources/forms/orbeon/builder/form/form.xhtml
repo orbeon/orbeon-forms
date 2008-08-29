@@ -197,11 +197,10 @@
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
-                                            <xforms:trigger appearance="minimal">
+                                            <xforms:trigger appearance="minimal" id="fb-edit-section-details-trigger">
                                                 <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Section Details" title="Section Details"/></xforms:label>
                                                 <!-- Show section details dialog -->
-                                                <!-- TODO: position better; isseu with id of buttons in fr:buttons as adding id causes duplicate id error -->
-                                                <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-section">
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-edit-section-details-trigger">
                                                     <xxforms:context name="fr:section-name" select="$section-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
@@ -224,8 +223,7 @@
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <!-- Edit help for section -->
-                                            <!-- TODO: id="fb-edit-section-help-trigger"  -->
-                                            <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger">
+                                            <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
                                                 <xforms:label><xhtml:img alt="Help" title="Help" src="/ops/images/xforms/help.png"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-section-help-trigger">

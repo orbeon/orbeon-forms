@@ -28,6 +28,7 @@
                 <refresh>This operation will refresh the page</refresh>
                 <errors>Your Form Contains the Following Errors</errors>
                 <toc>Table of Contents</toc>
+                <help>Help</help>
                 <error-count>Error in Your Form</error-count>
                 <errors-count>Errors in Your Form</errors-count>
             </titles>
@@ -53,6 +54,7 @@
                 <noscript>Accessible Version</noscript>
                 <refresh>Refresh</refresh>
                 <close-box>[close]</close-box>
+                <help-back>Back</help-back>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -127,6 +129,7 @@
                 <refresh>Cette opération raffraîchira la page</refresh>
                 <errors>Votre formulaire contient les erreurs suivantes</errors>
                 <toc>Table des matières</toc>
+                <help>Aide</help>
                 <error-count>erreur de saisie dans votre formulaire</error-count>
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
@@ -152,6 +155,7 @@
                 <noscript>Version accessible</noscript>
                 <refresh>Raffraîchir</refresh>
                 <close-box>[fermer]</close-box>
+                <help-back>Retour</help-back>
             </labels>
             <formats>
                 <date>Le [D] [Mn] [Y]</date>
@@ -207,6 +211,7 @@
                 <refresh>[This operation will refresh the page]</refresh>
                 <errors>[Your Form Contains the Following Errors]</errors>
                 <toc>[Table of Contents]</toc>
+                <help>[Help]</help>
                 <error-count>[Error in Your Form]</error-count>
                 <errors-count>[Errors in Your Form]</errors-count>
             </titles>
@@ -270,6 +275,7 @@
                 <offline>Sin conexión</offline>
                 <online>En línea</online>
                 <alert>Desaparición o valor incorrecto</alert>
+                <help-back>[Back]</help-back>
             </labels>
         </detail>
         <import-export>

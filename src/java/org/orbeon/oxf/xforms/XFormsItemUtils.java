@@ -223,7 +223,7 @@ public class XFormsItemUtils {
         }
 
         final List newItems = new ArrayList();
-        final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
+        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
 
         // Set binding on this control if required
         if (setBinding)

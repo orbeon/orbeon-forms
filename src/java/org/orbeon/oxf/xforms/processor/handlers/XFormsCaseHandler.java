@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.*;
@@ -38,16 +37,10 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
-        // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-
-        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
-
-        final ControlTree controlTree = containingDocument.getXFormsControls().getCurrentControlTree();
-
+        // Determine whether this case is visible
         final boolean isVisible;
         if (!handlerContext.isTemplate()) {
-            final XFormsCaseControl caseControl = (XFormsCaseControl) controlTree.getEffectiveIdsToControls().get(currentCaseEffectiveId);
+            final XFormsCaseControl caseControl = (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId (currentCaseEffectiveId);
 
             // This case is visible if it is selected or if the switch is read-only and we display read-only as static
             isVisible = caseControl.isVisible();
@@ -55,6 +48,10 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
             isVisible = false;
         }
 
+        // Find classes to add
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+
+        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -485,7 +485,7 @@ public class XFormsServer extends ProcessorImpl {
                                 boolean allEvents, boolean isOfflineEvents, boolean testOutputStaticState, boolean testOutputAllActions) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
 
         try {
             final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
@@ -606,7 +606,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                        final ControlTree initialControlTree = initialContainingDocument.getXFormsControls().getCurrentControlTree();
+                        final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
                         diffControls(pipelineContext, ch, containingDocument, initialControlTree.getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
@@ -626,7 +626,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     } else {
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                        final ControlTree initialControlTree = initialContainingDocument.getXFormsControls().getCurrentControlTree();
+                        final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
                         diffIndexState(ch, initialControlTree.getInitialMinimalRepeatIdToIndex(),
                                 currentControlTree.getMinimalRepeatIdToIndex());
                     }

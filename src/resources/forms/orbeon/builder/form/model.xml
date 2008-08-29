@@ -708,7 +708,7 @@
                     </xforms:textarea>
                 </xhtml:div>
             </template>
-            <template label="Date" image="/ops/images/xforms/calendar.png">
+            <template label="Date" image="/apps/fr/style/images/silk/date.png">
                 <xhtml:div class="date-input">
                     <xforms:input id="" ref="" incremental="true">
                         <xforms:label ref=""/>
@@ -718,7 +718,7 @@
                     </xforms:input>
                 </xhtml:div>
             </template>
-            <template label="Time" image="/apps/fr/style/images/silk/clock.png">
+            <template label="Time" image="/apps/fr/style/images/silk/time.png">
                 <xhtml:div class="time-input">
                     <xforms:input id="" ref="" incremental="true">
                         <xforms:label ref=""/>

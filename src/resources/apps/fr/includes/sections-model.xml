@@ -23,6 +23,8 @@
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!-- TODO: Once local models are supported, this can go directly into fr:section -->
     
     <!-- Contain section being currently expanded/collapsed -->
     <xforms:instance id="fr-current-section-instance">
@@ -35,6 +37,7 @@
     <!-- Handle section collapse -->
     <xforms:action ev:event="fr-after-collapse">
         <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-closed"/>
+        <xforms:toggle case="case-button-{instance('fr-current-section-instance')/id}-closed"/>
     </xforms:action>
 
     <!-- Close section -->
@@ -47,6 +50,7 @@
     <!-- Open section -->
     <xforms:action ev:event="fr-expand">
         <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-open"/>
+        <xforms:toggle case="case-button-{instance('fr-current-section-instance')/id}-open"/>
         <!-- Only if we support script -->
         <xxforms:script if="not(property('xxforms:noscript'))">frExpand();</xxforms:script>
     </xforms:action>

@@ -57,7 +57,7 @@ public class XFormsToggleAction extends XFormsAction {
                 // This case is not currently selected
 
                 // Actually toogle the xforms:case
-                final XFormsControls controls = containingDocument.getXFormsControls();
+                final XFormsControls controls = containingDocument.getControls();
                 controls.markDirtySinceLastRequest(false);
                 caseControl.toggle(pipelineContext);// this will dispatch events
             }

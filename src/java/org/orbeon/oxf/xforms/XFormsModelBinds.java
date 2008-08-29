@@ -244,7 +244,7 @@ public class XFormsModelBinds {
         // TODO: use containingDocument.startHandleOperation()
         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
-        final Map effectiveIdsToControls = containingDocument.getXFormsControls().getCurrentControlTree().getEffectiveIdsToControls();
+        final Map effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
         final Map nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);

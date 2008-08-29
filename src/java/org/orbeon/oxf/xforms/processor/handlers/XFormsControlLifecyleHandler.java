@@ -17,8 +17,12 @@ import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -74,6 +78,21 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
                 if ("control".equals(current)) {
                     // Handle control
+
+                    if (isNoscript) {
+                        // Output named anchor if the control has a help. This is so that a separate help section can
+                        // link back to the control.
+                        if (xformsControl != null && XFormsControl.hasHelp(containingDocument, xformsControl, staticId)) {
+                            final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                            final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                            reusableAttributes.clear();
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+                        }
+                    }
+
                     handleControlStart(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
                     // Do the rest in end() below if needed
                     if (i < config.length - 1) {

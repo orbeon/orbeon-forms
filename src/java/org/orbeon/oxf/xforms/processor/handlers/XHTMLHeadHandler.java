@@ -69,7 +69,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         // TODO: This would probably be done better, and more correctly, statically, in XFormsStaticState
         final Map javaScriptControlsAppearancesMap = new HashMap();
         {
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            final XFormsControls xformsControls = containingDocument.getControls();
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl control) {
                     final String controlName = control.getName();
@@ -206,7 +206,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Help events
                         {
-                            final boolean hasHandlerForXFormsHelp = containingDocument.getXFormsControls().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
+                            final boolean hasHandlerForXFormsHelp = containingDocument.getControls().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
                             if (hasHandlerForXFormsHelp) {
                                 dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }

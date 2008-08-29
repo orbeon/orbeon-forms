@@ -64,7 +64,7 @@ public class XFormsSetindexAction extends XFormsAction {
             return;
         }
 
-        final XFormsControls controls = containingDocument.getXFormsControls();
+        final XFormsControls controls = containingDocument.getControls();
 
         // Find repeat control
         final Object control = controls.resolveObjectById(null, repeatId);// TODO: pass sourceId

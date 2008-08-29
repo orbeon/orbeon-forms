@@ -32,6 +32,7 @@ th, td {border: 0; padding: 0 }
 
 h1, h2, h3 {
 	margin:1em 0;
+    color: #666699;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -134,6 +135,8 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 .xforms-label { font-weight: bold }
+
+.xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }
 
 /* Colored border for invalid fields */
 .xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: orange }

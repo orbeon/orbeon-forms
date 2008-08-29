@@ -322,6 +322,28 @@
                         </xml-source>
                     </li>
                     <li>
+                        <a name="xxforms-case"/>
+                        <p>
+                            <code>xxforms:case($switch-id as xs:string) as xs:string?</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:case()</code> function returns the id of the currently selected
+                            <code>&lt;xforms:case></code> within the given <code>&lt;xforms:switch></code>. It is
+                            recommended to use this function from XForms actions only.
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:switch id="my-switch">
+                                <xforms:case id="my-case-1">...</xforms:case>
+                                <xforms:case id="my-case-2">...</xforms:case>
+                            </xforms:switch>
+                            ...
+                            <xforms:trigger>
+                                <xforms:label>Add One</xforms:label>
+                                <xforms:setvalue if="xxforms:case('my-switch')" ref="foobar" value="12"/>
+                            </xforms:trigger>
+                        </xml-source>
+                    </li>
+                    <li>
                         <a name="xxforms-property"/>
                         <p>
                             <code>xxforms:property($property-name as xs:string) as xs:anyAtomicType?</code>

@@ -112,7 +112,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     protected XFormsContextStack getContextStack() {
-        return containingDocument.getXFormsControls().getContextStack();
+        return containingDocument.getControls().getContextStack();
     }
 
     public String getId() {
@@ -481,7 +481,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                 }
 
                 if (repeatIterationsToModify.size() > 0) {
-                    final XFormsControls controls = containingDocument.getXFormsControls();
+                    final XFormsControls controls = containingDocument.getControls();
 
                     // Find all repeat iterations and controls again
                     for (Iterator i = repeatIterationsToModify.iterator(); i.hasNext();) {
@@ -649,7 +649,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     protected XFormsControlLocal getLocalForUpdate() {
         if (containingDocument.isHandleDifferences()) {
             // Happening during a client request where we need to handle diffs
-            final XFormsControls controls =  containingDocument.getXFormsControls();
+            final XFormsControls controls =  containingDocument.getControls();
             if (controls.getInitialControlTree() != controls.getCurrentControlTree()) {
                 if (currentLocal != initialLocal)
                     throw new OXFException("currentLocal != initialLocal");

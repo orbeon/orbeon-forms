@@ -263,9 +263,9 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     /**
-     * Return the XForms controls.
+     * Return the controls.
      */
-    public XFormsControls getXFormsControls() {
+    public XFormsControls getControls() {
         return xformsControls;
     }
 

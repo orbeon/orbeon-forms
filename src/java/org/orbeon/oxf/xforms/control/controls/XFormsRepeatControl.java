@@ -255,7 +255,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         // NOTE: The following assumes the nodesets have changed
 
-        final XFormsControls controls = containingDocument.getXFormsControls();
+        final XFormsControls controls = containingDocument.getControls();
         controls.cloneInitialStateIfNeeded();
 
         final boolean isInsert = insertedNodeInfos != null;

@@ -381,7 +381,7 @@ public class XFormsUtils {
             return null;
 
         // Child element becomes the new binding
-        final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
+        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
         contextStack.pushBinding(pipelineContext, childElement);
         final String result = getElementValue(pipelineContext, containingDocument, contextStack, childElement, acceptHTML, containsHTML);
         contextStack.popBinding();

@@ -111,7 +111,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
             localForUpdate.visible = false;
-            containingDocument.getXFormsControls().markDirtySinceLastRequest(false);
+            containingDocument.getControls().markDirtySinceLastRequest(false);
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getEventName())) {
             // Open the dialog
 
@@ -122,7 +122,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             localForUpdate.neighborControlId = dialogOpenEvent.getNeighbor();
             localForUpdate.constrainToViewport = dialogOpenEvent.isConstrainToViewport();
 
-            containingDocument.getXFormsControls().markDirtySinceLastRequest(false);
+            containingDocument.getControls().markDirtySinceLastRequest(false);
         }
         super.performDefaultAction(pipelineContext, event);
     }

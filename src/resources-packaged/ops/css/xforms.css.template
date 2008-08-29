@@ -294,8 +294,3 @@ a.xforms-readonly { color: gray; cursor: default }
 
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
 a.ygtvlabel { cursor: pointer; }
-
-/* Legacy styles used by xforms-to-xhtml.xsl */
-.xforms-legacy-error-table { border: 0; margin: 0; padding: 0; }
-.xforms-legacy-error-table td { border: 0; margin: 0; padding: 0; }
-.xforms-legacy-help-table { margin: 0 }

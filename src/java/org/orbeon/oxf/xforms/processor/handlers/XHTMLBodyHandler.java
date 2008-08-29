@@ -14,19 +14,18 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
+import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.List;
 
 /**
  * Handle xhtml:body.
@@ -85,7 +84,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         contentHandler.startElement(uri, localname, qName, attributes);
         helper = new ContentHandlerHelper(contentHandler);
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
 
         // Get formatting prefix and declare it if needed
@@ -199,10 +198,57 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                     "type", "hidden", "name", "$noscript", "value", "true"
             });
 
-            // Add help section
-//            final List help
+//            // Add help section
+//            final boolean started[] = new boolean[1];
+//            containingDocument.getControls().visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+//                public void startVisitControl(XFormsControl control) {
+//                    if (control instanceof XFormsSingleNodeControl) {
+//                        final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+//                        final String help = singleNodeControl.getHelp(pipelineContext);
+//                        if (singleNodeControl.isRelevant() && help != null) {
 //
-//            xxx
+//                            startDivIfNeeded();
+//
+//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
+//                                    new String[] { "id", control.getEffectiveId() + "-help", "class", "xforms-help-group" });
+//
+//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
+//                                    new String[] { "class", "xforms-label" });
+//                            helper.text(singleNodeControl.getLabel(pipelineContext));
+//                            helper.endElement();
+//
+//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
+//                                    new String[] { "class", "xforms-help" });
+//                            helper.text(singleNodeControl.getHelp(pipelineContext));
+//                            helper.endElement();
+//
+//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "a",
+//                                    new String[] { "href", "#" + singleNodeControl.getEffectiveId() });
+//                            helper.text("Back");// TODO: i18n
+//                            helper.endElement();
+//
+//                            helper.endElement();
+//
+//    //    <span id="my-control-id-help" class="xforms-help-group">
+//    //        <span class="xforms-label">First Name</span>
+//    //        <span class="xforms-help">This is my help text. It is quite cool stuff, right?</span>
+//    //        <a href="#my-control-id">Back</a>
+//    //    </span>
+//                        }
+//                    }
+//                }
+//
+//                private final void startDivIfNeeded() {
+//                    if (!started[0]) {
+//                        helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "div",
+//                                        new String[] { "class", "xforms-help-panel" });
+//                        started[0] = true;
+//                    }
+//                }
+//            });
+//            if (started[0]) {
+//                helper.endElement();
+//            }
         }
     }
 

@@ -889,7 +889,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // TODO: rebuild computational dependency data structures
 
         // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-        containingDocument.getXFormsControls().markDirtySinceLastRequest(true);
+        containingDocument.getControls().markDirtySinceLastRequest(true);
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
@@ -993,7 +993,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // specify an ordering for the events."
 
         // This just handles the legacy XForms engine which doesn't use the controls
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
         if (xformsControls == null || xformsControls.getCurrentControlTree() == null)
             return;
 
@@ -1346,7 +1346,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         setInstance(newInstance, true);
 
         // The controls will be dirty
-        containingDocument.getXFormsControls().markDirtySinceLastRequest(true);
+        containingDocument.getControls().markDirtySinceLastRequest(true);
 
         // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
         setAllDeferredFlags(true);
@@ -1354,7 +1354,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Mark new instance nodes to which controls are bound for event dispatching
         if (!newInstance.isReadOnly()) {// replacing a read-only instance does not cause value change events at the moment
 
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            final XFormsControls xformsControls = containingDocument.getControls();
 
             // Rebuild controls if needed
             // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling

@@ -52,7 +52,7 @@ abstract public class XFormsFunction extends SystemFunction {
         } else if (functionContext instanceof XFormsModel) {
             // Deprecated
             final XFormsModel xformsModel = (XFormsModel) functionContext;
-            return xformsModel.getContainingDocument().getXFormsControls();
+            return xformsModel.getContainingDocument().getControls();
         } else if (functionContext instanceof Context) {
             // The "right" way to do it
             return ((Context) functionContext).getControls();
@@ -115,7 +115,7 @@ abstract public class XFormsFunction extends SystemFunction {
         }
 
         public XFormsControls getControls() {
-            return getContainingDocument().getXFormsControls();
+            return getContainingDocument().getControls();
         }
 
         public XFormsModel getContainingModel() {

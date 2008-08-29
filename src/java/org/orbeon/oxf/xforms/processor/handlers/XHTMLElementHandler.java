@@ -37,7 +37,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
         if (id != null) {
             final String effectiveId = handlerContext.getEffectiveId(attributes);
 
-            final ControlTree controlState = containingDocument.getXFormsControls().getCurrentControlTree();
+            final ControlTree controlState = containingDocument.getControls().getCurrentControlTree();
             final boolean hasAVT = controlState.hasAttributeControl(effectiveId);
             if (hasAVT) {
                 // This XHTML element has at least one AVT so process its attributes

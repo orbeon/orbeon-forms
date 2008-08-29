@@ -101,27 +101,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
             {
-                // Create xhtml:span for date display
-                // NOTE: With the new date / time / dateTime handling, we don't display the formatted date separately for now
-//                if (!isStaticReadonly(inputControl)) {
-//                    final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
-//                    if (isReadOnly)
-//                        spanClasses.append(" xforms-readonly");
-//                    reusableAttributes.clear();
-//                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
-//                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-//                    if (isConcreteControl && isDate) {
-//                        final String displayValueOrValue = inputControl.getDisplayValueOrExternalValue(pipelineContext);
-//                        if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
-//                            contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
-//                        } else {
-//                            // Add an nbsp to facilitate styling
-//                            contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
-//                        }
-//                    }
-//                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-//                }
-
                 // Create xhtml:input
                 {
                     if (!isStaticReadonly(inputControl)) {
@@ -217,28 +196,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         }
                     }
                 }
-
-                // Create xhtml:span for date picker
-                // NOTE: With the new date / time / dateTime handling, we don't display the icon
-//                if (!isStaticReadonly(inputControl)) {
-//                    // TODO: don't do this if type is not date or date-time: switch should be done in xforms.js
-//                    final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
-//                    if (isReadOnly)
-//                        spanClasses.append(" xforms-showcalendar-readonly");
-//
-//                    reusableAttributes.clear();
-//                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
-//                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
-//
-//                    // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
-//                    // background images way too often.
-//                    reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
-//                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// empty alt for validator
-//
-//                    final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-//                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
-//                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-//                }
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }

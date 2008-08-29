@@ -183,6 +183,19 @@
                                     </xsl:call-template>
                                 </xsl:if>
                             </xhtml:div>
+                            <!-- Noscript help section -->
+                            <xsl:if test="$is-noscript">
+                                <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                <xhtml:div class="xforms-help-panel">
+                                    <xhtml:h2>
+                                        <xforms:output value="$fr-resources/summary/titles/help"/>
+                                    </xhtml:h2>
+                                    <xhtml:ul>
+                                        <xsl:apply-templates select="fr:body/*" mode="noscript-help"/>
+                                    </xhtml:ul>
+                                </xhtml:div>
+                            </xsl:if>
+                            <!-- Buttons and status section -->
                             <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                             <xhtml:div class="yui-g fr-buttons-block">
                                 <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
@@ -371,6 +384,34 @@
             <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
         </xhtml:span>
 
+    </xsl:template>
+
+    <!-- Noscript help entry -->
+    <xsl:template match="xforms:*[@id]" mode="noscript-help">
+        <xhtml:li class="xforms-help-group">
+            <xhtml:a name="{@id}-help"/>
+            <xforms:output id="{@id}-help" value="':'" xxforms:order="label control help">
+                <xsl:apply-templates select="xforms:label | xforms:help"/>
+            </xforms:output>
+            <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+        </xhtml:li>
+    </xsl:template>
+
+    <xsl:template match="fr:section[@id]" mode="noscript-help">
+        <xhtml:li class="xforms-help-group">
+            <xhtml:a name="{@id}-help"/>
+            <xforms:output value="':'" xxforms:order="label control help">
+                <xsl:apply-templates select="xforms:label | xforms:help"/>
+            </xforms:output>
+            <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+            <xhtml:ul>
+                <xsl:apply-templates mode="#current"/>
+            </xhtml:ul>
+        </xhtml:li>
+    </xsl:template>
+
+    <xsl:template match="node()" mode="noscript-help">
+        <xsl:apply-templates mode="#current"/>
     </xsl:template>
 
     <!-- Error summary UI -->

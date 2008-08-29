@@ -125,7 +125,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // The context() function (XForms 1.1)
         register("context", Context.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // OPS XXForms functions
+        // Orbeon XXForms functions
+
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}case", XXFormsCase.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:get-request-header()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-header", XXFormsGetRequestHeader.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);

@@ -47,7 +47,7 @@ public class XFormsActionInterpreter {
                                    XFormsEventHandlerContainer eventHandlerContainer, Element actionElement, String containerId) {
         this.containingDocument = containingDocument;
 
-        this.xformsControls = containingDocument.getXFormsControls();
+        this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(containingDocument);
 
         // Set context on top-level action

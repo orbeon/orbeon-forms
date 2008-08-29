@@ -96,7 +96,15 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Upload control information */
-.xforms-upload-info { display: block; width: 100%; padding: 2px }
+.xforms-upload-info {
+    display: block;
+    width: 100%;
+    padding: 2px 2px 2px 18px;
+    background-image:url(images/silk/attach.png);
+    background-position:left center;
+    background-repeat:no-repeat;
+}
+
 .xforms-upload-mediatype, .xforms-upload-size { padding-left: 1em }
 .xforms-upload-remove { vertical-align: top }
 
@@ -105,6 +113,19 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-repeat-selected-item-2 { background-color: transparent }
 .xforms-repeat-selected-item-3 { background-color: transparent }
 .xforms-repeat-selected-item-4 { background-color: transparent }
+
+/* Noscript help section */
+
+.xforms-noscript .xforms-help-panel { display: block; width: auto; padding: 0 1em }
+/*.xforms-noscript .xforms-help-panel dt { list-style-type: square }*/
+/*.xforms-noscript .xforms-help-panel dd { display: inline  }*/
+/*.xforms-noscript .xforms-help-panel dl { margin-top: 0; margin-bottom: 0 }*/
+.xforms-noscript .xforms-help-panel .xforms-help-group { margin: 0 0 .5em }
+.xforms-noscript .xforms-help-panel .xforms-label { display: inline }
+.xforms-noscript .xforms-help-panel .xforms-help { display: inline }
+.xforms-noscript .xforms-help-panel .xforms-help-anchor { display: none }
+.xforms-noscript .xforms-help-panel .xforms-help-image { display: none }
+.xforms-noscript .xforms-help-panel a { margin-left: .5em }
 
 /* ************************************************* General Layout ************************************************* */
 

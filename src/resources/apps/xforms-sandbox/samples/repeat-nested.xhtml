@@ -93,6 +93,14 @@
             <xforms:label>Add company</xforms:label>
             <xforms:insert ev:event="DOMActivate" nodeset="/companies/company" at="last()+1" position="after"/>
         </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Add department</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="/companies/company/department" at="last()+1" position="after"/>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Add employee</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="/companies/company/department/employee" at="last()+1" position="after"/>
+        </xforms:trigger>
 
     </xhtml:body>
 </xhtml:html>

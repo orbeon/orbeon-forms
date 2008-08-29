@@ -61,15 +61,10 @@ public class SchedulerProcessor extends ProcessorImpl {
                         config.setProcessorDefinition(processorDefinition);
 
                         {
-                            Element processorNameElement = startTaskElement.element(new QName("processor-name"));
-                            if (processorNameElement != null) {
-                                // Use processor QName
-                                QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement);
-                                processorDefinition.setName(processorQName);
-                            } else {
-                                // Deprecated use of processor URI
-                                processorDefinition.setUri(XPathUtils.selectStringValueNormalize(startTaskElement, "processor-uri"));
-                            }
+                            // Use processor QName
+                            final Element processorNameElement = startTaskElement.element(new QName("processor-name"));
+                            final QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement);
+                            processorDefinition.setName(processorQName);
 
                             for (final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
                                 Element inputElement = (Element) j.next();

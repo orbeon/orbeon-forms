@@ -207,8 +207,6 @@ public class ProcessorUtils {
         try {
             // Create attributes for root element: xsi:type, and optional content-type
             final AttributesImpl attributes = new AttributesImpl();
-            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
@@ -217,9 +215,13 @@ public class ProcessorUtils {
 
             // Write document
             output.startDocument();
+            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
             output.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
             XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
             output.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            output.endPrefixMapping(XMLConstants.XSD_PREFIX);
+            output.endPrefixMapping(XMLConstants.XSI_PREFIX);
             output.endDocument();
 
         } catch (Exception e) {
@@ -238,8 +240,6 @@ public class ProcessorUtils {
         try {
             // Create attributes for root element: xsi:type, and optional content-type
             AttributesImpl attributes = new AttributesImpl();
-            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
@@ -248,9 +248,13 @@ public class ProcessorUtils {
 
             // Write document
             output.startDocument();
+            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
             output.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
             XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
             output.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            output.endPrefixMapping(XMLConstants.XSD_PREFIX);
+            output.endPrefixMapping(XMLConstants.XSI_PREFIX);
             output.endDocument();
 
         } catch (SAXException e) {

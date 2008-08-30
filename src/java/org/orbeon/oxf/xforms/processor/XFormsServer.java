@@ -748,7 +748,7 @@ public class XFormsServer extends ProcessorImpl {
                 final Integer newIndex = (Integer) currentEntry.getValue();
 
                 // Output information if there is a difference
-                final Integer oldIndex = (Integer) initialRepeatIdToIndex.get(repeatId);
+                final Integer oldIndex = (Integer) initialRepeatIdToIndex.get(repeatId);// may be null if there was no iteration
                 if (!newIndex.equals(oldIndex)) {
 
                     if (!found) {
@@ -757,7 +757,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", repeatId, "old-index", oldIndex.toString(), "new-index", newIndex.toString()});
+                            new String[] {"id", repeatId, "old-index", (oldIndex != null) ? oldIndex.toString() : "0", "new-index", newIndex.toString()});
                 }
             }
             if (found)

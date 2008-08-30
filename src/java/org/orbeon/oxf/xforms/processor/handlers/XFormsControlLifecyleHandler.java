@@ -70,6 +70,20 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             // Use local or default config
             final String[] config = (localOrder != null) ? StringUtils.split(localOrder) : handlerContext.getDocumentOrder();
 
+            // Output named anchor if the control has a help. This is so that a separate help section can link back to
+            // the control.
+            if (isNoscript) {
+                if (xformsControl != null && XFormsControl.hasHelp(containingDocument, xformsControl, staticId)) {
+                    final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+                }
+            }
+
             final boolean isTemplate = handlerContext.isTemplate();
 
             // Process everything up to and including the control
@@ -78,21 +92,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
                 if ("control".equals(current)) {
                     // Handle control
-
-                    if (isNoscript) {
-                        // Output named anchor if the control has a help. This is so that a separate help section can
-                        // link back to the control.
-                        if (xformsControl != null && XFormsControl.hasHelp(containingDocument, xformsControl, staticId)) {
-                            final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                            final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-                            reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
-                        }
-                    }
-
                     handleControlStart(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
                     // Do the rest in end() below if needed
                     if (i < config.length - 1) {

@@ -47,19 +47,19 @@
                     <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic">
                         <xforms:case id="case-button-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                             <!-- "+" trigger -->
-                            <xforms:trigger appearance="minimal" id="button-{$section-id}-open">
+                            <xforms:trigger appearance="minimal" id="button-{$section-id}-open" class="fr-section-open-close">
                                 <xforms:label>
                                     <!-- TODO: i18n of title -->
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/plus.png" alt="" title="Open section" class="fr-open-close"/>
+                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="Open section"/>
                                 </xforms:label>
                             </xforms:trigger>
                         </xforms:case>
                         <xforms:case id="case-button-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
                             <!-- "-" trigger -->
-                            <xforms:trigger appearance="minimal" id="button-{$section-id}-close">
+                            <xforms:trigger appearance="minimal" id="button-{$section-id}-close" class="fr-section-open-close">
                                 <xforms:label>
                                     <!-- TODO: i18n of title -->
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/minus.png" alt="" title="Close section" class="fr-open-close"/>
+                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="Close section"/>
                                 </xforms:label>
                             </xforms:trigger>
                         </xforms:case>

@@ -271,7 +271,8 @@ button.xforms-trigger img { margin-right: 10px }
 /* Sections */
 .fr-section-container { display: block; clear: both }
 .fr-section-container p { margin-top: 1em }
-.fr-section-container img.fr-open-close { margin-right: .5em }
+.fr-section-container .fr-section-open-close img { margin-right: 0 }
+.fr-section-container .fr-section-open-close { margin-right: .5em }
 /* For collapsible sections so that YUI animations work */
 .fr-section-container div.fr-collapsible {
     overflow: hidden;
@@ -398,7 +399,7 @@ button.xforms-trigger img { margin-right: 10px }
 @media print {
     .fr-bottom { display: none }
     .fr-top { display: none }
-    .fr-section-container img.fr-open-close { display: none }
+    .fr-section-container .fr-section-open-close { display: none }
     .fr-status-icons { display: none }
     noscript { display: none }
 }

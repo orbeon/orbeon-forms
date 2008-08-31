@@ -49,6 +49,8 @@
                             <instance-b>nested value b</instance-b>
                         </xforms:instance>
                     </xforms:model>
+                    <!-- Variable test -->
+                    <xxforms:variable name="foobar" xbl:attr="xbl:text=foobar"/>
                     <!-- Controls -->
                     <xhtml:div class="test-class">
                         <xforms:input ref="."/>
@@ -60,14 +62,18 @@
                             <xforms:group xbl:attr="context=myref">
                                 <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
                                 <xforms:input ref="date">
-                                    <xforms:label>Value 2</xforms:label>
+                                    <xforms:label>Value 2:</xforms:label>
                                 </xforms:input>
                                 <xhtml:br/>
                                 <xforms:input ref="time">
-                                    <xforms:label>Value 3</xforms:label>
+                                    <xforms:label>Value 3:</xforms:label>
                                 </xforms:input>
                             </xforms:group>
                         </xforms:group>
+                        <xhtml:br/>
+                        <xforms:output value="string-join(tokenize($foobar, '\s'), ' - ')">
+                            <xforms:label>Languages:</xforms:label>
+                        </xforms:output>
                     </xhtml:div>
                 </xbl:template>
             </xbl:binding>
@@ -80,7 +86,7 @@
         </xforms:input>
 
         <!-- Instanciate components -->
-        <foo:test id="my-test-1" myref="value1"/>
+        <foo:test id="my-test-1" myref="value1" foobar="en fr"/>
         <foo:test id="my-test-2" myref="value2"/>
 
         <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>

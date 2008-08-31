@@ -15,7 +15,7 @@ import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.SequenceExtent;
-import org.orbeon.saxon.style.XSLVariable;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.List;
 
@@ -41,26 +41,32 @@ public class Variable {
 
         this.variableName = element.attributeValue("name");
         if (variableName == null)
-            throw new ValidationException("xforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
+            throw new ValidationException("xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
 
         this.selectAttribute = element.attributeValue("select");
-        if (selectAttribute == null)
-            throw new ValidationException("xforms:variable or exforms:variable element must have a \"select\" attribute", getLocationData());
+//        if (selectAttribute == null)
+//            throw new ValidationException("xxforms:variable or exforms:variable element must have a \"select\" attribute", getLocationData());
     }
 
     private void evaluate(PipelineContext pipelineContext, boolean useCache) {
 
-        final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
-
-        final List currentNodeset = bindingContext.getNodeset();
-        if (currentNodeset != null && currentNodeset.size() > 0) {
-            variableValue = XPathCache.evaluateAsExtent(pipelineContext,
-                    currentNodeset, bindingContext.getPosition(),
-                    selectAttribute, containingDocument.getNamespaceMappings(element), bindingContext.getInScopeVariables(useCache),
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
-
+        if (selectAttribute == null) {
+            // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
+            variableValue = new StringValue(element.getStringValue());
         } else {
-            variableValue = EmptySequence.getInstance();
+            // There is a select attribute
+            final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
+            final List currentNodeset = bindingContext.getNodeset();
+            if (currentNodeset != null && currentNodeset.size() > 0) {
+                // TODO: in the future, we should allow null context for expressions that do not depend on the context
+                variableValue = XPathCache.evaluateAsExtent(pipelineContext,
+                        currentNodeset, bindingContext.getPosition(),
+                        selectAttribute, containingDocument.getNamespaceMappings(element), bindingContext.getInScopeVariables(useCache),
+                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
+
+            } else {
+                variableValue = EmptySequence.getInstance();
+            }
         }
     }
 

@@ -1267,7 +1267,7 @@ public class XFormsStaticState {
 
             // Here we create a completely separate document
             // Copy as the template element may be used many times
-            final Document shadowTreeDocument = Dom4jUtils.createDocumentCopyElement(templateElement);
+            final Document shadowTreeDocument = Dom4jUtils.createDocumentCopyParentNamespaces(templateElement);
 
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
                 public void startElement(Element element) {
@@ -1297,11 +1297,14 @@ public class XFormsStaticState {
 
                             } else {
                                 // a=b pair
+                                final QName leftSideQName; {
                                 final String leftSide = currentValue.substring(0, equalIndex);
-                                final String rightSide = currentValue.substring(equalIndex + 1);
-
-                                final QName leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
-                                final QName rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
+                                    leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
+                                }
+                                final QName rightSideQName; {
+                                    final String rightSide = currentValue.substring(equalIndex + 1);
+                                    rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
+                                }
 
                                 final boolean isLeftSideXBLText = leftSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
                                 final boolean isRightSideXBLText = rightSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
@@ -1318,20 +1321,22 @@ public class XFormsStaticState {
                                     rightSideValue = boundElement.getText();// must use getText() and not stringValue()
                                 }
 
-                                if (!isLeftSideXBLText) {
-                                     // Set attribute value
-                                    element.addAttribute(leftSideQName, rightSideValue);
-                                } else {
-                                    // Set text value
+                                if (rightSideValue != null) {// not sure if XBL says what should happen if the source attribute is not found 
+                                    if (!isLeftSideXBLText) {
+                                         // Set attribute value
+                                        element.addAttribute(leftSideQName, rightSideValue);
+                                    } else {
+                                        // Set text value
 
-                                    // "value of the attribute on the right-hand side are to be represented as text
-                                    // nodes underneath the shadow element"
-                                    
-                                    // TODO: "If the element has any child nodes in the DOM (any nodes, including
-                                    // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
-                                    // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
+                                        // "value of the attribute on the right-hand side are to be represented as text
+                                        // nodes underneath the shadow element"
 
-                                    element.setText(rightSide);
+                                        // TODO: "If the element has any child nodes in the DOM (any nodes, including
+                                        // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
+                                        // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
+
+                                        element.setText(rightSideValue);
+                                    }
                                 }
                             }
                             // TODO: handle xbl:lang?

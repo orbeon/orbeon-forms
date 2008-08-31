@@ -1583,9 +1583,10 @@
                     </tr>
                     <tr>
                         <th><code>select</code></th>
-                        <td>Mandatory</td>
+                        <td>Optional</td>
                         <td>
-                            XPath 2.0 expression determining the value of the variable.
+                            XPath 2.0 expression determining the value of the variable. If the attribute is omitted, the
+                            text content of the <code>&lt;exforms:variable></code> is used as the value.
                         </td>
                     </tr>
                 </table>

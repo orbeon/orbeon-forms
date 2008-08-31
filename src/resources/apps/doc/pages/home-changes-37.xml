@@ -1499,6 +1499,22 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 </xml-source>
             </section>
             <section>
+                <title>The <code>index()</code> Function</title>
+                <p>
+                    Due to the way repeat processing was implemented in Orbeon Forms 3.6 and earlier, the
+                    <code>index()</code> function could be reliably used in more places than in the current version.
+                </p>
+                <p>
+                    XForms 1.1 does not explicitly limit in what type of XPath expressions <code>index()</code>
+                    can be used. However, in Orbeon Forms, it is strongly advised at the moment to only use
+                    <code>index()</code> within actions, and to avoid using it in control bindings and binds, as
+                    doing so may yield unpredictable results.
+                </p>
+                <p>
+                    We hope to remove this limitation in the future.
+                </p>
+            </section>
+            <section>
                 <title>Image Triggers</title>
                 <p>
                     Orbeon Forms 3.6 and earlier allowed using images within <code>xforms:trigger</code> and

@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -46,6 +47,9 @@ public class HandlerContext {
     private boolean processedUserAgent;
     private boolean isRenderingEngineTrident;
     private boolean isRenderingEngineIE6OrEarlier;
+
+    private static final int INDEX_INCREMENT = 100;
+    private int currentTabIndex = 0;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
                           XFormsContainingDocument containingDocument, XFormsState encodedClientState, ExternalContext externalContext) {
@@ -75,6 +79,14 @@ public class HandlerContext {
 
     public ExternalContext getExternalContext() {
         return externalContext;
+    }
+
+    public int nextTabIndex() {
+        // NIY
+        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
+
+        currentTabIndex += INDEX_INCREMENT;
+        return currentTabIndex;
     }
 
     public String[] getDocumentOrder() {

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.pool.PoolableObjectFactory;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -25,7 +25,6 @@ import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
@@ -1433,6 +1432,30 @@ public class XFormsUtils {
         } else {
             // E.g. foobar.3-7 -> foobar.3-7-2
             return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
+        }
+    }
+
+    /**
+     * Return the parts of an effective id suffix, e.g. for $foo$bar.3-1-5 return new Integer[] { 3, 1, 5 }
+     *
+     * @param effectiveId   effective id to check
+     * @return              array of parts, empty array if no parts, null if effectiveId was null
+     */
+    public static Integer[] getEffectiveIdSuffixParts(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            final String[] stringResult = StringUtils.split(effectiveId.substring(suffixIndex + 1), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+            final Integer[] result = new Integer[stringResult.length];
+            for (int i = 0; i < stringResult.length; i++) {
+                final String currentString = stringResult[i];
+                result[i] = new Integer(currentString);
+            }
+            return result;
+        } else {
+            return new Integer[0];
         }
     }
 }

@@ -153,9 +153,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
         // Handle "tabindex"
         {
-            String value = srcAttributes.getValue("navindex");// This is the standard XForms attribute
-            if (value == null)
-                value = srcAttributes.getValue("tabindex");// This is the XHTML attribute
+            // This is the standard XForms attribute
+            String value = srcAttributes.getValue("navindex");
+            if (value == null) {
+                // Try the the XHTML attribute
+                value = srcAttributes.getValue("tabindex");
+            }
+//            if (value == null) {
+//                // Use automatically generated index
+//                value = Integer.toString(handlerContext.nextTabIndex());
+//            }
+
             if (value != null)
                 destAttributes.addAttribute("", "tabindex", "tabindex", ContentHandlerHelper.CDATA, value);
         }

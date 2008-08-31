@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -26,7 +27,6 @@ import org.orbeon.saxon.value.StringValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Base class for UI events.
@@ -112,15 +112,13 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             }
 
             final String effectiveTargetId = targetXFormsControl.getEffectiveId();
-            final int index = (effectiveTargetId == null) ? - 1 : effectiveTargetId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+            final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
 
-            if (index != -1) {
-                final String repeatIndexesString = effectiveTargetId.substring(index + 1);
-                final StringTokenizer st = new StringTokenizer(repeatIndexesString, "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
-                final List tokens = new ArrayList();
-                while (st.hasMoreTokens()) {
-                    final String currentToken = st.nextToken();
-                    tokens.add(new StringValue(currentToken));
+            if (parts.length > 0) {
+                final List tokens = new ArrayList(parts.length);
+                for (int i = 0; i < parts.length; i++) {
+                    final Integer currentIndex = parts[i];
+                    tokens.add(new StringValue(currentIndex.toString()));
                 }
                 return new ListIterator(tokens);
             } else {

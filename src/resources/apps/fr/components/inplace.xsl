@@ -26,7 +26,7 @@
         xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:template match="xforms:input[@appearance = 'fr:in-place']">
-        <xsl:if test="not(@id != '')">
+        <xsl:if test="normalize-space(@id) = ''">
             <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
         </xsl:if>
         <xforms:switch id="{@id}">
@@ -125,6 +125,7 @@
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger class="fr-inplace-rename">
+                                <!-- TODO: i18n -->
                                 <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:trigger>

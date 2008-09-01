@@ -70,10 +70,12 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             // Use local or default config
             final String[] config = (localOrder != null) ? StringUtils.split(localOrder) : handlerContext.getDocumentOrder();
 
-            // Output named anchor if the control has a help. This is so that a separate help section can link back to
-            // the control.
+            // Output named anchor if the control has a help or alert. This is so that a separate help and error
+            // sections can link back to the control.
             if (isNoscript) {
-                if (xformsControl != null && XFormsControl.hasHelp(containingDocument, xformsControl, staticId)) {
+                if (xformsControl != null
+                        && (XFormsControl.hasHelp(containingDocument, xformsControl, staticId)
+                            || XFormsControl.hasAlert(containingDocument, xformsControl, staticId))) {
                     final ContentHandler contentHandler = handlerContext.getController().getOutput();
                     final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");

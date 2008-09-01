@@ -386,24 +386,33 @@
 
     </xsl:template>
 
-    <!-- Noscript help entry -->
-    <xsl:template match="xforms:*[@id]" mode="noscript-help">
-        <xhtml:li class="xforms-help-group">
-            <xhtml:a name="{@id}-help"/>
-            <xforms:output id="{@id}-help" value="':'" xxforms:order="label control help">
-                <xsl:apply-templates select="xforms:label | xforms:help"/>
-            </xforms:output>
-            <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
-        </xhtml:li>
+    <!-- Noscript control help entry -->
+    <xsl:template match="xforms:*[@id and xforms:help]" mode="noscript-help">
+        <xforms:group ref=".[normalize-space({xforms:help/@ref})]"><!-- handling xforms:help/@ref this way will work only if it is not dependent on the control's context (case of Form Builder) -->
+            <xhtml:li class="xforms-help-group">
+                <!-- So the control's help icon can link to here -->
+                <xhtml:a name="{@id}-help"/>
+                <!-- Label and help text -->
+                <xforms:output id="{@id}-help" value="':'" xxforms:order="label control help">
+                    <xsl:apply-templates select="xforms:label | xforms:help"/>
+                </xforms:output>
+                <!-- Link back to the control -->
+                <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+            </xhtml:li>
+        </xforms:group>
     </xsl:template>
 
+    <!-- Noscript section help entry -->
     <xsl:template match="fr:section[@id]" mode="noscript-help">
         <xhtml:li class="xforms-help-group">
-            <xhtml:a name="{@id}-help"/>
-            <xforms:output value="':'" xxforms:order="label control help">
-                <xsl:apply-templates select="xforms:label | xforms:help"/>
-            </xforms:output>
-            <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+            <xforms:group ref=".[normalize-space({xforms:help/@ref})]"><!-- handling xforms:help/@ref this way will work only if it is not dependent on the control's context (case of Form Builder) -->
+                <xhtml:a name="{@id}-help"/>
+                <xforms:output value="':'" xxforms:order="label control help">
+                    <xsl:apply-templates select="xforms:label | xforms:help"/>
+                </xforms:output>
+                <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+            </xforms:group>
+            <!-- Recurse into nested controls -->
             <xhtml:ul>
                 <xsl:apply-templates mode="#current"/>
             </xhtml:ul>
@@ -426,12 +435,23 @@
                 <xhtml:ol class="fr-error-list">
                     <xforms:repeat nodeset="error">
                         <xhtml:li>
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label>
-                                    <xforms:output value="@label" class="fr-error-label"/>
-                                </xforms:label>
-                                <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
-                            </xforms:trigger>
+                            <xsl:choose>
+                                <xsl:when test="$is-noscript">
+                                    <!-- In noscript mode, use a plain link -->
+                                    <xhtml:a href="#{{@id}}">
+                                        <xforms:output value="@label" class="fr-error-label"/>
+                                    </xhtml:a>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xforms:output value="@label" class="fr-error-label"/>
+                                        </xforms:label>
+                                        <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
+                                    </xforms:trigger>
+                                </xsl:otherwise>
+                            </xsl:choose>
+
                             <!--<xhtml:a href="#{{@id}}">-->
                                 <!--<xforms:output value="@label" class="fr-error-label"/>-->
                             <!--</xhtml:a>-->

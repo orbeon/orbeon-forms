@@ -26,6 +26,10 @@
         xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:template match="xhtml:body//fr:section">
+        <xsl:if test="normalize-space(@id) = ''">
+            <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
+        </xsl:if>
+
         <xsl:variable name="open" as="xs:boolean" select="if (doc('input:instance')/*/mode = 'print') then true() else if (@open = 'false') then false() else true()"/>
         <xsl:variable name="section-id" as="xs:string" select="@id"/>
 
@@ -49,8 +53,7 @@
                             <!-- "+" trigger -->
                             <xforms:trigger appearance="minimal" id="button-{$section-id}-open" class="fr-section-open-close">
                                 <xforms:label>
-                                    <!-- TODO: i18n of title -->
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="Open section"/>
+                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="{{$fr-resources/components/labels/open-section}}"/>
                                 </xforms:label>
                             </xforms:trigger>
                         </xforms:case>
@@ -58,8 +61,7 @@
                             <!-- "-" trigger -->
                             <xforms:trigger appearance="minimal" id="button-{$section-id}-close" class="fr-section-open-close">
                                 <xforms:label>
-                                    <!-- TODO: i18n of title -->
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="Close section"/>
+                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="{{$fr-resources/components/labels/close-section}}"/>
                                 </xforms:label>
                             </xforms:trigger>
                         </xforms:case>

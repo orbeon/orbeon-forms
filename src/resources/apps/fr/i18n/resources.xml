@@ -14,6 +14,12 @@
 -->
 <resources xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <resource xml:lang="en">
+        <components>
+            <labels>
+                <open-section>Open section</open-section>
+                <close-section>Close section</close-section>
+            </labels>
+        </components>
         <summary>
             <titles>
                 <summary-title>Summary</summary-title>
@@ -115,6 +121,12 @@
         </import-export>
     </resource>
     <resource xml:lang="fr">
+        <components>
+            <labels>
+                <open-section>Ouvrir la section</open-section>
+                <close-section>Fermer la section</close-section>
+            </labels>
+        </components>
         <summary>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -197,6 +209,12 @@
         </detail>
     </resource>
     <resource xml:lang="es">
+        <components>
+            <labels>
+                <open-section>[Open section]</open-section>
+                <close-section>[Close section]</close-section>
+            </labels>
+        </components>
         <summary>
             <titles>
                 <summary-title>Síntesis</summary-title>

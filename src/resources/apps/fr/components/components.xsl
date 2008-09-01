@@ -147,7 +147,7 @@
         <xforms:model id="fr-help-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
-                      xxforms:order="help label control alert hint"
+                      xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}">

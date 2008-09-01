@@ -43,8 +43,18 @@
     display: inline;
     margin: 0 .5em 0 0;
     padding: 0;
-    float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
+    float: left; /* HACK: Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
                     image at the left of the label. */
+}
+
+.xforms-noscript .xforms-help-image {
+    /* NOTE: In noscript mode, help appears last in a control for accessibility reasons */
+    display: block;
+    margin: 0 0 0 .5em;
+}
+
+.xforms-noscript .fr-section-title .xforms-help-image {
+    display: inline;
 }
 
 /* Display alerts under each control */
@@ -69,6 +79,12 @@
     margin-top: .2em;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
+}
+
+.xforms-noscript .xforms-hint {
+    /* NOTE: In noscript mode, help appears last in a control for accessibility reasons */
+    float: left;
+    width: auto;
 }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
@@ -202,6 +218,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-error-list li { margin-bottom: .5em }
 .fr-error-list label { display: none }
 .fr-error-label, .fr-error-row, .fr-error-alert { }
+.fr-error-alert { color: red }
 
 /* Buttons */
 .fr-buttons {
@@ -277,6 +294,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-section-container div.fr-collapsible {
     overflow: hidden;
     margin-left: 22px;
+    padding-bottom: .25em;
 }
 
 .fr-section-title .xforms-help-image {

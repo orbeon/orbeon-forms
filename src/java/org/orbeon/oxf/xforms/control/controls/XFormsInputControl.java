@@ -67,7 +67,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
             } else {
                 // Other types
-            updatedValue = internalValue;
+                updatedValue = internalValue;
             }
         } else {
             // No type
@@ -83,16 +83,47 @@ public class XFormsInputControl extends XFormsValueControl {
 
     private String convertFromExternalValue(PipelineContext pipelineContext, String externalValue) {
         final String typeName = getBuiltinTypeName();
-        if (typeName != null && typeName.equals("boolean")) {
-            // xs:boolean input
+        if (typeName != null) {
+            if (typeName.equals("boolean")) {
+                // Boolean input
 
-            // Decrypt incoming value if needed. With open selection, values are sent to the client.
-            if (XFormsProperties.isEncryptItemValues(containingDocument))
-                externalValue = XFormsItemUtils.decryptValue(pipelineContext, externalValue);
+                // Decrypt incoming value if needed. With open selection, values are sent to the client.
+                if (XFormsProperties.isEncryptItemValues(containingDocument))
+                    externalValue = XFormsItemUtils.decryptValue(pipelineContext, externalValue);
 
-            // Anything but "true" is "false"
-            if (!externalValue.equals("true"))
-                externalValue = "false";
+                // Anything but "true" is "false"
+                if (!externalValue.equals("true"))
+                    externalValue = "false";
+            } else if (XFormsProperties.isNoscript(containingDocument)) {
+                if ( "date".equals(typeName)) {
+                    // Date input
+
+                    // TODO: parse date according to format, see _dateParsePatterns in xforms.js; put in ISODateUtils
+
+                } else if ("time".equals(typeName)) {
+                    // Time input
+
+                    // TODO: parse time according to format, see _timeParsePatterns in xforms.js; put in ISODateUtils
+
+                } else if ("dateTime".equals(typeName)) {
+                    // Date + time input
+
+                    // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
+                    final int separatorIndex = externalValue.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+
+                    final String datePart;
+                    final String timePart;
+                    if (separatorIndex == -1) {
+                        datePart = externalValue;
+                        timePart = "";
+                    } else {
+                        datePart = externalValue.substring(0, separatorIndex);
+                        timePart = externalValue.substring(separatorIndex + 1);
+                    }
+
+                    // TODO: parse date and time according to format, see above
+                }
+            }
         }
 
         return externalValue;
@@ -138,6 +169,16 @@ public class XFormsInputControl extends XFormsValueControl {
         }
 
         return (result != null) ? result : "";
+    }
+
+    /**
+     * Convenience method for handler: return a formatted value for read-only output.
+     *
+     * @param pipelineContext   pipeline context
+     * @return                  formatted value
+     */
+    public String getReadonlyValueUseFormat(PipelineContext pipelineContext) {
+        return getValueUseFormat(pipelineContext, format);
     }
 
     private String format(PipelineContext pipelineContext, String typeName, String formatName) {

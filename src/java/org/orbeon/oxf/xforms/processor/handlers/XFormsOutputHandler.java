@@ -87,7 +87,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
             }
 
             if (isConcreteControl) {
-                final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                final String displayValue = outputControl.getExternalValue(pipelineContext);
                 if (displayValue != null && displayValue.length() > 0)
                     contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
             }
@@ -118,13 +118,13 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                 } else if (isHTMLMediaType) {
                     // HTML case
                     if (isConcreteControl) {
-                        final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                        final String displayValue = outputControl.getExternalValue(pipelineContext);
                         XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
                     }
                 } else {
                     // Regular text case
                     if (isConcreteControl) {
-                        final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                        final String displayValue = outputControl.getExternalValue(pipelineContext);
                         if (displayValue != null && displayValue.length() > 0)
                             contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                     }

@@ -46,7 +46,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         // Evaluate control values
         getValue(pipelineContext);
-//        getDisplayValue(pipelineContext);
         getExternalValue(pipelineContext);
     }
 
@@ -166,22 +165,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         return getExternalValue(pipelineContext);
     }
 
-    /**
-     * Return a formatted display value of the control value, or the external control value if there is no such display
-     * value.
-     */
-    public String getDisplayValueOrExternalValue(PipelineContext pipelineContext) {
-//        return displayValue != null ? displayValue : getExternalValue(pipelineContext);
-        return getExternalValue(pipelineContext);
-    }
-
     protected final void setValue(String value) {
         this.value = value;
     }
-
-//    protected final void setDisplayValue(String displayValue) {
-//        this.displayValue = displayValue;
-//    }
 
     protected final void setExternalValue(String externalValue) {
         this.externalValue = externalValue;
@@ -197,7 +183,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        if (!XFormsUtils.compareStrings(getDisplayValueOrExternalValue(pipelineContext), other.getDisplayValueOrExternalValue(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getExternalValue(pipelineContext), other.getExternalValue(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

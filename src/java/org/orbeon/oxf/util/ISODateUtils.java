@@ -56,7 +56,7 @@ public class ISODateUtils {
 
     public static boolean checkDate(int year, int month, int day) {
         try {
-            GregorianCalendar c = new GregorianCalendar();
+            final GregorianCalendar c = new GregorianCalendar();
             c.clear();
             c.setLenient(false);
             c.set(year, month - 1, day);

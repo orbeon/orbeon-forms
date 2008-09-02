@@ -1325,10 +1325,6 @@ ORBEON.xforms.Controls = {
             } else {
                 ORBEON.util.Dom.setStringValue(control, newOutputControlValue);
             }
-            
-            ORBEON.util.Dom.addClass(control, "xforms-visited");
-            if (ORBEON.util.Dom.hasClass(control, "xforms-invalid")) 
-                ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:
             // so don't try to update it
@@ -4516,6 +4512,14 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // Other control just have a new value (and optional display value)
                                                 ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue);
+                                            }
+                                            // Mark field field as visited when its value changes, unless the new value is given to us when the field becomes relevant
+                                            // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed
+                                            // by handling this on the server-side with custom MIPS.
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") && relevant == null) {
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-visited");
+                                                if (ORBEON.util.Dom.hasClass(documentElement, "xforms-invalid"))
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-invalid-visited");
                                             }
                                         }
 

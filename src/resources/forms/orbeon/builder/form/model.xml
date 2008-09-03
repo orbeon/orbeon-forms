@@ -70,34 +70,44 @@
 
     <!-- Binds on main instance -->
     <xforms:bind nodeset=".">
-        <!-- Form metadata (also used by Form Runner) -->
-        <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
-            <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
-            <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
-            <xforms:bind id="title-bind" nodeset="title[@xml:lang = $fb-lang]" required="true()"/>
-            <xforms:bind id="description-bind" nodeset="description[@xml:lang = $fb-lang]"/>
-            <xforms:bind id="logo-bind" nodeset="logo" type="xs:anyURI"/>
-        </xforms:bind>
-        <!-- Global attachments (also used by Form Runner) -->
-        <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-attachments']/*">
-            <xforms:bind id="css-attachment-bind" nodeset="css" type="xs:anyURI"/>
-            <xforms:bind id="pdf-attachment-bind" nodeset="pdf" type="xs:anyURI"/>
-        </xforms:bind>
-        <!-- Form instance -->
-        <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*">
+        <xforms:bind nodeset="xhtml:head">
+            <xforms:bind nodeset="xforms:model[@id = 'fr-form-model']">
+                <!-- Form metadata (also used by Form Runner) -->
+                <xforms:bind nodeset="xforms:instance[@id = 'fr-form-metadata']/*">
+                    <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
+                    <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
+                    <xforms:bind id="title-bind" nodeset="title[@xml:lang = $fb-lang]" required="true()"/>
+                    <xforms:bind id="description-bind" nodeset="description[@xml:lang = $fb-lang]"/>
+                    <xforms:bind id="logo-bind" nodeset="logo" type="xs:anyURI"/>
+                    <!-- TODO: somehow mark current title as "required" if title in other languages are missing -->
+                </xforms:bind>
+                <!-- Global attachments (also used by Form Runner) -->
+                <xforms:bind nodeset="xforms:instance[@id = 'fr-form-attachments']/*">
+                    <xforms:bind id="css-attachment-bind" nodeset="css" type="xs:anyURI"/>
+                    <xforms:bind id="pdf-attachment-bind" nodeset="pdf" type="xs:anyURI"/>
+                </xforms:bind>
+                <!-- Form instance -->
+                <xforms:bind nodeset="xforms:instance[@id = 'fr-form-instance']/*">
 
-            <!-- Handle date / time types. Note we make them optional with xforms:* so we can save the form -->
-            <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xforms:date"/>
-            <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'time']/@nodeset]" type="xforms:time"/>
-            <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'dateTime']/@nodeset]" type="xforms:dateTime"/>
-            <!-- Handle "boolean" type -->
-            <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
+                    <!-- Handle date / time types. Note we make them optional with xforms:* so we can save the form -->
+                    <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xforms:date"/>
+                    <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'time']/@nodeset]" type="xforms:time"/>
+                    <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'dateTime']/@nodeset]" type="xforms:dateTime"/>
+                    <!-- Handle "boolean" type -->
+                    <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
 
-            <!-- Handle local attachments -->
-            <xforms:bind nodeset="*/*[@filename and @mediatype and @size]" type="xs:anyURI" class="fr-attachment"/>
+                    <!-- Handle local attachments -->
+                    <xforms:bind nodeset="*/*[@filename and @mediatype and @size]" type="xs:anyURI" class="fr-attachment"/>
+                </xforms:bind>
+                <!-- Resources -->
+                <xforms:bind nodeset="xforms:instance[@id = 'fr-form-resources']/*">
+                    <!-- Handle mandatory sections -->
+                    <xforms:bind nodeset="resource/*[name() = $body//fr:section/@id/substring-before(., '-section')]/label" required="true()"/>
+                </xforms:bind>
+            </xforms:bind>
+            <!-- Set HTML title with the first title found -->
+            <xforms:bind nodeset="xhtml:title" calculate="$metadata-instance/title[1]"/>
         </xforms:bind>
-        <!-- Set HTML title -->
-        <xforms:bind nodeset="xhtml:head/xhtml:title" calculate="$metadata-instance/title"/>
     </xforms:bind>
 
     <!-- Metadata -->
@@ -141,6 +151,10 @@
                     <label>Logo</label>
                     <hint>The logo appears at the top of your form</hint>
                 </logo>
+                <section-name>
+                    <hint>click to enter a section name</hint>
+                    <alert>The section name is required</alert>
+                </section-name>
                 <!-- TODO: i18n whole Form Builder -->
             </resource>
             <resource xml:lang="fr">

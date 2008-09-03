@@ -82,7 +82,7 @@
                         <xsl:when test="@editable = 'true'">
                             <xsl:variable name="input" as="element(xforms:input)">
                                 <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}" appearance="fr:in-place">
-                                    <xsl:apply-templates select="xforms:hint"/>
+                                    <xsl:apply-templates select="xforms:hint | xforms:alert"/>
                                     <xsl:apply-templates select="fr:buttons"/>
                                 </xforms:input>
                             </xsl:variable>
@@ -91,7 +91,7 @@
                         <xsl:otherwise>
                             <!-- Set the section id to this trigger: this id matching is needed to noscript help -->
                             <xforms:trigger id="{$section-id}" appearance="minimal">
-                                <xsl:apply-templates select="xforms:label | xforms:help"/>
+                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
                             </xforms:trigger>
                         </xsl:otherwise>
                     </xsl:choose>

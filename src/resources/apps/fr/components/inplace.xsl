@@ -42,7 +42,7 @@
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Keep label as is -->
-                            <xsl:copy-of select="xforms:label"/>
+                            <xsl:apply-templates select="xforms:label"/>
                             <!-- React to user click -->
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
@@ -51,7 +51,7 @@
                         </xforms:output>
                         <!-- Hidden output just to display alert -->
                         <xforms:output class="fr-hidden">
-                            <xsl:copy-of select="@ref | @bind | xforms:alert"/>
+                            <xsl:apply-templates select="@ref | @bind | xforms:alert"/>
                         </xforms:output>
                         <xsl:if test="fr:buttons">
                             <xhtml:span class="fr-inplace-buttons">
@@ -69,7 +69,7 @@
                             <xsl:if test="@tabindex | @navindex">
                                 <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
                             </xsl:if>
-                            <xsl:copy-of select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
+                            <xsl:apply-templates select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:input>
                         <xhtml:span class="fr-inplace-buttons">
@@ -102,7 +102,7 @@
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Keep label as is -->
-                            <xsl:copy-of select="xforms:label"/>
+                            <xsl:apply-templates select="xforms:label"/>
                             <!-- React to user click -->
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
@@ -111,7 +111,7 @@
                         </xforms:output>
                         <!-- Hidden output just to display alert -->
                         <xforms:output class="fr-hidden">
-                            <xsl:copy-of select="@ref | @bind | xforms:alert"/>
+                            <xsl:apply-templates select="@ref | @bind | xforms:alert"/>
                         </xforms:output>
                     </xhtml:span>
                 </xhtml:div>
@@ -120,7 +120,7 @@
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:textarea id="fr-inplace-{@id}-textarea" appearance="xxforms:autosize">
-                            <xsl:copy-of select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
+                            <xsl:apply-templates select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">
@@ -168,7 +168,7 @@
                                                               else $value')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="@bind"/>
+                        <xsl:apply-templates select="@bind"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>

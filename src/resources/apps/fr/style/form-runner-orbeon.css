@@ -184,6 +184,8 @@ p, fieldset, table { margin-bottom: 1em }
 }
 .fr-error-label, .fr-error-row { font-weight: bold }
 
+.fr-error-alert { color: #DF731B }
+
 /* Sections */
 .fr-section-container div.fr-collapsible {
     border-bottom: 1px dotted #666699;

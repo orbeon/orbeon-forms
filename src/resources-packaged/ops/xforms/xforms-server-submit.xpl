@@ -95,13 +95,22 @@
                                     <xsl:choose>
                                         <xsl:when test="contains(name, '$xforms-input-1')">
                                             <!-- Case of xforms:input, which may have two HTML input controls -->
-                                            <xsl:attribute name="source-control-id" select="replace(name, '\$xforms-input-1', '')"/>
-                                            <!-- TODO: handle formatting of $xforms-input-1 for date, time and dateTime => in Java code? how do we know the type? -->
-                                            <!-- TODO: handle $xforms-input-2 for dateTime -->
-                                            <xsl:value-of select="value"/>
+                                            <xsl:variable name="source-control-id" select="replace(name, '\$xforms-input-1', '')"/>
+                                            <xsl:attribute name="source-control-id" select="$source-control-id"/>
+                                            <xsl:variable name="second-input" select="../parameter[name = concat($source-control-id, '$xforms-input-2')]"/>
+                                            <xsl:choose>
+                                                <xsl:when test="$second-input">
+                                                    <!-- This is a bit of a hack: we concatenate the two values with a
+                                                    separator. In the future, use a component for dateTime anyway. -->
+                                                    <xsl:value-of select="concat(value, '·', $second-input/value)"/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="value"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </xsl:when>
                                         <xsl:when test="contains(name, '$xforms-input-2')">
-                                            <!-- NOP, handled with $xforms-input-1 -->
+                                            <!-- NOP: handled with $xforms-input-1 -->
                                         </xsl:when>
                                         <xsl:when test="ends-with(name, '.x')">
                                             <!-- input[@type = 'image'] -->

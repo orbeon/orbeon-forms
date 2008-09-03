@@ -587,7 +587,6 @@
                 <fileset dir="${test-src.dir}">
                     <include name="org/orbeon/oxf/**/*Test*.java"/>
                     <exclude name="org/orbeon/oxf/**/old/*Test*.java"/>
-                    <!--<exclude name="org/orbeon/oxf/test/XFormsPersistentApplicationStateStoreTest.java"/>-->
                 </fileset>
             </batchtest>
 

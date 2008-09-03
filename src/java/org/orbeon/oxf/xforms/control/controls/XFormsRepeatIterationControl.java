@@ -32,8 +32,10 @@ import java.util.Iterator;
  */
 public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerControl implements XFormsPseudoControl {
     private int iterationIndex;
-    public XFormsRepeatIterationControl(XFormsContainer container, XFormsControl parent, int iterationIndex) {
-        super(container, parent, null, "xxforms-repeat-iteration", XFormsUtils.getIterationEffectiveId(parent.getEffectiveId(), iterationIndex));
+    public XFormsRepeatIterationControl(XFormsContainer container, XFormsRepeatControl parent, int iterationIndex) {
+        // NOTE: Associate this control with the repeat element. This is so that even targets get a proper id
+        // NOTE: Effective id of an iteration is parentRepeatId·iteration
+        super(container, parent, parent.getControlElement(), "xxforms-repeat-iteration", XFormsUtils.getIterationEffectiveId(parent.getEffectiveId(), iterationIndex));
         this.iterationIndex = iterationIndex;
     }
 

@@ -1188,7 +1188,12 @@ public class XFormsContainingDocument extends XFormsContainer {
                 XFormsEventHandlerContainer container
                         = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentEventHandlerContainer(this);
                 while (container != null) {
-                    containers.add(container);
+
+                    // Add container except if it is a repeat, as we use repeat iterations instead
+                    if (!(container instanceof XFormsRepeatControl))
+                        containers.add(container);
+
+                    // Find parent
                     container = container.getParentEventHandlerContainer(this);
 
                     // Stop propagation on component boundary
@@ -1431,7 +1436,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         createControlsAndModels(pipelineContext);
 
         // Before dispaching initialization events, remember that first refresh must be performed
-        this.mustPerformInitializationFirstRefresh = true;
+        this.mustPerformInitializationFirstRefresh = XFormsProperties.isDispatchInitialEvents(this);
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
         // order to optimize events

@@ -279,13 +279,14 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 if (currentNewIndex != i) {
                     // Node has moved or is removed
 
-                    if (isDebugEnabled) {
-                        if (currentNewIndex == -1)
-                            containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
+                    final boolean isRemoved = currentNewIndex == -1;
+
+                    if (isRemoved && isDebugEnabled) {
+                        containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
                     }
 
                     // Deindex old iteration
-                    currentControlTree.deindexSubtree((XFormsContainerControl) oldChildren.get(i), true);
+                    currentControlTree.deindexSubtree((XFormsContainerControl) oldChildren.get(i), true, isRemoved);
                 }
             }
 
@@ -326,8 +327,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         // Set new index
                         newIteration.setIterationIndex(repeatIndex);
 
-                        // Index new iteration
-                        currentControlTree.indexSubtree(newIteration, true);
+                        // Index new iteration but do not cause events to be sent
+                        currentControlTree.indexSubtree(newIteration, true, false);
                     }
                 }
 

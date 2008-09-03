@@ -693,7 +693,28 @@
                             <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
                         </xxforms:action>
                     </p:input>
-                    <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
+                    <p:input name="controls">
+                        <controls
+                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                                <xforms:repeat nodeset="/form/departments/department" id="id123">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:insert nodeset="../department" at="2" position="after"/>
+                                    </xforms:action>
+                                    <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                                        <xforms:trigger id="id127">
+                                            <xforms:label>Insert</xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
+                                        <xforms:output ref="@first" id="id125"/>
+                                        <xforms:output ref="@last" id="id126"/>
+                                    </xforms:repeat>
+                                </xforms:repeat>
+                        </controls>
+                    </p:input>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
                         <instances/>
@@ -2206,7 +2227,7 @@
         </output>
     </test>
 
-    <test description="simple use of context()" name="oxf:pipeline">
+    <test description="Simple use of context()" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -2321,7 +2342,7 @@
         </output>
     </test>
 
-    <test description="variable slot allocation bug" name="oxf:pipeline">
+    <test description="Variable slot allocation bug" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -2375,7 +2396,7 @@
         </output>
     </test>
 
-    <test description="custom context functions" name="oxf:pipeline">
+    <test description="Custom context functions" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -2486,6 +2507,101 @@
                         <xxf:control id="repeat-index-2·8">5</xxf:control>
                         <xxf:control id="repeat-context-1·8">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·8">yellow</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="UI events upon repeat update" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xhtml:title>UI events upon insert</xhtml:title>
+                                <xforms:model xxforms:state-handling="client" xxforms:dispatch-initial-events="false">
+
+                                    <!-- Insert new iteration -->
+                                    <xforms:insert ev:event="xforms-ready"
+                                        nodeset="*" at="1" position="after" origin="instance('fruit-template')"/>
+
+                                    <xforms:instance id="fruits">
+                                        <fruits>
+                                            <orange>bloody</orange>
+                                            <apple>green</apple>
+                                        </fruits>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="fruit-template">
+                                        <pear>yellow</pear>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat nodeset="*" id="my-repeat">
+                                    <xforms:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled xforms-required xforms-optional xforms-valid xforms-invalid xforms-readonly xforms-readwrite"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+                                    <xforms:input ref="." id="my-input"/>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fruits" model-id="xforms-element-2">
+                                <fruits>
+                                    <orange>bloody</orange>
+                                    <pear>yellow</pear>
+                                    <apple>green</apple>
+                                </fruits>
+                            </instance>
+                            <instance id="fruit-template" model-id="xforms-element-2">
+                                <pear>yellow</pear>
+                            </instance>
+                            <instance id="events" model-id="xforms-element-2">
+                                <events>
+                                    <!-- Non-value controls at the moment do not dispatch valid/required events -->
+                                    <event type="xforms-enabled" target="my-repeat" indexes="2"/>
+                                    <event type="xforms-readwrite" target="my-repeat" indexes="2"/>
+                                    <event type="xforms-enabled" target="my-input" indexes="2"/>
+                                    <event type="xforms-optional" target="my-input" indexes="2"/>
+                                    <event type="xforms-readwrite" target="my-input" indexes="2"/>
+                                    <event type="xforms-valid" target="my-input" indexes="2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="my-input·1">bloody</xxf:control>
+                        <xxf:control id="my-input·2">yellow</xxf:control>
+                        <xxf:control id="my-input·3">green</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

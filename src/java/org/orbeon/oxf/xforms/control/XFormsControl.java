@@ -148,7 +148,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public String getAlert(PipelineContext pipelineContext) {
         if (!isAlertEvaluated) {
-            if (controlElement != null) {// protection for RepeatIterationControl
+            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 getContextStack().setBinding(this);
                 alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, tempContainsHTML);
                 isHTMLAlert = alert != null && tempContainsHTML[0];
@@ -170,7 +170,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public String getHelp(PipelineContext pipelineContext) {
         if (!isHelpEvaluated) {
-            if (controlElement != null) {// protection for RepeatIterationControl
+            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 getContextStack().setBinding(this);
                 help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, tempContainsHTML);
                 isHTMLHelp = help != null && tempContainsHTML[0];
@@ -192,7 +192,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public String getHint(PipelineContext pipelineContext) {
         if (!isHintEvaluated) {
-            if (controlElement != null) {// protection for RepeatIterationControl
+            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 getContextStack().setBinding(this);
                 hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), tempContainsHTML);
                 isHTMLHint = hint != null && tempContainsHTML[0];
@@ -214,7 +214,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public String getLabel(PipelineContext pipelineContext) {
         if (!isLabelEvaluated) {
-            if (controlElement != null) {// protection for RepeatIterationControl
+            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 getContextStack().setBinding(this);
                 label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), tempContainsHTML);
                 isHTMLLabel = label != null && tempContainsHTML[0];

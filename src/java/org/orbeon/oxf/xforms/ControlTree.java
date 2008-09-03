@@ -55,7 +55,7 @@ public class ControlTree implements Cloneable {
         // Create the tree of controls
         final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument);// this is temporary and won't be stored
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer,
-                new CreateControlsListener(rootControl, evaluateItemsets, pipelineContext, this));
+                new CreateControlsListener(pipelineContext, this, rootControl, evaluateItemsets, false));
 
         // Detach all root XFormsControl
         final List rootChildren = rootControl.getChildren();
@@ -112,11 +112,12 @@ public class ControlTree implements Cloneable {
         repeatIterationControl.setBindingContext(bindingContext);
 
         // Index this control
-        indexControl(repeatIterationControl);
+        // NOTE: Must do after setting the context, so that relevance can be properly determined
+        indexControl(repeatIterationControl, true);
 
         // Create the subtree
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, repeatControl, iterationIndex,
-                new CreateControlsListener(repeatIterationControl, false, pipelineContext, this));
+                new CreateControlsListener(pipelineContext, this, repeatIterationControl, false, true));
 
         return repeatIterationControl;
     }
@@ -124,9 +125,10 @@ public class ControlTree implements Cloneable {
     /**
      * Index a single controls.
      *
-     * @param control   control to index
+     * @param control           control to index
+     * @param registerEvents    whether to register a relevance event if the control is bound and relevant
      */
-    private void indexControl(XFormsControl control) {
+    private void indexControl(XFormsControl control, boolean registerEvents) {
         // Remember by effective id
         if (effectiveIdsToControls == null)
             effectiveIdsToControls = new LinkedHashMap();// order is not strictly needed, but it can help debugging
@@ -163,14 +165,25 @@ public class ControlTree implements Cloneable {
                 mapForId.put(attributeControl.getNameAttribute(), attributeControl);
             }
         }
+
+        // Add event if necessary
+        if (registerEvents && control instanceof XFormsSingleNodeControl) {
+            final NodeInfo boundNode = control.getBoundNode();
+            if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
+                // Control just came to existence and is now bound to a node and relevant
+                eventsToDispatch.put(control.getEffectiveId(),
+                        new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
+            }
+        }
     }
 
     /**
      * Deindex a single control.
      *
-     * @param control   control to deindex
+     * @param control           control to deindex
+     * @param registerEvents    whether to register a relevance event if the control was bound and relevant
      */
-    private void deindexControl(XFormsControl control) {
+    private void deindexControl(XFormsControl control, boolean registerEvents) {
 
         // Remove by effective id
         if (effectiveIdsToControls != null) {
@@ -195,6 +208,16 @@ public class ControlTree implements Cloneable {
                 }
             }
         }
+
+        // Add event if necessary
+        if (registerEvents && control instanceof XFormsSingleNodeControl) {
+            final NodeInfo boundNode = control.getBoundNode();
+            if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
+                // Control was bound to a node and relevant and is going out of existence
+                eventsToDispatch.put(control.getEffectiveId(),
+                        new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
+            }
+        }
     }
 
     /**
@@ -202,21 +225,13 @@ public class ControlTree implements Cloneable {
      *
      * @param containerControl  container control to start with
      * @param includeCurrent    whether to index the container control itself
+     * @param registerEvents    whether to register a relevance event if the control is bound and relevant
      */
-    public void indexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
+    public void indexSubtree(XFormsContainerControl containerControl, boolean includeCurrent, final boolean registerEvents) {
         visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
                 // Index control
-                indexControl(control);
-                // Add event if necessary
-                if (control instanceof XFormsSingleNodeControl) {
-                    final NodeInfo boundNode = control.getBoundNode();
-                    if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
-                        // Control just came to existence and is now bound to a node and relevant
-                        eventsToDispatch.put(control.getEffectiveId(),
-                                new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
-                    }
-                }
+                indexControl(control, registerEvents);
             }
         });
     }
@@ -226,21 +241,13 @@ public class ControlTree implements Cloneable {
      *
      * @param containerControl  container control to start with
      * @param includeCurrent    whether to index the container control itself
+     * @param registerEvents    whether to register a relevance event if the control was bound and relevant
      */
-    public void deindexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
+    public void deindexSubtree(XFormsContainerControl containerControl, boolean includeCurrent, final boolean registerEvents) {
         visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
                 // Deindex control
-                deindexControl(control);
-                // Add event if necessary
-                if (control instanceof XFormsSingleNodeControl) {
-                    final NodeInfo boundNode = control.getBoundNode();
-                    if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
-                        // Control was bound to a node and relevant and is going out of existence
-                        eventsToDispatch.put(control.getEffectiveId(),
-                                new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
-                    }
-                }
+                deindexControl(control, registerEvents);
             }
         });
     }
@@ -454,14 +461,16 @@ public class ControlTree implements Cloneable {
         private final boolean evaluateItemsets;
         private final PipelineContext pipelineContext;
         private final ControlTree result;
+        private final boolean registerEvents;
 
-        public CreateControlsListener(XFormsControl rootControl, boolean evaluateItemsets, PipelineContext pipelineContext, ControlTree result) {
+        public CreateControlsListener(PipelineContext pipelineContext, ControlTree result, XFormsControl rootControl, boolean evaluateItemsets, boolean registerEvents) {
 
             this.currentControlsContainer = rootControl;
 
             this.evaluateItemsets = evaluateItemsets;
             this.pipelineContext = pipelineContext;
             this.result = result;
+            this.registerEvents = registerEvents;
         }
 
         public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
@@ -478,12 +487,13 @@ public class ControlTree implements Cloneable {
                     select1Control.getItemset(pipelineContext, false);
             }
 
-            // Index this control
-            result.indexControl(control);
-
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
             control.setBindingContext(currentBindingContext);
+
+            // Index this control
+            // NOTE: Must do after setting the context, so that relevance can be properly determined
+            result.indexControl(control, registerEvents);
 
             // Add to current container control
             ((XFormsContainerControl) currentControlsContainer).addChild(control);
@@ -508,8 +518,7 @@ public class ControlTree implements Cloneable {
 
         public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
 
-            final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(container, currentControlsContainer, iteration);
-            result.indexControl(repeatIterationControl);
+            final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(container, (XFormsRepeatControl) currentControlsContainer, iteration);
 
             ((XFormsContainerControl) currentControlsContainer).addChild(repeatIterationControl);
             currentControlsContainer = repeatIterationControl;
@@ -517,6 +526,10 @@ public class ControlTree implements Cloneable {
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
             repeatIterationControl.setBindingContext(currentBindingContext);
+
+            // Index this control
+            // NOTE: Must do after setting the context, so that relevance can be properly determined
+            result.indexControl(repeatIterationControl, registerEvents);
 
             return true;
         }

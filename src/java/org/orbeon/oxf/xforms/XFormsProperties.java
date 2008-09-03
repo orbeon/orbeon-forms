@@ -98,6 +98,7 @@ public class XFormsProperties {
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
+    public static final String DISPATCH_INITIAL_EVENTS = "dispatch-initial-events";
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
 
@@ -165,6 +166,7 @@ public class XFormsProperties {
             new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
+            new PropertyDefinition(DISPATCH_INITIAL_EVENTS, true, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -388,6 +390,10 @@ public class XFormsProperties {
 
     public static String getComputedBinds(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, COMPUTED_BINDS_PROPERTY);
+    }
+
+    public static boolean isDispatchInitialEvents(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, DISPATCH_INITIAL_EVENTS);
     }
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {

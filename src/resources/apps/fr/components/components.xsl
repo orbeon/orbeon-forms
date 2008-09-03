@@ -131,7 +131,11 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Display localized errors count and form title -->
-            <xxforms:variable name="errors" select="count(xxforms:instance('fr-errors-instance')/error)" as="xs:integer"/>
+            <!-- Only count errors for controls that have been visited -->
+            <xxforms:variable name="errors" select="count(
+                for $e in xxforms:instance('fr-errors-instance')/error
+                return if (exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes])) then $e else () 
+            )" as="xs:integer"/>
             <xforms:output value="if ($errors > 0) then concat($errors, ' ', $fr-resources/summary/titles/(if ($errors = 1) then error-count else errors-count), ' - ', $title) else $title"/>
         </xsl:copy>
     </xsl:template>

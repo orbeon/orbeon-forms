@@ -49,7 +49,7 @@
 
     <!-- Template for visited controls information -->
     <xforms:instance id="fr-visited-template" xxforms:readonly="true">
-        <control xmlns="" id=""/>
+        <control xmlns="" id="" indexes=""/>
     </xforms:instance>
 
     <!-- Whether the form is valid or invalid -->
@@ -63,11 +63,19 @@
 
     <!-- Handle "control visited" events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-value-changed DOMFocusOut"
-                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')
-                        and not(instance('fr-visited-instance')/control[@id = event('xxforms:target')])">
-        <xforms:insert context="instance('fr-visited-instance')" nodeset="control" origin="instance('fr-visited-template')"/>
-        <xforms:setvalue ref="instance('fr-visited-instance')/control[last()]/@id" value="event('xxforms:target')"/>
+    <xforms:action ev:observer="fr-form-group" ev:event="DOMFocusOut xforms-value-changed"
+                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')"
+                   context="instance('fr-visited-instance')">
+        <xxforms:variable name="target" select="event('xxforms:target')"/>
+        <xxforms:variable name="indexes" select="string-join(event('xxforms:repeat-indexes'), '-')"/>
+        <!-- Do the insertion only if we don't know already that this control has been visited -->
+        <xforms:action if="empty(control[@id = $target and @indexes = $indexes])">
+            <xforms:insert context="." nodeset="control" origin="instance('fr-visited-template')"/>
+            <xforms:action context="control[last()]">
+                <xforms:setvalue ref="@id" value="$target"/>
+                <xforms:setvalue ref="@indexes" value="$indexes"/>
+            </xforms:action>
+        </xforms:action>
     </xforms:action>
 
     <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->

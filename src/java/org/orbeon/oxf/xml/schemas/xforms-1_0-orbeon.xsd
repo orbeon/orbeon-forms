@@ -107,6 +107,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="xforms:header"/>
                 <xsd:group ref="xforms:Action"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
@@ -115,11 +116,11 @@
             <xsd:attribute name="action" type="xsd:string" use="optional"/>
             <xsd:attribute name="resource" type="xsd:string" use="optional"/>
             <xsd:attribute name="instance" type="xsd:string" use="optional"/>
-            <xsd:attribute name="serialize" type="xsd:boolean" use="optional"/>
+            <xsd:attribute name="serialization" type="xsd:string" use="optional"/>
+            <xsd:attribute name="relevant" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="validate" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="method" use="required">
                 <xsd:simpleType>
-
                     <xsd:union memberTypes="xforms:QNameButNotNCNAME">
                         <xsd:simpleType>
                             <xsd:restriction base="xsd:string">
@@ -320,6 +321,26 @@
                 </xsd:sequence>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="header">
+        <xsd:complexType mixed="true">
+            <xsd:sequence>
+                <xsd:element ref="xforms:name"/>
+                <xsd:element ref="xforms:value"/>
+                <xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="name">
+        <xsd:complexType mixed="true">
+            <xsd:sequence>
+                <xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
+            <xsd:attribute name="value" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="value">
@@ -699,6 +720,13 @@
     </xsd:element>
     <xsd:element name="send">
         <xsd:complexType>
+            <xsd:sequence>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:choice>
+                        <xsd:any namespace="##other" processContents="lax"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="submission" type="xsd:NMTOKEN" use="required"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>

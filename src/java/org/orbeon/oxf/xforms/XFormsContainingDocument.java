@@ -1141,6 +1141,7 @@ public class XFormsContainingDocument extends XFormsContainer {
                     // the insert action to not rebuild controls to adjust indexes after insertion, as well as always
                     // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
                     // insert performance was good from the get go.
+                    // TODO: check above now that repeat/insert/delete has been improved
                     event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
                     // Dispatch event n times
                     final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);

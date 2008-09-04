@@ -426,14 +426,19 @@
     <!-- Error summary UI -->
     <xsl:template name="fr-error-summary">
         <xsl:param name="position" as="xs:string"/>
-        <xforms:group class="fr-error-summary fr-error-summary-{$position}" model="fr-persistence-model" ref=".[xxforms:instance('fr-errors-instance')/error]">
+
+        <!-- Errors to show: errors for visited controls -->
+
+        <!-- Only show this section if there are any visible errors -->
+        <xforms:group class="fr-error-summary fr-error-summary-{$position}" model="fr-error-summary-model"  ref=".[$visible-errors]">
             <xsl:if test="$position = 'bottom'">
                 <xhtml:div class="fr-separator">&#160;</xhtml:div>
             </xsl:if>
-            <xforms:group class="fr-error-summary-body" model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
+
+            <xforms:group class="fr-error-summary-body">
                 <xforms:output class="fr-error-title" value="$fr-resources/summary/titles/errors"/>
                 <xhtml:ol class="fr-error-list">
-                    <xforms:repeat nodeset="error">
+                    <xforms:repeat nodeset="$visible-errors">
                         <xhtml:li>
                             <xsl:choose>
                                 <xsl:when test="$is-noscript">
@@ -465,8 +470,6 @@
                     </xforms:repeat>
                 </xhtml:ol>
             </xforms:group>
-            <!--<xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">-->
-            <!--</xforms:group>-->
             <xsl:if test="$position = 'top'">
                 <xhtml:div class="fr-separator">&#160;</xhtml:div>
             </xsl:if>

@@ -16,8 +16,9 @@
     <resource xml:lang="en">
         <components>
             <labels>
-                <open-section>Open section</open-section>
-                <close-section>Close section</close-section>
+                <open-section>Open Section</open-section>
+                <close-section>Close Section</close-section>
+                <section-name>Section Name</section-name>
             </labels>
         </components>
         <summary>
@@ -125,6 +126,7 @@
             <labels>
                 <open-section>Ouvrir la section</open-section>
                 <close-section>Fermer la section</close-section>
+                <section-name>Nom de la section</section-name>
             </labels>
         </components>
         <summary>
@@ -211,8 +213,9 @@
     <resource xml:lang="es">
         <components>
             <labels>
-                <open-section>[Open section]</open-section>
-                <close-section>[Close section]</close-section>
+                <open-section>[Open Section]</open-section>
+                <close-section>[Close Section]</close-section>
+                <section-name>[Section Name]</section-name>
             </labels>
         </components>
         <summary>

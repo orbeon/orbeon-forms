@@ -84,7 +84,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
 
-        // Get model id (may be null) (really? how? legacy mode?)
         modelId = modelElement.attributeValue("id");
         modelEffectiveId = prefixedId;
 
@@ -102,10 +101,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    public XFormsModel(Document modelDocument) {// legacy
-        this(modelDocument.getRootElement().attributeValue("id"), modelDocument);
-    }
-
     public void setContainer(XFormsContainer container) {
 
         this.container = container;
@@ -117,12 +112,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         {
             for (Iterator i = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
                 final Element submissionElement = (Element) i.next();
-                String submissionId = submissionElement.attributeValue("id");
-                if (submissionId == null)// Can this happen? Maybe with the legacy engine?
-                    submissionId = "";
+                final String submissionId = submissionElement.attributeValue("id");
 
                 if (this.submissions == null)
                     this.submissions = new HashMap();
+
                 this.submissions.put(submissionId, new XFormsModelSubmission(this.containingDocument, submissionId, submissionElement, this));
             }
         }
@@ -992,18 +986,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // xforms-in-range must also be dispatched as appropriate. This specification does not
         // specify an ordering for the events."
 
-        // This just handles the legacy XForms engine which doesn't use the controls
         final XFormsControls xformsControls = containingDocument.getControls();
-        if (xformsControls == null || xformsControls.getCurrentControlTree() == null)
+
+        // Don't do anything if there are no children controls
+        if (xformsControls.getCurrentControlTree().getChildren() == null) {
+            containingDocument.logDebug("model", "not performing refresh because no controls are available");
             return;
+        }
 
         if (XFormsServer.logger.isDebugEnabled())
             containingDocument.logDebug("model", "performing refresh", new String[] { "model id", getEffectiveId() });
 
-        // If this is the first refresh we mark nodes to dispatch MIP events
-        final boolean isMustMarkMIPEvents = containingDocument.isInitializationFirstRefreshClear();
-
-        // Rebuild controls if needed
+        // Update control bindings if needed
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
@@ -1017,6 +1011,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final boolean isMustSendUIEvents = isMustSendValueChangedEvents || isMustSendRequiredEvents || isMustSendRelevantEvents || isMustSendReadonlyEvents || isMustSendValidEvents;
         if (isMustSendUIEvents) {
             // There are potentially event handlers for UI events, so do the whole processing
+
+            // If this is the first refresh we mark nodes to dispatch MIP events
+            final boolean isMustMarkMIPEvents = containingDocument.isInitializationFirstRefreshClear();
 
             // Build list of events to send
             final Map relevantBindingEvents = xformsControls.getCurrentControlTree().getEventsToDispatch();
@@ -1356,7 +1353,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             final XFormsControls xformsControls = containingDocument.getControls();
 
-            // Rebuild controls if needed
+            // Update control bindings if needed
             // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling
             doRebuild(pipelineContext);
             doRecalculate(pipelineContext);
@@ -1477,8 +1474,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Return the List of XFormsEventHandler objects within this object.
      */
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        // Do test on null for legacy XForm (no event handlers in the model are supported with the legacy engine)
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        return (staticState != null) ? staticState.getEventHandlers(getEffectiveId()) : null;
+        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
     }
 }

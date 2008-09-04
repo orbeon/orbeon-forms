@@ -883,7 +883,7 @@ public class XFormsStaticState {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // Check for mandatory id
-                // NOTE: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
+                // TODO: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
                 final String staticId = controlElement.attributeValue("id");
                 if (staticId == null)
                     throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName(), locationData);

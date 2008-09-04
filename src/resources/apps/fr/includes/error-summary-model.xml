@@ -80,40 +80,41 @@
 
     <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid xforms-value-changed"
-                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('xxforms:label')) != ''"
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid"
+                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('xxforms:label'))"
                    context="instance('fr-errors-instance')">
 
         <!-- Insert if the value is invalid or if it is required but empty -->
-        <xforms:action if="event('xxforms:type') = 'xforms-invalid' or (exforms:required(event('xxforms:binding')) and event('xxforms:binding') = '')">
-            <xxforms:variable name="current-error" select="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
-            <!-- Just update the label and alert if it already exists -->
-            <xforms:action if="exists($current-error)" context="$current-error">
-                <xforms:setvalue ref="$current-error/@alert" value="event('xxforms:alert')"/>
-                <xforms:setvalue ref="$current-error/@label" value="event('xxforms:label')"/>
-            </xforms:action>
-            <!-- Otherwise insert new element and sets its values -->
-            <xforms:action if="not(exists($current-error))">
-                <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
-                <xforms:action context="error[last()]">
-                    <xforms:setvalue ref="@id" value="event('xxforms:target')"/>
-                    <xforms:setvalue ref="@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
-                    <xforms:setvalue ref="@alert" value="event('xxforms:alert')"/>
-                    <xforms:setvalue ref="@label" value="event('xxforms:label')"/>
-                </xforms:action>
+        <xxforms:variable name="current-error" select="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
+        <!-- Just update the label and alert if it already exists -->
+        <xforms:action if="exists($current-error)" context="$current-error">
+            <xforms:setvalue ref="$current-error/@alert" value="event('xxforms:alert')"/>
+            <xforms:setvalue ref="$current-error/@label" value="event('xxforms:label')"/>
+        </xforms:action>
+        <!-- Otherwise insert new element and sets its values -->
+        <xforms:action if="not(exists($current-error))">
+            <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
+            <xforms:action context="error[last()]">
+                <xforms:setvalue ref="@id" value="event('xxforms:target')"/>
+                <xforms:setvalue ref="@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
+                <xforms:setvalue ref="@alert" value="event('xxforms:alert')"/>
+                <xforms:setvalue ref="@label" value="event('xxforms:label')"/>
             </xforms:action>
         </xforms:action>
     </xforms:action>
 
     <!-- Handle xforms-valid event on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid xforms-value-changed"
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid"
                    if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and instance('fr-errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"
                    context="instance('fr-errors-instance')">
         <!-- Don't remove error if the value is required but empty -->
-        <xforms:action if="not(exforms:required(event('xxforms:binding')) and event('xxforms:binding') = '')">
-            <xforms:delete nodeset="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
-        </xforms:action>
+        <xforms:delete nodeset="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
     </xforms:action>
+
+    <!-- Only count errors for controls that have been visited -->
+    <xxforms:variable name="visible-errors" select="
+        for $e in xxforms:instance('fr-errors-instance')/error
+        return if (exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes])) then $e else () " as="element(error)*"/>
 
 </xforms:model>

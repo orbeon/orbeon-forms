@@ -203,9 +203,18 @@ a.fb-edit-help-trigger img {
 #fb-details-section .fr-section-title .fr-inplace-delete { display: inline }
 #fb-details-section .fr-section-title .xforms-input input { width: 20em }
 
+/* For section alert, restore to something closer from the old-style alert icons */
 #fb-details-section .fr-section-title .xforms-alert-active {
-    display: inline;
-    
+    background: transparent url(../../../ops/images/xforms/exclamation.png) no-repeat left center;
+    display: inline-block;
+    font-size: 0;
+    height: 16px;
+    width: 16px;
+    text-indent: 16px;
+    margin-left: .25em;
+    overflow: hidden;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 /* **************************************************  ************************************************** */

@@ -136,7 +136,7 @@
                 for $e in xxforms:instance('fr-errors-instance')/error
                 return if (exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes])) then $e else () 
             )" as="xs:integer"/>
-            <xforms:output value="if ($errors > 0) then concat($errors, ' ', $fr-resources/summary/titles/(if ($errors = 1) then error-count else errors-count), ' - ', $title) else $title"/>
+            <xforms:output model="fr-error-summary-model" value="for $c in count($visible-errors) return if ($c > 0) then concat($c, ' ', $fr-resources/summary/titles/(if ($c = 1) then error-count else errors-count), ' - ', $title) else $title"/>
         </xsl:copy>
     </xsl:template>
 

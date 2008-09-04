@@ -75,7 +75,6 @@
         <xforms:rebuild/>
         <xforms:recalculate/>
         <xforms:revalidate/>
-        <xforms:refresh/>
 
         <!-- Set the initial data status -->
         <!--<xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>-->

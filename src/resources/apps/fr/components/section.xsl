@@ -83,6 +83,8 @@
                             <xsl:variable name="input" as="element(xforms:input)">
                                 <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}" appearance="fr:in-place">
                                     <xsl:apply-templates select="xforms:hint | xforms:alert"/>
+                                    <!-- Put a hidden label for the error sumnmary -->
+                                    <xforms:label class="fr-hidden" ref="$fr-resources/components/labels/section-name"/>
                                     <xsl:apply-templates select="fr:buttons"/>
                                 </xforms:input>
                             </xsl:variable>

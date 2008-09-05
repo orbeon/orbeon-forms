@@ -88,10 +88,6 @@
     margin-right: .5em
 }
 
-.widgets-xforms-instance-inspector .xforms-output {
-    margin-right: 1em
-}
-
 .widgets-xforms-instance-inspector td {
     padding: .5em
 }

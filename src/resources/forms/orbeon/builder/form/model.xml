@@ -152,8 +152,8 @@
                     <hint>The logo appears at the top of your form</hint>
                 </logo>
                 <section-name>
-                    <hint>click to enter a section name</hint>
-                    <alert>The section name is required</alert>
+                    <hint>click to enter a section title</hint>
+                    <alert>The section title is required</alert>
                 </section-name>
                 <!-- TODO: i18n whole Form Builder -->
             </resource>
@@ -181,6 +181,10 @@
                     <label>Logo</label>
                     <hint>Le logo apparaît au sommet de votre formulaire</hint>
                 </logo>
+                <section-name>
+                    <hint>cliquer pour entrer un titre de section</hint>
+                    <alert>Le title de section est requis</alert>
+                </section-name>
             </resource>
         </resources>
     </xforms:instance>

@@ -117,7 +117,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 if (this.submissions == null)
                     this.submissions = new HashMap();
 
-                this.submissions.put(submissionId, new XFormsModelSubmission(this.containingDocument, submissionId, submissionElement, this));
+                this.submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
             }
         }
 
@@ -483,7 +483,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 if (children == null || children.size() != 1) {
                                     final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element",
                                             new ExtendedLocationData(locationData, "processing inline XForms instance", instanceContainerElement));
-                                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
+                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                     break;
                                 }
                                 {
@@ -667,7 +667,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 // Got a blank src attribute, just dispatch xforms-link-exception
                                 final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
                                 final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, extendedLocationData);
-                                containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, instanceResource, instanceContainerElement, throwable));
+                                container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, instanceResource, instanceContainerElement, throwable));
                                 break;
                             }
                         }
@@ -768,10 +768,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
             // xforms-refresh are dispatched to the model element in sequence."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
+            container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
+            container.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
+            container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
+            container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 
         } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName) || XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
             // 4.5.4 The xforms-compute-exception Event
@@ -791,7 +791,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         // NOP
     }
 
@@ -806,7 +806,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         } else {
             throwable = ValidationException.wrapException(e, locationData);
         }
-        containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
+        container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
     }
 
     public static class EventSchedule {
@@ -948,9 +948,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance instance = (XFormsInstance) i.next();
                 if (invalidInstances.get(instance.getEffectiveId()) == null) {
-                    containingDocument.dispatchEvent(pipelineContext, new XXFormsValidEvent(instance));
+                    container.dispatchEvent(pipelineContext, new XXFormsValidEvent(instance));
                 } else {
-                    containingDocument.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(instance));
+                    container.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(instance));
                 }
             }
 
@@ -1434,22 +1434,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (currentDeferredActionContext != null) {
             if (currentDeferredActionContext.rebuild) {
                 containingDocument.startOutermostActionHandler();
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+                container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
             if (currentDeferredActionContext.recalculate) {
                 containingDocument.startOutermostActionHandler();
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
+                container.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
             if (currentDeferredActionContext.revalidate) {
                 containingDocument.startOutermostActionHandler();
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
+                container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
             if (currentDeferredActionContext.refresh) {
                 containingDocument.startOutermostActionHandler();
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
+                container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
         }
@@ -1466,14 +1466,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         public void updateInstance(int position, XFormsInstance instance);
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
-        return this.containingDocument;
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+        return this.container;
     }
 
     /**
      * Return the List of XFormsEventHandler objects within this object.
      */
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+    public List getEventHandlers(XFormsContainer container) {
         return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
     }
 }

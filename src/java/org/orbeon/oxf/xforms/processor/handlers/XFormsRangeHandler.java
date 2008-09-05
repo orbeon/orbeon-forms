@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -33,17 +32,22 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
+    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+        classes.append(" xforms-range-background");
+    }
+
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-        final XFormsRangeControl rangeControl = (XFormsRangeControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         final AttributesImpl newAttributes;
-        {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, rangeControl);
-            classes.append(" xforms-range-background");
-
-            handleMIPClasses(classes, id, rangeControl);
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, xformsControl);
+            addCustomClasses(classes, xformsControl);
+            handleMIPClasses(classes, id, xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

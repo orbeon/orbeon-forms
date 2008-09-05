@@ -44,7 +44,10 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         final boolean isConcreteControl = textareaControl != null;
 
         final AttributesImpl newAttributes;
-        {
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
             handleMIPClasses(classes, id, textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);

@@ -223,7 +223,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return XFormsModel  XFormsModel containing this instance
      */
     public XFormsModel getModel(XFormsContainer container) {
-        return container.getModelByEffectiveId(effectiveModelId);
+        // TODO: For now, do a search including descendant containers, as some callers don't use the proper container
+        return (XFormsModel) container.getObjectByEffectiveId(effectiveModelId);
     }
 
     /**
@@ -497,8 +498,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         }
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
-        return getModel(containingDocument);
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+        return getModel(container);
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -517,10 +518,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * Action run when the event reaches the target.
      *
      * @param pipelineContext       pipeline context
-     * @param containingDocument    containing document
+     * @param container             container
      * @param event                 event being dispatched
      */
-    public void performTargetAction(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+    public void performTargetAction(final PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // New nodes were just inserted
@@ -539,7 +540,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
                 // Perform the adjustments
 
                 // Find affected repeats and update their node-sets and indexes
-                final XFormsControls controls = containingDocument.getControls();
+                final XFormsControls controls = container.getContainingDocument().getControls();
                 updateRepeatNodeset(pipelineContext, controls, insertedNodeInfos);
             }
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
@@ -550,7 +551,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             final boolean didDeleteNodes = deletedNodeInfos.size() != 0;
             if (didDeleteNodes) {
                 // Find affected repeats and update them
-                final XFormsControls controls = containingDocument.getControls();
+                final XFormsControls controls = container.getContainingDocument().getControls();
                 updateRepeatNodeset(pipelineContext, controls, null);
             }
         }
@@ -640,8 +641,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         return (timeToLiveValue != null) ? Long.parseLong(timeToLiveValue) : -1;
     }
 
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        final XFormsStaticState staticState = containingDocument.getStaticState();
+    public List getEventHandlers(XFormsContainer container) {
+        final XFormsStaticState staticState = container.getContainingDocument().getStaticState();
         return (staticState != null) ? staticState.getEventHandlers(instanceId) : null;
     }
 

@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -33,14 +34,15 @@ public class XFormsResetAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
+        final XFormsContainer container = actionInterpreter.getContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
 
-        final Object modelObject = containingDocument.getModelByEffectiveId(modelId);// xxx fix cast not needed
+        final Object modelObject = container.getModelByEffectiveId(modelId);// xxx fix cast not needed
         if (modelObject instanceof XFormsModel) {
             final XFormsModel model = (XFormsModel) modelObject;
-            containingDocument.dispatchEvent(pipelineContext, new XFormsResetEvent(model));
+            container.dispatchEvent(pipelineContext, new XFormsResetEvent(model));
 
             // "the reset action takes effect immediately and clears all of the flags."
             model.setAllDeferredFlags(false);

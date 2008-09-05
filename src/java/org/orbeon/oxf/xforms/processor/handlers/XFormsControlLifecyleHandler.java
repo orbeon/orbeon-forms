@@ -14,15 +14,17 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -30,6 +32,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * phases are handled:
  *
  * o Give the handler a chance to do some prep work: prepareHandler()
+ * o Get custom information: addCustomClasses()
  * o Check whether the control wants any output at all: isMustOutputControl()
  * o Output label, control, hint, help, and alert in order specified by properties
  *
@@ -43,6 +46,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     private XFormsSingleNodeControl xformsControl;
     private Attributes attributes;
     private String[] endConfig;
+    private String spanQName;
 
     protected XFormsControlLifecyleHandler(boolean repeating) {
         super(repeating, false);
@@ -63,6 +67,35 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         prepareHandler(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
 
         if (isMustOutputControl(xformsControl)) {
+
+            final ContentHandler contentHandler = handlerContext.getController().getOutput();
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            if (handlerContext.isNewXHTMLLayout()) {
+                // Open control <div>
+                spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+
+                // Get appearance
+                final QName appearance = getAppearance(attributes);
+
+                // Get classes
+                final FastStringBuffer classes;
+                {
+                    // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
+                    classes = getInitialClasses(localname, attributes, xformsControl, appearance, isDefaultIncremental());
+                    // All MIP-related classes
+                    handleMIPClasses(classes, staticId, xformsControl);
+                    // Static classes: xforms-online, xforms-offline, ...
+                    containingDocument.getStaticState().appendClasses(classes, staticId);
+                    // Dynamic classes added by the control 
+                    addCustomClasses(classes, xformsControl);
+                }
+
+                // Get attributes
+                final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+            }
+
             // Get local order for control
             final String localOrder = attributes.getValue(XFormsConstants.XXFORMS_ORDER_QNAME.getNamespaceURI(),
                     XFormsConstants.XXFORMS_ORDER_QNAME.getName());
@@ -72,12 +105,10 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
             // Output named anchor if the control has a help or alert. This is so that a separate help and error
             // sections can link back to the control.
-            if (isNoscript) {
+            if (handlerContext.isNoScript()) {
                 if (xformsControl != null
                         && (XFormsControl.hasHelp(containingDocument, xformsControl, staticId)
                             || XFormsControl.hasAlert(containingDocument, xformsControl, staticId))) {
-                    final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
@@ -155,6 +186,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 }
             }
         }
+
+        if (handlerContext.isNewXHTMLLayout()) {
+            if (isMustOutputControl(xformsControl)) {
+                // Close control <div>
+                final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            }
+        }
     }
 
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
@@ -164,6 +203,15 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
         return true;
+    }
+
+    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+        // May be overridden by subclasses
+    }
+
+    protected boolean isDefaultIncremental() {
+        // May be overridden by subclasses
+        return false;
     }
 
     protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {

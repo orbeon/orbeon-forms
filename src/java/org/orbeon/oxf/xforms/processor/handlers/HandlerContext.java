@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -37,12 +36,15 @@ import java.util.Stack;
  */
 public class HandlerContext {
 
-    private ElementHandlerController controller;
-    private PipelineContext pipelineContext;
-    private XFormsContainingDocument containingDocument;
-    private XFormsState encodedClientState;
-    private ExternalContext externalContext;
+    private final ElementHandlerController controller;
+    private final PipelineContext pipelineContext;
+    private final XFormsContainingDocument containingDocument;
+    private final XFormsState encodedClientState;
+    private final ExternalContext externalContext;
     private final String[] documentOrder;
+
+    public final boolean isNoscript;
+    public final boolean isNewXHTMLLayout;
 
     private boolean processedUserAgent;
     private boolean isRenderingEngineTrident;
@@ -59,46 +61,49 @@ public class HandlerContext {
         this.encodedClientState = encodedClientState;
         this.externalContext = externalContext;
         this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
+
+        this.isNoscript = XFormsProperties.isNoscript(containingDocument);
+        this.isNewXHTMLLayout = XFormsProperties.isNewXHTMLLayout(containingDocument);
     }
 
-    public ElementHandlerController getController() {
+    final public ElementHandlerController getController() {
         return controller;
     }
 
-    public PipelineContext getPipelineContext() {
+    final public PipelineContext getPipelineContext() {
         return pipelineContext;
     }
 
-    public XFormsContainingDocument getContainingDocument() {
+    final public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
     }
 
-    public XFormsState getEncodedClientState() {
+    final public XFormsState getEncodedClientState() {
         return encodedClientState;
     }
 
-    public ExternalContext getExternalContext() {
+    final public ExternalContext getExternalContext() {
         return externalContext;
     }
 
     public int nextTabIndex() {
         // NIY
-        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
+//        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
 
         currentTabIndex += INDEX_INCREMENT;
         return currentTabIndex;
     }
 
-    public String[] getDocumentOrder() {
+    final public String[] getDocumentOrder() {
         return documentOrder;
     }
 
-    public boolean isRenderingEngineTrident() {
+    final public boolean isRenderingEngineTrident() {
         processedUserAgentIfNeeded();
         return isRenderingEngineTrident;
     }
 
-    public boolean isRenderingEngineIE6OrEarlier() {
+    final public boolean isRenderingEngineIE6OrEarlier() {
         processedUserAgentIfNeeded();
         return isRenderingEngineIE6OrEarlier;
     }
@@ -110,6 +115,14 @@ public class HandlerContext {
             isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : NetUtils.isRenderingEngineIE6OrEarlier(request);
             processedUserAgent = true;
         }
+    }
+
+    final public boolean isNoScript() {
+        return isNoscript;
+    }
+
+    final public boolean isNewXHTMLLayout() {
+        return isNewXHTMLLayout;
     }
 
     public String findXHTMLPrefix() {

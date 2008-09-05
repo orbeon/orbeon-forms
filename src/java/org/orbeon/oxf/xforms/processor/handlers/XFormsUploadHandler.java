@@ -36,21 +36,30 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
+    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+
+        // Control value
+        final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
+        final String value = handlerContext.isTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
+
+        if (value.equals(""))
+            classes.append(" xforms-upload-state-empty");
+        else
+            classes.append(" xforms-upload-state-file");
+    }
+
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        // Control value
-        final String value = handlerContext.isTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
-
         final AttributesImpl newAttributes;
-        {
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, uploadControl);
-            if (value.equals(""))
-                classes.append(" xforms-upload-state-empty");
-            else
-                classes.append(" xforms-upload-state-file");
+            addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, id, uploadControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }

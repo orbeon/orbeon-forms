@@ -111,7 +111,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         }
 
         // Generate template
-        if (isMustGenerateTemplate && !isNoscript) {// don't generate templates in noscript mode as they won't be used
+        if (isMustGenerateTemplate && !handlerContext.isNoScript()) {// don't generate templates in noscript mode as they won't be used
 
             if (!outputInterceptor.isMustGenerateFirstDelimiters()) {
                 // Delimiter: between repeat entries

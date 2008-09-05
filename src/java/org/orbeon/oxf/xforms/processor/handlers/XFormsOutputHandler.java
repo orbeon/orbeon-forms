@@ -42,6 +42,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
     protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
         // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,
         // because in that case we don't put the control in the regular hierarchy of controls.
+        // TODO: shouldn't we do this simply by not having the handlers being called in this case at all???
         final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
         if (parentHandlerName != null) {
             final String parentHandlerLocalname;
@@ -70,15 +71,19 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = outputControl != null;
 
-        final AttributesImpl newAttributes;
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, outputControl);
-
         final String mediatypeValue = attributes.getValue("mediatype");
         final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");
         final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"));
 
-        handleMIPClasses(classes, id, outputControl);
-        newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+        final AttributesImpl newAttributes;
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, outputControl);
+            handleMIPClasses(classes, id, outputControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+        }
 
         if (XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(getAppearance(attributes))) {
             // Just output value for "text" appearance

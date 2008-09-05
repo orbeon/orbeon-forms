@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -95,7 +96,7 @@ public class XFormsStaticState {
     private boolean isAnalyzed;             // whether this document has been analyzed already
     private Map controlNamesMap;            // Map<String, String> of control name to ""
     private Map eventNamesMap;              // Map<String, String> of event name to ""
-    private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
+    private Map eventHandlersMap;           // Map<String prefixedControlId, List<XFormsEventHandler> eventHandler>
     private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
     private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
@@ -831,32 +832,19 @@ public class XFormsStaticState {
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
-            analyzeComponentTree(pipelineContext, xpathConfiguration, controlsDocument.getRootElement(), repeatHierarchyStringBuffer);
+            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer);
 
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
-            // Iterate over models
+            // Iterate over models to extract event handlers
             for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
-                //final String prefixedId = (String) currentEntry.getKey();
 
-                final Element modelElement; {
+                final String modelPrefixedId = (String) currentEntry.getKey();
                 final Document modelDocument = (Document) currentEntry.getValue();
-                    modelElement = modelDocument.getRootElement();
-                }
-
-                // Iterate over model submissions
-                for (Iterator j = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); j.hasNext();) {
-                    final Element currentSubmissionElement = (Element) j.next();
-
-                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap);
-                    mergeEventHandlers(eventHandlersMap, submissionEventHandlers);
-                }
-
-                // Handle event handlers directly in model
-                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
-                mergeEventHandlers(eventHandlersMap, modelEventHandlers);
+                final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
+                extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
             }
 
             isAnalyzed = true;
@@ -866,10 +854,37 @@ public class XFormsStaticState {
         }
     }
 
+    private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix) {
+
+        // Get all candidate elements
+        final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,
+                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and (parent::xforms:* | parent::xxforms:*)/@id]",
+                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+        // Check them all
+        for (Iterator i = actionHandlers.iterator(); i.hasNext();) {
+            final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+
+            if (currentNodeInfo instanceof NodeWrapper) {
+                final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
+                // Make sure this is a known action name
+                if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
+                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
+                }
+            }
+        }
+    }
+
     private void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,
-                                      Element startElement, final FastStringBuffer repeatHierarchyStringBuffer) {
+                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
+
+        // Extract event handlers for this tree of controls
+        extractEventHandlers(pipelineContext, controlsDocumentInfo, prefix);
+
+        // Visit tree
         visitAllControlStatic(startElement, new XFormsStaticState.ControlElementVisitorListener() {
 
             private Stack repeatAncestorsStack = new Stack();
@@ -920,7 +935,8 @@ public class XFormsStaticState {
                             compactShadowTrees.put(staticId, compactShadowTreeDocument);
 
                             // TODO: the nested ids must be passed with prefix, right?
-                            analyzeComponentTree(pipelineContext, xpathConfiguration, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
+                            final String newPrefix = prefix + staticId + XFormsConstants.COMPONENT_SEPARATOR;
+                            analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
                         }
                     }
                 }
@@ -955,12 +971,6 @@ public class XFormsStaticState {
                 } else {
                     hasBinding = false;
                 }
-
-                // Gather event handlers
-                // Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
-                // TODO: event handlers must be gathered more globally
-                final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap);
-                mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
 
                 // Create static control information
                 controlInfoMap.put(controlId, new XFormsStaticState.ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName)));
@@ -1163,25 +1173,6 @@ public class XFormsStaticState {
 
     public List getOfflineInsertTriggerIds() {
         return offlineInsertTriggerIds;
-    }
-
-    private static void mergeEventHandlers(Map destination, Map source) {
-        if (source != null) {
-            for (Iterator i = source.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-
-                final String currentObserverid = (String) currentEntry.getKey();
-                final List currentEventHandlers = (List) currentEntry.getValue();
-
-                List existingEventHandlers = (List) destination.get(currentObserverid);
-                if (existingEventHandlers == null) {
-                    existingEventHandlers = new ArrayList();
-                    destination.put(currentObserverid, existingEventHandlers);
-                }
-
-                existingEventHandlers.addAll(currentEventHandlers);
-            }
-        }
     }
 
     /**

@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -34,7 +33,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,11 +48,9 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     private boolean forwarding;
 
     protected HandlerContext handlerContext;
+
     protected PipelineContext pipelineContext;
     protected XFormsContainingDocument containingDocument;
-    protected ExternalContext externalContext;
-    protected List pathMatchers;
-    protected boolean isNoscript;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
@@ -68,13 +64,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         this.pipelineContext = handlerContext.getPipelineContext();
         this.containingDocument = handlerContext.getContainingDocument();
-        this.externalContext = handlerContext.getExternalContext();
-
-        // This is used for URL rewriting
-        pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
-
-        // Cache this property as it is used often
-        isNoscript = XFormsProperties.isNoscript(containingDocument);
 
         super.setContext(context);
     }
@@ -432,7 +421,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-                if (isNoscript && control != null) {
+                if (handlerContext.isNoScript() && control != null) {
                     // Start <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
@@ -456,7 +445,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
 
-                if (isNoscript && control != null) {
+                if (handlerContext.isNoScript() && control != null) {
                     // End </a>
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);

@@ -22,19 +22,20 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventFactory;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.SequenceExtent;
@@ -1169,142 +1170,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         return goingOnline;
     }
 
-    /**
-     * Main event dispatching entry.
-     */
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            logDebug("event", "dispatching", new String[] { "name", event.getEventName(), "id", event.getTargetObject().getEffectiveId(), "location", event.getLocationData().toString() });
-        }
-
-        final XFormsEventTarget targetObject = event.getTargetObject();
-        try {
-            if (targetObject == null)
-                throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
-
-            // Find all event handler containers
-            final List containers = new ArrayList();
-            {
-                XFormsEventHandlerContainer container
-                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentEventHandlerContainer(this);
-                while (container != null) {
-
-                    // Add container except if it is a repeat, as we use repeat iterations instead
-                    if (!(container instanceof XFormsRepeatControl))
-                        containers.add(container);
-
-                    // Find parent
-                    container = container.getParentEventHandlerContainer(this);
-
-                    // Stop propagation on component boundary
-                    if (container instanceof XFormsComponentControl)
-                        break;
-                }
-            }
-
-            boolean propagate = true;
-            boolean performDefaultAction = true;
-
-            // Go from root to leaf
-            Collections.reverse(containers);
-
-            // Capture phase
-            for (Iterator i = containers.iterator(); i.hasNext();) {
-                final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-                final List eventHandlers = container.getEventHandlers(this);
-
-                if (eventHandlers != null) {
-                    if (container != targetObject) {
-                        // Event listeners on the target which are in capture mode are not called
-
-                        // Process event handlers
-                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
-
-                            if (!eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(event.getEventName())
-                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
-                                // Capture phase match on event name and target is specified
-                                startHandleEvent(event);
-                                try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainingDocument.this, container, event);
-                                } finally {
-                                    endHandleEvent();
-                                }
-                                propagate &= eventHandler.isPropagate();
-                                performDefaultAction &= eventHandler.isPerformDefaultAction();
-                            }
-                        }
-                        // Cancel propagation if requested and if authorized by event
-                        if (!propagate && event.isCancelable())
-                            break;
-                    }
-                }
-            }
-
-            // Go from leaf to root
-            Collections.reverse(containers);
-
-            // Bubbling phase
-            if (propagate && event.isBubbles()) {
-                for (Iterator i = containers.iterator(); i.hasNext();) {
-                    final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-                    final List eventHandlers = container.getEventHandlers(this);
-
-                    // Process "action at target"
-                    // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
-                    if (container == targetObject) {
-                        container.performTargetAction(pipelineContext, XFormsContainingDocument.this, event);
-                    }
-
-                    // Process event handlers
-                    if (eventHandlers != null) {
-                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
-
-                            if (eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(event.getEventName())
-                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
-                                // Bubbling phase match on event name and target is specified
-                                startHandleEvent(event);
-                                try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainingDocument.this, container, event);
-                                } finally {
-                                    endHandleEvent();
-                                }
-                                propagate &= eventHandler.isPropagate();
-                                performDefaultAction &= eventHandler.isPerformDefaultAction();
-                            }
-                        }
-                        // Cancel propagation if requested and if authorized by event
-                        if (!propagate)
-                            break;
-                    }
-                }
-            }
-
-            // Perform default action is allowed to
-            if (performDefaultAction || !event.isCancelable()) {
-                startHandleEvent(event);
-                try {
-                    targetObject.performDefaultAction(pipelineContext, event);
-                } finally {
-                    endHandleEvent();
-                }
-            }
-        } catch (Exception e) {
-            // Add location information if possible
-            final LocationData locationData = (targetObject != null)
-                    ? ((targetObject.getLocationData() != null)
-                        ? targetObject.getLocationData()
-                        : getLocationData())
-                    : null;
-
-            throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
-                    new String[] { "event", event.getEventName(), "target id", targetObject.getEffectiveId() }));
-        }
-    }
 
     public IndentedLogger getIndentedLogger() {
         return indentedLogger;
@@ -1343,25 +1208,6 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     public void logWarning(String type, String message, String[] parameters) {
         indentedLogger.logWarning(type, message, parameters);
-    }
-
-    private Stack eventStack = new Stack();
-
-    private void startHandleEvent(XFormsEvent event) {
-        eventStack.push(event);
-        indentedLogger.startHandleOperation();
-    }
-
-    private void endHandleEvent() {
-        eventStack.pop();
-        indentedLogger.endHandleOperation();
-    }
-
-    /**
-     * Return the event being processed by the current event handler, null if no event is being processed.
-     */
-    public XFormsEvent getCurrentEvent() {
-        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
     }
 
     /**

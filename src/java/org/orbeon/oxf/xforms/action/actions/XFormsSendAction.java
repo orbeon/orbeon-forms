@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -36,19 +37,20 @@ public class XFormsSendAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContextt) {
 
+        final XFormsContainer container = actionInterpreter.getContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Find submission object
         final String submissionId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("submission"));
         if (submissionId == null)
             throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
-        final Object submission = containingDocument.getObjectByEffectiveId(submissionId);// xxx fix not effective
+        final Object submission = container.getObjectByEffectiveId(submissionId);// xxx fix not effective
 
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent((XFormsEventTarget) submission);
             addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-            containingDocument.dispatchEvent(pipelineContext, newEvent);
+            container.dispatchEvent(pipelineContext, newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

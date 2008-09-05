@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
@@ -24,7 +24,7 @@ public interface XFormsEventTarget {
     public String getId();
     public String getEffectiveId();
     public LocationData getLocationData();
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument);
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event);
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container);
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event);
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event);
 }

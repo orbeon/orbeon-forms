@@ -146,7 +146,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
         // Scripts
         // TODO: Have option to put this at the bottom of the page. See theme-plain.xsl and http://developer.yahoo.com/performance/rules.html#js_bottom -->
-        if (!isNoscript && !XFormsProperties.isReadonly(containingDocument)) {
+        if (!handlerContext.isNoScript() && !XFormsProperties.isReadonly(containingDocument)) {
 
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
@@ -187,7 +187,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         // Heartbeat delay
                         {
                             final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
-                            final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, externalContext);
+                            final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext());
                             if (heartbeatDelay != ((Number) propertyDefinition.getDefaultValue()).longValue())
                                 dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, new Long(heartbeatDelay));
                         }

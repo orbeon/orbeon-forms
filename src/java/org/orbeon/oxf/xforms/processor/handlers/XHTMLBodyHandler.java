@@ -93,7 +93,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
         final String xformsSubmissionPath;
         {
-            final String requestPath = externalContext.getRequest().getRequestPath();
+            final String requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
             final boolean isForwarded = OPSXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
             if (isForwarded) {
                 // This is the case where the request was forwarded to us (separate deployment)
@@ -110,11 +110,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                 // Add id so that things work in portals
                 "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
                 // Regular classes
-                "class", isNoscript ? "xforms-form xforms-noscript" : "xforms-form",
+                "class", handlerContext.isNoScript() ? "xforms-form xforms-noscript" : "xforms-form",
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler
-                "onsubmit", isNoscript ? null : "return false",
+                "onsubmit", handlerContext.isNoScript() ? null : "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
         {
@@ -127,7 +127,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             });
         }
 
-        if (!isNoscript) {
+        if (!handlerContext.isNoScript()) {
             // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$server-events", "value", ""

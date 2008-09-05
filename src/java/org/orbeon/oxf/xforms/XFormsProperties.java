@@ -100,6 +100,8 @@ public class XFormsProperties {
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
     public static final String DISPATCH_INITIAL_EVENTS = "dispatch-initial-events";
 
+    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";
+
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
 
     public static class PropertyDefinition {
@@ -167,6 +169,7 @@ public class XFormsProperties {
             new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
             new PropertyDefinition(DISPATCH_INITIAL_EVENTS, true, false),
+            new PropertyDefinition(NEW_XHTML_LAYOUT, false, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -394,6 +397,10 @@ public class XFormsProperties {
 
     public static boolean isDispatchInitialEvents(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, DISPATCH_INITIAL_EVENTS);
+    }
+
+    public static boolean isNewXHTMLLayout(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
     }
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {

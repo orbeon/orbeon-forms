@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContainer;
 
 /**
  * Represent an XForms event handler.
@@ -25,10 +25,10 @@ public interface XFormsEventHandler {
     public boolean isPropagate();
     public boolean isPerformDefaultAction();
 
-    public String[] getObserverIds();
+    public String[] getObserverStaticIds();
     public boolean isMatchEventName(String eventName);
     public boolean isMatchTarget(String targetId);
 
-    public void handleEvent(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+    public void handleEvent(PipelineContext pipelineContext, XFormsContainer container,
                             XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event);
 }

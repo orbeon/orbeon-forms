@@ -17,7 +17,11 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -170,7 +174,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
                     deferredActionContext.refresh = true;
                 }
 
-                containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
             }
         }
     }
@@ -217,13 +221,23 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
-            XFormsModel model = (XFormsModel) i.next();
+            final XFormsModel model = (XFormsModel) i.next();
             final Object resultObject = model.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
-        // Check containing document
+        // Search in children
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                final Object resultObject = currentContainer.getObjectByEffectiveId(effectiveId);
+                if (resultObject != null)
+                    return resultObject;
+            }
+        }
+
+        // Check container id
         if (effectiveId.equals(getEffectiveId()))
             return this;
 
@@ -242,10 +256,20 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
-            XFormsModel model = (XFormsModel) i.next();
+            final XFormsModel model = (XFormsModel) i.next();
             final Object resultObject = model.resolveObjectById(effectiveSourceId, targetId);
             if (resultObject != null)
                 return resultObject;
+        }
+
+        // Search in children
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                final Object resultObject = currentContainer.resolveObjectById(effectiveSourceId, effectiveId);
+                if (resultObject != null)
+                    return resultObject;
+            }
         }
 
         // Check containing document
@@ -262,12 +286,25 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
      * @return      instance containing the node
      */
     public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
+
+        // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
             final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
             if (currentInstance != null)
                 return currentInstance;
         }
+
+        // Search in children
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                final XFormsInstance currentInstance = currentContainer.getInstanceForNode(nodeInfo);
+                if (currentInstance != null)
+                    return currentInstance;
+            }
+        }
+
         // This should not happen if the node is currently in an instance!
         return null;
     }
@@ -492,7 +529,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         this.locationData = locationData;
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
         return parentContainer;
     }
 
@@ -500,11 +537,167 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         // NOP
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         // NOP
     }
 
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+    public List getEventHandlers(XFormsContainer container) {
         return null;
+    }
+
+    private Stack eventStack = new Stack();
+
+    private void startHandleEvent(XFormsEvent event) {
+        eventStack.push(event);
+        containingDocument.startHandleOperation();
+    }
+
+    private void endHandleEvent() {
+        eventStack.pop();
+        containingDocument.endHandleOperation();
+    }
+
+    /**
+     * Return the event being processed by the current event handler, null if no event is being processed.
+     */
+    public XFormsEvent getCurrentEvent() {
+        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
+    }
+
+    /**
+     * Main event dispatching entry.
+     */
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            containingDocument.logDebug("event", "dispatching", new String[] { "name", event.getEventName(), "id", event.getTargetObject().getEffectiveId(), "location", event.getLocationData().toString() });
+        }
+
+        final XFormsEventTarget targetObject = event.getTargetObject();
+        try {
+                if (targetObject == null)
+                throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
+
+            // Find all event handler containers
+            final List eventHandlerContainers = new ArrayList();
+            {
+                XFormsEventHandlerContainer container
+                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentEventHandlerContainer(this);
+                while (container != null) {
+
+                    // Add container except if it is a repeat, as we use repeat iterations instead
+                    if (!(container instanceof XFormsRepeatControl))
+                        eventHandlerContainers.add(container);
+
+                    // Stop propagation on model container or component boundary
+                    if (container instanceof XFormsContainer || container instanceof XFormsComponentControl)
+                        break;
+
+                    // Find parent
+                    container = container.getParentEventHandlerContainer(this);
+                }
+            }
+
+            boolean propagate = true;
+            boolean performDefaultAction = true;
+
+            // Go from root to leaf
+            Collections.reverse(eventHandlerContainers);
+
+            // Capture phase
+            for (Iterator i = eventHandlerContainers.iterator(); i.hasNext();) {
+                final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) i.next();
+                final List eventHandlers = eventHandlerContainer.getEventHandlers(this);
+
+                if (eventHandlers != null) {
+                    if (eventHandlerContainer != targetObject) {
+                        // Event listeners on the target which are in capture mode are not called
+
+                        // Process event handlers
+                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
+
+                            if (!eventHandler.isBubblingPhase()
+                                    && eventHandler.isMatchEventName(event.getEventName())
+                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
+                                // Capture phase match on event name and target is specified
+                                startHandleEvent(event);
+                                try {
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, eventHandlerContainer, event);
+                                } finally {
+                                    endHandleEvent();
+                                }
+                                propagate &= eventHandler.isPropagate();
+                                performDefaultAction &= eventHandler.isPerformDefaultAction();
+                            }
+                        }
+                        // Cancel propagation if requested and if authorized by event
+                        if (!propagate && event.isCancelable())
+                            break;
+                    }
+                }
+            }
+
+            // Go from leaf to root
+            Collections.reverse(eventHandlerContainers);
+
+            // Bubbling phase
+            if (propagate && event.isBubbles()) {
+                for (Iterator i = eventHandlerContainers.iterator(); i.hasNext();) {
+                    final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
+                    final List eventHandlers = container.getEventHandlers(this);
+
+                    // Process "action at target"
+                    // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
+                    if (container == targetObject) {
+                        container.performTargetAction(pipelineContext, XFormsContainer.this, event);
+                    }
+
+                    // Process event handlers
+                    if (eventHandlers != null) {
+                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
+
+                            if (eventHandler.isBubblingPhase()
+                                    && eventHandler.isMatchEventName(event.getEventName())
+                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
+                                // Bubbling phase match on event name and target is specified
+                                startHandleEvent(event);
+                                try {
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, container, event);
+                                } finally {
+                                    endHandleEvent();
+                                }
+                                propagate &= eventHandler.isPropagate();
+                                performDefaultAction &= eventHandler.isPerformDefaultAction();
+                            }
+                        }
+                        // Cancel propagation if requested and if authorized by event
+                        if (!propagate)
+                            break;
+                    }
+                }
+            }
+
+            // Perform default action is allowed to
+            if (performDefaultAction || !event.isCancelable()) {
+                startHandleEvent(event);
+                try {
+                    targetObject.performDefaultAction(pipelineContext, event);
+                } finally {
+                    endHandleEvent();
+                }
+            }
+        } catch (Exception e) {
+            // Add location information if possible
+            final LocationData locationData = (targetObject != null)
+                    ? ((targetObject.getLocationData() != null)
+                        ? targetObject.getLocationData()
+                        : getLocationData())
+                    : null;
+
+            throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
+                    new String[] { "event", event.getEventName(), "target id", targetObject.getEffectiveId() }));
+        }
     }
 }

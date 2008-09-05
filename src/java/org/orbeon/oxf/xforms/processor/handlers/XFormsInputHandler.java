@@ -43,7 +43,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsInputControl inputControl = (XFormsInputControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -51,34 +51,36 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
         final String controlTypeName = (inputControl != null) ? inputControl.getBuiltinTypeName() : null;
 
-        final AttributesImpl newAttributes;
+
         final boolean isDateTime;
         final boolean isBoolean;
-        {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, inputControl);
-            if (!handlerContext.isTemplate()) {
-                if (isConcreteControl) {
-                    isDateTime = "dateTime".equals(controlTypeName);
-                    isBoolean = "boolean".equals(controlTypeName);
-                } else {
-                    isDateTime = false;
-                    isBoolean = false;
-                }
+        if (!handlerContext.isTemplate()) {
+            if (isConcreteControl) {
+                isDateTime = "dateTime".equals(controlTypeName);
+                isBoolean = "boolean".equals(controlTypeName);
             } else {
                 isDateTime = false;
                 isBoolean = false;
             }
-            handleMIPClasses(classes, id, inputControl);
+        } else {
+            isDateTime = false;
+            isBoolean = false;
+        }
+
+        final AttributesImpl newAttributes;
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, inputControl);
+            handleMIPClasses(classes, staticId, inputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 
         if (isBoolean) {
             // Produce a boolean output
 
-            // We try to look like an xforms:select[@appearance = 'full']
-            final QName appearance = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME;
             final boolean isMany = true;
-
             final List items = new ArrayList(2);
             final boolean isEncryptItemValues = XFormsProperties.isEncryptItemValues(containingDocument);
             items.add(new XFormsItemUtils.Item(isEncryptItemValues, Collections.EMPTY_LIST, "", "true", 1));
@@ -86,11 +88,16 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
-            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler();
+            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler() {
+                protected QName getAppearance(Attributes attributes) {
+                    // Try to look like an xforms:select[@appearance = 'full']
+                    return XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME;
+                }
+            };
             select1Handler.setContentHandler(getContentHandler());
             select1Handler.setContext(getContext());
 //            select1Handler.setDocumentLocator(get);
-            select1Handler.outputContent(attributes, id, effectiveId, localname, inputControl, items, isMany, appearance);
+            select1Handler.outputContent(attributes, staticId, effectiveId, localname, inputControl, items, isMany);
 
         } else {
 
@@ -99,7 +106,9 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+
             {
                 // Create xhtml:input
                 {
@@ -196,7 +205,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                     }
                 }
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
     }
 }

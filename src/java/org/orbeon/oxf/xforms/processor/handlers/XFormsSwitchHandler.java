@@ -14,41 +14,48 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xforms:switch.
  */
-public class XFormsSwitchHandler extends XFormsBaseHandler {
-
-    protected String effectiveSwitchId;
+public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
 
     public XFormsSwitchHandler() {
         super(false, false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        effectiveSwitchId = handlerContext.getEffectiveId(attributes);
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-        // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-        final XFormsSwitchControl switchXFormsControl = ((XFormsSwitchControl) containingDocument.getObjectByEffectiveId(effectiveSwitchId));
-        handleMIPClasses(classes, handlerContext.getId(attributes), switchXFormsControl);
+        if (!handlerContext.isNewXHTMLLayout()) {
 
-        // Start xhtml:span
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-        handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveSwitchId));
+            // Find classes to add
+            final AttributesImpl newAttributes; {
+                final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+                handleMIPClasses(classes, handlerContext.getId(attributes), xformsControl);
+                newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+            }
+
+            // Start xhtml:span
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+        }
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-        // Close xhtml:span
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-        handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+        if (!handlerContext.isNewXHTMLLayout()) {
+            // Close xhtml:span
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+        }
     }
 }

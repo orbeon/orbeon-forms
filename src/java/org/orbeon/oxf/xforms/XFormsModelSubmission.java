@@ -59,6 +59,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
+    private final XFormsContainer container;
     private final XFormsContainingDocument containingDocument;
     private final String id;
     private final XFormsModel model;
@@ -109,8 +110,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean fURLNorewrite;
 
-    public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
-        this.containingDocument = containingDocument;
+    public XFormsModelSubmission(XFormsContainer container, String id, Element submissionElement, XFormsModel model) {
+        this.container = container;
+        this.containingDocument = container.getContainingDocument();
         this.id = id;
         this.submissionElement = submissionElement;
         this.model = model;
@@ -252,7 +254,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
         return model;
     }
 
@@ -260,7 +262,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return model;
     }
 
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+    public List getEventHandlers(XFormsContainer container) {
         return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
     }
 
@@ -576,7 +578,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Submission Options."
 
                     final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, boundNodeInfo, requestedSerialization);
-                    containingDocument.dispatchEvent(pipelineContext, serializeEvent);
+                    container.dispatchEvent(pipelineContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
 
@@ -878,7 +880,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     // "the event xforms-submit-done is dispatched"
                                     if (!isDeferredSubmissionSecondPassReplaceAll) // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult));
+                                        container.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult));
 
                                     // Remember that we got a submission producing output
                                     containingDocument.setGotSubmissionReplaceAll();
@@ -923,7 +925,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             // analysis if the instance value is not obtained through AVT, and
                                             // dynamically otherwise. However, in the dynamic case, I think that this
                                             // should be a (currently non-specified by XForms) xforms-binding-error.
-                                            containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
+                                            container.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                         } else {
                                             final XFormsInstance newInstance;
                                             try {
@@ -1127,12 +1129,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         : XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, 0);
                     
                     submitErrorEvent.setThrowable(e);
-                    containingDocument.dispatchEvent(pipelineContext, submitErrorEvent);
+                    container.dispatchEvent(pipelineContext, submitErrorEvent);
                 }
             } finally {
                 // If submission succeeded, dispatch success event
                 if (submitDoneEvent != null && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                    containingDocument.dispatchEvent(pipelineContext, submitDoneEvent);
+                    container.dispatchEvent(pipelineContext, submitDoneEvent);
                 }
                 // Log total time spent in submission if needed
                 if (XFormsServer.logger.isDebugEnabled()) {
@@ -1147,7 +1149,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
     }
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         // NOP
     }
 

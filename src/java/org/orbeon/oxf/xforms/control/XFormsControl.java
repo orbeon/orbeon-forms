@@ -446,11 +446,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         getAlert(pipelineContext);
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainingDocument containingDocument) {
+    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
         return parent;
     }
 
-    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+    public List getEventHandlers(XFormsContainer container) {
         return containingDocument.getStaticState().getEventHandlers(getId());
     }
 
@@ -513,7 +513,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         }
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         // NOP
     }
 

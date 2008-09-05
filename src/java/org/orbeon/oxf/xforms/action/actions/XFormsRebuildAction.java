@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -34,14 +35,15 @@ public class XFormsRebuildAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
+        final XFormsContainer container = actionInterpreter.getContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? containingDocument.getModelByEffectiveId(modelId) : actionInterpreter.getContextStack().getCurrentModel();// xxx fix not effective
+        final XFormsModel model = (modelId != null) ? container.getModelByEffectiveId(modelId) : actionInterpreter.getContextStack().getCurrentModel();// xxx fix not effective
 
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
 
-        containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+        container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
     }
 }

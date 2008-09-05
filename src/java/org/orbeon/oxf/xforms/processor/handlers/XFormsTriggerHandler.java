@@ -39,6 +39,8 @@ import java.util.Map;
  */
 public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
+    private boolean isModal;
+
     public XFormsTriggerHandler() {
         super(false);
     }
@@ -53,6 +55,27 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Triggers don't need an alert
+    }
+
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+        final String modalAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "modal");
+        this.isModal = "true".equals(modalAttribute);
+    }
+
+    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+        // Set modal class
+        // TODO: xf:trigger/@xxforms:modal; do this in static state?
+        if (isModal)
+            classes.append(" xforms-trigger-appearance-modal");
+    }
+
+    protected QName getAppearance(Attributes controlAttributes) {
+        // Override appearance in noscript mode
+        final QName originalAppearance = super.getAppearance(controlAttributes);
+        if (handlerContext.isNoScript() && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
+            return XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
+        else
+            return originalAppearance;
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
@@ -73,31 +96,17 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
         final String labelValue = handlerContext.isTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
 
-        // Get appearance
-        final QName appearance; {
-            // Override appearance in noscript mode
-            final QName originalAppearance = getAppearance(attributes);
-            if (isNoscript && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
-                appearance = XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
-            else
-                appearance = originalAppearance;
+        final AttributesImpl newAttributes;
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            newAttributes = reusableAttributes;
+        } else {
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
+            handleMIPClasses(classes, staticId, triggerControl);
+            containingDocument.getStaticState().appendClasses(classes, staticId);
+            addCustomClasses(classes, triggerControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
-
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl, appearance, false);
-        handleMIPClasses(classes, staticId, triggerControl);
-        containingDocument.getStaticState().appendClasses(classes, staticId);
-
-        {
-            // Set modal class
-            final String modalAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "modal");
-            // Code below implements a different default for xforms:trigger and xforms:submit, but it's not clear we want that
-//            final boolean isSubmit = localname.equals("submit");
-//            if ((!isSubmit && "true".equals(modalAttribute)) || (isSubmit && !"false".equals(modalAttribute)))
-            if ("true".equals(modalAttribute))
-                classes.append(" xforms-trigger-appearance-modal");
-        }
-
-        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes
         handleAccessibilityAttributes(attributes, newAttributes);
@@ -109,6 +118,7 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }
 
+        final QName appearance = getAppearance(attributes);
         if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
             // Minimal (AKA "link") appearance
 
@@ -177,7 +187,7 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
             final String elementName;
-            if (isNoscript) {
+            if (handlerContext.isNoScript()) {
                 // We need a name to detect activation
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 

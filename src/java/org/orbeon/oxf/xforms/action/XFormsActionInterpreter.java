@@ -17,10 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -38,14 +35,17 @@ import java.util.Map;
  */
 public class XFormsActionInterpreter {
 
-    private XFormsContainingDocument containingDocument;
+    private final XFormsContainer container;
+    private final XFormsContainingDocument containingDocument;
 
-    private XFormsControls xformsControls;
-    private XFormsContextStack contextStack;
+    private final XFormsControls xformsControls;
+    private final XFormsContextStack contextStack;
 
-    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainer container,
                                    XFormsEventHandlerContainer eventHandlerContainer, Element actionElement, String containerId) {
-        this.containingDocument = containingDocument;
+
+        this.container = container;
+        this.containingDocument = container.getContainingDocument();
 
         this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(containingDocument);
@@ -75,6 +75,10 @@ public class XFormsActionInterpreter {
 
         // Push binding for outermost action
         contextStack.pushBinding(pipelineContext, actionElement);
+    }
+
+    public XFormsContainer getContainer() {
+        return container;
     }
 
     public XFormsContainingDocument getContainingDocument() {

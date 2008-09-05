@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -406,15 +407,18 @@ public class XFormsInsertAction extends XFormsAction {
     }
 
     private static boolean isAdjustIndexes(XFormsContainingDocument containingDocument) {
-        final SequenceIterator si = containingDocument.getCurrentEvent().getAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT);
-        if (si != null) {
-            try {
-                final Item item = si.next();
-                if (item instanceof BooleanValue) {
-                    return !((BooleanValue) item).getBooleanValue();
+        final XFormsEvent currentEvent = containingDocument.getCurrentEvent();
+        if (currentEvent != null) {// this will be null if we happen to be in a non-top-level container; won't fix now because this is a hack anyway
+            final SequenceIterator si = currentEvent.getAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT);
+            if (si != null) {
+                try {
+                    final Item item = si.next();
+                    if (item instanceof BooleanValue) {
+                        return !((BooleanValue) item).getBooleanValue();
+                    }
+                } catch (XPathException e) {
+                    throw new OXFException(e);
                 }
-            } catch (XPathException e) {
-                throw new OXFException(e);
             }
         }
         return true;

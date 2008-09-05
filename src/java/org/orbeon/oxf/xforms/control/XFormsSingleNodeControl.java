@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
@@ -105,10 +106,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     protected void getMIPsIfNeeded() {
         if (!mipsRead) {
-            final NodeInfo currentNodeInfo = bindingContext.getSingleNode();
+            final Item currentItem = bindingContext.getSingleItem();
             if (bindingContext.isNewBind()) {
-                if (currentNodeInfo != null) {
+                if (currentItem instanceof NodeInfo) {
                     // Control is bound to a node - get model item properties
+                    final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
                     this.readonly = InstanceData.getInheritedReadonly(currentNodeInfo);
                     this.required = InstanceData.getRequired(currentNodeInfo);
                     this.relevant = InstanceData.getInheritedRelevant(currentNodeInfo);
@@ -131,7 +133,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
                 this.readonly = false;
                 this.required = false;
-                this.relevant = (currentNodeInfo != null) ? InstanceData.getInheritedRelevant(currentNodeInfo) : false; // inherit relevance anyway
+                this.relevant = (currentItem instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentItem) : false; // inherit relevance anyway
                 this.valid = true;// by default, a control is not invalid
                 this.type = null;
             }

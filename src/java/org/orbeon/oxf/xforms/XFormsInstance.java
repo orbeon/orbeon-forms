@@ -642,8 +642,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     public List getEventHandlers(XFormsContainer container) {
-        final XFormsStaticState staticState = container.getContainingDocument().getStaticState();
-        return (staticState != null) ? staticState.getEventHandlers(instanceId) : null;
+        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(effectiveModelId));
     }
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {

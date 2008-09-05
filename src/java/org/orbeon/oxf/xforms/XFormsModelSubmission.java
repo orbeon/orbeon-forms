@@ -263,7 +263,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     public List getEventHandlers(XFormsContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
+        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

@@ -1474,6 +1474,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Return the List of XFormsEventHandler objects within this object.
      */
     public List getEventHandlers(XFormsContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
+        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 }

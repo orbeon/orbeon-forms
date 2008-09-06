@@ -12,11 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-/* *********************************************** Colors, fonts, etc. ********************************************** */
+/* ***** Colors, fonts, etc. **************************************************************************************** */
 
 /* TODO: repeats and dialogs still have colors and fonts settings in form-runner-base.css */
 
-/* *********************************************** Basic HTML settings ********************************************** */
+/* ***** Basic HTML settings **************************************************************************************** */
 
 html { overflow: scroll }/* TODO: add comment about why this is useful (if is actually is) */
 
@@ -75,7 +75,7 @@ th { font-weight:bold; text-align:center }
 caption { margin-bottom:.5em; text-align:center }
 p, fieldset, table { margin-bottom: 1em }
 
-/* ****************************************************** Other ***************************************************** */
+/* ***** Other ****************************************************************************************************** */
 
 .fr-top, .fr-bottom { background-repeat: no-repeat }
 .fr-top { line-height: 10px; }/* help background image display */
@@ -191,7 +191,7 @@ p, fieldset, table { margin-bottom: 1em }
     border-bottom: 1px dotted #666699;
 }
 
-/* ************************************************** Print and PDF ************************************************* */
+/* ***** Print and PDF ********************************************************************************************** */
 
 /* This is also used for PDF generation */
 @media print {

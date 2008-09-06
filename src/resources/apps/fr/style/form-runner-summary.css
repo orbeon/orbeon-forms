@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-/* ************************************************** Summary Page ************************************************** */
+/* ***** Summary Page *********************************************************************************************** */
 
 .fr-summary-repeat-column-number { text-align: right; width: 3em }
 
@@ -30,6 +30,9 @@
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
 .fr-summary-table th { background-color: #f8f8f8 }
 .fr-summary-table td, .fr-summary-table th { padding: 4px }
+
+/* Mainly to prevent dates to wrap */
+.fr-summary-table td { white-space: nowrap }
 
 .fr-summary-table {
     margin: 1px 0 0 1px;
@@ -57,3 +60,5 @@
 
 /* Controls added just to expose instance nodes to JavaScript */
 .fr-expose-to-javascript { display: none }
+
+.xforms-readonly input { background-color: white; background-image: none; border: 0 solid white }

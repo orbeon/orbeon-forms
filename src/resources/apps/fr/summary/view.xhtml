@@ -27,9 +27,13 @@
 
     <head>
         <title>Orbeon Form Runner</title>
-        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css" media="all"/>
         <!-- Summary page XForms model -->
         <xforms:model id="fr-form-model">
+
+            <!-- NOTE: This test is duplicated in other places -->
+            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+            <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
@@ -38,6 +42,32 @@
                                origin="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+
+                <!-- Special treatment for Form Builder -->
+                <xforms:action if="$is-form-builder and doc-available('oxf:/config/form-runner-roles.xml')">
+                    <xxforms:variable name="roles-config" select="doc('oxf:/config/form-runner-roles.xml')" as="document-node()"/>
+                    <xxforms:variable name="all-roles" select="for $r in $roles-config/*/constraint/role return $r" as="element(role)*"/>
+
+                    <!-- Extract roles from request -->
+                    <xxforms:variable name="header-name" select="xxforms:property('oxf.fb.security.roles-header')" as="xs:string?"/>
+                    <xxforms:variable name="header-roles" as="xs:string?"
+                                      select="for $r in $all-roles return if (normalize-space($r) = tokenize(xxforms:get-request-header($header-name), '\s')) then $r else ()"/>
+                    <xxforms:variable name="current-roles" as="xs:string?" select="$header-roles"/>
+
+                    <!-- TODO: option of using HTTP roles -->
+                    <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
+
+                    <!-- Check which constraints apply if any -->
+                    <xforms:action if="$current-roles[1]">
+                        <xforms:setvalue ref="instance('fr-search-constraints')/app" value="$current-roles[1]/../app"/>
+                        <xforms:setvalue ref="instance('fr-search-constraints')/form" value="$current-roles[1]/../form"/>
+                    </xforms:action>
+                    <xforms:action if="not($current-roles[1])">
+                        <!-- TODO: in this case, nothing must be shown! -->
+                    </xforms:action>
+
+                </xforms:action>
+
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
             </xforms:action>
@@ -124,6 +154,16 @@
                 </xxforms:script>
             </xforms:action>
 
+            <!-- Instance to specifed constraints -->
+            <xforms:instance id="fr-search-constraints">
+                <search xmlns="">
+                    <!-- Application name -->
+                    <app/>
+                    <!-- Form name -->
+                    <form/>
+                </search>
+            </xforms:instance>
+
             <!-- Instance to track search results and paging -->
             <xforms:instance id="fr-search-instance">
                 <search xmlns="">
@@ -150,6 +190,19 @@
                 <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
+
+                <!-- Binds specific to Form Builder -->
+                <xforms:bind nodeset=".[$is-form-builder]">
+                    <!-- Copy over constraints if they are not empty -->
+                    <!--<xforms:bind nodeset="app[normalize-space(instance('fr-search-constraints')/app)]" calculate="normalize-space(instance('fr-search-constraints')/app)"/>-->
+                    <!--<xforms:bind nodeset="form[normalize-space(instance('fr-search-constraints')/form)]" calculate="normalize-space(instance('fr-search-constraints')/form)"/>-->
+                    <!-- Make readonly search terms that have constraints -->
+                    <xforms:bind nodeset="query[normalize-space(instance('fr-search-constraints')/app) and contains(@path, 'application-name')]"
+                                 calculate="normalize-space(instance('fr-search-constraints')/app)"/>
+                    <xforms:bind nodeset="query[normalize-space(instance('fr-search-constraints')/form) and contains(@path, 'form-name')]"
+                                 calculate="normalize-space(instance('fr-search-constraints')/form)"/>
+                </xforms:bind>
+
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
@@ -177,7 +230,7 @@
                 <xforms:bind nodeset="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
                 <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
                 <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
-                <xforms:bind nodeset="page-count" calculate="(../total + ../page-size - 1) idiv ../page-size"/>
+                <xforms:bind nodeset="page-count" calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
                 <xforms:bind nodeset="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
                 <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
                 <xforms:bind nodeset="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
@@ -332,6 +385,8 @@
         </xhtml:script>
     </head>
     <body>
+        <!-- Whether this is the summary page for the form builder -->
+        <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
@@ -572,9 +627,6 @@
 
             </fr:body>
             <fr:buttons>
-
-                <!-- Whether this is the summary page for the form builder -->
-                <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
 
                 <!-- Custom buttons for the summary page -->
                 <xhtml:div class="fr-buttons fr-summary-buttons">

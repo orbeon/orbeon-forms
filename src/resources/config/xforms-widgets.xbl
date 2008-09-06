@@ -185,7 +185,7 @@
                         </xhtml:tr>
                     </xhtml:table>
                 </xforms:group>
-                <div class="widgets-xforms-instance-inspector-source" id="widgets-xforms-instance-inspector">
+                <xhtml:div class="widgets-xforms-instance-inspector-source" id="widgets-xforms-instance-inspector">
                     <xforms:group ref="instance('orbeon-xforms-instance-inspector-instance')">
                         <xforms:group ref="if (function = 'evaluate-xpath') then xml-output else
                                 xxforms:instance(instance('orbeon-xforms-instance-inspector-instance')/current-instance)">
@@ -211,7 +211,7 @@
                             </xforms:group>
                         </xforms:group>
                     </xforms:group>
-                </div>
+                </xhtml:div>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

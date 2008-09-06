@@ -14,14 +14,14 @@
 
 /* NOTE: IE em factor: 0.9759 */
 
-/* *************************************************** Utilities **************************************************** */
+/* ***** Utilities ************************************************************************************************** */
 
 .fr-clear { clear: both }
 
 .fr-layout-table { padding: 0; margin: 0 }
 .fr-layout-table tr td { width: auto; vertical-align: top }
 
-/* ************************************************* XForms Controls ************************************************ */
+/* ***** XForms Controls ******************************************************************************************** */
 
 /* Make sure disabled items take precendence over display: block on other classes */
 #fr-view .xforms-disabled { display: none }
@@ -143,7 +143,7 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-noscript .xforms-help-panel .xforms-help-image { display: none }
 .xforms-noscript .xforms-help-panel a { margin-left: .5em }
 
-/* ************************************************* General Layout ************************************************* */
+/* ***** General Layout ********************************************************************************************* */
 
 /* Main layout blocks */
 .fr-header { overflow: hidden }
@@ -230,7 +230,7 @@ button.xforms-trigger img { margin-right: 10px }
     width: 13em; *width: 11em
 }
 
-/* **************************************************** Repeats ***************************************************** */
+/* ***** Repeats **************************************************************************************************** */
 
 /* Repeats: all */
 .fr-repeat td { vertical-align: top; padding: 0.2em }
@@ -270,7 +270,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }
 .fr-grid .fr-grid-content .fr-repeat-table .fr-repeat-column-trigger .xforms-trigger { margin-top: 0 }/* because there is a margin set for triggers in grids below */
 
-/* **************************************************** Dialogs ***************************************************** */
+/* ***** Dialogs **************************************************************************************************** */
 
 /* Dialogs */
 .fr-dialog { width: 400px }
@@ -283,7 +283,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-dialog-message { margin-top: .5em; padding-top: 0.5em }
 .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
-/* **************************************************** Sections **************************************************** */
+/* ***** Sections *************************************************************************************************** */
 
 /* Sections */
 .fr-section-container { display: block; clear: both }
@@ -307,7 +307,7 @@ button.xforms-trigger img { margin-right: 10px }
     vertical-align: middle
 }
 
-/* ****************************************************** Grids ***************************************************** */
+/* ***** Grids ****************************************************************************************************** */
 
 .fr-grid {
     width: 100%;
@@ -413,7 +413,7 @@ button.xforms-trigger img { margin-right: 10px }
 #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
 #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 98.7% }
 
-/* ************************************************** Print and PDF ************************************************* */
+/* ***** Print and PDF ********************************************************************************************** */
 
 .fr-print-mode .fr-section-title img { display: none }
 .fr-print-mode .xforms-help-image { display: none }

@@ -66,8 +66,8 @@
             <xsl:apply-templates select="@* except @class"/>
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <xsl:apply-templates select="node()"/>
-                <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
             </xforms:group>
+            <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
     </xsl:template>
 
@@ -109,7 +109,7 @@
             <!-- Form Runner CSS stylesheets -->
             <xsl:if test="normalize-space($css-uri) != ''">
                 <xsl:for-each select="tokenize($css-uri, '\s')[normalize-space() != '']">
-                    <xhtml:link rel="stylesheet" href="{.}" type="text/css"/>
+                    <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
                 </xsl:for-each>
             </xsl:if>
 

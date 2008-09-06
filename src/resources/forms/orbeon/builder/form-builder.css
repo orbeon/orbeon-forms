@@ -37,7 +37,7 @@ a.fb-edit-help-trigger img {
 
 /*.section-container { border-top: 1px solid #666699; margin-top: .5em }*/
 
-/* ************************************************** Toolbox ************************************************** */
+/* ***** Toolbox **************************************************************************************************** */
 
 #fb-toolbox {
     padding: .5em;
@@ -100,7 +100,7 @@ a.fb-edit-help-trigger img {
 
 #fb-toolbox a.xforms-trigger { text-decoration: none }
 
-/* ************************************************** Dialogs ************************************************** */
+/* ***** Dialogs **************************************************************************************************** */
 
 /* Itemset editor dialog */
 #fb-itemset-editor-dialog { width: 35em }
@@ -156,7 +156,7 @@ a.fb-edit-help-trigger img {
 #fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
 #fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
 
-/* ************************************************** In-Place Editing ************************************************** */
+/* ***** In-Place Editing ******************************************************************************************* */
 
 /* In-place editing for regular fields */
 
@@ -217,7 +217,7 @@ a.fb-edit-help-trigger img {
     white-space: nowrap;
 }
 
-/* **************************************************  ************************************************** */
+/* ***** XXX ******************************************************************************************************** */
 
 .fb-metadata-section .fr-grid .fr-cell-content { width: 30em }
 
@@ -377,7 +377,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
 td:hover .fb-click-message { display: block }
 
-/* ************************************************** Accordion menu ************************************************** */
+/* ***** Accordion Menu ********************************************************************************************* */
 
 dl.accordion-menu { margin: 0; padding: 0; width: 100% }
 dl.accordion-menu dt.a-m-t {
@@ -429,7 +429,7 @@ html.accordion-menu-js dd.a-m-d-anim {
 	display: block;
 }
 
-/* ************************************************** Other media ************************************************** */
+/* ***** Other media ************************************************************************************************ */
 
 /* This is also used for PDF generation */
 @media print {

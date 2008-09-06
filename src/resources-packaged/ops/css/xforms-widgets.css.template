@@ -11,6 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
+
+/* ***** Tabs ******************************************************************************************************* */
+
 .widget-tabs {
     border-collapse: collapse;
     border-spacing: 0;
@@ -65,10 +68,16 @@
     padding-right: 2em;
 }
 
+/* ***** XForms Instance Inspector ********************************************************************************** */
+
 .widgets-xforms-instance-inspector {
     display: block;
     clear: both;
-    margin-top: 1em
+    background-color:white;
+    border: 1px solid #333366;
+    margin: 1em;
+    padding: .5em;
+
 }
 
 .widgets-xforms-instance-inspector-source {
@@ -90,4 +99,8 @@
 
 .widgets-xforms-instance-inspector td {
     padding: .5em
+}
+
+.widgets-xforms-instance-inspector h2 {
+    margin: 0
 }

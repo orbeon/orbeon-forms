@@ -481,6 +481,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final String xxformsExcludeResultPrefixes = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
                                 final List children = instanceContainerElement.elements();
                                 if (children == null || children.size() != 1) {
+                                    // TODO: dispatch xforms-link-exception
                                     final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element",
                                             new ExtendedLocationData(locationData, "processing inline XForms instance", instanceContainerElement));
                                     container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));

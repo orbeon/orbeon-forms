@@ -245,6 +245,7 @@ public class XFormsContextStack {
         final boolean isNewModel;
         if (modelId != null) {
             newModel = (XFormsModel) container.resolveObjectById(container.getFullPrefix(), modelId);
+            // TODO: dispatch xforms-binding-exception
             if (newModel == null)
                 throw new ValidationException("Invalid model id: " + modelId, locationData);
             isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed
@@ -264,6 +265,7 @@ public class XFormsContextStack {
         {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
+                // TODO: dispatch xforms-binding-exception if no bind is found
                 newNodeset = newModel.getBinds().getBindNodeset(bindId, currentBindingContext.getSingleItem());
                 hasOverriddenContext = false;
                 contextItem = currentBindingContext.getSingleItem();

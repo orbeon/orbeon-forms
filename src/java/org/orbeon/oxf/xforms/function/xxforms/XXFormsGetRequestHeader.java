@@ -28,7 +28,7 @@ import org.orbeon.saxon.value.StringValue;
 import java.util.Collections;
 
 /**
- * xxforms:get-header($header-name as xs:string) as xs:string*
+ * xxforms:get-request-header($header-name as xs:string) as xs:string*
  *
  * Return the value(s) of the given HTTP request header. Only supported during initialization.
  */

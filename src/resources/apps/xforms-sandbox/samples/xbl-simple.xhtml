@@ -23,7 +23,7 @@
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance xmlns="">
-                    <value0>42</value0>
+                    <value0/>
                     <value1>
                         <date>d1</date>
                         <time>t1</time>
@@ -34,6 +34,8 @@
                     </value2>
                 </instance>
             </xforms:instance>
+
+            <xforms:setvalue ev:event="xforms-model-construct-done" ref="value0" value="42"/>
         </xforms:model>
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="test-component" element="foo|test">
@@ -89,7 +91,7 @@
         <foo:test id="my-test-1" myref="value1" foobar="en fr"/>
         <foo:test id="my-test-2" myref="value2"/>
 
-        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+        <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </xhtml:body>
 </xhtml:html>

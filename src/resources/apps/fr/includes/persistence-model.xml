@@ -38,6 +38,24 @@
                          value="concat(xxforms:property('oxf.fr.appserver.uri'),
                                     xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.')))"/>
 
+        <!-- Initialize username and roles -->
+        <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'container'">
+            <!-- Case where we get the username and roles from the container -->
+            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-remote-user()"/>
+            <xforms:message level="xxforms:log-info">Roles: <xforms:output value="xxforms:property('oxf.fr.authentication.container.roles')"/></xforms:message>
+            <xforms:action xxforms:iterate="tokenize(xxforms:property('oxf.fr.authentication.container.roles'), '\s')">
+                <xxforms:variable name="role" select="."/>
+                <xforms:action if="xxforms:is-user-in-role($role)">
+                    <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'roles']/@value" value="if (. = '') then $role else concat(., ' ', $role)"/>
+                </xforms:action>
+            </xforms:action>
+        </xforms:action>
+        <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'header'">
+            <!-- Case where we get the username and roles from headers -->
+            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-request-header(xxforms:property('oxf.fr.authentication.header.username'))"/>
+            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'roles']/@value" value="xxforms:get-request-header(xxforms:property('oxf.fr.authentication.header.roles'))"/>
+        </xforms:action>
+
         <!-- Load current form configuration -->
         <xxforms:variable name="source-form" select="xxforms:get-request-attribute('oxf.fr.form')"/>
         <xforms:action if="exists($source-form)">
@@ -103,7 +121,9 @@
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
-            replace="none"/>
+            replace="none">
+        <xi:include href="persistence-model-headers.xml"/>
+    </xforms:submission>
 
     <!-- Publish form operation -->
     <xforms:action ev:event="fr-publish-form">
@@ -126,14 +146,13 @@
             ref="xxforms:instance('fr-form-instance')" method="put"
             resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
             replace="none">
-
+        <xi:include href="persistence-model-headers.xml"/>
         <!--<xforms:message ev:event="xforms-submit">-->
             <!--zzz-->
             <!--<xforms:output value="event('application')"/>-->
             <!--xxx-->
             <!--<xforms:output value="event('form')"/>-->
         <!--</xforms:message>-->
-
     </xforms:submission>
 
     <!-- Respond to save button activation -->
@@ -242,19 +261,25 @@
             validate="true" method="put"
             ref="event('holder')" xxforms:ensure-uploads="false"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
-            replace="none"/>
+            replace="none">
+        <xi:include href="persistence-model-headers.xml"/>
+    </xforms:submission>
 
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')" xxforms:ensure-uploads="false"
             resource="{event('resource')}"
-            replace="none"/>
+            replace="none">
+        <xi:include href="persistence-model-headers.xml"/>
+    </xforms:submission>
 
     <!-- Get document -->
     <xforms:submission id="fr-get-document-submission"
             method="get" serialization="none"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data.xml"
-            replace="instance" xxforms:instance="fr-form-instance"/>
+            replace="instance" xxforms:instance="fr-form-instance">
+        <xi:include href="persistence-model-headers.xml"/>
+    </xforms:submission>
 
     <!-- Source form with metadata -->
     <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
@@ -262,9 +287,10 @@
     </xforms:instance>
 
     <xforms:submission id="get-source-form-submission"
-        method="get" serialization="none"
-        resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
-        replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
+            method="get" serialization="none"
+            resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
+        <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 
     <xforms:instance id="fr-persistence-instance">
@@ -292,6 +318,13 @@
             <save/>
             <discard/>
         </triggers>
+    </xforms:instance>
+
+    <xforms:instance id="fr-authentication-headers">
+        <headers>
+            <header name="username" value=""/>
+            <header name="roles" value=""/>
+        </headers>
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">
@@ -367,6 +400,8 @@
 
     <xforms:submission id="fr-upload-attachment-submission" xxforms:ensure-uploads="true"
                        ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
-                       method="post" replace="none" resource="test:"/>
+                       method="post" replace="none" resource="test:">
+        <xi:include href="persistence-model-headers.xml"/>
+   </xforms:submission>
 
 </xforms:model>

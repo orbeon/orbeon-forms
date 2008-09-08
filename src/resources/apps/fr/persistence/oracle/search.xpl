@@ -81,23 +81,38 @@
 
                                 <!-- Query that returns all the search results, which we will reuse in multiple palces -->
                                 <xsl:variable name="query">
-                                    select created, last_modified, document_id
+                                    select
+                                        data.created, data.last_modified, data.document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-                                            , extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
+                                            , extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
                                                 '<xsl:value-of select="f:namespaces(.)"/>') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
-                                    from orbeon_form_data
-                                    where app = <sql:param type="xs:string" select="/search/app"/>
-                                        and form = <sql:param type="xs:string" select="/search/form"/>
+                                    from orbeon_form_data data,
+                                        (
+                                            select max(last_modified) last_modified, app, form, document_id
+                                            from orbeon_form_data
+                                            where
+                                                app = <sql:param type="xs:string" select="/search/app"/>
+                                                and form = <sql:param type="xs:string" select="/search/form"/>
+                                            group by app, form, document_id
+                                        ) latest
+                                    where
+                                        <!-- Merge with 'latest', to make sure we only consider the documet with the most recent last_date -->
+                                        data.last_modified = latest.last_modified
+                                        and data.app = latest.app
+                                        and data.form = latest.form
+                                        and data.document_id = latest.document_id
+                                        <!-- Don't take document that have been deleted -->
+                                        and data.deleted = 'N'
                                         <!-- Conditions on searcheable columns -->
                                         <xsl:for-each select="/search/query[@path and . != '']">
-                                            and lower(extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
+                                            and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
                                                 like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
                                         <xsl:if test="/search/query[empty(@path) and . != '']">
-                                             and contains(xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
+                                             and contains(data.xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
                                         </xsl:if>
                                     order by created
                                 </xsl:variable>

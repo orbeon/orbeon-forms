@@ -130,6 +130,11 @@ public class URLRewriter {
                 absolutePathNoContext = absoluteURINoContextURI.getPath();
             }
 
+            if (absolutePathNoContext.startsWith("/xforms-server/")) {
+                // These special URLs must not be rewritten
+                return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            }
+
             // 2. Determine if URL is a platform or application URL based on reserved paths
             final boolean isPlatformURL = absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
 

@@ -132,6 +132,9 @@
     <xforms:instance id="fr-form-resources" xxforms:readonly="true">
         <resources>
             <resource xml:lang="en">
+                <application-form-name>
+                    <label>Application and Form Names</label>
+                </application-form-name>
                 <application-name>
                     <label>Application Name</label>
                     <hint>click to add</hint>
@@ -162,6 +165,9 @@
                 <!-- TODO: i18n whole Form Builder -->
             </resource>
             <resource xml:lang="fr">
+                <application-form-name>
+                    <label>Nom de l'application et du formulaire</label>
+                </application-form-name>
                 <application-name>
                     <label>Nom de l'application</label>
                     <hint>Veuillez entrer un nom d'application</hint>

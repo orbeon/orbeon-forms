@@ -221,12 +221,13 @@ a.fb-edit-help-trigger img {
 
 /* ***** XXX ******************************************************************************************************** */
 
+.fb-metadata-ids { margin-top: 0 }
+.fb-metadata-ids .fr-grid-content { padding: .2em .2em .5em .2em }
+
 .fb-metadata-section .fr-grid .fr-cell-content { width: 30em }
 
 .fb-metadata-section {
-    background-image: url(../../../apps/fr/style/logo-bg.gif);
-    background-repeat: repeat-x;
-    background-color: #F8F8F8
+    background: #F8F8F8 url( ../../../apps/fr/style/logo-bg.gif ) repeat-x;
 }
 .fb-metadata-logo { vertical-align: middle }
 

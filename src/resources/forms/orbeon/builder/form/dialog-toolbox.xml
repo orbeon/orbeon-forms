@@ -399,40 +399,6 @@
                     </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>
-            <xhtml:dt class="a-m-t">Metadata</xhtml:dt>
-            <xhtml:dd class="a-m-d">
-                <xhtml:div class="bd">
-                    <!-- NOTE: ideally we would put an fr-grid on a <div> here, but this breaks with IE 7 and the accordion menu! -->
-                    <xhtml:div class="fr-grid-content fb-metadata-settings">
-
-                        <!-- Use an input if app name is a wildcard -->
-                        <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                        <xforms:group ref=".[$is-input]">
-                            <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                                <xforms:label ref="$form-resources/application-name/label"/>
-                                <xforms:hint ref="$form-resources/application-name/hint"/>
-                                <xforms:alert ref="$form-resources/application-name/alert"/>
-                            </xforms:input>
-                        </xforms:group>
-                        <!-- Otherwise list apps allowed -->
-                        <xforms:group ref=".[not($is-input)]">
-                            <xforms:select1 bind="application-name-bind">
-                                <xforms:label ref="$form-resources/application-name/label"/>
-                                <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
-                                    <xforms:label ref="@name"/>
-                                    <xforms:value ref="@name"/>
-                                </xforms:itemset>
-                            </xforms:select1>
-                        </xforms:group>
-
-                        <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                            <xforms:label ref="$form-resources/form-name/label"/>
-                            <xforms:hint ref="$form-resources/form-name/hint"/>
-                            <xforms:alert ref="$form-resources/form-name/alert"/>
-                        </xforms:input>
-                    </xhtml:div>
-                </xhtml:div>
-            </xhtml:dd>
             <xhtml:dt class="a-m-t">Advanced</xhtml:dt>
             <xhtml:dd class="a-m-d">
                 <xhtml:div class="bd">

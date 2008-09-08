@@ -40,8 +40,10 @@ public class XXFormsGetRemoteUser extends XFormsFunction {
 
         // Return user name
         final String remoteUser= (String) externalContext.getRequest().getRemoteUser();
-        return remoteUser == null
-                ? EmptyIterator.getInstance()
-                : new ListIterator(Collections.singletonList(new StringValue(remoteUser)));
+        if (remoteUser == null) {
+            return EmptyIterator.getInstance();
+        } else {
+            return new ListIterator(Collections.singletonList(new StringValue(remoteUser)));
+        }
     }
 }

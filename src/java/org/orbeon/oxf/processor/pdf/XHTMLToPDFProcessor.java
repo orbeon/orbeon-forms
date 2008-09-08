@@ -70,7 +70,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     final String resolvedURI = resolveURI(uri);
                     final ConnectionResult connectionResult
                             = NetUtils.openConnection(externalContext, indentedLogger, "GET", new URL(resolvedURI),
-                                null, null, null, null, null, null, null);
+                                null, null, null, null, null, null);
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();

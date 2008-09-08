@@ -613,7 +613,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                     new String[] { "URI", absoluteResolvedURLString });
 
                                         connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
-                                                "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null, null);
+                                                "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
 
                                         try {
                                             try {

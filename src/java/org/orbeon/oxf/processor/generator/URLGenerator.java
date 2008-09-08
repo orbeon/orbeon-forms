@@ -119,11 +119,11 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      List headerNames, Map headerNameValues, String forwardHeaders,
+                      Map headerNameValues, String forwardHeaders,
                       boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode,
-                headerNames, headerNameValues, forwardHeaders,
+                headerNameValues, forwardHeaders,
                 cacheUseLocalCache, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -136,7 +136,6 @@ public class URLGenerator extends ProcessorImpl {
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private boolean validating = DEFAULT_VALIDATING;
-        private List headerNames;
         private Map headerNameValues;
         private String headersToForward;
         private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
@@ -168,7 +167,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      List headerNames, Map headerNameValues, String headersToForward,
+                      Map headerNameValues, String headersToForward,
                       boolean cacheUseLocalCache, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
@@ -177,7 +176,6 @@ public class URLGenerator extends ProcessorImpl {
             this.forceEncoding = forceEncoding;
             this.ignoreConnectionEncoding = ignoreConnectionEncoding;
             this.validating = validating;
-            this.headerNames = headerNames;
             this.headerNameValues = headerNameValues;
             this.headersToForward = headersToForward;
             this.handleXInclude = handleXInclude;
@@ -227,10 +225,6 @@ public class URLGenerator extends ProcessorImpl {
 
         public String getMode() {
             return mode;
-        }
-
-        public List getHeaderNames() {
-            return headerNames;
         }
 
         public Map getHeaderNameValues() {
@@ -316,20 +310,17 @@ public class URLGenerator extends ProcessorImpl {
                                     throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                                 // Get headers
-                                List headerNames = null;
                                 Map headerNameValues = null;
                                 for (Iterator i = configElement.selectNodes("/config/header").iterator(); i.hasNext();) {
                                     final Element currentHeaderElement = (Element) i.next();
                                     final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
                                     final String currentHeaderValue = currentHeaderElement.element("value").getStringValue();
 
-                                    if (headerNames == null) {
+                                    if (headerNameValues == null) {
                                         // Lazily create collections
-                                        headerNames = new ArrayList();
-                                        headerNameValues = new HashMap();
+                                        headerNameValues = new LinkedHashMap();
                                     }
 
-                                    headerNames.add(currentHeaderName);
                                     headerNameValues.put(currentHeaderName, currentHeaderValue);
                                 }
 
@@ -365,7 +356,7 @@ public class URLGenerator extends ProcessorImpl {
                                     // Create configuration
                                     final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                             ignoreConnectionEncoding, validating, handleXInclude, mode,
-                                            headerNames, headerNameValues, forwardHeaders,
+                                            headerNameValues, forwardHeaders,
                                             cacheUseLocalCache, tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
@@ -801,7 +792,7 @@ public class URLGenerator extends ProcessorImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
                 connectionResult = NetUtils.openConnection(externalContext, indentedLogger, "GET", config.getURL(), null, null, null, null,
-                        config.getHeaderNames(), config.getHeaderNameValues(), config.getHeadersToForward());
+                        config.getHeaderNameValues(), config.getHeadersToForward());
                 inputStream = connectionResult.getResponseInputStream();
             }
         }

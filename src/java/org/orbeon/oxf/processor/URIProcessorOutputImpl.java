@@ -382,7 +382,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, null, null);
+                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, null);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

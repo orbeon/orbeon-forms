@@ -939,11 +939,11 @@ public class NetUtils {
      */
     public static ConnectionResult openConnection(ExternalContext externalContext, IndentedLogger indentedLogger,
                                                   String httpMethod, final URL connectionURL, String username, String password, String contentType,
-                                                  byte[] messageBody, List headerNames, Map headerNameValues, String headersToForward) {
+                                                  byte[] messageBody, Map headerNameValues, String headersToForward) {
 
         // Get  the headers to forward if any
         final Map headersMap = (externalContext.getRequest() != null) ?
-                getHeadersMap(externalContext, indentedLogger, username, headerNames, headerNameValues, headersToForward) : null;
+                getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : null;
         // Open the connection
         return openConnection(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
     }
@@ -957,7 +957,7 @@ public class NetUtils {
      * o a list of headers to forward
      */
     public static Map getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
-                                    List headerNames, Map headerNameValues, String headersToForward) {
+                                    Map headerNameValues, String headersToForward) {
         // Resulting header names and values to set
         final LinkedHashMap headersMap = new LinkedHashMap();
 
@@ -965,10 +965,11 @@ public class NetUtils {
         final Map headersToForwardMap = getHeadersToForward(headersToForward);
 
         // Set headers if provided
-        if (headerNames != null && headerNames.size() > 0) {
-            for (Iterator i = headerNames.iterator(); i.hasNext();) {
-                final String currentHeaderName = (String) i.next();
-                final String currentHeaderValue = (String) headerNameValues.get(currentHeaderName);
+        if (headerNameValues != null && headerNameValues.size() > 0) {
+            for (Iterator i = headerNameValues.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String currentHeaderName = (String) currentEntry.getKey();
+                final String currentHeaderValue = (String) currentEntry.getValue();
                 // Set header
                 headersMap.put(currentHeaderName, currentHeaderValue);
                 // Remove from list of headers to forward below

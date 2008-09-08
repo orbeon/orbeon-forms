@@ -103,9 +103,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean xxfFormsEnsureUploads;
 
-    private List headerNames;
-    private Map headerNameValues;
-
     private boolean xxfShowProgress;
 
     private boolean fURLNorewrite;
@@ -188,35 +185,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 avtSeparator = submissionElement.attributeValue("separator");
             }
             includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
-
-            // Headers
-            {
-                final List headerElements = submissionElement.elements("header");
-                if (headerElements.size() > 0) {
-
-                    headerNames = new ArrayList();
-                    headerNameValues = new HashMap();
-
-                    for (Iterator i = headerElements.iterator(); i.hasNext();) {
-                        final Element headerElement = (Element) i.next();
-
-                        // TODO: Handle @nodeset
-                        final Element headerNameElement = headerElement.element("name");
-                        if (headerNameElement == null)
-                            throw new XFormsSubmissionException("Missing <name> child element of <header> element", "processing <header> elements");
-                        final Element headerValueElement = headerElement.element("value");
-                        if (headerValueElement == null)
-                            throw new XFormsSubmissionException("Missing <value> child element of <header> element", "processing <header> elements");
-
-                        // TODO: Handle @value
-                        final String headerName = headerNameElement.getStringValue();
-                        final String headerValue = headerValueElement.getStringValue();
-
-                        headerNames.add(headerName);
-                        headerNameValues.put(headerName, headerValue);
-                    }
-                }
-            }
 
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
@@ -701,6 +669,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
                 final boolean isAsyncSubmission = isReplaceNone && "asynchronous".equals(resolvedMode);// for now we only support this with replace="none"
 
+                // Evaluate headers if any
+                final Map headerNameValues = evaluateHeaders(pipelineContext, contextStack);
+
                 // Result information
                 ConnectionResult connectionResult = null;
                 final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
@@ -737,7 +708,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && !fURLNorewrite
                                && !isNoscript // This SHOULD work with isNoscript as well, but it turns out we get exceptions related to content handlers, so disable for now
-                               && headerNames == null
+                               && headerNameValues == null
                                && !isAsyncSubmission // for now we don't handle optimized async; could be optimized in the future
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
@@ -830,7 +801,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
                                 final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
                                 final Map headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
-                                            resolvedXXFormsUsername,  headerNames, headerNameValues, forwardSubmissionHeaders);
+                                            resolvedXXFormsUsername, headerNameValues, forwardSubmissionHeaders);
 
                                 // Pack call into a Runnable
                                 final Runnable runnable = new Runnable() {
@@ -860,7 +831,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
                                         actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
-                                        headerNames, headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                                        headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                             }
                         }
                     }
@@ -1149,6 +1120,83 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
     }
+
+    /**
+     * Evaluate the <xforms:header> elements children of <xforms:submission>.
+     *
+     * @param pipelineContext   pipeline context
+     * @param contextStack      context stack set to enclosing <xforms:submission>
+     * @return                  LinkedHashMap<String headerName, String headerValue>, or null if no header elements
+     */
+    private Map evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
+        Map headerNameValues;
+        final List headerElements = submissionElement.elements("header");
+        if (headerElements.size() > 0) {
+            headerNameValues = new LinkedHashMap();
+
+            // Iterate over all <xforms:header> elements
+            for (Iterator i = headerElements.iterator(); i.hasNext();) {
+                final Element currentHeaderElement = (Element) i.next();
+
+                contextStack.pushBinding(pipelineContext, currentHeaderElement);
+                final XFormsContextStack.BindingContext currentHeaderBindingContext = contextStack.getCurrentBindingContext();
+                if (currentHeaderBindingContext.isNewBind()) {
+                    // This means there was @nodeset or @bind so we must iterate
+                    final List currentNodeset = contextStack.getCurrentNodeset();
+                    final int currentSize = currentNodeset.size();
+                    if (currentSize > 0) {
+                        // Push all iterations in turn
+                        for (int position = 1; position <= currentSize; position++) {
+                            contextStack.pushIteration(position);
+                            handleHeaderElement(pipelineContext, contextStack, headerNameValues, currentHeaderElement);
+                            contextStack.popBinding();
+                        }
+                    }
+                } else {
+                    // This means there is just a single header
+                    handleHeaderElement(pipelineContext, contextStack, headerNameValues, currentHeaderElement);
+                }
+                contextStack.popBinding();
+            }
+        } else {
+            headerNameValues = null;
+        }
+        return headerNameValues;
+    }
+
+    /**
+     * Evaluate a single <xforms:header> element. It may have a node-set binding.
+     *
+     * @param pipelineContext       pipeline context
+     * @param contextStack          context stack set to <xforms:header> (or element iteration)
+     * @param headerNameValues      LinkedHashMap<String headerName, String headerValue> to update
+     * @param currentHeaderElement  <xforms:header> element to evaluate
+     */
+    private void handleHeaderElement(PipelineContext pipelineContext, XFormsContextStack contextStack, Map headerNameValues, Element currentHeaderElement) {
+        final String headerName;
+        {
+            final Element headerNameElement = currentHeaderElement.element("name");
+            if (headerNameElement == null)
+                throw new XFormsSubmissionException("Missing <name> child element of <header> element", "processing <header> elements");
+
+            contextStack.pushBinding(pipelineContext, headerNameElement);
+            headerName = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, headerNameElement, false, null);
+            contextStack.popBinding();
+        }
+
+        final String headerValue;
+        {
+            final Element headerValueElement = currentHeaderElement.element("value");
+            if (headerValueElement == null)
+                throw new XFormsSubmissionException("Missing <value> child element of <header> element", "processing <header> elements");
+            contextStack.pushBinding(pipelineContext, headerValueElement);
+            headerValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, headerValueElement, false, null);
+            contextStack.popBinding();
+        }
+
+        headerNameValues.put(headerName, headerValue);
+    }
+
     public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
         // NOP
     }

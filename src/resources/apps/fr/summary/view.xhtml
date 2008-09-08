@@ -43,29 +43,9 @@
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
 
-                <!-- Special treatment for Form Builder -->
+                <!-- Special treatment for Form Builder if roles are configured -->
                 <xforms:action if="$is-form-builder and doc-available('oxf:/config/form-runner-roles.xml')">
-                    <xxforms:variable name="roles-config" select="doc('oxf:/config/form-runner-roles.xml')" as="document-node()"/>
-                    <xxforms:variable name="all-roles" select="for $r in $roles-config/*/constraint/role return $r" as="element(role)*"/>
-
-                    <!-- Extract roles from request -->
-                    <xxforms:variable name="header-name" select="xxforms:property('oxf.fb.security.roles-header')" as="xs:string?"/>
-                    <xxforms:variable name="header-roles" as="xs:string?"
-                                      select="for $r in $all-roles return if (normalize-space($r) = tokenize(xxforms:get-request-header($header-name), '\s')) then $r else ()"/>
-                    <xxforms:variable name="current-roles" as="xs:string?" select="$header-roles"/>
-
-                    <!-- TODO: option of using HTTP roles -->
-                    <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
-
-                    <!-- Check which constraints apply if any -->
-                    <xforms:action if="$current-roles[1]">
-                        <xforms:setvalue ref="instance('fr-search-constraints')/app" value="$current-roles[1]/../app"/>
-                        <xforms:setvalue ref="instance('fr-search-constraints')/form" value="$current-roles[1]/../form"/>
-                    </xforms:action>
-                    <xforms:action if="not($current-roles[1])">
-                        <!-- TODO: in this case, nothing must be shown! -->
-                    </xforms:action>
-
+                    <xforms:send submission="fr-get-roles-submission"/>
                 </xforms:action>
 
                 <!-- Query list of documents -->
@@ -139,29 +119,100 @@
             <xforms:action ev:event="fr-summary-xml">
                 <xforms:recalculate/>
                 <!-- TODO -->
-                <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
-            </xforms:action>
-
-            <xforms:action ev:event="fr-offline">
-                <xxforms:script ev:event="DOMActivate">
-                    frTakeOnlineOrOffline(false);
-                </xxforms:script>
-            </xforms:action>
-
-            <xforms:action ev:event="fr-online">
-                <xxforms:script ev:event="DOMActivate">
-                    frTakeOnlineOrOffline(true);
-                </xxforms:script>
+                <!--<xforms:load resource="abc" f:url-type="resource"/>-->
             </xforms:action>
 
             <!-- Instance to specifed constraints -->
+            <xforms:instance id="fr-roles" xxforms:readonly="true">
+                <roles xmlns="">
+                    <!-- Entries look like this: -->
+                    <!--<role name="eforms-list-sash_subside" app="sash" form="subside"/>-->
+                </roles>
+            </xforms:instance>
+
+            <xxforms:variable name="has-roles" select="instance('fr-roles')/role" as="xs:boolean"/>
+
+            <!-- Handle loading of roles configuration -->
+            <xforms:submission id="fr-get-roles-submission" serialize="none"
+                    method="get" resource="oxf:/config/form-runner-roles.xml"
+                    replace="instance" instance="fr-roles">
+
+                <xforms:action ev:event="xforms-submit-done">
+                    <xxforms:variable name="all-roles" select="instance('fr-roles')/role" as="element(role)*"/>
+
+                    <!-- Extract roles from request -->
+                    <xxforms:variable name="header-name" select="xxforms:property('oxf.fb.security.roles-header')" as="xs:string?"/>
+                    <xxforms:variable name="header-roles" as="element(role)*"
+                                      select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:get-request-header($header-name), '\s')) then $r else ()"/>
+                    <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
+
+                    <!-- TODO: option of using HTTP roles -->
+                    <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
+
+                    <!-- Take flat structure and create structure for current role's allowed apps and forms -->
+                    <xxforms:variable name="distinct-apps" as="xs:string*"
+                                      select="distinct-values(instance('fr-roles')/role[@name = ($current-roles/@name, '*')]/@app)"/><!-- also match on "*" to mean "any role" -->
+                    <xforms:action if="$distinct-apps = '*'">
+                        <!-- User has access to all apps (and therefore all forms) -->
+                        <xforms:insert context="instance('fr-search-constraints')"
+                                       origin="xxforms:element('app', (xxforms:attribute('name', '*'), xxforms:element('form', xxforms:attribute('name', '*'))))"/>
+                    </xforms:action>
+                    <xforms:action if="not($distinct-apps = '*')" xxforms:iterate="$distinct-apps">
+                        <!-- User has access to certain apps only -->
+                        <xxforms:variable name="current-app" select="." as="xs:string"/>
+
+                        <!-- Set default value for app if needed -->
+                        <xforms:setvalue if="not(normalize-space($app-query))" ref="$app-query" value="$current-app"/>
+
+                        <!-- Insert new app element -->
+                        <xforms:insert context="instance('fr-search-constraints')" nodeset="app"
+                                       origin="xxforms:element('app', xxforms:attribute('name', $current-app))"/>
+
+                        <xxforms:variable name="distinct-forms" as="xs:string*"
+                                          select="distinct-values(instance('fr-roles')/role[@app = $current-app]/@form)"/>
+
+                        <xforms:action if="$distinct-forms = '*'">
+                            <!-- User has access to all forms within this app -->
+                            <xforms:insert context="instance('fr-search-constraints')/app[@name = $current-app]" nodeset="form"
+                                           origin="xxforms:element('form', xxforms:attribute('name', '*'))"/>
+                        </xforms:action>
+                        <xforms:action if="not($distinct-forms = '*')" xxforms:iterate="$distinct-forms">
+                            <!-- User has access to certain forms within this app only -->
+                            <xxforms:variable name="current-form" select="." as="xs:string"/>
+
+                            <!-- Set default value for form if needed -->
+                            <xforms:setvalue if="not(normalize-space($form-query))" ref="$form-query" value="$current-form"/>
+
+                            <!-- Insert new form element -->
+                            <xforms:insert context="instance('fr-search-constraints')/app[@name = $current-app]" nodeset="form"
+                                           origin="xxforms:element('form', xxforms:attribute('name', $current-form))"/>
+                        </xforms:action>
+                    </xforms:action>
+                    <xforms:action if="not($current-roles)">
+                        <!-- TODO: in this case, nothing must be shown! -->
+                    </xforms:action>
+                </xforms:action>
+
+            </xforms:submission>
+
+            <!-- Instance to specifed constraints -->
             <xforms:instance id="fr-search-constraints">
-                <search xmlns="">
-                    <!-- Application name -->
-                    <app/>
-                    <!-- Form name -->
-                    <form/>
-                </search>
+                <apps xmlns="">
+                    <!--<app name="orbeon">-->
+                        <!--<form name="bookcast"/>-->
+                        <!--<form name="foo"/>-->
+                    <!--</app>-->
+                    <!--<app name="vd">-->
+                        <!--<form name="contact"/>-->
+                        <!--<form name="bar"/>-->
+                    <!--</app>-->
+                    <!--<app name="foo">-->
+                        <!--<form name="*"/>-->
+                    <!--</app>-->
+                    <!--<app name="*">-->
+                        <!--<form name="*"/>-->
+                    <!--</app>-->
+                </apps>
             </xforms:instance>
 
             <!-- Instance to track search results and paging -->
@@ -183,6 +234,9 @@
                 </search>
             </xforms:instance>
 
+            <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xxforms:variable name="form-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+
             <xforms:bind nodeset="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
                 <xforms:bind nodeset="query/@search-field" relevant=". = 'true'"/>
@@ -190,19 +244,6 @@
                 <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
-
-                <!-- Binds specific to Form Builder -->
-                <xforms:bind nodeset=".[$is-form-builder]">
-                    <!-- Copy over constraints if they are not empty -->
-                    <!--<xforms:bind nodeset="app[normalize-space(instance('fr-search-constraints')/app)]" calculate="normalize-space(instance('fr-search-constraints')/app)"/>-->
-                    <!--<xforms:bind nodeset="form[normalize-space(instance('fr-search-constraints')/form)]" calculate="normalize-space(instance('fr-search-constraints')/form)"/>-->
-                    <!-- Make readonly search terms that have constraints -->
-                    <xforms:bind nodeset="query[normalize-space(instance('fr-search-constraints')/app) and contains(@path, 'application-name')]"
-                                 calculate="normalize-space(instance('fr-search-constraints')/app)"/>
-                    <xforms:bind nodeset="query[normalize-space(instance('fr-search-constraints')/form) and contains(@path, 'form-name')]"
-                                 calculate="normalize-space(instance('fr-search-constraints')/form)"/>
-                </xforms:bind>
-
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
@@ -330,6 +371,18 @@
                     <!--}-->
                 <!--</xxforms:script>-->
             </xforms:submission>
+
+            <xforms:action ev:event="fr-offline">
+                <xxforms:script ev:event="DOMActivate">
+                    frTakeOnlineOrOffline(false);
+                </xxforms:script>
+            </xforms:action>
+
+            <xforms:action ev:event="fr-online">
+                <xxforms:script ev:event="DOMActivate">
+                    frTakeOnlineOrOffline(true);
+                </xxforms:script>
+            </xforms:action>
         </xforms:model>
         <xhtml:script type="text/javascript">
             function frTakeOnlineOrOffline(isTakeOnline) {
@@ -398,39 +451,95 @@
                         <xforms:label ref="$fr-resources/summary/labels/free-search"/>
                     </xforms:input>
 
+                    <!-- Special form builder search: use input or select1 for app/form name -->
+                    <xforms:group ref=".[$is-form-builder and $has-roles]">
+                        <div class="fr-summary-search-item">
+                            <!-- Application -->
+                            <xforms:group ref="$app-query">
+                                <xxforms:variable name="control-name" select="@name" as="xs:string"/>
+                                <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                <!-- Use an input if app name is a wildcard -->
+                                <xxforms:variable name="is-input" select="instance('fr-search-constraints')/app[@name = '*']" as="xs:boolean"/>
+                                <xforms:input ref=".[$is-input]" incremental="true" >
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                </xforms:input>
+                                <xforms:select1 ref=".[not($is-input)]">
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                    <xforms:itemset nodeset="instance('fr-search-constraints')/app">
+                                        <xforms:label ref="@name"/>
+                                        <xforms:value ref="@name"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xforms:group>
+                        </div>
+                        <div class="fr-summary-search-item">
+                            <!-- Form -->
+                            <xforms:group ref="$form-query">
+                                <xxforms:variable name="control-name" select="@name" as="xs:string"/>
+                                <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                <xxforms:variable name="current-app" select="instance('fr-search-constraints')/app[@name = $app-query]"/>
+                                <!-- Use an input if app name or form name is a wildcard -->
+                                <xxforms:variable name="is-input" select="instance('fr-search-constraints')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                <xforms:input ref=".[$is-input]" incremental="true" >
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                </xforms:input>
+                                <xforms:select1 ref=".[not($is-input)]">
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                    <xforms:itemset nodeset="$current-app/form">
+                                        <xforms:label ref="@name"/>
+                                        <xforms:value ref="@name"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xforms:group>
+                        </div>
+                    </xforms:group>
+
                     <!-- Structured search over query terms that have search-field set to 'true' -->
                     <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
-                        <xxforms:variable name="control-name" select="context()/@name"/>
+                        <xxforms:variable name="control-name" select="@name"/>
                         <div class="fr-summary-search-item">
                             <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
-                            <!-- input -->
-                            <xforms:input ref=".[@control = 'input']" incremental="true" >
-                                <xforms:label>
-                                    <xforms:output value="$label"/>
-                                </xforms:label>
-                            </xforms:input>
-                            <!-- textarea -->
-                            <xforms:input ref=".[@control = 'textarea']" incremental="true" >
-                                <xforms:label>
-                                    <xforms:output value="$label"/>
-                                </xforms:label>
-                            </xforms:input>
-                            <!-- select1 -->
-                            <xforms:select1 ref=".[@control = 'select1']">
-                                <xforms:label>
-                                    <xforms:output value="$label"/>
-                                </xforms:label>
-                                <xforms:item>
-                                    <xforms:label ref="$fr-resources/summary/labels/any"/>
-                                    <xforms:value/>
-                                </xforms:item>
-                                <xforms:itemset model="fr-persistence-model"
-                                                nodeset="$form-resources/*[local-name() = $control-name]/item"
-                                                xxforms:refresh-items="false">
-                                    <xforms:label ref="label"/>
-                                    <xforms:value ref="value"/>
-                                </xforms:itemset>
-                            </xforms:select1>
+
+                            <xforms:group  ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
+                                <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
+
+                                <!-- input -->
+                                <xforms:input ref=".[@control = 'input']" incremental="true" >
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                </xforms:input>
+                                <!-- textarea -->
+                                <xforms:input ref=".[@control = 'textarea']" incremental="true" >
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                </xforms:input>
+                                <!-- select1 -->
+                                <xforms:select1 ref=".[@control = 'select1']">
+                                    <xforms:label>
+                                        <xforms:output value="$label"/>
+                                    </xforms:label>
+                                    <xforms:item>
+                                        <xforms:label ref="$fr-resources/summary/labels/any"/>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset model="fr-persistence-model"
+                                                    nodeset="$form-resources/*[local-name() = $control-name]/item"
+                                                    xxforms:refresh-items="false">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xforms:group>
                         </div>
                     </xforms:repeat>
                     

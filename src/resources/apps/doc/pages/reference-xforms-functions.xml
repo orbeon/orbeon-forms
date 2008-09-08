@@ -541,6 +541,27 @@
                         </xml-source>
                     </li>
                     <li>
+                        <a name="xxforms-get-remote-user"/>
+                        <p>
+                            <code>xxforms:get-remote-user() xs:string?</code>
+                        </p>
+                        <p>
+                            Returns the username for the current user of the application, if known by the
+                            container, for instance because users log in with BASIC of FORM-based authentication.
+                        </p>
+                    </li>
+                    <li>
+                        <a name="xxforms-is-user-in-role"/>
+                        <p>
+                            <code>xxforms:is-user-in-role(xs:string) as xs:boolean</code>
+                        </p>
+                        <p>
+                            Returns true if and only if the container recognizes that the current user of the application
+                            has the specified role. Roles will be typically known by the container when users are logged
+                            in using either BASIC or FORM-based authentication.
+                        </p>
+                    </li>
+                    <li>
                         <a name="xxforms-valid"/>
                         <p>
                             <code>xxforms:valid($node as node(), $recurse as xs:boolean, $check-required-empty as xs:boolean) as xs:boolean</code>

@@ -156,6 +156,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
+        // xxforms:get-remote-user()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-remote-user", XXFormsGetRemoteUser.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO);
+
+        // xxforms:is-user-in-role(xs:string) as xs:boolean
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}is-user-in-role", XXFormsIsUserInRole.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:call-xpl
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}call-xpl", XXFormsCallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         //StandardFunction.arg(e, 0, Type.ANY_URI_TYPE, StaticProperty.EXACTLY_ONE);

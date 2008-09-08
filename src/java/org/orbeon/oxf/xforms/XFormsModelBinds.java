@@ -601,37 +601,21 @@ public class XFormsModelBinds {
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
         final Map namespaceMap = containingDocument.getNamespaceMappings(bind.getBindElement());
 
-        // Handle XPath constraint MIP
-        if (bind.getConstraint() != null) {
-            // Evaluate constraint
-            try {
-                // Get MIP value
-                final String xpath = "boolean(" + bind.getConstraint() + ")";
-                final boolean valid = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, namespaceMap, getVariables(currentNodeInfo),
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+        // Current validity value
+        // NOTE: This may have been set by schema validation earlier in the validation process
+        boolean isValid = !InstanceData.getValid(currentNodeInfo);
 
-                // Update node with MIP value
-                InstanceData.updateConstraint(currentNodeInfo, valid);
-            } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
-            }
+        // Bail is we are already invalid
+        if (!isValid) {
+            // NOTE: instance must already have been marked as invalid
+            return;
         }
 
-        String nodeValue = null;
-
-        // Handle required MIP
+        // Current required value (computed during previous recalculate)
         final boolean isRequired = InstanceData.getRequired(currentNodeInfo);
-        if (isRequired) {// this assumes that the required MIP has been already computed (during recalculate)
-            // Current node is required...
-            nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
 
-            if ("".equals(nodeValue)) {
-                // ...and empty
-                InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
-            }
-        }
+        // Node value, retrieved if needed
+        String nodeValue = null;
 
         // Handle type MIP
         if (bind.getType() != null) {
@@ -708,6 +692,7 @@ public class XFormsModelBinds {
 
                         // Set error on node if necessary
                         if (result instanceof ValidationErrorValue) {
+                            isValid = false;
                             InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                         }
                     } else if (isBuiltInXXFormsType) {
@@ -719,11 +704,13 @@ public class XFormsModelBinds {
                         if (typeLocalname.equals("xml")) {
                             // xxforms:xml type
                             if (!isOptionalAndEmpty && !XMLUtils.isWellFormedXML(nodeValue)) {
+                                isValid = false;
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }
                         } else if (typeLocalname.equals("xpath2")) {
                             // xxforms:xpath2 type
                             if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(nodeValue, namespaceMap)) {
+                                isValid = false;
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }
 
@@ -740,6 +727,7 @@ public class XFormsModelBinds {
 
                         // Set error on node if necessary
                         if (validationError != null) {
+                            isValid = false;
                             InstanceData.addSchemaError(currentNodeInfo, validationError, nodeValue, bind.getId());
                         }
                     } else {
@@ -752,8 +740,59 @@ public class XFormsModelBinds {
             }
         }
 
+        // Bail is we are already invalid
+        if (!isValid) {
+            // Remember invalid instances
+            final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
+            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
+            return;
+        }
+
+        // Handle required MIP
+        if (isRequired) {// this assumes that the required MIP has been already computed (during recalculate)
+            // Current node is required...
+            if (nodeValue == null)
+                nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
+
+            if ("".equals(nodeValue)) {// TODO: configurable notion of "empty"
+                // ...and empty
+                isValid = false;
+                InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+            }
+        }
+
+        // Bail is we are already invalid
+        if (!isValid) {
+            // Remember invalid instances
+            final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
+            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
+            return;
+        }
+
+        // Handle XPath constraint MIP
+
+        // NOTE: We evaluate the constraint here, so that if the type is not respected the constraint is not evaluated.
+        // This can also prevent XPath errors, e.g.: <xforms:bind nodeset="foobar" type="xs:integer" constraint=". > 10"/>
+        if (bind.getConstraint() != null) {
+            // Evaluate constraint
+            try {
+                // Get MIP value
+                final String xpath = "boolean(" + bind.getConstraint() + ")";
+                final boolean valid = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
+                    nodeset, position, xpath, namespaceMap, getVariables(currentNodeInfo),
+                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+
+                // Update node with MIP value
+                isValid &= valid;
+                InstanceData.updateConstraint(currentNodeInfo, valid);
+            } catch (Exception e) {
+                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
+                        bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
+            }
+        }
+
         // Remember invalid instances
-        if (!InstanceData.getValid(currentNodeInfo)) {
+        if (!isValid) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
             invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
         }

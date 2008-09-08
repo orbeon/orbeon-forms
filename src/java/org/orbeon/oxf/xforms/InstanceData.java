@@ -54,7 +54,7 @@ public class InstanceData {
 
     private String type;
     private boolean valueValid = DEFAULT_VALID;
-    private boolean constraint = DEFAULT_VALID;
+    private boolean constraint = DEFAULT_VALID;// TODO: we don't really need separate constraint information: valueValid is enough!
 
     // Event handling state
     private boolean valueChanged;

@@ -46,6 +46,10 @@
 
         <!-- Load components -->
         <xforms:send submission="fb-load-components"/>
+
+        <!-- Set default value for app and form if needed -->
+        <!-- NOTE: we use xxforms:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
+        <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')" ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
     </xforms:action>
 
     <!-- Variable pointing to the current language -->

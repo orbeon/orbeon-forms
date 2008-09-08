@@ -147,7 +147,7 @@
                 </form-name>
                 <title>
                     <label>Form Title</label>
-                    <hint>click to enter a form title</hint>
+                    <hint>required form title</hint>
                     <alert>The form title is required</alert>
                 </title>
                 <description>
@@ -170,22 +170,22 @@
                 </application-form-name>
                 <application-name>
                     <label>Nom de l'application</label>
-                    <hint>Veuillez entrer un nom d'application</hint>
+                    <hint>nom de l'application</hint>
                     <alert>Le nom de l'application doit être un identifiant non vide</alert>
                 </application-name>
                 <form-name>
                     <label>Nom du formulaire</label>
-                    <hint>Veuillez entrer un nom de formulaire</hint>
+                    <hint>nom du formulaire</hint>
                     <alert>Le nom du formulaire doit être un identifiant non vide</alert>
                 </form-name>
                 <title>
                     <label>Titre du formulaire</label>
-                    <hint>Veuillez entrer un titre de formulaire</hint>
+                    <hint>titre du formulaire</hint>
                     <alert>Le titre de formulaire est requis</alert>
                 </title>
                 <description>
                     <label>Description du formulaire</label>
-                    <hint>Veuillez entrer une description du formulaire</hint>
+                    <hint>description du formulaire</hint>
                 </description>
                 <logo>
                     <label>Logo</label>

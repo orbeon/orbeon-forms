@@ -231,13 +231,16 @@ a.fb-edit-help-trigger img {
 }
 .fb-metadata-logo { vertical-align: middle }
 
-/* TODO: trying to make this more WYSIWYG */
-/*#title-control .fr-inplace-content { text-align: right }*/
-/*#title-control .xforms-input-input { text-align: right }*/
-/*#title-control .fr-inplace-content .xforms-label { float: right }*/
+/* Try some WYSIWYG appearance */
+#title-control .xforms-label { text-align: right; display: none }
+#title-control .xforms-alert { text-align: right }
+#title-control .fr-inplace-content .xforms-output { color: #666699; font-size: 197%; text-align: right }
+#title-control .fr-inplace-content .xforms-input input { color: #666699; font-size: 197%; text-align: right }
 
-/*#description-control .fr-inplace-content { text-align: right }*/
-/*#description-control .fr-inplace-content .xforms-label { float: right }*/
+#description-control .xforms-label { text-align: right; display: none }
+#description-control .xforms-alert { text-align: right }
+#description-control .fr-inplace-content .xforms-output { color: #6E6E6E; font-size: smaller; font-style: italic; text-align: right }
+#description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: smaller; font-style: italic; text-align: right }
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }

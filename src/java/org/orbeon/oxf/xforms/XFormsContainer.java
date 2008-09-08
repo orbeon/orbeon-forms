@@ -575,7 +575,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
         final XFormsEventTarget targetObject = event.getTargetObject();
         try {
-                if (targetObject == null)
+            if (targetObject == null)
                 throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
 
             // Find all event handler containers

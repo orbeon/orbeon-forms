@@ -603,7 +603,7 @@ public class XFormsModelBinds {
 
         // Current validity value
         // NOTE: This may have been set by schema validation earlier in the validation process
-        boolean isValid = !InstanceData.getValid(currentNodeInfo);
+        boolean isValid = InstanceData.getValid(currentNodeInfo);
 
         // Bail is we are already invalid
         if (!isValid) {

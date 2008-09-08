@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model id="fr-roles-model"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+              xmlns:f="http://orbeon.org/oxf/xml/formatting"
+              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+              xmlns:saxon="http://saxon.sf.net/"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!-- NOTE: This test is duplicated in other places -->
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+    <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
+
+    <!-- Model initialization -->
+    <xforms:action ev:event="xforms-model-construct-done">
+        <!-- Special treatment for Form Builder if roles are configured -->
+        <xforms:action if="$is-form-builder and doc-available('oxf:/config/form-runner-roles.xml')">
+            <xforms:send submission="fr-get-roles-submission"/>
+        </xforms:action>
+    </xforms:action>
+
+    <!-- Instance containing roles -->
+    <xforms:instance id="fr-roles" xxforms:readonly="true">
+        <roles xmlns="">
+            <!-- Entries look like this: -->
+            <!--<role name="eforms-list-sash_subside" app="sash" form="subside"/>-->
+        </roles>
+    </xforms:instance>
+
+    <!-- Handle loading of roles configuration -->
+    <xforms:submission id="fr-get-roles-submission" serialization="none"
+            method="get" resource="oxf:/config/form-runner-roles.xml"
+            replace="instance" instance="fr-roles">
+
+        <xforms:action ev:event="xforms-submit-done">
+            <xxforms:variable name="all-roles" select="instance('fr-roles')/role" as="element(role)*"/>
+
+            <!-- Extract roles from request -->
+            <xxforms:variable name="header-name" select="xxforms:property('oxf.fb.security.roles-header')" as="xs:string?"/>
+            <xxforms:variable name="header-roles" as="element(role)*"
+                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:get-request-header($header-name), '\s')) then $r else ()"/>
+            <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
+
+            <!-- TODO: option of using HTTP roles -->
+            <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
+
+            <!-- Take flat structure and create structure for current role's allowed apps and forms -->
+            <xxforms:variable name="distinct-apps" as="xs:string*"
+                              select="distinct-values(instance('fr-roles')/role[@name = ($current-roles/@name, '*')]/@app)"/><!-- also match on "*" to mean "any role" -->
+            <xforms:action if="$distinct-apps = '*'">
+                <!-- User has access to all apps (and therefore all forms) -->
+                <xforms:insert context="instance('fr-permissions')"
+                               origin="xxforms:element('app', (xxforms:attribute('name', '*'), xxforms:element('form', xxforms:attribute('name', '*'))))"/>
+            </xforms:action>
+            <xforms:action if="not($distinct-apps = '*')" xxforms:iterate="$distinct-apps">
+                <!-- User has access to certain apps only -->
+                <xxforms:variable name="current-app" select="." as="xs:string"/>
+
+                <!-- Insert new app element -->
+                <xforms:insert context="instance('fr-permissions')" nodeset="app"
+                               origin="xxforms:element('app', xxforms:attribute('name', $current-app))"/>
+
+                <xxforms:variable name="distinct-forms" as="xs:string*"
+                                  select="distinct-values(instance('fr-roles')/role[@app = $current-app]/@form)"/>
+
+                <xforms:action if="$distinct-forms = '*'">
+                    <!-- User has access to all forms within this app -->
+                    <xforms:insert context="instance('fr-permissions')/app[@name = $current-app]" nodeset="form"
+                                   origin="xxforms:element('form', xxforms:attribute('name', '*'))"/>
+                </xforms:action>
+                <xforms:action if="not($distinct-forms = '*')" xxforms:iterate="$distinct-forms">
+                    <!-- User has access to certain forms within this app only -->
+                    <xxforms:variable name="current-form" select="." as="xs:string"/>
+
+                    <!-- Insert new form element -->
+                    <xforms:insert context="instance('fr-permissions')/app[@name = $current-app]" nodeset="form"
+                                   origin="xxforms:element('form', xxforms:attribute('name', $current-form))"/>
+                </xforms:action>
+            </xforms:action>
+            <xforms:action if="not($current-roles)">
+                <!-- TODO: in this case, nothing must be shown! -->
+            </xforms:action>
+        </xforms:action>
+
+    </xforms:submission>
+
+    <!-- Instance to specife user permissions for app/form -->
+    <xforms:instance id="fr-permissions">
+        <apps xmlns="">
+            <!--<app name="orbeon">-->
+                <!--<form name="bookcast"/>-->
+                <!--<form name="foo"/>-->
+            <!--</app>-->
+            <!--<app name="vd">-->
+                <!--<form name="contact"/>-->
+                <!--<form name="bar"/>-->
+            <!--</app>-->
+            <!--<app name="foo">-->
+                <!--<form name="*"/>-->
+            <!--</app>-->
+            <!--<app name="*">-->
+                <!--<form name="*"/>-->
+            <!--</app>-->
+        </apps>
+    </xforms:instance>
+
+</xforms:model>

@@ -184,6 +184,8 @@
         <xi:include href="../includes/print-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
         <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles roles and permissions -->
+        <xi:include href="../includes/roles-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- Copy existing main model -->
         <xsl:copy>

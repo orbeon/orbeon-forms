@@ -203,14 +203,30 @@
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
                                                 <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
-                                                update <xsl:value-of select="$table-name"/>
-                                                set deleted = 'Y'
-                                                where
-                                                    app = <sql:param type="xs:string" select="/request/app"/>
-                                                    and form = <sql:param type="xs:string" select="/request/form"/>
-                                                    <xsl:if test="$is-data">
-                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                    </xsl:if>
+                                                insert into <xsl:value-of select="$table-name"/>
+                                                    (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
+                                                select
+                                                    created, 
+                                                    <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                    <sql:param type="xs:string" select="/request/username"/>,
+                                                    app, form, <xsl:if test="$is-data">document_id,</xsl:if>
+                                                    'Y', xml
+                                                from (
+                                                    select * from <xsl:value-of select="$table-name"/>
+                                                    where
+                                                        (app, form, <xsl:if test="$is-data">document_id,</xsl:if> last_modified) =
+                                                        (
+                                                            select
+                                                                app, form, <xsl:if test="$is-data">document_id,</xsl:if> max(last_modified)
+                                                            from <xsl:value-of select="$table-name"/>
+                                                            where
+                                                                app = <sql:param type="xs:string" select="/request/app"/>
+                                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                            group by
+                                                                app, form <xsl:if test="$is-data">, document_id</xsl:if>
+                                                        )
+                                                )
                                             </sql:update>
                                         </sql:execute>
                                     </sql:connection>

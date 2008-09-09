@@ -103,7 +103,7 @@
                                     <xsl:apply-templates select="fr:metadata/node()"/>
                                     <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                 </xsl:when>
-                                <xsl:when test="$has-metadata">
+                                <xsl:otherwise>
                                     <!-- Description in chosen language or first one if not found -->
                                     <xxforms:variable name="description"
                                                       select="($source-form-metadata/description[@xml:lang = $metadata-lang],
@@ -150,7 +150,7 @@
                                         </xsl:choose>
                                     </xhtml:div>
                                     <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                                </xsl:when>
+                                </xsl:otherwise>
                             </xsl:choose>
                             <xhtml:div class="yui-g fr-body">
 

@@ -105,7 +105,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-separator {
     background-color: orange;
-    line-height: .5em;
+    line-height: .25em;
 }
 
 .fr-metadata, .fr-buttons-block {

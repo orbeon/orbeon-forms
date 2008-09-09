@@ -116,9 +116,8 @@ button.xforms-trigger img { margin-right: 10px }
     display: block;
     width: 100%;
     padding: 2px 2px 2px 18px;
-    background-image:url(images/silk/attach.png);
-    background-position:left center;
-    background-repeat:no-repeat;
+    background: url( images/silk/attach.png ) no-repeat left center;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 .xforms-upload-mediatype, .xforms-upload-size { padding-left: 1em }
@@ -163,6 +162,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
 
 /* Metadata */
+.fr-metadata { display: block }
 .fr-metadata table { width: 100% }
 .fr-metadata table tr td { vertical-align: middle }
 

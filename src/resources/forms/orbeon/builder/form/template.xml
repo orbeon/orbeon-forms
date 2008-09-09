@@ -50,7 +50,7 @@
                     <title xml:lang="en"/>
                     <description xml:lang="en"/>
                     <author/>
-                    <logo mediatype="" filename="" size=""/>
+                    <logo mediatype="image/png" filename="Orbeon Logo" size="">oxf:/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
                 </metadata>
             </xforms:instance>
 

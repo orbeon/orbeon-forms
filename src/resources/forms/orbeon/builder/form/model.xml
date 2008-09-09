@@ -147,7 +147,7 @@
                 </form-name>
                 <title>
                     <label>Form Title</label>
-                    <hint>required form title</hint>
+                    <hint>click to enter the form title</hint>
                     <alert>The form title is required</alert>
                 </title>
                 <description>

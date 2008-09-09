@@ -63,7 +63,7 @@
 
     <!-- Handle "control visited" events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="DOMFocusOut xforms-value-changed"
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusOut xforms-value-changed"
                    if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')"
                    context="instance('fr-visited-instance')">
         <xxforms:variable name="target" select="event('xxforms:target')"/>
@@ -80,7 +80,7 @@
 
     <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid"
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-invalid"
                    if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('xxforms:label'))"
                    context="instance('fr-errors-instance')">
 
@@ -105,7 +105,7 @@
 
     <!-- Handle xforms-valid event on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid"
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-valid"
                    if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and instance('fr-errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"
                    context="instance('fr-errors-instance')">
         <!-- Don't remove error if the value is required but empty -->

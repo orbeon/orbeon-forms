@@ -369,7 +369,7 @@
 
 
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-value-changed">
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-value-changed">
 
         <!-- Mark status as dirty if data changes in fr-form-instance instance only -->
         <xforms:setvalue if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')"
@@ -381,14 +381,14 @@
 
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->
-    <xforms:action ev:observer="fr-form-group" ev:event="DOMFocusIn">
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusIn">
         <xforms:toggle case="fr-message-none"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
     </xforms:action>
 
     <!-- Perform background submission upon xforms-sepect #fr-form-group for xforms:upload -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-select"
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-select"
             if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and event('xxforms:binding')/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>

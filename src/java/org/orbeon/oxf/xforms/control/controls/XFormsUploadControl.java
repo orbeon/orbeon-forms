@@ -101,7 +101,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             final String newValue;
             if (handleTemporaryFiles) {
                 // Try to delete temporary file if old value was temp URI and new value is different
-                if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value)) {
+                if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value) && oldValue.startsWith("file:")) {
                     final File file = new File(new URI(oldValue));
                     if (file.exists()) {
                         final boolean success = file.delete();

@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -102,7 +103,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     // Copy stream out
                     InputStream is = null;
                     try {
-                        is = new URI(resource.getURI()).toURL().openStream();
+                        is = URLFactory.createURL(resource.getURI()).openStream();
                         NetUtils.copyStream(is, response.getOutputStream());
                     } catch (Exception e) {
                         XFormsServer.logger.error("Exception copying stream", e);

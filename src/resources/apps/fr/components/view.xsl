@@ -97,71 +97,65 @@
                 <xhtml:div id="bd" class="fr-container">
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
-                            <!-- description in chosen language or first one if not found -->
-                            <xxforms:variable name="description"
-                                              select="($source-form-metadata/description[@xml:lang = $metadata-lang],
-                                                        $source-form-metadata/description[1],
-                                                        instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
-                                                        instance('fr-form-metadata')/description[1])[1]"/>
+                            <xsl:choose>
+                                <xsl:when test="fr:metadata">
+                                    <!-- Custom metadata section -->
+                                    <xsl:apply-templates select="fr:metadata/node()"/>
+                                    <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                </xsl:when>
+                                <xsl:when test="$has-metadata">
+                                    <!-- Description in chosen language or first one if not found -->
+                                    <xxforms:variable name="description"
+                                                      select="($source-form-metadata/description[@xml:lang = $metadata-lang],
+                                                                $source-form-metadata/description[1],
+                                                                instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
+                                                                instance('fr-form-metadata')/description[1])[1]"/>
 
-                            <!--xxx noscript xxx-->
-                            <!--<xforms:output value="property('xxforms:noscript')"/>                            -->
+                                    <!--xxx noscript xxx-->
+                                    <!--<xforms:output value="property('xxforms:noscript')"/>                            -->
 
-                            <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
-                            <!--xxx-->
-                            <!--<xforms:output value="string-join($source-form-metadata/(description[@xml:lang = $metadata-lang], description[1]), ' - ')"/>-->
-                            <xhtml:div class="yui-g fr-metadata">
-                                <xsl:choose>
-                                    <!-- If custom logo section is provided, use that -->
-                                    <xsl:when test="fr:logo">
-                                        <xsl:apply-templates select="fr:logo/node()"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                                            <xhtml:table class="fr-layout-table">
-                                                <xhtml:tr>
-                                                    <xhtml:td rowspan="2">
-                                                        <xsl:if test="$default-logo-uri">
-                                                            <xforms:output class="fr-logo" value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
-                                                        </xsl:if>
-                                                    </xhtml:td>
-                                                    <xhtml:td>
-                                                        <xhtml:h1 class="fr-form-title">
-                                                            <xforms:output value="$title"/>
-                                                        </xhtml:h1>
-                                                    </xhtml:td>
-                                                </xhtml:tr>
-                                                <xhtml:tr>
-                                                    <xhtml:td>
-                                                        <xforms:output class="fr-form-description" value="$description"/>
-                                                    </xhtml:td>
-                                                </xhtml:tr>
-                                            </xhtml:table>
-                                        </xforms:group>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xhtml:div>
-                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                    <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
+                                    <!--xxx-->
+                                    <!--<xforms:output value="string-join($source-form-metadata/(description[@xml:lang = $metadata-lang], description[1]), ' - ')"/>-->
+
+                                    <xhtml:div class="yui-g fr-metadata">
+                                        <xsl:choose>
+                                            <!-- If custom logo section is provided, use that -->
+                                            <xsl:when test="fr:logo">
+                                                <xsl:apply-templates select="fr:logo/node()"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                                                    <xhtml:table class="fr-layout-table">
+                                                        <xhtml:tr>
+                                                            <xhtml:td rowspan="2">
+                                                                <xsl:if test="$default-logo-uri">
+                                                                    <xforms:output class="fr-logo" value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                                </xsl:if>
+                                                            </xhtml:td>
+                                                            <xhtml:td>
+                                                                <xhtml:h1 class="fr-form-title">
+                                                                    <xforms:output value="$title"/>
+                                                                </xhtml:h1>
+                                                            </xhtml:td>
+                                                        </xhtml:tr>
+                                                        <xhtml:tr>
+                                                            <xhtml:td>
+                                                                <xforms:output class="fr-form-description" value="$description"/>
+                                                            </xhtml:td>
+                                                        </xhtml:tr>
+                                                    </xhtml:table>
+                                                </xforms:group>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xhtml:div>
+                                    <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                </xsl:when>
+                            </xsl:choose>
                             <xhtml:div class="yui-g fr-body">
 
                                 <!-- Table of contents -->
                                 <xsl:call-template name="fr-toc"/>
-
-                                <!-- Optional description-->
-                                <!--<xforms:group model="fr-form-model" ref=".[normalize-space($description) != '']">-->
-                                    <!--<xforms:switch>-->
-                                        <!--<xforms:case id="fr-form-description-case-on">-->
-                                            <!--<xhtml:div class="fr-form-description">-->
-                                                <!--<xforms:output value="$description"/>-->
-                                                <!--<xforms:trigger appearance="minimal" class="fr-close">-->
-                                                    <!--<xforms:label ref="$fr-resources/summary/labels/close-box"/>-->
-                                                    <!--<xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>-->
-                                                <!--</xforms:trigger>-->
-                                            <!--</xhtml:div>-->
-                                        <!--</xforms:case>-->
-                                        <!--<xforms:case id="fr-form-description-case-off"/>-->
-                                    <!--</xforms:switch>-->
-                                <!--</xforms:group>-->
 
                                 <!-- Error summary (if at top) -->
                                 <xsl:if test="normalize-space($error-summary) = ('top', 'both')">

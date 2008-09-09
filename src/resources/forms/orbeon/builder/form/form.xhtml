@@ -53,6 +53,97 @@
                 <!-- Toolbox -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-toolbox.xml" xxi:omit-xml-base="true"/>
             </fr:left>
+            <fr:metadata>
+                <!-- Section about form metadata -->
+                <xforms:group id="fb-metadata-group">
+                    <xhtml:div class="fr-metadata">
+                        <xhtml:table class="fr-layout-table">
+                            <xhtml:tr>
+                                <xhtml:td rowspan="2">
+                                    <!-- Image -->
+                                    <xforms:group>
+                                        <xforms:label ref="$form-resources/logo/label" class="fr-hidden"/>
+                                        <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
+                                            <xforms:output ref="." mediatype="image/*">
+                                                <xforms:label class="fb-xforms-disabled"/>
+                                            </xforms:output>
+                                        </xforms:group>
+                                        <!-- File chooser -->
+                                        <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
+                                            <xforms:label class="fb-xforms-disabled"/>
+                                            <xforms:filename ref="@filename"/>
+                                            <xforms:mediatype ref="@mediatype"/>
+                                            <xxforms:size ref="@size"/>
+                                        </xforms:upload>
+                                        <xforms:hint ref="$form-resources/logo/hint"/>
+                                    </xforms:group>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <!-- Form title -->
+                                    <xhtml:div class="fb-title-control">
+                                        <xforms:input id="fb-title-control" bind="title-bind"
+                                                      appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                                            <xforms:label ref="$form-resources/title/label"/>
+                                            <xforms:hint ref="$form-resources/title/hint"/>
+                                            <xforms:alert ref="$form-resources/title/alert"/>
+                                        </xforms:input>
+                                    </xhtml:div>
+                                </xhtml:td>
+                            </xhtml:tr>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <!-- Form description -->
+                                    <xhtml:div class="fb-description-control">
+                                        <xforms:textarea id="fb-description-control" bind="description-bind"
+                                                         appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                                            <xforms:label ref="$form-resources/description/label"/>
+                                            <xforms:hint ref="$form-resources/description/hint"/>
+                                        </xforms:textarea>
+                                    </xhtml:div>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xhtml:table>
+                    </xhtml:div>
+                    <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                    <fr:grid columns="4">
+                        <fr:tr>
+                            <fr:td>
+                                <!-- Application name -->
+
+                                <!-- Use an input if app name is a wildcard -->
+                                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                <xforms:group ref=".[$is-input]">
+                                    <xforms:input id="application-name-control" bind="application-name-bind" class="fr-summary fr-search" incremental="true">
+                                        <xforms:label ref="$form-resources/application-name/label"/>
+                                        <xforms:hint ref="$form-resources/application-name/hint"/>
+                                        <xforms:alert ref="$form-resources/application-name/alert"/>
+                                    </xforms:input>
+                                </xforms:group>
+                                <!-- Otherwise list apps allowed -->
+                                <xforms:group ref=".[not($is-input)]">
+                                    <xforms:select1 bind="application-name-bind">
+                                        <xforms:label ref="$form-resources/application-name/label"/>
+                                        <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
+                                            <xforms:label ref="@name"/>
+                                            <xforms:value ref="@name"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xforms:group>
+                            </fr:td>
+                            <fr:td>
+                                <!-- Form name -->
+                                <xforms:input id="form-name-control" bind="form-name-bind" class="fr-summary fr-search" incremental="true">
+                                    <xforms:label ref="$form-resources/form-name/label"/>
+                                    <!--<xforms:hint ref="$form-resources/form-name/hint"/>-->
+                                    <xforms:alert ref="$form-resources/form-name/alert"/>
+                                </xforms:input>
+                            </fr:td>
+                            <fr:td/>
+                            <fr:td/>
+                        </fr:tr>
+                    </fr:grid>
+                </xforms:group>
+            </fr:metadata>
             <fr:body>
 
                 <!-- In-place view deselected, remember id -->
@@ -109,92 +200,10 @@
                     NOTE: section and repeat can have some properties, such as a label.  
 
                 -->
-                <!-- Section about form metadata -->
-                <xhtml:div id="fb-metadata-section" class="fb-metadata-section fr-section-container">
-                    <fr:grid columns="3" class="fb-metadata-ids">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <!-- Application name -->
-
-                                <!-- Use an input if app name is a wildcard -->
-                                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                                <xforms:group ref=".[$is-input]">
-                                    <xforms:input id="application-name-control" bind="application-name-bind" class="fr-summary fr-search" incremental="true">
-                                        <xforms:label ref="$form-resources/application-name/label"/>
-                                        <xforms:hint ref="$form-resources/application-name/hint"/>
-                                        <xforms:alert ref="$form-resources/application-name/alert"/>
-                                    </xforms:input>
-                                </xforms:group>
-                                <!-- Otherwise list apps allowed -->
-                                <xforms:group ref=".[not($is-input)]">
-                                    <xforms:select1 bind="application-name-bind">
-                                        <xforms:label ref="$form-resources/application-name/label"/>
-                                        <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
-                                            <xforms:label ref="@name"/>
-                                            <xforms:value ref="@name"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xforms:group>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <!-- Form name -->
-                                <xforms:input id="form-name-control" bind="form-name-bind" class="fr-summary fr-search" incremental="true">
-                                    <xforms:label ref="$form-resources/form-name/label"/>
-                                    <!--<xforms:hint ref="$form-resources/form-name/hint"/>-->
-                                    <xforms:alert ref="$form-resources/form-name/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <!-- Form title -->
-                                <xforms:input id="title-control" bind="title-bind"
-                                              appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                                    <xforms:label ref="$form-resources/title/label"/>
-                                    <xforms:hint ref="$form-resources/title/hint"/>
-                                    <xforms:alert ref="$form-resources/title/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
-    
-                    <fr:grid columns="3">
-                        <xhtml:tr>
-                            <xhtml:td class="fb-metadata-logo">
-                                <!-- Image -->
-                                <xforms:group>
-                                    <xforms:label ref="$form-resources/logo/label"/>
-                                    <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
-                                        <xforms:output ref="." mediatype="image/*">
-                                            <xforms:label class="fb-xforms-disabled"/>
-                                        </xforms:output>
-                                    </xforms:group>
-                                    <!-- File chooser -->
-                                    <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
-                                        <xforms:label class="fb-xforms-disabled"/>
-                                        <xforms:filename ref="@filename"/>
-                                        <xforms:mediatype ref="@mediatype"/>
-                                        <xxforms:size ref="@size"/>
-                                    </xforms:upload>
-                                    <xforms:hint ref="$form-resources/logo/hint"/>
-                                </xforms:group>
-                            </xhtml:td>
-                            <xhtml:td/>
-                            <xhtml:td>
-                                <!-- Form description -->
-                                <xhtml:div>
-                                    <xforms:textarea id="description-control" bind="description-bind"
-                                                     appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                                        <xforms:label ref="$form-resources/description/label"/>
-                                        <xforms:hint ref="$form-resources/description/hint"/>
-                                    </xforms:textarea>
-                                </xhtml:div>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
-                </xhtml:div>
 
                 <!-- Form details -->
-                <xforms:group context="$body" id="fb-details-section">
-                <!--<fr:section id="fb-details-section" context="$body">-->
+                <xforms:group context="$body" id="fb-details-group">
+                <!--<fr:section id="fb-details-group" context="$body">-->
                     <!--<xforms:label>Form Details</xforms:label>-->
 
                     <xhtml:div>

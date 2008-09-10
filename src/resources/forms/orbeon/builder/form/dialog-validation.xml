@@ -152,12 +152,7 @@
         <xforms:setvalue if="normalize-space($instance/alert) != ''" ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $current-control-name, '/alert')"/>
         <xforms:setvalue if="normalize-space($instance/alert) = ''" ref="$current-control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
 
-        <xxforms:variable name="is-bind"
-                          select="$instance/schema-type != ''
-                                    or $instance/builtin-type != 'string'
-                                    or $instance/required = 'true'
-                                    or normalize-space($instance/calculate) != ''"/>
-        <xforms:action if="$is-bind">
+        <xforms:action>
 
             <!-- Insert bind if needed -->
             <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
@@ -213,18 +208,6 @@
             </xforms:action>
 
             <!-- TODO: constraints -->
-
-        </xforms:action>
-        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
-        <xforms:action if="not($is-bind) and exists($bind)">
-            <!-- Remove bind and associated data -->
-
-            <!-- Make sure the control doesn't point to the bind -->
-            <xforms:delete nodeset="$current-control/@bind"/>
-            <xforms:insert context="$current-control" origin="xxforms:attribute('ref', $current-control-name)"/>
-
-            <!-- Delete the bind -->
-            <xforms:delete nodeset="$bind"/>
 
         </xforms:action>
     </xforms:action>

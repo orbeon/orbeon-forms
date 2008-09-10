@@ -34,6 +34,16 @@
                 <xbl:template>
                     <!-- NOTE: Once new scoping rules are in place, the following group should work -->
                     <!--<xforms:group xbl:attr="ref bind">-->
+                        <!--<xxforms:variable name="result" ref="."/>-->
+                        <xxforms:variable name="result" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                        <xforms:group ref="$result">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
+                                <xforms:setvalue ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
+                            </xforms:action>
+                        </xforms:group>
+
+                        <!-- Local model containing the date and time  -->
                         <xforms:model id="dateTime-model">
                             <xforms:instance id="dateTime-instance">
                                 <values>
@@ -45,15 +55,7 @@
                             <xforms:bind nodeset="time" type="xs:time"/>
                         </xforms:model>
 
-                        <xxforms:variable name="result" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
-
-                        <xforms:group ref="$result">
-                            <xforms:action ev:event="xforms-value-changed">
-                                <xforms:setvalue ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
-                                <xforms:setvalue ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
-                            </xforms:action>
-                        </xforms:group>
-                    
+                        <!-- Local controls -->
                         <xforms:group model="dateTime-model">
                             <!-- NOTE: Once xbl:content is implemented, this will work -->
                             <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->

@@ -254,6 +254,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
      */
     public Object resolveObjectById(String effectiveSourceId, String targetId) {
 
+        // Check this id
+        if (targetId.equals(getEffectiveId()))
+            return this;
+
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel model = (XFormsModel) i.next();
@@ -266,15 +270,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         if (childrenContainers != null) {
             for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
                 final XFormsContainer currentContainer = (XFormsContainer) i.next();
-                final Object resultObject = currentContainer.resolveObjectById(effectiveSourceId, effectiveId);
+                final Object resultObject = currentContainer.resolveObjectById(effectiveSourceId, targetId);
                 if (resultObject != null)
                     return resultObject;
             }
         }
-
-        // Check containing document
-        if (targetId.equals(getEffectiveId()))
-            return this;
 
         return null;
     }

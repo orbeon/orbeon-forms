@@ -199,7 +199,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password, uriReference.headersToForward);
                     return state.getLastModified(urlString, uriReference.username, uriReference.password);
 
                 } else  {
@@ -247,20 +247,22 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     public static class URIReference {
-        public URIReference(String context, String spec, String username, String password) {
+        public URIReference(String context, String spec, String username, String password, String headersToForward) {
             this.context = context;
             this.spec = spec;
             this.username = username;
             this.password = password;
+            this.headersToForward = headersToForward;
         }
 
         public String context;
         public String spec;
         public String username;
         public String password;
+        public String headersToForward;
 
         public String toString() {
-            return "[" + context + ", " + spec + ", " + username + "]";
+            return "[" + context + ", " + spec + ", " + username + ", " + headersToForward + "]";
         }
     }
 
@@ -315,13 +317,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          * @param context   optional context (can be null)
          * @param spec      URL spec
          */
-        public void addReference(String context, String spec, String username, String password) {
+        public void addReference(String context, String spec, String username, String password, String headersToForward) {
             if (references == null)
                 references = new ArrayList();
 
 //            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
 
-            references.add(new URIReference(context, spec, username, password));
+            references.add(new URIReference(context, spec, username, password, headersToForward));
         }
 
         /**
@@ -365,7 +367,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
      * @param username      optional username
      * @param password      optional password
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password, String headersToForward) {
 
         final String urlString = url.toExternalForm();
 
@@ -382,7 +384,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, null);
+                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

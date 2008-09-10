@@ -219,7 +219,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                             // Keep URI reference
                             if (uriReferences != null)
-                                uriReferences.addReference(base, href, null, null);
+                                uriReferences.addReference(base, href, null, null, null);
 
                             // Read document
                             systemId = source.getSystemId();

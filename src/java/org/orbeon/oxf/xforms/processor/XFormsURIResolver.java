@@ -56,10 +56,10 @@ public class XFormsURIResolver extends TransformerURIResolver {
     }
 
     public Source resolve(String href, String base) throws TransformerException {
-        return resolve(href, base, null, null);
+        return resolve(href, base, null, null, null);
     }
 
-    public Source resolve(String href, String base, final String username, final String password) throws TransformerException {
+    public Source resolve(String href, String base, final String username, final String password, final String headersToForward) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -83,7 +83,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
                 final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) getProcessor().getState(getPipelineContext());
 
                 // First, put in state if necessary
-                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, username, password);
+                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, username, password, headersToForward);
 
                 // Then try to read from state
                 if (state.isDocumentSet(urlString, username, password)) {// not sure why this would not be the case
@@ -112,9 +112,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readURLAsDocument(String urlString, String username, String password) {
+    public Document readURLAsDocument(String urlString, String username, String password, String headersToForward) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password);
+            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
 
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -131,9 +131,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readURLAsDocumentInfo(String urlString, String username, String password) {
+    public DocumentInfo readURLAsDocumentInfo(String urlString, String username, String password, String headersToForward) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password);
+            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
 
             final TinyBuilder treeBuilder = new TinyBuilder();
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -150,9 +150,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler) {
+    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler, String headersToForward) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password);
+            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
 
             final SAXResult saxResult = new SAXResult(contentHandler);
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();

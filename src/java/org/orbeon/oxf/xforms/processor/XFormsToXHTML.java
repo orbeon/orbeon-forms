@@ -289,7 +289,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final String currentSchemaURI = schemaURIs[j];
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - adding document cache dependency for schema: " + currentSchemaURI);
-                    inputDependencies.addReference(null, currentSchemaURI, null, null);// TODO: support username / password on schema refs
+                    inputDependencies.addReference(null, currentSchemaURI, null, null,
+                            XFormsProperties.getForwardSubmissionHeaders(containingDocument));// TODO: support username / password on schema refs
                 }
             }
 
@@ -304,7 +305,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                             // Add dependency only for instances that are not globally shared
                             if (logger.isDebugEnabled())
                                 logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
-                            inputDependencies.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword());
+                            inputDependencies.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(),
+                                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {
                             // Don't add the dependency as we don't want the instance URI to be hit
                             // For all practical purposes, globally shared instances must remain constant!

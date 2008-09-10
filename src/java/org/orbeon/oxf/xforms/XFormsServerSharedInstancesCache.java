@@ -93,7 +93,8 @@ public class XFormsServerSharedInstancesCache {
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ConnectionResult connectionResult = NetUtils.openConnection(externalContext,
-                    containingDocument.getIndentedLogger(), "GET", sourceURL, null, null, null, null, null, null);
+                    containingDocument.getIndentedLogger(), "GET", sourceURL, null, null, null, null, null,
+                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
             if (connectionResult.statusCode != 200) {

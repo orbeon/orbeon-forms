@@ -188,8 +188,4 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         return super.equalsExternal(pipelineContext, obj);
     }
-
-    public boolean isValueControl() {
-        return XFormsControlFactory.isValueControl(getName());
-    }
 }

@@ -244,7 +244,7 @@ public class XFormsContextStack {
         final XFormsModel newModel;
         final boolean isNewModel;
         if (modelId != null) {
-            newModel = (XFormsModel) container.resolveObjectById(container.getFullPrefix(), modelId);
+            newModel = (XFormsModel) container.getModelByEffectiveId(container.getFullPrefix() + modelId);
             // TODO: dispatch xforms-binding-exception
             if (newModel == null)
                 throw new ValidationException("Invalid model id: " + modelId, locationData);

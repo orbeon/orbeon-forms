@@ -1,0 +1,82 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:foo="http://orbeon.org/oxf/xml/foo"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance>
+                    <value1/>
+                    <value2/>
+                </instance>
+            </xforms:instance>
+            <xforms:setvalue ev:event="xforms-model-construct-done" ref="value1" value="current-dateTime()"/>
+        </xforms:model>
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="dateTime-component" element="foo|dateTime">
+                <xbl:template>
+                    <!-- NOTE: Once new scoping rules are in place, the following group should work -->
+                    <!--<xforms:group xbl:attr="ref bind">-->
+                        <xforms:model id="dateTime-model">
+                            <xforms:instance id="dateTime-instance">
+                                <values>
+                                    <date/>
+                                    <time/>
+                                </values>
+                            </xforms:instance>
+                            <xforms:bind nodeset="date" type="xs:date"/>
+                            <xforms:bind nodeset="time" type="xs:time"/>
+                        </xforms:model>
+
+                        <xxforms:variable name="result" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+
+                        <xforms:group ref="$result">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
+                                <xforms:setvalue ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
+                            </xforms:action>
+                        </xforms:group>
+                    
+                        <xforms:group model="dateTime-model">
+                            <!-- NOTE: Once xbl:content is implemented, this will work -->
+                            <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
+                            <xforms:input ref="date"/>
+                            <xforms:input ref="time"/>
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="$result" value="concat(context()/date, 'T', context()/time)"/>
+                            </xforms:action>
+                        </xforms:group>
+                    <!--</xforms:group>-->
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+
+        <foo:dateTime id="dateTime1" ref="value1"/>
+        <foo:dateTime id="dateTime2" ref="value2"/>
+
+        <xforms:input ref="value1"/>
+        <xforms:input ref="value2"/>
+
+        <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

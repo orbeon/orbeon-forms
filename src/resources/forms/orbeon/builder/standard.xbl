@@ -27,7 +27,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:foo="http://orbeon.org/oxf/xml/foo">
 
-    <xbl:binding id="test-component" element="foo|bar">
+    <xbl:binding-xxx id="test-component" element="foo|bar">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -59,9 +59,9 @@
                 </xforms:input>
             </xhtml:div>
         </xbl:template>
-    </xbl:binding>
+    </xbl:binding-xxx>
 
-    <xbl:binding id="foo-select1-binding" element="foo|select1"><!-- [appearance='xxforms|full'] -->
+    <xbl:binding-xxx id="foo-select1-binding" element="foo|select1"><!-- [appearance='xxforms|full'] -->
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -106,6 +106,67 @@
                     <xforms:output ref=".[$value = $ref]" value="$label"/>
                 </xforms:repeat>
             </xforms:group>
+        </xbl:template>
+    </xbl:binding-xxx>
+
+    <xbl:binding id="dateTime-component" element="foo|dateTime">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Date and Time</display-name>
+            <display-name lang="fr">[Custom Date and Time]</display-name>
+            <description lang="en">Custom widget handling date and time values</description>
+            <description lang="fr">[Custom widget handling date and time values]</description>
+            <icon xml:lang="en">
+                <small-icon>/apps/fr/style/images/silk/clock_link.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
+            </icon>
+            <datatype>xs:dateTime</datatype>
+            <template>
+                 <foo:dateTime>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </foo:dateTime>
+            </template>
+        </metadata>
+
+        <xbl:template>
+            <!-- NOTE: Once new scoping rules are in place, the following group should work -->
+            <!--<xforms:group xbl:attr="ref bind">-->
+                <!--<xxforms:variable name="result" ref="."/>-->
+                <xxforms:variable name="result" context="xxforms:component-context()" xbl:attr="ref bind" select="." as="node()*"/>
+                <xforms:group ref="$result">
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:setvalue ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
+                        <xforms:setvalue ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
+                    </xforms:action>
+                </xforms:group>
+
+                <!-- Local model containing the date and time  -->
+                <xforms:model id="dateTime-model">
+                    <xforms:instance id="dateTime-instance">
+                        <values>
+                            <date/>
+                            <time/>
+                        </values>
+                    </xforms:instance>
+                    <xforms:bind nodeset="date" type="xs:date"/>
+                    <xforms:bind nodeset="time" type="xs:time"/>
+                </xforms:model>
+
+                <!-- Local controls -->
+                <xforms:group model="dateTime-model">
+                    <!-- NOTE: Once xbl:content is implemented, this will work -->
+                    <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
+                    <xforms:input ref="date"/>
+                    <xforms:input ref="time"/>
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:setvalue ref="$result" value="concat(context()/date, 'T', context()/time)"/>
+                    </xforms:action>
+                </xforms:group>
+            <!--</xforms:group>-->
         </xbl:template>
     </xbl:binding>
 

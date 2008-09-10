@@ -864,9 +864,12 @@ public class XFormsUtils {
      *
      * @param uriString    URI to encode
      * @param processSpace whether to process the space character or leave it unchanged
-     * @return             encoded URI
+     * @return             encoded URI, or null if uriString was null
      */
     public static String encodeHRRI(String uriString, boolean processSpace) {
+
+        if (uriString == null)
+            return null;
 
         // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".

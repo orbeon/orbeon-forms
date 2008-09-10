@@ -428,6 +428,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean resolvedXXFormsHandleXInclude;
                 {
                     final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
+
+                    if (tempActionOrResource == null) {
+                        // This can be null if, e.g. you have an AVT like resource="{()}"
+                        throw new XFormsSubmissionException("xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
+                                "resolving resource URI");
+                    }
+
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
                     resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);

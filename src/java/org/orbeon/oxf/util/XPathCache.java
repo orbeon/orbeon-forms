@@ -163,7 +163,8 @@ public class XPathCache {
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(pipelineContext, contextItems, contextPosition, xpathString,
                 prefixToURIMap, variableToValueMap, functionLibrary, baseURI, true, false, locationData);
         try {
-            return xpathExpression.evaluateSingleKeepNodeInfo(functionContext).toString();
+            final Object result = xpathExpression.evaluateSingleKeepNodeInfo(functionContext);
+            return (result != null) ? result.toString() : null;
         } catch (XPathException e) {
             throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
         } finally {
@@ -185,7 +186,8 @@ public class XPathCache {
         final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(pipelineContext, contextItems, contextPosition, "string(subsequence(" + xpathString + ", 1, 1))",
                 prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
         try {
-            return xpathExpression.evaluateSingleKeepNodeInfo(functionContext).toString();
+            final Object result = xpathExpression.evaluateSingleKeepNodeInfo(functionContext);
+            return (result != null) ? result.toString() : null;
         } catch (XPathException e) {
             throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
         } finally {

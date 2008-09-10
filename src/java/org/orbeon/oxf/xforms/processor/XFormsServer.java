@@ -270,7 +270,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Start external events
                     containingDocument.startExternalEventsSequence(pipelineContext, response);
-                    containingDocument.startHandleOperation("XForms server", "starting handling external events");
+                    containingDocument.startHandleOperation("XForms server", "handling external events");
 
                     // Reorder events if needed for offline mode
                     if (isNoscript) {

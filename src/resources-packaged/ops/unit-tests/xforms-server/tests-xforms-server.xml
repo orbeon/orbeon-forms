@@ -2581,9 +2581,10 @@
                             </instance>
                             <instance id="events" model-id="xforms-element-2">
                                 <events>
-                                    <!-- Non-value controls at the moment do not dispatch valid/required events -->
                                     <event type="xforms-enabled" target="my-repeat" indexes="2"/>
+                                    <event type="xforms-optional" target="my-repeat" indexes="2"/>
                                     <event type="xforms-readwrite" target="my-repeat" indexes="2"/>
+                                    <event type="xforms-valid" target="my-repeat" indexes="2"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
                                     <event type="xforms-optional" target="my-input" indexes="2"/>
                                     <event type="xforms-readwrite" target="my-input" indexes="2"/>

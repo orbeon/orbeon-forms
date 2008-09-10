@@ -606,26 +606,34 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToformatDisplayTime: function(jsDate) {
-        if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_TIME_PROPERTY) == "[h]:[m]:[s] [P]") {
+        if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_TIME_PROPERTY) == "[H]:[m]:[s]") {
+            // EU time
+            return jsDate.getHours() + ":"
+                    + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
+                    + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
+        } else {
+            // Default: [h]:[m]:[s] [P]
             // US time
             return jsDate.getHours() % 12 + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
                     + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
-        } else {
-            // EU time
-            return jsDate.getHours() + ":"
-                    + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
-                    + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
         }
     },
 
     jsDateToformatDisplayDate: function(jsDate) {
-        // US date
-        // [M]/[D]/[Y]
-        return (jsDate.getMonth() + 1)
-               + '/' + jsDate.getDate()
-               + '/' + jsDate.getFullYear();
+        if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D].[M].[Y]") {
+            // "Swiss" date
+            return jsDate.getDate()
+                   + '.' + (jsDate.getMonth() + 1)
+                   + '.' + jsDate.getFullYear();
+        } else {
+            // Default: [M]/[D]/[Y]
+            // US date
+            return (jsDate.getMonth() + 1)
+                   + '/' + jsDate.getDate()
+                   + '/' + jsDate.getFullYear();
+        }
     },
 
     /**
@@ -820,6 +828,16 @@ ORBEON.util.DateTime = {
                 var d = new Date();
                 d.setDate(parseInt(bits[2], 10));
                 d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                return d;
+            }
+        },
+        // dd.mm.yyyy (Swiss style)
+        {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
+            handler: function(bits) {
+                var d = new Date();
+                d.setYear(bits[3]);
+                d.setDate(parseInt(bits[1], 10));
+                d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
                 return d;
             }
         },
@@ -2907,6 +2925,19 @@ ORBEON.widgets.JSCalendar = function() {
 
 ORBEON.widgets.YUICalendar = function() {
 
+    var RESOURCES = {
+        "fr": {
+            "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],
+            "WEEKDAYS_SHORT": ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
+            "START_WEEKDAY": 1
+        },
+        "es": {
+            "MONTHS_LONG": [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",  "Septiembre",  "Octubre",  "Noviembre",  "Diciembre" ],
+            "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "S\xe1"],
+            "START_WEEKDAY": 1
+        }
+    };
+
     // Set when the calendar is ceated the first time
     var yuiCalendar = null;
     var calendarDiv = null;
@@ -2978,6 +3009,14 @@ ORBEON.widgets.YUICalendar = function() {
                 // Listeners on calendar events
                 yuiCalendar.renderEvent.subscribe(setupListeners, yuiCalendar, true);
                 yuiCalendar.selectEvent.subscribe(dateSelected, yuiCalendar, true);
+            }
+
+            // Localize calendar if necessary
+            var lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang");
+            if (lang != null) {
+                var resources = RESOURCES[lang];
+                for (var key in resources)
+                    yuiCalendar.cfg.setProperty(key, resources[key]);
             }
 
             // Set date

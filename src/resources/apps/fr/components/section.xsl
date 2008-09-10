@@ -37,7 +37,7 @@
 
         <!-- Section content area -->
 
-        <xforms:group id="{$section-id}-group">
+        <xforms:group id="{$section-id}"><!-- Use actual id so we can dispatch events here -->
             <!-- Support single-node bindings and context -->
             <xsl:copy-of select="@ref | @bind | @context"/>
             <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>

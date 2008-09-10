@@ -37,7 +37,7 @@
 
         <!-- Section content area -->
 
-        <xforms:group id="{$section-id}"><!-- Use actual id so we can dispatch events here -->
+        <xforms:group id="{$section-id}-group">
             <!-- Support single-node bindings and context -->
             <xsl:copy-of select="@ref | @bind | @context"/>
             <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
@@ -91,7 +91,7 @@
                             <xsl:apply-templates select="$input"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <!-- Set the section id to this trigger: this id matching is needed to noscript help -->
+                            <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
                             <xforms:trigger id="{$section-id}" appearance="minimal">
                                 <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
                             </xforms:trigger>

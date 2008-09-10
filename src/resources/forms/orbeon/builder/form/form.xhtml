@@ -217,7 +217,7 @@
 
                             <xhtml:div class="fb-top-level-content">
                                 <!-- Top-level section -->
-                                <xforms:group ref=".[local-name() = 'section']">
+                                <xforms:group id="fb-top-level-section-block" ref=".[local-name() = 'section']">
 
                                     <!-- Section name -->
                                     <xxforms:variable name="section-name" select="if (@context) then @context else substring-before(@bind, '-bind')" as="xs:string"/>
@@ -225,6 +225,31 @@
                                     <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-name]" as="element()"/>
                                     <!-- Resources for the section -->
                                     <xxforms:variable name="section-resource" select="$current-resources/*[name() = $section-name]" as="element()"/>
+
+                                    <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
+                                    <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section-block">
+
+                                        <xxforms:variable name="section-name" select="if (context()/@context) then context()/@context else substring-before(context()/@bind, '-bind')"/>
+
+                                        <!-- Delete holder element for section -->
+                                        <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>
+                                        <!-- Delete resources for section -->
+                                        <xforms:delete nodeset="$resources/resource/*[name() = $section-name]"/>
+
+                                        <!-- Delete holder element and resources for control -->
+                                        <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
+                                            <xforms:action if="exists(*)">
+                                                <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
+                                                <xforms:delete nodeset="$resources/resource/*[name() = context()/*/@ref]"/>
+                                            </xforms:action>
+                                        </xforms:action>
+
+                                        <!-- Delete bind -->
+                                        <xforms:delete nodeset="$model//xforms:bind[@nodeset = $section-name]"/>
+
+                                        <!-- Delete section including all controls -->
+                                        <xforms:delete nodeset="."/>
+                                    </xforms:action>
 
                                     <fr:section id="fb-top-level-section" editable="true">
                                         <xforms:label ref="$section-resource/label"/>
@@ -240,7 +265,7 @@
                                                                             count(context()/*/xhtml:tr/xhtml:td[*]),
                                                                             ' controls will be deleted.')"/>
 
-                                                    <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
+                                                    <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section-block'"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="minimal" id="fb-edit-section-details-trigger">
@@ -278,31 +303,6 @@
                                                 </xforms:action>
                                             </xforms:trigger>
                                         </fr:buttons>
-
-                                        <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
-                                        <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section">
-
-                                            <xxforms:variable name="section-name" select="if (context()/@context) then context()/@context else substring-before(context()/@bind, '-bind')"/>
-
-                                            <!-- Delete holder element for section -->
-                                            <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>
-                                            <!-- Delete resources for section -->
-                                            <xforms:delete nodeset="$resources/resource/*[name() = $section-name]"/>
-
-                                            <!-- Delete holder element and resources for control -->
-                                            <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
-                                                <xforms:action if="exists(*)">
-                                                    <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
-                                                    <xforms:delete nodeset="$resources/resource/*[name() = context()/*/@ref]"/>
-                                                </xforms:action>
-                                            </xforms:action>
-
-                                            <!-- Delete bind -->
-                                            <xforms:delete nodeset="$model//xforms:bind[@nodeset = $section-name]"/>
-
-                                            <!-- Delete section including all controls -->
-                                            <xforms:delete nodeset="."/>
-                                        </xforms:action>
 
                                         <!-- Section content -->
                                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="none">

@@ -199,8 +199,9 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // Read-only mode
                         if (isConcreteControl) {
                             final String formattedValue = inputControl.getReadonlyValueUseFormat(pipelineContext);
-                            if (formattedValue != null)
-                                contentHandler.characters(formattedValue.toCharArray(), 0, formattedValue.length());
+                            final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue(pipelineContext);
+                            if (outputValue != null)
+                                contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
                         }
                     }
                 }

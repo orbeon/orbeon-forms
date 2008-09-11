@@ -483,7 +483,7 @@
                                     <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
                                     <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
+                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
                                         <th>
                                             <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
                                             <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
@@ -522,7 +522,7 @@
                                                 <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                             </xforms:group>
                                         </td>
-                                        <xforms:repeat nodeset="details/detail">
+                                        <xforms:repeat nodeset="details/detail" id="document-details-repeat">
                                             <td>
                                                 <!-- control to make data accessible to JavaScript -->
                                                 <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>

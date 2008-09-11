@@ -2027,6 +2027,7 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
             ORBEON.xforms.Globals.formHelpPanel[form.id].show();
+            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
         }
 
         // Set focus on close button if visible (we don't want to set the focus on the close button if not

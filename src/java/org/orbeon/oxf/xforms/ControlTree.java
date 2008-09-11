@@ -284,7 +284,7 @@ public class ControlTree implements Cloneable {
         return effectiveIdsToControls;
     }
 
-    public Map getInitialMinimalRepeatIdToIndex() {
+    public Map getInitialMinimalRepeatIdToIndex(XFormsStaticState staticState) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
@@ -300,10 +300,12 @@ public class ControlTree implements Cloneable {
             }
         });
 
+        addMissingRepeatIndexes(staticState, repeatIdToIndex);
+
         return repeatIdToIndex;
     }
 
-    public Map getMinimalRepeatIdToIndex() {
+    public Map getMinimalRepeatIdToIndex(XFormsStaticState staticState) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
@@ -319,7 +321,21 @@ public class ControlTree implements Cloneable {
             }
         });
 
+        addMissingRepeatIndexes(staticState, repeatIdToIndex);
+
         return repeatIdToIndex;
+    }
+
+    private void addMissingRepeatIndexes(XFormsStaticState staticState, Map repeatIdToIndex) {
+        final Map repeats = staticState.getRepeatControlInfoMap();
+        if (repeats != null) {
+            for (Iterator i = repeats.keySet().iterator(); i.hasNext();) {
+                final String repeatStaticId = (String) i.next();
+                if (repeatIdToIndex.get(repeatStaticId) == null) {
+                    repeatIdToIndex.put(repeatStaticId, new Integer(0));
+                }
+            }
+        }
     }
 
     /**

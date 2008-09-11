@@ -94,7 +94,7 @@ public class XFormsStaticState {
 
     // Static analysis
     private boolean isAnalyzed;             // whether this document has been analyzed already
-    private Map controlNamesMap;            // Map<String, String> of control name to ""
+    private Map controlTypes;               // Map<String type, LinkedHashMap<String staticId, ControlInfo info>>
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String prefixedControlId, List<XFormsEventHandler> eventHandler>
     private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
@@ -673,6 +673,10 @@ public class XFormsStaticState {
         return controlInfoMap;
     }
 
+    public Map getRepeatControlInfoMap() {
+        return (Map) controlTypes.get("repeat");
+    }
+
     /**
      * Statically check whether a control is a value control.
      *
@@ -720,7 +724,7 @@ public class XFormsStaticState {
     }
 
     public boolean hasControlByName(String controlName) {
-        return controlNamesMap.get(controlName) != null;
+        return controlTypes.get(controlName) != null;
     }
 
     public ItemsInfo getItemsInfo(String controlId) {
@@ -822,7 +826,7 @@ public class XFormsStaticState {
      */
     public synchronized boolean analyzeIfNecessary(final PipelineContext pipelineContext) {
         if (!isAnalyzed) {
-            controlNamesMap = new HashMap();
+            controlTypes = new HashMap();
             eventNamesMap = new HashMap();
             eventHandlersMap = new HashMap();
             controlInfoMap = new HashMap();
@@ -893,7 +897,6 @@ public class XFormsStaticState {
 
                 // Gather control name
                 final String controlName = controlElement.getName();
-                controlNamesMap.put(controlName, "");
 
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
@@ -972,8 +975,19 @@ public class XFormsStaticState {
                     hasBinding = false;
                 }
 
-                // Create static control information
-                controlInfoMap.put(controlId, new XFormsStaticState.ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName)));
+                // Create and index static control information
+                final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName));
+                controlInfoMap.put(controlId, info);
+
+                {
+                    Map controlsMap = (Map) controlTypes.get(controlName);
+                    if (controlsMap == null) {
+                        controlsMap = new LinkedHashMap();
+                        controlTypes.put(controlName, controlsMap);
+                    }
+
+                    controlsMap.put(controlId, info);
+                }
 
                 // Gather xforms:repeat information
                 if (controlName.equals("repeat")) {

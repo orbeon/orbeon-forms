@@ -330,6 +330,7 @@ public class XFormsControls {
             // A repeat element does exist for this id, but it has zero iterations
             return 0;
         } else {
+            // No repeat element exists
             return -1;
         }
     }

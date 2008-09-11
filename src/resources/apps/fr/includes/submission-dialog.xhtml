@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        id="fr-submission-result-dialog" level="modal" close="true" draggable="false" class="fr-dialog" model="fr-submission-result-model">
+
+    <!-- TODO: i18n -->
+    <xforms:label>Form Submitted</xforms:label>
+    
+    <xhtml:div>
+        <xforms:output mediatype="text/html" value="."/>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group>
+            <xxforms:hide ev:event="DOMActivate" dialog="fr-submission-result-dialog"/>
+            <xforms:trigger ref="instance('fr-submission-result-triggers')/close-clear">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>-->
+                    Close and Clear
+                </xforms:label>
+                <!-- Clear form data -->
+                <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
+            </xforms:trigger>
+            <xforms:trigger ref="instance('fr-submission-result-triggers')/close">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>-->
+                    Close
+                </xforms:label>
+            </xforms:trigger>
+            <!-- Create a new document in either case  -->
+            <xforms:dispatch ev:event="DOMActivate" name="fr-new-document" target="fr-persistence-model"/>
+        </xforms:group>
+    </xhtml:div>
+    <!-- Set value when dialog opens -->
+    <xforms:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr:content')"/>
+    <!-- Clear value when dialog closes -->
+    <xforms:setvalue ev:event="xxforms-dialog-close" ref="."/>
+    <!-- Local model -->
+    <xforms:model id="fr-submission-result-model">
+        <xforms:instance id="fr-submission-result-instance">
+            <content xmlns=""/>
+        </xforms:instance>
+        <xforms:instance id="fr-submission-result-triggers">
+            <triggers xmlns="">
+                <close-clear/>
+                <close/>
+            </triggers>
+        </xforms:instance>
+
+        <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+        <xxforms:variable name="app" select="$parameters/app"/>
+        <xxforms:variable name="form" select="$parameters/form"/>
+
+        <xforms:bind nodeset="instance('fr-submission-result-triggers')">
+            <xforms:bind nodeset="close-clear" relevant=". = 'enabled'" readonly="false()"
+                    calculate="if (not(normalize-space()))
+                               then if (xxforms:property(string-join(('oxf.fr.detail.submit-mode.button.clear', $app, $form), '.')))
+                                    then 'enabled'
+                                    else 'disabled'
+                               else ."/>
+            <xforms:bind nodeset="close" relevant=". = 'enabled'" readonly="false()"
+                    calculate="if (not(normalize-space()))
+                               then if (xxforms:property(string-join(('oxf.fr.detail.submit-mode.button.close', $app, $form), '.')))
+                                    then 'enabled'
+                                    else 'disabled'
+                               else ."/>
+        </xforms:bind>
+    </xforms:model>
+</xxforms:dialog>

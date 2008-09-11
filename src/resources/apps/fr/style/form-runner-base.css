@@ -283,6 +283,8 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-dialog-message { margin-top: .5em; padding-top: 0.5em }
 .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
+#fr-submission-result-dialog { width: 800px }
+
 /* ***** Sections *************************************************************************************************** */
 
 /* Sections */

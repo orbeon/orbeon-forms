@@ -111,6 +111,9 @@
                        origin="instance('fr-source-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*"/>
     </xforms:action>
 
+    <!-- New document operation -->
+    <xforms:setvalue ev:event="fr-new-document" ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+
     <!-- Delete operation -->
     <xforms:action ev:event="fr-delete-data">
         <xforms:send submission="fr-delete-document-submission">
@@ -156,7 +159,7 @@
     </xforms:submission>
 
     <!-- Respond to save button activation -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-submit-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="$parameters/document != ''">
 
@@ -257,11 +260,16 @@
         </uris>
     </xforms:instance>
 
+    <!-- Instance to store the result of the create/update submission -->
+    <xforms:instance id="fr-create-update-submission-response">
+        <response xmlns=""/>
+    </xforms:instance>
+
     <xforms:submission id="fr-create-update-submission"
             validate="true" method="put"
             ref="event('holder')" xxforms:ensure-uploads="false"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
-            replace="none">
+            replace="text" target="instance('fr-create-update-submission-response')">
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 
@@ -343,6 +351,18 @@
         <xforms:refresh/>
 
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+
+        <!-- Get property for submit mode -->
+        <xxforms:variable name="submit-mode" select="xxforms:property(string-join(('oxf.fr.detail.submit-mode', $app, $form), '.'))" as="xs:boolean?"/>
+        <xforms:action if="$submit-mode">
+            <xxforms:variable name="response-content-type" select="event('response-headers')[lower-case(name) = 'content-type']/value" as="xs:string?"/>
+            <xforms:action if="starts-with($response-content-type, 'text/html')">
+                <!-- Show the submission result dialog -->
+                <xxforms:show dialog="fr-submission-result-dialog">
+                    <xxforms:context name="fr:content" select="instance('fr-create-update-submission-response')"/>
+                </xxforms:show>
+            </xforms:action>
+        </xforms:action>
 
     </xforms:action>
 

@@ -107,8 +107,12 @@
     <!-- Clear operation -->
     <xforms:action ev:event="fr-clear">
         <!-- Copy original instance -->
-        <xforms:insert nodeset="xxforms:instance('fr-form-instance')"
-                       origin="instance('fr-source-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*"/>
+        <xxforms:variable name="instance-element" as="element(xforms:instance)"
+                          select="instance('fr-source-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']"/>
+        <!-- Case of inline template -->
+        <xforms:insert if="not($instance-element/@src)" nodeset="xxforms:instance('fr-form-instance')" origin="$instance-element/*"/>
+        <!-- Case of @src template -->
+        <xforms:insert if="$instance-element/@src" nodeset="xxforms:instance('fr-form-instance')" origin="doc($instance-element/@src)"/>
     </xforms:action>
 
     <!-- New document operation -->

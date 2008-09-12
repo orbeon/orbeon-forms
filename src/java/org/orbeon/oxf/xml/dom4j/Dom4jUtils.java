@@ -714,4 +714,48 @@ public class Dom4jUtils {
         public void endElement(Element element);
         public void text(Text text);
     }
+
+    /**
+     * Return a list of all elements that precede startElement (not included) up to and including the given ancestor
+     * element. Elements are ordered from the starting element to the ancestor.
+     *
+     * @param startElement      element to start with
+     * @param ancestorElement   ancestor element to stop at
+     * @return                  List<Element>
+     */
+    public static List findPrecedingElements(Element startElement, Element ancestorElement) {
+        final List result = new ArrayList();
+        findPrecedingElements(result, startElement, ancestorElement);
+        return result;
+    }
+
+    private static void findPrecedingElements(List finalResult, Element startElement, Element ancestorElement) {
+        final Element parentElement = startElement.getParent();
+        if (parentElement == null)
+            return;
+
+        final List siblingElements = parentElement.elements();
+        if (siblingElements.size() > 1) {
+            final List result = new ArrayList();
+            for (Iterator i = siblingElements.iterator(); i.hasNext();) {
+                final Element currentElement = (Element) i.next();
+
+                if (currentElement == startElement)
+                    break;
+
+                result.add(currentElement);
+            }
+
+            Collections.reverse(result);
+            finalResult.addAll(result);
+        }
+
+        // Add parent
+        finalResult.add(ancestorElement);
+
+        // Find parent's preceding elements
+        if (parentElement != ancestorElement) {
+            findPrecedingElements(finalResult, parentElement, ancestorElement);
+        }
+    }
 }

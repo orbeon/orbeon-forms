@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.Variable;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -64,6 +65,10 @@ public class XFormsActionAction extends XFormsAction {
                 contextStack.popBinding();
             }
         }
+
+        if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("action", "evaluated variables within action",
+                    new String[] { "count", Integer.toString(variablesCount) });
 
         // Unscope all variables
         for (int i = 0; i < variablesCount; i++)

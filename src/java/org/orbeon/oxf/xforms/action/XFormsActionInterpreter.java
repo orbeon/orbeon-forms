@@ -18,17 +18,20 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Execute a top-level XForms action and the included nested actions if any.
@@ -72,6 +75,34 @@ public class XFormsActionInterpreter {
 
         // Set context on container element
         contextStack.setBinding(pipelineContext, eventHandlerContainer);
+
+        // Check variables in scope for action handlers within controls
+        if (eventHandlerContainer instanceof XFormsControl) {
+            int variablesCount = 0;
+
+            final List actionPrecedingElements = Dom4jUtils.findPrecedingElements(actionElement, ((XFormsControl) eventHandlerContainer).getControlElement());
+            if (actionPrecedingElements.size() > 0) {
+                Collections.reverse(actionPrecedingElements);
+                for (Iterator i = actionPrecedingElements.iterator(); i.hasNext();) {
+                    final Element currentElement = (Element) i.next();
+                    final String currentElementName = currentElement.getName();
+                    if (currentElementName.equals("variable")) {
+                        // Create variable object
+                        final Variable variable = new Variable(containingDocument, contextStack, currentElement);
+
+                        // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
+                        // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
+                        contextStack.pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+
+                        variablesCount++;
+                    }
+                }
+            }
+
+            if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("action", "evaluated variables for outer action",
+                        new String[] { "count", Integer.toString(variablesCount) });
+        }
 
         // Push binding for outermost action
         contextStack.pushBinding(pipelineContext, actionElement);

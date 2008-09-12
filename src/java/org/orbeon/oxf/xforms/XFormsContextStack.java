@@ -148,7 +148,8 @@ public class XFormsContextStack {
     public void setBinding(PipelineContext pipelineContext, XFormsEventHandlerContainer eventHandlerContainer) {
 
         if (eventHandlerContainer == null) {
-            // Odd case which can happen when a handler and control are in a removed iteration. Set an empty context.
+            // Odd case which can happen when an action handler and control are in a removed iteration. Set an empty context.
+            // OR, case where an action handler is within another action handler!
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
             final XFormsModel xformsModel = container.getDefaultModel();

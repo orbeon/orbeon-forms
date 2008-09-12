@@ -39,6 +39,7 @@ public class XFormsContextStack {
     private XFormsContainer container;
     private XFormsContainingDocument containingDocument;
     private XFormsFunction.Context functionContext;
+    private BindingContext parentBindingContext;
 
     private Stack contextStack = new Stack();
 
@@ -55,15 +56,27 @@ public class XFormsContextStack {
         this.functionContext = new XFormsFunction.Context(containingModel, this);
     }
 
+    public void setParentBindingContext(BindingContext parentBindingContext) {
+        this.parentBindingContext = parentBindingContext;
+    }
+
     public XFormsFunction.Context getFunctionContext() {
         return functionContext;
     }
 
     /**
-     * Reset the binding context to the root of the first model's first instance.
+     * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
      */
     public void resetBindingContext(PipelineContext pipelineContext) {
-        resetBindingContext(pipelineContext, container.getDefaultModel());
+        if (parentBindingContext == null) {
+            // Reset to default model 
+            resetBindingContext(pipelineContext, container.getDefaultModel());
+        } else {
+            // Clear existing stack
+            contextStack.clear();
+            // Set initial context to parent
+            contextStack.push(parentBindingContext);
+        }
     }
 
     /**

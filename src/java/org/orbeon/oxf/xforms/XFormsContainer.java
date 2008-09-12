@@ -107,6 +107,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
 
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
+        this.contextStack.setParentBindingContext(bindingContext);
     }
 
     public XFormsContextStack.BindingContext getBindingContext() {

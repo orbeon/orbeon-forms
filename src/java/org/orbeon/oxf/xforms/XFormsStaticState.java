@@ -42,6 +42,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.apache.commons.lang.StringUtils;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
@@ -915,7 +916,7 @@ public class XFormsStaticState {
                         // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
 
                         // If the document has a template, recurse into it
-                        final Document fullShadowTreeDocument = generateXBLShadowContent(controlElement, bindingElement);
+                        final Document fullShadowTreeDocument = generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement);
                         if (fullShadowTreeDocument != null) {
 
                             // Extract models from components instances
@@ -1265,7 +1266,7 @@ public class XFormsStaticState {
      * @param binding           corresponding <xbl:binding>
      * @return                  shadow tree document
      */
-    private static Document generateXBLShadowContent(final Element boundElement, Element binding) {
+    private static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper, final Element boundElement, Element binding) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -1351,7 +1352,72 @@ public class XFormsStaticState {
 
                     // Handle xbl:content
                     if (element.getQName().equals(XFormsConstants.XBL_CONTENT_QNAME)) {
-                        // TODO
+                        final String includesAttribute = element.attributeValue("includes");
+                        final List contentToInsert;
+                        if (includesAttribute == null) {
+                            // All bound node content must be copied over
+                            final List elementContent = boundElement.content();
+                            final List clonedContent = new ArrayList();
+                            for (Iterator i = elementContent.iterator(); i.hasNext();) {
+                                final Node node = (Node) i.next();
+                                if (!(node instanceof Namespace)) {
+                                     clonedContent.add(Dom4jUtils.createCopy(node));
+                                }
+                            }
+
+                            contentToInsert = clonedContent;
+                        } else {
+                            // Apply CSS selector
+
+                            // Poor man's CSS selector parser:
+                            // o input: foo|a foo|b, bar|a bar|b
+                            // o output: .//foo:a//foo:b|.//bar:a//bar:b
+                            // TODO: handle [att], [att=val], [att~=val], [att|=val]
+                            final FastStringBuffer sb = new FastStringBuffer(includesAttribute.length());
+                            final String[] selectors = StringUtils.split(includesAttribute, ',');
+                            for (int i = 0; i < selectors.length; i++) {
+                                final String selector = selectors[i];
+                                if (i > 0)
+                                    sb.append("|");
+                                sb.append(".//");
+                                final String[] pathElements = StringUtils.split(selector.trim(), ' ');
+                                for (int j = 0; j < pathElements.length; j++) {
+                                    final String pathElement = pathElements[j];
+                                    if (j > 0)
+                                        sb.append("//");
+                                    sb.append(pathElement.replace('|', ':').trim());
+                                }
+                            }
+
+                            final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
+
+                            // TODO: don't use getNamespaceContext() as this is already computed for the bound element
+                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, sb.toString(), Dom4jUtils.getNamespaceContext(boundElement),
+                                    null, null, null, null, null);// TODO: locationData
+
+                            if (elements.size() > 0) {
+                                // Clone all the resulting elements
+                                contentToInsert = new ArrayList(elements.size());
+                                for (Iterator i = elements.iterator(); i.hasNext();) {
+                                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                                    final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
+                                    contentToInsert.add(Dom4jUtils.createCopy(currentElement));
+                                }
+                            } else {
+                                contentToInsert = null;
+                            }
+                        }
+
+                        // Insert content if any
+                        if (contentToInsert != null && contentToInsert.size() > 0) {
+                            final List parentContent = element.getParent().content();
+                            final int elementIndex = parentContent.indexOf(element);
+                            parentContent.addAll(elementIndex, contentToInsert);
+                        }
+
+                        // Remove <xbl:content> from shadow tree
+                        element.detach();
                     }
                 }
 

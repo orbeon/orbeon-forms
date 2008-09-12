@@ -77,6 +77,10 @@ public class XFormsActionInterpreter {
         contextStack.setBinding(pipelineContext, eventHandlerContainer);
 
         // Check variables in scope for action handlers within controls
+
+        // NOTE: This is not optimal, as variable values are re-evaluated and may have values different from the ones
+        // used by the controls during refresh. Contemplate handling this differently, e.g. see
+        // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements
         if (eventHandlerContainer instanceof XFormsControl) {
             int variablesCount = 0;
 

@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.ControlTree;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -33,34 +36,55 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
         // Start xhtml:* element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final String id = attributes.getValue("id");
-        if (id != null) {
-            final String effectiveId = handlerContext.getEffectiveId(attributes);
-
-            final ControlTree controlState = containingDocument.getControls().getCurrentControlTree();
-            final boolean hasAVT = controlState.hasAttributeControl(effectiveId);
+        final String staticId = attributes.getValue("id");
+        if (staticId != null) {
+            final boolean hasAVT = containingDocument.getStaticState().hasAttributeControl(staticId);
             if (hasAVT) {
-                // This XHTML element has at least one AVT so process its attributes
+                // This element has at least one AVT so process its attributes
 
+                final String effectiveId = handlerContext.getEffectiveId(attributes);
                 final int attributesCount = attributes.getLength();
                 boolean found = false;
                 for (int i = 0; i < attributesCount; i++) {
                     final String attributeValue = attributes.getValue(i);
                     if (attributeValue.indexOf('{') != -1) {
-                        // This is an AVT
+                        // This is an AVT most likely
                         found = true;
 
                         final String attributeLocalName = attributes.getLocalName(i);
                         final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
-                        final XXFormsAttributeControl attributeControl = controlState.getAttributeControl(effectiveId, attributeQName);
 
-                        // Find effective attribute value
+                        // Get static id of attribute control associated with this particular attribute
+                        final String attributeControlStaticId; {
+                            final XFormsStaticState.ControlInfo controlInfo = containingDocument.getStaticState().getAttributeControl(staticId, attributeQName);
+                            attributeControlStaticId = controlInfo.getElement().attributeValue("id");
+                        }
+
+                        // Find concrete control if possible
+                        final XXFormsAttributeControl attributeControl;
+                        if (handlerContext.isTemplate()) {
+                            attributeControl = null;
+                        } else if (attributeControlStaticId != null) {
+                            final String attributeControlEffectiveId = XFormsUtils.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
+                            attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlEffectiveId);
+                        } else {
+                            // This should not happen
+                            attributeControl = null;
+                        }
+
+                        // Determine attribute value
                         final String effectiveAttributeValue;
                         if (attributeControl != null) {
                             effectiveAttributeValue = attributeControl.getExternalValue(pipelineContext);
                         } else {
                             // Use blank value
-                            effectiveAttributeValue = "";
+
+                            if ("src".equals(attributeQName) && XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && "img".equals(localname)) {
+                                // Special case of xhtml:img/@src
+                                effectiveAttributeValue = XFormsConstants.DUMMY_IMAGE_URI;
+                            } else {
+                                effectiveAttributeValue = "";   
+                            }
                         }
 
                         // Set the value of the attribute

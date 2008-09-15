@@ -99,6 +99,7 @@ public class XFormsStaticState {
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String prefixedControlId, List<XFormsEventHandler> eventHandler>
     private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
+    private Map attributeControls;          // Map<String forStaticId, Map<String name, ControlInfo info>>
     private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
     private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
@@ -733,6 +734,21 @@ public class XFormsStaticState {
     }
 
     /**
+     * Whether a host language element with the given id ("for attribute") has an AVT on an attribute.
+     *
+     * @param staticForAttribute    id of the host language element to check
+     * @return                      true iif that element has one or more AVTs
+     */
+    public boolean hasAttributeControl(String staticForAttribute) {
+        return attributeControls != null && attributeControls.get(staticForAttribute) != null;
+    }
+
+    public ControlInfo getAttributeControl(String staticForAttribute, String attributeName) {
+        final Map mapForId = (Map) attributeControls.get(staticForAttribute);
+        return (mapForId != null) ? (ControlInfo) mapForId.get(attributeName) : null;
+    }
+
+    /**
      * Return the list of repeat ids descendant of a given repeat id.
      */
     public List getNestedRepeatIds(final String repeatId) {
@@ -979,7 +995,6 @@ public class XFormsStaticState {
                 // Create and index static control information
                 final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName));
                 controlInfoMap.put(controlId, info);
-
                 {
                     Map controlsMap = (Map) controlTypes.get(controlName);
                     if (controlsMap == null) {
@@ -990,8 +1005,9 @@ public class XFormsStaticState {
                     controlsMap.put(controlId, info);
                 }
 
-                // Gather xforms:repeat information
                 if (controlName.equals("repeat")) {
+                    // Gather xforms:repeat information
+
                     // Find repeat parents
                     {
                         // Create repeat hierarchy string
@@ -1039,10 +1055,27 @@ public class XFormsStaticState {
                     if (itemsInfoMap == null)
                         itemsInfoMap = new HashMap();
                     itemsInfoMap.put(controlId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
-                } else if (controlName.equals("case")) {
+//                } else if (controlName.equals("case")) {
                     // TODO: Check that xforms:case is within: switch
 //                    if (!(currentControlsContainer.getName().equals("switch")))
 //                        throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
+                } else  if ("attribute".equals(controlName)) {
+                    // Special indexing of xxforms:attribute controls
+                    final String staticForAttribute = controlElement.attributeValue("for");
+                    final String nameAttribute = controlElement.attributeValue("name");
+                    Map mapForId;
+                    if (attributeControls == null) {
+                        attributeControls = new HashMap();
+                        mapForId = new HashMap();
+                        attributeControls.put(staticForAttribute, mapForId);
+                    } else {
+                        mapForId = (Map) attributeControls.get(staticForAttribute);
+                        if (mapForId == null) {
+                            mapForId = new HashMap();
+                            attributeControls.put(staticForAttribute, mapForId);
+                        }
+                    }
+                    mapForId.put(nameAttribute, info);
                 }
             }
 

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -79,13 +78,6 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     public String getEffectiveForAttribute() {
-        // A kind of hacky way of getting the effective id of the HTML element
-        final String effectiveId = getEffectiveId();
-        final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveId);
-        final String suffix; {
-            final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-            suffix = (suffixIndex == -1) ? "" : effectiveId.substring(suffixIndex);
-        }
-        return prefix + forAttribute + suffix;
+        return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), forAttribute);
     }
 }

@@ -1461,4 +1461,22 @@ public class XFormsUtils {
             return new Integer[0];
         }
     }
+
+    /**
+     * Compute an effective id based on an existing effective id and a static id. E.g.:
+     *
+     *  foo$bar.1-2 and myStaticId => foo$myStaticId.1-2
+     *
+     * @param baseEffectiveId   base effective id
+     * @param staticId          static id
+     * @return                  effective id
+     */
+    public static String getRelatedEffectiveId(String baseEffectiveId, String staticId) {
+        final String prefix = getEffectiveIdPrefix(baseEffectiveId);
+        final String suffix; {
+            final int suffixIndex = baseEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+            suffix = (suffixIndex == -1) ? "" : baseEffectiveId.substring(suffixIndex);
+        }
+        return prefix + staticId + suffix;
+    }
 }

@@ -35,7 +35,6 @@ public class ControlTree implements Cloneable {
     // Indexing of controls
     private Map effectiveIdsToControls; // Map<String effectiveId, XFormsControl control>
     private Map controlTypes;           // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
-    private Map attributeControls;      // Map<String effectiveFor, Map<String attributeName, XFormsControl control>>
 
     private Map eventsToDispatch = new HashMap(); // Map<String effectiveId, EventSchedule eventSchedule>
 
@@ -87,7 +86,6 @@ public class ControlTree implements Cloneable {
         // NOTE: The cloned tree does not make use of this so we clear it
         cloned.effectiveIdsToControls = null;
         cloned.controlTypes = null;
-        cloned.attributeControls = null;
         cloned.eventsToDispatch = null;
 
         cloned.isBindingsDirty = false;
@@ -148,22 +146,6 @@ public class ControlTree implements Cloneable {
 
             controlsMap.put(control.getEffectiveId(), control);
 
-        } else if (control instanceof XXFormsAttributeControl) {
-            final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) control;
-            final String effectiveForAttribute = attributeControl.getEffectiveForAttribute();
-            if (attributeControls == null) {
-                attributeControls = new HashMap();
-                final Map mapForId = new HashMap();
-                attributeControls.put(effectiveForAttribute, mapForId);
-                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
-            } else {
-                Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
-                if (mapForId == null) {
-                    mapForId = new HashMap();
-                    attributeControls.put(effectiveForAttribute, mapForId);
-                }
-                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
-            }
         }
 
         // Add event if necessary
@@ -196,15 +178,6 @@ public class ControlTree implements Cloneable {
                 Map controlsMap = (Map) controlTypes.get(control.getName());
                 if (controlsMap != null) {
                     controlsMap.remove(control.getEffectiveId());
-                }
-            }
-        } else if (control instanceof XXFormsAttributeControl) {
-            if (attributeControls != null) {
-                final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) control;
-                final String effectiveForAttribute = attributeControl.getEffectiveForAttribute();
-                Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
-                if (mapForId != null) {
-                    mapForId.remove(attributeControl.getNameAttribute());
                 }
             }
         }
@@ -373,15 +346,6 @@ public class ControlTree implements Cloneable {
 
     public Map getRepeatControls() {
         return (Map) ((controlTypes != null) ? controlTypes.get("repeat") : null);
-    }
-
-    public boolean hasAttributeControl(String effectiveForAttribute) {
-        return attributeControls != null && attributeControls.get(effectiveForAttribute) != null;
-    }
-
-    public XXFormsAttributeControl getAttributeControl(String effectiveForAttribute, String attributeName) {
-        final Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
-        return (mapForId != null) ? (XXFormsAttributeControl) mapForId.get(attributeName) : null;
     }
 
     /**

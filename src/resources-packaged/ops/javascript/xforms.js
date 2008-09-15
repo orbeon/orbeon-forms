@@ -758,8 +758,8 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
             handler: function(bits) {
                 var d = new Date();
-                d.setDate(parseInt(bits[1], 10));
                 d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
+                d.setDate(parseInt(bits[1], 10));
                 return d;
             }
         },
@@ -767,9 +767,9 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
                 var d = new Date();
-                d.setDate(parseInt(bits[1], 10));
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
                 d.setYear(bits[3]);
+                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
+                d.setDate(parseInt(bits[1], 10));
                 return d;
             }
         },
@@ -777,8 +777,8 @@ ORBEON.util.DateTime = {
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
             handler: function(bits) {
                 var d = new Date();
-                d.setDate(parseInt(bits[2], 10));
                 d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
+                d.setDate(parseInt(bits[2], 10));
                 return d;
             }
         },
@@ -817,8 +817,8 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(bits[3]);
-                d.setDate(parseInt(bits[2], 10));
                 d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                d.setDate(parseInt(bits[2], 10));
                 return d;
             }
         },
@@ -836,8 +836,8 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(bits[3]);
-                d.setDate(parseInt(bits[1], 10));
                 d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
+                d.setDate(parseInt(bits[1], 10));
                 return d;
             }
         },
@@ -846,8 +846,8 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(parseInt(bits[1]));
-                d.setDate(parseInt(bits[3], 10));
                 d.setMonth(parseInt(bits[2], 10) - 1);
+                d.setDate(parseInt(bits[3], 10));
                 return d;
             }
         }
@@ -1917,23 +1917,23 @@ ORBEON.xforms.Controls = {
     updateLoadingPosition: function(formID) {
         // Compute new X
         var x;
-    {
-        var initialRight = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][0];
-        var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
-        x = scrollX + YAHOO.util.Dom.getViewportWidth() - initialRight;
-    }
+        {
+            var initialRight = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][0];
+            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+            x = scrollX + YAHOO.util.Dom.getViewportWidth() - initialRight;
+        }
         // Compute new Y
         var y;
-    {
-        // Distance between top of viewport and top of the page. Initially 0 when we are at the top of the page.
-        var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-        var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][1];
-        y = scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY) > initialTop
-            // Place indicator at a few pixels from the top of the viewport
-                ? scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY)
-            // Loading is visible left at its initial position, so leave it there
-                : initialTop;
-    }
+        {
+            // Distance between top of viewport and top of the page. Initially 0 when we are at the top of the page.
+            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+            var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][1];
+            y = scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY) > initialTop
+                // Place indicator at a few pixels from the top of the viewport
+                    ? scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY)
+                // Loading is visible left at its initial position, so leave it there
+                    : initialTop;
+        }
         // Position overlay
         var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
         overlay.cfg.setProperty("x", x);

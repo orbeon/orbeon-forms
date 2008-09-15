@@ -66,8 +66,8 @@
                     <uri>http://www.w3.org/1999/xhtml</uri>
                 </match>
                 <replace>
-                    <uri></uri>
-                    <prefix></prefix>
+                    <uri/>
+                    <prefix/>
                 </replace>
             </config>
         </p:input>
@@ -81,6 +81,8 @@
                 <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
                 <version>4.01</version>
                 <encoding>utf-8</encoding>
+                <indent>true</indent>
+                <indent-amount>0</indent-amount>
             </config>
         </p:input>
         <p:input name="data" href="#html-data"/>
@@ -92,10 +94,6 @@
         <p:input name="config">
             <config>
                 <status-code>500</status-code>
-                <header>
-                    <name>Cache-Control</name>
-                    <value>post-check=0, pre-check=0</value>
-                </header>
             </config>
         </p:input>
         <p:input name="data" href="#converted"/>

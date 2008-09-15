@@ -236,11 +236,11 @@
                 <xsl:comment> Set error processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.error-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
                 </init-param>
                 <init-param>
-                    <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/config/error.xpl</param-value>
+                    <param-name>oxf.error-processor.input.controller</param-name>
+                    <param-value>oxf:/config/error-page-flow.xml</param-value>
                 </init-param>
                 <xsl:comment> Set supported methods </xsl:comment>
                 <init-param>

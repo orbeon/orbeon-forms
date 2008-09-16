@@ -2681,5 +2681,112 @@
         </output>
     </test>
 
+    <test description="Boolean MIP values conversion" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client">
+
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <a/>
+                                            <b/>
+                                            <c/>
+                                            <d/>
+                                            <e/>
+                                            <f/>
+                                            <g/>
+                                            <h/>
+                                            <i/>
+                                            <j/>
+
+                                            <false>false</false>
+                                            <true>true</true>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:bind nodeset="a" constraint="'false'"/>
+                                    <xforms:bind nodeset="b" constraint="false()"/>
+                                    <xforms:bind nodeset="c" constraint="'true'"/>
+                                    <xforms:bind nodeset="d" constraint="true()"/>
+                                    <xforms:bind nodeset="e" constraint="../true"/>
+                                    <xforms:bind nodeset="f" constraint="../false"/>
+                                    <xforms:bind nodeset="g" constraint="non-existing"/>
+                                    <xforms:bind nodeset="h" constraint="0"/>
+                                    <xforms:bind nodeset="i" constraint="1000"/>
+                                    <xforms:bind nodeset="j" constraint="number('NaN')"/>
+
+                                    <xforms:instance id="result">
+                                        <result/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="*">
+                                        <xxforms:variable name="current" select="."/>
+                                        <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body/>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="xforms-element-1">
+                                <instance>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                    <d/>
+                                    <e/>
+                                    <f/>
+                                    <g/>
+                                    <h/>
+                                    <i/>
+                                    <j/>
+                                    <false>false</false>
+                                    <true>true</true>
+                                </instance>
+                            </instance>
+                            <instance id="result" model-id="xforms-element-1">
+                                <result>
+                                    <a>true</a><!-- this might change in the future if instead the xs:boolean() logic is used -->
+                                    <b>false</b>
+                                    <c>true</c>
+                                    <d>true</d>
+                                    <e>true</e>
+                                    <f>true</f>
+                                    <g>false</g>
+                                    <h>false</h>
+                                    <i>true</i>
+                                    <j>false</j>
+                                    <false>true</false>
+                                    <true>true</true>
+                                </result>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

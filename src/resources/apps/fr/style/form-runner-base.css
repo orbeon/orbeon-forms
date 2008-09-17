@@ -285,6 +285,9 @@ button.xforms-trigger img { margin-right: 10px }
 
 #fr-submission-result-dialog { width: 800px }
 
+/* Hide header bar or minimal appearance dialogs as YUI adds one to panels */
+.xforms-dialog-appearance-minimal .hd { display: none }
+
 /* ***** Sections *************************************************************************************************** */
 
 /* Sections */

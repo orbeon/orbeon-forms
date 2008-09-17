@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-validation-dialog" appearance="minimal" model="fb-validation-model">
+      id="fb-edit-validation-dialog" appearance="minimal" model="fb-validation-model" level="modal">
 
     <xforms:label>Edit Validation Properties</xforms:label>
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>

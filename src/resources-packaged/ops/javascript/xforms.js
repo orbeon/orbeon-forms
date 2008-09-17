@@ -3653,10 +3653,13 @@ ORBEON.xforms.Init = {
         // Create dialog object
         if (isMinimal) {
             // Create minimal dialog
-            yuiDialog = new YAHOO.widget.Overlay(dialog.id, {
+            yuiDialog = new YAHOO.widget.Panel(dialog.id, {
+                close: false,
+                modal: isModal,
                 visible: false,
                 constraintoviewport: true,
-                iframe: true
+                iframe: true,
+                underlay: "shadow"
             });
             // Close the dialog when users click on document
             YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);

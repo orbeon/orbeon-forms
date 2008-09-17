@@ -23,7 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-help-dialog" appearance="minimal" model="fb-edit-help-model">
+      id="fb-edit-help-dialog" appearance="minimal" model="fb-edit-help-model" level="modal">
 
     <xforms:label>Edit Help</xforms:label>
     <xhtml:div>

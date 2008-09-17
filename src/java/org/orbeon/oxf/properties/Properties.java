@@ -105,7 +105,7 @@ public class Properties {
                 }
 
                 final InputStream in = uc.getInputStream();
-                final Document document = TransformerUtils.readDom4j(in, propertiesURI, false);
+                final Document document = TransformerUtils.readDom4j(in, propertiesURI, true);
                 propertyStore = new PropertyStore(document);
 
                 lastUpdate = current;

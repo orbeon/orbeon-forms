@@ -74,7 +74,7 @@ public class PropertyStore {
     public PropertyStore(final Document propertiesDocument) {
 
         // NOTE: the use of "attributes" and "attribute" is for special use of the property store by certain processors
-        for (final Iterator i = XPathUtils.selectIterator(propertiesDocument, "/properties/property | /attributes/attribute"); i.hasNext();) {
+        for (final Iterator i = XPathUtils.selectIterator(propertiesDocument, "/properties//property | /attributes//attribute"); i.hasNext();) {
             final Element propertyElement = (Element) i.next();
 
             // Extract attributes

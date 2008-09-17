@@ -20,7 +20,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
+    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+    lang="en">
 
     <xhtml:head>
         <xhtml:title>XForms Controls</xhtml:title>
@@ -143,9 +144,9 @@
                     <xforms:input ref="date" navindex="4" class="datafield">
                         <xforms:label class="fixed-width">Date:</xforms:label>
                         <xforms:help>
-                            <div>
+                                   <div>
                                 <p>
-                                    This field must contain:
+                                           This field must contain:
                                 </p>
                                 <ul>
                                     <li>a valid date</li>
@@ -158,7 +159,7 @@
                 <xhtml:p>
                     <xforms:output ref="date" xxforms:format=".">
                         <xforms:label class="fixed-width">Date (native XML):</xforms:label>
-                    <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
+                        <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>
@@ -332,7 +333,7 @@
             </widget:tab>
         </widget:tabs>
 
-        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+        <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </xhtml:body>
 </xhtml:html>

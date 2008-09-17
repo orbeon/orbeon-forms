@@ -110,24 +110,32 @@ public class PipelineContext {
 
     public PipelineContext() {
         final Properties properties = org.orbeon.oxf.properties.Properties.instance();
-        final PropertySet propertySet = properties.getPropertySet();
-        final String traceClass = propertySet.getNCName("processor.trace");
-        if (traceClass == null) {
-            trace = null;
+        if (properties != null) {
+            final PropertySet propertySet = properties.getPropertySet();
+            if (propertySet != null) {
+                final String traceClass = propertySet.getNCName("processor.trace");
+                if (traceClass == null) {
+                    trace = null;
+                } else {
+                    Throwable t = null;
+                    Trace trace = null;
+                    try {
+                        final Class clazz = Class.forName(traceClass);
+                        trace = (Trace) clazz.newInstance();
+                        trace.setPipelineContext(this);
+                    } catch (final Exception e) {
+                        t = e;
+                    }
+                    this.trace = trace;
+                    if (t != null) {
+                        throw new OXFException(t);
+                    }
+                }
+            } else {
+                trace = null;
+            }
         } else {
-            Throwable t = null;
-            Trace trace = null;
-            try {
-                final Class clazz = Class.forName(traceClass);
-                trace = (Trace) clazz.newInstance();
-                trace.setPipelineContext(this);
-            } catch (final Exception e) {
-                t = e;
-            }
-            this.trace = trace;
-            if (t != null) {
-                throw new OXFException(t);
-            }
+            trace = null;
         }
     }
 

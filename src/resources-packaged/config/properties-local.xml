@@ -11,5 +11,5 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors"/>
+<!-- NOTE: In the future, we can use <xi:fallback> and remove this file. -->
+<properties/>

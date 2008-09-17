@@ -1,0 +1,46 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <!-- Global properties -->
+    <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
+    <property as="xs:integer" name="oxf.cache.size"                                  value="500"/>
+    <property as="xs:integer" name="oxf.cache.xpath.size"                            value="600"/>
+    <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
+    <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
+    <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
+
+    <!-- Epilogue configuration -->
+    <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
+    <property as="xs:boolean" name="oxf.epilogue.use-theme"                          value="true"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.theme.portlet"                      value="oxf:/config/theme-portlet-examples.xsl"/>
+    <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
+    <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
+    <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                     value="true"/>
+
+    <!-- Processor-specific properties -->
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-memory-size"   value="10240"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
+    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
+    <property as="xs:boolean" processor-name="oxf:saxon8"    name="generate-source-location" value="false"/>
+    <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
+
+    <!--<property as="xs:boolean" processor-name="oxf:xml-converter"       name="serialize-xml-11" value="true"/>-->
+
+</properties>

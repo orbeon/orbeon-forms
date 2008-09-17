@@ -1,0 +1,67 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <!-- Encryption of XForms hidden fields and field names -->
+    <property as="xs:string"  name="oxf.xforms.password"                             value="CHANGE THIS PASSWORD"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-item-values"                  value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
+
+    <!-- Default formatting of XForms types -->
+    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.integer"                       value="if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
+
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                    value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or  [D].[M].[Y]-->
+    <property as="xs:string"  name="oxf.xforms.format.input.time"                    value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [H]:[m]:[s] -->
+
+    <!-- XForms cache configuration -->
+    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="server"/>
+    <property as="xs:integer" name="oxf.xforms.store.application.size"               value="20000000"/>
+    <property as="xs:string"  name="oxf.xforms.store.application.username"           value="guest"/>
+    <property as="xs:string"  name="oxf.xforms.store.application.password"           value="guest"/>
+    <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>
+    <property as="xs:string"  name="oxf.xforms.store.application.collection"         value="/db/orbeon/xforms/cache/"/>
+    <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
+    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
+    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="40"/>
+
+    <!-- Other XForms options -->
+    <property as="xs:string"  name="oxf.xforms.order"                                value="label control help alert hint"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
+    <property as="xs:string"  name="oxf.xforms.forward-submission-headers"           value="Authorization"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.noscript"                             value="false"/>
+    <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
+    <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                 value="4"/>
+    <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
+    <property as="xs:string"  name="oxf.xforms.datepicker"                           value="yui"/>  <!-- jcalendar or yui -->
+
+</properties>

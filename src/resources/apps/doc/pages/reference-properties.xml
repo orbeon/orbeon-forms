@@ -36,7 +36,7 @@
                         href="reference-resource-managers">Resource Manager</link> (the properties being read like any
                         other Orbeon Forms resources). By default it tries to load a file from the
                         URL<code>oxf:/properties.xml</code>. This value can be overridden in the Web application
-                        descriptor <code>web.xmxl</code> with the <code>oxf.properties</code> initialization parameter:
+                        descriptor <code>web.xml</code> with the <code>oxf.properties</code> initialization parameter:
 
                         <xml-source>
                             <context-param>
@@ -45,6 +45,36 @@
                             </context-param>
                         </xml-source>
                     </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Standard Property Files</b> – Even though the location of the property file can be
+                        configured in web.xml, Orbeon Forms uses the following locations:
+                    </p>
+                    <ul>
+                        <li>
+                            <code>oxf:/config/properties.xml</code>: the main property file. This file is stored within
+                            <code>orbeon-resources-public.jar</code>. In turn, it uses XInclude to include the following
+                            files:
+                        </li>
+                        <li>
+                            <code>oxf:/config/properties-base.xml</code>: base Orbeon Forms properties. This file is
+                            under <code>WEB-INF/resources/config/</code>.
+                        </li>
+                        <li>
+                            <code>oxf:/config/properties-xforms.xml</code>: XForms engine properties. This file is
+                            under <code>WEB-INF/resources/config/</code>.
+                        </li>
+                        <li>
+                            <code>oxf:/config/properties-form-runner.xml</code>: Orbeon Form Runner properties. This
+                            file is under <code>WEB-INF/resources/config/</code>.
+                        </li>
+                        <li>
+                            <code>oxf:/config/properties-local.xml</code>: optional file with properties local to the
+                            deployment. This file can also contain properties that override properties in the above
+                            files. This file should be placed under <code>WEB-INF/resources/config/</code>.
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <p>

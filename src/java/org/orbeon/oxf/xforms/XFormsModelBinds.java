@@ -544,10 +544,7 @@ public class XFormsModelBinds {
             // Evaluate "required" XPath expression on this node
             try {
                 // Get MIP value
-                final String xpath = "boolean(" + bind.getRequired() + ")";
-                final boolean required = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+                final boolean required = evaluateBooleanExpression1(pipelineContext, bind, bind.getRequired(), nodeset, position, currentVariables);
 
                 // Update node with MIP value
                 InstanceData.setRequired(currentNodeInfo, required);
@@ -561,10 +558,7 @@ public class XFormsModelBinds {
         if (bind.getRelevant() != null) {
                 // Evaluate "relevant" XPath expression on this node
                 try {
-                    final String xpath = "boolean(" + bind.getRelevant() + ")";
-                    boolean relevant = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                        nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+                    final boolean relevant = evaluateBooleanExpression1(pipelineContext, bind, bind.getRelevant(), nodeset, position, currentVariables);
                     // Mark node
                     InstanceData.setRelevant(currentNodeInfo, relevant);
                 } catch (Exception e) {
@@ -578,10 +572,7 @@ public class XFormsModelBinds {
             // The bind has a readonly attribute
             // Evaluate "readonly" XPath expression on this node
             try {
-                final String xpath = "boolean(" + bind.getReadonly() + ")";
-                boolean readonly = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+                final boolean readonly = evaluateBooleanExpression1(pipelineContext, bind, bind.getReadonly(), nodeset, position, currentVariables);
 
                 // Mark node
                 InstanceData.setReadonly(currentNodeInfo, readonly);
@@ -594,6 +585,19 @@ public class XFormsModelBinds {
             // Mark node
             InstanceData.setReadonly(currentNodeInfo, true);
         }
+    }
+
+    private boolean evaluateBooleanExpression1(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
+        final String xpath = "boolean(" + xpathExpression + ")";
+        return ((Boolean) XPathCache.evaluateSingle(pipelineContext,
+            nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
+            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+    }
+
+    private boolean evaluateBooleanExpression2(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
+        return XPathCache.evaluateAsBoolean(pipelineContext,
+            nodeset, position, xpathExpression, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
+            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
     }
 
     private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {
@@ -777,10 +781,7 @@ public class XFormsModelBinds {
             // Evaluate constraint
             try {
                 // Get MIP value
-                final String xpath = "boolean(" + bind.getConstraint() + ")";
-                final boolean valid = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, namespaceMap, getVariables(currentNodeInfo),
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
+                final boolean valid = evaluateBooleanExpression1(pipelineContext, bind, bind.getConstraint(), nodeset, position, getVariables(currentNodeInfo));
 
                 // Update node with MIP value
                 isValid &= valid;

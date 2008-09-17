@@ -188,6 +188,23 @@ public class PooledXPathExpression {
     }
 
     private SequenceIterator evaluate(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
+        prepareContext(xpathContext, functionContext);
+        return expression.iterate(xpathContext);
+    }
+
+    /**
+     * Evaluate the expression as a boolean value.
+     */
+    public boolean evaluateAsBoolean(Object functionContext) throws XPathException {
+        final Item contextItem = (Item) contextItems.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
+        prepareContext(xpathContext, functionContext);
+        // TODO: this actually doesn't work like cast as xs:boolean, which is the purpose of this
+//        return expression.effectiveBooleanValue(xpathContext);
+        throw new OXFException("NIY");
+    }
+
+    private final void prepareContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
 
         // Pass function context to controller
         xpathContext.getController().setUserData("", this.getClass().getName(), functionContext);
@@ -212,8 +229,6 @@ public class PooledXPathExpression {
                 }
             }
         }
-
-        return expression.iterate(xpathContext);
     }
 
     private static class ListSequenceIterator implements SequenceIterator, Cloneable {

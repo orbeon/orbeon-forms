@@ -268,12 +268,8 @@
                                             <xsl:when test="doc('input:instance')/*/mode = ('view')">
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <xsl:if test="$has-button-close">
-                                                            <fr:back-button/>
-                                                        </xsl:if>
-                                                        <xsl:if test="$has-button-pdf">
-                                                            <fr:pdf-button/>
-                                                        </xsl:if>
+                                                        <fr:back-button/>
+                                                        <fr:pdf-button/>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
@@ -289,26 +285,16 @@
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <fr:refresh-button/>
-                                                        <xsl:if test="$has-button-close">
-                                                            <fr:back-button/>
-                                                        </xsl:if>
-                                                        <xsl:if test="$has-button-clear">
-                                                            <fr:clear-button/>
-                                                        </xsl:if>
-                                                        <xsl:if test="$has-button-print">
-                                                            <fr:print-button/>
-                                                        </xsl:if>
-                                                        <xsl:if test="$has-button-pdf">
-                                                            <fr:pdf-button/>
-                                                        </xsl:if>
+                                                        <fr:back-button/>
+                                                        <fr:clear-button/>
+                                                        <fr:print-button/>
+                                                        <fr:pdf-button/>
                                                         <!-- These buttons are disabled until we can save initial changes to the DOM in store and
                                                               replay them when the form is first loaded offline -->
                                                         <!--<fr:take-offline/>-->
                                                         <!--<fr:take-online/>-->
                                                         <!--<fr:save-offline/>-->
-                                                        <xsl:if test="$has-button-save-locally">
-                                                            <fr:save-locally-button/>
-                                                        </xsl:if>
+                                                        <fr:save-locally-button/>
                                                         <fr:save-button/>
                                                     </fr:buttons>
                                                 </xsl:variable>

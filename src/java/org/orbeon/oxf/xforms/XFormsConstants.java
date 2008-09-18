@@ -70,6 +70,9 @@ public class XFormsConstants {
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
     public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
 
+    // XForms QNames
+    public static final QName XFORMS_BIND_QNAME = new QName("bind", XFORMS_NAMESPACE);
+
     // eXForms at http://www.exforms.org/
     public static final String EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0";
     public static final String EXFORMS_PREFIX = "exf";

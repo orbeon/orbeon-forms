@@ -109,6 +109,10 @@ public class XFormsModelSchemaValidator {
         }
     }
 
+    public boolean hasSchema() {
+        return schemaGrammar != null;
+    }
+
     private static class MSVGrammarReaderController implements GrammarReaderController {
 
         static private Logger logger = LoggerFactory.createLogger(MSVGrammarReaderController.class);

@@ -61,9 +61,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Binds
     private XFormsModelBinds binds;
+    private boolean mustBindValidate;
 
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
+    private boolean mustSchemaValidate;
 
     // Container
     private XFormsContainer container;
@@ -121,7 +123,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
 
         // Create binds object
-        binds = new XFormsModelBinds(this);
+        binds = XFormsModelBinds.create(this);
+        mustBindValidate = binds != null;
     }
 
     public XFormsContainer getContainer() {
@@ -323,30 +326,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     private void loadSchemasIfNeeded(PipelineContext pipelineContext) {
-        final Element modelElement = modelDocument.getRootElement();
         if (schemaValidator == null) {
             if (!XFormsProperties.isSkipSchemaValidation(containingDocument)) {
+                final Element modelElement = modelDocument.getRootElement();
                 schemaValidator = new XFormsModelSchemaValidator(modelElement);
                 schemaValidator.loadSchemas(pipelineContext);
-            }
-        }
-    }
 
-    private void applySchemasIfNeeded(Map invalidInstances) {
-        // Don't do anything if there is no schema
-        if (schemaValidator != null) {
-            // Apply schemas to all instances
-            if (getInstances() != null) {
-                for (Iterator i = getInstances().iterator(); i.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                    // Currently we don't support validating read-only instances
-                    if (!currentInstance.isReadOnly()) {
-                        if (!schemaValidator.validateInstance(currentInstance)) {
-                            // Remember that instance is invalid
-                            invalidInstances.put(currentInstance.getEffectiveId(), "");
-                        }
-                    }
-                }
+                mustSchemaValidate = schemaValidator != null && schemaValidator.hasSchema();
             }
         }
     }
@@ -368,7 +354,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Refresh binds
         doRebuild(pipelineContext);
-        binds.applyComputedExpressionBinds(pipelineContext);
+        if (binds != null)
+            binds.applyComputedExpressionBinds(pipelineContext);
         doRevalidate(pipelineContext);
 
         synchronizeInstanceDataEventState();
@@ -878,15 +865,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public void doRebuild(PipelineContext pipelineContext) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing rebuild", new String[] { "model id", getEffectiveId() });
-
         // Rebuild bind tree
-        binds.rebuild(pipelineContext);
-        // TODO: rebuild computational dependency data structures
+        if (binds != null) {
+            binds.rebuild(pipelineContext);
+            // TODO: rebuild computational dependency data structures
 
-        // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-        containingDocument.getControls().markDirtySinceLastRequest(true);
+            // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+            containingDocument.getControls().markDirtySinceLastRequest(true);
+        }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
@@ -896,23 +882,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public void doRecalculate(PipelineContext pipelineContext) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing recalculate", new String[] { "model id", getEffectiveId() });
-
-        if (instances != null) {
-            // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
-            // to evaluate "calculate" binds before the other binds.
-
-            // TODO: use containingDocument.startHandleOperation()
-            final long recalculateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-
+        if (instances != null && binds != null) {
             // Apply calculate binds
             binds.applyCalculateBinds(pipelineContext);
-
-            if (XFormsServer.logger.isDebugEnabled()) {
-                final long recalculateTime = System.currentTimeMillis() - recalculateStartTime;
-                containingDocument.logDebug("model", "done recalculating", new String[] { "time", Long.toString(recalculateTime) });
-            }
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -924,11 +896,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public void doRevalidate(final PipelineContext pipelineContext) {
 
-        if (XFormsServer.logger.isDebugEnabled())
+        if (instances != null && (mustBindValidate || mustSchemaValidate)) {
+            // TODO: use containingDocument.startHandleOperation()
+            if (XFormsServer.logger.isDebugEnabled())
             containingDocument.logDebug("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
-        if (instances != null) {
-            // TODO: use containingDocument.startHandleOperation()
             final long revalidateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Clear validation state
@@ -942,8 +914,25 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Run validation
             final Map invalidInstances = new HashMap();
-            applySchemasIfNeeded(invalidInstances);
-            binds.applyValidationBinds(pipelineContext, invalidInstances);
+
+            // Validate using schemas if needed
+            if (mustSchemaValidate) {
+                // Apply schemas to all instances
+                for (Iterator i = instances.iterator(); i.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                    // Currently we don't support validating read-only instances
+                    if (!currentInstance.isReadOnly()) {
+                        if (!schemaValidator.validateInstance(currentInstance)) {
+                            // Remember that instance is invalid
+                            invalidInstances.put(currentInstance.getEffectiveId(), "");
+                        }
+                    }
+                }
+            }
+
+            // Validate using binds if needed
+            if (mustBindValidate)
+                binds.applyValidationBinds(pipelineContext, invalidInstances);
 
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching

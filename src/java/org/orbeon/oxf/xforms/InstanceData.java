@@ -63,7 +63,6 @@ public class InstanceData {
     private boolean previousRequiredState = DEFAULT_REQUIRED;
     private boolean previousValidState = DEFAULT_VALID;
 
-    private Map switchIdsToCaseIds;
     private String invalidBindIds;
     private List schemaErrors;
 
@@ -368,8 +367,6 @@ public class InstanceData {
             existingInstanceData.relevant = DEFAULT_RELEVANT;
             existingInstanceData.readonly = DEFAULT_READONLY;
             existingInstanceData.required = DEFAULT_REQUIRED;
-
-            existingInstanceData.switchIdsToCaseIds = null;
         }
     }
 
@@ -420,50 +417,6 @@ public class InstanceData {
 
     public static void markValueChanged(Node node) {
         getOrCreateInstanceData(node).valueChanged = true;
-    }
-
-    public static void addSwitchIdToCaseId(NodeInfo nodeInfo, String switchId, String caseId) {
-        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo);
-
-        if (instanceData.switchIdsToCaseIds == null)
-            instanceData.switchIdsToCaseIds = new HashMap();
-
-        instanceData.switchIdsToCaseIds.put(switchId,  caseId);
-    }
-
-    public static void setSwitchIdsToCaseIds(Node node, Map switchIdsToCaseIds) {
-        final InstanceData existingInstanceData = getLocalInstanceData(node);
-        if (existingInstanceData == null) {
-            if (switchIdsToCaseIds != null) {
-                // Different from default so set on new InstanceData
-                final InstanceData newInstanceData = createNewInstanceData(node);
-                newInstanceData.switchIdsToCaseIds = switchIdsToCaseIds;
-            }
-        } else {
-            // Set on existing InstanceData
-            existingInstanceData.switchIdsToCaseIds = switchIdsToCaseIds;
-        }
-    }
-
-    public static Map getSwitchIdsToCaseIds(Node node) {
-        final InstanceData existingInstanceData = getLocalInstanceData(node);
-        if (existingInstanceData == null) {
-            return null;
-        } else {
-            return existingInstanceData.switchIdsToCaseIds;
-        }
-    }
-
-    public static String getCaseIdForSwitchId(NodeInfo nodeInfo, String switchId) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        if (existingInstanceData == null) {
-            return null;
-        } else {
-            if (existingInstanceData.switchIdsToCaseIds == null)
-                return null;
-            else
-                return (String) existingInstanceData.switchIdsToCaseIds.get(switchId);
-        }
     }
 
     private static InstanceData getOrCreateInstanceData(NodeInfo nodeInfo) {

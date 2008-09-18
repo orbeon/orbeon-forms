@@ -61,18 +61,34 @@ public class XFormsModelBinds {
     private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
     private XFormsContextStack contextStack;                    // context stack for evaluation
 
+    private final List bindElements;
     private List topLevelBinds = new ArrayList();               // List<Bind>
     private Map singleNodeContextBinds = new HashMap();         // Map<String, Bind>
     private Map iterationsForContextNodeInfo = new HashMap();   // Map<NodeInfo, List<BindIteration>>
     private List offlineBinds = new ArrayList();                // List<Bind>
     private Map variableNamesToIds = new HashMap();             // Map<String, String> of name to id
 
-    public XFormsModelBinds(XFormsModel model) {
+    /**
+     * Create an instance of XFormsModelBinds if the given model has xforms:bind elements.
+     *
+     * @param model XFormsModel
+     * @return      XFormsModelBinds or null if the model doesn't have xforms:bind elements
+     */
+    public static XFormsModelBinds create(XFormsModel model) {
+        final List bindElements = model.getModelDocument().getRootElement().elements(XFormsConstants.XFORMS_BIND_QNAME);
+        final boolean hasBinds = bindElements != null && bindElements.size() > 0;
+
+        return hasBinds ? new XFormsModelBinds(model, bindElements) : null;
+    }
+
+    private XFormsModelBinds(XFormsModel model, List bindElements) {
         this.model = model;
         this.contextStack = new XFormsContextStack(model);
 
         this.containingDocument = model.getContainingDocument();
         this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
+
+        this.bindElements = bindElements;
     }
 
     /**
@@ -81,6 +97,11 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void rebuild(PipelineContext pipelineContext) {
+
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("model", "performing rebuild", new String[] { "model id", model.getEffectiveId() });
+        // TODO: use containingDocument.startHandleOperation()
+
         // Reset everything
         contextStack.resetBindingContext(pipelineContext, model);
         topLevelBinds.clear();
@@ -90,8 +111,7 @@ public class XFormsModelBinds {
         variableNamesToIds.clear();
 
         // Iterate through all top-level bind elements
-        final List childElements = model.getModelDocument().getRootElement().elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
-        for (Iterator i = childElements.iterator(); i.hasNext();) {
+        for (Iterator i = bindElements.iterator(); i.hasNext();) {
             final Element currentBindElement = (Element) i.next();
             // Create and remember as top-level bind
             final Bind currentBind = new Bind(pipelineContext, currentBindElement, true);
@@ -106,10 +126,18 @@ public class XFormsModelBinds {
      */
     public void applyCalculateBinds(final PipelineContext pipelineContext) {
 
+        // TODO: use containingDocument.startHandleOperation()
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("model", "performing recalculate", new String[] { "model id", model.getEffectiveId() });
+
+        final long recalculateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+
         // Reset context stack just to re-evaluate the variables
         contextStack.resetBindingContext(pipelineContext, model);
 
         // Handle calculations
+        // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
+        // to evaluate "calculate" binds before the other binds.
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
                 handleCalculateBinds(pipelineContext, bind, nodeset, position);
@@ -119,6 +147,11 @@ public class XFormsModelBinds {
         // Update computed expression binds if requested (done here according to XForms 1.1)
         if (computedBindsCalculate) {
             applyComputedExpressionBinds(pipelineContext);
+        }
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            final long recalculateTime = System.currentTimeMillis() - recalculateStartTime;
+            containingDocument.logDebug("model", "done recalculating", new String[] { "time", Long.toString(recalculateTime) });
         }
     }
 
@@ -257,66 +290,69 @@ public class XFormsModelBinds {
             // TODO: Nested containers
             for (Iterator h = containingDocument.getModels().iterator(); h.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) h.next();
-                final List offlineBinds = currentModel.getBinds().getOfflineBinds();
-                //  Iterate through offline binds
-                for (Iterator i = offlineBinds.iterator(); i.hasNext();) {
-                    final Bind currentBind = (Bind) i.next();
-                    final List currentNodeset = currentBind.getNodeset();
+                final XFormsModelBinds currentBinds = currentModel.getBinds();
+                if (currentBinds != null) {
+                    final List offlineBinds = currentBinds.getOfflineBinds();
+                    //  Iterate through offline binds
+                    for (Iterator i = offlineBinds.iterator(); i.hasNext();) {
+                        final Bind currentBind = (Bind) i.next();
+                        final List currentNodeset = currentBind.getNodeset();
 
-                    // Find ids of controls inheriting the readonly and relevant MIPs if necessary
-                    final String readonly = currentBind.getReadonly();
-                    final String relevant = currentBind.getRelevant();
-                    final List controlsInheritingMIPs;
-                    if (readonly != null || relevant != null ) {
-                        // Find ids of controls that inherit the property
+                        // Find ids of controls inheriting the readonly and relevant MIPs if necessary
+                        final String readonly = currentBind.getReadonly();
+                        final String relevant = currentBind.getRelevant();
+                        final List controlsInheritingMIPs;
+                        if (readonly != null || relevant != null ) {
+                            // Find ids of controls that inherit the property
 
-                        // Find attributes and elements which are children of nodes in the current nodeset
-                        final List nestedNodeset = new ArrayList();
-                        XFormsUtils.getNestedAttributesAndElements(nestedNodeset, currentNodeset);
-                        if (nestedNodeset.size() > 0) {
-                            // Find all controls bound to those nested nodes: they are influenced by the mips
-                            controlsInheritingMIPs = getBoundControls(nodesToControlsMapping, nestedNodeset);
+                            // Find attributes and elements which are children of nodes in the current nodeset
+                            final List nestedNodeset = new ArrayList();
+                            XFormsUtils.getNestedAttributesAndElements(nestedNodeset, currentNodeset);
+                            if (nestedNodeset.size() > 0) {
+                                // Find all controls bound to those nested nodes: they are influenced by the mips
+                                controlsInheritingMIPs = getBoundControls(nodesToControlsMapping, nestedNodeset);
+                            } else {
+                                // No controls are bound to nested nodes
+                                controlsInheritingMIPs = null;
+                            }
                         } else {
-                            // No controls are bound to nested nodes
                             controlsInheritingMIPs = null;
                         }
-                    } else {
-                        controlsInheritingMIPs = null;
-                    }
 
-                    // Find controls directly bound to nodes in the bind nodeset
-                    final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
+                        // Find controls directly bound to nodes in the bind nodeset
+                        final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
 
-                    if (boundControls.size() > 0) {
-                        for (Iterator j = boundControls.iterator(); j.hasNext();) {
-                            final XFormsControl currentControl = (XFormsControl) j.next();
+                        if (boundControls.size() > 0) {
+                            for (Iterator j = boundControls.iterator(); j.hasNext();) {
+                                final XFormsControl currentControl = (XFormsControl) j.next();
 
-                            if (controlFound)
-                                sb.append(',');
-                            controlFound = true;
+                                if (controlFound)
+                                    sb.append(',');
+                                controlFound = true;
 
-                            // Control id
-                            sb.append('"');
-                            sb.append(currentControl.getEffectiveId());
-                            sb.append("\": {");
+                                // Control id
+                                sb.append('"');
+                                sb.append(currentControl.getEffectiveId());
+                                sb.append("\": {");
 
 
-                            // Output MIPs
-                            boolean mipFound = false;
-                            mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate(), null);
-                            mipFound = appendNameValue(sb, mipFound, "relevant", relevant, controlsInheritingMIPs);
-                            mipFound = appendNameValue(sb, mipFound, "readonly", readonly, controlsInheritingMIPs);
-                            mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired(), null);
-                            mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint(), null);
+                                // Output MIPs
+                                boolean mipFound = false;
+                                mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate(), null);
+                                mipFound = appendNameValue(sb, mipFound, "relevant", relevant, controlsInheritingMIPs);
+                                mipFound = appendNameValue(sb, mipFound, "readonly", readonly, controlsInheritingMIPs);
+                                mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired(), null);
+                                mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint(), null);
 
-                            // Output type MIP as an exploded QName
-                            final String typeMip = currentBind.getType();
-                            if (typeMip != null) {
-                                final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
-                                mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName), null);
+                                // Output type MIP as an exploded QName
+                                final String typeMip = currentBind.getType();
+                                if (typeMip != null) {
+                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
+                                    mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName), null);
+                                }
+
+                                sb.append('}');
                             }
-
-                            sb.append('}');
                         }
                     }
                 }
@@ -332,25 +368,28 @@ public class XFormsModelBinds {
 
                 // Iterate through variables
                 // NOTE: We assume top-level or single-node context binds
-                final Map variables = currentModel.getBinds().getVariables(null);
-                boolean controlFound = false;
-                for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String currentVariableName = (String) currentEntry.getKey();
-                    final SequenceExtent currentVariableValue = (SequenceExtent) currentEntry.getValue();
+                final XFormsModelBinds currentBinds = currentModel.getBinds();
+                if (currentBinds != null) {
+                    final Map variables = currentModel.getBinds().getVariables(null);
+                    boolean controlFound = false;
+                    for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        final String currentVariableName = (String) currentEntry.getKey();
+                        final SequenceExtent currentVariableValue = (SequenceExtent) currentEntry.getValue();
 
-                    // Find controls bound to the bind exposed as a variable
-                    final List currentNodeset = sequenceExtentToList(currentVariableValue);
-                    final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
-                    if (boundControls.size() > 0) {
-                        for (Iterator j = boundControls.iterator(); j.hasNext();) {
-                            final XFormsControl currentControl = (XFormsControl) j.next();
-                            // Make sure this is a value control (e.g. we can't get the value of bound groups in the UI)
-                            if (currentControl instanceof XFormsValueControl) {
-                                final String effectiveControlId = currentControl.getEffectiveId();
-                                controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId, null);
-                                // We only handle the first value control found
-                                break;
+                        // Find controls bound to the bind exposed as a variable
+                        final List currentNodeset = sequenceExtentToList(currentVariableValue);
+                        final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
+                        if (boundControls.size() > 0) {
+                            for (Iterator j = boundControls.iterator(); j.hasNext();) {
+                                final XFormsControl currentControl = (XFormsControl) j.next();
+                                // Make sure this is a value control (e.g. we can't get the value of bound groups in the UI)
+                                if (currentControl instanceof XFormsValueControl) {
+                                    final String effectiveControlId = currentControl.getEffectiveId();
+                                    controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId, null);
+                                    // We only handle the first value control found
+                                    break;
+                                }
                             }
                         }
                     }
@@ -722,7 +761,7 @@ public class XFormsModelBinds {
                             throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
                         }
 
-                    } else if (model.getSchemaValidator() != null) {
+                    } else if (model.getSchemaValidator() != null && model.getSchemaValidator().hasSchema()) {
                         // Other type and there is a schema
 
                         // There are possibly types defined in the schema

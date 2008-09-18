@@ -63,28 +63,6 @@ public class XFormsUtils {
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
-    // For XForms Classic only.
-    public static void removeInstanceAttributes(final NodeInfo elementNodeInfo) {
-        // Don't do anything if we have a read-only document
-        if (!(elementNodeInfo instanceof NodeWrapper))
-            return;
-
-        // Visit all elements in the document and remove @xxforms:*
-        final Node instanceNode = (Node) getNodeFromNodeInfo(elementNodeInfo, "");
-        Visitor visitor = new VisitorSupport() {
-            public void visit(Element node) {
-                final List newAttributes = new ArrayList();
-                for (Iterator i = node.attributeIterator(); i.hasNext();) {
-                    final Attribute attr = (Attribute) i.next();
-                    if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
-                        newAttributes.add(attr);
-
-                }
-                node.setAttributes(newAttributes);
-            }
-        };
-        instanceNode.accept(visitor);
-    }
     /**
      * Iterate through nodes of the instance document and call the walker on each of them.
      *

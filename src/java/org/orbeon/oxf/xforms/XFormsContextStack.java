@@ -280,7 +280,8 @@ public class XFormsContextStack {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
                 // TODO: dispatch xforms-binding-exception if no bind is found
-                newNodeset = newModel.getBinds().getBindNodeset(bindId, currentBindingContext.getSingleItem());
+                final XFormsModelBinds binds = newModel.getBinds();
+                newNodeset = (binds != null) ?  binds.getBindNodeset(bindId, currentBindingContext.getSingleItem()) : Collections.EMPTY_LIST;
                 hasOverriddenContext = false;
                 contextItem = currentBindingContext.getSingleItem();
                 isNewBind = true;

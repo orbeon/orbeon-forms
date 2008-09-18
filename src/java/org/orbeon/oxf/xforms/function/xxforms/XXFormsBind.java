@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsModelBinds;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -24,6 +25,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * The xxforms:bind() function.
@@ -40,7 +42,8 @@ public class XXFormsBind extends XFormsFunction {
         final XFormsContextStack contextStack = getContextStack(xpathContext);
         final XFormsModel currentModel = contextStack.getCurrentModel();
 
-        final List bindNodeset = currentModel.getBinds().getBindNodeset(bindId, contextStack.getCurrentSingleItem());
+        final XFormsModelBinds currentBinds = currentModel.getBinds();
+        final List bindNodeset = (currentBinds != null) ? currentBinds.getBindNodeset(bindId, contextStack.getCurrentSingleItem()) : Collections.EMPTY_LIST;
 
         return new ListIterator(bindNodeset);
     }

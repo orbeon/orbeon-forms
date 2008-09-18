@@ -53,14 +53,23 @@
     <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
 
     <!-- Get request information -->
+    <!-- Noscript parameter -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <!-- Noscript parameter -->
                 <include>/request/parameters/parameter[starts-with(name, 'fr-noscript')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
+    </p:processor>
+
+    <!--
+        DO NOT REMOVE THIS UNLESS YOU REALLY KNOW WHAT YOU ARE DOING! This is in place to make sure we read the
+        #request output above. components.xsl below may not read it at times, which causes oxf:request to never cache
+        its output, leading to oxf:xforms-to-xhtml's input to not be cacheable. Tricky.
+    -->
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#request"/>
     </p:processor>
 
     <!-- Apply UI components -->

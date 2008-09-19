@@ -97,7 +97,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             select1Handler.setContentHandler(getContentHandler());
             select1Handler.setContext(getContext());
 //            select1Handler.setDocumentLocator(get);
-            select1Handler.outputContent(attributes, staticId, effectiveId, localname, inputControl, items, isMany);
+            select1Handler.outputContent(attributes, staticId, effectiveId, localname, inputControl, items, isMany, true);
 
         } else {
 

@@ -30,7 +30,7 @@
     <!-- ==== Pages ==== -->
 
     <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)(/summary/|/list/)?" matcher="oxf:perl5-matcher"
+          path-info="/fr/([^/]+)/([^/]+)(/summary/|/list/|/)?" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -46,6 +46,48 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
+    <!-- Edit document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(edit)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-detail.xml"
+          model="detail/read-form.xpl" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+        <setvalue ref="/*/document" matcher-group="4"/>
+    </page>
+
+    <!-- View document as HTML -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(view)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-detail.xml"
+          model="detail/read-form.xpl" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+        <setvalue ref="/*/document" matcher-group="4"/>
+    </page>
+
+    <!-- View document as PDF -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-detail.xml"
+          model="detail/read-form.xpl" view="pdf-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+        <setvalue ref="/*/document" matcher-group="4"/>
+    </page>
+
+    <!-- Test form by retrieving form from the database first -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-detail.xml"
+          model="test-model.xpl" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+        <setvalue ref="/*/document" matcher-group="4"/>
+    </page>
+
+    <!-- ==== "Inline" functionality (called while editing form data) ==== -->
+
     <!-- Print document to HTML -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)" matcher="oxf:perl5-matcher"
           view="print-html.xpl"/>
@@ -58,46 +100,6 @@
     <page path-info="/fr/([^/]+)/([^/]+)/(pdf-template)" matcher="oxf:perl5-matcher"
           view="print-pdf-template.xpl"/>
 
-    <!-- Edit document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
-          model="detail/read-form.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/document" matcher-group="3"/>
-        <setvalue ref="/*/mode" matcher-group="4"/>
-    </page>
-
-    <!-- View document as HTML -->
-    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(view)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
-          model="detail/read-form.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/document" matcher-group="3"/>
-        <setvalue ref="/*/mode" matcher-group="4"/>
-    </page>
-
-    <!-- View document as PDF -->
-    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(pdf)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
-          model="detail/read-form.xpl" view="pdf-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/document" matcher-group="3"/>
-        <setvalue ref="/*/mode" matcher-group="4"/>
-    </page>
-
-    <!-- Test form by retrieving form from the database first -->
-    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(test)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
-          model="test-model.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/document" matcher-group="3"/>
-        <setvalue ref="/*/mode" matcher-group="4"/>
-    </page>
-
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page id="test-form" path-info="/fr/([^/]+)/([^/]+)/(test)" matcher="oxf:perl5-matcher"
           model="inline-test-model.xpl" view="html-view.xpl">
@@ -105,6 +107,8 @@
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
+
+    <!-- ==== Other ==== -->
 
     <!-- Upload document and start from there -->
     <page path-info="/fr/upload" model="import-export/upload.xpl"/>

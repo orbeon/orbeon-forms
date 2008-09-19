@@ -93,22 +93,22 @@
 
             <xforms:action ev:event="fr-summary-edit">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/edit/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-view">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-pdf">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/pdf" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-test">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/test{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-xml">

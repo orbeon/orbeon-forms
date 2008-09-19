@@ -35,23 +35,11 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
             <config xsl:version="2.0">
 
-                <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
-                <xsl:variable name="app" select="/*/app" as="xs:string"/>
-                <xsl:variable name="form" select="/*/form" as="xs:string"/>
-                <xsl:variable name="suffix" select="'uri'" as="xs:string"/>
-
-                <!-- List of properties from specific to generic -->
-                <xsl:variable name="names"
-                                  select="(string-join(($prefix, $app, $form, 'data', $suffix), '.'),
-                                           string-join(($prefix, $app, $form, $suffix), '.'),
-                                           string-join(($prefix, $app, $suffix), '.'),
-                                           string-join(($prefix, '*', $suffix), '.'))" as="xs:string+"/>
-
-                <!-- Find all values -->
-                <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
-
-                <!-- Create URI with first non-empty value -->
-                <xsl:variable name="resource" select="concat($values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
+                <!-- Create URI based on properties -->
+                <xsl:variable name="resource"
+                              select="concat(pipeline:property('oxf.fr.appserver.uri'),
+                                        pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'data'), '.')),
+                                        '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
                 <url>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
                 </url>

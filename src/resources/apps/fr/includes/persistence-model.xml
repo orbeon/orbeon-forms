@@ -135,6 +135,8 @@
     <!-- Publish form operation -->
     <xforms:action ev:event="fr-publish-form">
 
+        <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
+
         <!-- Determine the URI of the collection to deploy to -->
         <xxforms:variable name="app" select="event('application')"/>
         <xxforms:variable name="form" select="event('form')"/>
@@ -149,10 +151,15 @@
         </xforms:send>
     </xforms:action>
 
+    <!-- Instance to store the result of the create/update submission -->
+    <xforms:instance id="fr-publish-form-submission-response">
+        <response xmlns=""/>
+    </xforms:instance>
+
     <xforms:submission id="fr-publish-form-submission" xxforms:ensure-uploads="false"
             ref="xxforms:instance('fr-form-instance')" method="put"
             resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
-            replace="none">
+            replace="text" target="instance('fr-publish-form-submission-response')">
         <xi:include href="persistence-model-headers.xml"/>
         <!--<xforms:message ev:event="xforms-submit">-->
             <!--zzz-->
@@ -185,13 +192,41 @@
             <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">false</xforms:setvalue>
 
             <!-- Iterate over attachment controls while there is no submission error -->
-            <xforms:action xxforms:iterate="$attachment-binds">
+            <!--<xforms:action xxforms:iterate="$attachment-binds">-->
+            <xforms:action xxforms:iterate="(1 to count($attachment-binds))">
 
                 <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                    <xxforms:variable name="bind" select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                        or @id = $attachment-controls/@bind])[number(context())]"/>
 
-                    <xxforms:variable name="bind" select="."/>
-                    <xxforms:variable name="expression" select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
-                    <xxforms:variable name="holders" select="xxforms:instance('fr-form-instance')/saxon:evaluate($expression)"/>
+                    <!--
+                        Argh: why does the sequence below suddenly does not contain nodes in document order? This
+                        doesn't work properly:
+
+                          string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')
+
+                        But it does work if split between:
+
+                          o $bind/ancestor-or-self::xforms:bind and
+                          o string-join($binds/@nodeset, '/')
+
+                        This sounds like an issue similar to the one we had with preceding-sibling:: a while ago, and
+                        was fixed in NodeWrapper. See:
+
+                          http://forge.objectweb.org/tracker/?group_id=168&atid=350207&func=detail&aid=306836
+                          http://forge.objectweb.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
+
+                    -->
+                    <xxforms:variable name="binds" select="$bind/ancestor-or-self::xforms:bind"/>
+                    <xxforms:variable name="expression" select="string-join($binds/@nodeset, '/')"/>
+
+                    <!--<xforms:message level="xxforms:log-error">-->
+                        <!--xxx <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
+                        <!--xxx <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
+                        <!--xxx <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
+                    <!--</xforms:message>-->
+
+                    <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
 
                     <xforms:action xxforms:iterate="$holders">
                         <xxforms:variable name="holder" select="."/>

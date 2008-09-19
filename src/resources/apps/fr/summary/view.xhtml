@@ -43,6 +43,11 @@
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
 
+                <!-- Set page size -->
+                <xxforms:variable name="page-size" select="instance('fr-search-instance')/page-size" as="element(page-size)"/>
+                <xforms:setvalue ref="$page-size" model="fr-persistence-model"
+                                 value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
             </xforms:action>

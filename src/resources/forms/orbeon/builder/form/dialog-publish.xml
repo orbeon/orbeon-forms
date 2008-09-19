@@ -25,61 +25,121 @@
       id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
     <xforms:label>Publish Form</xforms:label>
-    <xhtml:div>
-        <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
-        <xhtml:p>
-            Are you sure you want to publish this form? This will override the existing form with
-            the following properties:
-        </xhtml:p>
-        <!-- TODO: check whether a form already exists -->
-        <!-- TODO: if so, also check whether data for that form already exists -->
-        <xhtml:div class="fr-grid">
-            <xhtml:div class="fr-grid-content">
-                <xforms:output value="$metadata-instance/application-name">
-                    <xforms:label>Application Name</xforms:label>
-                </xforms:output>
-                <xforms:output value="$metadata-instance/form-name">
-                    <xforms:label>Form Name</xforms:label>
-                </xforms:output>
+    <!-- Switch to display initial / success / error cases -->
+    <xforms:switch>
+        <xforms:case id="fb-publish-dialog-message-start">
+            <xhtml:div>
+                <xhtml:p>
+                    Are you sure you want to publish this form? This will override the existing form with
+                    the following properties:
+                </xhtml:p>
+                <!-- TODO: check whether a form already exists -->
+                <!-- TODO: if so, also check whether data for that form already exists -->
+                <xhtml:div class="fr-grid">
+                    <xhtml:div class="fr-grid-content fb-publish-message">
+                        <xforms:output value="$metadata-instance/application-name">
+                            <xforms:label>Application Name</xforms:label>
+                        </xforms:output>
+                        <xforms:output value="$metadata-instance/form-name">
+                            <xforms:label>Form Name</xforms:label>
+                        </xforms:output>
+                    </xhtml:div>
+                </xhtml:div>
             </xhtml:div>
-        </xhtml:div>
-    </xhtml:div>
-    <xhtml:div class="fr-dialog-buttons">
-        <xforms:group>
-            <xforms:trigger xxforms:modal="true">
-                <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Publish</xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <!-- TODO: make sure form is saved -->
-                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                        <xxforms:context name="application" select="$metadata-instance/application-name"/>
-                        <xxforms:context name="form" select="$metadata-instance/form-name"/>
-                    </xforms:dispatch>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger xxforms:modal="true">
-                <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Publish and Open</xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <!-- TODO: make sure form is saved -->
-                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                        <xxforms:context name="application" select="$metadata-instance/application-name"/>
-                        <xxforms:context name="form" select="$metadata-instance/form-name"/>
-                    </xforms:dispatch>
-                    <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}" xxforms:target="_blank"/>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
-            </xforms:trigger>
-        </xforms:group>
-    </xhtml:div>
-    <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-    <!-- Set focus when the dialog open  -->
-    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
+            <xhtml:div class="fr-dialog-buttons">
+                <xforms:group>
+                    <xforms:trigger xxforms:modal="true">
+                        <xforms:label>
+                            <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                            <xhtml:span>Publish</xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Clear submission result -->
+                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+                            <!-- TODO: make sure form is saved -->
+                            <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
+                                <xxforms:context name="application" select="$metadata-instance/application-name"/>
+                                <xxforms:context name="form" select="$metadata-instance/form-name"/>
+                            </xforms:dispatch>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <xforms:trigger xxforms:modal="true">
+                        <xforms:label>
+                            <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                            <xhtml:span>Publish and Open</xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Clear submission result -->
+                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+                            <!-- TODO: make sure form is saved -->
+                            <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
+                                <xxforms:context name="application" select="$metadata-instance/application-name"/>
+                                <xxforms:context name="form" select="$metadata-instance/form-name"/>
+                            </xforms:dispatch>
+                            <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}" xxforms:target="_blank"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xhtml:div>
+        </xforms:case>
+        <xforms:case id="fb-publish-dialog-success">
+            <xhtml:div>
+                <xhtml:p>
+                    The form was published successfully.
+                </xhtml:p>
+                <xxforms:variable name="response" model="fr-persistence-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
+                <xforms:group ref=".[normalize-space($response) != '']" class="fb-publish-message">
+                    <xforms:output value="$response" mediatype="text/html"/>
+                </xforms:group>
+            </xhtml:div>
+            <xhtml:div class="fr-dialog-buttons">
+                <xforms:group>
+                    <xforms:trigger>
+                        <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xhtml:div>
+        </xforms:case>
+        <xforms:case id="fb-publish-dialog-error">
+            <xhtml:div>
+                <xhtml:p>
+                    There was an error during form publishing.
+                </xhtml:p>
+            </xhtml:div>
+            <xhtml:div class="fr-dialog-buttons">
+                <xforms:group>
+                    <xforms:trigger>
+                        <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xhtml:div>
+        </xforms:case>
+    </xforms:switch>
+
+    <!-- Initialize dialog -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <!-- Clear publish submission response -->
+        <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+        <!-- Open start area -->
+        <xforms:toggle case="fb-publish-dialog-message-start"/>
+    </xforms:action>
+
+    <!-- Respond to successful publish submission -->
+    <xforms:action ev:event="xforms-submit-done" ev:observer="fr-publish-form-submission">
+        <!-- Open success area -->
+        <xforms:toggle case="fb-publish-dialog-success"/>
+    </xforms:action>
+
+    <!-- Respond to unsuccessful publish submission -->
+    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-publish-form-submission">
+        <!-- Open error area -->
+        <xforms:toggle case="fb-publish-dialog-error"/>
+    </xforms:action>
+
 </xxforms:dialog>

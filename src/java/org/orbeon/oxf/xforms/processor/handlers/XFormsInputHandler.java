@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -88,12 +87,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
-            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler() {
-                protected QName getAppearance(Attributes attributes) {
-                    // Try to look like an xforms:select[@appearance = 'full']
-                    return XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME;
-                }
-            };
+            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler();
             select1Handler.setContentHandler(getContentHandler());
             select1Handler.setContext(getContext());
 //            select1Handler.setDocumentLocator(get);

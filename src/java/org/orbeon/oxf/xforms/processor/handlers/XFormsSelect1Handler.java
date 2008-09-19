@@ -110,7 +110,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
         final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, id);
 
-        outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany);
+        outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, isFull);
     }
 
     protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
@@ -119,7 +119,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             super.handleLabel(staticId, effectiveId, xformsControl, isTemplate);
     }
 
-    public void outputContent(Attributes attributes, String id, String effectiveId, String localname, final XFormsValueControl xformsControl, List items, final boolean isMany) throws SAXException {
+    public void outputContent(Attributes attributes, String id, String effectiveId, String localname, final XFormsValueControl xformsControl, List items, final boolean isMany, final boolean isFull) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 

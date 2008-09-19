@@ -29,6 +29,16 @@ public class DOMSerializer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
+    /**
+     * Find the last modified timestamp of the dependencies of this processor.
+     *
+     * @param pipelineContext       pipeline context
+     * @return                      timestamp, <= 0 if unknown
+     */
+    public long findInputLastModified(PipelineContext pipelineContext) {
+        return findInputLastModified(pipelineContext, getInputByName(INPUT_DATA), false);
+    }
+
     public Document getDocument(PipelineContext pipelineContext) {
         return (Document) pipelineContext.getAttribute(this);
     }

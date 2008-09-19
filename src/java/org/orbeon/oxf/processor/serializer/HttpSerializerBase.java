@@ -88,18 +88,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 }
 
                 // Get last modification date and compute last modified if possible
-                long lastModified;
-                {
-                    final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, dataInput);
-                    if (keyValidity == null || !isInputInCache(pipelineContext, keyValidity)) {
-                        lastModified = 0;
-                    } else {
-                        lastModified = (keyValidity.validity != null) ? findLastModified(keyValidity.validity) : 0; 
-                    }
-                }
-
-                if (logger.isDebugEnabled())
-                    logger.debug("Last modified: " + lastModified);
+                final long lastModified = findInputLastModified(pipelineContext, dataInput, true);
 
                 // Set caching headers and force revalidation
                 response.setCaching(lastModified, true, true);

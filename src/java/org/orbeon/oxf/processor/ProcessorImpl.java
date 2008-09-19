@@ -1187,6 +1187,10 @@ public abstract class ProcessorImpl implements Processor {
 
         public final OutputCacheKey getKey(PipelineContext context) {
             return getFilter().getKey(context);
+//            if (result == null) {
+//                System.out.print(".");
+//            }
+//            return result;
         }
 
         public final Object getValidity(PipelineContext context) {
@@ -1203,12 +1207,12 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     protected static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {
-        ProcessorOutput output = input.getOutput();
+        final ProcessorOutput output = input.getOutput();
         return (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
     }
 
     protected static Object getInputValidity(PipelineContext context, ProcessorInput input) {
-        ProcessorOutput output = input.getOutput();
+        final ProcessorOutput output = input.getOutput();
         return (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
     }
 
@@ -1239,10 +1243,10 @@ public abstract class ProcessorImpl implements Processor {
      * @return  a KeyValidity object containing non-null key and validity, or null
      */
     protected KeyValidity getInputKeyValidity(PipelineContext context, ProcessorInput input) {
-        OutputCacheKey outputCacheKey = getInputKey(context, input);
+        final OutputCacheKey outputCacheKey = getInputKey(context, input);
         if (outputCacheKey == null) return null;
-        InputCacheKey inputCacheKey = new InputCacheKey(input, outputCacheKey);
-        Object inputValidity = getInputValidity(context, input);
+        final InputCacheKey inputCacheKey = new InputCacheKey(input, outputCacheKey);
+        final Object inputValidity = getInputValidity(context, input);
         if (inputValidity == null) return null;
         return new KeyValidity(inputCacheKey, inputValidity);
     }
@@ -1360,7 +1364,7 @@ public abstract class ProcessorImpl implements Processor {
             return true;
         }
 
-        protected final CacheKey getLocalKey(PipelineContext pipelineContext) {
+        protected CacheKey getLocalKey(PipelineContext pipelineContext) {
             for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
                 String key = (String) i.next();
                 if (!isInputInCache(pipelineContext, key))// NOTE: This requires that there is only one input with that name
@@ -1536,14 +1540,46 @@ public abstract class ProcessorImpl implements Processor {
         }
     }
 
-    public static long findLastModified(Object validity) {
+    /**
+     * Find the last modified timestamp of a particular input.
+     *
+     * @param pipelineContext       pipeline context
+     * @param input                 input to check
+     * @param inputMustBeInCache    if true, also return 0 if the input is not currently in cache
+     * @return                      timestamp, <= 0 if unknown
+     */
+    protected long findInputLastModified(PipelineContext pipelineContext, ProcessorInput input, boolean inputMustBeInCache) {
+        final long lastModified;
+        {
+            final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
+            if (keyValidity == null || inputMustBeInCache && !isInputInCache(pipelineContext, keyValidity)) {
+                lastModified = 0;
+            } else {
+                lastModified = (keyValidity.validity != null) ? findLastModified(keyValidity.validity) : 0;
+            }
+        }
+
+        if (logger.isDebugEnabled())
+            logger.debug("Last modified: " + lastModified);
+
+        return lastModified;
+    }
+
+    /**
+     * Recursively find the last modified timestamp of a validity object. Supported types are Long and List<Long>. The
+     * latest timestamp is returned.
+     *
+     * @param validity  validity object
+     * @return          timestamp, <= 0 if unknown
+     */
+    protected static long findLastModified(Object validity) {
         if (validity instanceof Long) {
             return ((Long) validity).longValue();
         } else if (validity instanceof List) {
-            List list = (List) validity;
+            final List list = (List) validity;
             long latest = 0;
             for (Iterator i = list.iterator(); i.hasNext();) {
-                Object o = i.next();
+                final Object o = i.next();
                 latest = Math.max(latest, findLastModified(o));
             }
             return latest;

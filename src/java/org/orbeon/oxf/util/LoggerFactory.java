@@ -73,15 +73,15 @@ public class LoggerFactory {
                 log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY_OLD);
 
             if (log4jConfigURL != null) {
-                Processor url = PipelineUtils.createURLGenerator(log4jConfigURL, true);
-                DOMSerializer dom = new DOMSerializer();
-                PipelineUtils.connect(url, ProcessorImpl.OUTPUT_DATA, dom, ProcessorImpl.INPUT_DATA);
-                PipelineContext ctx = new PipelineContext();
-                url.reset(ctx);
-                dom.reset(ctx);
-                dom.start(ctx);
-                Object o = dom.getW3CDocument(ctx).getDocumentElement();
-                DOMConfigurator.configure( ( org.w3c.dom.Element )o );
+                final Processor urlGenerator = PipelineUtils.createURLGenerator(log4jConfigURL, true);
+                final DOMSerializer domSerializer = new DOMSerializer();
+                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
+                final PipelineContext pipelineContext = new PipelineContext();
+                urlGenerator.reset(pipelineContext);
+                domSerializer.reset(pipelineContext);
+                domSerializer.start(pipelineContext);
+                final Object o = domSerializer.getW3CDocument(pipelineContext).getDocumentElement();
+                DOMConfigurator.configure((org.w3c.dom.Element) o);
             } else {
                 logger.info("Property " + LOG4J_DOM_CONFIG_PROPERTY + " not set. Skipping logging initialization.");
             }

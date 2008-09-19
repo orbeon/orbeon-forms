@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.properties;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PipelineUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Set;
 
 /**
@@ -38,6 +39,8 @@ import java.util.Set;
  * </properties>
  */
 public class Properties {
+
+    private static Logger logger = LoggerFactory.createLogger(Properties.class);
 
     public static final String DEFAULT_PROPERTIES_URI = "oxf:/properties.xml";
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";
@@ -56,6 +59,9 @@ public class Properties {
      */
     private PropertyStore propertyStore = null;
 
+    // Used for refresh
+    private Processor urlGenerator;
+    private DOMSerializer domSerializer;
     private long lastUpdate = Long.MIN_VALUE;
 
     private Properties() {
@@ -96,22 +102,37 @@ public class Properties {
 
                 if (lastUpdate + RELOAD_DELAY >= current) break done;
 
-                final URL url = URLFactory.createURL(propertiesURI);
-                final URLConnection uc = url.openConnection();
+                // Create mini-pipeline to read properties if needed
+                if (urlGenerator == null) {
+                    urlGenerator = PipelineUtils.createURLGenerator(propertiesURI, true);// enable XInclude too
+                    domSerializer = new DOMSerializer();
+                    PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
+                }
 
-                if (propertyStore != null && uc.getLastModified() <= lastUpdate) {
+                // Initialize pipeline
+                final PipelineContext pipelineContext = new PipelineContext();
+                urlGenerator.reset(pipelineContext);
+                domSerializer.reset(pipelineContext);
+
+                // Find whether we can skip reloading
+                if (propertyStore != null && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Not reloading properties because they have not changed.");
+                    }
                     lastUpdate = current;
                     break done;
                 }
 
-                final InputStream in = uc.getInputStream();
-                final Document document = TransformerUtils.readDom4j(in, propertiesURI, true);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Reloading properties because timestamp indicates they may have changed.");
+                }
+
+                // Read updated properties document
+                domSerializer.start(pipelineContext);
+                final Document document = domSerializer.getDocument(pipelineContext);
                 propertyStore = new PropertyStore(document);
 
                 lastUpdate = current;
-
-            } catch (final IOException e) {
-                throwable = e;
             } finally {
                 initializing = false;
             }

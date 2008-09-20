@@ -462,17 +462,23 @@
         <!-- This is statically built in XSLT instead of using XForms -->
         <xsl:if test="$has-toc and $is-detail and not($is-form-builder)">
             <xhtml:div class="fr-toc">
-                <xhtml:h2>
-                    <xforms:output value="$fr-resources/summary/titles/toc"/>
-                </xhtml:h2>
-                <xhtml:ol>
-                    <xsl:for-each select="/xhtml:html/xhtml:body//fr:section">
-                        <xhtml:li>
-                            <xhtml:a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></xhtml:a>
-                            <!-- Will have to add sub-sections when necessary -->
-                        </xhtml:li>
-                    </xsl:for-each>
-                </xhtml:ol>
+                <!-- Set context to fr-form-model for binds below -->
+                <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                    <xhtml:h2>
+                        <xforms:output value="$fr-resources/summary/titles/toc"/>
+                    </xhtml:h2>
+                    <xhtml:ol>
+                        <xsl:for-each select="/xhtml:html/xhtml:body//fr:section">
+                            <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
+                            <xforms:group bind="{@bind}">
+                                <xhtml:li>
+                                    <xhtml:a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></xhtml:a>
+                                    <!-- NOTE: Will have to add sub-sections when necessary -->
+                                </xhtml:li>
+                            </xforms:group>
+                        </xsl:for-each>
+                    </xhtml:ol>
+                </xforms:group>
             </xhtml:div>
             <xhtml:div class="fr-separator">&#160;</xhtml:div>
         </xsl:if>

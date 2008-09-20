@@ -113,7 +113,7 @@
 
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="14">
                     <xsl:for-each select="$xhtml/xhtml:body//fr:body//fr:section">
-                        <xsl:variable name="section-name" select="@context" as="xs:string"/>
+                        <xsl:variable name="section-name" select="substring-before(@bind, '-section')" as="xs:string"/>
                         <group ref="{$section-name}" >
                             <xsl:for-each select=".//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
                                 <xsl:variable name="control" select="." as="element()"/>

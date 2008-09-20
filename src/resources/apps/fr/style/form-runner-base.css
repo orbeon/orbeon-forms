@@ -71,6 +71,7 @@
 }
 .xforms-alert-active-visited {
     display: block;
+    clear: both;
 }
 
 /* Display hints under each control */
@@ -318,7 +319,7 @@ button.xforms-trigger img { margin-right: 10px }
     width: 100%;
     border-collapse: separate;
     clear: both;
-    margin: .5em 0 0 0; /* Adding space before grid, so grid is not right below title or previous grid */
+    margin: 0; /* We used to add space before grid, so grid is not right below title or previous grid, but it's better like this now right? */
 }
 .fr-grid tr th { text-align: left }
 .fr-grid .fr-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table */

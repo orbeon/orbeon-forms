@@ -41,7 +41,7 @@
 .xforms-help-image {
     vertical-align: -0.2em;
     display: inline;
-    margin: 0 .5em 0 0;
+    margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
     padding: 0;
     float: left; /* HACK: Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
                     image at the left of the label. */

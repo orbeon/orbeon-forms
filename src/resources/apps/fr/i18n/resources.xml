@@ -79,6 +79,8 @@
             </messages>
             <labels>
                 <save-document>Save</save-document>
+                <publish>Publish</publish>
+                <test>Test</test>
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
                 <return>Back to Forms</return>
@@ -95,7 +97,6 @@
                 <clear>Clear</clear>
                 <confirm>Confirm</confirm>
                 <cancel>Cancel</cancel>
-                <publish>Publish</publish>
                 <offline>Take offline</offline>
                 <online>Take online</online>
                 <alert>Missing or incorrect value</alert>
@@ -174,7 +175,7 @@
             <formats>
                 <date>Le [D] [Mn] [Y]</date>
                 <time>[H01]:[m01]:[s01]</time>
-                <datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</datetime>
+                <dateTime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
             </formats>
         </summary>
@@ -187,6 +188,8 @@
             </messages>
             <labels>
                 <save-document>Sauvegarder</save-document>
+                <publish>Publier</publish>
+                <test>Tester</test>
                 <save-locally>Sauvegarde Locale</save-locally>
                 <save-offline>Sauvegarde Or-ligne</save-offline>
                 <return>Retour</return>
@@ -203,7 +206,6 @@
                 <clear>Effacer</clear>
                 <confirm>Confirmer</confirm>
                 <cancel>Annuler</cancel>
-                <publish>Publier</publish>
                 <offline>Or-ligne</offline>
                 <online>En-ligne</online>
                 <alert>Valeur manquante ou incorrecte</alert>
@@ -276,6 +278,8 @@
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
+                <publish>[Publish]</publish>
+                <test>[Test]</test>
                 <save-locally>Guardar Localmente</save-locally>
                 <save-offline>Guardar Sin conexión</save-offline>
                 <return>Volver a las formas</return>
@@ -292,7 +296,6 @@
                 <clear>Borrar</clear>
                 <confirm>Confirme</confirm>
                 <cancel>Cancelar</cancel>
-                <publish>[Publish]</publish>
                 <offline>Sin conexión</offline>
                 <online>En línea</online>
                 <alert>Desaparición o valor incorrecto</alert>

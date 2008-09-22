@@ -245,7 +245,7 @@
             <!-- Test button -->
             <xforms:trigger ref="$instance/save-test-trigger[false()]">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
+                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                     <xhtml:span>Test</xhtml:span>
                 </xforms:label>
 
@@ -258,7 +258,7 @@
             <xforms:trigger ref="$instance/save-test-trigger">
 
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Publish" title="Publish"/>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
                     <xhtml:span>Save</xhtml:span>
                 </xforms:label>
                 <!-- Save changes to form -->

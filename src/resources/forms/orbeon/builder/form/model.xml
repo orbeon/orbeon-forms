@@ -44,6 +44,9 @@
             <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version = (7, 8)"/>
         </xforms:action>
 
+        <!-- Set current language based on first resources available in loaded form -->
+        <xforms:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
+
         <!-- Load components -->
         <xforms:send submission="fb-load-components"/>
 
@@ -201,7 +204,7 @@
 
     <!-- Instance containing the current language -->
     <xforms:instance id="fb-language-instance">
-        <language>en</language>
+        <language/>
     </xforms:instance>
 
     <!-- Temporary instance for grid computations -->

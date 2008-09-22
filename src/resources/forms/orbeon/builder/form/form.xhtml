@@ -1084,8 +1084,8 @@
                 <!-- Test form -->
                 <xforms:trigger model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
                     <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
-                        <xhtml:span>Test</xhtml:span>
+                        <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
                     </xforms:label>
                     <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
                 </xforms:trigger>
@@ -1093,8 +1093,8 @@
                 <!-- Publish form -->
                 <xforms:trigger id="fb-publish-button" model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/world.png" alt="Publish" title="Publish"/>
-                        <xhtml:span>Publish</xhtml:span>
+                        <xhtml:img src="/apps/fr/style/images/silk/world.png" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/publish"/></xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xxforms:show dialog="fb-publish-dialog"/>

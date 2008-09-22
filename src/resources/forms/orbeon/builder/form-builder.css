@@ -31,7 +31,7 @@
 a.fb-edit-help-trigger img {
     vertical-align: -0.2em;
     display: inline;
-    margin: 0 .5em 0 0;
+    margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
     padding: 0;
 }
 
@@ -130,6 +130,10 @@ a.fb-edit-help-trigger img {
 #fb-database-service-dialog { width: 45em }
 #fb-database-service-dialog textarea { height: 10em; font-family: monospace }
 
+/* Help dialog */
+#fb-edit-help-dialog { width: 40em }
+#fb-edit-help-dialog textarea { width: 98%; height: 12em }
+
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
 .xforms-dialog .xforms-label img { vertical-align: middle } 
@@ -137,11 +141,10 @@ a.fb-edit-help-trigger img {
 #fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }
 #fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
 
-#fb-edit-details-dialog, #fb-edit-help-dialog,
+#fb-edit-details-dialog,
     #fb-edit-validation-dialog, #fb-section-details-dialog,
     #fb-add-language-dialog { width: 20em }
 #fb-edit-details-dialog .xforms-input input { width: 98% }
-#fb-edit-help-dialog textarea { width: 98%; height: 4em }
 #fb-section-details-dialog .xforms-input input { width: 98% }
 
 #fb-edit-validation-dialog textarea { width: 98%; height: 4em }

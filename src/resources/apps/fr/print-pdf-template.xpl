@@ -111,10 +111,10 @@
                     </group>
                 </xsl:if>
 
-                <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="14">
+                <group ref="/*">
                     <xsl:for-each select="$xhtml/xhtml:body//fr:body//fr:section">
-                        <xsl:variable name="section-name" select="substring-before(@bind, '-section')" as="xs:string"/>
-                        <group ref="{$section-name}" >
+                        <xsl:variable name="section-name" select="substring-before(@bind, '-bind')" as="xs:string"/>
+                        <group ref="{$section-name}">
                             <xsl:for-each select=".//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
                                 <xsl:variable name="control" select="." as="element()"/>
                                 <xsl:variable name="control-name" select="substring-before($control/@id, '-control')" as="xs:string"/>
@@ -131,6 +131,8 @@
                                     then string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')
                                     else string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')" as="xs:string"/>
 
+                                <!-- Here use section$field pattern -->
+                                <xsl:variable name="field-name" select="concat($section-name, '$', $control-name)"/>
                                 <xsl:choose>
                                     <xsl:when test="local-name($control) = ('select', 'select1')">
                                         <!-- Selection control -->
@@ -138,22 +140,47 @@
 
                                         <xsl:choose>
                                             <xsl:when test="local-name($control) = 'select' and $control/@appearance = 'full'">
-                                                <!-- Checkboxes -->
-                                                <field acro-field-name="'{$control-name}.{$control-value}'" value="'X'"/>
+                                                <!-- Checkboxes: use control value and match export values in PDF -->
+                                                <!--<field acro-field-name="'{$field-name}.{$control-value}'" value="'X'"/>-->
+                                                <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
+                                            </xsl:when>
+                                            <xsl:when test="local-name($control) = 'select1' and $control/@appearance = 'full'">
+                                                <!-- Radio buttons: use control value and match export values in PDF -->
+                                                <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <!-- Other selection controls -->
-                                                <field acro-field-name="'{$control-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
+                                                <!-- Other selection controls: just use the label -->
+                                                <field acro-field-name="'{$field-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
                                         <!-- Date -->
-                                        <field acro-field-name="'{$control-name}'" value="'{if ($control-value castable as xs:date) then format-date(xs:date($control-value), $fr-current-resources/summary/formats/date, $request-language, (), ()) else $control-value}'"/>
+                                        <!-- TODO: format comes from under <summary> -->
+                                        <field acro-field-name="'{$field-name}'"
+                                               value="'{if ($control-value castable as xs:date)
+                                                        then format-date(xs:date($control-value), $fr-current-resources/summary/formats/date, $request-language, (), ())
+                                                        else $control-value}'"/>
+                                    </xsl:when>
+                                    <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'time'">
+                                        <!-- Time -->
+                                        <!-- TODO: format comes from under <summary> -->
+                                        <field acro-field-name="'{$field-name}'"
+                                               value="'{if ($control-value castable as xs:time)
+                                                        then format-date(xs:time($control-value), $fr-current-resources/summary/formats/time, $request-language, (), ())
+                                                        else $control-value}'"/>
+                                    </xsl:when>
+                                    <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'dateTime'">
+                                        <!-- Date and time -->
+                                        <!-- TODO: format comes from under <summary> -->
+                                        <field acro-field-name="'{$field-name}'"
+                                               value="'{if ($control-value castable as xs:dateTime)
+                                                        then format-dateTime(xs:dateTime($control-value), $fr-current-resources/summary/formats/dateTime, $request-language, (), ())
+                                                        else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- Other control -->
-                                        <field acro-field-name="'{$control-name}'" value="'{$control-value}'"/>
+                                        <field acro-field-name="'{$field-name}'" value="'{replace($control-value, '''', '''''')}'"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
 

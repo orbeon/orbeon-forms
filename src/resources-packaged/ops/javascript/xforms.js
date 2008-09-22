@@ -1376,18 +1376,20 @@ ORBEON.xforms.Controls = {
             var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                     ? newControlValue.split(" ") : new Array(newControlValue);
             var options = control.options;
-            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                var option = options[optionIndex];
-                try {
-                    option.selected = xformsArrayContains(selectedValues, option.value);
-                } catch (e) {
-                    // nop
-                    //
-                    // This is to prevent the error "Could not set the selected property. Unspecified error." in IE.
-                    // Like noted in this blog entry: http://ianso.blogspot.com/2005_10_01_ianso_archive.html (search
-                    // for the error message), it seems that DOM updates are somewhat asynchrous and that when you
-                    // make an element visible and change a property right after that, it is sometimes as if the element
-                    // is not visible yet, and so the property cannot be changed.
+            if (options != null) {
+                for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                    var option = options[optionIndex];
+                    try {
+                        option.selected = xformsArrayContains(selectedValues, option.value);
+                    } catch (e) {
+                        // nop
+                        //
+                        // This is to prevent the error "Could not set the selected property. Unspecified error." in IE.
+                        // Like noted in this blog entry: http://ianso.blogspot.com/2005_10_01_ianso_archive.html (search
+                        // for the error message), it seems that DOM updates are somewhat asynchrous and that when you
+                        // make an element visible and change a property right after that, it is sometimes as if the element
+                        // is not visible yet, and so the property cannot be changed.
+                    }
                 }
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {

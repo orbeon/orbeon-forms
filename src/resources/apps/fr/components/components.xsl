@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -186,12 +187,15 @@
         <!-- This model handles roles and permissions -->
         <xi:include href="../includes/roles-model.xml" xxi:omit-xml-base="true"/>
 
-        <!-- Copy existing main model -->
+        <!-- Copy and annotate existing main model -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
 
-            <!-- Special bind to set the form instance read-only when necessary -->
+            <!-- Bind to set the form instance read-only when necessary -->
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf')"/>
+
+            <!-- Variable exposing all the user roles -->
+            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-all-roles'), '\s')" as="xs:string*"/>
 
         </xsl:copy>
 

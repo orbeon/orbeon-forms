@@ -17,6 +17,8 @@
 
 .xforms-select table { margin-bottom: 0 }
 
+#fr-view fieldset { border:1px solid #CCCCCC; }
+
 .fb-ie-warning { display: block; margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
 /*.fr-section-title div {*/

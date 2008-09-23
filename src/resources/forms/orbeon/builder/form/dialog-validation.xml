@@ -30,85 +30,96 @@
         <xhtml:div class="fr-grid">
             <xhtml:div class="fr-grid-content">
 
-                <xforms:select1 ref="builtin-type">
-                    <xforms:label>Built-in Type</xforms:label>
-                    <xforms:hint>Built-in data type</xforms:hint>
-                    <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                        <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
-                        <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
-                    </xforms:itemset>
-                    <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                </xforms:select1>
+                <xforms:group appearance="xxforms:fieldset">
+                    <xforms:label>Types</xforms:label>
+                    <xforms:select1 ref="builtin-type">
+                        <xforms:label>Built-in Type</xforms:label>
+                        <xforms:hint>Built-in data type</xforms:hint>
+                        <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
+                            <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
+                            <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
+                        </xforms:itemset>
+                        <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                    </xforms:select1>
 
-                <xforms:select1 ref="required" appearance="full">
-                    <xforms:label>Requiredness</xforms:label>
-                    <xforms:hint>Whether the data is required</xforms:hint>
-                    <xforms:item>
-                        <xforms:label>Required</xforms:label>
-                        <xforms:value>true</xforms:value>
-                    </xforms:item>
-                    <xforms:item>
-                        <xforms:label>Optional</xforms:label>
-                        <xforms:value>false</xforms:value>
-                    </xforms:item>
-                </xforms:select1>
+                    <!-- Schema type selection if applicable -->
+                    <xforms:select1 ref="schema-type[$model/xs:schema]">
+                        <xforms:label>
+                            <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
+                            <xhtml:span>Schema Type</xhtml:span>
+                        </xforms:label>
+                        <xforms:hint>Imported schema type</xforms:hint>
+                        <xforms:item>
+                            <xforms:label>[Select...]</xforms:label>
+                            <xforms:value/>
+                        </xforms:item>
+                        <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                            <xforms:label ref="@name"/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                        <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                    </xforms:select1>
+
+                    <xforms:select1 ref="required" appearance="full">
+                        <xforms:label>Requiredness</xforms:label>
+                        <xforms:hint>Whether the data is required</xforms:hint>
+                        <xforms:item>
+                            <xforms:label>Required</xforms:label>
+                            <xforms:value>true</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Optional</xforms:label>
+                            <xforms:value>false</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+                </xforms:group>
 
                 <!-- TODO: expression for @constraint + figure out how to deal w/ max length etc. -->
 
                 <!-- TODO: expression for @required -->
 
-                <xforms:input ref="constraint" incremental="true">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
-                        <xhtml:span>Constraint</xhtml:span>
-                    </xforms:label>
-                    <xforms:alert>Incorrect XPath expression</xforms:alert>
-                    <xforms:hint>Boolean XPath expression</xforms:hint>
-                </xforms:input>
+                <xforms:group appearance="xxforms:fieldset">
+                    <xforms:label>Expressions</xforms:label>
+                    <!--<xforms:help>-->
+                        <!--<xhtml:div>-->
+                            <!--Foobar-->
+                        <!--</xhtml:div>-->
+                    <!--</xforms:help>-->
+                    <xforms:input ref="constraint" incremental="true">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
+                            <xhtml:span>Constraint</xhtml:span>
+                        </xforms:label>
+                        <xforms:alert>Incorrect XPath expression</xforms:alert>
+                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                    </xforms:input>
 
-                <xforms:input ref="relevant" incremental="true">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                        <xhtml:span>Visibility</xhtml:span>
-                    </xforms:label>
-                    <xforms:alert>Incorrect XPath expression</xforms:alert>
-                    <xforms:hint>Boolean XPath expression</xforms:hint>
-                </xforms:input>
+                    <xforms:input ref="relevant" incremental="true">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
+                            <xhtml:span>Visibility</xhtml:span>
+                        </xforms:label>
+                        <xforms:alert>Incorrect XPath expression</xforms:alert>
+                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                    </xforms:input>
 
-                <xforms:input ref="readonly" incremental="true">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                        <xhtml:span>Read-Only</xhtml:span>
-                    </xforms:label>
-                    <xforms:alert>Incorrect XPath expression</xforms:alert>
-                    <xforms:hint>Boolean XPath expression</xforms:hint>
-                </xforms:input>
+                    <xforms:input ref="readonly" incremental="true">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
+                            <xhtml:span>Read-Only</xhtml:span>
+                        </xforms:label>
+                        <xforms:alert>Incorrect XPath expression</xforms:alert>
+                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                    </xforms:input>
 
-                <xforms:input ref="calculate" incremental="true">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
-                        <xhtml:span>Calculated Value</xhtml:span>
-                    </xforms:label>
-                    <xforms:hint>XPath expression</xforms:hint>
-                </xforms:input>
-
-                <!-- Schema type selection if applicable -->
-                <xforms:select1 ref="schema-type[$model/xs:schema]">
-                    <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
-                        <xhtml:span>Schema Type</xhtml:span>
-                    </xforms:label>
-                    <xforms:hint>Imported schema type</xforms:hint>
-                    <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
-                        <xforms:label ref="@name"/>
-                        <xforms:value ref="@name"/>
-                    </xforms:itemset>
-                    <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                </xforms:select1>
+                    <xforms:input ref="calculate" incremental="true">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
+                            <xhtml:span>Calculated Value</xhtml:span>
+                        </xforms:label>
+                        <xforms:hint>XPath expression</xforms:hint>
+                    </xforms:input>
+                </xforms:group>
 
                 <!-- Alert message -->
                 <xforms:textarea ref="alert" incremental="true">

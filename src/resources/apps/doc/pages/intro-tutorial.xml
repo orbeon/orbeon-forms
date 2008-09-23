@@ -1266,7 +1266,8 @@
                     </xforms:group>
                 </xml-source>
                 <p>
-                    And this is how the result should look like:
+                    And this is how the result should look like (you will see how to add the Save button you see on
+                    this screenshot in the next section):
                 </p>
                 <figure src="../apps/doc/images/tutorial/12.png"/>
                 <p>

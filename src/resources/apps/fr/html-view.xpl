@@ -76,9 +76,13 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
-        <p:input name="request" href="#request"/>
         <p:input name="config" href="components/components.xsl"/>
         <p:output name="data" id="after-components"/>
+        <p:input name="request" href="#request"/>
+        <!-- This is here just so that we can reload the form when properties change -->
+        <p:input name="properties-xforms" href="oxf:/config/properties-xforms.xml"/>
+        <p:input name="properties-form-runner" href="oxf:/config/properties-form-runner.xml"/>
+        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
     </p:processor>
 
     <!-- Handle XInclude -->

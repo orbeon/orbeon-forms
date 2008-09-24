@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -1458,6 +1459,12 @@ public class XFormsStaticState {
 
                 public void text(Text text) {}
             });
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                XFormsContainingDocument.logDebugStatic("static state", "shadow tree",
+                        new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(shadowTreeDocument) });
+            }
+
             return shadowTreeDocument;
         } else {
             return null;

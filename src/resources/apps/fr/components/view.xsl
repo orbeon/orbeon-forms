@@ -200,12 +200,12 @@
                                             <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
                                                 <!-- Form is invalid -->
                                                 <!-- TODO: i18n of title -->
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="Errors on Form" title="Errors on Form"/>
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>
                                             </xforms:group>
                                             <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'true']">
                                                 <!-- Form is valid -->
                                                 <!-- TODO: i18n of title -->
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="No Errors on Form" title="No Errors on Form"/>
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>
                                             </xforms:group>
                                             <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                                                 <!-- Data is dirty -->
@@ -417,7 +417,7 @@
             </xsl:if>
 
             <xforms:group class="fr-error-summary-body">
-                <xforms:output class="fr-error-title" value="$fr-resources/summary/titles/errors"/>
+                <xforms:output class="fr-error-title" value="$fr-resources/errors/summary-title"/>
                 <xhtml:ol class="fr-error-list">
                     <xforms:repeat nodeset="$visible-errors">
                         <xhtml:li>

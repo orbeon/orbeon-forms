@@ -16,11 +16,16 @@
     <resource xml:lang="en">
         <components>
             <labels>
-                <open-section>Open Section</open-section>
-                <close-section>Close Section</close-section>
+                <open-section>Show Section</open-section>
+                <close-section>Hide Section</close-section>
                 <section-name>Section Name</section-name>
             </labels>
         </components>
+        <errors>
+            <summary-title>Your Form Contains the Following Errors</summary-title>
+            <some>Errors on Form</some>
+            <none>No Errors on Form</none>
+        </errors>
         <summary>
             <titles>
                 <summary-title>Summary</summary-title>
@@ -33,7 +38,6 @@
                 <to>to</to>
                 <of>of</of>
                 <refresh>This operation will refresh the page</refresh>
-                <errors>Your Form Contains the Following Errors</errors>
                 <toc>Table of Contents</toc>
                 <help>Help</help>
                 <error-count>Error in Your Form</error-count>
@@ -125,11 +129,16 @@
     <resource xml:lang="fr">
         <components>
             <labels>
-                <open-section>Ouvrir la section</open-section>
-                <close-section>Fermer la section</close-section>
+                <open-section>Montrer section</open-section>
+                <close-section>Cacher section</close-section>
                 <section-name>Nom de la section</section-name>
             </labels>
         </components>
+        <errors>
+            <summary-title>Votre formulaire contient les erreurs suivantes</summary-title>
+            <some>Ce formulaire contient des erreurs</some>
+            <none>Ce formulaire ne contient pas d'erreurs</none>
+        </errors>
         <summary>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -141,8 +150,7 @@
                 <search-2>documents.</search-2>
                 <to>à</to>
                 <of>sur</of>
-                <refresh>Cette opération raffraîchira la page</refresh>
-                <errors>Votre formulaire contient les erreurs suivantes</errors>
+                <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
                 <help>Aide</help>
                 <error-count>erreur de saisie dans votre formulaire</error-count>
@@ -215,11 +223,16 @@
     <resource xml:lang="es">
         <components>
             <labels>
-                <open-section>[Open Section]</open-section>
-                <close-section>[Close Section]</close-section>
+                <open-section>[Show Section]</open-section>
+                <close-section>[Hide Section]</close-section>
                 <section-name>[Section Name]</section-name>
             </labels>
         </components>
+        <errors>
+            <summary-title>[Your Form Contains the Following Errors]</summary-title>
+            <some>[Errors on Form]</some>
+            <none>[No Errors on Form]</none>
+        </errors>
         <summary>
             <titles>
                 <summary-title>Síntesis</summary-title>
@@ -232,7 +245,6 @@
                 <to>[to]</to>
                 <of>de</of>
                 <refresh>[This operation will refresh the page]</refresh>
-                <errors>[Your Form Contains the Following Errors]</errors>
                 <toc>[Table of Contents]</toc>
                 <help>[Help]</help>
                 <error-count>[Error in Your Form]</error-count>

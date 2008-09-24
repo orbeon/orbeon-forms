@@ -48,13 +48,22 @@
         <xhtml:script type="text/javascript">
             var start = new Date().getTime();
             YAHOO.util.Event.onDOMReady(function (){
-                var trigger = ORBEON.util.Dom.getElementById();
                 YAHOO.util.Event.addListener("set-values-trigger", "click", function() {
                     for (var i = 1; i &lt;= 300; i++) {
                         var controlID = "field" + XFORMS_SEPARATOR_1 + i;
                         var control = ORBEON.util.Dom.getElementById(controlID);
                         ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
                         ORBEON.xforms.Document.setValue(controlID, "123-" + i);
+                    }
+                });
+            });
+            YAHOO.util.Event.onDOMReady(function (){
+                YAHOO.util.Event.addListener("clear-values-trigger", "click", function() {
+                    for (var i = 1; i &lt;= 300; i++) {
+                        var controlID = "field" + XFORMS_SEPARATOR_1 + i;
+                        var control = ORBEON.util.Dom.getElementById(controlID);
+                        ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
+                        ORBEON.xforms.Document.setValue(controlID, "");
                     }
                 });
             });
@@ -73,6 +82,9 @@
                 <xxforms:offline ev:event="DOMActivate"/>
             </xforms:trigger>
             <!-- Tiggers when offline -->
+            <xforms:trigger ref=".[offline = 'true']" id="clear-values-trigger">
+                <xforms:label>Clear values</xforms:label>
+            </xforms:trigger>
             <xforms:trigger ref=".[offline = 'true']" id="set-values-trigger">
                 <xforms:label>Set values</xforms:label>
             </xforms:trigger>

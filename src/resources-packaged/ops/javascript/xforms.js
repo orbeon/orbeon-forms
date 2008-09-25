@@ -5469,50 +5469,52 @@ ORBEON.xforms.Offline = {
     storeEvents: function(events) {
         function emptyStringIfNull(value) { return value == null ? "" : value; }
 
-        ORBEON.xforms.Offline.init();
+        ORBEON.xforms.Offline._runShowingIndicator(function() {
+            ORBEON.xforms.Offline.init();
 
-        // Compute new events
-        var newEventsString = "";
-        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-            var event = events[eventIndex];
+            // Compute new events
+            var newEventsString = "";
+            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+                var event = events[eventIndex];
 
-            // Array containing all the properties of the event we are storing the database
-            var eventArray = [
-                emptyStringIfNull(event.form.id),
-                emptyStringIfNull(event.targetId),
-                emptyStringIfNull(event.otherId),
-                emptyStringIfNull(event.value),
-                emptyStringIfNull(event.eventName),
-                event.bubbles ? 1 : 0,
-                event.cancelable ? 1 : 0,
-                event.ignoreErrors ? 1 : 0
-            ];
-            // Serialize all the information
-            var eventString = "";
-            for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++) {
-                if (eventComponentIndex != 0) eventString += " ";
-                eventString += escape(eventArray[eventComponentIndex]);
+                // Array containing all the properties of the event we are storing the database
+                var eventArray = [
+                    emptyStringIfNull(event.form.id),
+                    emptyStringIfNull(event.targetId),
+                    emptyStringIfNull(event.otherId),
+                    emptyStringIfNull(event.value),
+                    emptyStringIfNull(event.eventName),
+                    event.bubbles ? 1 : 0,
+                    event.cancelable ? 1 : 0,
+                    event.ignoreErrors ? 1 : 0
+                ];
+                // Serialize all the information
+                var eventString = "";
+                for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++) {
+                    if (eventComponentIndex != 0) eventString += " ";
+                    eventString += escape(eventArray[eventComponentIndex]);
+                }
+                // Add this event to newEventsString
+                if (newEventsString.length > 0) newEventsString += " ";
+                newEventsString += escape(eventString);
             }
-            // Add this event to newEventsString
-            if (newEventsString.length > 0) newEventsString += " ";
-            newEventsString += escape(eventString);
-        }
 
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
-        var currentEventsString = resultSet.fieldByName("offline_events");
-        if (currentEventsString != "") {
-            currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
-            currentEventsString += " ";
-        }
-        currentEventsString += newEventsString;
-        currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+            var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
+            var currentEventsString = resultSet.fieldByName("offline_events");
+            if (currentEventsString != "") {
+                currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+                currentEventsString += " ";
+            }
+            currentEventsString += newEventsString;
+            currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
 
-        // Compute new values of controls
-        var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
+            // Compute new values of controls
+            var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
 
-        // Store new events and new value of controls
-        ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
-                [ controlValuesString, currentEventsString, window.location.href ]).close();
+            // Store new events and new value of controls
+            ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
+                    [ controlValuesString, currentEventsString, window.location.href ]).close();
+        });
     },
 
     loadFormInIframe: function(url, loadListener) {
@@ -5561,7 +5563,7 @@ ORBEON.xforms.Offline = {
                             ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatID, iteration, value);
                         } else {
                             // We have a control
-                        setter(inheritedControl, value);
+                            setter(inheritedControl, value);
                         }
                     };
                 }
@@ -5578,10 +5580,7 @@ ORBEON.xforms.Offline = {
             }
         }
 
-        // Show loading indicator
-        xformsDisplayIndicator("loading");
-        // Use timeout function to give a change to the browser to show the loading indicator before we continue with evaluation of the MIPS
-        window.setTimeout(function() {
+        ORBEON.xforms.Offline._runShowingIndicator(function() {
 
             // Create context once; we then update it for values that are calculated
             var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
@@ -5656,11 +5655,7 @@ ORBEON.xforms.Offline = {
 
                 ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
             }
-
-            // Hide loading indicator
-            xformsDisplayIndicator("none");
-
-        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+        });
     },
 
     _serializeControlValues: function(controlValues) {
@@ -5711,6 +5706,18 @@ ORBEON.xforms.Offline = {
         return key == null ? text :
                text == "" ? text :
                byteArrayToString(rijndaelDecrypt(hexToByteArray(text), key, "ECB"));
+    },
+
+    _runShowingIndicator: function(f) {
+        // Show loading indicator
+        xformsDisplayIndicator("loading");
+        // Use timeout function to give a change to the browser to show the loading indicator before we continue with evaluation of the MIPS
+        window.setTimeout(function() {
+            // Run actual code
+            f();
+            // Hide loading indicator
+            xformsDisplayIndicator("none");
+        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
     }
 };
 

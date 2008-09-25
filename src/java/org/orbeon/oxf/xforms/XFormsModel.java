@@ -1463,6 +1463,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
+    public void rebuildRevalidateIfNeeded(PipelineContext pipelineContext) {
+        if (deferredActionContext != null) {
+            if (deferredActionContext.rebuild) {
+                doRebuild(pipelineContext);
+            }
+            if (deferredActionContext.recalculate) {
+                doRecalculate(pipelineContext);
+            }
+        }
+    }
+
     /**
      * This class is cloneable.
      */

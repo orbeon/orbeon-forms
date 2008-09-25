@@ -268,18 +268,23 @@ public class XFormsServer extends ProcessorImpl {
                         response = externalContext.getResponse();
                     }
 
-                    // Start external events
-                    containingDocument.startExternalEventsSequence(pipelineContext, response);
-                    containingDocument.startHandleOperation("XForms server", "handling external events");
-
-                    // Reorder events if needed for offline mode
-                    if (isNoscript) {
+                    // Iterate through events to:
+                    // 1. Reorder events if needed for noscript mode
+                    // 2. Detect whether we got xxforms-online
+                    boolean hasXXFormsOnline = false;
+                    {
                         final XFormsStaticState staticState = containingDocument.getStaticState();
                         List activateEvents = null;
                         for (Iterator i = eventElements.iterator(); i.hasNext();) {
                             final Element eventElement = (Element) i.next();
                             final String eventName = eventElement.attributeValue("name");
-                            if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+
+                            if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
+                                // We got an xxforms-online event
+                                hasXXFormsOnline = true;
+                            }
+
+                            if (isNoscript && XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
                                 // Special event for noscript mode
                                 final String sourceControlId = eventElement.attributeValue("source-control-id");
                                 if (!staticState.isValueControl(sourceControlId)) {
@@ -293,9 +298,16 @@ public class XFormsServer extends ProcessorImpl {
                                 }
                             }
                         }
-                        if (activateEvents != null)
+                        if (isNoscript && activateEvents != null)
                             eventElements.addAll(activateEvents);
+
+                        if (hasXXFormsOnline)
+                            containingDocument.logDebug("XForms server", "got xxforms-online event, enabling optimized handling of event sequence");
                     }
+
+                    // Start external events
+                    containingDocument.startExternalEventsSequence(pipelineContext, response, hasXXFormsOnline);
+                    containingDocument.startHandleOperation("XForms server", "handling external events");
                     
                     // Iterate through all events to dispatch them
                     for (Iterator i = eventElements.iterator(); i.hasNext();) {
@@ -333,7 +345,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                                     // Remember new event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
@@ -347,12 +359,12 @@ public class XFormsServer extends ProcessorImpl {
 
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }
                                 // Send new event
-                                containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd);
+                                containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd, hasXXFormsOnline);
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -367,11 +379,11 @@ public class XFormsServer extends ProcessorImpl {
                     // Flush stored event if needed
                     if (lastSourceControlId != null) {
                         // Send old event
-                        containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
+                        containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                     }
 
                     // End external events
-                    containingDocument.endExternalEventsSequence();
+                    containingDocument.endExternalEventsSequence(pipelineContext, hasXXFormsOnline);
                     containingDocument.endHandleOperation();
                 }
 

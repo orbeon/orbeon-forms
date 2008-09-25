@@ -499,6 +499,21 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         }
     }
 
+    public void rebuildRevalidateIfNeeded(PipelineContext pipelineContext) {
+        // Handle this container
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.rebuildRevalidateIfNeeded(pipelineContext);
+        }
+        // Recurse into children containers
+        if (childrenContainers != null) {
+            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+                final XFormsContainer currentContainer = (XFormsContainer) i.next();
+                currentContainer.rebuildRevalidateIfNeeded(pipelineContext);
+            }
+        }
+    }
+
     public void synchronizeInstanceDataEventState() {
         // Handle this container
         for (Iterator i = models.iterator(); i.hasNext();) {

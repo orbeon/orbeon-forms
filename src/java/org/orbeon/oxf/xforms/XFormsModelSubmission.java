@@ -377,16 +377,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // this seems however unneeded.
 
                         // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-
-                        final XFormsModel.DeferredActionContext deferredActionContext = modelForInstance.getDeferredActionContext();
-                        if (deferredActionContext != null) {
-                            if (deferredActionContext.rebuild) {
-                                modelForInstance.doRebuild(pipelineContext);
-                            }
-                            if (deferredActionContext.recalculate) {
-                                modelForInstance.doRecalculate(pipelineContext);
-                            }
-                        }
+                        modelForInstance.rebuildRevalidateIfNeeded(pipelineContext);
                     }
                 } else {
                     // Case where no instance was found

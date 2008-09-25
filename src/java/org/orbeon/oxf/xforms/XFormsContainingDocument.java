@@ -727,8 +727,11 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @param filesElement              optional files elements for upload
      * @param dndStart                  optional DnD start information
      * @param dndEnd                    optional DnD end information
+     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlEffectiveId, String otherControlEffectiveId, String valueString, Element filesElement, String dndStart, String dndEnd) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlEffectiveId,
+                                     String otherControlEffectiveId, String valueString, Element filesElement,
+                                     String dndStart, String dndEnd, boolean handleGoingOnline) {
 
         // Get event target object
         XFormsEventTarget eventTarget;
@@ -748,7 +751,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         }
 
         // Check whether the event is allowed on that target
-        if (!checkForAllowedEvents(eventName, eventTarget))
+        if (!checkForAllowedEvents(eventName, eventTarget, handleGoingOnline))
             return;
 
         // Get other event target
@@ -813,8 +816,13 @@ public class XFormsContainingDocument extends XFormsContainer {
 //            }
 //        }
 
-        // Ensure deferred event handling
-        startOutermostActionHandler();
+        if (!handleGoingOnline) {
+            // When not going online, each event is within its own start/end outermost action handler
+            startOutermostActionHandler();
+        } else {
+            // When going online, ensure rebuild/revalidate before each event
+            rebuildRevalidateIfNeeded(pipelineContext);
+        }
         {
             // Create event
             final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
@@ -885,16 +893,6 @@ public class XFormsContainingDocument extends XFormsContainer {
                 // changed on the client. This means that this event(s) must be the first to come!
 
                 final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
-
-                // 1. xforms-recalculate
-                // 2. xforms-revalidate
-                // 3. xforms-refresh performs reevaluation of UI binding expressions then dispatches
-                // these events according to value changes, model item property changes and validity
-                // changes
-                // [n] xforms-value-changed, [n] xforms-valid or xforms-invalid, [n] xforms-enabled or
-                // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
-                // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
-
                 {
                     // Store value into instance data through the control
                     final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
@@ -931,18 +929,21 @@ public class XFormsContainingDocument extends XFormsContainer {
                 dispatchEvent(pipelineContext, xformsEvent);
             }
         }
-        // Ensure deferred event handling
-        endOutermostActionHandler(pipelineContext);
+        // When not going online, each event is within its own start/end outermost action handler
+        if (!handleGoingOnline) {
+            endOutermostActionHandler(pipelineContext);
+        }
     }
 
     /**
      * Check whether the external event is allowed on the gtiven target/
      *
-     * @param eventName     event name
-     * @param eventTarget   event target
-     * @return              true iif the event is allowed
+     * @param eventName         event name
+     * @param eventTarget       event target
+     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
+     * @return                  true iif the event is allowed
      */
-    private boolean checkForAllowedEvents(String eventName, XFormsEventTarget eventTarget) {
+    private boolean checkForAllowedEvents(String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measures that also ensures that somebody is not able to change values in an instance
@@ -980,6 +981,12 @@ public class XFormsContainingDocument extends XFormsContainer {
                 }
 
                 final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
+
+                if (handleGoingOnline) {
+                    // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
+                    // the MIPs need to be re-evaluated before being checked below
+                    xformsControl.markDirty();
+                }
 
                 if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
                     // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
@@ -1053,8 +1060,9 @@ public class XFormsContainingDocument extends XFormsContainer {
      *
      * @param pipelineContext   current PipelineContext
      * @param response          ExternalContext.Response for xforms:submission[@replace = 'all'], or null
+     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void startExternalEventsSequence(PipelineContext pipelineContext, ExternalContext.Response response) {
+    public void startExternalEventsSequence(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline) {
         // Clear containing document state
         clearClientState();
 
@@ -1063,12 +1071,24 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         // Initialize controls
         xformsControls.initialize(pipelineContext);
+
+        // Start outermost action handler here if going online
+        if (handleGoingOnline)
+            startOutermostActionHandler();
     }
 
     /**
      * End a sequence of external events.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void endExternalEventsSequence() {
+    public void endExternalEventsSequence(PipelineContext pipelineContext, boolean handleGoingOnline) {
+
+        // End outermost action handler here if going online
+        if (handleGoingOnline)
+            endOutermostActionHandler(pipelineContext);
+
         this.response = null;
     }
 

@@ -152,6 +152,7 @@ a.fb-edit-help-trigger img {
 #fb-edit-validation-dialog textarea { width: 98%; height: 4em }
 #fb-edit-validation-dialog .xforms-label { display: block; clear: both }
 #fb-edit-validation-dialog .xforms-hint { display: block; clear: both }
+#fb-edit-validation-dialog .xforms-disabled { display: none }
 
 #fb-schema-upload-dialog .xforms-hint { width: 100% }
 #fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }

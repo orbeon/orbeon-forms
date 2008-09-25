@@ -2929,6 +2929,11 @@ ORBEON.widgets.JSCalendar = function() {
 ORBEON.widgets.YUICalendar = function() {
 
     var RESOURCES = {
+        "en": {
+            "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "Septembre",  "October",  "November",  "December" ],
+            "WEEKDAYS_SHORT": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+            "START_WEEKDAY": 0
+        },
         "fr": {
             "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],
             "WEEKDAYS_SHORT": ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
@@ -3014,13 +3019,13 @@ ORBEON.widgets.YUICalendar = function() {
                 yuiCalendar.selectEvent.subscribe(dateSelected, yuiCalendar, true);
             }
 
-            // Localize calendar if necessary
+            // Localize calendar
             var lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang");
-            if (lang != null) {
-                var resources = RESOURCES[lang];
-                for (var key in resources)
-                    yuiCalendar.cfg.setProperty(key, resources[key]);
-            }
+            if (lang == null)
+                lang = "en";
+            var resources = RESOURCES[lang];
+            for (var key in resources)
+                yuiCalendar.cfg.setProperty(key, resources[key]);
 
             // Set date
             control = target;

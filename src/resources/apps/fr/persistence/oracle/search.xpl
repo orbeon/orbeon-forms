@@ -98,7 +98,7 @@
                                             group by app, form, document_id
                                         ) latest
                                     where
-                                        <!-- Merge with 'latest', to make sure we only consider the documet with the most recent last_date -->
+                                        <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
                                         data.last_modified = latest.last_modified
                                         and data.app = latest.app
                                         and data.form = latest.form
@@ -121,10 +121,21 @@
                                 <sql:execute>
                                     <sql:query>
                                         select
-                                            (select count(*) from orbeon_form_data
-                                                where app = <sql:param type="xs:string" select="/search/app"/>
-                                                and form = <sql:param type="xs:string" select="/search/form"/>) total,
-                                            (select count(*) from (<xsl:copy-of select="$query"/>)) search_total
+                                            (
+                                                select count(*) from orbeon_form_data
+                                                where
+                                                    (app, form, document_id, last_modified) in (
+                                                        select app, form, document_id, max(last_modified) last_modified
+                                                        from orbeon_form_data
+                                                        where
+                                                            app = <sql:param type="xs:string" select="/search/app"/>
+                                                            and form = <sql:param type="xs:string" select="/search/form"/>
+                                                        group by app, form, document_id)
+                                                    and deleted = 'N'
+                                            ) total,
+                                            (
+                                                select count(*) from (<xsl:copy-of select="$query"/>)
+                                            ) search_total
                                         from dual
                                     </sql:query>
                                     <sql:result-set>

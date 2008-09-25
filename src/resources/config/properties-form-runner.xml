@@ -30,8 +30,8 @@
                                                                                                 /apps/fr/style/form-runner-base.css
                                                                                                 /apps/fr/style/form-runner-orbeon.css"/>
     <property as="xs:string"  name="oxf.fr.authentication.method"                    value="header"/> <!-- "container", "header", or empty -->
-    <property as="xs:string"  name="oxf.fr.authentication.header.username"           value="My-Username"/>
-    <property as="xs:string"  name="oxf.fr.authentication.header.roles"              value="My-Roles"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.username"           value="My-Username-Header"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.roles"              value="My-Roles-Header"/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"           value="orbeon admin user"/>
 
     <property as="xs:boolean" name="oxf.fr.version.*.*"                              value="true"/>
@@ -56,9 +56,7 @@
 
     <!-- Form Builder properties -->
     <!--<property as="xs:anyURI"  name="oxf.fb.schemas.uri.*.*"                          value="oxf:/forms/orbeon/builder/standard.xsd"/>-->
-    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/standard.xbl"/>
-
-    <property as="xs:string"  name="oxf.fb.security.roles-header"                    value=""/>
+    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/apps/fr/components/standard.xbl"/>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>

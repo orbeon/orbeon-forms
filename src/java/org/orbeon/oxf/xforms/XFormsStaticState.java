@@ -1426,7 +1426,7 @@ public class XFormsStaticState {
                             final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                             // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, sb.toString(), Dom4jUtils.getNamespaceContext(boundElement),
+                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, sb.toString(), Dom4jUtils.getNamespaceContext(element),
                                     null, null, null, null, null);// TODO: locationData
 
                             if (elements.size() > 0) {

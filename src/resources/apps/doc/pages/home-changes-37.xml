@@ -64,9 +64,19 @@
                     </li>
                     <li>
                         <p>
+                            <b>Reusable user interface components.</b> Orbeon Forms now implements a complete system of
+                            reusable components, based on the <a href="http://www.w3.org/TR/xbl/">XBL specification</a>.
+                            This allows you to define and reuse UI components in your forms. There is no limit to the
+                            types of components you can build: examples include special date selectors, color pickers,
+                            reusable address blocks, etc.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Improved date and time controls.</b> You can now type in dates, and the date picker is by
                             default the YUI date picker. We have also added controls for <code>xs:time</code> and
-                            <code>xs:dateTime</code> types.
+                            <code>xs:dateTime</code> types. The date picker is localized in English, French and
+                            Spanish.
                         </p>
                     </li>
                     <li>
@@ -80,7 +90,7 @@
                     </li>
                     <li>
                         <p>
-                            <b>New YUI.</b> Orbeon Forms now uses YUI 2.5.2.
+                            <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.5.2.
                         </p>
                     </li>
                     <li>

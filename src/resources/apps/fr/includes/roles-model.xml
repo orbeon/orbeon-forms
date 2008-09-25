@@ -24,17 +24,27 @@
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <!-- NOTE: This test is duplicated in other places -->
-    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-    <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
-
     <!-- Model initialization -->
     <xforms:action ev:event="xforms-model-construct-done">
         <!-- Special treatment for Form Builder if roles are configured -->
-        <xforms:action if="$is-form-builder and doc-available('oxf:/config/form-runner-roles.xml')">
+
+        <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'header' and doc-available('oxf:/config/form-runner-roles.xml')">
+
+            <!-- Extract roles from request -->
+            <xxforms:variable name="header-name" select="xxforms:property('oxf.fr.authentication.header.roles')" as="xs:string?"/>
+            <xforms:setvalue ref="instance('fr-all-roles')" value="xxforms:get-request-header($header-name)"/>
+
+            <!-- TODO: option of using HTTP roles -->
+
+            <!-- Handle configuration -->
             <xforms:send submission="fr-get-roles-submission"/>
         </xforms:action>
     </xforms:action>
+
+    <!-- Instance containing all roles currently available, space-separated -->
+    <xforms:instance id="fr-all-roles">
+        <roles xmlns=""/>
+    </xforms:instance>
 
     <!-- Instance containing roles -->
     <xforms:instance id="fr-roles" xxforms:readonly="true">
@@ -52,10 +62,8 @@
         <xforms:action ev:event="xforms-submit-done">
             <xxforms:variable name="all-roles" select="instance('fr-roles')/role" as="element(role)*"/>
 
-            <!-- Extract roles from request -->
-            <xxforms:variable name="header-name" select="xxforms:property('oxf.fb.security.roles-header')" as="xs:string?"/>
             <xxforms:variable name="header-roles" as="element(role)*"
-                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:get-request-header($header-name), '\s')) then $r else ()"/>
+                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-all-roles'), '\s')) then $r else ()"/>
             <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
 
             <!-- TODO: option of using HTTP roles -->

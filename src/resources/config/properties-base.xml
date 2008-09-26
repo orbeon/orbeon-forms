@@ -22,6 +22,8 @@
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
+    <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->
+    <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
 
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>

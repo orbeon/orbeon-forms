@@ -30,6 +30,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.properties.Properties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class HTTPURLConnection extends URLConnection {
+
+    public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
+    public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
 
     // Use a single shared connection manager so we can have efficient connection pooling
     private static HttpConnectionManager connectionManager;
@@ -101,6 +105,12 @@ public class HTTPURLConnection extends URLConnection {
             // Make authentification preemptive
             if (userinfo != null || isAuthenticationRequestedWithUsername)
                 httpClient.getParams().setAuthenticationPreemptive(true);
+
+            // Set proxy if defined in properties
+            final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
+            final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
+            if (proxyHost != null && proxyPort != null)
+                httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort.intValue());
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL

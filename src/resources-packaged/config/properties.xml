@@ -32,6 +32,7 @@
     <xi:include href="oxf:/config/properties-base.xml"/>
     <xi:include href="oxf:/config/properties-xforms.xml"/>
     <xi:include href="oxf:/config/properties-form-runner.xml"/>
+    <xi:include href="oxf:/config/properties-form-builder.xml"/>
     <xi:include href="oxf:/config/properties-local.xml"/>
 
 </properties>

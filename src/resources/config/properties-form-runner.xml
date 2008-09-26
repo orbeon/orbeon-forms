@@ -16,12 +16,12 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Form Runner properties -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                value="/fr/service/exist"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"  value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form" value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form"            value="/fr/service/resource"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
-    <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"    value="oracle"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db"/>
+    <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                     value="en"/>
@@ -37,34 +37,27 @@
     <property as="xs:string"  name="oxf.fr.authentication.header.roles"              value="My-Roles-Header"/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"           value="orbeon admin user"/>
 
-    <property as="xs:boolean" name="oxf.fr.version.*.*"                              value="true"/>
-    <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.version.*.*"                                         value="true"/>
+    <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                                   value="true"/>
 
-    <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                    value="10"/>
+    <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                           value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                 value="bottom"/>
-    <property as="xs:boolean" name="oxf.fr.detail.submit-mode.*.*"                   value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.submit-mode.button.clear.*.*"      value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.submit-mode.button.close.*.*"      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                                      value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
+    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="go"/> <!-- Combination of: clear keep go close-window -->
+    <property as="xs:boolean" name="oxf.fr.detail.submit.button.keep.*.*"                       value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.submit.button.go.*.*"                         value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"           value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.close.*.*"                  value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.clear.*.*"                  value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.print.*.*"                  value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.pdf.*.*"                    value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.save.*.*"                   value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.submit.*.*"                 value="true"/>
-
-    <!-- Form Builder properties -->
-    <!--<property as="xs:anyURI"  name="oxf.fb.schemas.uri.*.*"                          value="oxf:/forms/orbeon/builder/standard.xsd"/>-->
-    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/apps/fr/components/standard.xbl"/>
-
-    <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="save submit"/> <!-- Combination of: refresh close clear print pdf save submit -->
+    <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"                      value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.close.*.*"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.clear.*.*"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.print.*.*"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.pdf.*.*"                               value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.save.*.*"                              value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.submit.*.*"                            value="true"/>
 
 </properties>

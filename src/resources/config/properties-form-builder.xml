@@ -1,0 +1,30 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <!-- Form Builder properties -->
+    <!--<property as="xs:anyURI"  name="oxf.fb.schemas.uri.*.*"                          value="oxf:/forms/orbeon/builder/standard.xsd"/>-->
+    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/standard.xbl"/>
+
+    <property as="xs:string"  name="oxf.fb.security.roles-header"                    value=""/>
+
+    <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
+
+</properties>

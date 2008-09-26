@@ -26,40 +26,6 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xbl:binding-xxx id="test-component" element="fr|bar">
-
-        <!-- Orbeon Form Builder Component Metadata -->
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">A Thing</display-name>
-            <display-name lang="fr">Une chose</display-name>
-            <description lang="en">This is a little thing</description>
-            <description lang="fr">Ceci est une petite chose</description>
-            <icon xml:lang="en">
-                <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
-            </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                 <fr:bar>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                </fr:bar>
-            </template>
-        </metadata>
-        
-        <!-- Template -->
-        <xbl:template>
-            <xhtml:div class="test-class">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
-                <xforms:input xbl:attr="ref bind">
-                    <xforms:label>Value 2</xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xbl:template>
-    </xbl:binding-xxx>
-
     <xbl:binding-xxx id="fr-select1-binding" element="fr|select1"><!-- [appearance='xxforms|full'] -->
 
         <!-- Orbeon Form Builder Component Metadata -->

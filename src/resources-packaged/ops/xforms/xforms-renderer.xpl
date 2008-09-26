@@ -63,10 +63,15 @@
             </p:processor>
         </p:when>
         <p:otherwise>
+            <!-- Run XInclude as that may be desirable (e.g. to include components) -->
+            <p:processor name="oxf:xinclude">
+                <p:input name="config" href="#extracted-document"/>
+                <p:output name="data" id="xincluded-document"/>
+            </p:processor>
             <!-- Call up standard Orbeon Forms epilogue -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="/config/epilogue.xpl"/>
-                <p:input name="data" href="#extracted-document"/>
+                <p:input name="data" href="#xincluded-document"/>
                 <!-- There is no "current submission" -->
                 <p:input name="instance"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
                 <!-- Make legacy XForms engine happy -->

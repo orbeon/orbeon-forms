@@ -33,6 +33,8 @@
 
 .fr-summary-table-div {
     overflow-x: auto;
+    overflow-y: hidden;
+    *padding-bottom: 17px;
 }
 
 /* Mainly to prevent dates to wrap */
@@ -41,7 +43,8 @@
 .fr-summary-table {
     margin: 1px;/* should't have to do this, but FF3 behaves funny otherwise */
     border-collapse: collapse;
-    width: 99.99%/* 100% causes FF 3 to still use a scrollbar; why? */
+    width: 99.99%;/* 100% causes FF 3 to still use a scrollbar; why? */
+    *width: 99.7%/* HACK: Also issue with IE 7, but slightly different one */
 }
 
 .fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }

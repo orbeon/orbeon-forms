@@ -29,6 +29,9 @@
     <property as="xs:string"  name="oxf.fr.css.uri.*.*"                              value="/ops/css/yui/reset-fonts-grids.css
                                                                                                 /apps/fr/style/form-runner-base.css
                                                                                                 /apps/fr/style/form-runner-orbeon.css"/>
+    <property as="xs:string"  name="oxf.fr.css.uri.orbeon.*"                         value="/ops/css/yui/reset-fonts-grids.css
+                                                                                                /apps/fr/style/form-runner-base.css
+                                                                                                /apps/fr/style/form-runner-orbeon.css"/>
     <property as="xs:string"  name="oxf.fr.authentication.method"                    value="header"/> <!-- "container", "header", or empty -->
     <property as="xs:string"  name="oxf.fr.authentication.header.username"           value="My-Username-Header"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles"              value="My-Roles-Header"/>

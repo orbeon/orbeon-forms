@@ -17,7 +17,7 @@
 
     <!-- Form Builder properties -->
     <!--<property as="xs:anyURI"  name="oxf.fb.schemas.uri.*.*"                          value="oxf:/forms/orbeon/builder/standard.xsd"/>-->
-    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/standard.xbl"/>
+    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/apps/fr/components/standard.xbl"/>
 
     <property as="xs:string"  name="oxf.fb.security.roles-header"                    value=""/>
 

@@ -45,11 +45,6 @@
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                                      value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
-    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="go"/> <!-- Combination of: clear keep go close-window -->
-    <property as="xs:boolean" name="oxf.fr.detail.submit.button.keep.*.*"                       value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.submit.button.go.*.*"                         value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="save submit"/> <!-- Combination of: refresh close clear print pdf save submit -->
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"                      value="false"/>
@@ -59,5 +54,11 @@
     <property as="xs:boolean" name="oxf.fr.detail.button.pdf.*.*"                               value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.save.*.*"                              value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.submit.*.*"                            value="true"/>
+
+    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="go"/> <!-- Combination of: clear keep go close-window -->
+    <property as="xs:boolean" name="oxf.fr.detail.submit.button.keep.*.*"                       value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.submit.button.go.*.*"                         value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>
 
 </properties>

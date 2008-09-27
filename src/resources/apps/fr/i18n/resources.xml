@@ -80,6 +80,8 @@
                 <form-validation-error>Document not saved: please check for errors in your form before saving again.</form-validation-error>
                 <database-error>Error communicating with the database: please contact your system administrator.</database-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
+                <submit-dialog-title>Form Submitted</submit-dialog-title>
+                <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
             </messages>
             <labels>
                 <save-document>Save</save-document>
@@ -87,6 +89,7 @@
                 <test>Test</test>
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
+                <submit-document>Submit</submit-document>
                 <return>Back to Forms</return>
                 <discard>Forget Changes</discard>
                 <language-choice>Language</language-choice>
@@ -104,6 +107,10 @@
                 <offline>Take offline</offline>
                 <online>Take online</online>
                 <alert>Missing or incorrect value</alert>
+                <submit-dialog-clear>Clear and close</submit-dialog-clear>
+                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Close window</submit-dialog-close-window>
             </labels>
         </detail>
         <import-export>
@@ -200,6 +207,7 @@
                 <test>Tester</test>
                 <save-locally>Sauvegarde Locale</save-locally>
                 <save-offline>Sauvegarde Or-ligne</save-offline>
+                <submit-document>Envoyer</submit-document>
                 <return>Retour</return>
                 <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>
@@ -294,6 +302,7 @@
                 <test>[Test]</test>
                 <save-locally>Guardar Localmente</save-locally>
                 <save-offline>Guardar Sin conexión</save-offline>
+                <submit-document>Enviar</submit-document>
                 <return>Volver a las formas</return>
                 <discard>Olvídese de los cambios</discard>
                 <language-choice>Idioma</language-choice>

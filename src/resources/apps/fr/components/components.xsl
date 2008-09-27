@@ -51,13 +51,7 @@
     <xsl:variable name="is-noscript-table" select="not(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
-
-    <xsl:variable name="has-button-save-locally" select="pipeline:property(string-join(('oxf.fr.detail.button.save-locally', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-button-close" select="pipeline:property(string-join(('oxf.fr.detail.button.close', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-button-clear" select="pipeline:property(string-join(('oxf.fr.detail.button.clear', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-button-print" select="pipeline:property(string-join(('oxf.fr.detail.button.print', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-button-pdf" select="pipeline:property(string-join(('oxf.fr.detail.button.pdf', $app, $form), '.'))" as="xs:boolean?"/>
-    
+    <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="components-uri" select="pipeline:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">

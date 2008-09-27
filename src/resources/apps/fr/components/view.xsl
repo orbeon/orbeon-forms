@@ -257,9 +257,7 @@
                                             <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <xsl:if test="$has-button-close">
-                                                            <fr:close-button/>
-                                                        </xsl:if>
+                                                        <fr:close-button/>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
@@ -284,20 +282,12 @@
                                             <xsl:otherwise>
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <fr:refresh-button/>
-                                                        <fr:back-button/>
-                                                        <fr:clear-button/>
-                                                        <fr:print-button/>
-                                                        <fr:pdf-button/>
-                                                        <!-- These buttons are disabled until we can save initial changes to the DOM in store and
-                                                              replay them when the form is first loaded offline -->
-                                                        <!--<fr:take-offline/>-->
-                                                        <!--<fr:take-online/>-->
-                                                        <!--<fr:save-offline/>-->
-                                                        <fr:save-locally-button/>
-                                                        <fr:save-button/>
+                                                        <xsl:for-each select="$buttons">
+                                                            <xsl:element name="fr:{.}-button"/>
+                                                        </xsl:for-each>
                                                     </fr:buttons>
                                                 </xsl:variable>
+                                                <xsl:message>Buttons: <xsl:copy-of select="$default-buttons"/></xsl:message>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
                                             </xsl:otherwise>
                                         </xsl:choose>

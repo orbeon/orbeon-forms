@@ -70,6 +70,10 @@
                             file is under <code>WEB-INF/resources/config/</code>.
                         </li>
                         <li>
+                            <code>oxf:/config/properties-form-builder.xml</code>: Orbeon Form Builder properties. This
+                            file is under <code>WEB-INF/resources/config/</code>.
+                        </li>
+                        <li>
                             <code>oxf:/config/properties-local.xml</code>: optional file with properties local to the
                             deployment. This file can also contain properties that override properties in the above
                             files. This file should be placed under <code>WEB-INF/resources/config/</code>.

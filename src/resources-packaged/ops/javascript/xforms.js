@@ -1275,7 +1275,7 @@ ORBEON.xforms.Controls = {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-full")) {
+                || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
             var inputs = control.getElementsByTagName("input");
             var spanValue = "";
             for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -1358,7 +1358,7 @@ ORBEON.xforms.Controls = {
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-full")) {
+                || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
             // Handle checkboxes and radio buttons
             var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                     ? newControlValue.split(" ") : new Array(newControlValue);
@@ -1739,7 +1739,7 @@ ORBEON.xforms.Controls = {
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-full")) {
+                || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
             // XForms radio buttons
             for (var spanIndex = 0; spanIndex < control.childNodes.length; spanIndex++) {
                 var span = control.childNodes[spanIndex];
@@ -2486,7 +2486,7 @@ ORBEON.xforms.Events = {
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
                     || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
-                    || ORBEON.util.Dom.hasClass(target, "xforms-input-appearance-full")) {
+                    || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
                 // Click on checkbox or radio button
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",

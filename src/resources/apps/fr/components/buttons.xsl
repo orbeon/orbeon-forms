@@ -124,33 +124,12 @@
         </xforms:trigger>
     </xsl:template>
 
-    <xsl:template match="fr:take-offline">
-        <xforms:trigger id="take-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'true') then . else ()">
+    <xsl:template match="fr:save-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save" xxforms:modal="true" id="fr-save-button">
             <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/take-offline.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
             </xforms:label>
-            <xxforms:offline ev:event="DOMActivate"/>
-        </xforms:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:take-online">
-        <xforms:trigger id="take-online-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/take-online.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
-            </xforms:label>
-            <xxforms:online ev:event="DOMActivate"/>
-        </xforms:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:save-offline">
-        <xforms:trigger id="save-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/save.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-offline"/></xhtml:span>
-            </xforms:label>
-            <xxforms:offline-save ev:event="DOMActivate"/>
         </xforms:trigger>
     </xsl:template>
 
@@ -159,15 +138,6 @@
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/save-locally"/>
-            </xforms:label>
-        </xforms:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:save-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save" xxforms:modal="true" id="fr-save-button">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
             </xforms:label>
         </xforms:trigger>
     </xsl:template>
@@ -197,5 +167,38 @@
             </xforms:action>
         </xforms:trigger>
     </xsl:template>
+
+    <!-- === Offline Buttons (alpha code, not supported/documented) === -->
+
+    <xsl:template match="fr:take-offline-button">
+        <xforms:trigger id="take-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'true') then . else ()">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/take-offline.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
+            </xforms:label>
+            <xxforms:offline ev:event="DOMActivate"/>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:take-online-button">
+        <xforms:trigger id="take-online-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/take-online.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
+            </xforms:label>
+            <xxforms:online ev:event="DOMActivate"/>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:save-offline-button">
+        <xforms:trigger id="save-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/save.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-offline"/></xhtml:span>
+            </xforms:label>
+            <xxforms:offline-save ev:event="DOMActivate"/>
+        </xforms:trigger>
+    </xsl:template>
+
 
 </xsl:stylesheet>

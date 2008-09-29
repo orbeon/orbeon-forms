@@ -200,6 +200,8 @@
                 <form-validation-error>Document non sauvegardé: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
                 <database-error>Erreur de base de données: veuillez contacter votre administrateur système.</database-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas sauvegardées.</clear-confirm-message>
+                <submit-dialog-title>[Form Submitted]</submit-dialog-title>
+                <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
             </messages>
             <labels>
                 <save-document>Sauvegarder</save-document>
@@ -225,8 +227,31 @@
                 <offline>Or-ligne</offline>
                 <online>En-ligne</online>
                 <alert>Valeur manquante ou incorrecte</alert>
+                <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
+                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Close window</submit-dialog-close-window>
             </labels>
         </detail>
+        <import-export>
+            <dialog-title>[Save]</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        [To save the data you entered; click on the link below and save the document on your machine.
+                    </p>
+                    <p>
+                        To reopen the information you entered, double click on the file you saved on your machine and
+                        the tool will automatically retrieve the information entered preciously.
+                    </p>
+                    <p>
+                        <b>Note:</b> No data is kept on the server and if you delete the file you saved your data will
+                        be lost.]
+                    </p>
+                </div>
+            </dialog-body>
+            <link>Save</link>
+        </import-export>
     </resource>
     <resource xml:lang="es">
         <components>
@@ -292,9 +317,10 @@
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
                 <form-validation-error>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
-                <!-- TODO: should be "Database error" -->
                 <database-error>Documento no guardado: por favor, póngase en contacto con el administrador del sistema.</database-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
+                <submit-dialog-title>[Form Submitted]</submit-dialog-title>
+                <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
@@ -320,7 +346,10 @@
                 <offline>Sin conexión</offline>
                 <online>En línea</online>
                 <alert>Desaparición o valor incorrecto</alert>
-                <help-back>[Back]</help-back>
+                <submit-dialog-clear>[Clear and close]</submit-dialog-clear>
+                <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
+                <submit-dialog-go>[OK]</submit-dialog-go>
+                <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
             </labels>
         </detail>
         <import-export>

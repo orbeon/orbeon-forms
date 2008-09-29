@@ -170,7 +170,18 @@
     </xforms:submission>
 
     <!-- Respond to save button activation -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-submit-button">
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
+        <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save">save</xforms:setvalue>
+        <xforms:dispatch name="fr-save-action" target="fr-persistence-model"/>
+    </xforms:action>
+
+    <!-- Respond to submit button activation -->
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-submit-button">
+        <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save">submit</xforms:setvalue>
+        <xforms:dispatch name="fr-save-action" target="fr-persistence-model"/>
+    </xforms:action>
+
+    <xforms:action ev:event="fr-save-action">
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="$parameters/document != ''">
 
@@ -352,6 +363,8 @@
             <error/>
             <!-- Whether an error was received -->
             <is-error>false</is-error>
+            <!-- Whether the last action that triggered the a fr-create-update-submission is a "submit" or a "save" -->
+            <submit-or-save/>
         </save>
     </xforms:instance>
 
@@ -391,16 +404,13 @@
 
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
 
-        <!-- Get property for submit mode -->
-        <xxforms:variable name="submit-mode" select="xxforms:property(string-join(('oxf.fr.detail.submit-mode', $app, $form), '.'))" as="xs:boolean?"/>
-        <xforms:action if="$submit-mode">
-            <xxforms:variable name="response-content-type" select="event('response-headers')[lower-case(name) = 'content-type']/value" as="xs:string?"/>
-            <xforms:action if="starts-with($response-content-type, 'text/html')">
-                <!-- Show the submission result dialog -->
-                <xxforms:show dialog="fr-submission-result-dialog">
-                    <xxforms:context name="fr:content" select="instance('fr-create-update-submission-response')"/>
-                </xxforms:show>
-            </xforms:action>
+        <xforms:message level="xxforms:log-info">fr-persistence-instance: <xforms:output value="saxon:serialize(instance('fr-persistence-instance'), 'xml')"/></xforms:message>
+        <!-- If the document was saved because of a "submit", handle the rest of the submission process -->
+        <xforms:action if="instance('fr-persistence-instance')/submit-or-save = 'submit'">
+            <!-- Show the submission result dialog -->
+            <xxforms:show dialog="fr-submission-result-dialog">
+                <xxforms:context name="fr:content" select="instance('fr-create-update-submission-response')"/>
+            </xxforms:show>
         </xforms:action>
 
     </xforms:action>

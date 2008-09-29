@@ -46,7 +46,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                                      value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="save submit"/> <!-- Combination of: refresh close clear print pdf save submit -->
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="close clear print pdf save"/> <!-- Combination of: refresh close clear print pdf save submit -->
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"                      value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.close.*.*"                             value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.clear.*.*"                             value="true"/>

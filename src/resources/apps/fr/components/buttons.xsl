@@ -143,7 +143,7 @@
     </xsl:template>
 
     <xsl:template match="fr:submit-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save" xxforms:modal="true" id="fr-submit-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/submit" xxforms:modal="true" id="fr-submit-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/application_go.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-document"/></xhtml:span>

@@ -5473,7 +5473,7 @@ ORBEON.xforms.Offline = {
             ORBEON.xforms.Offline.init();
 
             // Compute new events
-            var newEventsString = "";
+            var newEventsString = [];
             for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
                 var event = events[eventIndex];
 
@@ -5489,14 +5489,14 @@ ORBEON.xforms.Offline = {
                     event.ignoreErrors ? 1 : 0
                 ];
                 // Serialize all the information
-                var eventString = "";
+                var eventString = [];
                 for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++) {
-                    if (eventComponentIndex != 0) eventString += " ";
-                    eventString += escape(eventArray[eventComponentIndex]);
+                    if (eventComponentIndex != 0) eventString.push(" ");
+                    eventString.push(escape(eventArray[eventComponentIndex]));
                 }
                 // Add this event to newEventsString
-                if (newEventsString.length > 0) newEventsString += " ";
-                newEventsString += escape(eventString);
+                if (newEventsString.length > 0) newEventsString.push(" ");
+                newEventsString.push(escape(eventString.join("")));
             }
 
             var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
@@ -5505,7 +5505,7 @@ ORBEON.xforms.Offline = {
                 currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
                 currentEventsString += " ";
             }
-            currentEventsString += newEventsString;
+            currentEventsString += newEventsString.join("");
             currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
 
             // Compute new values of controls
@@ -5659,12 +5659,14 @@ ORBEON.xforms.Offline = {
     },
 
     _serializeControlValues: function(controlValues) {
-        var controlValuesString = "";
+        var controlValuesString = [];
         for (controlID in controlValues) {
-            if (controlValuesString != "") controlValuesString += " ";
-            controlValuesString += escape(controlID) + " " + escape(controlValues[controlID]);
+            if (controlValuesString.length > 0) controlValuesString.push(" ");
+            controlValuesString.push(escape(controlID));
+            controlValuesString.push(" ");
+            controlValuesString.push(escape(controlValues[controlID]));
         }
-        controlValuesString = ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey());
+        controlValuesString = ORBEON.xforms.Offline._encrypt(controlValuesString.join(""), ORBEON.xforms.Offline.getEncryptionKey());
         return controlValuesString;
     },
 

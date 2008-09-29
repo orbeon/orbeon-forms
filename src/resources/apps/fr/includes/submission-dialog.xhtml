@@ -26,8 +26,8 @@
     <xforms:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
     
     <xhtml:div>
-        <xxforms:variable name="content-from-persistence" select="xxforms:property(string-join(('oxf.fr.detail.submit.submit.content-from-persistence', $app, $form), '.'))"/>
-        <xforms:output ref="if ($content-from-persistence = 'true') then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
+        <xxforms:variable name="content-from-persistence" select="xxforms:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
+        <xforms:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>

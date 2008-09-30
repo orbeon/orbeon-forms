@@ -353,7 +353,7 @@
             </section>
             <a name="asynchronous-submissions"/>
             <section>
-                <title>Preliminary support for asynchronous handling of <code>&lt;xforms:submission></code></title>
+                <title>Preliminary Support for Asynchronous Handling of <code>&lt;xforms:submission></code></title>
                 <p>
                     Orbeon Forms partially supports the XForms 1.1 <code>mode="asynchronous"</code> attribute on
                     <code>&lt;xforms:submission></code>. The limitations are:
@@ -394,6 +394,40 @@
                         <code>mode="synchronous"</code>.
                     </p>
                 </note>
+            </section>
+            <a name="dispatch-delay"/>
+            <section>
+                <title>Preliminary Support for <code>delay</code> Attribute on <code>&lt;xforms:dispatch></code> Action</title>
+                <p>
+                    Orbeon Forms partially supports the XForms 1.1 <code>delay</code> attribute on
+                    <code>&lt;xforms:dispatch></code>. The limitations are:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            A delay greater than zero always incurs a round-trip with the client. This may mean higher
+                            latency and ressource usage than could be expected. You are advised to use delays in the
+                            order of seconds at least.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Events are not combined as specified in XForms 1.1.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Custom event context information is not supported and simply ignored.
+                        </p>
+                    </li>
+                </ul>
+                <xml-source>
+                    <xforms:dispatch name="my-event" target="my-model" delay="2000"/>
+                </xml-source>
+                <p>
+                    For more information, please visit the <a
+                    href="http://www.w3.org/TR/xforms11/#action-dispatch">XForms 1.1 specification</a>.
+                </p>
             </section>
             <a name="xforms11-if-while"/>
             <section>

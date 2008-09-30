@@ -23,19 +23,19 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db"/>
     <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
-    <property as="xs:string"  name="oxf.fr.default-language.*.*"                     value="en"/>
-    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                     value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
-    <property as="xs:string"  name="oxf.fr.css.uri.*.*"                              value="/ops/css/yui/reset-fonts-grids.css
-                                                                                                /apps/fr/style/form-runner-base.css
-                                                                                                /apps/fr/style/form-runner-orbeon.css"/>
-    <property as="xs:string"  name="oxf.fr.css.uri.orbeon.*"                         value="/ops/css/yui/reset-fonts-grids.css
-                                                                                                /apps/fr/style/form-runner-base.css
-                                                                                                /apps/fr/style/form-runner-orbeon.css"/>
-    <property as="xs:string"  name="oxf.fr.authentication.method"                    value="header"/> <!-- "container", "header", or empty -->
-    <property as="xs:string"  name="oxf.fr.authentication.header.username"           value="My-Username-Header"/>
-    <property as="xs:string"  name="oxf.fr.authentication.header.roles"              value="My-Roles-Header"/>
-    <property as="xs:string"  name="oxf.fr.authentication.container.roles"           value="orbeon admin user"/>
+    <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
+    <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
+    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+    <property as="xs:string"  name="oxf.fr.css.uri.*.*"                                         value="/ops/css/yui/reset-fonts-grids.css
+                                                                                                       /apps/fr/style/form-runner-base.css
+                                                                                                       /apps/fr/style/form-runner-orbeon.css"/>
+    <property as="xs:string"  name="oxf.fr.css.uri.orbeon.*"                                    value="/ops/css/yui/reset-fonts-grids.css
+                                                                                                       /apps/fr/style/form-runner-base.css
+                                                                                                       /apps/fr/style/form-runner-orbeon.css"/>
+    <property as="xs:string"  name="oxf.fr.authentication.method"                               value="header"/> <!-- "container", "header", or empty -->
+    <property as="xs:string"  name="oxf.fr.authentication.header.username"                      value="My-Username-Header"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.roles"                         value="My-Roles-Header"/>
+    <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value="orbeon admin user"/>
 
     <property as="xs:boolean" name="oxf.fr.version.*.*"                                         value="true"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                                   value="true"/>
@@ -45,8 +45,11 @@
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                                      value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
+    <property as="xs:boolean" name="oxf.fr.detail.new.accept-post.*.*"                          value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*"                          value="/fr/service/custom/my-app/new"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="close clear print pdf save"/> <!-- Combination of: refresh close clear print pdf save submit -->
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="close clear print pdf save submit"/> <!-- Combination of: refresh close clear print pdf save save-locally submit -->
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"                      value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.close.*.*"                             value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.clear.*.*"                             value="true"/>
@@ -55,8 +58,8 @@
     <property as="xs:boolean" name="oxf.fr.detail.button.save.*.*"                              value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.submit.*.*"                            value="true"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="go"/> <!-- Combination of: clear keep go close-window -->
+    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="clear keep go close-window"/> <!-- Combination of: clear keep go close-window -->
     <property as="xs:boolean" name="oxf.fr.detail.submit.button.keep.*.*"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.submit.button.go.*.*"                         value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>

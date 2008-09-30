@@ -172,6 +172,16 @@
         <setvalue ref="/*/resource" matcher-group="1"/>
     </page>
 
+    <!-- ==== Internationalization ==== -->
+
+    <!-- Service putting together Form Runner resources -->
+    <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="i18n/fr-resources.xpl"  
+          default-submission="summary/submission-page-summary.xml">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
     <!-- ==== Other Services ==== -->
 
     <!-- Generate HTML to be saved -->

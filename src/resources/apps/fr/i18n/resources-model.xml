@@ -42,8 +42,12 @@
     </xforms:instance>
 
     <!-- Instance containing the Form Runner resources -->
-    <xforms:instance id="fr-fr-resources" src="oxf:/apps/fr/i18n/resources.xml"/>
-    <xforms:instance id="fr-fr-resources-override" src="oxf:/config/form-runner-resources.xml" xxforms:readonly="true"/>
+    <xforms:instance id="fr-fr-resources"><dummy/></xforms:instance>
+    <xforms:submission id="fr-get-fr-resources"
+            serialization="none" resource="/fr/service/i18n/fr-resources/{xxforms:instance('fr-form-metadata')/application-name}/{xxforms:instance('fr-form-metadata')/form-name}" method="get"
+            replace="instance" instance="fr-fr-resources" />
+            <!-- TODO: We would like make this readonly/shared, but it we do modifications to the properties are not taken into account -->
+            <!--xxforms:readonly="true" xxforms:shared="application"-->
 
     <!-- Instance containing the current Form Runner resources -->
     <xforms:instance id="fr-fr-current-resources">
@@ -95,26 +99,7 @@
         <xforms:setvalue ref="instance('fr-default-language-instance')"
                          value="xxforms:property(string-join(('oxf.fr.default-language', xxforms:instance('fr-parameters-instance')/app, xxforms:instance('fr-parameters-instance')/form), '.'))"/>
         <xforms:message level="xxforms:log-info">Getting default language: <xforms:output value="instance('fr-default-language-instance')"/></xforms:message>
-        <!-- Override resources -->
-        <xforms:action xxforms:iterate="instance('fr-fr-resources-override')/resource">
-            <xxforms:variable name="language" select="@xml:lang"/>
-            <xforms:action xxforms:iterate=".//*[empty(*)]">
-                <!-- Get the path without the /resources/resource[x] part (will start with /) -->
-                <xxforms:variable name="partial-path" select="substring-after(saxon:path(), ']')"/>
-                <!-- Add resource part based on language -->
-                <!-- TODO: It be better to do this in XSLT instead of XForms so the resources can be static/shared -->
-                <xxforms:variable name="full-path" select="concat('/resources/resource[@xml:lang = ''', $language, ''']', $partial-path)"/>
-                <xxforms:variable name="resource-element" select="instance('fr-fr-resources')/saxon:evaluate($full-path)"/>
-                <xforms:action if="empty($resource-element)">
-                    <xforms:message level="xxforms:log-warning">Cannot override resource at path (resource not found): <xforms:output value="$full-path"/></xforms:message>
-                </xforms:action>
-                <xforms:action if="exists($resource-element)">
-                    <xforms:message level="xxforms:log-info">XXX <xforms:output value="."/></xforms:message>
-                    <xforms:setvalue ref="$resource-element" value="context()"/>
-                    <xforms:message level="xxforms:log-info">XXX <xforms:output value="saxon:serialize($resource-element, 'xml')"/></xforms:message>
-                </xforms:action>
-            </xforms:action>
-        </xforms:action>
+        <xforms:send submission="fr-get-fr-resources"/>
     </xforms:action>
 
     <!-- Initialize language and resources if there are any resources at all -->

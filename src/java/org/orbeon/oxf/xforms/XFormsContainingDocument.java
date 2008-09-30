@@ -80,15 +80,16 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     // Client state
     private XFormsModelSubmission activeSubmission;
-    private List asynchronousSubmissions;// List<Runnable>
+    private List asynchronousSubmissions;   // List<Runnable runnable>
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
     private List messagesToRun;
-    private List loadsToRun;
-    private List scriptsToRun;
+    private List loadsToRun;                // List<Load load>
+    private List scriptsToRun;              // List<Script script>
     private String focusEffectiveControlId;
     private String helpEffectiveControlId;
+    private List delayedEvents;             // List<DelayedEvent delayedEvents>
 
     private boolean goingOffline;
     private boolean goingOnline;
@@ -411,6 +412,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         this.scriptsToRun = null;
         this.focusEffectiveControlId = null;
         this.helpEffectiveControlId = null;
+        this.delayedEvents = null;
 
         this.goingOffline = false;
         this.goingOnline = false;
@@ -520,6 +522,59 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public List getMessagesToRun() {
         return messagesToRun;
+    }
+
+    /**
+     * Schedule an event for delayed execution, following xforms:dispatch/@delay semantics.
+     *
+     * @param eventName         name of the event to dispatch
+     * @param targetStaticId    static id of the target to dispatch to
+     * @param bubbles           whether the event bubbles
+     * @param cancelable        whether the event is cancelable
+     * @param delay             delay after which to dispatch the event
+     */
+    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay) {
+        if (delayedEvents == null)
+            delayedEvents = new ArrayList();
+
+        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay));
+    }
+
+    public List getDelayedEvents() {
+        return delayedEvents;
+    }
+
+    public static class DelayedEvent {
+        private String eventName;
+        private String targetStaticId;
+        private boolean bubbles;
+        private boolean cancelable;
+        private long time;
+
+        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time) {
+            this.eventName = eventName;
+            this.targetStaticId = targetStaticId;
+            this.bubbles = bubbles;
+            this.cancelable = cancelable;
+            this.time = time;
+        }
+
+        public String getEncodedDocument(PipelineContext pipelineContext) {
+            final Document eventsDocument = Dom4jUtils.createDocument();
+            final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
+
+            final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
+            eventElement.addAttribute("name", eventName);
+            eventElement.addAttribute("source-control-id", targetStaticId);
+            eventElement.addAttribute("bubbles", Boolean.toString(bubbles));
+            eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
+
+            return XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+        }
+
+        public long getTime() {
+            return time;
+        }
     }
 
     public static class Message {
@@ -720,8 +775,11 @@ public class XFormsContainingDocument extends XFormsContainer {
      * Execute an external event and ensure deferred event handling.
      *
      * @param pipelineContext           current PipelineContext
+     * @param isTrustedEvent            whether this event is trusted
      * @param eventName                 name of the event
-     * @param controlEffectiveId        effective control id to dispatch to
+     * @param targetEffectiveId         effective id of the target to dispatch to
+     * @param bubbles                   whether the event bubbles (for custom events)
+     * @param cancelable                whether the event is cancelable (for custom events)
      * @param otherControlEffectiveId   other effective control id if any
      * @param valueString               optional context string
      * @param filesElement              optional files elements for upload
@@ -729,20 +787,21 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @param dndEnd                    optional DnD end information
      * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlEffectiveId,
+    public void executeExternalEvent(PipelineContext pipelineContext, boolean isTrustedEvent, String eventName, String targetEffectiveId,
+                                     boolean bubbles, boolean cancelable,
                                      String otherControlEffectiveId, String valueString, Element filesElement,
                                      String dndStart, String dndEnd, boolean handleGoingOnline) {
 
         // Get event target object
         XFormsEventTarget eventTarget;
         {
-            final Object eventTargetObject = getObjectByEffectiveId(controlEffectiveId);
+            final Object eventTargetObject = getObjectByEffectiveId(targetEffectiveId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                    throw new ValidationException("Event target id '" + controlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
+                    throw new ValidationException("Event target id '" + targetEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", controlEffectiveId, "event name", eventName });
+                        logDebug("containing document", "ignoring client event with invalid target id", new String[] { "target id", targetEffectiveId, "event name", eventName });
                     }
                     return;
                 }
@@ -750,9 +809,15 @@ public class XFormsContainingDocument extends XFormsContainer {
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
-        // Check whether the event is allowed on that target
-        if (!checkForAllowedEvents(eventName, eventTarget, handleGoingOnline))
+        if (isTrustedEvent) {
+            // Event is trusted, don't check if it is allowed
+            if (XFormsServer.logger.isDebugEnabled()) {
+                logDebug("containing document", "processing trusted event", new String[] { "target id", targetEffectiveId, "event name", eventName });
+            }
+        } else if (!checkForAllowedEvents(eventName, eventTarget, handleGoingOnline)) {
+            // Event is not trusted and is not allowed
             return;
+        }
 
         // Get other event target
         final XFormsEventTarget otherEventTarget;
@@ -765,7 +830,7 @@ public class XFormsContainingDocument extends XFormsContainer {
                     throw new ValidationException("Other event target id '" + otherControlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", controlEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId });
+                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "target id", targetEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId });
                     }
                     return;
                 }
@@ -826,10 +891,10 @@ public class XFormsContainingDocument extends XFormsContainer {
         {
             // Create event
             final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
-                    true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
+                    true, bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
             // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-            if (controlEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
+            if (targetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
                     && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
 
                 // Check if the value to set will be different from the current value
@@ -946,7 +1011,7 @@ public class XFormsContainingDocument extends XFormsContainer {
     private boolean checkForAllowedEvents(String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
-        // This is also a security measures that also ensures that somebody is not able to change values in an instance
+        // This is also a security measure that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
         if (eventTarget instanceof XFormsControl) {
             // Target is a control
@@ -1028,7 +1093,7 @@ public class XFormsContainingDocument extends XFormsContainer {
                 // The event is not explicitly allowed: check for implicitly allowed events
                 if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on xforms:submission", new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName });
+                        logDebug("containing document", "ignoring invalid client event on xforms:submission", new String[] { "submission id", eventTarget.getEffectiveId(), "event name", eventName });
                     }
                     return false;
                 }
@@ -1038,7 +1103,7 @@ public class XFormsContainingDocument extends XFormsContainer {
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    logDebug("containing document", "ignoring invalid client event on containing document", new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName });
+                    logDebug("containing document", "ignoring invalid client event on containing document", new String[] { "target id", eventTarget.getEffectiveId(), "event name", eventName });
                 }
                 return false;
             }
@@ -1047,7 +1112,7 @@ public class XFormsContainingDocument extends XFormsContainer {
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    logDebug("containing document", "ignoring invalid client event", new String[] { "control id", eventTarget.getEffectiveId(), "event name", eventName });
+                    logDebug("containing document", "ignoring invalid client event", new String[] { "target id", eventTarget.getEffectiveId(), "event name", eventName });
                 }
                 return false;
             }

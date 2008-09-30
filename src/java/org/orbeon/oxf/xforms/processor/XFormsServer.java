@@ -97,7 +97,7 @@ public class XFormsServer extends ProcessorImpl {
 
         final Element filesElement;
         final Element actionElement;
-        final Element serverEventsElement;
+        final List serverEventsElement;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -109,15 +109,22 @@ public class XFormsServer extends ProcessorImpl {
         filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
         // Get server events if any
-        serverEventsElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
+        serverEventsElement = requestDocument.getRootElement().elements(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Get events requested by the client
         final List eventElements = new ArrayList();
 
-        // Gather automatic events if any
-        if (serverEventsElement != null) {
-            final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, serverEventsElement.getStringValue());
-            eventElements.addAll(serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+        // Gather server events first if any
+        int serverEventsCount = 0;
+        if (serverEventsElement != null && serverEventsElement.size() > 0) {
+            for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                final Element element = (Element) i.next();
+
+                final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
+                final List xxformsEventElements = serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME);
+                serverEventsCount += xxformsEventElements.size();
+                eventElements.addAll(xxformsEventElements);
+            }
         }
 
         // Gather client events if any
@@ -310,12 +317,20 @@ public class XFormsServer extends ProcessorImpl {
                     containingDocument.startHandleOperation("XForms server", "handling external events");
                     
                     // Iterate through all events to dispatch them
-                    for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                    int eventElementIndex = 0;
+                    for (Iterator i = eventElements.iterator(); i.hasNext(); eventElementIndex++) {
                         final Element eventElement = (Element) i.next();
-                        final String sourceControlId = eventElement.attributeValue("source-control-id");
-                        final String otherControlId = eventElement.attributeValue("other-control-id");
-                        final String eventName = eventElement.attributeValue("name");
 
+                        // Whether this event is trusted, that is whether this event was a server event. Server events
+                        // are processed first, so are at the beginning of eventElements.
+                        boolean isTrustedEvent = eventElementIndex < serverEventsCount;
+
+                        final String eventName = eventElement.attributeValue("name");
+                        final String sourceTargetId = eventElement.attributeValue("source-control-id");
+                        final boolean bubbles = !"false".equals(eventElement.attributeValue("bubbles"));// default is true
+                        final boolean cancelable = !"false".equals(eventElement.attributeValue("cancelable"));// default is true
+
+                        final String otherControlId = eventElement.attributeValue("other-control-id");
                         final String dndStart = eventElement.attributeValue("dnd-start");
                         final String dndEnd = eventElement.attributeValue("dnd-end");
 
@@ -329,7 +344,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Remember that we got this event
                             allEvents = true;
 
-                        } else if (sourceControlId != null && eventName != null) {
+                        } else if (sourceTargetId != null && eventName != null) {
                             // A normal event is passed
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
                                 // xxforms-value-change-with-focus-change event
@@ -338,16 +353,17 @@ public class XFormsServer extends ProcessorImpl {
                                 // same control. Not sure if this is still needed.
                                 if (lastSourceControlId == null) {
                                     // Remember event
-                                    lastSourceControlId = sourceControlId;
+                                    lastSourceControlId = sourceTargetId;
                                     lastValueChangeEventValue = value;
-                                } else if (lastSourceControlId.equals(sourceControlId)) {
+                                } else if (lastSourceControlId.equals(sourceTargetId)) {
                                     // Update event
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
+                                    containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
+                                            true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                                     // Remember new event
-                                    lastSourceControlId = sourceControlId;
+                                    lastSourceControlId = sourceTargetId;
                                     lastValueChangeEventValue = value;
                                 }
                             } else {
@@ -359,19 +375,21 @@ public class XFormsServer extends ProcessorImpl {
 
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
+                                    containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
+                                            true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }
                                 // Send new event
-                                containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd, hasXXFormsOnline);
+                                containingDocument.executeExternalEvent(pipelineContext, isTrustedEvent, eventName, sourceTargetId,
+                                        bubbles, cancelable, otherControlId, value, filesElement, dndStart, dndEnd, hasXXFormsOnline);
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
                                 // Remember id of controls for which value changed
-                                valueChangeControlIds.put(sourceControlId, "");
+                                valueChangeControlIds.put(sourceTargetId, "");
                             }
-                        } else if (!(sourceControlId == null && eventName == null)) {
+                        } else if (!(sourceTargetId == null && eventName == null)) {
                             // Error case
                             throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
@@ -379,7 +397,8 @@ public class XFormsServer extends ProcessorImpl {
                     // Flush stored event if needed
                     if (lastSourceControlId != null) {
                         // Send old event
-                        containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
+                        containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
+                                true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
                     }
 
                     // End external events
@@ -507,7 +526,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // Compute automatic events
             boolean requireClientSubmission = false;
-            String serverEvents = null;
+            String submissionServerEvents = null;
             {
                 final XFormsModelSubmission activeSubmission = containingDocument.getClientActiveSubmission();
                 final List loads = containingDocument.getLoadsToRun();
@@ -546,7 +565,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
                     // Encode events so that the client cannot send back arbitrary events
                     if (requireClientSubmission)
-                        serverEvents = XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+                        submissionServerEvents = XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
                 }
             }
 
@@ -653,11 +672,25 @@ public class XFormsServer extends ProcessorImpl {
                     outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
 
-                // Output automatic events
-                if (serverEvents != null) {
+                // Output server events
+                if (submissionServerEvents != null) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events");
-                    ch.text(serverEvents);
+                    ch.text(submissionServerEvents);
                     ch.endElement();
+                }
+                {
+                    final List delayedEvents = containingDocument.getDelayedEvents();
+                    if (delayedEvents != null && delayedEvents.size() > 0) {
+                        final long currentTime = System.currentTimeMillis();
+                        for (Iterator i = delayedEvents.iterator(); i.hasNext();) {
+                            final XFormsContainingDocument.DelayedEvent delayedEvent = (XFormsContainingDocument.DelayedEvent) i.next();
+
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
+                                    new String[] { "delay",  Long.toString(delayedEvent.getTime() - currentTime)} );
+                            ch.text(delayedEvent.getEncodedDocument(pipelineContext));
+                            ch.endElement();
+                        }
+                    }
                 }
 
                 // Check if we want to require the client to perform a form submission

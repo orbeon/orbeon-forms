@@ -106,11 +106,12 @@
                     </element>
                 </zeroOrMore>
             </element>
-            <optional>
+            <!-- Client may send more than one if needed (e.g. multiple delayed server events to be sent at the same time) -->
+            <zeroOrMore>
                 <element name="xxforms:server-events">
                     <data type="string"/>
                 </element>
-            </optional>
+            </zeroOrMore>
         </element>
     </start>
 

@@ -218,11 +218,17 @@
                             </zeroOrMore>
                         </element>
                     </optional>
-                    <optional>
+                    <!-- Allow for zero or more in case there are multiple delays -->
+                    <zeroOrMore>
                         <element name="xxforms:server-events">
+                            <!-- Optional delay after which the client must send the event -->
+                            <optional>
+                                <attribute name="delay"/>
+                            </optional>
+                            <!-- Encoded server event(s) -->
                             <data type="string"/>
                         </element>
-                    </optional>
+                    </zeroOrMore>
                     <optional>
                         <element name="xxforms:submission">
                             <optional>

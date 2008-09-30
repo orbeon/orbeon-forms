@@ -74,32 +74,57 @@ public class XFormsDispatchAction extends XFormsAction {
             final String newEventCancelableString = resolveAVT(actionInterpreter, pipelineContext, actionElement, "cancelable", false);
             newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
         }
-
-        // Find actual target
-        final Object xformsEventTarget;
+        final int resolvedDelay;
         {
-            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectByEffectiveId(resolvedNewEventTargetId);
-            if (tempXFormsEventTarget != null) {
-                // Object with this id exists
-                xformsEventTarget = tempXFormsEventTarget;
-            } else {
-                // Otherwise, try effective id
-                xformsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), resolvedNewEventTargetId, actionElement);
-            }
+            // Resolve AVT
+            final String delayString = resolveAVT(actionInterpreter, pipelineContext, actionElement, "delay", false);
+            resolvedDelay = (delayString == null || delayString.equals("")) ? 0 : Integer.parseInt(delayString);
         }
 
-        if (xformsEventTarget instanceof XFormsEventTarget) {
-            // Create and dispatch the event
-            final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
-            addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-            actionInterpreter.getContainer().dispatchEvent(pipelineContext, newEvent);
-        } else {
-            // "If there is a null search result for the target object and the source object is an XForms action such as
-            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+        if (resolvedDelay <= 0) {
+            // Event is dispatched immediately
 
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:dispatch", "cannot find target, ignoring action",
-                        new String[] { "target id", resolvedNewEventTargetId } );
+            // "10.8 The dispatch Element [...] If the delay is not specified or if the given value does not conform
+            // to xsd:nonNegativeInteger, then the event is dispatched immediately as the result of the dispatch
+            // action."
+
+            // Find actual target
+            final Object xformsEventTarget;
+            {
+                final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectByEffectiveId(resolvedNewEventTargetId);
+                if (tempXFormsEventTarget != null) {
+                    // Object with this id exists
+                    xformsEventTarget = tempXFormsEventTarget;
+                } else {
+                    // Otherwise, try effective id
+                    xformsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), resolvedNewEventTargetId, actionElement);
+                }
+            }
+
+            if (xformsEventTarget instanceof XFormsEventTarget) {
+                // Create and dispatch the event
+                final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
+                addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
+                actionInterpreter.getContainer().dispatchEvent(pipelineContext, newEvent);
+            } else {
+                // "If there is a null search result for the target object and the source object is an XForms action such as
+                // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("xforms:dispatch", "cannot find target, ignoring action",
+                            new String[] { "target id", resolvedNewEventTargetId } );
+            }
+        } else {
+            // Event is dispatched after a delay
+
+            // "10.8 The dispatch Element [...] the specified event is added to the delayed event queue unless an event
+            // with the same name and target element already exists on the delayed event queue. The dispatch action has
+            // no effect if the event delay is a non-negative integer and the specified event is already in the delayed
+            // event queue. [...] Since an element bearing a particular ID may be repeated, the delayed event queue may
+            // contain more than one event with the same name and target IDREF. It is the name and the target run-time
+            // element that must be unique."
+
+            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay);
         }
     }
 }

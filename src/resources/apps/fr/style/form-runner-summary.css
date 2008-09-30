@@ -53,7 +53,10 @@
 .fr-summary-search { display: block; margin-bottom: .5em }
 .fr-summary-search-items { display: block; clear: both }
 .fr-summary-search-item { float: left; margin-right: .5em }
-.fr-summary-search-item select { width: 100% } 
+.fr-summary-search-item select {
+    width: 100%;
+    *width: auto;/* HACK: IE 7 misbehaves here, so don't use 100% */
+}
 
 .fr-paging-buttons { padding-top: .5em }
 .fr-paging-buttons button { vertical-align: middle }

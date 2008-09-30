@@ -99,27 +99,71 @@ public class PropertySet {
         // Store exact property name anyway
         exactProperties.put(name, typeValue);
 
-        if (name.indexOf(".*.") != -1 || name.startsWith("*.") || name.endsWith(".*")) {
-            // Contains wildcards so store tree
+        // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
+        final StringTokenizer st = new StringTokenizer(name, ".");
+        PropertyNode currentNode = wildcardProperties;
+        while (st.hasMoreTokens()) {
+            final String currentToken = st.nextToken();
+            if (currentNode.children == null) {
+                currentNode.children = new HashMap();
+            }
+            PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
+            if (newNode == null) {
+                newNode = new PropertyNode();
+                currentNode.children.put(currentToken, newNode);
+            }
+            currentNode = newNode;
+        }
 
-            final StringTokenizer st = new StringTokenizer(name, ".");
-            PropertyNode currentNode = wildcardProperties;
-            while (st.hasMoreTokens()) {
-                final String currentToken = st.nextToken();
-                if (currentNode.children == null) {
-                    currentNode.children = new HashMap();
-                }
-                PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
-                if (newNode == null) {
-                    newNode = new PropertyNode();
-                    currentNode.children.put(currentToken, newNode);
-                }
-                currentNode = newNode;
+        // Store value
+        currentNode.typeValue = typeValue;
+    }
+
+
+    private List getPropertiesStartsWithWorker(PropertyNode propertyNode, String consumed, String[] tokens, int currentTokenPosition) {
+        List result = new ArrayList();
+        String token = currentTokenPosition >= tokens.length ? null : tokens[currentTokenPosition];
+
+        if (token == null || "*".equals(token)) {
+            if (propertyNode.children == null && token == null) {
+                result.add(consumed);
             }
 
-            // Store value
-            currentNode.typeValue = typeValue;
+            // Go through all children
+            if (propertyNode.children != null) {
+                for (Iterator keys = propertyNode.children.keySet().iterator(); keys.hasNext();) {
+                    String key = (String) keys.next();
+                    String newConsumed = consumed.length() == 0 ? key : consumed + "." +  key;
+                    List keyProperties = getPropertiesStartsWithWorker((PropertyNode) propertyNode.children.get(key), newConsumed, tokens, currentTokenPosition + 1);
+                    result.addAll(keyProperties);
+                }
+            }
+        } else {
+            // Regular token
+            PropertyNode[] newPropertNodes = new PropertyNode[2];
+            // Find property node with exact name
+            newPropertNodes[0] = (PropertyNode) propertyNode.children.get(token);
+            // Find property node with *
+            newPropertNodes[1] = (PropertyNode) propertyNode.children.get("*");
+            for (int newPropertNodesIndex = 0; newPropertNodesIndex < 2; newPropertNodesIndex++) {
+                PropertyNode newPropertNode = newPropertNodes[newPropertNodesIndex];
+                if (newPropertNode != null) {
+                    String actualToken = newPropertNodesIndex == 0 ? token : "*";
+                    String newConsumed = consumed.length() == 0 ? actualToken : consumed + "." +  actualToken;
+                    List keyProperties = getPropertiesStartsWithWorker(newPropertNode, newConsumed, tokens, currentTokenPosition + 1);
+                    result.addAll(keyProperties);
+                }
+            }
         }
+        return result;
+    }
+
+    public List getPropertiesStartsWith(String name) {
+        List tokensList = new ArrayList();
+        for (StringTokenizer nameTokenizer = new StringTokenizer(name, "."); nameTokenizer.hasMoreTokens();)
+            tokensList.add(nameTokenizer.nextToken());
+        String[] tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
+        return getPropertiesStartsWithWorker(wildcardProperties, "", tokensArray, 0);
     }
 
     /**
@@ -135,7 +179,6 @@ public class PropertySet {
         TypeValue typeValue = (TypeValue) exactProperties.get(name);
         if (typeValue == null) {
             // If not found try wildcards
-
             final StringTokenizer st = new StringTokenizer(name, ".");
             PropertyNode currentNode = wildcardProperties;
             while (st.hasMoreTokens()) {

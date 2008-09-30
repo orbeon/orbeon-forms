@@ -15,10 +15,15 @@ package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
-import org.orbeon.saxon.functions.*;
+import org.orbeon.saxon.functions.FormatDate;
+import org.orbeon.saxon.functions.FormatNumber2;
+import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.functions.StandardFunction;
+import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.NamespaceConstant;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
@@ -27,6 +32,7 @@ import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.SequenceType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PipelineFunctionLibrary implements FunctionLibrary {
@@ -64,6 +70,10 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
 
     public static AtomicValue property(String name) {
         return XXFormsProperty.property(name);
+    }
+
+    public static List propertiesStartsWith(String name) {
+        return XXFormsPropertiesStartsWith.propertiesStartsWith(name);
     }
 
     public static String rewriteResourceURI(String uri, boolean absolute) {

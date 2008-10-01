@@ -94,14 +94,16 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
-                    containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
+                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (Iterator i = selectEvents.iterator(); i.hasNext();) {
-                    containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
+                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
 

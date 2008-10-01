@@ -102,7 +102,8 @@ public class XFormsSubmissionUtils {
             if (doReplace) {
                 // "the event xforms-submit-done is dispatched"
                 if (xformsModelSubmission != null)
-                    xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
+                    xformsModelSubmission.getContainer(containingDocument).dispatchEvent(pipelineContext,
+                            new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
                 // Just forward the reply
                 // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
                 requestDispatcher.forward(requestAdapter, response != null ? response : externalContext.getResponse());

@@ -111,6 +111,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return container;
     }
 
+    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
+        return getContainer();
+    }
+
     protected XFormsContextStack getContextStack() {
         return containingDocument.getControls().getContextStack();
     }

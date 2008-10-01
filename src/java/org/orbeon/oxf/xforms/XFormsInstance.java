@@ -219,12 +219,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     /**
      * Return the model that contains this instance.
      *
-     * @param container     XFormsContainer containing this instance
-     * @return XFormsModel  XFormsModel containing this instance
+     * @param containingDocument    XFormsContainingDocument
+     * @return XFormsModel          XFormsModel containing this instance
      */
-    public XFormsModel getModel(XFormsContainer container) {
-        // TODO: For now, do a search including descendant containers, as some callers don't use the proper container
-        return (XFormsModel) container.getObjectByEffectiveId(effectiveModelId);
+    public XFormsModel getModel(XFormsContainingDocument containingDocument) {
+        return (XFormsModel) containingDocument.getObjectByEffectiveId(effectiveModelId);
     }
 
     /**
@@ -247,6 +246,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         // Instance effective id has the same prefix as effective id of the model
         final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveModelId);
         return prefix + getId();
+    }
+
+    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
+        return getModel(containingDocument).getContainer();
     }
 
     public String getEffectiveModelId() {
@@ -499,7 +502,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
-        return getModel(container);
+        return getModel(container.getContainingDocument());
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

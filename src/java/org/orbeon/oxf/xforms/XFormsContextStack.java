@@ -174,7 +174,7 @@ public class XFormsContextStack {
             resetBindingContext(pipelineContext, xformsModel);
         } else if (eventHandlerContainer instanceof XFormsInstance) {
             final XFormsInstance xformsInstance = (XFormsInstance) eventHandlerContainer;
-            resetBindingContext(pipelineContext, xformsInstance.getModel(container));
+            resetBindingContext(pipelineContext, xformsInstance.getModel(containingDocument));
         } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
             final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
             final XFormsModel xformsModel = (XFormsModel) submission.getModel();

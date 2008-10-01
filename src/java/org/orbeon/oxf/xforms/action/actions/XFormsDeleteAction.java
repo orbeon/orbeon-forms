@@ -159,7 +159,7 @@ public class XFormsDeleteAction extends XFormsAction {
             containingDocument.getControls().markDirtySinceLastRequest(true);
 
             // "4. If the delete is successful, the event xforms-delete is dispatched."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+            modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
         }
 
         return deletedNodeInfos;

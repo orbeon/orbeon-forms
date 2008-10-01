@@ -561,6 +561,14 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         return null;
     }
 
+    public XFormsContainer getContainer() {
+        return this;
+    }
+
+    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
+        return getContainer();
+    }
+
     private Stack eventStack = new Stack();
 
     private void startHandleEvent(XFormsEvent event) {

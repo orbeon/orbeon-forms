@@ -52,7 +52,7 @@ public class Index extends XFormsFunction {
             final PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
             final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
-            currentModel.getContainingDocument().dispatchEvent(pipelineContext,
+            currentModel.getContainer().dispatchEvent(pipelineContext,
                     new XFormsComputeExceptionEvent(currentModel, message, exception));
 
             // TODO: stop processing!

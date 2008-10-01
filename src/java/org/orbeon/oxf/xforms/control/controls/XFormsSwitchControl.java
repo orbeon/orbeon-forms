@@ -92,10 +92,10 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
+            previouslySelectedCaseControl.getContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
 
             // "2. Dispatching an xform-select event to the case to be selected."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent(caseControl));
+            caseControl.getContainer().dispatchEvent(pipelineContext, new XFormsSelectEvent(caseControl));
         }
     }
 

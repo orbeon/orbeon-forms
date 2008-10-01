@@ -94,7 +94,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+            getContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
         }
 
         try {

@@ -45,7 +45,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             final Object object = containingDocument.getObjectByEffectiveId(submissionId);// xxx fix not effective
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
+                submission.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
             } else {
                 throw new ValidationException("xforms:submit submission attribute must point to an xforms:submission element: " + submissionId, getLocationData());
             }

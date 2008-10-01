@@ -131,6 +131,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return container;
     }
 
+    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
+        return getContainer();
+    }
+
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
     }

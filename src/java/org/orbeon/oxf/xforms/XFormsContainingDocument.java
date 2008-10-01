@@ -1000,6 +1000,16 @@ public class XFormsContainingDocument extends XFormsContainer {
         }
     }
 
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+        // Ensure that the event uses the proper container to dispatch the event
+        final XFormsContainer targetContainer = event.getTargetObject().getContainer(this);
+        if (targetContainer == this) {
+            super.dispatchEvent(pipelineContext, event);
+        } else {
+            targetContainer.dispatchEvent(pipelineContext, event);
+        }
+    }
+
     /**
      * Check whether the external event is allowed on the gtiven target/
      *

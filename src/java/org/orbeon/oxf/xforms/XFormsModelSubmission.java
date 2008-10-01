@@ -218,6 +218,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return prefix + getId();
     }
 
+    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
+        return getModel().getContainer();
+    }
+
     public LocationData getLocationData() {
         return (LocationData) submissionElement.getData();
     }

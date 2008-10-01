@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
@@ -36,8 +36,8 @@ public class XXFormsHideAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainer container = actionInterpreter.getContainer();
 
         // Resolve attribute as AVTs
         final String dialogId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
@@ -47,15 +47,17 @@ public class XXFormsHideAction extends XFormsAction {
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-close event to dialog
-            final Object controlObject = (dialogId != null) ? xformsControls.getObjectByEffectiveId(dialogId) : null;// xxx fix not effective
+            // TODO: use container.getObjectByEffectiveId() once XFormsContainer is able to have local controls
+            final Object controlObject = (dialogId != null) ? containingDocument.getObjectByEffectiveId(container.getFullPrefix() + dialogId) : null;
             if (controlObject instanceof XXFormsDialogControl) {
-                final XFormsEvent newEvent = new XXFormsDialogCloseEvent((XFormsEventTarget) controlObject);
+                final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(eventTarget);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-                containingDocument.dispatchEvent(pipelineContext, newEvent);
+                eventTarget.getContainer(containingDocument).dispatchEvent(pipelineContext, newEvent);
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
-                        new String[] { "dialog id", dialogId } );
+                    containingDocument.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
+                            new String[]{"dialog id", dialogId});
             }
         }
     }

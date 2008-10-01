@@ -29,14 +29,26 @@
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-model-construct-done">
 
-        <!-- Initialize form and data URIs from properties properties -->
+        <!-- Initialize form, data, and new service URIs from properties properties -->
         <xforms:setvalue ref="instance('fr-uris-instance')/form-collection"
                          value="concat(xxforms:property('oxf.fr.appserver.uri'),
                                     xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.')))"/>
-
         <xforms:setvalue ref="instance('fr-uris-instance')/data-collection"
                          value="concat(xxforms:property('oxf.fr.appserver.uri'),
                                     xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.')))"/>
+        <xxforms:variable name="new-service-uri" select="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
+        <xforms:setvalue ref="instance('fr-uris-instance')/new-service-uri"
+                         value="if (starts-with($new-service-uri, '/'))
+                            then concat(xxforms:property('oxf.fr.appserver.uri'), $new-service-uri)
+                            else $new-service-uri"/>
+
+        <!-- Initialize parameters to pass to "new" service -->
+        <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
+        <xforms:action xxforms:iterate="tokenize($pass-request-parameters, '\s')">
+            <xxforms:variable name="parameter-name" select="."/>
+            <xxforms:variable name="parameter-value" select="xxforms:get-request-parameter($parameter-name)"/>
+            <xforms:insert context="instance('fr-service-parameters')" origin="xxforms:element($parameter-name, $parameter-value)"/>
+        </xforms:action>
 
         <!-- Initialize username and roles -->
         <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'container'">
@@ -79,6 +91,10 @@
         <xforms:action if="$is-new-document">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+            <!-- Do we call a service to initialize the instance? -->
+            <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))">
+                <xforms:send submission="fr-get-instance-from-service"/>
+            </xforms:action>
             <!-- Do we accept data posted to this page? -->
             <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
                 <xxforms:variable name="form-data" select="xxforms:get-request-parameter('form-data')"/>
@@ -308,6 +324,7 @@
         <uris xmlns="">
             <form-collection/>
             <data-collection/>
+            <new-service-uri/>
         </uris>
     </xforms:instance>
 
@@ -351,6 +368,16 @@
             replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
+
+    <xforms:instance id="fr-service-parameters">
+        <parameters/>
+    </xforms:instance>
+
+    <!-- Calls a service to get the initial instance -->
+    <xforms:submission id="fr-get-instance-from-service"
+            method="get" separator="&amp;" ref="instance('fr-service-parameters')"
+            resource="{instance('fr-uris-instance')/new-service-uri}"
+            replace="instance" xxforms:instance="fr-form-instance"/>
 
     <xforms:instance id="fr-persistence-instance">
         <save xmlns="">

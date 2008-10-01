@@ -117,6 +117,7 @@
             <xsd:attribute name="resource" type="xsd:string" use="optional"/>
             <xsd:attribute name="instance" type="xsd:string" use="optional"/>
             <xsd:attribute name="serialization" type="xsd:string" use="optional"/>
+            <xsd:attribute name="target" type="xsd:string" use="optional"/>
             <xsd:attribute name="relevant" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="validate" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="method" use="required">

@@ -79,13 +79,14 @@
         <xforms:action if="$is-new-document">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
-            <!-- If we find form data in the session, use it and reset session -->
-            <xxforms:variable name="form-data-from-session" select="xxforms:get-session-attribute('fr-upload-form-data')"/>
-            <xforms:action if="exists($form-data-from-session) and not($form-data-from-session/*/@xsi:nil = 'true')">
-                <!--  Get data from session -->
-                <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data-from-session"/>
-                <!-- Reset session -->
-                <xforms:insert context="." origin="xxforms:set-session-attribute('fr-upload-form-data', ())"/>
+            <!-- Do we accept data posted to this page? -->
+            <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
+                <xxforms:variable name="form-data" select="xxforms:get-request-parameter('form-data')"/>
+                <!-- Do we have data posted to this form? -->
+                <xforms:action if="$form-data">
+                    <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
+                    <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+                </xforms:action>
             </xforms:action>
         </xforms:action>
 
@@ -406,7 +407,6 @@
 
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
 
-        <xforms:message level="xxforms:log-info">fr-persistence-instance: <xforms:output value="saxon:serialize(instance('fr-persistence-instance'), 'xml')"/></xforms:message>
         <!-- If the document was saved because of a "submit", handle the rest of the submission process -->
         <xforms:action if="instance('fr-persistence-instance')/submit-or-save = 'submit'">
             <!-- Show the submission result dialog -->

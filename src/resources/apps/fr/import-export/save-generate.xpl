@@ -44,17 +44,11 @@
                             <xsl:variable name="form" as="xs:string" select="$parameters/form"/>
 
                             <!-- Form we produce -->
-                            <form name="form1" method="post" action="{substring-before($request-url, '/xforms-server')}/fr/upload" id="form1">
+                            <form name="form1" method="post" action="{substring-before($request-url, '/xforms-server')}/fr/{$app}/{$form}/new/" id="form">
                                 <input type="hidden" name="form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
-                                <input type="hidden" name="app" value="{$app}"/>
-                                <input type="hidden" name="form" value="{$form}"/>
+                                <input type="submit" value="Open"/>
                             </form>
                         </body>
-                        <script language="Javascript">
-                            var theform = window.navigator.appName.toLowerCase().indexOf("netscape") != -1
-                                ? document.forms["form1"] : document.form1;
-                            theform.submit();
-                        </script>
                     </html>
                 </xsl:template>
             </xsl:stylesheet>

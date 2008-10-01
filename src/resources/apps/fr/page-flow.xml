@@ -108,21 +108,6 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
-    <!-- ==== Other ==== -->
-
-    <!-- Upload document and start from there -->
-    <page path-info="/fr/upload" model="import-export/upload.xpl"/>
-
-    <!-- Serve document previously produced -->
-    <page path-info="/fr/serve" model="import-export/serve.xpl" default-submission="import-export/serve-instance.xml">
-        <setvalue ref="/instance/uuid" parameter="uuid"/>
-        <setvalue ref="/instance/filename" parameter="filename"/>
-    </page>
-
-    <!-- Custom pages provided by the project -->
-    <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="/forms/${1}/page/${2}.xhtml"/>
-
     <!-- ==== Built-in eXist-based Persistence Services ==== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
@@ -187,9 +172,20 @@
     <!-- Generate HTML to be saved -->
     <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>
 
+    <!-- Serve document previously produced -->
+    <page path-info="/fr/service/import-export/serve" model="import-export/serve.xpl" default-submission="import-export/serve-instance.xml">
+        <setvalue ref="/instance/uuid" parameter="uuid"/>
+        <setvalue ref="/instance/filename" parameter="filename"/>
+    </page>
+
     <!-- Custom services provided by the project -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/service/${2}.xpl"/>
+
+    <!-- Custom pages provided by the project -->
+    <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/page/${2}.xhtml"/>
+
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

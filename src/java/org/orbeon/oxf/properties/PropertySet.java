@@ -166,6 +166,29 @@ public class PropertySet {
         return getPropertiesStartsWithWorker(wildcardProperties, "", tokensArray, 0);
     }
 
+
+    private TypeValue getPropertyWorker(PropertyNode propertyNode, String[] tokens, int currentTokenPosition) {
+
+        if (propertyNode == null) {
+            // Dead end
+            return null;
+        } else if (currentTokenPosition == tokens.length) {
+            // We're done with the search, see if we found something here
+            return propertyNode.typeValue != null ? propertyNode.typeValue : null;
+        } else {
+            // Dead end
+            if (propertyNode.children == null) return null;
+            final String currentToken = tokens[currentTokenPosition];
+            // Look for value with actual token
+            PropertyNode newNode = (PropertyNode) propertyNode.children.get(currentToken);
+            TypeValue result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
+            if (result != null) return result;
+            // If we couldn't find a value with the actual token, look for value with *
+            newNode = (PropertyNode) propertyNode.children.get("*");
+            return getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
+        }
+    }
+
     /**
      * Get a property.
      *
@@ -178,36 +201,19 @@ public class PropertySet {
         // Try first from exact properties
         TypeValue typeValue = (TypeValue) exactProperties.get(name);
         if (typeValue == null) {
-            // If not found try wildcards
-            final StringTokenizer st = new StringTokenizer(name, ".");
-            PropertyNode currentNode = wildcardProperties;
-            while (st.hasMoreTokens()) {
-                final String currentToken = st.nextToken();
-                if (currentNode.children == null) {
-                    // Not found
-                    return null;
-                }
-                PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
-                if (newNode == null) {
-                    // Exact value not found, try wildcard
-                    newNode = (PropertyNode) currentNode.children.get("*");
+            // If not found try traversing tree which contains properties with wildcards
 
-                    if (newNode == null) {
-                        // Not found
-                        return null;
-                    }
-                }
-
-                // Keep going
-                currentNode = newNode;
+            // Parse name and put into array
+            final String[] tokensArray;
+            {
+                List tokensList = new ArrayList();
+                for (StringTokenizer nameTokenizer = new StringTokenizer(name, "."); nameTokenizer.hasMoreTokens();)
+                    tokensList.add(nameTokenizer.nextToken());
+                tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
             }
-
-            typeValue = currentNode.typeValue;
-
-            if (typeValue == null) {
-                // Not found
-                return null;
-            }
+            // Call recursive worker
+            typeValue = getPropertyWorker(wildcardProperties, tokensArray, 0);
+            if (typeValue == null) return null;
         }
 
         // Found a value, check type

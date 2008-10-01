@@ -413,7 +413,7 @@
                     <!-- Only set local values if the bound node is an xs:date -->
                     <xforms:action ev:event="xforms-value-changed" if="$result castable as xs:positiveInteger">
                         <xforms:setvalue model="number-model" ref="area" value="substring($result, 1, 3)"/>
-                        <xforms:setvalue model="number-model" ref="local" value="substring($result, 4)"/>
+                        <xforms:setvalue model="number-model" ref="local" value="concat(substring($result, 4, 3), ' ', substring($result, 7, 4))"/>
                     </xforms:action>
                 </xforms:group>
 

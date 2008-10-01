@@ -110,10 +110,13 @@
             </xforms:instance>
 
             <xforms:bind id="fr-form-binds" nodeset=".">
-                <xforms:bind nodeset="details">
+                <xforms:bind id="details-bind" nodeset="details">
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="author-bind" nodeset="author" required="true()"/>
                     <xforms:bind id="language-bind" nodeset="language"/>
+                </xforms:bind>
+                <xforms:bind id="notes-bind" nodeset="notes">
+                    <xforms:bind id="note-bind" nodeset="note"/>
                 </xforms:bind>
             </xforms:bind>
 
@@ -320,7 +323,7 @@
             <xforms:label>XForms Bookcast</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
-                <fr:section id="details-section" context="details">
+                <fr:section id="details-section" bind="details-bind">
                     <xforms:label ref="$form-resources/details/label"/>
                     <xforms:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3">
@@ -383,7 +386,7 @@
                     </fr:grid>
                 </fr:section>
 
-                <fr:section id="notes-section" context="notes">
+                <fr:section id="notes-section" bind="notes-bind">
                     <xforms:label ref="$form-resources/notes/label"/>
                     <xforms:help ref="$form-resources/notes/help"/>
                     <fr:grid columns="1">

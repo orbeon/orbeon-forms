@@ -97,7 +97,7 @@ public class XFormsServer extends ProcessorImpl {
 
         final Element filesElement;
         final Element actionElement;
-        final List serverEventsElement;
+        final List serverEventsElements;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -109,15 +109,15 @@ public class XFormsServer extends ProcessorImpl {
         filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
         // Get server events if any
-        serverEventsElement = requestDocument.getRootElement().elements(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
+        serverEventsElements = requestDocument.getRootElement().elements(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Get events requested by the client
         final List eventElements = new ArrayList();
 
         // Gather server events first if any
         int serverEventsCount = 0;
-        if (serverEventsElement != null && serverEventsElement.size() > 0) {
-            for (Iterator i = eventElements.iterator(); i.hasNext();) {
+        if (serverEventsElements != null && serverEventsElements.size() > 0) {
+            for (Iterator i = serverEventsElements.iterator(); i.hasNext();) {
                 final Element element = (Element) i.next();
 
                 final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
@@ -408,7 +408,11 @@ public class XFormsServer extends ProcessorImpl {
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler
-                    if (!isNoscript) {
+                    if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
+                        // NOP: Response already sent out by a submission
+                        // TODO: Something similar should also be done for submission during initialization
+                        containingDocument.logDebug("XForms server", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
+                    } else if (!isNoscript) {
                         // This is an Ajax response
                         containingDocument.startHandleOperation("XForms server", "handling regular Ajax response");
                         outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
@@ -467,11 +471,7 @@ public class XFormsServer extends ProcessorImpl {
         final XFormsState encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
 
         final List loads = containingDocument.getLoadsToRun();
-        if (containingDocument.isGotSubmissionReplaceAll()) {
-            // NOP: Response already sent out by a submission
-            // TODO: Something similar should also be done for submission during initialization
-            containingDocument.logDebug("XForms server", "handling noscript response for submission with replace=\"all\"");
-        } else if (loads != null && loads.size() > 0) {
+        if (loads != null && loads.size() > 0) {
             // Handle xforms:load response
 
             // Get last load only (or should we use first one?)

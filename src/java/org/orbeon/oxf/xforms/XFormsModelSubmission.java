@@ -350,10 +350,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         && avtXXFormsUsername == null // can't optimize if there are authentication credentials
                         && avtXXFormsTarget == null;  // can't optimize if there is a target
 
+                // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
-                // In noscript mode, there is no deferred submission process
+                final boolean isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
+
                 final boolean isPossibleDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
-                final boolean isDeferredSubmission = !isNoscript && isPossibleDeferredSubmission;
+                final boolean isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
                 isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
@@ -709,7 +711,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && !fURLNorewrite
-                               && !isNoscript // This SHOULD work with isNoscript as well, but it turns out we get exceptions related to content handlers, so disable for now
+                               && isAllowDeferredSubmission
                                && headerNameValues == null
                                && !isAsyncSubmission // for now we don't handle optimized async; could be optimized in the future
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
@@ -863,12 +865,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     // Set content-type
                                     response.setContentType(connectionResult.getResponseContentType());
-
-                                    // Set target in noscript mode
-                                    if (isNoscript && resolvedXXFormsTarget != null) {
-                                        // NOTE: The "Window-target" header does not seem to have any effect with modern browsers
-                                        response.setHeader("Window-target", resolvedXXFormsTarget);
-                                    }
 
                                     // Forward headers to response
                                     connectionResult.forwardHeaders(response);

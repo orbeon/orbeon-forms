@@ -32,7 +32,7 @@
     <!-- The raw document produced by the page view -->
 <!--    <p:param type="input" name="data"/>-->
     <!-- The XML submission if any -->
-<!--    <p:param type="input" name="instance"/>-->
+    <p:param type="input" name="instance"/>
 
     <!-- Get request information -->
     <p:processor name="oxf:request">
@@ -86,6 +86,7 @@
                     </p:processor>
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
+                        <p:input name="instance" href="#instance"/>
                         <p:input name="request" href="#request"/>
                         <p:input name="config" href="#theme"/>
                         <p:output name="data" id="themed-data"/>

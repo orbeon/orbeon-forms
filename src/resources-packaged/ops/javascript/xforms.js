@@ -2486,7 +2486,7 @@ ORBEON.xforms.Events = {
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
                     || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
-                    || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+                    || (ORBEON.util.Dom.hasClass(target, "xforms-input") && ORBEON.util.Dom.hasClass(target, "xforms-type-boolean"))) {
                 // Click on checkbox or radio button
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",

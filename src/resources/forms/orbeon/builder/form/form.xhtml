@@ -947,8 +947,16 @@
                                                                                                 </xforms:upload>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
-                                                                                                <!-- TODO: use actual image for the component -->
-                                                                                                <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="Component" title="Component" width="16" height="16"/>
+                                                                                                <xxforms:variable name="component-binding" as="element()?"
+                                                                                                                  select="instance('fb-components-instance')//xbl:binding[@element = translate(context()/name(), ':', '|')]"/>
+                                                                                                <xxforms:variable name="component-metadata" as="element()?"
+                                                                                                                  select="$component-binding/fb:metadata"/>
+                                                                                                <xxforms:variable name="icon-url" as="xs:string?"
+                                                                                                                  select="$component-metadata/fb:icon[@lang = $form-resources/@xml:lang]/fb:small-icon"/>
+                                                                                               
+                                                                                                <xhtml:img src="{($icon-url, '/apps/fr/style/images/silk/plugin.png')[1]}"
+                                                                                                           alt="{($component-metadata/fb:display-name[@lang = $form-resources/@xml:lang], 'Component')[1]}"
+                                                                                                           title="{($component-metadata/fb:display-name[@lang = $form-resources/@xml:lang], 'Component')[1]}"/>
                                                                                             </xforms:group>
                                                                                             <!-- Button to show items editor if needed -->
                                                                                             <xforms:trigger ref="*[xforms:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">

@@ -50,6 +50,10 @@
                         <xforms:label>Show in Search</xforms:label>
                         <xforms:value>fr-search</xforms:value>
                     </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Confirmation Email Address</xforms:label>
+                        <xforms:value>fr-confirmation-email</xforms:value>
+                    </xforms:item>
                 </xforms:select>
             </xhtml:div>
         </xhtml:div>

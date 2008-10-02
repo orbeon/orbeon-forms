@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Iterator;
@@ -31,7 +31,7 @@ import java.util.Iterator;
  */
 public class XFormsActionAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -59,7 +59,7 @@ public class XFormsActionAction extends XFormsAction {
                 contextStack.pushBinding(pipelineContext, currentActionElement);
 
                 // Run action
-                actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, currentActionElement);
+                actionInterpreter.runAction(pipelineContext, targetId, eventObserver, currentActionElement);
 
                 // Restore context
                 contextStack.popBinding();

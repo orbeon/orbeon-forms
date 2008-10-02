@@ -25,10 +25,10 @@ public interface XFormsEventHandler {
     public boolean isPropagate();
     public boolean isPerformDefaultAction();
 
-    public String[] getObserverStaticIds();
+    public String[] getObserversStaticIds();
     public boolean isMatchEventName(String eventName);
     public boolean isMatchTarget(String targetId);
 
     public void handleEvent(PipelineContext pipelineContext, XFormsContainer container,
-                            XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event);
+                            XFormsEventObserver eventObserver, XFormsEvent event);
 }

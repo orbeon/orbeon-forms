@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContainer, Cloneable {
+public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Cloneable {
 
     private Document modelDocument;
 
@@ -1489,7 +1489,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         public void updateInstance(int position, XFormsInstance instance);
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
         return this.container;
     }
 

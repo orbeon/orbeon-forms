@@ -13,20 +13,16 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainer;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+
+import java.util.List;
 
 /**
- * XFormsEventTarget is implemented by classes that support dispatching of events.
+ * Represents event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
  */
-public interface XFormsEventTarget {
+public interface XFormsEventObserver extends XFormsEventTarget {
     public String getId();
     public String getEffectiveId();
-    public XFormsContainer getContainer(XFormsContainingDocument containingDocument);
-    public LocationData getLocationData();
+    public List getEventHandlers(XFormsContainer container);
     public XFormsEventObserver getParentEventObserver(XFormsContainer container);
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event);
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event);
 }

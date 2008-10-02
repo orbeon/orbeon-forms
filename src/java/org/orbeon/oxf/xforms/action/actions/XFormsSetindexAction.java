@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -33,7 +33,7 @@ import java.util.Iterator;
  */
 public class XFormsSetindexAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();

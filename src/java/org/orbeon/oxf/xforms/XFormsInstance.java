@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
@@ -53,7 +53,7 @@ import java.util.Map;
 /**
  * Represent an XForms instance.
  */
-public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerContainer {
+public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     static public Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
 
@@ -501,7 +501,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         }
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
         return getModel(container.getContainingDocument());
     }
 

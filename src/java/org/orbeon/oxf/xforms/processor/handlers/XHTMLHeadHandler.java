@@ -315,7 +315,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                             sb.append("\",\"");
                             sb.append(script.getEventTargetId());
                             sb.append("\",\"");
-                            sb.append(script.getEventHandlerContainerId());
+                            sb.append(script.getEventObserverId());
                             sb.append("\");");
                         }
                     }

@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -34,7 +34,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsSendAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContextt) {
 
         final XFormsContainer container = actionInterpreter.getContainer();

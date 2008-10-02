@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import java.util.Map;
 public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
     private Element eventHandlerElement;
-    private String containerStaticId;
+    private String ancestorObserverStaticId;
 
     private Map eventNames;
     private String[] observerStaticIds;
@@ -41,19 +42,24 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private boolean isPropagate;            // "true" means "continue", "false" means "stop"
     private boolean isPerformDefaultAction; // "true" means "perform", "false" means "cancel"
 
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String containerStaticId) {
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId) {
 
         this.eventHandlerElement = eventHandlerElement;
-        this.containerStaticId = containerStaticId;
+        this.ancestorObserverStaticId = ancestorObserverStaticId;
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension
         {
             final String observerAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
-            if (observerAttribute == null) {
-                observerStaticIds = new String[] {containerStaticId};
-            } else {
+            if (observerAttribute != null) {
+                // ev:observer attribute specifies observers
                 observerStaticIds = StringUtils.split(observerAttribute);
+            } else if (ancestorObserverStaticId != null ) {
+                // Observer is ancestor
+                observerStaticIds = new String[] { ancestorObserverStaticId };
+            } else {
+                // No observer
+                observerStaticIds = new String[0];
             }
         }
 
@@ -97,45 +103,66 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
     }
 
-    public static void addActionHandler(Map eventNamesMap, Map eventHandlersMap, Element currentActionElement, String prefix) {
-        final String containerId = currentActionElement.getParent().attributeValue("id");
-        final XFormsEventHandlerImpl newEventHandlerImpl = new XFormsEventHandlerImpl(currentActionElement, containerId);
-        final String[] observerIds = newEventHandlerImpl.getObserverStaticIds();
-        for (int j = 0; j < observerIds.length; j++) {
-            final String currentObserverStaticId = observerIds[j];
-            final String currentObserverPrefixedId = prefix + currentObserverStaticId;
+    public static void addActionHandler(Map eventNamesMap, Map eventHandlersMap, Element actionElement, String prefix) {
 
-            // Get handlers for observer
-            final List eventHandlersForObserver;
-            {
-                final Object currentList = eventHandlersMap.get(currentObserverPrefixedId);
-                if (currentList == null) {
-                    eventHandlersForObserver = new ArrayList();
-                    eventHandlersMap.put(currentObserverPrefixedId, eventHandlersForObserver);
-                } else {
-                    eventHandlersForObserver = (List) currentList;
+        // Find closest ancestor observer
+        final Element ancestorObserver = findAncestorObserver(actionElement);
+
+        // Create event handler
+        final String eventObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
+        final XFormsEventHandlerImpl newEventHandlerImpl = new XFormsEventHandlerImpl(actionElement, eventObserverStaticId);
+
+        // Register event handler
+        final String[] observersStaticIds = newEventHandlerImpl.getObserversStaticIds();
+        if (observersStaticIds.length > 0) {
+            // There is at least one observer
+            for (int j = 0; j < observersStaticIds.length; j++) {
+                final String currentObserverStaticId = observersStaticIds[j];
+                final String currentObserverPrefixedId = prefix + currentObserverStaticId;
+
+                // Get handlers for observer
+                final List eventHandlersForObserver;
+                {
+                    final Object currentList = eventHandlersMap.get(currentObserverPrefixedId);
+                    if (currentList == null) {
+                        eventHandlersForObserver = new ArrayList();
+                        eventHandlersMap.put(currentObserverPrefixedId, eventHandlersForObserver);
+                    } else {
+                        eventHandlersForObserver = (List) currentList;
+                    }
                 }
+
+                // Add event handler
+                eventHandlersForObserver.add(newEventHandlerImpl);
             }
 
-            // Add event handler
-            eventHandlersForObserver.add(newEventHandlerImpl);
+            // Remember all event names
+            final String eventAttribute = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
+            final String[] eventNames = StringUtils.split(eventAttribute);
+            for (int j = 0; j < eventNames.length; j++)
+                eventNamesMap.put(eventNames[j], "");
+        }
+    }
+
+    private static Element findAncestorObserver(Element actionElement) {
+
+        // Recurse until we find an element which is an event observer
+        Element currentAncestor = actionElement.getParent();
+        while (currentAncestor.getParent() != null && !XFormsStaticState.isEventObserver(currentAncestor)) {
+            currentAncestor = currentAncestor.getParent();
         }
 
-        // Remember all event names
-        final String eventAttribute = currentActionElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
-        final String[] eventNames = StringUtils.split(eventAttribute);
-        for (int j = 0; j < eventNames.length; j++)
-            eventNamesMap.put(eventNames[j], "");
+        return currentAncestor;
     }
 
     public void handleEvent(PipelineContext pipelineContext, XFormsContainer container,
-                            XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event) {
+                            XFormsEventObserver eventObserver, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
-        new XFormsActionInterpreter(pipelineContext, container, eventHandlerContainer, eventHandlerElement, containerStaticId)
-                .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
+        new XFormsActionInterpreter(pipelineContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)
+                .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
     }
 
-    public String[] getObserverStaticIds() {
+    public String[] getObserversStaticIds() {
         return observerStaticIds;
     }
 

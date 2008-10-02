@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsResetEvent;
 import org.orbeon.saxon.om.Item;
 
@@ -31,7 +31,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsResetAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainer container = actionInterpreter.getContainer();

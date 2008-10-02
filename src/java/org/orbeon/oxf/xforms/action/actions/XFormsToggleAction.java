@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
 
@@ -31,7 +31,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsToggleAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -50,7 +50,7 @@ public class XFormsToggleAction extends XFormsAction {
             caseId = caseAttribute;
         }
 
-        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), caseId, actionElement);
+        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), caseId, actionElement);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
             if (!caseControl.isSelected()) {

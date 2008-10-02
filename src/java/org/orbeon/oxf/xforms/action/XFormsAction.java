@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext,
-                                 String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                                 String targetId, XFormsEventObserver eventObserver, Element actionElement,
                                  boolean hasOverriddenContext, Item overriddenContext);
 
     /**

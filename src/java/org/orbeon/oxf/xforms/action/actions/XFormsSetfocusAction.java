@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -32,7 +32,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsSetfocusAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -50,7 +50,7 @@ public class XFormsSetfocusAction extends XFormsAction {
                 return;
         }
 
-        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), resolvedControlId, actionElement);
+        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedControlId, actionElement);
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
             containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));

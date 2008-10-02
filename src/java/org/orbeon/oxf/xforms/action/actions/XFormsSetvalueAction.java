@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class XFormsSetvalueAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
-                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -89,7 +89,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists, we can try to set the value
-            doSetValue(pipelineContext, containingDocument, eventHandlerContainer, currentNode, valueToSet, null, false);
+            doSetValue(pipelineContext, containingDocument, eventObserver, currentNode, valueToSet, null, false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP

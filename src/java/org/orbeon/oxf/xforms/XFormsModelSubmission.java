@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -55,7 +55,7 @@ import java.util.*;
  *
  * TODO: This badly needs to be modularized instead of being a soup of "ifs"!
  */
-public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHandlerContainer {
+public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObserver {
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
@@ -226,7 +226,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
         return model;
     }
 

@@ -1488,6 +1488,29 @@ public class XFormsStaticState {
 
         return result.getDocument();
     }
+
+    /**
+     * Return true if the given element is an event observer. Must return true for controls, xforms:model,
+     * xforms:instance, xforms:submission.
+     *
+     * @param element   element to check
+     * @return          true iif the element is an event observer
+     */
+    public static boolean isEventObserver(Element element) {
+
+        // TODO: should have more efficient way of checking this, e.g. Map<QName elementQName>
+        if (XFormsControlFactory.isBuiltinControl(element.getName())) {
+            return true;
+        }
+
+        final String localName = element.getName();
+        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(element.getNamespaceURI())
+                && ("model".equals(localName) || "instance".equals(localName) || "submission".equals(localName))) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 /**

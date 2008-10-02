@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -45,7 +45,7 @@ public class XFormsActionInterpreter {
     private final XFormsContextStack contextStack;
 
     public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainer container,
-                                   XFormsEventHandlerContainer eventHandlerContainer, Element actionElement, String containerId) {
+                                   XFormsEventObserver eventObserver, Element actionElement, String ancestorObserverStaticId) {
 
         this.container = container;
         this.containingDocument = container.getContainingDocument();
@@ -54,37 +54,38 @@ public class XFormsActionInterpreter {
         this.contextStack = new XFormsContextStack(container);
 
         // Set context on top-level action
-        final String effectiveEventContainerId;
-        if (eventHandlerContainer.getId().equals(containerId)) {
+        final String eventContainerEffectiveId;
+        if (eventObserver.getId().equals(ancestorObserverStaticId)) {
             // We have access to the effective context
-            effectiveEventContainerId = eventHandlerContainer.getEffectiveId();
+            eventContainerEffectiveId = eventObserver.getEffectiveId();
         } else {
             // We don't really know, and this won't work for handlers nested within repeats but will work for outer
             // controls and, models, instances and submissions
-            effectiveEventContainerId = containerId;
+            // TODO: once XFormsContainer supports nested control tree, use resolveObjectById() to obtain effective id 
+            eventContainerEffectiveId = ancestorObserverStaticId;
         }
 
-        setActionBindingContext(pipelineContext, containingDocument, actionElement, effectiveEventContainerId);
+        setActionBindingContext(pipelineContext, containingDocument, actionElement, eventContainerEffectiveId);
     }
 
     private void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                                          Element actionElement, String effectiveEventContainerId) {
 
-        // Get "fresh" container
-        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectByEffectiveId(effectiveEventContainerId);
+        // Get "fresh" observer
+        final XFormsEventObserver eventObserver = (XFormsEventObserver) containingDocument.getObjectByEffectiveId(effectiveEventContainerId);
 
         // Set context on container element
-        contextStack.setBinding(pipelineContext, eventHandlerContainer);
+        contextStack.setBinding(pipelineContext, eventObserver);
 
         // Check variables in scope for action handlers within controls
 
         // NOTE: This is not optimal, as variable values are re-evaluated and may have values different from the ones
         // used by the controls during refresh. Contemplate handling this differently, e.g. see
         // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements
-        if (eventHandlerContainer instanceof XFormsControl) {
+        if (eventObserver instanceof XFormsControl) {
             int variablesCount = 0;
 
-            final List actionPrecedingElements = Dom4jUtils.findPrecedingElements(actionElement, ((XFormsControl) eventHandlerContainer).getControlElement());
+            final List actionPrecedingElements = Dom4jUtils.findPrecedingElements(actionElement, ((XFormsControl) eventObserver).getControlElement());
             if (actionPrecedingElements.size() > 0) {
                 Collections.reverse(actionPrecedingElements);
                 for (Iterator i = actionPrecedingElements.iterator(); i.hasNext();) {
@@ -137,10 +138,10 @@ public class XFormsActionInterpreter {
      *
      * @param pipelineContext       current PipelineContext
      * @param targetEffectiveId     effective id of the target control
-     * @param eventHandlerContainer event handler containe this action is running in
+     * @param eventObserver event handler containe this action is running in
      * @param actionElement         Element specifying the action to execute
      */
-    public void runAction(final PipelineContext pipelineContext, String targetEffectiveId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void runAction(final PipelineContext pipelineContext, String targetEffectiveId, XFormsEventObserver eventObserver, Element actionElement) {
 
         // Check that we understand the action element
         final String actionNamespaceURI = actionElement.getNamespaceURI();
@@ -211,7 +212,7 @@ public class XFormsActionInterpreter {
                         contextStack.pushBinding(pipelineContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext);
 
                         final Item overriddenContextNodeInfo = contextStack.getCurrentSingleItem();
-                        runSingleIteration(pipelineContext, targetEffectiveId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                        runSingleIteration(pipelineContext, targetEffectiveId, eventObserver, actionElement, actionNamespaceURI,
                                 actionName, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         // Restore context
@@ -226,7 +227,7 @@ public class XFormsActionInterpreter {
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
 
-                runSingleIteration(pipelineContext, targetEffectiveId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                runSingleIteration(pipelineContext, targetEffectiveId, eventObserver, actionElement, actionNamespaceURI,
                         actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getContextItem());
             }
         } catch (Exception e) {
@@ -235,7 +236,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void runSingleIteration(PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer,
+    private void runSingleIteration(PipelineContext pipelineContext, String targetId, XFormsEventObserver eventObserver,
                                     Element actionElement, String actionNamespaceURI, String actionName, String ifConditionAttribute,
                                     String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
@@ -266,7 +267,7 @@ public class XFormsActionInterpreter {
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
             containingDocument.startHandleOperation();
-            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, contextItem);
+            xformsAction.execute(this, pipelineContext, targetId, eventObserver, actionElement, hasOverriddenContext, contextItem);
             containingDocument.endHandleOperation();
 
             // Stop if there is no iteration

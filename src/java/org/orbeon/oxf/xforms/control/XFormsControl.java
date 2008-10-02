@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -40,7 +40,7 @@ import java.util.*;
 /**
  * Represents an XForms control.
  */
-public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHandlerContainer, Cloneable {
+public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, Cloneable {
 
     private XFormsContainer container;
     protected XFormsContainingDocument containingDocument;
@@ -450,7 +450,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         getAlert(pipelineContext);
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
         return parent;
     }
 

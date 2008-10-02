@@ -39,7 +39,7 @@ import java.util.*;
  * o We may use this for nested repeat iterations as well.
  * o We may build nested component trees.
  */
-public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerContainer {
+public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 
     // Static id of the control using this container, e.g. my-foo-bar
     private final String staticId;
@@ -545,7 +545,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
         this.locationData = locationData;
     }
 
-    public XFormsEventHandlerContainer getParentEventHandlerContainer(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
         return parentContainer;
     }
 
@@ -603,22 +603,22 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
                 throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
 
             // Find all event handler containers
-            final List eventHandlerContainers = new ArrayList();
+            final List eventObservers = new ArrayList();
             {
-                XFormsEventHandlerContainer container
-                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentEventHandlerContainer(this);
-                while (container != null) {
+                XFormsEventObserver eventObserver
+                        = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
+                while (eventObserver != null) {
 
                     // Add container except if it is a repeat, as we use repeat iterations instead
-                    if (!(container instanceof XFormsRepeatControl))
-                        eventHandlerContainers.add(container);
+                    if (!(eventObserver instanceof XFormsRepeatControl))
+                        eventObservers.add(eventObserver);
 
                     // Stop propagation on model container or component boundary
-                    if (container instanceof XFormsContainer || container instanceof XFormsComponentControl)
+                    if (eventObserver instanceof XFormsContainer || eventObserver instanceof XFormsComponentControl)
                         break;
 
                     // Find parent
-                    container = container.getParentEventHandlerContainer(this);
+                    eventObserver = eventObserver.getParentEventObserver(this);
                 }
             }
 
@@ -626,19 +626,19 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             boolean performDefaultAction = true;
 
             // Go from root to leaf
-            Collections.reverse(eventHandlerContainers);
+            Collections.reverse(eventObservers);
 
             // Capture phase
-            for (Iterator i = eventHandlerContainers.iterator(); i.hasNext();) {
-                final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) i.next();
-                final List eventHandlers = eventHandlerContainer.getEventHandlers(this);
+            for (Iterator i = eventObservers.iterator(); i.hasNext();) {
+                final XFormsEventObserver currentEventObserver = (XFormsEventObserver) i.next();
+                final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
-                if (eventHandlers != null) {
-                    if (eventHandlerContainer != targetObject) {
+                if (currentEventHandlers != null) {
+                    if (currentEventObserver != targetObject) {
                         // Event listeners on the target which are in capture mode are not called
 
                         // Process event handlers
-                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                        for (Iterator j = currentEventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
                             if (!eventHandler.isBubblingPhase()
@@ -647,7 +647,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
                                 // Capture phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, eventHandlerContainer, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, event);
                                 } finally {
                                     endHandleEvent();
                                 }
@@ -663,23 +663,23 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
             }
 
             // Go from leaf to root
-            Collections.reverse(eventHandlerContainers);
+            Collections.reverse(eventObservers);
 
             // Bubbling phase
             if (propagate && event.isBubbles()) {
-                for (Iterator i = eventHandlerContainers.iterator(); i.hasNext();) {
-                    final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-                    final List eventHandlers = container.getEventHandlers(this);
+                for (Iterator i = eventObservers.iterator(); i.hasNext();) {
+                    final XFormsEventObserver currentEventObserver = (XFormsEventObserver) i.next();
+                    final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
                     // Process "action at target"
                     // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
-                    if (container == targetObject) {
-                        container.performTargetAction(pipelineContext, XFormsContainer.this, event);
+                    if (currentEventObserver == targetObject) {
+                        currentEventObserver.performTargetAction(pipelineContext, XFormsContainer.this, event);
                     }
 
                     // Process event handlers
-                    if (eventHandlers != null) {
-                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                    if (currentEventHandlers != null) {
+                        for (Iterator j = currentEventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
                             if (eventHandler.isBubblingPhase()
@@ -688,7 +688,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventHandlerCon
                                 // Bubbling phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, container, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, event);
                                 } finally {
                                     endHandleEvent();
                                 }

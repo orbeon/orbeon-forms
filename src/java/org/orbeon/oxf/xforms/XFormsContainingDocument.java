@@ -595,7 +595,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         }
     }
 
-    public void addScriptToRun(String scriptId, String eventTargetId, String eventHandlerContainerId) {
+    public void addScriptToRun(String scriptId, String eventTargetId, String eventObserverId) {
 
         if (activeSubmission != null)
             throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
@@ -606,18 +606,18 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList();
-        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventHandlerContainerId));
+        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventObserverId));
     }
 
     public static class Script {
         private String functionName;
         private String eventTargetId;
-        private String eventHandlerContainerId;
+        private String eventObserverId;
 
-        public Script(String functionName, String eventTargetId, String eventHandlerContainerId) {
+        public Script(String functionName, String eventTargetId, String eventObserverId) {
             this.functionName = functionName;
             this.eventTargetId = eventTargetId;
-            this.eventHandlerContainerId = eventHandlerContainerId;
+            this.eventObserverId = eventObserverId;
         }
 
         public String getFunctionName() {
@@ -628,8 +628,8 @@ public class XFormsContainingDocument extends XFormsContainer {
             return eventTargetId;
         }
 
-        public String getEventHandlerContainerId() {
-            return eventHandlerContainerId;
+        public String getEventObserverId() {
+            return eventObserverId;
         }
     }
 

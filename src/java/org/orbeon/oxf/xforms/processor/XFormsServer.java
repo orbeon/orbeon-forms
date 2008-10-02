@@ -904,7 +904,7 @@ public class XFormsServer extends ProcessorImpl {
         for (Iterator i = scripts.iterator(); i.hasNext();) {
             final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
-                    new String[]{ "name", script.getFunctionName(), "target-id", script.getEventTargetId(), "observer-id", script.getEventHandlerContainerId() });
+                    new String[]{ "name", script.getFunctionName(), "target-id", script.getEventTargetId(), "observer-id", script.getEventObserverId() });
         }
     }
 

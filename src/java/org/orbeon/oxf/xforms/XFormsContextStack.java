@@ -20,7 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -156,42 +156,42 @@ public class XFormsContextStack {
      * Set the binding for an event handler container. Support controls, models, and submissions.
      *
      * @param pipelineContext       current PipelineContext
-     * @param eventHandlerContainer container object
+     * @param eventObserver container object
      */
-    public void setBinding(PipelineContext pipelineContext, XFormsEventHandlerContainer eventHandlerContainer) {
+    public void setBinding(PipelineContext pipelineContext, XFormsEventObserver eventObserver) {
 
-        if (eventHandlerContainer == null) {
+        if (eventObserver == null) {
             // Odd case which can happen when an action handler and control are in a removed iteration. Set an empty context.
             // OR, case where an action handler is within another action handler!
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
             final XFormsModel xformsModel = container.getDefaultModel();
             contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
-        } else if (eventHandlerContainer instanceof XFormsControl) {
-            setBinding((XFormsControl) eventHandlerContainer);
-        } else if (eventHandlerContainer instanceof XFormsModel) {
-            final XFormsModel xformsModel = (XFormsModel) eventHandlerContainer;
+        } else if (eventObserver instanceof XFormsControl) {
+            setBinding((XFormsControl) eventObserver);
+        } else if (eventObserver instanceof XFormsModel) {
+            final XFormsModel xformsModel = (XFormsModel) eventObserver;
             resetBindingContext(pipelineContext, xformsModel);
-        } else if (eventHandlerContainer instanceof XFormsInstance) {
-            final XFormsInstance xformsInstance = (XFormsInstance) eventHandlerContainer;
+        } else if (eventObserver instanceof XFormsInstance) {
+            final XFormsInstance xformsInstance = (XFormsInstance) eventObserver;
             resetBindingContext(pipelineContext, xformsInstance.getModel(containingDocument));
-        } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
-            final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
+        } else if (eventObserver instanceof XFormsModelSubmission) {
+            final XFormsModelSubmission submission = (XFormsModelSubmission) eventObserver;
             final XFormsModel xformsModel = (XFormsModel) submission.getModel();
             resetBindingContext(pipelineContext, xformsModel);
             pushBinding(pipelineContext, submission.getSubmissionElement());
         } else {
             // Should not happen
-            throw new OXFException("Invalid XFormsEventHandlerContainer type: " + eventHandlerContainer.getClass());
+            throw new OXFException("Invalid XFormsEventObserver type: " + eventObserver.getClass());
         }
 
         // TODO: Some code here which attempts to set iteration context for handlers within repeats. Check if needed.
             // If in the iteration, then it may be in no context if there is no iteration.
-//            if (eventHandlerContainer instanceof XFormsRepeatControl) {
-//                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) eventHandlerContainer;
+//            if (eventObserver instanceof XFormsRepeatControl) {
+//                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) eventObserver;
 //                final List children = repeatControl.getChildren();
 //
-//                final Integer repeatIndexInteger = (Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(eventHandlerContainerId);
+//                final Integer repeatIndexInteger = (Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(eventObserverId);
 //                if (repeatIndexInteger != null && children != null && children.size() > 0) {
 //                    final int index = repeatIndexInteger.intValue();
 //                    final int childrenSize = children.size();
@@ -199,13 +199,13 @@ public class XFormsContextStack {
 //                        final RepeatIterationControl repeatIteration = (RepeatIterationControl) children.get(index);
 //                        xformsControls.setBinding(pipelineContext, repeatIteration);
 //                    } else {
-//                        xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+//                        xformsControls.setBinding(pipelineContext, (XFormsControl) eventObserver);
 //                    }
 //                } else {
-//                    xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+//                    xformsControls.setBinding(pipelineContext, (XFormsControl) eventObserver);
 //                }
 //            } else {
-//                contextStack.setBinding((XFormsControl) eventHandlerContainer);
+//                contextStack.setBinding((XFormsControl) eventObserver);
 //            }
     }
 

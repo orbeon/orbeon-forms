@@ -1472,6 +1472,9 @@
                                 <li>
                                     <code>cancelable</code>
                                 </li>
+                                <li>
+                                    <code>delay</code>
+                                </li>
                             </ul>
                         </li>
                         <li>

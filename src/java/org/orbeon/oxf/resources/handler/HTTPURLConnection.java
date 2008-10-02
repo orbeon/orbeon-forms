@@ -46,6 +46,10 @@ public class HTTPURLConnection extends URLConnection {
 
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
+	public static String PROXY_USERNAME_PROPERTY = "oxf.http.proxy.username";
+	public static String PROXY_PASSWORD_PROPERTY = "oxf.http.proxy.password";
+	public static String PROXY_NTLM_HOST_PROPERTY = "oxf.http.proxy.ntlm.host";
+	public static String PROXY_NTLM_DOMAIN_PROPERTY = "oxf.http.proxy.ntlm.domain";
 
     // Use a single shared connection manager so we can have efficient connection pooling
     private static HttpConnectionManager connectionManager;
@@ -109,8 +113,27 @@ public class HTTPURLConnection extends URLConnection {
             // Set proxy if defined in properties
             final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
             final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
-            if (proxyHost != null && proxyPort != null)
+			if (proxyHost != null && proxyPort != null) {
                 httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort.intValue());
+
+				// Proxy authentication
+				final String proxyUsername = Properties.instance().getPropertySet().getString(PROXY_USERNAME_PROPERTY);
+				final String proxyPassword = Properties.instance().getPropertySet().getString(PROXY_PASSWORD_PROPERTY);
+				if (proxyUsername != null && proxyPassword != null) {
+					final Credentials proxyCred;
+					{
+						final String ntlmHost = Properties.instance().getPropertySet().getString(PROXY_NTLM_HOST_PROPERTY);
+						final String ntlmDomain = Properties.instance().getPropertySet().getString(PROXY_NTLM_DOMAIN_PROPERTY);
+						if(ntlmHost != null && ntlmDomain != null){
+							proxyCred = new NTCredentials(proxyUsername, proxyPassword,ntlmHost,ntlmDomain);
+						}else{
+							proxyCred = new UsernamePasswordCredentials(proxyUsername, proxyPassword);
+						}
+
+					}
+					httpClient.getState().setProxyCredentials(AuthScope.ANY, proxyCred);
+				}
+			}
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL

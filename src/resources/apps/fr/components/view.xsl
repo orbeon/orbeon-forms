@@ -274,12 +274,13 @@
                                             </xsl:when>
                                             <!-- In PDF mode, don't include anything -->
                                             <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
-                                            <!-- Use user-provided buttons -->
-                                            <xsl:when test="fr:buttons">
-                                                <xsl:apply-templates select="fr:buttons/node()"/>
-                                            </xsl:when>
                                             <!-- Use default buttons -->
                                             <xsl:otherwise>
+                                                <!-- Message shown next to the buttons -->
+                                                <xhtml:div class="fr-buttons-message">
+                                                    <xforms:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
+                                                </xhtml:div>
+                                                <!-- List of buttons we inculde on the detail page based on property -->
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <xsl:for-each select="$buttons">
@@ -287,7 +288,6 @@
                                                         </xsl:for-each>
                                                     </fr:buttons>
                                                 </xsl:variable>
-                                                <xsl:message>Buttons: <xsl:copy-of select="$default-buttons"/></xsl:message>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
                                             </xsl:otherwise>
                                         </xsl:choose>

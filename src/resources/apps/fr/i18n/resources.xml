@@ -82,6 +82,7 @@
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
+                <buttons-message/>
             </messages>
             <labels>
                 <save-document>Save</save-document>
@@ -202,6 +203,7 @@
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas sauvegardées.</clear-confirm-message>
                 <submit-dialog-title>[Form Submitted]</submit-dialog-title>
                 <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
+                <buttons-message/>
             </messages>
             <labels>
                 <save-document>Sauvegarder</save-document>
@@ -321,6 +323,7 @@
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
                 <submit-dialog-title>[Form Submitted]</submit-dialog-title>
                 <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
+                <buttons-message/>
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>

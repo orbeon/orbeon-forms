@@ -14,8 +14,9 @@
         xmlns:f="http://www.orbeon.com/oxf/function">
 
     <p:param name="form-instance" type="input"/>
-    <p:param name="parameters" type="input" debug="parameters"/>
-    <p:param name="uuid" type="output" debug="uuid"/>
+    <p:param name="parameters" type="input"/>
+    <p:param name="fr-current-resources" type="input"/>
+    <p:param name="uuid" type="output"/>
 
     <p:processor name="oxf:request">
         <p:input name="config">
@@ -30,6 +31,7 @@
         <p:input name="data" href="#form-instance"/>
         <p:input name="request" href="#request"/>
         <p:input name="parameters" href="#parameters"/>
+        <p:input name="fr-current-resources" href="#fr-current-resources"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:output method="xml" name="xml"/>
@@ -42,12 +44,21 @@
                             <xsl:variable name="parameters" as="element(request)" select="doc('input:parameters')/request"/>
                             <xsl:variable name="app" as="xs:string" select="$parameters/app"/>
                             <xsl:variable name="form" as="xs:string" select="$parameters/form"/>
+                            <xsl:variable name="context" as="xs:string" select="substring-before($request-url, '/xforms-server')"/>
+                            <xsl:variable name="resource" as="element(resource)" select="doc('input:fr-current-resources')/resource"/>
 
+                            <div style="text-align: center">
+                                <div style="width: 600px; margin: 1em; padding: 1em; background-image: url({$context}/apps/fr/style/logo-bg.gif); border: 5px solid #3598D4">
+                                    <p>
+                                        <xsl:value-of select="$resource/detail/messages/saved-locally-open"/>
+                                    </p>
                             <!-- Form we produce -->
-                            <form name="form1" method="post" action="{substring-before($request-url, '/xforms-server')}/fr/{$app}/{$form}/new/" id="form">
+                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/new/" id="form">
                                 <input type="hidden" name="form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
                                 <input type="submit" value="Open"/>
                             </form>
+                                </div>
+                            </div>
                         </body>
                     </html>
                 </xsl:template>

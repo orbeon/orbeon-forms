@@ -103,7 +103,7 @@
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
                 
                 <xxforms:variable name="result" select="." as="node()*"/>
-                <xforms:group ref="$result">
+                <xforms:group ref="$result" appearance="xxforms:internal">
                     <xforms:action ev:event="xforms-value-changed">
                         <xforms:setvalue model="dateTime-model" ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
                         <xforms:setvalue model="dateTime-model" ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
@@ -123,7 +123,7 @@
                 </xforms:model>
 
                 <!-- Local controls -->
-                <xforms:group model="dateTime-model">
+                <xforms:group model="dateTime-model" class="fr-component-group">
                     <xforms:input ref="date"/>
                     <xforms:input ref="time"/>
                     <xforms:action ev:event="xforms-value-changed">
@@ -244,7 +244,7 @@
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>
-            <datatype>xs:date</datatype>
+            <datatype>xs:nonNegativeInteger</datatype>
             <template>
                  <fr:date>
                      <xforms:label ref=""/>
@@ -296,12 +296,15 @@
             </xforms:model>
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
+                <xhtml:style>
+                    .fr-component-group select.xforms-select1-appearance-minimal { width: auto }
+                </xhtml:style>
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
                 <xxforms:variable name="result" select="." as="node()*"/>
 
                 <!-- React to update to bound node -->
-                <xforms:group ref="$result">
+                <xforms:group ref="$result" appearance="xxforms:internal">
                     <!-- Only set local values if the bound node is an xs:date -->
                     <xforms:action ev:event="xforms-value-changed" if="$result castable as xs:date">
                         <xforms:setvalue model="date-model" ref="year" value="year-from-date($result)"/>
@@ -310,7 +313,7 @@
                     </xforms:action>
                 </xforms:group>
 
-                <xforms:group model="date-model">
+                <xforms:group model="date-model" class="fr-component-group">
                     <xforms:select1 ref="year" xxforms:refresh-items="false">
                         <!--<xforms:label>Year</xforms:label>-->
                         <xforms:item>
@@ -401,15 +404,15 @@
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
                 <xhtml:style>
-                    .fr-us-phone-area input { width: 3em }
-                    .fr-us-phone-local input { width: 8em }
+                    .fr-component-group .fr-us-phone-area input { width: 3em }
+                    .fr-component-group .fr-us-phone-local input { width: 8em }
                 </xhtml:style>
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
                 <xxforms:variable name="result" select="." as="node()*"/>
 
                 <!-- React to update to bound node -->
-                <xforms:group ref="$result">
+                <xforms:group ref="$result" appearance="xxforms:internal">
                     <!-- Only set local values if the bound node is an xs:date -->
                     <xforms:action ev:event="xforms-value-changed" if="$result castable as xs:positiveInteger">
                         <xforms:setvalue model="number-model" ref="area" value="substring($result, 1, 3)"/>
@@ -417,7 +420,7 @@
                     </xforms:action>
                 </xforms:group>
 
-                <xforms:group model="number-model">
+                <xforms:group model="number-model" class="fr-component-group">
                     (<xforms:input ref="area" class="fr-us-phone-area"><xforms:alert/></xforms:input>)
                     <xforms:input ref="local" class="fr-us-phone-local"><xforms:alert/></xforms:input>
 

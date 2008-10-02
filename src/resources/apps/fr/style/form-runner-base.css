@@ -419,6 +419,12 @@ button.xforms-trigger img { margin-right: 10px }
 #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
 #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 98.7% }
 
+/* ***** Components ************************************************************************************************* */
+
+/* Handle the common case where a component is made of a series of nested controls to display inline within a box */
+.fr-component-group { display: block }
+.fr-component-group .xforms-control { display: inline }
+
 /* ***** Print and PDF ********************************************************************************************** */
 
 .fr-print-mode .fr-section-title img { display: none }

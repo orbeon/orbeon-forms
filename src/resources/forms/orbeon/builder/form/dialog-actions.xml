@@ -375,7 +375,7 @@
 
         <!-- Template for a given binding -->
         <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:action id="" ev:event="fb-dummy-event">
+            <xforms:action id="">
                 <!-- React to event... on control... -->
                 <xforms:action ev:event="" ev:observer="">
                     <!-- Service to call -->

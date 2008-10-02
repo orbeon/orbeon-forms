@@ -274,6 +274,10 @@
                                             </xsl:when>
                                             <!-- In PDF mode, don't include anything -->
                                             <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
+                                            <!-- Use user-provided buttons -->
+                                            <xsl:when test="fr:buttons">
+                                                <xsl:apply-templates select="fr:buttons/node()"/>
+                                            </xsl:when>
                                             <!-- Use default buttons -->
                                             <xsl:otherwise>
                                                 <!-- Message shown next to the buttons -->

@@ -41,14 +41,22 @@
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
                     </xforms:item>
+                    <!-- Just a value change -->
                     <xforms:item>
                         <xforms:label>Value Change</xforms:label>
                         <xforms:value>xforms-value-changed</xforms:value>
                     </xforms:item>
+                    <!-- Value change AND the first time the control shows -->
+                    <xforms:item>
+                        <xforms:label>Value Change or Form Load</xforms:label>
+                        <xforms:value>xforms-value-changed xforms-enabled</xforms:value>
+                    </xforms:item>
+                    <!-- Control activation -->
                     <xforms:item>
                         <xforms:label>Activation</xforms:label>
                         <xforms:value>DOMActivate</xforms:value>
                     </xforms:item>
+                    <!-- Form load -->
                     <xforms:item>
                         <xforms:label>Form Load</xforms:label>
                         <xforms:value>xforms-ready</xforms:value>
@@ -344,9 +352,9 @@
                     <xforms:bind name="submission-bind" nodeset="xforms:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xforms:bind nodeset="@ev:observer"
-                                 required="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
-                                 relevant="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
-                                 calculate="if (../@ev:event = ('DOMActivate', 'xforms-value-changed')) then . else ('fr-form-model')"
+                                 required="tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 relevant="tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 calculate="if (tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else ('fr-form-model')"
                                  readonly="false()"/>
                 </xforms:bind>
                 <!-- xforms-submit -->

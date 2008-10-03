@@ -326,20 +326,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             throw new OXFException("Unable to set value of read-only instance.");
 
         final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-        if (containingDocument != null && eventTarget != null && node instanceof Element) {
-
+        if (containingDocument != null && eventTarget != null) {
             // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
             // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
-
-            final Element element = (Element) node;
-
-            final List content = element.content();
-            for (Iterator i = content.iterator(); i.hasNext();) {
-                final Object currentContent = i.next();
-                if (currentContent instanceof Element || currentContent instanceof ProcessingInstruction) {
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(eventTarget));
-                    return;
-                }
+            if (!Dom4jUtils.isSimpleContent(node)) {
+                containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(eventTarget));
+                return;
             }
         }
         setValueForNode(pipelineContext, node, newValue, type);

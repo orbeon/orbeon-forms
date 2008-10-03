@@ -758,4 +758,30 @@ public class Dom4jUtils {
             findPrecedingElements(finalResult, parentElement, ancestorElement);
         }
     }
+
+    /**
+     * Whether the content of the node is simple content.
+     *
+     * @param node  node to check
+     * @return      true iif the content of the node is simple content
+     */
+    public static boolean isSimpleContent(Node node) {
+        if (node instanceof Attribute)
+            return true;
+
+        if (!(node instanceof Element))
+            return false;
+
+        final Element element = (Element) node;
+
+        final List content = element.content();
+        for (Iterator i = content.iterator(); i.hasNext();) {
+            final Object currentContent = i.next();
+            if (currentContent instanceof Element || currentContent instanceof ProcessingInstruction) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

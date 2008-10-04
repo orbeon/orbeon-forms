@@ -132,44 +132,38 @@ public class XFormsServer extends ProcessorImpl {
             eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
-        // Check for heartbeat event
-        if (eventElements.size() > 0) {
-            for (Iterator i = eventElements.iterator(); i.hasNext();) {
-                final Element eventElement = (Element) i.next();
-                final String eventName = eventElement.attributeValue("name");
-                if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
+        // Check for message where there is only the heartbeat event
+        if (eventElements.size() == 1) {
+            final Element eventElement = (Element) eventElements.get(0);
+            final String eventName = eventElement.attributeValue("name");
+            if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
 
-                    // This event must be sent on its own
-                    if (eventElements.size() > 1)
-                        throw new OXFException("Got xxforms-session-heartbeat event along with other events.");
+                // Hit session if it exists (it's probably not even necessary to do so)
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final ExternalContext.Session session = externalContext.getSession(false);
 
-                    // Hit session if it exists (it's probably not even necessary to do so)
-                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                    final ExternalContext.Session session = externalContext.getSession(false);
-
-                    if (logger.isDebugEnabled()) {
-                        if (session != null)
-                            logger.debug("XForms - received heartbeat from client for session: " + session.getId());
-                        else
-                            logger.debug("XForms - received heartbeat from client (no session available).");
-                    }
-
-                    // Output simple resulting document
-                    try {
-                        final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
-                        ch.startDocument();
-                        contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
-                        ch.endElement();
-                        contentHandler.endPrefixMapping("xxf");
-                        ch.endDocument();
-                    } catch (SAXException e) {
-                        throw new OXFException(e);
-                    }
-
-                    // Don't do anything else
-                    return;
+                if (logger.isDebugEnabled()) {
+                    if (session != null)
+                        logger.debug("XForms - received heartbeat from client for session: " + session.getId());
+                    else
+                        logger.debug("XForms - received heartbeat from client (no session available).");
                 }
+
+                // Output simple resulting document
+                try {
+                    final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+                    ch.startDocument();
+                    contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                    ch.endElement();
+                    contentHandler.endPrefixMapping("xxf");
+                    ch.endDocument();
+                } catch (SAXException e) {
+                    throw new OXFException(e);
+                }
+
+                // Don't do anything else
+                return;
             }
         }
 

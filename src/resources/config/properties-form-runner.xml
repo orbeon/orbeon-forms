@@ -19,6 +19,7 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form"            value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.provinces.form"           value="/fr/service/resource"/>
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db"/>
     <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
@@ -49,11 +50,18 @@
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*"                          value="/fr/service/custom/my-app/new"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="back clear print pdf save"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="back clear print pdf email save"/>
     <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="clear keep go close-window"/>
     <property as="xs:boolean" name="oxf.fr.detail.submit.button.keep.*.*"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.submit.button.go.*.*"                         value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>
+
+    <!-- Email configuration -->
+    <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                             value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.password.*.*"                             value=""/>
+    <property as="xs:string"  name="oxf.fr.email.from.*.*"                                      value=""/>
+    <property as="xs:string"  name="oxf.fr.email.to.*.*"                                        value=""/>
 
 </properties>

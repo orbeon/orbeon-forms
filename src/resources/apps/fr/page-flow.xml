@@ -86,7 +86,7 @@
         <setvalue ref="/*/document" matcher-group="4"/>
     </page>
 
-    <!-- ==== "Inline" functionality (called while editing form data) ==== -->
+    <!-- ==== "Inline" functionality (form data is posted) ==== -->
 
     <!-- Print document to HTML -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)" matcher="oxf:perl5-matcher"
@@ -107,6 +107,10 @@
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
+
+    <!-- Email document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(email)" matcher="oxf:perl5-matcher"
+          view="email/email-form.xpl"/>
 
     <!-- ==== Built-in eXist-based Persistence Services ==== -->
 
@@ -178,9 +182,13 @@
         <setvalue ref="/instance/filename" parameter="filename"/>
     </page>
 
-    <!-- Custom services provided by the project -->
+    <!-- Custom services provided by the application -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/service/${2}.xpl"/>
+
+    <!-- Custom services provided by the form -->
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/${2}/service/${3}.xpl"/>
 
     <!-- Custom pages provided by the project -->
     <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"

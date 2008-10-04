@@ -59,7 +59,9 @@
     <!-- If you don't use portlets at all, you can bypass this -->
     <p:choose  href="#request">
         <!-- If the container is a servlet, call the servlet epilogue pipeline -->
-        <p:when test="/request/container-type = 'servlet' and not(/request/parameters/parameter[name = ('orbeon-portlet', 'fr-portlet')]/value = 'true')">
+        <p:when test="/request/container-type = 'servlet'
+                and not(p:property('oxf.epilogue.embeddable')) 
+                and not(/request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet', 'fr-portlet')]/value = 'true')">
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="epilogue-servlet.xpl"/>
                 <p:input name="data" href="#data"/>

@@ -94,8 +94,6 @@ var APPLICATION_RESOURCES_VERSION = "1.0";
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-var BASE_URL = null;
-var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
 var PATH_TO_JAVASCRIPT_2 = "/xforms-server/";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
@@ -138,6 +136,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
      * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
      * just registering the event handler on the window object.
      */
+    baseURL: null,
+    xformsServerURL: null,
     eventQueue: [],                      // Events to be sent to the server
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
@@ -192,7 +192,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     formDynamicState: {},                // State that changes at every request
     formServerEvents: {},                // Server events information
     formClientState: {},                 // Store for information we want to keep when the page is reloaded
-    modalProgressPanel: null               //Overlay modal panel for displaying progress bar
+    topLevelListenerRegistered: false,   // Have we already registered the listeners on the top-level elements, which never change
+    modalProgressPanel: null             //Overlay modal panel for displaying progress bar
 };
 
 /**
@@ -973,7 +974,7 @@ ORBEON.util.Utils = {
                 modal:true,
                 visible:true
             });
-            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + BASE_URL + '/ops/images/xforms/processing.gif"/>');
+            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + ORBEON.xforms.Globals.baseURL + '/ops/images/xforms/processing.gif"/>');
             ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
         }
         ORBEON.xforms.Globals.modalProgressPanel.show();
@@ -3138,7 +3139,6 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElement: function(repeatElement, previousSiblingId) {
-        //console.log("Draggable element", repeatElement);
         var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
 
         if(previousSiblingId.indexOf(XFORMS_SEPARATOR_1) == -1)
@@ -3154,6 +3154,7 @@ ORBEON.xforms.Init = {
     },
 
     document: function() {
+
         // Notify the offline module that the page was loaded
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
@@ -3161,26 +3162,32 @@ ORBEON.xforms.Init = {
         // Register events in the capture phase for W3C-compliant browsers.
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             ORBEON.xforms.Init.registerListenersOnFormElements();
-            YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
-            YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
-            YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
+            if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+                YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
+                YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
+                YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
+            }
         } else {
-            document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
-            document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
-            document.addEventListener("change", ORBEON.xforms.Events.change, true);
+            if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+                document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
+                document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
+                document.addEventListener("change", ORBEON.xforms.Events.change, true);
+            }
         }
 
         ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
         // Register events that bubble on document for all browsers
-        YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
-        YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
-        YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
-        YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
-        YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
-        YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
-        YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
-        YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
-        YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
+        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+            YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
+            YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
+            YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
+            YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
+            YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
+            YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
+            YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
+            YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
+            YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
+        }
 
         // Initialize XForms server URL
         // NOTE: The server provides us with a base URL, but we must use a client-side value to support proxying
@@ -3193,13 +3200,13 @@ ORBEON.xforms.Init = {
                 if (startPathToJavaScript == -1)
                     startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
                 if (startPathToJavaScript != -1) {
-                    BASE_URL = scriptSrc.substr(0, startPathToJavaScript);
+                    ORBEON.xforms.Globals.baseURL = scriptSrc.substr(0, startPathToJavaScript);
                     break;
                 }
             }
         }
 
-        XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+        ORBEON.xforms.Globals.xformsServerURL = ORBEON.xforms.Globals.baseURL + "/xforms-server";
 
         // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
         if (ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_PROPERTY)) {
@@ -3401,6 +3408,7 @@ ORBEON.xforms.Init = {
             window.parent.childWindowOrbeonReady = null;
         }
 
+        ORBEON.xforms.Globals.topLevelListenerRegistered = true;
         ORBEON.xforms.Events.orbeonLoadedEvent.fire();
     },
 
@@ -3606,7 +3614,7 @@ ORBEON.xforms.Init = {
         if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
             ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
 
-        fckEditor.BasePath = BASE_URL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
+        fckEditor.BasePath = ORBEON.xforms.Globals.baseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
         fckEditor.ToolbarSet = "OPS";
 
         // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
@@ -3988,7 +3996,7 @@ ORBEON.xforms.Server = {
             var ajaxTimeout = ORBEON.util.Utils.getProperty(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY);
             if (ajaxTimeout != -1)
                 callback.timeout = ajaxTimeout;
-            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, ORBEON.xforms.Globals.requestDocument);
+            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
@@ -4036,15 +4044,52 @@ ORBEON.xforms.Server = {
 
 
     handleResponseAjax: function(o) {
+
         var responseXML = o.responseXML;
-        if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
-            // The XML docucment does not come in o.responseXML: parse o.responseText.
-            // This happens in particular when we get a response after a background upload.
-            var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-            responseXML = ORBEON.util.Dom.stringToDom(xmlString);
+        if (o.getResponseHeader["Content-Type"] == "text/html") {
+
+            // Parse content we receive into a new div we create just for that purpose
+            var temporaryContainer = document.createElement("div");
+            temporaryContainer.innerHTML = o.responseText;
+            var newPortletDiv = ORBEON.util.Dom.getChildElementByIndex(temporaryContainer, 0);
+
+            // Get existing div which is above the form that issued this request
+            var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
+            while (existingPortletDiv != null && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
+                existingPortletDiv = existingPortletDiv.parentNode;
+
+            // Remove content from existing div
+            while (existingPortletDiv.childNodes.length > 0)
+                existingPortletDiv.removeChild(existingPortletDiv.firstChild);
+
+            // Add children from newPortletDiv
+            while (newPortletDiv.childNodes.length > 0)
+                existingPortletDiv.appendChild(newPortletDiv.firstChild);
+
+            // Perform initialization again
+            ORBEON.xforms.Init.document();
+
+        } else {
+            if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
+                // The XML docucment does not come in o.responseXML: parse o.responseText.
+                // This happens in particular when we get a response after a background upload.
+                var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+                responseXML = ORBEON.util.Dom.stringToDom(xmlString);
+            }
+            var formID = ORBEON.xforms.Globals.requestForm.id;
+            ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
         }
-        var formID = ORBEON.xforms.Globals.requestForm.id;
-        ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
+
+        // Reset changes, as changes are included in this bach of events
+        ORBEON.xforms.Globals.changedIdsRequest = {};
+        // Go ahead with next request, if any
+        ORBEON.xforms.Globals.requestInProgress = false;
+        ORBEON.xforms.Globals.requestDocument = "";
+        ORBEON.xforms.Globals.executeEventFunctionQueued++;
+        ORBEON.util.Utils.hideModalProgressPanel();
+        ORBEON.xforms.Server.executeNextRequest(false);
+
+        // Notify listeners that we are done processing this request
         ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
     },
 
@@ -4863,7 +4908,7 @@ ORBEON.xforms.Server = {
                                             upload: ORBEON.xforms.Server.handleUploadResponse,
                                             failure: ORBEON.xforms.Server.handleFailure
                                         }
-                                        YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback);
+                                        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback);
                                     }
                                     ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                     break;
@@ -4954,10 +4999,8 @@ ORBEON.xforms.Server = {
                     xformsDisplayIndicator("loading");
                     ORBEON.xforms.Globals.loadingOtherPage = true;
                 }
-
-                // Hack for instance inspector - need to see how to do this better
-                //                sourceResize();
-
+            // Hack for instance inspector - need to see how to do this better
+            //                sourceResize();
             } else if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("error") != -1) {
                 // Extract and display error message
@@ -4972,15 +5015,6 @@ ORBEON.xforms.Server = {
         } catch (e) {
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
-
-       // Reset changes, as changes are included in this bach of events
-        ORBEON.xforms.Globals.changedIdsRequest = {};
-        // Go ahead with next request, if any
-        ORBEON.xforms.Globals.requestInProgress = false;
-        ORBEON.xforms.Globals.requestDocument = "";
-        ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        ORBEON.util.Utils.hideModalProgressPanel();
-        ORBEON.xforms.Server.executeNextRequest(false);
     },
 
     callUserScript: function(functionName, targetId, observerId) {
@@ -6222,4 +6256,3 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }
-

@@ -33,6 +33,7 @@
     <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                     value="true"/>
+    <property as="xs:boolean" name="oxf.epilogue.embeddable"                         value="false"/>
 
     <!-- Processor-specific properties -->
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>

@@ -63,7 +63,8 @@
                                 <!--</xforms:itemset>-->
                             <!--</fb:select1>-->
 
-                            <xforms:group id="fr-language-selector">
+                            <!-- Don't display language selector if there is only one language -->
+                            <xforms:group id="fr-language-selector" ref=".[count($available-languages) gt 1]">
                                 <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
                                     <xxforms:variable name="position" select="position()"/>
                                     <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>

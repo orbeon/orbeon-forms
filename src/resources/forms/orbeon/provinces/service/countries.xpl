@@ -14,7 +14,8 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param type="output" name="data"/>
 
@@ -34,9 +35,14 @@
         <p:input name="data" href="#text"/>
         <p:input name="config">
             <countries xsl:version="2.0">
+                <!-- NOTE: the format of admin1Codes.txt is not extremely clear -->
                 <xsl:for-each-group select="tokenize(/*, '&#x0a;', '')[normalize-space()]" group-adjacent="substring(., 1, 2)">
-                    <country code="{substring(., 1, 2)}">
-                        <xsl:for-each select="current-group()">
+                    <xsl:variable name="country-code" select="substring(., 1, 2)" as="xs:string"/>
+                    <xsl:variable name="country-number" select="position()" as="xs:integer"/>
+                    <!--<xsl:variable name="country-name"-->
+                                  <!--select="for $n in substring(., 7) return if (contains($n, '(general)')) then substring-before($n, '(general)') else $n" as="xs:string"/>-->
+                    <country code="{$country-code}" name="{$country-code}">
+                        <xsl:for-each select="current-group()[not(contains(., 'general'))]">
                             <province>
                                 <xsl:value-of select="substring(., 7)"/>
                             </province>

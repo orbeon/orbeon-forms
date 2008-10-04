@@ -9,7 +9,7 @@
             xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
     <xhtml:head>
-        <xhtml:title>Itemset Service</xhtml:title>
+        <xhtml:title>Provinces by Country</xhtml:title>
         <xforms:model id="fr-form-model">
             <xforms:instance id="fr-form-instance">
                 <form>
@@ -29,8 +29,12 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>provinces</form-name>
-                    <title xml:lang="en">Itemset Service</title>
-                    <description xml:lang="en"/>
+                    <title xml:lang="en">Provinces by Country</title>
+                    <description xml:lang="en">
+                        This example shows how services and actions can be used to create dependent lists of items
+                        retrieved dynamically. The first list contains all of the world's countries. The second list
+                        contains the selected country's provinces.
+                    </description>
                     <author/>
                     <logo mediatype="image/png" filename="Orbeon Logo" size="">oxf:/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
                 </metadata>
@@ -112,7 +116,7 @@
                                           select="xxforms:instance('fr-current-form-resources')/*[name() = $control-name]"/>
                         <xforms:delete nodeset="$control-resources/item"/>
                         <xforms:action xxforms:iterate="$response-items">
-                            <xxforms:variable name="item-label" select="@code" as="xs:string"/>
+                            <xxforms:variable name="item-label" select="@name" as="xs:string"/>
                             <xxforms:variable name="item-value" select="@code" as="xs:string"/>
                             <xforms:insert nodeset="$control-resources/*"
                                            origin="xxforms:element('item', (xxforms:element('label', xs:string($item-label)), xxforms:element('value', xs:string($item-value))))"/>

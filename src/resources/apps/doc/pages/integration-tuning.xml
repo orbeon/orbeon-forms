@@ -296,6 +296,11 @@
                     company, you can rewrite this as <code>/company/department/person</code>, which
                     will typically run more efficiently.
                 </p>
+                <p>
+                    Note that if you can, try to avoid running many XSLT transformations. In particular, you may be able
+                    to avoid running a theme stylesheet entirely. See also <a href="#your-app-epilogue">Customize the
+                    standard epilogue</a>.
+                </p>
             </section>
             <a name="your-app-xpl-profiling"/>
             <section>
@@ -318,20 +323,6 @@
                     href="reference-properties#trace">properties documentation</a>.
                 </p>
             </section>
-            <a name="your-app-portal"/>
-            <section>
-                <title>Do not run your code in the examples portal</title>
-                <note>
-                    <p>This applies to versions of Orbeon Forms prior to 3.5.</p>
-                </note>
-                <p>
-                    The examples portal in Orbeon Forms 3.0 (i.e. the home page of Orbeon Forms, which lists all the Orbeon Forms examples), while
-                    convenient to run examples, is not implemented optimally and relies on portlets which cause
-                    overhead. The first thing to do is make sure that your code runs outside of the examples portal,
-                    i.e. that your page flow entries are present in the main page flow file
-                    (<code>resources/page-flow.xml</code>).
-                </p>
-            </section>
             <a name="your-app-epilogue"/>
             <section>
                 <title>Customize the standard epilogue</title>
@@ -341,10 +332,6 @@
                 </p>
                 <ul>
                     <li>
-                        If you do not use XForms Classic, you can remove the test for the XForms classic engine. (If
-                        you are wondering what XForms Classic is, you are probably not using it.)
-                    </li>
-                    <li>
                         If you do not use "widgets" (i.e. tabs, as this is the only standard "widget" at this point),
                         you can remove the inclusion of <code>xforms-widgets.xsl</code>.
                     </li>
@@ -353,7 +340,10 @@
                     </li>
                     <li>
                         If you are using the <code>theme-plain.xsl</code> theme and have not modified it, you can
-                        bypass completely the theme stylesheet.
+                        bypass completely the theme stylesheet. You can do this with the following property:
+                        <xml-source>
+                            <property as="xs:boolean" name="oxf.epilogue.use-theme" value="false"/>
+                        </xml-source>
                     </li>
                 </ul>
                 <p>

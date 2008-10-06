@@ -40,7 +40,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
     <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(print|pdf-template|pdf)</config></p:input>
+        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(print|pdf-template|pdf|email)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -59,7 +59,7 @@
         <p:output name="data" id="page-detail"/>
     </p:processor>
     
-    <!-- Obtain the form -->
+    <!-- Obtain the form definition -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="detail/read-form.xpl"/>
         <p:input name="instance" href="#page-detail"/>

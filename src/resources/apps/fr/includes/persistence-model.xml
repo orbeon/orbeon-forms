@@ -306,11 +306,6 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Go back to the Form Runner summary page -->
-    <xforms:action ev:event="fr-goto-summary">
-        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
-    </xforms:action>
-
     <!-- Parameters passed to this page -->
     <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
     <xforms:instance id="fr-parameters-instance" src="input:instance"/>

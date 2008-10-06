@@ -174,8 +174,8 @@
         <xi:include href="../includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles document persistence -->
         <xi:include href="../includes/persistence-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles print functionality -->
-        <xi:include href="../includes/print-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles navigation functionality -->
+        <xi:include href="../includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
         <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles roles and permissions -->

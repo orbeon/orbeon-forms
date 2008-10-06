@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:saxon="http://saxon.sf.net/"
+          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+
+    <!-- fr-form-instance -->
+    <p:param type="input" name="instance"/>
+
+    <p:param type="output" name="data"/>
+
+    <!-- Extract page detail (app, form, document, and mode) from URL -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/request-path</include>
+                <include>/request/parameters/parameter</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+    <p:processor name="oxf:perl5-matcher">
+        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(email)</config></p:input>
+        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
+        <p:output name="data" id="matcher-groups"/>
+    </p:processor>
+
+    <!-- Put app, form, and mode in format understood by read-form.xpl -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#matcher-groups"/>
+        <p:input name="config">
+            <request xsl:version="2.0">
+                <app><xsl:value-of select="/result/group[1]"/></app>
+                <form><xsl:value-of select="/result/group[2]"/></form>
+                <document/>
+                <mode><xsl:value-of select="/result/group[3]"/></mode>
+            </request>
+        </p:input>
+        <p:output name="data" id="page-detail"/>
+    </p:processor>
+
+    <!-- Obtain the form definition -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../detail/read-form.xpl"/>
+        <p:input name="instance" href="#page-detail"/>
+        <p:output name="data" id="xhtml-fr-xforms"/>
+    </p:processor>
+
+    <!-- Build email message -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="xhtml" href="#xhtml-fr-xforms"/>
+        <p:input name="request" href="#request"/>
+        <p:input name="instance" href="#page-detail"/>
+        <p:input name="config">
+            <message xsl:version="2.0">
+
+                <xsl:variable name="data" select="/*" as="element()"/>
+                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
+                <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
+
+                <!-- Language requested -->
+                <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
+
+                <!-- App and form -->
+                <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
+                <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
+
+                <!-- Find fr-confirmation-email controls and binds -->
+
+                <xsl:variable name="controls" as="element()*"
+                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-confirmation-email']"/>
+                <xsl:variable name="binds" as="element(xforms:bind)*"
+                              select="for $control in $controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+
+                <xsl:variable name="paths" as="xs:string*"
+                              select="for $bind in $binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+
+                <!-- Extract email addresses from form if any -->
+                <xsl:variable name="email-addresses" as="xs:string*"
+                              select="for $path in $paths return $data/saxon:evaluate($path)"/>
+
+                <!-- SMTP outgoing server settings -->
+                <smtp-host>
+                    <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
+                </smtp-host>
+                <credentials>
+                    <username>
+                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
+                    </username>
+                    <password>
+                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.password', $app, $form), '.'))"/>
+                    </password>
+                </credentials>
+
+                <!-- Sender -->
+                <from>
+                    <email>
+                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
+                    </email>
+                </from>
+                <!-- Recipients -->
+                <xsl:for-each select="$email-addresses">
+                    <to>
+                        <email>
+                            <xsl:value-of select="."/>
+                        </email>
+                    </to>
+                </xsl:for-each>
+                <to>
+                    <email>
+                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
+                    </email>
+                </to>
+                <!-- TODO: read from fr resources -->
+                <!-- Message details -->
+                <subject>Formulaire Etat de Vaud (prototype Orbeon Forms)</subject>
+                <body content-type="multipart/related">
+                    <!-- TODO: read from fr resources -->
+                    <part name="text" content-type="text/plain">Veuillez trouver en attachement le formulaire au formats XML et PDF.</part>
+                    <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
+                    <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                </body>
+            </message>
+        </p:input>
+        <p:output name="data" id="message" debug="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+    </p:processor>
+
+    <!-- Obtain PDF data for attachment -->
+    <!-- TODO: use template or not depending on whether there is an attachment -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../print-pdf.xpl"/>
+        <p:input name="instance" href="#instance"/>
+        <p:output name="data" id="form-pdf"/>
+    </p:processor>
+
+    <!-- Convert form data for attachment -->
+    <p:processor name="oxf:xml-converter">
+        <p:input name="data" href="#instance"/>
+        <p:input name="config"><config/></p:input>
+        <p:output name="data" id="form-xml"/>
+    </p:processor>
+
+    <!-- Send the email -->
+    <p:processor name="oxf:email">
+        <!-- The instance contains the email message -->
+        <p:input name="data" href="#message"/>
+        <!-- The attachment contains the XML document -->
+        <p:input name="form-xml" href="#form-xml"/>
+        <!-- The attachment contains the pdf document -->
+        <p:input name="form-pdf" href="#form-pdf"/>
+    </p:processor>
+
+    <!-- If something goes wrong, an exception will be thrown before we get here -->
+    <p:processor name="oxf:identity">
+        <p:input name="data">
+            <status>success</status>
+        </p:input>
+        <p:output name="data" ref="data"/>
+    </p:processor>
+
+</p:config>

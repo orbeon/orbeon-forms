@@ -48,7 +48,7 @@
                 <xforms:output value="$fr-resources/detail/labels/close"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                <xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>
             </xforms:action>
         </xforms:trigger>
         <xsl:if test="false()">
@@ -59,7 +59,7 @@
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                    <xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>
                 </xforms:action>
             </xforms:trigger>
             <!-- Trigger shown to go back if the data is clean -->
@@ -69,7 +69,7 @@
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                    <xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>
                 </xforms:action>
             </xforms:trigger>
         </xsl:if>
@@ -88,7 +88,7 @@
     </xsl:template>
 
     <xsl:template match="fr:print-button">
-        <xforms:trigger>
+        <xforms:trigger ref="instance('fr-triggers-instance')/submit">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
@@ -101,8 +101,9 @@
 
     <xsl:template match="fr:pdf-button">
         <!-- Show button only if there is no PDF template -->
-        <xforms:trigger model="fr-persistence-model"
-                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf = '']">
+        <xxforms:variable name="has-pdf-template" as="xs:boolean"
+                          select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != ''"/>
+        <xforms:trigger model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit[not($has-pdf-template)]">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -113,7 +114,7 @@
         </xforms:trigger>
         <!-- Show button only if there is a PDF template -->
         <xforms:trigger model="fr-persistence-model"
-                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != '']">
+                        ref="instance('fr-triggers-instance')/submit[$has-pdf-template]">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -164,6 +165,20 @@
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xxforms:script>window.close();</xxforms:script>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:email-button">
+
+        <!-- Don't show this button in noscript mode -->
+        <xforms:trigger ref="instance('fr-triggers-instance')/submit" xxforms:modal="true" id="fr-email-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/email"/>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-email-submission"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>

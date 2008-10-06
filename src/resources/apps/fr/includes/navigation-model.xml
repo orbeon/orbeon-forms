@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model id="fr-navigation-model"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+              xmlns:f="http://orbeon.org/oxf/xml/formatting"
+              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+              xmlns:saxon="http://saxon.sf.net/"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!-- This dummy instance ensures that xforms:submission doesn't complain about an empty single-node binding -->
+    <xforms:instance id="fr-navigation-instance"><dummy/></xforms:instance>
+
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+
+    <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
+         URL design perspective having the language better identifies the resource -->
+
+    <xforms:submission id="fr-print-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/print?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+        xxforms:target="_blank" xxforms:show-progress="false"/>
+
+    <xforms:submission id="fr-pdf-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf?fr-language={xxforms:instance('fr-language-instance')}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+        xxforms:target="_blank" xxforms:show-progress="false"/>
+
+    <xforms:submission id="fr-pdf-template-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf-template?document={xxforms:instance('fr-parameters-instance')/document}&amp;fr-language={xxforms:instance('fr-language-instance')}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+        xxforms:target="_blank" xxforms:show-progress="false"/>
+
+    <!-- Go back to the Form Runner summary page -->
+    <xforms:action ev:event="fr-goto-summary">
+        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+    </xforms:action>
+
+    <!-- Send the current form by email -->
+    <xforms:submission id="fr-email-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/email?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
+
+</xforms:model>

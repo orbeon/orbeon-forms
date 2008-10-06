@@ -109,6 +109,7 @@
                 <offline>Take offline</offline>
                 <online>Take online</online>
                 <alert>Missing or incorrect value</alert>
+                <email>Email</email>
                 <submit-dialog-clear>Clear and close</submit-dialog-clear>
                 <submit-dialog-keep>Keep values and close</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
@@ -231,6 +232,7 @@
                 <offline>Or-ligne</offline>
                 <online>En-ligne</online>
                 <alert>Valeur manquante ou incorrecte</alert>
+                <email>Email</email>
                 <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
                 <submit-dialog-keep>Keep values and close</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
@@ -352,6 +354,7 @@
                 <offline>Sin conexión</offline>
                 <online>En línea</online>
                 <alert>Desaparición o valor incorrecto</alert>
+                <email>Email</email>
                 <submit-dialog-clear>[Clear and close]</submit-dialog-clear>
                 <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
                 <submit-dialog-go>[OK]</submit-dialog-go>

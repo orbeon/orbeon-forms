@@ -52,7 +52,7 @@
             <!-- Run XForms Server -->
             <p:processor name="oxf:xforms-server">
                 <p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng"/>
-                <p:output name="response" id="xforms-response" schema-href="xforms-server-response.rng"/>
+                <p:output name="response" id="xforms-response"/>
                 <!--<p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
                 <!--<p:output name="response" id="xforms-response" debug="xxxresponse"/>-->
             </p:processor>
@@ -109,6 +109,7 @@
                                 <indent>false</indent>
                             </config>
                         </p:input>
+                        <!-- Do schema validation here -->
                         <p:input name="data" href="#xforms-response" schema-href="xforms-server-response.rng" />
                         <p:output name="data" id="converted"/>
                     </p:processor>

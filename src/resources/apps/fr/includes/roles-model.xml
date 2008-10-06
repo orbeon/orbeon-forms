@@ -30,11 +30,35 @@
 
         <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'header' and doc-available('oxf:/config/form-runner-roles.xml')">
 
-            <!-- Extract roles from request -->
-            <xxforms:variable name="header-name" select="xxforms:property('oxf.fr.authentication.header.roles')" as="xs:string?"/>
-            <xforms:setvalue ref="instance('fr-all-roles')" value="xxforms:get-request-header($header-name)"/>
+            <!--
+                Extract roles from request headers. Support extracting role names from a given header. Role names can
+                be separated by spaces, commas, or pipes ("|"). Furthermore, they can optionally be composed of
+                properties in the form of "name=value", where "name" is specified by a configuration property, and
+                "value" is the value of the role. The reason for this logic is to support the following LDAP-related
+                format:
 
-            <!-- TODO: option of using HTTP roles -->
+                  cn=role1,dc=acme,dc=ch|cn=role2,dc=acme,dc=ch|...
+
+                This results in the following list of roles:
+
+                  role1 role2
+            -->
+            <xxforms:variable name="header-name" select="xxforms:property('oxf.fr.authentication.header.roles')" as="xs:string?"/>
+            <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
+            <xxforms:variable name="tokens" select="for $t in tokenize(xxforms:get-request-header($header-name), '[\s,|]') return normalize-space($t)" as="xs:string*"/>
+
+            <!--<xxforms:variable name="tokens" select="for $t in tokenize('cn=role1,dc=acme,dc=ch|cn=role2,dc=acme,dc=ch', '[\s,|]') return normalize-space($t)" as="xs:string*"/>-->
+
+            <xforms:setvalue ref="instance('fr-all-roles')"
+                             value="string-join(for $t in $tokens
+                                                    return if ($header-property-name != '')
+                                                            then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
+
+            <!--<xforms:message level="xxforms:log-error">-->
+                <!--Roles extracted: <xforms:output value="instance('fr-all-roles')"/>-->
+            <!--</xforms:message>-->
+
+            <!-- TODO: option of using servlet roles -->
 
             <!-- Handle configuration -->
             <xforms:send submission="fr-get-roles-submission"/>
@@ -66,7 +90,7 @@
                               select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-all-roles'), '\s')) then $r else ()"/>
             <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
 
-            <!-- TODO: option of using HTTP roles -->
+            <!-- TODO: option of using servlet roles -->
             <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
 
             <!-- Take flat structure and create structure for current role's allowed apps and forms -->

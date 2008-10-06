@@ -332,6 +332,7 @@ public class XFormsInsertAction extends XFormsAction {
                         // is harder as we have to deal with removing duplicate attributes and find a reasonable
                         // insertion strategy.
 
+                        // TODO: Don't think we should even do this now in XForms 1.1
                         insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes);
 
                     } else {
@@ -354,12 +355,27 @@ public class XFormsInsertAction extends XFormsAction {
                         // location depending on their node type."
 
                         boolean hasTextNode = false;
+                        int addIndex = 0;
+                        insertedNodes = new ArrayList(clonedNodes.size());
                         for (int i = 0; i < clonedNodes.size(); i++) {
                             final Node clonedNode = (Node) clonedNodes.get(i);
-                            hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
-                            siblingElements.add(actualInsertionIndex + i, clonedNode);
+
+                            if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
+                                // Element, text, comment, processing instruction node
+                                siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
+                                insertedNodes.add(clonedNode);
+                                hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
+                                addIndex++;
+                            } else {
+                                // We never insert attributes or namespace nodes as siblings
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
+                                            new String[] {
+                                                    "type", clonedNode.getNodeTypeName(),
+                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
+                                            } );
+                            }
                         }
-                        insertedNodes = clonedNodes;
 
                         // Normalize text nodes if needed to respect XPath 1.0 constraint
                         if (hasTextNode)

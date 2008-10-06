@@ -159,7 +159,7 @@ public class EmailProcessor extends ProcessorImpl {
             Message message = new MimeMessage(session);
 
             // Set From
-            message.setFrom(createAddress(messageElement.element("from")));
+            message.addFrom(createAddresses(messageElement.element("from")));
 
             // Set To
             String testToProperty = getPropertySet().getString(EMAIL_TEST_TO);
@@ -172,24 +172,24 @@ public class EmailProcessor extends ProcessorImpl {
             } else {
                 // Regular list of To elements
                 for (Iterator i = messageElement.elements("to").iterator(); i.hasNext();) {
-                    Element toElement = (Element) i.next();
-                    InternetAddress address = createAddress(toElement);
-                    message.addRecipient(Message.RecipientType.TO, address);
+                    final Element toElement = (Element) i.next();
+                    final InternetAddress[] addresses = createAddresses(toElement);
+                    message.addRecipients(Message.RecipientType.TO, addresses);
                 }
             }
 
             // Set Cc
             for (Iterator i = messageElement.elements("cc").iterator(); i.hasNext();) {
-                Element toElement = (Element) i.next();
-                InternetAddress address = createAddress(toElement);
-                message.addRecipient(Message.RecipientType.CC, address);
+                final Element toElement = (Element) i.next();
+                final InternetAddress[] addresses = createAddresses(toElement);
+                message.addRecipients(Message.RecipientType.CC, addresses);
             }
 
             // Set Bcc
             for (Iterator i = messageElement.elements("bcc").iterator(); i.hasNext();) {
-                Element toElement = (Element) i.next();
-                InternetAddress address = createAddress(toElement);
-                message.addRecipient(Message.RecipientType.BCC, address);
+                final Element toElement = (Element) i.next();
+                final InternetAddress[] addresses = createAddresses(toElement);
+                message.addRecipients(Message.RecipientType.BCC, addresses);
             }
 
             // Set headers if any
@@ -444,11 +444,12 @@ public class EmailProcessor extends ProcessorImpl {
         return fileItem;
     }
 
-    private InternetAddress createAddress(Element addressElement) throws AddressException, UnsupportedEncodingException {
-        String email = addressElement.element("email").getStringValue();
-        Element nameElement = addressElement.element("name");
-        return nameElement == null ? new InternetAddress(email)
-                : new InternetAddress(email, nameElement.getStringValue());
+    private InternetAddress[] createAddresses(Element addressElement) throws AddressException, UnsupportedEncodingException {
+        final String email = addressElement.element("email").getStringValue();
+        final Element nameElement = addressElement.element("name");
+        // If only the <email> element is specified, allow for comma-separated addresses
+        return nameElement == null ? InternetAddress.parse(email)
+                : new InternetAddress[] { new InternetAddress(email, nameElement.getStringValue()) };
     }
 
     private class SimpleTextDataSource implements DataSource {

@@ -83,22 +83,22 @@
                 <tr>
                     <td>message/from</td>
                     <td>1</td>
-                    <td>Sender of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                    <td>Sender of the message. Contains an <code>&lt;email></code> element and an optional <code>&lt;name></code> element.</td>
                 </tr>
                 <tr>
                     <td>message/to</td>
                     <td>1..n</td>
-                    <td>Recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                    <td>Recipient(s) of the message. Contains an <code>&lt;email></code> element and an optional <code>&lt;name></code> element.</td>
                 </tr>
                 <tr>
                     <td>message/cc</td>
                     <td>0..n</td>
-                    <td>Carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                    <td>Carbon copy recipient(s) of the message. Contains an <code>&lt;email></code> element and an optional <code>&lt;name></code> element.</td>
                 </tr>
                 <tr>
                     <td>message/bcc</td>
                     <td>0..n</td>
-                    <td>Blind carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                    <td>Blind carbon copy recipient(s) of the message. Contains an <code>&lt;email></code> element and an optional <code>&lt;name></code> element.</td>
                 </tr>
                 <tr>
                     <td>message/subject</td>
@@ -109,8 +109,8 @@
                     <td>message/header</td>
                     <td>0..n</td>
                     <td>
-                        Optional extra email header to add. Contains a <code>name</code> element
-                        and a <code>value</code> element.
+                        Optional extra email header to add. Contains a <code>&lt;name></code> element
+                        and a <code>&lt;value></code> element.
                     </td>
                 </tr>
                 <tr>
@@ -177,18 +177,27 @@
                     <td>1</td>
                     <td>
                         The content of the body part. This can contain embedded
-                        <code>part</code> elements if the content is multipart. It can be XHTML
+                        <code>&lt;part></code> elements if the content is multipart. It can be XHTML
                         if the content-type is <code>text/html</code>. Finally, it can be any
                         text content, including just plain HTML (which can be embedded in a
                         CDATA section for convenience).
                     </td>
                 </tr>
             </table>
+            <p>
+                When specifying email addresses, and when the <code>&lt;name></code> element is omitted, the
+                <code>&lt;email></code> element may contain several email addresses separated by commas:
+            </p>
+            <xml-source>
+                <to>
+                    <email>"Info" &lt;info@orbeon.com>, "John" &lt;john@example.org></email>
+                </to>
+            </xml-source>
         </section>
         <section>
             <title>Simple Messages</title>
             <p>
-                A simple message requires a <code>body</code> element with:
+                A simple message requires a <code>&lt;body></code> element with:
             </p>
             <ul>
                 <li>A text <code>content-type</code> attribute, for example <code>text/plain</code></li>
@@ -223,7 +232,7 @@
             <title>Character Encoding</title>
             <p>
                 In the example above, no character encoding is specified for the
-                <code>body</code> element. This determines what character encoding is used in
+                <code>&lt;body></code> element. This determines what character encoding is used in
                 the body of the email message constructed by the Email processor. If no
                 encoding is specified, the default <code>iso-8859-1</code> is used. In some
                 cases, it is useful to specify a character encoding. For example, if it is known
@@ -272,16 +281,16 @@
             </ul>
             <p>
                 To create a multipart email, specify one of the multipart content types on the
-                <code>body</code> element. The <code>body</code> element must contain one or
-                more <code>part</code> elements.
+                <code>&lt;body></code> element. The <code>&lt;body></code> element must contain one or
+                more <code>&lt;part></code> elements.
             </p>
             <p>
-                In turn, <code>part</code> elements may contain other parts. In that case, a
-                <code>part</code> element must declare a multipart content type attribute, and
-                contain at least one <code>part</code> element.
+                In turn, <code>&lt;part></code> elements may contain other parts. In that case, a
+                <code>&lt;part></code> element must declare a multipart content type attribute, and
+                contain at least one <code>&lt;part></code> element.
             </p>
             <p>
-                The main part of the body is encapsulated by the <code>body</code> element of
+                The main part of the body is encapsulated by the <code>&lt;body></code> element of
                 the message.
             </p>
         </section>
@@ -292,8 +301,8 @@
             </p>
             <ul>
                 <li>
-                    <b>Inline:</b> the content is directly embedded in the <code>body</code> or
-                    <code>part</code> element.
+                    <b>Inline:</b> the content is directly embedded in the <code>&lt;body></code> or
+                    <code>&lt;part></code> element.
                 </li>
                 <li>
                     <b>Out of line:</b> the content is available from a resource or dynamically
@@ -303,14 +312,14 @@
             <section>
                 <title>Inline Parts</title>
                 <p>
-                    The content of the <code>body</code> or <code>part</code> element can be of
+                    The content of the <code>&lt;body></code> or <code>&lt;part></code> element can be of
                     the following types:
                 </p>
                 <ul>
                     <li>
                         <b>HTML: </b> the content type is <code>text/html</code>. In this case,
                         the inline content is considered as HTML and converted to HTML. A root
-                        <code>html</code> element must be present.
+                        <code>&lt;html></code> element must be present.
                     </li>
                     <li>
                         <b>Text type:</b> this is the case when the content type starts with
@@ -327,7 +336,7 @@
             <section>
                 <title>Out of Line Parts</title>
                 <p>
-                    This mode is enabled when the <code>part</code> element contains an
+                    This mode is enabled when the <code>&lt;part></code> element contains an
                     <code>src</code> attribute.
                 </p>
                 <p>

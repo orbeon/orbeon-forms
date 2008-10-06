@@ -22,7 +22,7 @@ html { overflow: scroll }/* TODO: add comment about why this is useful (if is ac
 
 body {
     background-color: #FFE27F;
-    background-image: url(images/stripes.png);
+    background-image: url(images/stripes-bright2.png);
     text-align: left /* Not sure why the YUI resets this to center */
 }
 

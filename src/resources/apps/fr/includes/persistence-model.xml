@@ -87,7 +87,7 @@
             <xforms:send submission="fr-get-document-submission"/>
         </xforms:action>
         <!-- No document id is provided and we are not in print view -->
-        <xxforms:variable name="is-new-document" select="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf'))"/>
+        <xxforms:variable name="is-new-document" select="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf', 'email'))"/>
         <xforms:action if="$is-new-document">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>

@@ -144,7 +144,7 @@
         <!-- This model handles help -->
         <xforms:model id="fr-help-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
-                      xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
+                      xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf', 'email')) then 'static' else 'dynamic'}"
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
@@ -186,7 +186,7 @@
             <xsl:apply-templates select="@*|node()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
-            <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf')"/>
+            <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf', 'email')"/>
 
             <!-- Variable exposing all the user roles -->
             <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-all-roles'), '\s')" as="xs:string*"/>

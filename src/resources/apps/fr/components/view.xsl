@@ -34,7 +34,7 @@
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
                        class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
                 <xhtml:div class="fr-header">
-                    <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
+                    <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf', 'email'))">
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
                             <xhtml:div class="fr-noscript-choice" style="float: left">

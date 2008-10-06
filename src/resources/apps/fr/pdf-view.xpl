@@ -28,9 +28,9 @@
 
     <p:param type="output" name="data"/>
 
-    <!-- Apply components -->
+    <!-- Unroll the form (theme, components, inclusions) -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="html-view.xpl"/>
+        <p:input name="config" href="unroll-form.xpl"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="data" href="#data"/>
         <p:output name="data" id="xhtml-document"/>

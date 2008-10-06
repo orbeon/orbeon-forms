@@ -27,68 +27,11 @@
     <!-- XHTML+XForms -->
     <p:param type="output" name="data"/>
 
-    <!-- Apply project-specific theme -->
-    <p:choose href="#instance">
-        <p:when test="doc-available(concat('oxf:/forms/', /*/app, '/theme.xsl'))">
-            <!-- TODO: Also fetch theme from persistence layer -->
-            <p:processor name="oxf:url-generator">
-                <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
-                                                'oxf:/forms/', /*/app, '/theme.xsl'))))"/>
-                <p:output name="data" id="theme"/>
-            </p:processor>
-            <p:processor name="oxf:xslt">
-                <p:input name="data" href="#data"/>
-                <p:input name="config" href="#theme"/>
-                <p:output name="data" id="themed-data"/>
-            </p:processor>
-        </p:when>
-        <p:otherwise>
-            <p:processor name="oxf:identity">
-                <p:input name="data" href="#data"/>
-                <p:output name="data" id="themed-data"/>
-            </p:processor>
-        </p:otherwise>
-    </p:choose>
-
-    <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
-
-    <!-- Get request information -->
-    <!-- Noscript parameter -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/parameters/parameter[starts-with(name, 'fr-noscript')]</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <!--
-        DO NOT REMOVE THIS UNLESS YOU REALLY KNOW WHAT YOU ARE DOING! This is in place to make sure we read the
-        #request output above. components.xsl below may not read it at times, which causes oxf:request to never cache
-        its output, leading to oxf:xforms-to-xhtml's input to not be cacheable. Tricky.
-    -->
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#request"/>
-    </p:processor>
-
-    <!-- Apply UI components -->
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#themed-data"/>
+    <!-- Unroll the form (theme, components, inclusions) -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="unroll-form.xpl"/>
         <p:input name="instance" href="#instance"/>
-        <p:input name="config" href="components/components.xsl"/>
-        <p:output name="data" id="after-components"/>
-        <p:input name="request" href="#request"/>
-        <!-- This is here just so that we can reload the form when the properties or the resources change -->
-        <p:input name="properties-xforms" href="oxf:/config/properties-xforms.xml"/>
-        <p:input name="properties-form-runner" href="oxf:/config/properties-form-runner.xml"/>
-        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
-        <p:input name="resources-form-runner-override" href="oxf:/config/form-runner-resources.xml"/>
-    </p:processor>
-
-    <!-- Handle XInclude -->
-    <p:processor name="oxf:xinclude">
-        <p:input name="config" href="#after-components"/>
+        <p:input name="data" href="#data"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

@@ -432,9 +432,11 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* This is also used for PDF generation */
 @media print {
-    .fr-bottom { display: none }
+    .fr-header { display: none }
     .fr-top { display: none }
-    .fr-section-container .fr-section-open-close { display: none }
+    .fr-buttons-block { display: none }
     .fr-status-icons { display: none }
+    .fr-bottom { display: none }
+    .fr-section-container .fr-section-open-close { display: none }
     noscript { display: none }
 }

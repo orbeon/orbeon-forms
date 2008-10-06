@@ -22,6 +22,7 @@ html { overflow: scroll }/* TODO: add comment about why this is useful (if is ac
 
 body {
     background-color: #FFE27F;
+    background-image: url(images/stripes.png);
     text-align: left /* Not sure why the YUI resets this to center */
 }
 
@@ -105,7 +106,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-separator {
     background-color: orange;
-    line-height: .25em;
+    height: 4px;/* size in em seems to cause issues in Firefox as not all separators appear the same height */
 }
 
 .fr-metadata, .fr-buttons-block {

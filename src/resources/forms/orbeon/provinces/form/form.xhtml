@@ -21,8 +21,8 @@
             </xforms:instance>
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
                 <xforms:bind id="section-1-bind" nodeset="section-1">
-                    <xforms:bind id="countries-bind" nodeset="countries" name="countries"/>
-                    <xforms:bind id="provinces-bind" nodeset="provinces" name="provinces"/>
+                    <xforms:bind id="countries-bind" nodeset="countries" name="countries" required="true()"/>
+                    <xforms:bind id="provinces-bind" nodeset="provinces" name="provinces" required="true()"/>
                 </xforms:bind>
             </xforms:bind>
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">

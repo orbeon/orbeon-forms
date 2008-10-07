@@ -77,7 +77,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <!-- Dependency on override properties so stylesheet runs again when properties change -->
+        <!-- Dependency on overridden properties so stylesheet runs again when properties change -->
         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
         <p:output name="data" ref="data"/>
     </p:processor>

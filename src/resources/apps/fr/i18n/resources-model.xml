@@ -44,13 +44,14 @@
     <!-- Instance containing the Form Runner resources -->
     <xforms:instance id="fr-fr-resources"><dummy/></xforms:instance>
     <xforms:submission id="fr-get-fr-resources"
-            serialization="none" resource="/fr/service/i18n/fr-resources/{xxforms:instance('fr-form-metadata')/application-name}/{xxforms:instance('fr-form-metadata')/form-name}" method="get"
+            serialization="none" method="get"
+            resource="/fr/service/i18n/fr-resources/{xxforms:instance('fr-form-metadata')/application-name}/{xxforms:instance('fr-form-metadata')/form-name}" 
             replace="instance" instance="fr-fr-resources" xxforms:readonly="true"/>
             <!-- TODO: We would like make this xxforms:shared="application", but if we do modifications to the properties are not taken into account -->
 
     <!-- Instance containing the current Form Runner resources -->
     <xforms:instance id="fr-fr-current-resources">
-        <resource xmlns=""/> 
+        <resource xmlns=""/>
     </xforms:instance>
 
     <!-- Instance containing all the ISO 639-1 languages -->
@@ -107,5 +108,5 @@
         <!-- Get initial resources for current language (will also save current language into the session) -->
         <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
     </xforms:action>
-    
+
 </xforms:model>

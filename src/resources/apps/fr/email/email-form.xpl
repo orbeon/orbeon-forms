@@ -30,37 +30,37 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/request-path</include>
                 <include>/request/parameters/parameter</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
-    <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(email)</config></p:input>
-        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
-        <p:output name="data" id="matcher-groups"/>
-    </p:processor>
 
-    <!-- Put app, form, and mode in format understood by read-form.xpl -->
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#matcher-groups"/>
-        <p:input name="config">
-            <request xsl:version="2.0">
-                <app><xsl:value-of select="/result/group[1]"/></app>
-                <form><xsl:value-of select="/result/group[2]"/></form>
-                <document/>
-                <mode><xsl:value-of select="/result/group[3]"/></mode>
-            </request>
-        </p:input>
-        <p:output name="data" id="page-detail"/>
+    <!-- Extract request parameters (app, form, document, and mode) from URL -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../print/request-parameters.xpl"/>
+        <p:output name="data" id="parameters"/>
     </p:processor>
 
     <!-- Obtain the form definition -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../detail/read-form.xpl"/>
-        <p:input name="instance" href="#page-detail"/>
+        <p:input name="instance" href="#parameters"/>
         <p:output name="data" id="xhtml-fr-xforms"/>
+    </p:processor>
+
+    <!-- Retrieve Form Runner resources -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
+            <config xsl:version="2.0">
+                <url>
+                    <xsl:value-of select="pipeline:rewriteResourceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
+                </url>
+                <!-- Forward the same headers that the XForms engine forwards -->
+                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+            </config>
+        </p:input>
+        <p:output name="data" id="fr-resources"/>
     </p:processor>
 
     <!-- Build email message -->
@@ -68,13 +68,15 @@
         <p:input name="data" href="#instance"/>
         <p:input name="xhtml" href="#xhtml-fr-xforms"/>
         <p:input name="request" href="#request"/>
-        <p:input name="instance" href="#page-detail"/>
+        <p:input name="instance" href="#parameters"/>
+        <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="config">
             <message xsl:version="2.0">
 
                 <xsl:variable name="data" select="/*" as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
                 <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
+                <xsl:variable name="fr-resources" select="doc('input:fr-resources')/*" as="element(resources)"/>
 
                 <!-- Language requested -->
                 <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
@@ -83,10 +85,10 @@
                 <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
                 <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
 
-                <!-- Find fr-confirmation-email controls and binds -->
+                <!-- Find fr-email-recipient controls and binds -->
 
                 <xsl:variable name="controls" as="element()*"
-                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-confirmation-email']"/>
+                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-email-recipient']"/>
                 <xsl:variable name="binds" as="element(xforms:bind)*"
                               select="for $control in $controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
@@ -106,7 +108,7 @@
                         <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
                     </username>
                     <password>
-                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.password', $app, $form), '.'))"/>
+                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
                     </password>
                 </credentials>
 
@@ -129,24 +131,25 @@
                         <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
                     </email>
                 </to>
-                <!-- TODO: read from fr resources -->
                 <!-- Message details -->
-                <subject>Formulaire Etat de Vaud (prototype Orbeon Forms)</subject>
+                <subject>
+                    <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
+                </subject>
                 <body content-type="multipart/related">
-                    <!-- TODO: read from fr resources -->
-                    <part name="text" content-type="text/plain">Veuillez trouver en attachement le formulaire au formats XML et PDF.</part>
+                    <part name="text" content-type="text/plain">
+                        <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
+                    </part>
                     <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                     <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                 </body>
             </message>
         </p:input>
-        <p:output name="data" id="message" debug="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+        <p:output name="data" id="message"/>
     </p:processor>
 
     <!-- Obtain PDF data for attachment -->
-    <!-- TODO: use template or not depending on whether there is an attachment -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../print-pdf.xpl"/>
+        <p:input name="config" href="../print/print-pdf.xpl"/>
         <p:input name="instance" href="#instance"/>
         <p:output name="data" id="form-pdf"/>
     </p:processor>

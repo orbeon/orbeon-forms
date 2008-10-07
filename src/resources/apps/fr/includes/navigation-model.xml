@@ -42,11 +42,6 @@
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 
-    <xforms:submission id="fr-pdf-template-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/pdf-template?document={xxforms:instance('fr-parameters-instance')/document}&amp;fr-language={xxforms:instance('fr-language-instance')}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
-        xxforms:target="_blank" xxforms:show-progress="false"/>
-
     <!-- Go back to the Form Runner summary page -->
     <xforms:action ev:event="fr-goto-summary">
         <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>

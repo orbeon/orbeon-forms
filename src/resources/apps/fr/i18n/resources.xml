@@ -26,6 +26,10 @@
             <some>Errors on Form</some>
             <none>No Errors on Form</none>
         </errors>
+        <email>
+            <subject>Orbeon Forms: Confirmation</subject>
+            <body>Please find attached the form in PDF and XML format.</body>
+        </email>
         <summary>
             <titles>
                 <summary-title>Summary</summary-title>
@@ -149,6 +153,10 @@
             <some>Ce formulaire contient des erreurs</some>
             <none>Ce formulaire ne contient pas d'erreurs</none>
         </errors>
+        <email>
+            <subject>Orbeon Forms: Confirmation</subject>
+            <body>Veuillez trouver en attachement le formulaire au formats XML et PDF.</body>
+        </email>
         <summary>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -272,6 +280,10 @@
             <some>[Errors on Form]</some>
             <none>[No Errors on Form]</none>
         </errors>
+        <email>
+            <subject>[Orbeon Forms: Confirmation]</subject>
+            <body>[Please find attached the form in PDF and XML format.]</body>
+        </email>
         <summary>
             <titles>
                 <summary-title>Síntesis</summary-title>

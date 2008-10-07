@@ -90,15 +90,11 @@
 
     <!-- Print document to HTML -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)" matcher="oxf:perl5-matcher"
-          view="print-html.xpl"/>
+          view="print/print-html.xpl"/>
 
-    <!-- Print document to PDF (automatic mode) -->
+    <!-- Print document to PDF -->
     <page path-info="/fr/([^/]+)/([^/]+)/(pdf)" matcher="oxf:perl5-matcher"
-          view="print-pdf.xpl"/>
-
-    <!-- Print document to PDF (template mode) -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(pdf-template)" matcher="oxf:perl5-matcher"
-          view="print-pdf-template.xpl"/>
+          view="print/print-pdf.xpl"/>
 
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page id="test-form" path-info="/fr/([^/]+)/([^/]+)/(test)" matcher="oxf:perl5-matcher"

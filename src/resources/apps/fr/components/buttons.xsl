@@ -100,27 +100,13 @@
     </xsl:template>
 
     <xsl:template match="fr:pdf-button">
-        <!-- Show button only if there is no PDF template -->
-        <xxforms:variable name="has-pdf-template" as="xs:boolean"
-                          select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != ''"/>
-        <xforms:trigger model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit[not($has-pdf-template)]">
+        <xforms:trigger model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-pdf-submission"/>
-            </xforms:action>
-        </xforms:trigger>
-        <!-- Show button only if there is a PDF template -->
-        <xforms:trigger model="fr-persistence-model"
-                        ref="instance('fr-triggers-instance')/submit[$has-pdf-template]">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-            </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="fr-pdf-template-submission"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>

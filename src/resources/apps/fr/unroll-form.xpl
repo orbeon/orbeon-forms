@@ -83,7 +83,6 @@
         <p:input name="properties-xforms" href="oxf:/config/properties-xforms.xml"/>
         <p:input name="properties-form-runner" href="oxf:/config/properties-form-runner.xml"/>
         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
-        <p:input name="resources-form-runner-override" href="oxf:/config/form-runner-resources.xml"/>
     </p:processor>
 
     <!-- Handle XInclude -->

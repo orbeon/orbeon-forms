@@ -141,20 +141,29 @@
             <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
         </xsl:if>
 
-        <!-- This model handles help -->
-        <xforms:model id="fr-help-model"
+        <!-- Model receiving input parameters -->
+        <xforms:model id="fr-parameters-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf', 'email')) then 'static' else 'dynamic'}"
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}">
-            <xforms:instance id="fr-help-instance">
-                <help xmlns="">
-                    <label/>
-                    <help/>
-                </help>
-            </xforms:instance>
+
+            <!-- Parameters passed to this page -->
+            <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
+            <xforms:instance id="fr-parameters-instance" src="input:instance"/>
+
+        </xforms:model>
+
+        <!-- This model handles help -->
+        <!--<xforms:model id="fr-help-model">-->
+            <!--<xforms:instance id="fr-help-instance">-->
+                <!--<help xmlns="">-->
+                    <!--<label/>-->
+                    <!--<help/>-->
+                <!--</help>-->
+            <!--</xforms:instance>-->
 
             <!-- Take action upon xforms-help on #fr-form-group -->
             <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-help" ev:defaultAction="cancel">-->
@@ -162,14 +171,16 @@
                 <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('xxforms:help')"/>-->
             <!--</xforms:action>-->
 
-        </xforms:model>
+        <!--</xforms:model>-->
 
-        <!-- This model handles form sections -->
-        <xi:include href="../includes/sections-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles roles and permissions -->
+        <xi:include href="../includes/roles-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles i18n resources -->
         <xi:include href="../i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles offline functionality through Google Gears -->
         <xi:include href="../offline/offline-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles form sections -->
+        <xi:include href="../includes/sections-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles error summary -->
         <xi:include href="../includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles document persistence -->
@@ -178,8 +189,6 @@
         <xi:include href="../includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
         <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles roles and permissions -->
-        <xi:include href="../includes/roles-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- Copy and annotate existing main model -->
         <xsl:copy>
@@ -189,7 +198,7 @@
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf', 'email')"/>
 
             <!-- Variable exposing all the user roles -->
-            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-all-roles'), '\s')" as="xs:string*"/>
+            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s')" as="xs:string*"/>
 
         </xsl:copy>
 

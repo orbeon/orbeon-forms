@@ -25,6 +25,11 @@
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+    <xxforms:variable name="app" select="$parameters/app"/>
+    <xxforms:variable name="form" select="$parameters/form"/>
+    <xxforms:variable name="document" select="$parameters/document"/>
+
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-model-construct-done">
@@ -305,14 +310,6 @@
             </xforms:send>
         </xforms:action>
     </xforms:action>
-
-    <!-- Parameters passed to this page -->
-    <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
-    <xforms:instance id="fr-parameters-instance" src="input:instance"/>
-    <xxforms:variable name="parameters" select="instance('fr-parameters-instance')"/>
-    <xxforms:variable name="app" select="$parameters/app"/>
-    <xxforms:variable name="form" select="$parameters/form"/>
-    <xxforms:variable name="document" select="$parameters/document"/>
 
     <!-- Persistence URIs -->
     <xforms:instance id="fr-uris-instance">

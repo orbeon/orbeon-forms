@@ -49,13 +49,13 @@
 
             <!--<xxforms:variable name="tokens" select="for $t in tokenize('cn=role1,dc=acme,dc=ch|cn=role2,dc=acme,dc=ch', '[\s,|]') return normalize-space($t)" as="xs:string*"/>-->
 
-            <xforms:setvalue ref="instance('fr-all-roles')"
+            <xforms:setvalue ref="instance('fr-roles-instance')/all-roles"
                              value="string-join(for $t in $tokens
                                                     return if ($header-property-name != '')
                                                             then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
 
             <!--<xforms:message level="xxforms:log-error">-->
-                <!--Roles extracted: <xforms:output value="instance('fr-all-roles')"/>-->
+                <!--Roles extracted: <xforms:output value="instance('fr-roles-instance')/all-roles"/>-->
             <!--</xforms:message>-->
 
             <!-- TODO: option of using servlet roles -->
@@ -65,13 +65,20 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Instance containing all roles currently available, space-separated -->
-    <xforms:instance id="fr-all-roles">
-        <roles xmlns=""/>
+    <!-- Instance containing roles information -->
+    <xforms:instance id="fr-roles-instance">
+        <roles xmlns="">
+            <!-- Whether roles are configured -->
+            <has-roles>false</has-roles>
+            <!-- List of all available roles, space-separated -->
+            <all-roles/>
+            <!-- Whether the current page is authorized given the current roles -->
+            <authorized>false</authorized>
+        </roles>
     </xforms:instance>
 
     <!-- Instance containing roles -->
-    <xforms:instance id="fr-roles" xxforms:readonly="true">
+    <xforms:instance id="fr-roles-config" xxforms:readonly="true">
         <roles xmlns="">
             <!-- Entries look like this: -->
             <!--<role name="eforms-list-sash_subside" app="sash" form="subside"/>-->
@@ -79,23 +86,28 @@
     </xforms:instance>
 
     <!-- Handle loading of roles configuration -->
+    <!-- TODO: wasteful to use submission and instance when doc() could be used. However summary view listens to this submission. -->
     <xforms:submission id="fr-get-roles-submission" serialization="none"
             method="get" resource="oxf:/config/form-runner-roles.xml"
-            replace="instance" instance="fr-roles">
+            replace="instance" instance="fr-roles-config">
 
         <xforms:action ev:event="xforms-submit-done">
-            <xxforms:variable name="all-roles" select="instance('fr-roles')/role" as="element(role)*"/>
+            <xxforms:variable name="all-roles" select="instance('fr-roles-config')/role" as="element(role)*"/>
 
             <xxforms:variable name="header-roles" as="element(role)*"
-                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-all-roles'), '\s')) then $r else ()"/>
+                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s')) then $r else ()"/>
             <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
+            
+            <!-- Remember whether roles configuration was provided -->
+            <xxforms:variable name="has-roles" as="xs:boolean" select="exists($all-roles)"/>
+            <xforms:setvalue ref="instance('fr-roles-instance')/has-roles" value="$has-roles"/>
 
             <!-- TODO: option of using servlet roles -->
             <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
 
             <!-- Take flat structure and create structure for current role's allowed apps and forms -->
             <xxforms:variable name="distinct-apps" as="xs:string*"
-                              select="distinct-values(instance('fr-roles')/role[@name = ($current-roles/@name, '*')]/@app)"/><!-- also match on "*" to mean "any role" -->
+                              select="distinct-values(instance('fr-roles-config')/role[@name = ($current-roles/@name, '*')]/@app)"/><!-- also match on "*" to mean "any role" -->
             <xforms:action if="$distinct-apps = '*'">
                 <!-- User has access to all apps (and therefore all forms) -->
                 <xforms:insert context="instance('fr-permissions')"
@@ -110,7 +122,7 @@
                                origin="xxforms:element('app', xxforms:attribute('name', $current-app))"/>
 
                 <xxforms:variable name="distinct-forms" as="xs:string*"
-                                  select="distinct-values(instance('fr-roles')/role[@app = $current-app]/@form)"/>
+                                  select="distinct-values(instance('fr-roles-config')/role[@app = $current-app]/@form)"/>
 
                 <xforms:action if="$distinct-forms = '*'">
                     <!-- User has access to all forms within this app -->
@@ -129,11 +141,26 @@
             <xforms:action if="not($current-roles)">
                 <!-- TODO: in this case, nothing must be shown! -->
             </xforms:action>
+
+            <!--
+                Remember whether the page is authorized or not. Usually a container protection by path will be in
+                place.
+             -->
+            <xforms:setvalue if="not($has-roles)" ref="instance('fr-roles-instance')/authorized">true</xforms:setvalue>
+            <xforms:action if="$has-roles">
+                <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
+                <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
+
+                <xforms:setvalue ref="instance('fr-roles-instance')/authorized"
+                             value="exists(instance('fr-permissions')/app[@name = '*'])
+                                        or exists(instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)])"/>
+            </xforms:action>
+
         </xforms:action>
 
     </xforms:submission>
 
-    <!-- Instance to specife user permissions for app/form -->
+    <!-- Instance to specify user permissions for app/form -->
     <xforms:instance id="fr-permissions">
         <apps xmlns="">
             <!--<app name="orbeon">-->

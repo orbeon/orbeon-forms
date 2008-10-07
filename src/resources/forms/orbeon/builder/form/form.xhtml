@@ -578,41 +578,39 @@
                                                                                     <xforms:trigger appearance="minimal" id="fb-insert-row-below-trigger">
                                                                                         <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
-                                                                                            <xforms:action ev:event="DOMActivate">
 
-                                                                                                <!-- Prepare span grid -->
-                                                                                                <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
-                                                                                                    <xxforms:context name="grid" select="$grid"/>
-                                                                                                </xforms:dispatch>
+                                                                                            <!-- Prepare span grid -->
+                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
+                                                                                                <xxforms:context name="grid" select="$grid"/>
+                                                                                            </xforms:dispatch>
 
-                                                                                                <!-- Adjust rowspans -->
-                                                                                                <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. = 'x']">
-                                                                                                    <!-- This current cell in the row to delete is impacted by a rowspan -->
-                                                                                                    <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
+                                                                                            <!-- Adjust rowspans -->
+                                                                                            <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. = 'x']">
+                                                                                                <!-- This current cell in the row to delete is impacted by a rowspan -->
+                                                                                                <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
 
-                                                                                                    <!-- Find td which contains the rowspan -->
-                                                                                                    <xxforms:variable name="c" select="(../preceding-sibling::r/c[$x][. != 'x'])[last()]"/>
-                                                                                                    <xxforms:variable name="y" select="count($c/../preceding-sibling::r) + 1"/>
-                                                                                                    <xxforms:variable name="rowspan-td-x" select="count($c/preceding-sibling::c[. != 'x']) + 1"/>
-                                                                                                    <xxforms:variable name="rowspan-td" select="$grid/xhtml:tr[$y]/xhtml:td[$rowspan-td-x]"/>
+                                                                                                <!-- Find td which contains the rowspan -->
+                                                                                                <xxforms:variable name="c" select="(../preceding-sibling::r/c[$x][. != 'x'])[last()]"/>
+                                                                                                <xxforms:variable name="y" select="count($c/../preceding-sibling::r) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td-x" select="count($c/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td" select="$grid/xhtml:tr[$y]/xhtml:td[$rowspan-td-x]"/>
 
-                                                                                                    <!-- Increment rowspan value -->
-                                                                                                    <xxforms:variable name="current-rowspan" select="if ($rowspan-td/@rowspan) then xs:integer($rowspan-td/@rowspan) else 1"/>
-                                                                                                    <xforms:insert context="$rowspan-td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + 1))"/>
+                                                                                                <!-- Increment rowspan value -->
+                                                                                                <xxforms:variable name="current-rowspan" select="if ($rowspan-td/@rowspan) then xs:integer($rowspan-td/@rowspan) else 1"/>
+                                                                                                <xforms:insert context="$rowspan-td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + 1))"/>
 
-                                                                                                </xforms:action>
-
-                                                                                                <!-- Number of tds that must be in the new row -->
-                                                                                                <xxforms:variable name="new-td-count"
-                                                                                                                  select="if ($tr/following-sibling::xhtml:tr)
-                                                                                                                          then count(instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. != 'x'])
-                                                                                                                          else xs:integer($grid/@columns)"/>
-
-                                                                                                <!-- Insert new row -->
-                                                                                                <xforms:insert context="$grid" nodeset="xhtml:tr"
-                                                                                                               at="$tr-position" position="after"
-                                                                                                               origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                             </xforms:action>
+
+                                                                                            <!-- Number of tds that must be in the new row -->
+                                                                                            <xxforms:variable name="new-td-count"
+                                                                                                              select="if ($tr/following-sibling::xhtml:tr)
+                                                                                                                      then count(instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. != 'x'])
+                                                                                                                      else xs:integer($grid/@columns)"/>
+
+                                                                                            <!-- Insert new row -->
+                                                                                            <xforms:insert context="$grid" nodeset="xhtml:tr"
+                                                                                                           at="$tr-position" position="after"
+                                                                                                           origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>
                                                                                 </xhtml:div>

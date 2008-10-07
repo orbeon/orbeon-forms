@@ -87,7 +87,8 @@
                 <xsl:template match="instances/instance">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
-                        <xsl:copy-of select="saxon:parse(string(.))"/>
+                        <!-- Not sure why we can have the instance either serialized as text or directly inline! -->
+                        <xsl:copy-of select="if (*) then * else saxon:parse(string(.))"/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>

@@ -2788,5 +2788,171 @@
         </output>
     </test>
 
+    <test description="Repeat iteration relevance" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
+                        </xxforms:action>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls>
+                            <xforms:group ref="authorizations" id="authorization-group">
+                                <xforms:repeat nodeset="authorization" id="authorization-repeat">
+                                    <xforms:input ref="approvalStatus" id="approvalStatus-input"><xforms:label>Approval Status:</xforms:label></xforms:input>
+                                    <xforms:repeat nodeset="conditions/condition" id="condition-repeat">
+                                        <xforms:textarea ref="description" id="description-textarea"><xforms:label>Condition:</xforms:label></xforms:textarea>
+                                    </xforms:repeat>
+                                </xforms:repeat>
+                            </xforms:group>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="main-instance">
+                                    <tea xmlns="">
+                                        <authorizations>
+                                            <authorization>
+                                                <approvalStatus>aaa</approvalStatus>
+                                                <conditions>
+                                                    <condition>
+                                                        <description/>
+                                                        <resolution/>
+                                                    </condition>
+                                                    <condition>
+                                                        <description/>
+                                                        <resolution/>
+                                                    </condition>
+                                                </conditions>
+                                            </authorization>
+                                            <authorization>
+                                                <approvalStatus/>
+                                                <conditions>
+                                                    <condition>
+                                                        <description/>
+                                                        <resolution/>
+                                                    </condition>
+                                                    <condition>
+                                                        <description/>
+                                                        <resolution/>
+                                                    </condition>
+                                                </conditions>
+                                            </authorization>
+                                        </authorizations>
+                                    </tea>
+                                </xforms:instance>
+
+                                <xforms:bind nodeset="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
+
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <instances>
+                            <instance model-id="main-model" id="main-instance">
+                                <tea xmlns="">
+                                    <authorizations>
+                                        <authorization>
+                                            <approvalStatus>aaa</approvalStatus>
+                                            <conditions>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                            </conditions>
+                                        </authorization>
+                                        <authorization>
+                                            <approvalStatus/>
+                                            <conditions>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                            </conditions>
+                                        </authorization>
+                                    </authorizations>
+                                </tea>
+                            </instance>
+                        </instances>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <tea>
+                                    <authorizations>
+                                        <authorization>
+                                            <approvalStatus>aaa</approvalStatus>
+                                            <conditions>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                            </conditions>
+                                        </authorization>
+                                        <authorization>
+                                            <approvalStatus>bbb</approvalStatus>
+                                            <conditions>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                                <condition>
+                                                    <description/>
+                                                    <resolution/>
+                                                </condition>
+                                            </conditions>
+                                        </authorization>
+                                    </authorizations>
+                                </tea>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="authorization-repeat" index="2"/>
+                            <control effective-id="condition-repeat·1" index="1"/>
+                            <control effective-id="condition-repeat·2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
+                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="1"/>
+                        <xxf:control id="description-textarea·2-1" relevant="true"/>
+                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="2"/>
+                        <xxf:control id="description-textarea·2-2" relevant="true"/>
+                    </xxf:control-values>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
+                    </xxf:repeat-indexes>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

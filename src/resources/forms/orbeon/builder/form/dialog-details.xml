@@ -51,7 +51,7 @@
                         <xforms:value>fr-search</xforms:value>
                     </xforms:item>
                     <xforms:item>
-                        <xforms:label>Confirmation Email Address</xforms:label>
+                        <xforms:label>Email Recipient</xforms:label>
                         <xforms:value>fr-email-recipient</xforms:value>
                     </xforms:item>
                 </xforms:select>

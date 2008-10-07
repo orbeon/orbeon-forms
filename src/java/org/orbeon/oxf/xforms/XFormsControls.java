@@ -662,6 +662,7 @@ public class XFormsControls {
             }
 
             // Mark the control as dirty so it gets reevaluated
+            // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
             control.markDirty();
         }
 
@@ -669,8 +670,19 @@ public class XFormsControls {
         }
 
         public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
+
+            // Get reference to iteration control
+            final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) effectiveIdsToControls.get(effectiveIterationId);
+
+            // Check whether this is an existing iteration as opposed to a newly created iteration
+            final boolean isExistingIteration = newIterationsMap.get(effectiveIterationId) == null;
+            if (isExistingIteration) {
+                // Mark the control as dirty so it gets reevaluated
+                repeatIterationControl.markDirty();
+            }
+
             // Allow recursing into this iteration only if it is not a newly created iteration
-            return newIterationsMap.get(effectiveIterationId) == null;
+            return isExistingIteration;
         }
 
         public void endRepeatIteration(int iteration) {

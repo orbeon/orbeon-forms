@@ -5533,21 +5533,24 @@ ORBEON.xforms.Offline = {
                 newEventsString.push(escape(eventString.join("")));
             }
 
-            var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
-            var currentEventsString = resultSet.fieldByName("offline_events");
-            if (currentEventsString != "") {
-                currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
-                currentEventsString += " ";
+
+            if (newEventsString.length > 0) {
+                var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
+                var currentEventsString = resultSet.fieldByName("offline_events");
+                if (currentEventsString != "") {
+                    currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+                    currentEventsString += " ";
+                }
+                currentEventsString += newEventsString.join("");
+                currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+
+                // Compute new values of controls
+                var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
+
+                // Store new events and new value of controls
+                ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
+                        [ controlValuesString, currentEventsString, window.location.href ]).close();
             }
-            currentEventsString += newEventsString.join("");
-            currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
-
-            // Compute new values of controls
-            var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
-
-            // Store new events and new value of controls
-            ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
-                    [ controlValuesString, currentEventsString, window.location.href ]).close();
         });
     },
 

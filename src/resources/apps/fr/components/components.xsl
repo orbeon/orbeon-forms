@@ -42,6 +42,7 @@
     <xsl:variable name="is-detail" select="doc('input:instance')/*/mode != ''" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
+    <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>
 
     <!-- Properties -->
     <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
@@ -61,7 +62,7 @@
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <xsl:apply-templates select="node()"/>
             </xforms:group>
-            <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+            <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
         </xsl:copy>
     </xsl:template>
 

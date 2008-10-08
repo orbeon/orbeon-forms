@@ -118,6 +118,8 @@
                 <submit-dialog-keep>Keep values and close</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Close window</submit-dialog-close-window>
+                <collapse-all>Collapse all</collapse-all>
+                <expand-all>Expand all</expand-all>
             </labels>
         </detail>
         <import-export>
@@ -242,9 +244,11 @@
                 <alert>Valeur manquante ou incorrecte</alert>
                 <email>Email</email>
                 <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
-                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
+                <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Close window</submit-dialog-close-window>
+                <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
+                <collapse-all>[Collapse all]</collapse-all>
+                <expand-all>[Expand all]</expand-all>
             </labels>
         </detail>
         <import-export>
@@ -371,6 +375,8 @@
                 <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
                 <submit-dialog-go>[OK]</submit-dialog-go>
                 <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
+                <collapse-all>[Collapse all]</collapse-all>
+                <expand-all>[Expand all]</expand-all>
             </labels>
         </detail>
         <import-export>

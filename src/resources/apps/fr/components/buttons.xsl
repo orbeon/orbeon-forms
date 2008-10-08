@@ -169,6 +169,38 @@
         </xforms:trigger>
     </xsl:template>
 
+    <xsl:template match="fr:collapse-all-button">
+
+        <xforms:trigger id="fr-collapse-all-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/collapse-all"/>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xsl:for-each select="$input-data//fr:section/@id">
+                    <xforms:toggle case="case-{.}-closed"/>
+                    <xforms:toggle case="case-button-{.}-closed"/>
+                </xsl:for-each>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:expand-all-button">
+
+        <xforms:trigger id="fr-expand-all-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/expand-all"/>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xsl:for-each select="$input-data//fr:section/@id">
+                    <xforms:toggle case="case-{.}-open"/>
+                    <xforms:toggle case="case-button-{.}-open"/>
+                </xsl:for-each>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
     <!-- === Offline Buttons (alpha code, not supported/documented) === -->
 
     <xsl:template match="fr:take-offline-button">

@@ -4046,7 +4046,7 @@ ORBEON.xforms.Server = {
     handleResponseAjax: function(o) {
 
         var responseXML = o.responseXML;
-        if (o.getResponseHeader["Content-Type"] == "text/html") {
+        if (!YAHOO.lang.isUndefined(o.getResponseHeader) && o.getResponseHeader["Content-Type"] == "text/html") {
 
             // Parse content we receive into a new div we create just for that purpose
             var temporaryContainer = document.createElement("div");

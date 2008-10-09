@@ -91,6 +91,7 @@
                 <xhtml:p>
                     The form was published successfully.
                 </xhtml:p>
+                <!-- Display response content if present -->
                 <xxforms:variable name="response" model="fr-persistence-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
                 <xforms:group ref=".[normalize-space($response) != '']" class="fb-publish-message">
                     <xforms:output value="$response" mediatype="text/html"/>
@@ -132,6 +133,9 @@
 
     <!-- Respond to successful publish submission -->
     <xforms:action ev:event="xforms-submit-done" ev:observer="fr-publish-form-submission">
+        <!-- Clear response if not HTML -->
+        <xforms:setvalue if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
+            model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
         <!-- Open success area -->
         <xforms:toggle case="fb-publish-dialog-success"/>
     </xforms:action>

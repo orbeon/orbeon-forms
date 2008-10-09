@@ -116,85 +116,11 @@ var ORBEON = ORBEON || {};
 ORBEON.util = ORBEON.util || {};
 ORBEON.xforms = ORBEON.xforms || {};
 ORBEON.widgets = ORBEON.widgets || {};
+ORBEON.xforms.Globals = ORBEON.xforms.Globals || {}
 
 /**
  * Global constants and variable
  */
-ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
-    // Booleans used for browser detection
-    isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
-    isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox
-    isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0 (NOTE: will have to fix this for Firefox 4 and later)
-    isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
-    isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
-    isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
-    isRenderingEngineTrident: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
-            && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
-
-    /**
-     * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
-     * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
-     * just registering the event handler on the window object.
-     */
-    baseURL: null,
-    xformsServerURL: null,
-    eventQueue: [],                      // Events to be sent to the server
-    eventsFirstEventTime: 0,             // Time when the first event in the queue was added
-    requestForm: null,                   // HTML for the request currently in progress
-    requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
-    requestInProgress: false,            // Indicates wether an Ajax request is currently in process
-    requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
-    requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
-    executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
-    maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
-    currentFocusControlId: null,         // Track which control has focus
-    htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
-    repeatTreeChildToParent: {},         // Describes the repeat hierarchy
-    repeatIndexes: {},                   // The current index for each repeat
-    repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-    inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
-    yuiCalendar: null,                   // Reusable calendar widget
-    tooltipLibraryInitialized: false,
-    changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
-    serverValue: {},                     // Values on controls known to the server
-    autoCompleteLastKeyCode: {},         // Stores the last key entered for each auto-complete field
-    autoCompleteOpen: {},
-    loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
-    activeControl: null,                 // The currently active control, used to disable hint
-    autosizeTextareas: [],               // Ids of the autosize textareas on the page
-    fckEditorLoading: false,             // True if  a FCK editor is currently loading
-    fckEditorsToLoad: [],                // Queue of FCK editor to load
-    dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-    dialogMinimalVisible: {},            // Map for minimal dialog id -> boolean isVisible
-    dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
-    hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
-    alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
-    helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
-    debugDiv: null,                      // Points to the div when debug messages are displayed
-    debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
-    lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
-    pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
-    menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
-    menuYui: {},                         // Maps menu id to the YUI object for that menu
-    treeYui: {},                         // Maps tree id to the YUI object for that tree
-    idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
-    isReloading: false,                  // Whether the form is being reloaded from the server
-    lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
-    // Data relative to a form is stored in an array indexed by form id.
-    formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
-    formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
-    formErrorPanel: {},                  // YUI panel used to report errors
-    formHelpPanel: {},                   // Help dialog: YUI panel
-    formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
-    formHelpPanelCloseButton: {},        // Help dialog: close button
-    formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
-    formStaticState: {},                 // State that does not change for the life of the page
-    formDynamicState: {},                // State that changes at every request
-    formServerEvents: {},                // Server events information
-    formClientState: {},                 // Store for information we want to keep when the page is reloaded
-    topLevelListenerRegistered: false,   // Have we already registered the listeners on the top-level elements, which never change
-    modalProgressPanel: null             //Overlay modal panel for displaying progress bar
-};
 
 /**
  * The IE version of those methods does not store anything in the
@@ -3155,6 +3081,84 @@ ORBEON.xforms.Init = {
 
     document: function() {
 
+        ORBEON.xforms.Globals = {
+            // Booleans used for browser detection
+            isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
+            isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox
+            isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0 (NOTE: will have to fix this for Firefox 4 and later)
+            isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
+            isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
+            isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
+            isRenderingEngineTrident: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
+                    && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
+
+            /**
+             * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
+             * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
+             * just registering the event handler on the window object.
+             */
+            baseURL: null,
+            xformsServerURL: null,
+            eventQueue: [],                      // Events to be sent to the server
+            eventsFirstEventTime: 0,             // Time when the first event in the queue was added
+            requestForm: null,                   // HTML for the request currently in progress
+            requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
+            requestInProgress: false,            // Indicates wether an Ajax request is currently in process
+            requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
+            requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
+            executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
+            maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
+            currentFocusControlId: null,         // Track which control has focus
+            htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
+            repeatTreeChildToParent: {},         // Describes the repeat hierarchy
+            repeatIndexes: {},                   // The current index for each repeat
+            repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
+            inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
+            yuiCalendar: null,                   // Reusable calendar widget
+            tooltipLibraryInitialized: false,
+            changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
+            serverValue: {},                     // Values on controls known to the server
+            autoCompleteLastKeyCode: {},         // Stores the last key entered for each auto-complete field
+            autoCompleteOpen: {},
+            loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
+            activeControl: null,                 // The currently active control, used to disable hint
+            autosizeTextareas: [],               // Ids of the autosize textareas on the page
+            fckEditorLoading: false,             // True if  a FCK editor is currently loading
+            fckEditorsToLoad: [],                // Queue of FCK editor to load
+            dialogs: {},                         // Map for dialogs: id -> YUI dialog object
+            dialogMinimalVisible: {},            // Map for minimal dialog id -> boolean isVisible
+            dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
+            hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
+            alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
+            helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
+            debugDiv: null,                      // Points to the div when debug messages are displayed
+            debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
+            lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
+            pageLoadedRegistered: true,          // If the page loaded listener has been registered already, to avoid running it more than once
+            menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
+            menuYui: {},                         // Maps menu id to the YUI object for that menu
+            treeYui: {},                         // Maps tree id to the YUI object for that tree
+            idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
+            isReloading: false,                  // Whether the form is being reloaded from the server
+            lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
+            // Data relative to a form is stored in an array indexed by form id.
+            formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
+            formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
+            formErrorPanel: {},                  // YUI panel used to report errors
+            formHelpPanel: {},                   // Help dialog: YUI panel
+            formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
+            formHelpPanelCloseButton: {},        // Help dialog: close button
+            formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
+            formStaticState: {},                 // State that does not change for the life of the page
+            formDynamicState: {},                // State that changes at every request
+            formServerEvents: {},                // Server events information
+            formClientState: {},                 // Store for information we want to keep when the page is reloaded
+            modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
+            topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
+                ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered 
+        };
+
+
         // Notify the offline module that the page was loaded
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
@@ -3980,8 +3984,9 @@ ORBEON.xforms.Server = {
         // Hide loading indicator if we have not started a new request (nothing more to run)
         // and there are not events in the queue. However make sure not to hide the error message
         // if the last XHR query returned an error.
-        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0)
+        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0) {
             xformsDisplayIndicator("none");
+        }
     },
 
     asyncRequest: function() {
@@ -4078,19 +4083,18 @@ ORBEON.xforms.Server = {
             }
             var formID = ORBEON.xforms.Globals.requestForm.id;
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
+            // Reset changes, as changes are included in this bach of events
+            ORBEON.xforms.Globals.changedIdsRequest = {};
+            // Go ahead with next request, if any
+            ORBEON.xforms.Globals.requestInProgress = false;
+            ORBEON.xforms.Globals.requestDocument = "";
+            ORBEON.xforms.Globals.executeEventFunctionQueued++;
+            ORBEON.util.Utils.hideModalProgressPanel();
+            ORBEON.xforms.Server.executeNextRequest(false);
+
+            // Notify listeners that we are done processing this request
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
         }
-
-        // Reset changes, as changes are included in this bach of events
-        ORBEON.xforms.Globals.changedIdsRequest = {};
-        // Go ahead with next request, if any
-        ORBEON.xforms.Globals.requestInProgress = false;
-        ORBEON.xforms.Globals.requestDocument = "";
-        ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        ORBEON.util.Utils.hideModalProgressPanel();
-        ORBEON.xforms.Server.executeNextRequest(false);
-
-        // Notify listeners that we are done processing this request
-        ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
     },
 
     /**
@@ -5961,24 +5965,29 @@ function xformsLogProperties(object) {
 
 function xformsDisplayIndicator(state) {
     var form = ORBEON.xforms.Globals.requestForm;
-    var formID = form.id;
-    switch (state) {
-        case "loading":
-            if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
-                ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", true);
-                ORBEON.xforms.Controls.updateLoadingPosition(formID);
-            }
-            if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
-                ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
-            break;
-        case "none":
-            if (!ORBEON.xforms.Globals.loadingOtherPage) {
-                if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null)
-                    ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
+    // Form can be null if an incremental event happens around the same time as an non-incremental event. Both were sent
+    // but the incremental run an executeNextRequest after the response arrived. If the response replaces the HTML,
+    // then the form will be null.
+    if (form != null) {
+        var formID = form.id;
+        switch (state) {
+            case "loading":
+                if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
+                    ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", true);
+                    ORBEON.xforms.Controls.updateLoadingPosition(formID);
+                }
                 if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
                     ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
-            }
-            break;
+                break;
+            case "none":
+                if (!ORBEON.xforms.Globals.loadingOtherPage) {
+                    if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null)
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
+                    if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
+                        ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
+                }
+                break;
+        }
     }
 }
 

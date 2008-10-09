@@ -63,7 +63,7 @@
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <xsl:apply-templates select="node()"/>
             </xforms:group>
-            <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+            <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
     </xsl:template>
 

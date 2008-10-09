@@ -49,7 +49,8 @@
     <xsl:variable name="has-noscript-link" select="pipeline:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-toc" select="pipeline:property(string-join(('oxf.fr.detail.toc', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="is-noscript-table" select="not(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table" select="not(not(pipeline:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s')" as="xs:string*"/>

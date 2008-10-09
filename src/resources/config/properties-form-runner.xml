@@ -45,6 +45,7 @@
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.noscript.section.collapse.*.*"                value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                                      value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
     <property as="xs:boolean" name="oxf.fr.detail.new.accept-post.*.*"                          value="false"/>

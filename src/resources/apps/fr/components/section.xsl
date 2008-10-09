@@ -48,35 +48,37 @@
 
                 <!-- Open/close button -->
                 <xforms:group appearance="xxforms:internal">
-                    <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic">
-                        <xforms:case id="case-button-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
-                            <!-- "+" trigger -->
-                            <xforms:trigger appearance="minimal" id="button-{$section-id}-open" class="fr-section-open-close">
-                                <xforms:label>
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="{{$fr-resources/components/labels/open-section}}"/>
-                                </xforms:label>
-                            </xforms:trigger>
-                        </xforms:case>
-                        <xforms:case id="case-button-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
-                            <!-- "-" trigger -->
-                            <xforms:trigger appearance="minimal" id="button-{$section-id}-close" class="fr-section-open-close">
-                                <xforms:label>
-                                    <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="{{$fr-resources/components/labels/close-section}}"/>
-                                </xforms:label>
-                            </xforms:trigger>
-                        </xforms:case>
-                    </xforms:switch>
+                    <xsl:if test="not($is-noscript) or $is-noscript-section-collapse">
+                        <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic">
+                            <xforms:case id="case-button-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
+                                <!-- "+" trigger -->
+                                <xforms:trigger appearance="minimal" id="button-{$section-id}-open" class="fr-section-open-close">
+                                    <xforms:label>
+                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="{{$fr-resources/components/labels/open-section}}"/>
+                                    </xforms:label>
+                                </xforms:trigger>
+                            </xforms:case>
+                            <xforms:case id="case-button-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
+                                <!-- "-" trigger -->
+                                <xforms:trigger appearance="minimal" id="button-{$section-id}-close" class="fr-section-open-close">
+                                    <xforms:label>
+                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="{{$fr-resources/components/labels/close-section}}"/>
+                                    </xforms:label>
+                                </xforms:trigger>
+                            </xforms:case>
+                        </xforms:switch>
 
-                    <!-- Handle DOMActivate event to open/close the switches -->
-                    <xforms:action ev:event="DOMActivate" ev:target="{$section-id} button-{$section-id}-open button-{$section-id}-close">
-                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
-                            <xsl:value-of select="$section-id"/>
-                        </xforms:setvalue>
-                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('xxforms:repeat-indexes')"/>
-                        <!-- Dispatch fr-collapse or fr-expand -->
-                        <xforms:dispatch target="fr-sections-model"
-                                         name="fr-{{if (xxforms:case('switch-{$section-id}') = 'case-{$section-id}-open') then 'collapse' else 'expand'}}"/>
-                    </xforms:action>
+                        <!-- Handle DOMActivate event to open/close the switches -->
+                        <xforms:action ev:event="DOMActivate" ev:target="{$section-id} button-{$section-id}-open button-{$section-id}-close">
+                            <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
+                                <xsl:value-of select="$section-id"/>
+                            </xforms:setvalue>
+                            <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('xxforms:repeat-indexes')"/>
+                            <!-- Dispatch fr-collapse or fr-expand -->
+                            <xforms:dispatch target="fr-sections-model"
+                                             name="fr-{{if (xxforms:case('switch-{$section-id}') = 'case-{$section-id}-open') then 'collapse' else 'expand'}}"/>
+                        </xforms:action>
+                    </xsl:if>
 
                     <xsl:choose>
                         <xsl:when test="@editable = 'true'">
@@ -90,11 +92,17 @@
                             </xsl:variable>
                             <xsl:apply-templates select="$input"/>
                         </xsl:when>
-                        <xsl:otherwise>
+                        <xsl:when test="not($is-noscript) or $is-noscript-section-collapse">
                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
                             <xforms:trigger id="{$section-id}" appearance="minimal">
                                 <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
                             </xforms:trigger>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- Set the section id to this output: this id matching is needed for noscript help -->
+                            <xforms:output id="{$section-id}" appearance="minimal" value="''">
+                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
+                            </xforms:output>
                         </xsl:otherwise>
                     </xsl:choose>
 

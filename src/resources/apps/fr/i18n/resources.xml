@@ -247,8 +247,8 @@
                 <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
-                <collapse-all>[Collapse all]</collapse-all>
-                <expand-all>[Expand all]</expand-all>
+                <collapse-all>Fermer sections</collapse-all>
+                <expand-all>Ouvrir sections</expand-all>
             </labels>
         </detail>
         <import-export>
@@ -274,15 +274,15 @@
     <resource xml:lang="es">
         <components>
             <labels>
-                <open-section>[Show Section]</open-section>
-                <close-section>[Hide Section]</close-section>
-                <section-name>[Section Name]</section-name>
+                <open-section>Mostrar sección</open-section>
+                <close-section>Cerrar sección</close-section>
+                <section-name>Nombre de la sección</section-name>
             </labels>
         </components>
         <errors>
-            <summary-title>[Your Form Contains the Following Errors]</summary-title>
-            <some>[Errors on Form]</some>
-            <none>[No Errors on Form]</none>
+            <summary-title>Su formulario contiene los siguientes errores</summary-title>
+            <some>Errores en el formulario</some>
+            <none>No hay errores en el formulario</none>
         </errors>
         <email>
             <subject>[Orbeon Forms: Confirmation]</subject>
@@ -295,38 +295,39 @@
                 <created>Creado</created>
                 <last-modified>Fecha de modificación</last-modified>
                 <selected>Seleccionado</selected>
-                <search-1>[Search returned]</search-1>
-                <search-2>[documents.]</search-2>
-                <to>[to]</to>
+                <search-1>Resultado de la búsqueda</search-1>
+                <search-2>documentos.</search-2>
+                <to>al</to>
                 <of>de</of>
-                <refresh>[This operation will refresh the page]</refresh>
-                <toc>[Table of Contents]</toc>
-                <help>[Help]</help>
-                <error-count>[Error in Your Form]</error-count>
-                <errors-count>[Errors in Your Form]</errors-count>
+                <refresh>Este botón actualizará la página</refresh>
+                <toc>Tabla de contenidos</toc>
+                <help>Ayuda</help>
+                <error-count>Errores en su formulario</error-count>
+                <errors-count>Errores en su formulario</errors-count>
             </titles>
             <messages>
-                <intro><i>Por favor, seleccione una forma para llevar a cabo una operación, o seleccione "Nueva Forma" para crear un nuevo formulario en blanco.</i></intro>
-                <no-form-found><i>No se encontró el formulario de datos.</i></no-form-found>
+                <intro><i>Por favor, seleccione un formulario para llevar a cabo una operación, o seleccione "Nuevo Formulario" para crear un nuevo formulario en blanco.</i></intro>
+                <no-form-found><i>No se encontró el formulario.</i></no-form-found>
             </messages>
             <labels>
-                <new-form>Nueva Forma</new-form>
-                <import-forms>Formas de importación</import-forms>
-                <edit-form>Editar seleccionados</edit-form>
-                <delete-form>Eliminar seleccionados</delete-form>
+                <new-form>Nuevo Formulario</new-form>
+                <import-forms>Importar Formulario</import-forms>
+                <edit-form>Editar Formulario</edit-form>
+                <delete-form>Eliminar Formulario</delete-form>
                 <view-readonly>Ver HTML</view-readonly>
                 <view-xml>Ver XML</view-xml>
                 <view-pdf>Ver PDF</view-pdf>
                 <language-choice>Elegir idioma</language-choice>
-                <form-choice>Elige una Forma</form-choice>
+                <form-choice>Eligir un Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
-                <any>[[Any]]</any>
+                <any>Alguna</any>
                 <previous>Anterior</previous>
                 <next>Siguiente</next>
-                <script>[Full Version]</script>
-                <noscript>[Accessible Version]</noscript>
-                <refresh>[Refresh]</refresh>
-                <close-box>[[fermer]]</close-box>
+                <script>Versión Completa</script>
+                <noscript>Versión accesible</noscript>
+                <refresh>Actualizar</refresh>
+                <close-box>Cerrrar</close-box>
+                <help-back>Atrás</help-back>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -339,22 +340,22 @@
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
                 <form-validation-error>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
-                <database-error>Documento no guardado: por favor, póngase en contacto con el administrador del sistema.</database-error>
+                <database-error>Documento no guardado: por favor, contacte al administrador del sistema.</database-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
-                <submit-dialog-title>[Form Submitted]</submit-dialog-title>
-                <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
+                <submit-dialog-title>Su formulario ha sido enviado</submit-dialog-title>
+                <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted había ingresado al momento de guardar su documento.</saved-locally-open>
+                <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
-                <publish>[Publish]</publish>
-                <test>[Test]</test>
-                <save-locally>Guardar Localmente</save-locally>
+                <publish>Publicar</publish>
+                <test>Probar</test>
+                <save-locally>Guardar en su computador</save-locally>
                 <save-offline>Guardar Sin conexión</save-offline>
                 <submit-document>Enviar</submit-document>
-                <return>Volver a las formas</return>
-                <discard>Olvídese de los cambios</discard>
+                <return>Volver al formulario</return>
+                <discard>No guardar los cambios</discard>
                 <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario contiene errores</check-errors-in-form>
@@ -363,20 +364,20 @@
                 <close>Cerrar</close>
                 <print>Imprimir</print>
                 <print-pdf>PDF</print-pdf>
-                <print-pdf-template>[PDF (Template)]</print-pdf-template>
+                <print-pdf-template>Modelo PDF</print-pdf-template>
                 <clear>Borrar</clear>
-                <confirm>Confirme</confirm>
+                <confirm>Confirmar</confirm>
                 <cancel>Cancelar</cancel>
                 <offline>Sin conexión</offline>
                 <online>En línea</online>
-                <alert>Desaparición o valor incorrecto</alert>
-                <email>Email</email>
-                <submit-dialog-clear>[Clear and close]</submit-dialog-clear>
-                <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
-                <submit-dialog-go>[OK]</submit-dialog-go>
-                <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
-                <collapse-all>[Collapse all]</collapse-all>
-                <expand-all>[Expand all]</expand-all>
+                <alert>Valor no especificado o incorrecto</alert>
+                <email>Correo Electrónico</email>
+                <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
+                <submit-dialog-keep>Mantener los datos y cerrar</submit-dialog-keep>
+                <submit-dialog-go>Aceptar</submit-dialog-go>
+                <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
+                <collapse-all>Cerrar Secciones</collapse-all>
+                <expand-all>Abrir Secciones</expand-all>
             </labels>
         </detail>
         <import-export>
@@ -385,7 +386,7 @@
                 <div>
                     <p>
                         Para guardar la información que usted ha ingresado haga clic en el siguiente enlace y guarde el
-                        documento en su máquina.
+                        documento en su computador.
                     </p>
                     <p>
                         Para recuperar la información, haga doble clic sobre documento guardado y se abrirá

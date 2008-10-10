@@ -51,14 +51,25 @@
         </xforms:group>
 
         <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>Custom Date Controls</xforms:label>
-            <fr:date ref="date1" id="date1">
+            <xforms:label>Dropdown Date Controls</xforms:label>
+            <fr:dropdown-date ref="date1" id="date1">
                 <xforms:label>Date 1: </xforms:label>
-            </fr:date>
+            </fr:dropdown-date>
 
-            <fr:date ref="date2" id="date2">
+            <fr:dropdown-date ref="date2" id="date2">
                 <xforms:label>Date 2: </xforms:label>
-            </fr:date>
+            </fr:dropdown-date>
+        </xforms:group>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>Fields Date Controls</xforms:label>
+            <fr:fields-date ref="date1" id="date3">
+                <xforms:label>Date 1: </xforms:label>
+            </fr:fields-date>
+
+            <fr:fields-date ref="date2" id="date4">
+                <xforms:label>Date 2: </xforms:label>
+            </fr:fields-date>
         </xforms:group>
 
         <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>

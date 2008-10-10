@@ -26,54 +26,6 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xbl:binding-xxx id="fr-select1-binding" element="fr|select1"><!-- [appearance='xxforms|full'] -->
-
-        <!-- Orbeon Form Builder Component Metadata -->
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Link Select</display-name>
-            <display-name lang="fr">Selection lien</display-name>
-            <description lang="en">Single selection control which uses a series of links</description>
-            <description lang="fr">Contrôle de sélection unique utilisant une série de liens</description>
-            <icon lang="en">
-                <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
-            </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                 <fr:select1>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                     <xforms:itemset nodeset="">
-                         <xforms:label ref="label"/>
-                         <xforms:value ref="value"/>
-                     </xforms:itemset>
-                </fr:select1>
-            </template>
-        </metadata>
-
-        <xbl:template>
-            <xforms:group xbl:attr="ref bind">
-                <xxforms:variable name="ref" select="."/>
-                <!-- NOTE: the code below doesn't work because xbl:attr is unable to copy attributes from other elements -->
-                <xforms:repeat model="fr-resources-model" xbl:attr="xforms|itemset[nodeset]">
-                    <xxforms:variable name="position" select="position()"/>
-                    <xxforms:variable name="label" xbl:attr="select=xforms|itemset xforms|label[ref]"/>
-                    <xxforms:variable name="value" xbl:attr="select=xforms|itemset xforms|value[ref]"/>
-                    <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                    <xforms:trigger ref=".[$value != $ref]" appearance="minimal">
-                        <xforms:label value="$label"/>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="$ref" value="$value"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <xforms:output ref=".[$value = $ref]" value="$label"/>
-                </xforms:repeat>
-            </xforms:group>
-        </xbl:template>
-    </xbl:binding-xxx>
-
     <xbl:binding id="dateTime-component" element="fr|dateTime">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -133,38 +85,6 @@
             </xforms:group>
         </xbl:template>
     </xbl:binding>
-
-    <xbl:binding-xxx id="fr-color-binding" element="fr|rgb">
-
-        <!-- Orbeon Form Builder Component Metadata -->
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">RGB Color</display-name>
-            <display-name lang="fr">Couleur RGB</display-name>
-            <icon lang="en">
-                <small-icon>/apps/fr/style/images/silk/palette.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/palette.png</large-icon>
-            </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                 <fr:rgb>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                </fr:rgb>
-            </template>
-        </metadata>
-
-        <xbl:template>
-            <xforms:group xbl:attr="ref bind">
-                <xforms:input ref="." incremental="true">
-                    <xforms:label>RGB Color</xforms:label>
-                    <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
-                </xforms:input>
-                <xhtml:div style="margin-top: .5em; border: 1px solid orange; width: 100%; height: 2em; background-color: {.}"/>
-            </xforms:group>
-        </xbl:template>
-    </xbl:binding-xxx>
 
     <xbl:binding id="fr-color-binding-2" element="fr|rgb2">
 
@@ -234,7 +154,7 @@
     <!--
         Component to represent a date control based on drop-down menus.
      -->
-    <xbl:binding id="fr-date-binding" element="fr|date">
+    <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -244,14 +164,14 @@
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>
-            <datatype>xs:nonNegativeInteger</datatype>
+            <datatype>xforms:date</datatype>
             <template>
-                 <fr:date>
+                 <fr:dropdown-date>
                      <xforms:label ref=""/>
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
                      <xforms:alert ref=""/>
-                </fr:date>
+                </fr:dropdown-date>
             </template>
         </metadata>
 
@@ -297,7 +217,7 @@
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
                 <xhtml:style>
-                    .fr-component-group select.xforms-select1-appearance-minimal { width: auto }
+                    .xbl-fr-dropdown-date .fr-component-group select.xforms-select1-appearance-minimal { width: auto }
                 </xhtml:style>
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
@@ -317,7 +237,7 @@
                     <xforms:select1 ref="year" xxforms:refresh-items="false">
                         <!--<xforms:label>Year</xforms:label>-->
                         <xforms:item>
-                            <xforms:label/>
+                            <xforms:label>Year</xforms:label>
                             <xforms:value/>
                         </xforms:item>
                         <xforms:itemset nodeset="instance('years-itemset')/year">
@@ -328,7 +248,7 @@
                     <xforms:select1 ref="month" xxforms:refresh-items="false">
                         <!--<xforms:label>Month</xforms:label>-->
                         <xforms:item>
-                            <xforms:label/>
+                            <xforms:label>Month</xforms:label>
                             <xforms:value/>
                         </xforms:item>
                         <xforms:itemset nodeset="instance('months-itemset')/month">
@@ -339,7 +259,7 @@
                     <xforms:select1 ref="day" xxforms:refresh-items="true">
                         <!--<xforms:label>Day</xforms:label>-->
                         <xforms:item>
-                            <xforms:label/>
+                            <xforms:label>Day</xforms:label>
                             <xforms:value/>
                         </xforms:item>
                         <xforms:itemset nodeset="instance('days-itemset')/day">
@@ -404,8 +324,8 @@
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
                 <xhtml:style>
-                    .fr-component-group .fr-us-phone-area input { width: 3em }
-                    .fr-component-group .fr-us-phone-local input { width: 8em }
+                    .xbl-fr-us-phone .fr-component-group .fr-us-phone-area input { width: 3em }
+                    .xbl-fr-us-phone .fr-component-group .fr-us-phone-local input { width: 8em }
                 </xhtml:style>
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
@@ -436,4 +356,94 @@
             </xforms:group>
         </xbl:template>
     </xbl:binding>
+
+    <!--
+        Component to represent a date control based on separate fields.
+     -->
+    <xbl:binding id="fr-fields-date-binding" element="fr|fields-date">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Fields Date</display-name>
+            <display-name lang="fr">Date avec Champs</display-name>
+            <icon lang="en">
+                <small-icon>/ops/images/xforms/calendar.png</small-icon>
+                <large-icon>/ops/images/xforms/calendar.png</large-icon>
+            </icon>
+            <datatype>xforms:date</datatype>
+            <template>
+                 <fr:fields-date>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </fr:fields-date>
+            </template>
+        </metadata>
+
+        <xbl:template>
+            <!-- Local model -->
+            <xforms:model id="fields-date-model">
+                <xforms:instance id="fields-date-instance">
+                    <date>
+                        <year/>
+                        <month/>
+                        <day/>
+                    </date>
+                </xforms:instance>
+
+            </xforms:model>
+            <!-- Local controls -->
+            <xforms:group xbl:attr="ref bind">
+                <xhtml:style>
+                    .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
+                    .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
+
+                    <!-- Make hidden date picker invisible -->
+                    .fr-hidden-date-picker { position: relative }
+                    .fr-hidden-date-picker img { z-index: 1; position: absolute; top: 0; left: 0; *top: 4px }
+                    .fr-hidden-date-picker input.xforms-type-date { width: 1px; opacity: 0; -moz-opacity: 0; *filter: alpha(opacity: 0) }
+                    .fr-hidden-date-picker span.xforms-type-date { display: inline; z-index: 2; position: relative  }
+
+                </xhtml:style>
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                <xxforms:variable name="result" select="." as="node()*"/>
+
+                <!-- React to update to bound node -->
+                <xforms:group ref="$result" appearance="xxforms:internal">
+                    <!-- Only set local values if the bound node is an xs:date -->
+                    <xforms:action ev:event="xforms-value-changed" if="$result castable as xs:date">
+                        <xforms:setvalue model="fields-date-model" ref="year" value="year-from-date($result)"/>
+                        <xforms:setvalue model="fields-date-model" ref="month" value="month-from-date($result)"/>
+                        <xforms:setvalue model="fields-date-model" ref="day" value="day-from-date($result)"/>
+                    </xforms:action>
+                </xforms:group>
+
+                <xforms:group model="fields-date-model" class="fr-component-group">
+                    <xforms:input ref="month" class="fr-width-2"/>
+                    <xforms:input ref="day" class="fr-width-2"/>
+                    <xforms:input ref="year" class="fr-width-4"/>
+
+                    <!-- React to update to local values -->
+                    <xforms:action ev:event="xforms-value-changed">
+                        <!-- Only proceed if all parts are integers -->
+                        <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
+                            <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
+                            <!-- Only set value if the result is castable as a date -->
+                            <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:group>
+
+                <!-- This builds a date picker hidden hidden behind a calendar image -->
+                <xhtml:span class="fr-hidden-date-picker">
+                    <xhtml:img src="/ops/images/xforms/calendar.png" alt="Date Picker"/>
+                    <xforms:input ref="$result"/>
+                </xhtml:span>
+
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+
 </xbl:xbl>

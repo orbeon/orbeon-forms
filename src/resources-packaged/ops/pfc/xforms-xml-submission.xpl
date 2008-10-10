@@ -38,7 +38,8 @@
 
     <p:choose href="#request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
-        <p:when test="lower-case(/*/method) = ('post')
+        <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
+        <p:when test="(lower-case(/*/method) = ('post') or /*/container-type = 'portlet')
                         and (/*/content-type = 'application/x-www-form-urlencoded' or starts-with(/*/content-type, 'multipart/form-data'))
                         and (/*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events'])">
             <!-- Process submission -->
@@ -55,7 +56,8 @@
             </p:processor>
         </p:when>
         <!-- Check for XML post -->
-        <p:when test="lower-case(/*/method) = ('post', 'put')
+        <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
+        <p:when test="(lower-case(/*/method) = ('post', 'put') or /*/container-type = 'portlet')
                         and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
             <!-- Extract request body -->

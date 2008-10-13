@@ -646,6 +646,7 @@
             <xsd:attribute name="target" type="xsd:NMTOKEN" use="required"/>
             <xsd:attribute name="bubbles" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attribute name="cancelable" type="xsd:boolean" use="optional" default="true"/>
+            <xsd:attribute name="delay" type="xsd:integer" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>

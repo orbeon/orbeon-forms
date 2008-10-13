@@ -3924,17 +3924,38 @@ ORBEON.xforms.Server = {
                         requestDocumentString.push('</xxforms:initial-dynamic-state>\n');
                     }
 
+
+                    // Keep track of the events we have handled, so we can later remove them from the queue
+                    var handledEvents = [];
+
+                    // Add server-events, if any. Server execpts server-events in a separate elements before the
+                    // <xxforms:action> which contains all the <xxforms:event>.
+                    for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
+                        var event = ORBEON.xforms.Globals.eventQueue[i];
+                        // Only handle this event if it is for the form we chose, and if
+                        if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
+                            if (event.eventName == "server-events") {
+                                requestDocumentString.push(indent);
+                                requestDocumentString.push('<xxforms:server-events>');
+                                requestDocumentString.push(event.value);
+                                requestDocumentString.push('</xxforms:server-events>');
+                                handledEvents.unshift(i);
+                            }
+                        }
+                    }
+
                     // Start action
                     requestDocumentString.push(indent);
                     requestDocumentString.push('<xxforms:action>\n');
 
                     // Add events
-                    var handledEvents = [];
                     for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
                         var event = ORBEON.xforms.Globals.eventQueue[i];
 
-                        // Only handle this event if it is for the form we chose
-                        if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
+                        // Only handle this event if it is for the form we chose, and if
+                        // And if this is not an xforms-events (which is sent separately, not as an action).
+                        if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm
+                                && event.eventName != "server-events") {
                             // Create <xxforms:event> element
                             requestDocumentString.push(indent + indent);
                             requestDocumentString.push('<xxforms:event');
@@ -4872,8 +4893,23 @@ ORBEON.xforms.Server = {
 
                                 // Server events
                                 case "server-events": {
-                                    // If there is a "submission" element, this must always come first
-                                    serverEventsIndex = actionIndex;
+                                    var serverEventsElement = actionElement.childNodes[actionIndex];
+                                    var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
+                                    if (delay == null) {
+                                        // Case of 2-phase submission: store position of this element, and later when we
+                                        // process the submission element, we'll store the value of server-events in the
+                                        // $server-events form field, which will be submitted to the server by POSTing
+                                        // the form.
+                                        serverEventsIndex = actionIndex;
+                                    } else {
+                                        // Case where we need to send those events to the server with a regular Ajax request
+                                        //  after the given delay.
+                                        var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
+                                        window.setTimeout(function () {
+                                            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.getElementById(formID), null, null, serverEvents, "server-events");
+                                            ORBEON.xforms.Server.fireEvents([event]);
+                                        }, delay);
+                                    }
                                     break;
                                 }
 

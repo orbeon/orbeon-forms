@@ -32,6 +32,11 @@
                     <data type="string"/>
                 </element>
             </optional>
+            <zeroOrMore>
+                <element name="xxforms:server-events">
+                    <data type="string"/>
+                </element>
+            </zeroOrMore>
             <optional>
                 <element name="xxforms:files">
                     <oneOrMore>

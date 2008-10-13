@@ -31,9 +31,9 @@
 
             <xforms:action ev:event="my-event" if="started = 'true'">
                 <!-- Increment count -->
-                <xforms:setvalue ref="." value=". + 1"/>
+                <xforms:setvalue ref="/instance/count" value=". + 1"/>
                 <!-- Dispatch new event -->
-                <xforms:dispatch name="my-event" target="my-model" delay="2000"/>
+                <xforms:dispatch name="my-event" target="my-model" delay="1000"/>
             </xforms:action>
 
         </xforms:model>
@@ -50,7 +50,7 @@
                 <!-- Mark that we have started -->
                 <xforms:setvalue ref="started">true</xforms:setvalue>
                 <!-- Dispatch the event after 2 seconds -->
-                <xforms:dispatch name="my-event" target="my-model" delay="2000"/>
+                <xforms:dispatch name="my-event" target="my-model" delay="1000"/>
             </xforms:action>
         </xforms:trigger>
 

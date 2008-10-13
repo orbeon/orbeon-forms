@@ -23,6 +23,13 @@
         <xhtml:title>Offline MIPS</xhtml:title>
         <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
 
+            <xforms:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/null" replace="instance">
+                <xforms:action ev:event="xforms-submit-error">
+                    <!-- Go back offline, as if the submission had failed -->
+                    <xxforms:offline/>
+                </xforms:action>
+            </xforms:submission>
+
             <xforms:instance id="instance">
                 <instance>
                     <a/>
@@ -123,6 +130,13 @@
             <xforms:trigger ref=".[instance('ui')/offline = 'true']">
                 <xforms:label>Take online</xforms:label>
                 <xxforms:online ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
+                <xforms:label>Take online with error</xforms:label>
+                <xforms:action  ev:event="DOMActivate">
+                    <xxforms:online/>
+                    <xforms:send submission="simulate-submission"/>
+                </xforms:action>
             </xforms:trigger>
             <xforms:trigger ref=".[instance('ui')/offline = 'true']">
                 <xforms:label>Save to Gears</xforms:label>

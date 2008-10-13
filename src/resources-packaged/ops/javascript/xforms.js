@@ -3097,8 +3097,8 @@ ORBEON.xforms.Init = {
              * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
              * just registering the event handler on the window object.
              */
-            baseURL: null,
-            xformsServerURL: null,
+            baseURL: ORBEON.xforms.Globals.baseURL,
+            xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
             requestForm: null,                   // HTML for the request currently in progress
@@ -4072,7 +4072,7 @@ ORBEON.xforms.Server = {
     handleResponseAjax: function(o) {
 
         var responseXML = o.responseXML;
-        if (!YAHOO.lang.isUndefined(o.getResponseHeader) && o.getResponseHeader["Content-Type"] == "text/html") {
+        if (!YAHOO.lang.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
 
             // Parse content we receive into a new div we create just for that purpose
             var temporaryContainer = document.createElement("div");

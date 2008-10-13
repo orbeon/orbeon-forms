@@ -23,12 +23,12 @@
         <xhtml:title>XForms Submission Replace All</xhtml:title>
         <xforms:model>
             <xforms:instance id="instance" src="input:instance"/>
-            <xforms:instance id="orbeon-portlet">
-                <orbeon-portlet/>
+            <xforms:instance id="orbeon-embeddable">
+                <orbeon-embeddable/>
             </xforms:instance>
             <xforms:submission id="ask-name" method="post" action="/xforms-sandbox/sample/submission-replace-all-1{
-                if (instance('orbeon-portlet') != '') then '?orbeon-portlet=true' else ''}" replace="all"/>
-            <xforms:setvalue ref="instance('orbeon-portlet')" value="xxforms:get-request-parameter('orbeon-portlet')" ev:event="xforms-ready"/>
+                if (instance('orbeon-embeddable') != '') then '?orbeon-embeddable=true' else ''}" replace="all"/>
+            <xforms:setvalue ref="instance('orbeon-embeddable')" value="xxforms:get-request-parameter('orbeon-embeddable')" ev:event="xforms-ready"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

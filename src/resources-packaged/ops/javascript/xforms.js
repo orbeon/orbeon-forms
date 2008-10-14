@@ -2946,10 +2946,14 @@ ORBEON.widgets.YUICalendar = function() {
                 yuiCalendar.selectEvent.subscribe(dateSelected, yuiCalendar, true);
             }
 
-            // Localize calendar
+            // Get language from html/@lang
             var lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang");
+            // If not language is set there, use English
             if (lang == null)
                 lang = "en";
+            // Just keep first 2 letters (fr_FR becomes fr)
+            lang = lang.substring(0, 2);
+            // Find resource for selected language
             var resources = RESOURCES[lang];
             for (var key in resources)
                 yuiCalendar.cfg.setProperty(key, resources[key]);

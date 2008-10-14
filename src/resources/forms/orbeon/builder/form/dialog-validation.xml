@@ -61,14 +61,14 @@
                     </xforms:select1>
 
                     <xforms:select1 ref="required" appearance="full">
-                        <xforms:label>Requiredness</xforms:label>
+                        <xforms:label>Required</xforms:label>
                         <xforms:hint>Whether the data is required</xforms:hint>
                         <xforms:item>
-                            <xforms:label>Required</xforms:label>
+                            <xforms:label>Yes</xforms:label>
                             <xforms:value>true</xforms:value>
                         </xforms:item>
                         <xforms:item>
-                            <xforms:label>Optional</xforms:label>
+                            <xforms:label>No</xforms:label>
                             <xforms:value>false</xforms:value>
                         </xforms:item>
                     </xforms:select1>

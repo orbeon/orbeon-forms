@@ -630,11 +630,11 @@
                                                                             <!-- The rowspan below has an IE HACK as IE messesup rowspan with invisible <tr> elements -->
                                                                             <xhtml:td class="fb-grid-td" rowspan="{if (@rowspan) then if (instance('fb-user-agent-instance')/is-ie = 'true') then @rowspan * 2 - 1 else @rowspan else 1}">
                                                                                 <xhtml:div class="fb-grid-cell-icons">
-                                                                                    <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
+                                                                                    <!-- TODO: Implement DnD -->
                                                                                     <!-- Drag -->
-                                                                                    <xforms:trigger appearance="minimal">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
-                                                                                    </xforms:trigger>
+                                                                                    <!--<xforms:trigger appearance="minimal">-->
+                                                                                        <!--<xforms:label><xhtml:img src="/apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>-->
+                                                                                    <!--</xforms:trigger>-->
                                                                                     <!-- Expand cell down -->
                                                                                     <xforms:group ref=".[exists($td/../following-sibling::xhtml:tr[xs:integer(if ($td/@rowspan) then $td/@rowspan else 1)])]">
                                                                                         <xforms:trigger appearance="minimal" id="fb-expand-cell-down-trigger">

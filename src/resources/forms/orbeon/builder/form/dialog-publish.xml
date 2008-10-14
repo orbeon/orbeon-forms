@@ -76,7 +76,7 @@
                                 <xxforms:context name="application" select="$metadata-instance/application-name"/>
                                 <xxforms:context name="form" select="$metadata-instance/form-name"/>
                             </xforms:dispatch>
-                            <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}" xxforms:target="_blank"/>
+                            <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary/" xxforms:target="_blank"/>
                         </xforms:action>
                     </xforms:trigger>
                     <xforms:trigger>

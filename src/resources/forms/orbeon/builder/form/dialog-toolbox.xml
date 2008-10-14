@@ -222,10 +222,11 @@
                                             <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
 
                                             <!-- Set bind type if needed -->
-                                            <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
-                                            <xforms:insert if="$control-type = 'time-input'" context="$bind" origin="xxforms:attribute('type', 'xs:time')"/>
-                                            <xforms:insert if="$control-type = 'dateTime-input'" context="$bind" origin="xxforms:attribute('type', 'xs:dateTime')"/>
-                                            <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
+                                            <!-- NOTE: By default we make things optional so use the xforms:* types -->
+                                            <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xforms:date')"/>
+                                            <xforms:insert if="$control-type = 'time-input'" context="$bind" origin="xxforms:attribute('type', 'xforms:time')"/>
+                                            <xforms:insert if="$control-type = 'dateTime-input'" context="$bind" origin="xxforms:attribute('type', 'xforms:dateTime')"/>
+                                            <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xforms:anyURI')"/>
 
                                             <!-- Open label editor for newly inserted control -->
                                             <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>

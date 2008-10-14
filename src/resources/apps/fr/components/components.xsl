@@ -118,6 +118,10 @@
 
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xhtml:link | xhtml:style)"/>
+
+            <!-- For IE debugging -->
+            <!--<xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
+            <!--<xhtml:script language="javascript" type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
         </xsl:copy>
     </xsl:template>
 

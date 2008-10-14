@@ -343,6 +343,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fb-edit-items { text-decoration: none; display: block; clear: both }
 
 /* Styling comon to all HTML form controls */
+/* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,
     .fr-grid .xforms-upload input,
     .fr-grid .xforms-textarea,
@@ -354,8 +355,12 @@ button.xforms-trigger img { margin-right: 10px }
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-.fr-grid .xforms-input input.xforms-type-date { width: 8em }/* set this again as default is 100% above */
-.fr-grid .xforms-input input.xforms-type-time { width: 8em }/* set this again as default is 100% above */
+/* Set this again as default is 100% above */
+/* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
+.fr-grid .xforms-input input.xforms-type-date,
+    .fr-grid .xforms-input input.xforms-type-time {
+    width: 8em;
+}
 
 /* Radio buttons */
 .fr-grid .xforms-select1-appearance-full span input { float: left }
@@ -417,7 +422,11 @@ button.xforms-trigger img { margin-right: 10px }
 /* TODO: more controls */
 #doc4 .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
 #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
-#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 98.7% }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
+
+#doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
+    #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time { *width: 7.3em }
 
 /* ***** Components ************************************************************************************************* */
 

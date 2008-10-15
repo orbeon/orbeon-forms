@@ -59,6 +59,8 @@
                 </xhtml:div>
                 <!-- Remember there was a focus event -->
                 <xforms:setvalue ev:event="DOMFocusIn" ref="instance('focus')">true</xforms:setvalue>
+                <!-- De-highlight after the last DOMFocusOut -->
+                <xforms:setvalue ev:event="DOMFocusOut" ref="instance('focus')">false</xforms:setvalue>
             </xforms:repeat>
         </xhtml:div>
     </xhtml:body>

@@ -114,7 +114,7 @@
                                         <xsl:if test="/search/query[empty(@path) and . != '']">
                                              and contains(data.xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
                                         </xsl:if>
-                                    order by created
+                                    order by created desc
                                 </xsl:variable>
 
                                 <!-- Get total number of document in collection for this app/form -->

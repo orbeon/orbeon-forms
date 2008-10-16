@@ -87,9 +87,9 @@
         <!-- Handle binary and XML GET -->
         <p:when test="/*/method = 'GET'">
 
-            <p:processor name="oxf:sql">
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-description"/>
-                <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
+                <p:input name="config">
                     <sql:config xsl:version="2.0">
                         <sql:connection>
                             <sql:datasource>
@@ -126,7 +126,9 @@
                                     <sql:row-iterator>
                                         <xsl:choose>
                                             <xsl:when test="$is-attachment">
-                                                <sql:get-column-value column="file_content" type="xs:base64Binary"/>
+                                                <blob>
+                                                    <sql:get-column-value column="file_content" type="xs:base64Binary"/>
+                                                </blob>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <sql:get-column-value column="xml" type="odt:xmlFragment"/>
@@ -138,6 +140,12 @@
                         </sql:connection>
                     </sql:config>
                 </p:input>
+                <p:output name="data" id="sql-config"/>
+            </p:processor>
+
+            <p:processor name="oxf:sql">
+                <p:input name="data" href="#request-description"/>
+                <p:input name="config" href="#sql-config"/>
                 <p:output name="data" id="sql-out"/>
             </p:processor>
 

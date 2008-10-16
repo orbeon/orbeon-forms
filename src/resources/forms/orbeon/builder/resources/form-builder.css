@@ -1,0 +1,454 @@
+/*
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+
+#fr-view { margin-left: 15.5em; *margin-left: 15.126 }/* because the toolbox is on the left */
+/*.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }*/
+
+.xforms-select table { margin-bottom: 0 }
+
+#fr-view fieldset { border:1px solid #CCCCCC; }
+
+.fb-ie-warning { display: block; margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
+
+/*.fr-section-title div {*/
+    /*background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center*/
+/*}*/
+
+.fb-nowrap { white-space: nowrap }
+.fb-xforms-disabled { display: none }
+.fb-hide-alert .xforms-alert { display: none }
+
+/* This is like the form runner's help image */
+a.fb-edit-help-trigger img {
+    vertical-align: -0.2em;
+    display: inline;
+    margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
+    padding: 0;
+}
+
+/*.section-container { border-top: 1px solid #666699; margin-top: .5em }*/
+
+/* ***** Toolbox **************************************************************************************************** */
+
+#fb-toolbox {
+    padding: .5em;
+    background-color: #F8F8F8;
+    border-right: 2px solid orange;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    overflow: auto;
+}
+
+#fb-toolbox .fb-toolbox-inside {
+    width: 13.077em; *width: 12.75em;
+    margin-right: 15px;
+    padding-bottom: 1.5em /* with Firefox and Safari, scrollable content appears otherwise clipped a little (because content gets out of the box?) */
+}
+
+#fb-toolbox .fb-tools { margin: .5em }
+#fb-toolbox .bd { padding: .5em }
+
+#fb-toolbox .fb-tool button {
+    width: 100%;
+    text-align: left;
+    font-size: 11px;
+    font-weight: normal;
+    color: #333333;
+    margin: 1px 1px 2px 1px;
+    padding: 1px 2px 1px 2px;
+    background-color: #F8F8F8;
+    background-image: url( ../../../../apps/fr/style/logo-bg.gif );
+    background-repeat: repeat-x;
+    border-width: 1px;
+    border-left-color: #ccc;
+    border-top-color: #ccc;
+    border-right-color: gray;
+    border-bottom-color: gray;
+}
+
+#fb-toolbox .fb-tool button img { margin-left: .5em }
+#fb-toolbox .fb-tool button:hover { background-color: white; background-image: none }
+#fb-toolbox .fb-tool button.xforms-readonly { color: white }
+#fb-toolbox .fb-tool button.xforms-readonly:hover {
+    background-color: #F8F8F8;
+    background-image: url( ../../../../apps/fr/style/logo-bg.gif )
+}
+
+/* Cut / Copy / Paste */
+#fb-toolbox .fb-xvc { text-align: center }
+#fb-toolbox .fb-xvc .xforms-trigger { margin-right: .5em }
+
+/* Language choice */
+#fb-toolbox .fb-language-choice { text-align: left }
+#fb-toolbox .fb-language-choice .xforms-select1 { width: 100% }
+#fb-toolbox .fb-language-choice .xforms-label { display: block; margin-bottom: 3px }
+
+/* Services and actions */
+#fb-toolbox ul { margin: 0; overflow: auto }
+#fb-toolbox li { list-style-type: none; white-space: nowrap; font-size: 11px }
+
+#fb-toolbox a.xforms-trigger { text-decoration: none }
+
+#fb-toolbox .fb-metadata-settings select { width: 100% }
+
+/* ***** Dialogs **************************************************************************************************** */
+
+/* Itemset editor dialog */
+#fb-itemset-editor-dialog { width: 35em }
+#fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
+#fb-itemset-editor-dialog .fb-dialog-body { }
+#fb-itemset-editor-dialog .fb-language-choice { text-align: right; display: block }
+#fb-itemset-editor-dialog .fb-language-choice .xforms-select1 { width: auto }
+
+/* Submission editor dialog */
+#fb-service-dialog { width: 45em }
+.fb-service-dialog-error { border: 2px solid red; padding: .25em }
+.fb-service-dialog-error select { border: none }
+.fb-service-dialog-success { border: 2px solid green; padding: .25em }
+.fb-submission-response { display: block; height: 200px; overflow-y: auto }
+.fb-submission-response textarea { height: 10em }
+
+/* Bindings editor dialog */
+#fb-action-dialog { width: 45em }
+#fb-action-dialog .xforms-select1 { width: auto }
+#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-label { display: block }
+#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-hint { display: block }
+#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-disabled { display: none }
+#fb-action-dialog .fr-repeat-table th { white-space: nowrap }
+
+#fb-database-service-dialog { width: 45em }
+#fb-database-service-dialog textarea { height: 10em; font-family: monospace }
+
+/* Help dialog */
+#fb-edit-help-dialog { width: 40em }
+#fb-edit-help-dialog textarea { width: 98%; height: 12em }
+
+/* Other dialogs */
+.xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
+.xforms-dialog .xforms-label img { vertical-align: middle } 
+
+#fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }
+#fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
+
+#fb-edit-details-dialog,
+    #fb-edit-validation-dialog, #fb-section-details-dialog,
+    #fb-add-language-dialog { width: 20em }
+#fb-edit-details-dialog .xforms-input input { width: 98% }
+#fb-section-details-dialog .xforms-input input { width: 98% }
+
+#fb-edit-validation-dialog textarea { width: 98%; height: 4em }
+#fb-edit-validation-dialog .xforms-label { display: block; clear: both }
+#fb-edit-validation-dialog .xforms-hint { display: block; clear: both }
+#fb-edit-validation-dialog .xforms-disabled { display: none }
+
+#fb-schema-upload-dialog .xforms-hint { width: 100% }
+#fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }
+#fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger }
+#fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
+
+#fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto; background-color: white }
+#fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
+#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
+
+/* Publish dialog */
+#fb-publish-dialog { width: 35em }
+.fb-publish-message {
+    border: 2px solid #DDDDEE;
+    display: block;
+    padding: .5em;
+}
+
+/* ***** In-Place Editing ******************************************************************************************* */
+
+/* In-place editing for regular fields */
+
+.fr-inplace-buttons { display: block; margin-top: .5em; margin-bottom: .5em }
+.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 }/* because another rule puts a margin to position buttons further down in the grid */
+.fr-inplace-input input {
+    border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none; width: 100%
+}
+
+.fr-inplace-textarea textarea.xforms-textarea {
+    border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none
+}
+
+.fr-inplace-buttons .xforms-control { display: inline }
+
+/* Highlighting of in-place outputs depending on hovering */
+.fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+
+/* In-place editing for metadata section */
+#fb-metadata-group .fr-inplace-input .xforms-input input { width: 100% }
+#fb-metadata-group .fr-inplace-textarea textarea.xforms-textarea { width: 100% }
+
+
+/* In-place editing for section titles */
+.fr-section-title .fr-inplace-content .xforms-output { text-decoration: underline; color: #666699 }
+#fb-details-group .fr-section-title { display: block }
+
+/* Only show buttons when in edit mode or when hovering over the title */
+#fb-details-group .fr-section-title .fr-inplace-buttons { display: none }
+#fb-details-group .fr-section-title .fr-inplace-edit .fr-inplace-buttons,
+    #fb-details-group .fr-section-title:hover .fr-inplace-buttons { display: inline }
+
+#fb-details-group .fr-section-title .fr-inplace-buttons { margin-left: .5em; margin-right: .5em; background-color: white }
+#fb-details-group .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
+#fb-details-group .fr-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
+#fb-details-group .fr-section-title .fr-inplace-content .xforms-label { display: none }
+#fb-details-group .fr-section-title .fr-inplace-delete img { padding: 0 }
+#fb-details-group .fr-section-title .fr-inplace-delete { display: inline }
+#fb-details-group .fr-section-title .xforms-input input { width: 20em }
+
+/* For section alert, restore to something closer from the old-style alert icons */
+#fb-details-group .fr-section-title .xforms-alert-active {
+    background: transparent url(../../../ops/images/xforms/exclamation.png) no-repeat left center;
+    display: inline-block;
+    font-size: 0;
+    height: 16px;
+    width: 16px;
+    text-indent: 16px;
+    margin-left: .25em;
+    overflow: hidden;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* ***** XXX ******************************************************************************************************** */
+
+#fb-metadata-group .fr-grid { margin: 0 }
+#fb-metadata-group td { width: 50% } 
+
+/* Try some WYSIWYG appearance */
+.fb-title-control, .fb-description-control { text-align: right }
+
+.fb-title-control .xforms-label { text-align: right; display: none }
+.fb-title-control .fr-inplace-content .xforms-output { color: #666699; font-size: 197% }
+.fb-title-control .fr-inplace-content .xforms-input input { color: #666699; font-size: 197%; text-align: right }
+
+.fb-description-control .xforms-label { text-align: right; display: none }
+.fb-description-control .fr-inplace-content .xforms-output { color: #6E6E6E; font-size: smaller; font-style: italic }
+.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: smaller; font-style: italic; text-align: right }
+
+/* Highlighting of top-level blocks (sections, ...) */
+.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
+.fb-top-level-content:hover { border-left: 4px solid #ccc }
+.fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #666699}
+
+/* Highlighting of section content (grids, ...) */
+.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
+.fb-section-content:hover { border-left: 4px solid #ccc}
+.fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #666699}
+
+/* Control editor */
+.fb-control-label .xforms-label { display: none }
+.fb-control-label .fr-inplace-content {
+    font-weight: bold;
+    display: inline;
+    margin-bottom: .2em;
+}
+
+.fb-control-label .fr-inplace-edit .xforms-alert { display: none }
+.fb-control-control .xforms-label { display: none }
+.fb-control-control .xforms-alert { display: none }
+
+a.xforms-help-image .fb-control-help { vertical-align: baseline; }
+
+.fb-control-hint .fr-inplace-content {
+    font-size: smaller;
+    font-style: italic;
+    display: block;
+    margin-left: .5em;
+    margin-top: .2em;
+    color: gray
+}
+
+/* Grid */
+
+.fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
+.fb-grid-td { width: auto; vertical-align: top; border: 1px dotted gray; padding: .2em }
+.fb-grid-td .xforms-alert { display: none }
+
+.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+
+/* Grid icons and hovering */
+.fb-grid-top-left-td { text-align: center }
+.fb-grid .fb-grid-top-left-td img { display: none }
+.fb-grid:hover .fb-grid-top-left-td img { display: inline }
+
+/* Row icons and hovering */
+.fb-grid .fb-grid-tr .fb-grid-row-icons img { display: none }
+.fb-grid .fb-grid-tr:hover .fb-grid-row-icons img { display: inline }
+
+/* Cell icons and hovering */
+.fb-grid-cell-icons { float: left; margin-right: .2em }
+.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
+.fb-grid .fb-grid-td .fb-grid-cell-icons img { display: none }
+.fb-grid .fb-grid-td:hover .fb-grid-cell-icons img { display: inline }
+
+.fb-grid-control-icons { float: right }
+.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
+.fb-grid .fb-grid-td .fb-grid-control-icons img { display: none }
+.fb-grid .fb-grid-td:hover .fb-grid-control-icons img { display: inline }
+
+/* Column icons */
+.fb-grid-column-toolbar-td { text-align: center; padding-bottom: 2px }/* padding so that the icon doesn't touch the table border */
+.fb-grid-column-toolbar-td .fb-insert-left { float: left }
+.fb-grid-column-toolbar-td .fb-insert-right { float: right }
+
+/* Selected cell */
+.xforms-repeat-selected-item-4 {
+    background-color: #F8F8F8;
+    background-image: url( ../../../../apps/fr/style/logo-bg.gif );
+    background-repeat: repeat-x;
+}
+
+/* Grid content */
+.fb-grid-td .fb-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table - but beware it causes clipping of inside content */
+.fb-grid-td .fb-grid-content { float: left; width: 64.6em; *width: 63em }
+
+.fb-control-control { *padding-right: 6px }/* To help IE move back controls within .fb-grid-content */
+.fb-control-control { margin-top: .3em }
+
+#fb-details-group .fb-grid-td .xforms-input input,
+    #fb-details-group .fb-grid-td .xforms-upload input,
+    #fb-details-group .fb-grid-td .xforms-textarea,
+    #fb-details-group .fb-grid-td .xforms-select1-appearance-minimal,
+    #fb-details-group .fb-grid-td .xforms-select1-appearance-compact,
+    #fb-details-group .fb-grid-td .xforms-select-appearance-compact {
+    width: 100%;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box
+}
+
+/* set this again as default is 100% above */
+#fb-details-group .fb-grid-td .xforms-input input.xforms-type-date,
+    #fb-details-group .fb-grid-td .xforms-input input.xforms-type-time {
+    width: 8em;
+    *width: 7.3em;/* IE adjustment */
+}
+
+#fb-details-group .fb-grid-td .xforms-textarea { height: 6em }
+#fb-details-group .fb-grid-td .xforms-select1-appearance-compact { height: 6em }
+#fb-details-group .fb-grid-td .xforms-select-appearance-compact { height: 6em }
+
+#fb-details-group .fb-grid-td .xforms-mediatype-image { display: block; border: 2px solid #666699; overflow: auto }
+#fb-details-group .fb-grid-td .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
+#fb-details-group .fb-grid-td .xforms-mediatype-image img { display: block }
+
+
+.fb-grid-2-columns .fb-grid-td { width: 50% }
+.fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 30.5em; *width: 29.8em }
+
+.fb-grid-3-columns .fb-grid-td { width: 33.3%; }
+.fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 19.4em; *width: 18.9em }
+
+.fb-grid-4-columns .fb-grid-td { width: 25%; }
+.fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 13.8em; *width: 13.4em }
+
+/* Radio buttons */
+.fb-grid .xforms-select1-appearance-full span input { float: left; }
+.fb-grid .xforms-select1-appearance-full span label { float: left; margin-right: 0 }
+/* Size of text for radio button; needs to be set for every page width / columns number combination */
+#doc .fb-grid-2-columns .xforms-select1-appearance-full span label { width: 24em; }
+
+#doc-fb .fb-grid-1-columns .xforms-select1-appearance-full span label { width: 62.3em; *width: 60em }
+#doc-fb .fb-grid-2-columns .xforms-select1-appearance-full span label { width: 28.3em; *width: 27em  }
+#doc-fb .fb-grid-3-columns .xforms-select1-appearance-full span label { width: 17em; *width: 16em }
+#doc-fb .fb-grid-4-columns .xforms-select1-appearance-full span label { width: 11.3em; *width: 10.5em }
+
+/* Checkboxes */
+.fb-grid .xforms-select-appearance-full span input { float: left; }
+.fb-grid .xforms-select-appearance-full span label { float: left; margin-right: 0 }
+
+/* Size of text for checkboxes; needs to be set for every page width / columns number combination */
+#doc .fb-grid-2-columns .xforms-select-appearance-full span label { width: 24em; }
+
+#doc-fb .fb-grid-1-columns .xforms-select-appearance-full span label { width: 62.3em; *width: 60em }
+#doc-fb .fb-grid-2-columns .xforms-select-appearance-full span label { width: 28.3em; *width: 27em }
+#doc-fb .fb-grid-3-columns .xforms-select-appearance-full span label { width: 17em; *width: 16em }
+#doc-fb .fb-grid-4-columns .xforms-select-appearance-full span label { width: 11.3em; *width: 10.5em }
+
+.fb-empty-cell { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
+.fb-empty-cell span { display: none }
+.xforms-repeat-selected-item-4 .fb-empty-cell, td:hover .fb-empty-cell { display: block }
+.xforms-repeat-selected-item-4 .fb-empty-cell .fb-use-toolbar-message { display: block }
+.xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
+td:hover .fb-click-message { display: block }
+
+/* ***** Accordion Menu ********************************************************************************************* */
+
+dl.accordion-menu { margin: 0; padding: 0; width: 100% }
+dl.accordion-menu dt.a-m-t {
+
+    margin: 0;
+	padding: 0.3em 1em;
+
+    background-color: #F8F8F8;
+    background-image: url( ../../../../apps/fr/style/logo-bg.gif );
+    color: #333333;
+    font-weight: bold;
+
+    border-style: solid;
+    border-width: 1px;
+    border-color: #CCCCCC gray gray #CCCCCC
+}
+
+dl.accordion-menu dt.a-m-t-hover { background: white }
+html.accordion-menu-js dt.a-m-t-expand {}
+
+dl.accordion-menu dd.a-m-d .bd {
+	border: solid 1px gray;
+    border-top-width: 0;
+    /*border-bottom-width: 0;*/
+    border-left-color: #CCCCCC
+}
+
+html.accordion-menu-js dt.a-m-t{
+	cursor: pointer;
+	zoom: 1;
+}
+
+dl.accordion-menu dd.a-m-d { margin: 0; padding: 0 }
+html.accordion-menu-js dd.a-m-d { display: none }
+html.accordion-menu-js dd.a-m-d-expand { display: block }
+
+html.accordion-menu-js dd.a-m-d-before-expand {
+	display: block;
+	position: relative;
+	z-index: -1;
+	opacity: 0;
+	height: auto !important;
+	visibility: hidden;
+	overflow: visible;
+}
+
+html.accordion-menu-js dd.a-m-d-anim {
+	overflow: hidden;
+	display: block;
+}
+
+/* ***** Other media ************************************************************************************************ */
+
+/* This is also used for PDF generation */
+@media print {
+    #doc, #doc2, #doc3, #doc-fb { margin-left: auto; *margin-left: auto }
+    input { height: 1em }
+}

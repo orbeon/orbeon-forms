@@ -951,7 +951,7 @@
                                                                                                 <xxforms:variable name="component-metadata" as="element()?"
                                                                                                                   select="$component-binding/fb:metadata"/>
                                                                                                 <xxforms:variable name="icon-url" as="xs:string?"
-                                                                                                                  select="$component-metadata/fb:icon[@lang = $form-resources/@xml:lang]/fb:small-icon"/>
+                                                                                                                  select="$component-metadata/(fb:icon[@lang = $form-resources/@xml:lang], fb:icon)[1]/fb:small-icon"/>
                                                                                                
                                                                                                 <xhtml:img src="{($icon-url, '/apps/fr/style/images/silk/plugin.png')[1]}"
                                                                                                            alt="{($component-metadata/fb:display-name[@lang = $form-resources/@xml:lang], 'Component')[1]}"

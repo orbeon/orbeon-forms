@@ -944,6 +944,7 @@
                                                                                                     <xxforms:size ref="@size"/>
                                                                                                 </xforms:upload>
                                                                                             </xforms:group>
+                                                                                            <!-- Component -->
                                                                                             <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
                                                                                                 <xxforms:variable name="component-binding" as="element()?"
                                                                                                                   select="instance('fb-components-instance')//xbl:binding[@element = translate(context()/name(), ':', '|')]"/>

@@ -296,6 +296,9 @@
         <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
         <xxforms:variable name="binding-name" select="event('binding-name')"/>
 
+        <!-- Clear working values -->
+        <xforms:setvalue ref="$instance/name"/>
+        <xforms:setvalue ref="$instance/initial-name"/>
         <xforms:delete nodeset="$instance/xforms:action"/>
 
         <!-- Empty binding if no binding id passed -->

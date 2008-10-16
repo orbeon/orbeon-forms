@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -104,7 +105,8 @@ public class XFormsLoadAction extends XFormsAction {
                 externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, pipelineContext, currentElement, value, generateAbsoluteURL);
             } else {
                 // Just a resource URL
-                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value, generateAbsoluteURL);
+                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value,
+                        generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             }
         }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);

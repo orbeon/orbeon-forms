@@ -89,7 +89,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                     // xs:anyURI type
                     if (!urlNorewrite) {
                         // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
-                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, true);
+                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
                         updatedValue = proxyURI(pipelineContext, rewrittenURI);
                     } else {
                         // Otherwise we leave the value as is

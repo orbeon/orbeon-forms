@@ -14,28 +14,30 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an XForms control.
@@ -543,7 +545,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
 
                 private boolean isStartElement;
-                private final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 public void characters(char[] chars, int start, int length) throws SAXException {
                     sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
@@ -559,13 +560,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         final String currentName = attributes.getLocalName(i);
                         final String currentValue = attributes.getValue(i);
 
-                        final String rewrittenValue;
-                        if ("src".equals(currentName) || "href".equals(currentName)) {
-                            // We should probably use xml:base, but AbstractRewrite doesn't use xml:base
-                            rewrittenValue = externalContext.getResponse().rewriteResourceURL(currentValue, false);
-                        } else {
-                            rewrittenValue = currentValue;
-                        }
+                        // Rewrite URI attribute if needed
+                        // NOTE: Sould probably use xml:base but we don't have an Element available to gather xml:base information
+                        final String rewrittenValue = XFormsUtils.rewriteURLAttributeIfNeeded(pipelineContext, null, currentName, currentValue);
 
                         sb.append(' ');
                         sb.append(currentName);

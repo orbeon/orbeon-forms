@@ -73,6 +73,11 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         super.setValue(rawValue);
     }
 
+    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+        // Rewrite URI attribute if needed
+        return XFormsUtils.rewriteURLAttributeIfNeeded(pipelineContext, getControlElement(), nameAttribute, getExternalValue(pipelineContext));
+    }
+
     public String getNameAttribute() {
         return nameAttribute;
     }

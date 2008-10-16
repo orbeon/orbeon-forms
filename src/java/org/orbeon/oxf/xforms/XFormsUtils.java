@@ -773,19 +773,37 @@ public class XFormsUtils {
      * Resolve a resource URL includng xml:base resolution.
      *
      * @param pipelineContext       current PipelineContext
-     * @param currentElement        element used for xml:base resolution
+     * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
-     * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
+     * @param rewriteMode           rewrite mode (see ExternalContext.Response)
      * @return                      resolved URL
      */
-    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url, boolean generateAbsoluteURL) {
+    public static String resolveResourceURL(PipelineContext pipelineContext, Element element, String url, int rewriteMode) {
 
-        final URI resolvedURI = resolveXMLBase(currentElement, url);
+        final URI resolvedURI = resolveXMLBase(element, url);
         final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        return URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString,
-                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        return URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString, rewriteMode);
+    }
+
+    /**
+     * Rewrite an attribute if that attribute contains a URI, e.g. @href or @src.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param element               element used to start resolution (if null, no resolution takes place)
+     * @param attributeName         attribute name
+     * @param attributeValue        attribute value
+     * @return                      rewritten URL
+     */
+    public static String rewriteURLAttributeIfNeeded(PipelineContext pipelineContext, Element element, String attributeName, String attributeValue) {
+        final String rewrittenValue;
+        if ("src".equals(attributeName) || "href".equals(attributeName)) {
+            rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+        } else {
+            rewrittenValue = attributeValue;
+        }
+        return rewrittenValue;
     }
 
     /**
@@ -888,28 +906,32 @@ public class XFormsUtils {
      * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
      * the resolution.
      *
-     * @param element   element used to start resolution
+     * @param element   element used to start resolution (if null, no resolution takes place)
      * @param uri       URI to resolve
      * @return          resolved URI
      */
     public static URI resolveXMLBase(Element element, String uri) {
-        final List xmlBaseElements = new ArrayList();
-
-        // Collect xml:base values
-        Element currentElement = element;
-        do {
-            final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME);
-            if (xmlBaseAttribute != null)
-                xmlBaseElements.add(xmlBaseAttribute);
-            currentElement = currentElement.getParent();
-        } while(currentElement != null);
-
-        // Go from root to leaf
-        Collections.reverse(xmlBaseElements);
-        xmlBaseElements.add(uri);
-
-        // Resolve paths from root to leaf
         try {
+            // Allow for null Element
+            if (element == null)
+                return new URI(uri);
+
+            final List xmlBaseElements = new ArrayList();
+
+            // Collect xml:base values
+            Element currentElement = element;
+            do {
+                final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME);
+                if (xmlBaseAttribute != null)
+                    xmlBaseElements.add(xmlBaseAttribute);
+                currentElement = currentElement.getParent();
+            } while(currentElement != null);
+
+            // Go from root to leaf
+            Collections.reverse(xmlBaseElements);
+            xmlBaseElements.add(uri);
+
+            // Resolve paths from root to leaf
             URI result = null;
             for (Iterator i = xmlBaseElements.iterator(); i.hasNext();) {
                 final String currentXMLBase = (String) i.next();

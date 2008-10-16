@@ -575,7 +575,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                                     final URL absoluteResolvedURL;
                                     final String absoluteResolvedURLString;
                                     {
-                                        final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource, false);
+                                        final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource,
+                                                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
                                         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resolvedURL);
                                         if (inputName != null) {
                                             // URL is input:*, keep it as is

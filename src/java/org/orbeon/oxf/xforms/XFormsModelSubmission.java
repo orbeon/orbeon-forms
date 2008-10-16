@@ -761,7 +761,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             resolvedURL = resolvedActionOrResource;
                         } else {
                             // Rewrite URL
-                            resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, submissionElement, resolvedActionOrResource, false);
+                            resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, submissionElement, resolvedActionOrResource,
+                                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
 
                             if (request.getContainerType().equals("portlet") && "resource".equals(urlType) && !NetUtils.urlHasProtocol(resolvedURL)) {
                                 // In this case, we have to prepend the complete server path

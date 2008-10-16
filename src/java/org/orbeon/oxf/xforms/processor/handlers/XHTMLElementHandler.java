@@ -75,6 +75,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                         // Determine attribute value
                         final String effectiveAttributeValue;
                         if (attributeControl != null) {
+                            // Use value provided
                             effectiveAttributeValue = attributeControl.getExternalValue(pipelineContext);
                         } else {
                             // Use blank value

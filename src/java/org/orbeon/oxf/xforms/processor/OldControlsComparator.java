@@ -299,7 +299,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
+                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
@@ -328,7 +328,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
+                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {

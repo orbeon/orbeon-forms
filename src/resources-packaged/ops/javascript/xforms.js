@@ -444,12 +444,6 @@ ORBEON.util.Dom = {
 
 };
 
-(function () {
-    var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTrident ? ORBEON.util.IEDom : ORBEON.util.MozDom;
-    for (var method in methodsFrom)
-        ORBEON.util.Dom[method] = methodsFrom[method];
-}());
-
 /**
  * General purpose methods on string
  */
@@ -3162,6 +3156,12 @@ ORBEON.xforms.Init = {
                 ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered 
         };
 
+        // Initialize DOM methods based on browser
+        (function () {
+            var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTrident ? ORBEON.util.IEDom : ORBEON.util.MozDom;
+            for (var method in methodsFrom)
+                ORBEON.util.Dom[method] = methodsFrom[method];
+        }());
 
         // Notify the offline module that the page was loaded
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
@@ -4285,26 +4285,26 @@ ORBEON.xforms.Server = {
                                         var deleteId = ORBEON.util.Dom.getAttribute(deleteElementElement, "id");
                                         var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
                                         var count = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
-                                           // Find end of the repeat
+                                        // Find end of the repeat
                                         var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(deleteId, parentIndexes));
-                                           // Find last element to delete
+                                        // Find last element to delete
                                         var lastElementToDelete;
-                                    {
-                                        lastElementToDelete = repeatEnd.previousSibling;
-                                        if (parentIndexes == "") {
-                                            // Top-level repeat: need to go over template
-                                            while (true) {
-                                                // Look for delimiter that comes just before the template
-                                                if (lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                        && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter")
-                                                        && !ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-template"))
-                                                    break;
+                                        {
+                                            lastElementToDelete = repeatEnd.previousSibling;
+                                            if (parentIndexes == "") {
+                                                // Top-level repeat: need to go over template
+                                                while (true) {
+                                                    // Look for delimiter that comes just before the template
+                                                    if (lastElementToDelete.nodeType == ELEMENT_TYPE
+                                                            && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter")
+                                                            && !ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-template"))
+                                                        break;
+                                                    lastElementToDelete = lastElementToDelete.previousSibling;
+                                                }
                                                 lastElementToDelete = lastElementToDelete.previousSibling;
                                             }
-                                            lastElementToDelete = lastElementToDelete.previousSibling;
                                         }
-                                    }
-                                           // Perform delete
+                                        // Perform delete
                                         for (var countIndex = 0; countIndex < count; countIndex++) {
                                             var nestedRepeatLevel = 0;
                                             while (true) {

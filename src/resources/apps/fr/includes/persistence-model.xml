@@ -102,7 +102,7 @@
             </xforms:action>
             <!-- Do we accept data posted to this page? -->
             <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
-                <xxforms:variable name="form-data" select="xxforms:get-request-parameter('form-data')"/>
+                <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
                 <!-- Do we have data posted to this form? -->
                 <xforms:action if="$form-data">
                     <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>

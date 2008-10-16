@@ -214,8 +214,8 @@
                 <!-- Set calculated value if needed -->
                 <xforms:insert if="normalize-space($instance/calculate) != ''" context="$new-bind"
                                origin="xxforms:attribute('calculate', normalize-space($instance/calculate))"/>
-                <xforms:delete if="normalize-space($instance/readonly) = ''" context="$new-bind"
-                               nodeset="@readonly"/>
+                <xforms:delete if="normalize-space($instance/calculate) = ''" context="$new-bind"
+                               nodeset="@calculate"/>
             </xforms:action>
 
             <!-- TODO: constraints -->

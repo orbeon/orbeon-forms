@@ -47,7 +47,8 @@
     <!-- Properties -->
     <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-noscript-link" select="pipeline:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-toc" select="pipeline:property(string-join(('oxf.fr.detail.toc', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="min-toc" select="(pipeline:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
+    <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="is-noscript-table" select="not(not(pipeline:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean?"/>
     <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean?"/>

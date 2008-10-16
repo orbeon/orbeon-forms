@@ -455,7 +455,7 @@
     <!-- Table of contents UI -->
     <xsl:template name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
-        <xsl:if test="$has-toc and $is-detail and not($is-form-builder)">
+        <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count(/xhtml:html/xhtml:body//fr:section) ge $min-toc">
             <xhtml:div class="fr-toc">
                 <!-- Set context to fr-form-model for binds below -->
                 <xforms:group model="fr-form-model" appearance="xxforms:internal">

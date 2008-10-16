@@ -1261,11 +1261,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         return goingOffline;
     }
 
-    public boolean goingOnline() {
-        return goingOnline;
-    }
-
-
     public IndentedLogger getIndentedLogger() {
         return indentedLogger;
     }

@@ -162,7 +162,7 @@
                                         <!-- TODO: format comes from under <summary> -->
                                         <field acro-field-name="'{$field-name}'"
                                                value="'{if ($control-value castable as xs:time)
-                                                        then format-date(xs:time($control-value), $fr-current-resources/summary/formats/time, $request-language, (), ())
+                                                        then format-time(xs:time($control-value), $fr-current-resources/summary/formats/time, $request-language, (), ())
                                                         else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'dateTime'">

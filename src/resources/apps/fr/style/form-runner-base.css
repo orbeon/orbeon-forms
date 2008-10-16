@@ -223,8 +223,8 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* Buttons */
 .fr-buttons {
-    padding-right: 1em;
     float: right;
+    text-align: right;
 }
 
 .fr-buttons .xforms-trigger {

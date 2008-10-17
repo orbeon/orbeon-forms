@@ -66,6 +66,9 @@ public class XFormsOutputControl extends XFormsValueControl {
             final List currentNodeset = bindingContext.getNodeset();
             if (currentNodeset != null && currentNodeset.size() > 0) {
 
+                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+                getContextStack().setBinding(this);
+
                 value = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
                         valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), bindingContext.getInScopeVariables(),

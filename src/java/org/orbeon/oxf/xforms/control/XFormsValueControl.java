@@ -88,6 +88,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     protected String getValueUseFormat(PipelineContext pipelineContext, String format) {
+
+        // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+        getContextStack().setBinding(this);
+
         final String result;
         if (format == null) {
             // Try default format for known types

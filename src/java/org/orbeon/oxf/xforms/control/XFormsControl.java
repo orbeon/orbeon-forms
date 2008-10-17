@@ -60,6 +60,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     // Dynamic information (changes depending on the content of XForms instances)
     private String effectiveId;
+    private String prefixedId;
+
     protected XFormsContextStack.BindingContext bindingContext;
     private NodeInfo boundNode;
 
@@ -118,6 +120,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     protected XFormsContextStack getContextStack() {
+        // TODO: Once each container has its own subtree of controls, use container's context stack
         return containingDocument.getControls().getContextStack();
     }
 
@@ -144,6 +147,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return effectiveId;
     }
 
+    public String getPrefixedId() {
+        if (prefixedId == null) {
+            prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+        }
+        return prefixedId;
+    }
+
     protected void setEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
     }
@@ -155,8 +165,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public String getAlert(PipelineContext pipelineContext) {
         if (!isAlertEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                getContextStack().setBinding(this);
-                alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, tempContainsHTML);
+                final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
+                alert = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, true, tempContainsHTML);
                 isHTMLAlert = alert != null && tempContainsHTML[0];
             }
             isAlertEvaluated = true;
@@ -177,8 +187,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public String getHelp(PipelineContext pipelineContext) {
         if (!isHelpEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                getContextStack().setBinding(this);
-                help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, tempContainsHTML);
+                final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
+                help = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, true, tempContainsHTML);
                 isHTMLHelp = help != null && tempContainsHTML[0];
             }
             isHelpEvaluated = true;
@@ -199,8 +209,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public String getHint(PipelineContext pipelineContext) {
         if (!isHintEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                getContextStack().setBinding(this);
-                hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), tempContainsHTML);
+                final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
+                hint = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
+
                 isHTMLHint = hint != null && tempContainsHTML[0];
             }
             isHintEvaluated = true;
@@ -221,8 +232,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public String getLabel(PipelineContext pipelineContext) {
         if (!isLabelEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                getContextStack().setBinding(this);
-                label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), tempContainsHTML);
+                final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
+                label = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
+
                 isHTMLLabel = label != null && tempContainsHTML[0];
             }
             isLabelEvaluated = true;

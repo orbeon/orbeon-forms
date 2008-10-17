@@ -110,6 +110,11 @@ public class XFormsStaticState {
     private boolean hasOfflineSupport;      // whether the document requires offline support
     private List offlineInsertTriggerIds;   // List<String> of trigger ids that can do inserts
 
+    private Map labelsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
+    private Map helpsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
+    private Map hintsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
+    private Map alertsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
+
     // Components
     private Map componentsFactories;        // Map<QName, Factory> of QNames to component factory
     private Map componentBindings;          // Map<QName, Element> of QNames to bindings
@@ -680,6 +685,22 @@ public class XFormsStaticState {
         return (Map) controlTypes.get("repeat");
     }
 
+    public Element getLabelElement(String prefixeId) {
+        return (Element) labelsMap.get(prefixeId);
+    }
+
+    public Element getHelpElement(String prefixeId) {
+        return (Element) helpsMap.get(prefixeId);
+    }
+
+    public Element getHintElement(String prefixeId) {
+        return (Element) hintsMap.get(prefixeId);
+    }
+
+    public Element getAlertElement(String prefixeId) {
+        return (Element) alertsMap.get(prefixeId);
+    }
+
     /**
      * Statically check whether a control is a value control.
      *
@@ -1087,6 +1108,41 @@ public class XFormsStaticState {
                 }
             }
         });
+
+        // Gather label, hint, help, alert information
+        {
+            final List lhhaElements = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                "//(xforms:label | xforms:help | xforms:hint | xforms:alert)[not(ancestor::xforms:instance) and exists(@for | parent::xforms:*/@id | parent::xxforms:*/@id)]", BASIC_NAMESPACE_MAPPINGS,
+                null, null, null, null, locationData);
+
+            int lhhaCount = 0;
+            for (Iterator i = lhhaElements.iterator(); i.hasNext(); lhhaCount++) {
+                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                final Element llhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
+                final String forAttribute = llhaElement.attributeValue("for");
+                final String controlPrefixedId;
+                if (forAttribute == null) {
+                    // Element is directly nested in XForms element
+                    controlPrefixedId = prefix + llhaElement.getParent().attributeValue("id");
+                } else {
+                    // Element has a @for attribute
+                    controlPrefixedId = prefix + forAttribute;
+                }
+
+                final String elementName = llhaElement.getName();
+                if ("label".equals(elementName)) {
+                    labelsMap.put(controlPrefixedId, llhaElement);
+                } else if ("help".equals(elementName)) {
+                    helpsMap.put(controlPrefixedId, llhaElement);
+                } else if ("hint".equals(elementName)) {
+                    hintsMap.put(controlPrefixedId, llhaElement);
+                } else if ("alert".equals(elementName)) {
+                    alertsMap.put(controlPrefixedId, llhaElement);
+                }
+            }
+            XFormsContainingDocument.logDebugStatic("static state", "extracted label, help, hint and alert elements", new String[] { "count", Integer.toString(lhhaCount) });
+        }
 
         // Gather online/offline information
         {

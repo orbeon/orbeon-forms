@@ -192,6 +192,10 @@ public class XFormsInputControl extends XFormsValueControl {
             return null;
         } else {
             // Format
+
+            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+            getContextStack().setBinding(this);
+
             final String xpathExpression =
                     "if (. castable as xs:" + typeName + ") then format-" + typeName + "(xs:" + typeName + "(.), '"
                             + XFormsProperties.getTypeInputFormat(containingDocument, formatName)

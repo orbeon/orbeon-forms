@@ -27,6 +27,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.*;
@@ -337,6 +338,51 @@ public class XFormsUtils {
                 return sb.toString();
             }
         }
+    }
+
+    /**
+     * Get the value of a label, help, hint or alert related to a particular control.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param containingDocument    current XFormsContainingDocument
+     * @param control               control
+     * @param lhhaElement           element associated to the control (either as child or using @for)
+     * @param acceptHTML            whether the result may contain HTML
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
+     * @return                      string containing the result of the evaluation, null if evaluation failed
+     */
+    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                                    XFormsControl control, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
+
+        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
+        final String value;
+        if (lhhaElement == null) {
+            // No LHHA at all
+            value = null;
+        } else if (lhhaElement.getParent() == control.getControlElement()) {
+            // LHHA is direct child of control, evaluate within context
+            contextStack.setBinding(control);
+            contextStack.pushBinding(pipelineContext, lhhaElement);
+            value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.popBinding();
+        } else {
+            // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
+
+            // Find context object for XPath evaluation
+            final Element parentElement = lhhaElement.getParent();
+            final Object contextObject = containingDocument.resolveObjectById(control.getEffectiveId(), parentElement.attributeValue("id"));
+            if (contextObject instanceof XFormsControl) {
+                // Found context, evaluate relative to that
+                contextStack.setBinding((XFormsControl) contextObject);
+                contextStack.pushBinding(pipelineContext, lhhaElement);
+                value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
+                contextStack.popBinding();
+            } else {
+                // No context, don't evaluate (not sure why this should happen!)
+                value = null;
+            }
+        }
+        return value;
     }
 
     /**
@@ -1250,7 +1296,13 @@ public class XFormsUtils {
                 if (pipelineContext == null)
                     throw new OXFException("xforms:output must not show-up in static itemset: " + childElement.getName());
 
-                final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
+                final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null) {
+                    // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
+                    // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
+                    protected XFormsContextStack getContextStack() {
+                        return ChildElementVisitorListener.this.contextStack;
+                    }
+                };
                 contextStack.pushBinding(pipelineContext, element);
                 {
                     outputControl.setBindingContext(contextStack.getCurrentBindingContext());

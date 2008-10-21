@@ -36,6 +36,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
@@ -87,21 +88,25 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                     String stringValue = (String) result;
                     output.characters(stringValue.toCharArray(), 0, stringValue.length());
                 } else if (result instanceof List) {
+                    final List listResult = (List) result;
                     if ("value-of".equals(localname)) {
                         // Get string value
-//                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
-//                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
-                        PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
-                                wrapper.wrap(result), "string(.)", null);
-                        String stringValue;
-                        try {
-                            stringValue = (String) expr.evaluateSingle();
-                        } catch (XPathException e) {
-                            throw new OXFException(e);
-                        } finally {
-                            if (expr != null)
-                                expr.returnToPool();
+
+                        final String stringValue;
+                        if (listResult.size() > 0) {
+                            // Wrap all elements of the list
+                            final List newList = new ArrayList(listResult.size());
+                            for (Iterator i = listResult.iterator(); i.hasNext();) {
+                                newList.add(wrapper.wrap(i.next()));
+                            }
+
+                            stringValue = XPathCache.evaluateAsString(interpreterContext.getPipelineContext(), newList, 1, "string(.)",
+                                null, null, null, null, null, null);
+                        } else {
+                            // It's just an empty list
+                            stringValue = "";
                         }
+
                         output.characters(stringValue.toCharArray(), 0, stringValue.length());
                     } else {
                         LocationSAXWriter saxw = new LocationSAXWriter();
@@ -114,8 +119,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                 } else if (result instanceof Node) {
                     if ("value-of".equals(localname)) {
                         // Get string value
-//                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
-//                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
+                        // TODO: use XPathCache.evaluateAsString()
                         PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
                                 wrapper.wrap(result), "string(.)", null);
                         String stringValue;

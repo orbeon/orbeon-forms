@@ -449,6 +449,40 @@
         <a name="extensions"/>
         <section>
             <title>Extensions</title>
+            <a name="lhha-for"/>
+            <section>
+                <title>Standalone Label, Hint, Help and Alert Elements</title>
+                <p>
+                    In XForms, <code>&lt;label></code>, <code>&lt;hint></code>, <code>&lt;help></code> and
+                    <code>&lt;alert></code> ("LHHA") elements must always be nested within a control. In HTML on the
+                    other hand, the <code>&lt;label></code> element supports a <code>for</code> attribute which relates
+                    the element to a control. Orbeon Forms follows HTML and support the <code>for</code> attribute on
+                    all the LHHA elements. This allows placing LHHA elements in other locations on the page:
+                </p>
+                <xml-source>
+                    <table>
+                        <tr>
+                            <td>
+                                <xforms:label for="first-name-control">Please enter your first name:</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input id="first-name-control" ref="first-name" />
+                            </td>
+                            <td>
+                                <xforms:hint for="first-name-control">Just your first name...</xforms:hint>
+                            </td>
+                        </tr>
+                    </table>
+                    <p>
+                        <xforms:alert for="first-name-control">Oops the first name is not valid</xforms:alert>
+                    </p>
+                </xml-source>
+                <note>
+                    <p>
+                        Standalone LHHA elements must not cross <code>&lt;xforms:repeat></code> boundaries.
+                    </p>
+                </note>
+            </section>
             <a name="readonly-mode"/>
             <section>
                 <title>Read-Only Mode</title>

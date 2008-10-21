@@ -1,0 +1,69 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events">
+    <head>
+        <title>XForms LHHA "for" Attribute</title>
+        <xforms:model>
+            <xforms:instance>
+                <instance xmlns="">
+                    <first-name/>
+                    <last-name/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind ref="*" required="true()"/>
+        </xforms:model>
+    </head>
+    <body>
+        <p>
+            This example shows an Orbeon Forms extension allowing you to use a <code>for</code> attribute on label,
+            help, hint and alert elements.
+        </p>
+        <h2>Spread around LHHA elements</h2>
+        <table>
+            <tr>
+                <td>
+                    <xforms:label for="first-name-control">Please enter your first name:</xforms:label>
+                </td>
+                <td>
+                    <xforms:input id="first-name-control" ref="first-name" />
+                </td>
+                <td>
+                    <xforms:hint for="first-name-control">Just your first name...</xforms:hint>
+                </td>
+            </tr>
+        </table>
+        <p>
+            <xforms:alert for="first-name-control">Oops the first name is not valid</xforms:alert>
+        </p>
+        <div>
+            <xforms:help for="first-name-control">
+                This is a big help text about how your first name must be entered.
+            </xforms:help>
+        </div>
+        <h2>Nested LHHA elements</h2>
+        <div>
+            <xforms:input id="last-name-control" ref="last-name">
+                <xforms:label>Please enter your first name:</xforms:label>
+                <xforms:hint>Just your first name...</xforms:hint>
+                <xforms:alert>Oops the first name is not valid</xforms:alert>
+                <xforms:help>
+                    This is a big help text about how your first name must be entered.
+                </xforms:help>
+            </xforms:input>
+        </div>
+    </body>
+</html>

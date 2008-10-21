@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -43,27 +44,27 @@ public class XFormsControlFactory {
     public static final Map SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap();
 
     static {
-        CONTAINER_CONTROLS.put("group", "");
-        CONTAINER_CONTROLS.put("repeat", "");
-        CONTAINER_CONTROLS.put("switch", "");
-        CONTAINER_CONTROLS.put("case", "");
-        CONTAINER_CONTROLS.put("dialog", "");
+        CONTAINER_CONTROLS.put("group", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put("repeat", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put("switch", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put("case", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put("dialog", XFormsConstants.XXFORMS_NAMESPACE_URI);        // xxforms:dialog extension
 
-        CORE_VALUE_CONTROLS.put("input", "");
-        CORE_VALUE_CONTROLS.put("secret", "");
-        CORE_VALUE_CONTROLS.put("textarea", "");
-        CORE_VALUE_CONTROLS.put("output", "");
-        CORE_VALUE_CONTROLS.put("upload", "");
-        CORE_VALUE_CONTROLS.put("range", "");
-        CORE_VALUE_CONTROLS.put("select", "");
-        CORE_VALUE_CONTROLS.put("select1", "");
+        CORE_VALUE_CONTROLS.put("input", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("secret", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("textarea", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("output", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("upload", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("range", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("select", XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put("select1", XFormsConstants.XFORMS_NAMESPACE_URI);
 
-        CORE_VALUE_CONTROLS.put("attribute", ""); // xxforms:attribute extension
-        CORE_VALUE_CONTROLS.put("text", "");      // xxforms:text extension
+        CORE_VALUE_CONTROLS.put("attribute", XFormsConstants.XXFORMS_NAMESPACE_URI);    // xxforms:attribute extension
+        CORE_VALUE_CONTROLS.put("text", XFormsConstants.XXFORMS_NAMESPACE_URI);         // xxforms:text extension
 
         final Map coreNoValueControls = new HashMap();
-        coreNoValueControls.put("submit", "");
-        coreNoValueControls.put("trigger", "");
+        coreNoValueControls.put("submit", XFormsConstants.XFORMS_NAMESPACE_URI);
+        coreNoValueControls.put("trigger", XFormsConstants.XFORMS_NAMESPACE_URI);
 
         CORE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
         CORE_CONTROLS.putAll(coreNoValueControls);
@@ -225,8 +226,9 @@ public class XFormsControlFactory {
         return factory.createXFormsControl(container, parent, element, controlName, effectiveId);
     }
 
-    public static boolean isValueControl(String controlName) {
-        return CORE_VALUE_CONTROLS.get(controlName) != null;
+    public static boolean isValueControl(String controlURI, String controlName) {
+        final String uri = (String) CORE_VALUE_CONTROLS.get(controlName);
+        return controlURI.equals(uri);
     }
 
     public static boolean isContainerControl(String controlName) {
@@ -237,8 +239,14 @@ public class XFormsControlFactory {
         return CORE_CONTROLS.get(controlName) != null;
     }
 
-    public static boolean isBuiltinControl(String controlName) {
-        return BUILTIN_CONTROLS.get(controlName) != null;
+    public static boolean isCoreControl(String controlURI, String controlName) {
+        final String uri = (String) CORE_CONTROLS.get(controlName);
+        return controlURI.equals(uri);
+    }
+
+    public static boolean isBuiltinControl(String controlURI, String controlName) {
+        final String uri = (String) BUILTIN_CONTROLS.get(controlName);
+        return controlURI.equals(uri);
     }
 
     public static abstract class Factory {

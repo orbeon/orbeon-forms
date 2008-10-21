@@ -911,6 +911,7 @@ public class XFormsStaticState {
 
                 // Gather control name
                 final String controlName = controlElement.getName();
+                final String controlURI = controlElement.getNamespaceURI();
 
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
@@ -961,7 +962,7 @@ public class XFormsStaticState {
                     final boolean hasRef = controlElement.attribute("ref") != null;
                     final boolean hasNodeset = controlElement.attribute("nodeset") != null;
 
-                    if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlElement.getNamespaceURI())) {
+                    if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlURI)) {
                         if (XFormsControlFactory.MANDATORY_SINGLE_NODE_CONTROLS.get(controlName) != null && !(hasRef || hasBind)) {
                             throw new ValidationException("Missing mandatory single node binding for element: " + controlElement.getQualifiedName(), locationData);
                         }
@@ -985,7 +986,7 @@ public class XFormsStaticState {
                 }
 
                 // Create and index static control information
-                final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName));
+                final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlURI, controlName));
                 controlInfoMap.put(controlPrefixedId, info);
                 {
                     Map controlsMap = (Map) controlTypes.get(controlName);
@@ -1094,13 +1095,15 @@ public class XFormsStaticState {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                 final Element llhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
+                final Element parentElement = llhaElement.getParent();
+
                 final String forAttribute = llhaElement.attributeValue("for");
                 final String controlPrefixedId;
-                if (forAttribute == null) {
-                    // Element is directly nested in XForms element
+                if (forAttribute == null || XFormsControlFactory.isCoreControl(parentElement.getNamespaceURI(), parentElement.getName())) {
+                    // Element is directly nested in XForms element OR it has a @for attribute but is within a core control so we ignore the @for attribute
                     controlPrefixedId = prefix + llhaElement.getParent().attributeValue("id");
                 } else {
-                    // Element has a @for attribute
+                    // Element has a @for attribute and is not within a core control
                     controlPrefixedId = prefix + forAttribute;
                 }
 
@@ -1528,8 +1531,7 @@ public class XFormsStaticState {
      */
     public static boolean isEventObserver(Element element) {
 
-        // TODO: should have more efficient way of checking this, e.g. Map<QName elementQName>
-        if (XFormsControlFactory.isBuiltinControl(element.getName())) {
+        if (XFormsControlFactory.isBuiltinControl(element.getNamespaceURI(), element.getName())) {
             return true;
         }
 

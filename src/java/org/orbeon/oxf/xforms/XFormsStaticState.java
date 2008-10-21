@@ -685,6 +685,10 @@ public class XFormsStaticState {
         return (Map) controlTypes.get("repeat");
     }
 
+    public Element getControlElement(String prefixeId) {
+        return ((XFormsStaticState.ControlInfo) controlInfoMap.get(prefixeId)).getElement();
+    }
+
     public Element getLabelElement(String prefixeId) {
         return (Element) labelsMap.get(prefixeId);
     }

@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -205,24 +206,32 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         }
     }
 
-    private boolean hasLocalLabel() {
-        final Element element = containingDocument.getStaticState().getLabelElement(prefixedId);
-        return element != null && element.attributeValue("for") == null;
+    private final boolean hasLocalLabel() {
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return hasLocalElement(staticState, staticState.getLabelElement(prefixedId));
     }
 
-    private boolean hasLocalHint() {
-        final Element element = containingDocument.getStaticState().getHintElement(prefixedId);
-        return element != null && element.attributeValue("for") == null;
+    private final boolean hasLocalHint() {
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return hasLocalElement(staticState, staticState.getHintElement(prefixedId));
     }
 
-    private boolean hasLocalHelp() {
-        final Element element = containingDocument.getStaticState().getHelpElement(prefixedId);
-        return element != null && element.attributeValue("for") == null;
+    private final boolean hasLocalHelp() {
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return hasLocalElement(staticState, staticState.getHelpElement(prefixedId));
     }
 
-    private boolean hasLocalAlert() {
-        final Element element = containingDocument.getStaticState().getAlertElement(prefixedId);
-        return element != null && element.attributeValue("for") == null;
+    private final boolean hasLocalAlert() {
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return hasLocalElement(staticState, staticState.getAlertElement(prefixedId));
+    }
+
+    private final boolean hasLocalElement(XFormsStaticState staticState, Element lhhaElement) {
+        if (lhhaElement == null)
+            return false;
+
+        final Element controlElement = staticState.getControlElement(prefixedId);
+        return lhhaElement.getParent() == controlElement;
     }
 
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {

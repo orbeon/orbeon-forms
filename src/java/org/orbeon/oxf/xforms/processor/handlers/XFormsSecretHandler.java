@@ -35,7 +35,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsSecretControl secretControl = (XFormsSecretControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -46,7 +46,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
             newAttributes = reusableAttributes;
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, secretControl);
-            handleMIPClasses(classes, id, secretControl);
+            handleMIPClasses(classes, getPrefixedId(), secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
         }

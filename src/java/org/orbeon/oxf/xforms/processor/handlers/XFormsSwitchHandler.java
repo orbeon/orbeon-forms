@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -29,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
 
     public XFormsSwitchHandler() {
-        super(false, false);
+        super(false, true);
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
@@ -39,7 +37,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
             // Find classes to add
             final AttributesImpl newAttributes; {
                 final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-                handleMIPClasses(classes, handlerContext.getId(attributes), xformsControl);
+                handleMIPClasses(classes, getPrefixedId(), xformsControl);
                 newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             }
 

@@ -65,6 +65,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
 
+            // Add handlers for LHHA elements
+            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
+                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
+                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
+                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
+                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
+            }
+
             // Add handlers for custom components
             final Map componentBindings = staticState.getComponentBindings();
             if (componentBindings != null) {
@@ -197,58 +205,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$noscript", "value", "true"
             });
-
-//            // Add help section
-//            final boolean started[] = new boolean[1];
-//            containingDocument.getControls().visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-//                public void startVisitControl(XFormsControl control) {
-//                    if (control instanceof XFormsSingleNodeControl) {
-//                        final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-//                        final String help = singleNodeControl.getHelp(pipelineContext);
-//                        if (singleNodeControl.isRelevant() && help != null) {
-//
-//                            startDivIfNeeded();
-//
-//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
-//                                    new String[] { "id", control.getEffectiveId() + "-help", "class", "xforms-help-group" });
-//
-//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
-//                                    new String[] { "class", "xforms-label" });
-//                            helper.text(singleNodeControl.getLabel(pipelineContext));
-//                            helper.endElement();
-//
-//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span",
-//                                    new String[] { "class", "xforms-help" });
-//                            helper.text(singleNodeControl.getHelp(pipelineContext));
-//                            helper.endElement();
-//
-//                            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "a",
-//                                    new String[] { "href", "#" + singleNodeControl.getEffectiveId() });
-//                            helper.text("Back");// TODO: i18n
-//                            helper.endElement();
-//
-//                            helper.endElement();
-//
-//    //    <span id="my-control-id-help" class="xforms-help-group">
-//    //        <span class="xforms-label">First Name</span>
-//    //        <span class="xforms-help">This is my help text. It is quite cool stuff, right?</span>
-//    //        <a href="#my-control-id">Back</a>
-//    //    </span>
-//                        }
-//                    }
-//                }
-//
-//                private final void startDivIfNeeded() {
-//                    if (!started[0]) {
-//                        helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "div",
-//                                        new String[] { "class", "xforms-help-panel" });
-//                        started[0] = true;
-//                    }
-//                }
-//            });
-//            if (started[0]) {
-//                helper.endElement();
-//            }
         }
     }
 

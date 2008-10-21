@@ -33,8 +33,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
-
 /**
  * Base class for all XHTML and XForms element handlers.
  */
@@ -83,10 +81,10 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    public void handleMIPClasses(FastStringBuffer sb, String controlId, XFormsSingleNodeControl xformsControl) {
+    public void handleMIPClasses(FastStringBuffer sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(controlId)).hasBinding();
+        final boolean hasBinding = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId)).hasBinding();
         if (hasBinding) {
             if (xformsControl != null) {
                 // The case of a concrete control
@@ -315,18 +313,18 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         handleLabelHintHelpAlert(forId, forEffectiveId, type, xformsControl, isTemplate, true);
     }
 
-    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl control, boolean isTemplate, boolean placeholder) throws SAXException {
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String lhhaType, XFormsSingleNodeControl control, boolean isTemplate, boolean placeholder) throws SAXException {
 
-        final boolean isHint = type.equals("hint");
-        final boolean isAlert = type.equals("alert");
+        final boolean isHint = lhhaType.equals("hint");
+        final boolean isAlert = lhhaType.equals("alert");
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
         if (isStaticReadonly(control) && (isAlert || isHint))
             return;
 
-        final boolean isLabel = type.equals("label");
-        final boolean isHelp = type.equals("help");
+        final boolean isLabel = lhhaType.equals("label");
+        final boolean isHelp = lhhaType.equals("help");
 
         final String labelHintHelpAlertValue;
         final boolean mustOutputHTMLFragment;
@@ -358,17 +356,16 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         final Attributes labelHintHelpAlertAttributes;
         {
             // Statically obtain attributes information
-            final Map controlInfoMap = containingDocument.getStaticState().getControlInfoMap();
-            final Element controlElement = ((XFormsStaticState.ControlInfo) controlInfoMap.get(forId)).getElement();
+            final XFormsStaticState staticState = containingDocument.getStaticState();
             final Element nestedElement;
             if (isLabel) {
-                nestedElement = controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                nestedElement = staticState.getLabelElement(forId);
             } else if (isHelp) {
-                nestedElement = controlElement.element(XFormsConstants.XFORMS_HELP_QNAME);
+                nestedElement = staticState.getHelpElement(forId);
             } else if (isHint) {
-                nestedElement = controlElement.element(XFormsConstants.XFORMS_HINT_QNAME);
+                nestedElement = staticState.getHintElement(forId);
             } else if (isAlert) {
-                nestedElement = controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME);
+                nestedElement = staticState.getAlertElement(forId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
@@ -410,7 +407,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             }
 
             classes.append(" xforms-");
-            classes.append(type);
+            classes.append(lhhaType);
 
             final String labelClasses = classes.toString();
 
@@ -455,19 +452,29 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, labelHintHelpAlertValue, mustOutputHTMLFragment);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, lhhaType, labelHintHelpAlertValue, mustOutputHTMLFragment);
             }
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forEffectiveId, String value, boolean mustOutputHTMLFragment) throws SAXException {
-        attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
+    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String forEffectiveId, String lhhaType, String value, boolean mustOutputHTMLFragment) throws SAXException {
+
+        // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
+        final AttributesImpl newAttribute;
+        if (lhhaType != null) {
+            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", forEffectiveId + "-" + lhhaType);
+        } else {
+            newAttribute = new AttributesImpl(attributes);
+        }
+
+        // Add @for attribute
+        newAttribute.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, newAttribute);
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment) {

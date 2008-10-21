@@ -67,11 +67,6 @@
                 </p:otherwise>
             </p:choose>
 
-            <!--<p:processor name="oxf:sax-logger">-->
-                <!--<p:input name="data" href="#widgeted-view"/>-->
-                <!--<p:output name="data" id="widgeted-view2"/>-->
-            <!--</p:processor>-->
-
             <!-- Get current namespace to enable caching per portlet -->
             <p:processor name="oxf:request">
                 <p:input name="config">
@@ -91,6 +86,11 @@
                 <p:input name="instance" href="#instance"/>
                 <p:output name="document" id="xhtml-data"/>
             </p:processor>
+
+            <!--<p:processor name="oxf:sax-logger">-->
+                <!--<p:input name="data" href="#xhtml-data"/>-->
+                <!--<p:output name="data" id="xhtml-data2"/>-->
+            <!--</p:processor>-->
 
             <!-- XInclude processing to add error dialog configuration and more -->
             <p:processor name="oxf:xinclude">

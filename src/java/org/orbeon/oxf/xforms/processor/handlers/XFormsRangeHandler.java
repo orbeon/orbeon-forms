@@ -36,7 +36,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         classes.append(" xforms-range-background");
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -47,7 +47,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, xformsControl);
             addCustomClasses(classes, xformsControl);
-            handleMIPClasses(classes, id, xformsControl);
+            handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

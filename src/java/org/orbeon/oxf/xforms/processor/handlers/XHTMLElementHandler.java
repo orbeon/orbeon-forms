@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -36,9 +36,11 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
         // Start xhtml:* element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final String staticId = attributes.getValue("id");
+        final String staticId = handlerContext.getId(attributes);
+        final String prefixedId = handlerContext.getIdPrefix() + staticId;
+
         if (staticId != null) {
-            final boolean hasAVT = containingDocument.getStaticState().hasAttributeControl(staticId);
+            final boolean hasAVT = containingDocument.getStaticState().hasAttributeControl(prefixedId);
             if (hasAVT) {
                 // This element has at least one AVT so process its attributes
 
@@ -56,7 +58,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId; {
-                            final XFormsStaticState.ControlInfo controlInfo = containingDocument.getStaticState().getAttributeControl(staticId, attributeQName);
+                            final XFormsStaticState.ControlInfo controlInfo = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
                             attributeControlStaticId = controlInfo.getElement().attributeValue("id");
                         }
 

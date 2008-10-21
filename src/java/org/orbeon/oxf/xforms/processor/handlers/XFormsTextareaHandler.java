@@ -37,7 +37,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsTextareaControl textareaControl = (XFormsTextareaControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -49,7 +49,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             newAttributes = reusableAttributes;
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
-            handleMIPClasses(classes, id, textareaControl);
+            handleMIPClasses(classes, getPrefixedId(), textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);
         }

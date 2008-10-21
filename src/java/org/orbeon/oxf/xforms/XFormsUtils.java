@@ -370,17 +370,27 @@ public class XFormsUtils {
 
             // Find context object for XPath evaluation
             final Element parentElement = lhhaElement.getParent();
-            final Object contextObject = containingDocument.resolveObjectById(control.getEffectiveId(), parentElement.attributeValue("id"));
-            if (contextObject instanceof XFormsControl) {
-                // Found context, evaluate relative to that
-                contextStack.setBinding((XFormsControl) contextObject);
-                contextStack.pushBinding(pipelineContext, lhhaElement);
-                value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
-                contextStack.popBinding();
+
+            final String parentStaticId = parentElement.attributeValue("id");
+            if (parentStaticId == null) {
+                // Assume we are at the top-level
+                contextStack.resetBindingContext(pipelineContext);
             } else {
-                // No context, don't evaluate (not sure why this should happen!)
-                value = null;
+                // Not at top-level, find containing object
+                final Object contextObject = containingDocument.resolveObjectById(control.getEffectiveId(), parentStaticId);
+                if (contextObject instanceof XFormsControl) {
+                    // Found context, evaluate relative to that
+                    contextStack.setBinding((XFormsControl) contextObject);
+                } else {
+                    // No context, don't evaluate (not sure why this should happen!)
+                    contextStack.resetBindingContext(pipelineContext);
+                }
             }
+
+            // Push binding relative to context established above and evaluate
+            contextStack.pushBinding(pipelineContext, lhhaElement);
+            value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.popBinding();
         }
         return value;
     }

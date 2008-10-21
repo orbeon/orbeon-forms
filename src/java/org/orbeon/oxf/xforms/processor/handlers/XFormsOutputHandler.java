@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -39,32 +38,13 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
-        // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,
-        // because in that case we don't put the control in the regular hierarchy of controls.
-        // TODO: shouldn't we do this simply by not having the handlers being called in this case at all???
-        final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
-        if (parentHandlerName != null) {
-            final String parentHandlerLocalname;
-            final int bracketIndex = parentHandlerName.indexOf("}");
-            if (bracketIndex != -1) {
-                parentHandlerLocalname = parentHandlerName.substring(bracketIndex + 1);
-            } else {
-                parentHandlerLocalname = parentHandlerName;
-            }
-            if (XFormsControlFactory.isCoreControl(parentHandlerLocalname))
-                return false;
-        }
-        return true;
-    }
-
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Handle alert only if there is no value attribute
         if (attributes.getValue("value") == null)
             super.handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
 
@@ -81,7 +61,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
             newAttributes = reusableAttributes;
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, outputControl);
-            handleMIPClasses(classes, id, outputControl);
+            handleMIPClasses(classes, getPrefixedId(), outputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

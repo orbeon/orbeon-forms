@@ -320,14 +320,16 @@ public class XFormsControls {
     /**
      * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
      */
-    public int getRepeatIndex(String repeatId) {
+    public int getRepeatIndex(XFormsContainer container, String repeatStaticId) {
         // TODO: pass sourceId
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(null, repeatId);
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(null, repeatStaticId);
         if (repeatControl != null) {
             // Found
             return repeatControl.getIndex();
-        } else if (containingDocument.getStaticState().getControlInfoMap().get(repeatId) != null) {
+        } else if (containingDocument.getStaticState().getControlInfoMap().get(container.getFullPrefix() + repeatStaticId) != null) {
             // A repeat element does exist for this id, but it has zero iterations
+
+            // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
             return 0;
         } else {
             // No repeat element exists
@@ -391,7 +393,7 @@ public class XFormsControls {
         contextStack.pushIteration(iterationIndex);
 
         // Start visiting children of the xforms:repeat element
-        final Element repeatControlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getId())).getElement();
+        final Element repeatControlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getPrefixedId())).getElement();
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), enclosingRepeatControl.getContainer(), repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
@@ -519,7 +521,7 @@ public class XFormsControls {
                     newContainer.getContextStack().resetBindingContext(pipelineContext);
 
                     // Recurse into component tree
-                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(staticControlId);
+                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
                     visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                             staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
                 }

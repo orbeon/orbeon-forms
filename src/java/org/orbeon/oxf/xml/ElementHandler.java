@@ -17,19 +17,19 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Base class for all element handlers.
  */
-public abstract class ElementHandler extends ForwardingContentHandler {
+public abstract class ElementHandler {
 
     private Object context;
 
     /**
      * Override this to detect that the element has started.
      *
-     * @param uri
-     * @param localname
-     * @param qName
-     * @param attributes
+     * @param uri           element namespace URI
+     * @param localname     element local name
+     * @param qName         element qualified name
+     * @param attributes    element attributes
      * @throws SAXException
      */
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -38,23 +38,43 @@ public abstract class ElementHandler extends ForwardingContentHandler {
     /**
      * Override this to detect that the element has ended.
      *
-     * @param uri
-     * @param localname
-     * @param qName
+     * @param uri           element namespace URI
+     * @param localname     element local name
+     * @param qName         element qualified name
      * @throws SAXException
      */
     public void end(String uri, String localname, String qName) throws SAXException {
     }
 
+    /**
+     * Whether the body of the handled element may be repeated.
+     *
+     * @return true iif the body may be repeated
+     */
     public abstract boolean isRepeating();
 
+    /**
+     * Whether the body of the handled element must be processed.
+     *
+     * @return true iif the body of the handled element must be processed
+     */
     public abstract boolean isForwarding();
 
-    public Object getContext() {
-        return context;
-    }
-
+    /**
+     * Set a context object for this handler.
+     *
+     * @param context context object
+     */
     public void setContext(Object context) {
         this.context = context;
+    }
+
+    /**
+     * Return a context object for this handler.
+     *
+     * @return context object
+     */
+    public Object getContext() {
+        return context;
     }
 }

@@ -79,6 +79,7 @@ public class XFormsControlFactory {
 
         SINGLE_NODE_OR_VALUE_CONTROLS.put("output", "");
 
+        // TODO: some of those are not controls at all, must review this
         OPTIONAL_SINGLE_NODE_CONTROLS.putAll(coreNoValueControls);
         OPTIONAL_SINGLE_NODE_CONTROLS.put("output", "");  // can have @value attribute
         OPTIONAL_SINGLE_NODE_CONTROLS.put("value", "");   // can have inline text

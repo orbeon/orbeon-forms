@@ -48,7 +48,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             classes.append(" xforms-upload-state-file");
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -60,7 +60,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, uploadControl);
             addCustomClasses(classes, xformsControl);
-            handleMIPClasses(classes, id, uploadControl);
+            handleMIPClasses(classes, getPrefixedId(), uploadControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

@@ -66,21 +66,21 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @param pipelineContext       current pipeline context
      * @param containingDocument    current containing document
      * @param control               control from which to obtain itemset (may be null if control has a static itemset)
-     * @param id                    id of control from which to obtain itemset (if control is null)
+     * @param prefixedId            prefixed id of control from which to obtain itemset (if control is null)
      * @return                      itemset or null if it is not possible to obtain it
      */
-    public static List getItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsSelect1Control control, String id) {
+    public static List getItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsSelect1Control control, String prefixedId) {
         if (control != null) {
             // Control is there so just ask it
             return control.getItemset(pipelineContext, true);
         } else {
             final boolean isStaticItemset; {
-                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
+                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
                 isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
             }
             if (isStaticItemset) {
                 // No control but the itemset is static so obtain it
-                return XFormsItemUtils.evaluateStaticItemsets(containingDocument, id);
+                return XFormsItemUtils.evaluateStaticItemsets(containingDocument, prefixedId);
             } else {
                 // Not possible so return null
                 return null;

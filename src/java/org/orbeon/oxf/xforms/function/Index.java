@@ -39,12 +39,12 @@ public class Index extends XFormsFunction {
         return findIndexForRepeatId(xpathContext, repeatId);
     }
 
-    protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatId) {
-        final int index = getControls(xpathContext).getRepeatIndex(repeatId);
+    protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
+        final int index = getControls(xpathContext).getRepeatIndex(getContainer(xpathContext), repeatStaticId);
 
         if (index == -1) {
             // Dispatch exception event
-            final String message = "Function index uses repeat id '" + repeatId + "' which is not in scope";
+            final String message = "Function index uses repeat id '" + repeatStaticId + "' which is not in scope";
             final RuntimeException exception = new ValidationException(message, null);
 
             // This function is always called from controls so PipelineContext should be present

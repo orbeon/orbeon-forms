@@ -1224,12 +1224,12 @@ public class XFormsContainingDocument extends XFormsContainer {
     public void goOffline(PipelineContext pipelineContext) {
 
         // Handle inserts of controls marked as "offline insert triggers"
-        final List offlineInsertTriggerIds = getStaticState().getOfflineInsertTriggerIds();
-        if (offlineInsertTriggerIds != null) {
+        final List offlineInsertTriggerPrefixedIds = getStaticState().getOfflineInsertTriggerIds();
+        if (offlineInsertTriggerPrefixedIds != null) {
             
-            for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                final Object o = getObjectByEffectiveId(currentId);
+            for (Iterator i = offlineInsertTriggerPrefixedIds.iterator(); i.hasNext();) {
+                final String currentPrefixedId = (String) i.next();
+                final Object o = getObjectByEffectiveId(currentPrefixedId);// NOTE: won't work for triggers within repeats
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
                     final XFormsEvent event = new XFormsDOMActivateEvent(trigger);

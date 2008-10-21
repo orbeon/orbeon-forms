@@ -93,7 +93,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
             final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;// not null
 
             // Try to get static itemset info
-            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsControl2.getId());
+            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsControl2.getPrefixedId());
             if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
                 // There is no need to send an update:
                 //

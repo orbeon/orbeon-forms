@@ -90,7 +90,7 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
         final boolean isConcreteControl = triggerControl != null;
 
-        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
+        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
         if (isConcreteControl && !hasLabel)
             throw new ValidationException("Missing label on xforms:trigger element.", triggerControl.getLocationData());
 
@@ -102,8 +102,8 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
             newAttributes = reusableAttributes;
         } else {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
-            handleMIPClasses(classes, staticId, triggerControl);
-            containingDocument.getStaticState().appendClasses(classes, staticId);
+            handleMIPClasses(classes, getPrefixedId(), triggerControl);
+            containingDocument.getStaticState().appendClasses(classes, getPrefixedId());
             addCustomClasses(classes, triggerControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }

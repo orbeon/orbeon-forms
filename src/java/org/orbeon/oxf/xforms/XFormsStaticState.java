@@ -79,7 +79,7 @@ public class XFormsStaticState {
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
     private Document controlsDocument;                  // controls cocument
-    private LinkedHashMap modelDocuments = new LinkedHashMap();// Map<String, Document> of model prefixed ids) to model documents
+    private LinkedHashMap modelDocuments = new LinkedHashMap();// Map<String modelPrefixedId, Document modelDocument>
     private SAXStore xhtmlDocument;                     // entire XHTML document for noscript mode only
 
     private Map xxformsScripts;                         // Map<String, String> of id to script content
@@ -96,19 +96,19 @@ public class XFormsStaticState {
 
     // Static analysis
     private boolean isAnalyzed;             // whether this document has been analyzed already
-    private Map controlTypes;               // Map<String type, LinkedHashMap<String staticId, ControlInfo info>>
-    private Map eventNamesMap;              // Map<String, String> of event name to ""
-    private Map eventHandlersMap;           // Map<String prefixedControlId, List<XFormsEventHandler> eventHandler>
-    private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
-    private Map attributeControls;          // Map<String forStaticId, Map<String name, ControlInfo info>>
-    private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
+    private Map controlTypes;               // Map<String type, LinkedHashMap<String prefixedId, ControlInfo info>>
+    private Map eventNamesMap;              // Map<String eventName, String "">
+    private Map eventHandlersMap;           // Map<String controlPrefixedId, List<XFormsEventHandler> eventHandler>
+    private Map controlInfoMap;             // Map<String controlPrefixedId, ControlInfo>
+    private Map attributeControls;          // Map<String forPrefixedId, Map<String name, ControlInfo info>>
+    // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
+    private Map namespacesMap;              // Map<String staticId, Map<String prefix, String uri>> of namespace mappings
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
-    private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
-    private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
-    private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
-    private Map controlClasses;             // Map<String, String> of control id to class
+    private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
+    private Map itemsInfoMap;               // Map<String controlPrefixedId, ItemsInfo>
+    private Map controlClasses;             // Map<String controlPrefixedId, String classes>
     private boolean hasOfflineSupport;      // whether the document requires offline support
-    private List offlineInsertTriggerIds;   // List<String> of trigger ids that can do inserts
+    private List offlineInsertTriggerIds;   // List<String triggerPrefixedId> of triggers can do inserts
 
     private Map labelsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
     private Map helpsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
@@ -118,8 +118,8 @@ public class XFormsStaticState {
     // Components
     private Map componentsFactories;        // Map<QName, Factory> of QNames to component factory
     private Map componentBindings;          // Map<QName, Element> of QNames to bindings
-    private Map fullShadowTrees;            // Map<String, Document> of ids to shadow trees (with full content, e.g. XHTML)
-    private Map compactShadowTrees;         // Map<String, Document> of ids to shadow trees (without full content, only the XForms controls)
+    private Map fullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
+    private Map compactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -134,7 +134,7 @@ public class XFormsStaticState {
      * producing an XForms page.
      *
      * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards by the caller.
-     * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
+     * @param namespacesMap         Map<String staticId, Map<String prefix, String uri>> of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
     public XFormsStaticState(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore annotatedDocument) {
@@ -704,16 +704,11 @@ public class XFormsStaticState {
     /**
      * Statically check whether a control is a value control.
      *
-     * @param controlId id or effective id of the control
-     * @return          true iif the control is a value control
+     * @param controlEffectiveId    prefixed id or effective id of the control
+     * @return                      true iif the control is a value control
      */
-    public boolean isValueControl(String controlId) {
-
-        final int separatorIndex = controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-        if (separatorIndex != -1)
-            controlId = controlId.substring(0, separatorIndex);
-
-        final ControlInfo controlInfo = (ControlInfo) controlInfoMap.get(controlId);
+    public boolean isValueControl(String controlEffectiveId) {
+        final ControlInfo controlInfo = (ControlInfo) controlInfoMap.get(XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId));
         return (controlInfo != null) ? controlInfo.isValueControl() : false;
     }
 
@@ -723,7 +718,7 @@ public class XFormsStaticState {
      * as the mapping is considered transient and not sharable among pages.
      *
      * @param element       Element to get namsepace mapping for
-     * @return              Map<String, String>
+     * @return              Map<String prefix, String uri>
      */
     public Map getNamespaceMappings(Element element) {
         final String id = element.attributeValue("id");
@@ -751,54 +746,23 @@ public class XFormsStaticState {
         return controlTypes.get(controlName) != null;
     }
 
-    public ItemsInfo getItemsInfo(String controlId) {
-        return (itemsInfoMap != null) ? (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlId) : null;
+    public ItemsInfo getItemsInfo(String controlPrefixedId) {
+        return (itemsInfoMap != null) ? (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlPrefixedId) : null;
     }
 
     /**
      * Whether a host language element with the given id ("for attribute") has an AVT on an attribute.
      *
-     * @param staticForAttribute    id of the host language element to check
+     * @param prefixedForAttribute  id of the host language element to check
      * @return                      true iif that element has one or more AVTs
      */
-    public boolean hasAttributeControl(String staticForAttribute) {
-        return attributeControls != null && attributeControls.get(staticForAttribute) != null;
+    public boolean hasAttributeControl(String prefixedForAttribute) {
+        return attributeControls != null && attributeControls.get(prefixedForAttribute) != null;
     }
 
-    public ControlInfo getAttributeControl(String staticForAttribute, String attributeName) {
-        final Map mapForId = (Map) attributeControls.get(staticForAttribute);
+    public ControlInfo getAttributeControl(String prefixedForAttribute, String attributeName) {
+        final Map mapForId = (Map) attributeControls.get(prefixedForAttribute);
         return (mapForId != null) ? (ControlInfo) mapForId.get(attributeName) : null;
-    }
-
-    /**
-     * Return the list of repeat ids descendant of a given repeat id.
-     */
-    public List getNestedRepeatIds(final String repeatId) {
-        // Check if the result is already computed
-        {
-            final List cachedResult = (List) repeatDescendantsMap.get(repeatId);
-            if (cachedResult != null)
-                return cachedResult;
-        }
-
-        // Compute and cache for further requests
-        synchronized (this) {
-            final List newResult = new ArrayList();
-            addRepeatChildren(newResult, repeatId);
-            repeatDescendantsMap.put(repeatId, newResult);
-            return newResult;
-        }
-    }
-
-    private void addRepeatChildren(List result, String repeatId) {
-        final List children = (List) repeatChildrenMap.get(repeatId);
-        if (children != null) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final String currentChild = (String) i.next();
-                result.add(currentChild);
-                addRepeatChildren(result, currentChild);
-            }
-        }
     }
 
     /*
@@ -840,21 +804,21 @@ public class XFormsStaticState {
     /**
      * Return the expanded shadow tree for the given static control id.
      *
-     * @param controlId static control id
-     * @return          expanded shadow tree, or null
+     * @param controlPrefixedId     prefixed control id
+     * @return                      full expanded shadow tree, or null
      */
-    public Element getFullShadowTree(String controlId) {
-        return (fullShadowTrees == null) ? null : ((Document) fullShadowTrees.get(controlId)).getRootElement();
+    public Element getFullShadowTree(String controlPrefixedId) {
+        return (fullShadowTrees == null) ? null : ((Document) fullShadowTrees.get(controlPrefixedId)).getRootElement();
     }
 
     /**
      * Return the expanded shadow tree for the given static control id, with only XForms controls and no markup.
      *
-     * @param controlId static control id
-     * @return          expanded shadow tree, or null
+     * @param controlPrefixedId     prefixed control id
+     * @return                      compact expanded shadow tree, or null
      */
-    public Element getCompactShadowTree(String controlId) {
-        return (compactShadowTrees == null) ? null : ((Document) compactShadowTrees.get(controlId)).getRootElement();
+    public Element getCompactShadowTree(String controlPrefixedId) {
+        return (compactShadowTrees == null) ? null : ((Document) compactShadowTrees.get(controlPrefixedId)).getRootElement();
     }
 
     /**
@@ -870,7 +834,6 @@ public class XFormsStaticState {
             eventHandlersMap = new HashMap();
             controlInfoMap = new HashMap();
             repeatChildrenMap = new HashMap();
-            repeatDescendantsMap = new HashMap();
 
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
@@ -932,18 +895,20 @@ public class XFormsStaticState {
 
             private Stack repeatAncestorsStack = new Stack();
 
-            public void startVisitControl(Element controlElement, String controlId) {
+            public void startVisitControl(Element controlElement, String controlStaticId) {
+
+                // Check for mandatory id
+                // TODO: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
+                if (controlStaticId == null)
+                    throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName(), locationData);
+
+                // Prefixed id
+                final String controlPrefixedId = prefix + controlStaticId;
 
                 // Gather control name
                 final String controlName = controlElement.getName();
 
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
-
-                // Check for mandatory id
-                // TODO: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
-                final String staticId = controlElement.attributeValue("id");
-                if (staticId == null)
-                    throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName(), locationData);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
                 if (componentBindings != null) {
@@ -952,6 +917,7 @@ public class XFormsStaticState {
                         // A custom component is bound to this element
 
                         // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
+                        // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
 
                         // If the document has a template, recurse into it
                         final Document fullShadowTreeDocument = generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement);
@@ -964,20 +930,20 @@ public class XFormsStaticState {
                             for (Iterator i = extractedModels.iterator(); i.hasNext();) {
                                 final Document currentModelDocument = (Document) i.next();
                                 // Store models by "prefixed id"
-                                modelDocuments.put(staticId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                                modelDocuments.put(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
 
                             XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
 
-                            // Remember full shadow tree for this static id
-                            fullShadowTrees.put(staticId, fullShadowTreeDocument);
+                            // Remember full shadow tree for this prefixed id
+                            fullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
 
                             // Generate compact shadow tree for this static id
                             final Document compactShadowTreeDocument = filterShadowTree(fullShadowTreeDocument);
-                            compactShadowTrees.put(staticId, compactShadowTreeDocument);
+                            compactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                             // TODO: the nested ids must be passed with prefix, right?
-                            final String newPrefix = prefix + staticId + XFormsConstants.COMPONENT_SEPARATOR;
+                            final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
                             analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
                         }
                     }
@@ -1016,7 +982,7 @@ public class XFormsStaticState {
 
                 // Create and index static control information
                 final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlName));
-                controlInfoMap.put(controlId, info);
+                controlInfoMap.put(controlPrefixedId, info);
                 {
                     Map controlsMap = (Map) controlTypes.get(controlName);
                     if (controlsMap == null) {
@@ -1024,7 +990,7 @@ public class XFormsStaticState {
                         controlTypes.put(controlName, controlsMap);
                     }
 
-                    controlsMap.put(controlId, info);
+                    controlsMap.put(controlPrefixedId, info);
                 }
 
                 if (controlName.equals("repeat")) {
@@ -1036,7 +1002,7 @@ public class XFormsStaticState {
                         if (repeatHierarchyStringBuffer.length() > 0)
                             repeatHierarchyStringBuffer.append(',');
 
-                        repeatHierarchyStringBuffer.append(controlId);
+                        repeatHierarchyStringBuffer.append(controlPrefixedId);
 
                         if (repeatAncestorsStack.size() > 0) {
                             // If we have a parent, append it
@@ -1055,12 +1021,12 @@ public class XFormsStaticState {
                                 parentRepeatList = new ArrayList();
                                 repeatChildrenMap.put(parentRepeatId, parentRepeatList);
                             }
-                            parentRepeatList.add(controlId);
+                            parentRepeatList.add(controlPrefixedId);
                         }
 
                     }
 
-                    repeatAncestorsStack.push(controlId);
+                    repeatAncestorsStack.push(controlPrefixedId);
                 } else if (controlName.equals("select") || controlName.equals("select1")) {
                     // Gather itemset information
 
@@ -1076,25 +1042,25 @@ public class XFormsStaticState {
                     // Remember information
                     if (itemsInfoMap == null)
                         itemsInfoMap = new HashMap();
-                    itemsInfoMap.put(controlId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
+                    itemsInfoMap.put(controlPrefixedId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
 //                } else if (controlName.equals("case")) {
                     // TODO: Check that xforms:case is within: switch
 //                    if (!(currentControlsContainer.getName().equals("switch")))
 //                        throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
                 } else  if ("attribute".equals(controlName)) {
                     // Special indexing of xxforms:attribute controls
-                    final String staticForAttribute = controlElement.attributeValue("for");
+                    final String prefixedForAttribute = prefix + controlElement.attributeValue("for");
                     final String nameAttribute = controlElement.attributeValue("name");
                     Map mapForId;
                     if (attributeControls == null) {
                         attributeControls = new HashMap();
                         mapForId = new HashMap();
-                        attributeControls.put(staticForAttribute, mapForId);
+                        attributeControls.put(prefixedForAttribute, mapForId);
                     } else {
-                        mapForId = (Map) attributeControls.get(staticForAttribute);
+                        mapForId = (Map) attributeControls.get(prefixedForAttribute);
                         if (mapForId == null) {
                             mapForId = new HashMap();
-                            attributeControls.put(staticForAttribute, mapForId);
+                            attributeControls.put(prefixedForAttribute, mapForId);
                         }
                     }
                     mapForId.put(nameAttribute, info);
@@ -1111,6 +1077,10 @@ public class XFormsStaticState {
 
         // Gather label, hint, help, alert information
         {
+            // Search LHHA elements that either:
+            //
+            // o have @for attribute
+            // o are the child of an xforms:* or xxforms:* element that has an id
             final List lhhaElements = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
                 "//(xforms:label | xforms:help | xforms:hint | xforms:alert)[not(ancestor::xforms:instance) and exists(@for | parent::xforms:*/@id | parent::xxforms:*/@id)]", BASIC_NAMESPACE_MAPPINGS,
                 null, null, null, null, locationData);
@@ -1174,27 +1144,27 @@ public class XFormsStaticState {
 
             for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                addClasses(currentId, "xxforms-online");
+                addClasses(prefix + currentId, "xxforms-online");
             }
 
             for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                addClasses(currentId, "xxforms-offline");
+                addClasses(prefix + currentId, "xxforms-offline");
             }
 
             for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                addClasses(currentId, "xxforms-offline-save");
+                addClasses(prefix + currentId, "xxforms-offline-save");
             }
 
             for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                addClasses(currentId, "xxforms-offline-insert");
+                addClasses(prefix + currentId, "xxforms-offline-insert");
             }
 
             for (Iterator i = offlineDeleteTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                addClasses(currentId, "xxforms-offline-delete");
+                addClasses(prefix + currentId, "xxforms-offline-delete");
             }
 
             {
@@ -1251,27 +1221,27 @@ public class XFormsStaticState {
         return hasOfflineSupport;
     }
 
-    private void addClasses(String controlId, String classes) {
+    private void addClasses(String controlPrefixedId, String classes) {
         if (controlClasses == null)
             controlClasses = new HashMap();
-        final String currentClasses = (String) controlClasses.get(controlId);
+        final String currentClasses = (String) controlClasses.get(controlPrefixedId);
         if (currentClasses == null) {
             // Set
-            controlClasses.put(controlId, classes);
+            controlClasses.put(controlPrefixedId, classes);
         } else {
             // Append
-            controlClasses.put(controlId, currentClasses + ' ' + classes);
+            controlClasses.put(controlPrefixedId, currentClasses + ' ' + classes);
         }
     }
     
-    public void appendClasses(FastStringBuffer sb, String controlId) {
+    public void appendClasses(FastStringBuffer sb, String prefixedId) {
         if ((controlClasses == null))
             return;
 
         if (sb.length() > 0)
             sb.append(' ');
 
-        final String classes = (String) controlClasses.get(controlId);
+        final String classes = (String) controlClasses.get(prefixedId);
         if (classes != null)
             sb.append(classes);
     }

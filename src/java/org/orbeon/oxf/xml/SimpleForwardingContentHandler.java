@@ -19,7 +19,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Simple ContentHandler able to forward to another ContentHandler.
  */
 public class SimpleForwardingContentHandler implements ContentHandler {
     private ContentHandler contentHandler;

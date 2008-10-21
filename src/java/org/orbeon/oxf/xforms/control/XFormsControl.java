@@ -297,65 +297,45 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Whether a given control has an xforms:label element.
      *
-     * @param containingDocument    containing document (if control is null)
-     * @param control               concrete control if available, or null
-     * @param staticId              static control id (if control is null)
+     * @param containingDocument    containing document
+     * @param prefixedId              static control id
      * @return                      true iif there is an xforms:label element
      */
-    public static boolean hasLabel(XFormsContainingDocument containingDocument, XFormsControl control, String staticId) {
-        final Element controlElement = getControlElement(containingDocument, control, staticId);
-        return controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME) != null;
-    }
-
-    /**
-     * Whether a given control has an xforms:alert element.
-     *
-     * @param containingDocument    containing document (if control is null)
-     * @param control               concrete control if available, or null
-     * @param staticId              static control id (if control is null)
-     * @return                      true iif there is an xforms:alert element
-     */
-    public static boolean hasAlert(XFormsContainingDocument containingDocument, XFormsControl control, String staticId) {
-        final Element controlElement = getControlElement(containingDocument, control, staticId);
-        return controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME) != null;
+    public static boolean hasLabel(XFormsContainingDocument containingDocument, String prefixedId) {
+        return containingDocument.getStaticState().getLabelElement(prefixedId) != null;
     }
 
     /**
      * Whether a given control has an xforms:hint element.
      *
-     * @param containingDocument    containing document (if control is null)
-     * @param control               concrete control if available, or null
-     * @param staticId              static control id (if control is null)
+     * @param containingDocument    containing document
+     * @param prefixedId              static control id
      * @return                      true iif there is an xforms:hint element
      */
-    public static boolean hasHint(XFormsContainingDocument containingDocument, XFormsControl control, String staticId) {
-        final Element controlElement = getControlElement(containingDocument, control, staticId);
-        return controlElement.element(XFormsConstants.XFORMS_HINT_QNAME) != null;
+    public static boolean hasHint(XFormsContainingDocument containingDocument, String prefixedId) {
+        return containingDocument.getStaticState().getHintElement(prefixedId) != null;
     }
 
     /**
      * Whether a given control has an xforms:help element.
      *
-     * @param containingDocument    containing document (if control is null)
-     * @param control               concrete control if available, or null
-     * @param staticId              static control id (if control is null)
+     * @param containingDocument    containing document
+     * @param prefixedId              static control id
      * @return                      true iif there is an xforms:help element
      */
-    public static boolean hasHelp(XFormsContainingDocument containingDocument, XFormsControl control, String staticId) {
-        final Element controlElement = getControlElement(containingDocument, control, staticId);
-        return controlElement.element(XFormsConstants.XFORMS_HELP_QNAME) != null;
+    public static boolean hasHelp(XFormsContainingDocument containingDocument, String prefixedId) {
+        return containingDocument.getStaticState().getHelpElement(prefixedId) != null;
     }
 
-    private static Element getControlElement(XFormsContainingDocument containingDocument, XFormsControl control, String staticId) {
-        final Element controlElement;
-        if (control != null) {
-            // Concrete control
-            controlElement = control.getControlElement();
-        } else {
-            // Static control
-            controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(staticId)).getElement();
-        }
-        return controlElement;
+    /**
+     * Whether a given control has an xforms:alert element.
+     *
+     * @param containingDocument    containing document
+     * @param prefixedId              static control id
+     * @return                      true iif there is an xforms:alert element
+     */
+    public static boolean hasAlert(XFormsContainingDocument containingDocument, String prefixedId) {
+        return containingDocument.getStaticState().getAlertElement(prefixedId) != null;
     }
 
     /**

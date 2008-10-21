@@ -221,9 +221,9 @@ public class HandlerContext {
         return (componentContextStack == null || componentContextStack.size() == 0) ? "" : (String) componentContextStack.peek();
     }
 
-    public void pushComponentContext(String staticId) {
+    public void pushComponentContext(String prefixedId) {
 
-        final String newIdPrefix = getIdPrefix() + staticId + XFormsConstants.COMPONENT_SEPARATOR;
+        final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
         if (componentContextStack == null)
             componentContextStack = new Stack();

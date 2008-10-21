@@ -69,8 +69,8 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
 
         currentOutputInterceptor.setAddedClasses(new FastStringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
 
+        // TODO: is the use of XFormsElementFilterContentHandler necessary now?
         handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
-        setContentHandler(handlerContext.getController().getOutput());
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
@@ -78,7 +78,6 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
 
         // Restore output
         handlerContext.getController().setOutput(currentSavedOutput);
-        setContentHandler(currentSavedOutput);
 
         if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
             // Output end delimiter

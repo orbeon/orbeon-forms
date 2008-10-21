@@ -214,12 +214,12 @@ public class XFormsItemUtils {
         // Optimize static itemsets
         {
             final boolean isStaticItemset; {
-            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(select1Control.getId());
+            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(select1Control.getPrefixedId());
                 isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
             }
 
             if (isStaticItemset)
-                return evaluateStaticItemsets(containingDocument, select1Control.getId());
+                return evaluateStaticItemsets(containingDocument, select1Control.getPrefixedId());
         }
 
         final List newItems = new ArrayList();
@@ -396,11 +396,11 @@ public class XFormsItemUtils {
         return newItems;
     }
 
-    public static List evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String id) {
+    public static List evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String prefixedId) {
 
         final List newItems = new ArrayList();
 
-        final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(id)).getElement();
+        final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(prefixedId)).getElement();
         final boolean isOpenSelection = XFormsSelect1Control.isOpenSelection(controlElement);
         final boolean isEncryptItemValues = !isOpenSelection && XFormsProperties.isEncryptItemValues(containingDocument);
 

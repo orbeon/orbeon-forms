@@ -268,7 +268,7 @@ public class ControlTree implements Cloneable {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                    repeatIdToIndex.put(repeatControl.getId(), new Integer(((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex()));
+                    repeatIdToIndex.put(repeatControl.getPrefixedId(), new Integer(((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex()));
                 }
             }
         });
@@ -289,7 +289,7 @@ public class ControlTree implements Cloneable {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                    repeatIdToIndex.put(repeatControl.getId(), new Integer(repeatControl.getIndex()));
+                    repeatIdToIndex.put(repeatControl.getPrefixedId(), new Integer(repeatControl.getIndex()));
                 }
             }
         });
@@ -303,9 +303,9 @@ public class ControlTree implements Cloneable {
         final Map repeats = staticState.getRepeatControlInfoMap();
         if (repeats != null) {
             for (Iterator i = repeats.keySet().iterator(); i.hasNext();) {
-                final String repeatStaticId = (String) i.next();
-                if (repeatIdToIndex.get(repeatStaticId) == null) {
-                    repeatIdToIndex.put(repeatStaticId, new Integer(0));
+                final String repeatPrefixedId = (String) i.next();
+                if (repeatIdToIndex.get(repeatPrefixedId) == null) {
+                    repeatIdToIndex.put(repeatPrefixedId, new Integer(0));
                 }
             }
         }

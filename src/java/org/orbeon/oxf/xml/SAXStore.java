@@ -16,6 +16,7 @@ package org.orbeon.oxf.xml;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.processor.SAXLoggerProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -235,7 +236,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     }
 
     /**
-     * This prints the instance with extra annotation attributes to System.out. For debug only.
+     * This attempts to print the content to System.out. For debug only.
      */
     public void readOut() {
         try {
@@ -244,6 +245,17 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             th.startDocument();
             replay(th);
             th.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * This outputs the content to the SAXLoggerProcessor logger. For debug only
+     */
+    public void logContents() {
+        try {
+            replay(new SAXLoggerProcessor.DebugContentHandler());
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -311,11 +323,6 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
         addToEventBuffer(END_PREFIX_MAPPING);
         // NOTE: We don't keep location data for this event as it is very unlikely to be used
-//        if (locator != null) {
-//            addToLineBuffer(locator.getLineNumber());
-//            addToLineBuffer(locator.getColumnNumber());
-//            addToSystemIdBuffer(locator.getSystemId());
-//        }
         stringBuffer.add(s);
 
         super.endPrefixMapping(s);
@@ -405,11 +412,6 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
         addToEventBuffer(START_PREFIX_MAPPING);
         // NOTE: We don't keep location data for this event as it is very unlikely to be used
-//        if (locator != null) {
-//            addToLineBuffer(locator.getLineNumber());
-//            addToLineBuffer(locator.getColumnNumber());
-//            addToSystemIdBuffer(locator.getSystemId());
-//        }
         stringBuffer.add(s);
         stringBuffer.add(s1);
 

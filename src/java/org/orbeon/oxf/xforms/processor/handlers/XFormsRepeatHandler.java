@@ -62,8 +62,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
             }
         });
+        // TODO: is the use of XFormsElementFilterContentHandler necessary now?
         handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
-        setContentHandler(handlerContext.getController().getOutput());
 
         if (isConcreteControl && (isTopLevelRepeat || !isMustGenerateTemplate)) {
 
@@ -147,7 +147,6 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
 
         // Restore output
         handlerContext.getController().setOutput(savedOutput);
-        setContentHandler(savedOutput);
 
         // Delimiter: end repeat
         outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),

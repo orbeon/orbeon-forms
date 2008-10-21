@@ -88,12 +88,12 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         if (!isGroupInTable) {
             // Gather information about the label and alert
 
-            final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
+            final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
             final String labelClassAttribute;
             if (handlerContext.isTemplate() || xformsControl == null) {
                 // Determine information statically
 
-                final Element groupElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(handlerContext.getId(attributes))).getElement();
+                final Element groupElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(getPrefixedId())).getElement();
                 final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
 
                 labelValue = null;
@@ -139,7 +139,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
         // Find classes to add
         final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-        handleMIPClasses(classes, staticId, xformsControl);
+        handleMIPClasses(classes, getPrefixedId(), xformsControl);
 
         // Start xhtml:span or xhtml:fieldset
         final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
@@ -160,7 +160,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
                 // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
                 // styling in particular.
-                final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
+                final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
                 if (hasLabel) {
 
                     // Handle label classes
@@ -197,8 +197,8 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
                             outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
                 }
             });
+            // TODO: is the use of XFormsElementFilterContentHandler necessary now?
             controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
-            setContentHandler(controller.getOutput());
 
             // Set control classes
             outputInterceptor.setAddedClasses(classes);
@@ -224,7 +224,6 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
             // Restore output
             controller.setOutput(savedOutput);
-            setContentHandler(savedOutput);
 
             // Delimiter: end repeat
             outputInterceptor.flushCharacters(true, true);
@@ -241,7 +240,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             // styling in particular.
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
-            outputLabelFor(handlerContext, reusableAttributes, effectiveId, labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, "label", labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
         }
     }
 

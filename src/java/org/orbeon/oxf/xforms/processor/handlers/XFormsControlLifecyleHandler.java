@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
+import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -42,7 +43,9 @@ import org.xml.sax.helpers.AttributesImpl;
 public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     private String staticId;
+    private String prefixedId;
     private String effectiveId;
+
     private XFormsSingleNodeControl xformsControl;
     private Attributes attributes;
     private String[] endConfig;
@@ -56,10 +59,16 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         super(repeating, forwarding);
     }
 
+    protected String getPrefixedId() {
+        return prefixedId;
+    }
+
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         staticId = handlerContext.getId(attributes);
+        prefixedId = handlerContext.getIdPrefix() + staticId;
         effectiveId = handlerContext.getEffectiveId(attributes);
+
         xformsControl = handlerContext.isTemplate()
                 ? null : (XFormsSingleNodeControl) containingDocument.getObjectByEffectiveId(effectiveId);
 
@@ -83,9 +92,9 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                     // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
                     classes = getInitialClasses(localname, attributes, xformsControl, appearance, isDefaultIncremental());
                     // All MIP-related classes
-                    handleMIPClasses(classes, staticId, xformsControl);
+                    handleMIPClasses(classes, prefixedId, xformsControl);
                     // Static classes: xforms-online, xforms-offline, ...
-                    containingDocument.getStaticState().appendClasses(classes, staticId);
+                    containingDocument.getStaticState().appendClasses(classes, prefixedId);
                     // Dynamic classes added by the control 
                     addCustomClasses(classes, xformsControl);
                 }
@@ -107,8 +116,8 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             // sections can link back to the control.
             if (handlerContext.isNoScript()) {
                 if (xformsControl != null
-                        && (XFormsControl.hasHelp(containingDocument, xformsControl, staticId)
-                            || XFormsControl.hasAlert(containingDocument, xformsControl, staticId))) {
+                        && (XFormsControl.hasHelp(containingDocument, prefixedId)
+                            || XFormsControl.hasAlert(containingDocument, prefixedId))) {
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
@@ -137,19 +146,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                     break;
                 } else if ("label".equals(current)) {
                     // xforms:label
-                    if (XFormsControl.hasLabel(containingDocument, xformsControl, staticId))
+                    if (hasLocalLabel())
                         handleLabel(staticId, effectiveId, xformsControl, isTemplate);
                 } else if ("alert".equals(current)) {
                     // xforms:alert
-                    if (XFormsControl.hasAlert(containingDocument, xformsControl, staticId))
+                    if (hasLocalAlert())
                         handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
                 } else if ("hint".equals(current)) {
                     // xforms:hint
-                    if (XFormsControl.hasHint(containingDocument, xformsControl, staticId))
+                    if (hasLocalHint())
                         handleHint(staticId, effectiveId, xformsControl, isTemplate);
                 } else {
                     // xforms:help
-                    if (XFormsControl.hasHelp(containingDocument, xformsControl, staticId))
+                    if (hasLocalHelp())
                         handleHelp(staticId, effectiveId, xformsControl, isTemplate);
                 }
             }
@@ -169,19 +178,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                     handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
                 } else if ("label".equals(current)) {
                     // xforms:label
-                    if (XFormsControl.hasLabel(containingDocument, xformsControl, staticId))
+                    if (hasLocalLabel())
                         handleLabel(staticId, effectiveId, xformsControl, isTemplate);
                 } else if ("alert".equals(current)) {
                     // xforms:alert
-                    if (XFormsControl.hasAlert(containingDocument, xformsControl, staticId))
+                    if (hasLocalAlert())
                         handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
                 } else if ("hint".equals(current)) {
                     // xforms:hint
-                    if (XFormsControl.hasHint(containingDocument, xformsControl, staticId))
+                    if (hasLocalHint())
                         handleHint(staticId, effectiveId, xformsControl, isTemplate);
                 } else {
                     // xforms:help
-                    if (XFormsControl.hasHelp(containingDocument, xformsControl, staticId))
+                    if (hasLocalHelp())
                         handleHelp(staticId, effectiveId, xformsControl, isTemplate);
                 }
             }
@@ -194,6 +203,26 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
         }
+    }
+
+    private boolean hasLocalLabel() {
+        final Element element = containingDocument.getStaticState().getLabelElement(prefixedId);
+        return element != null && element.attributeValue("for") == null;
+    }
+
+    private boolean hasLocalHint() {
+        final Element element = containingDocument.getStaticState().getHintElement(prefixedId);
+        return element != null && element.attributeValue("for") == null;
+    }
+
+    private boolean hasLocalHelp() {
+        final Element element = containingDocument.getStaticState().getHelpElement(prefixedId);
+        return element != null && element.attributeValue("for") == null;
+    }
+
+    private boolean hasLocalAlert() {
+        final Element element = containingDocument.getStaticState().getAlertElement(prefixedId);
+        return element != null && element.attributeValue("for") == null;
     }
 
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {

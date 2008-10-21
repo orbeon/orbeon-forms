@@ -1059,7 +1059,7 @@ public class XMLUtils {
         return addOrReplaceAttribute(attributes, "", "", "class", newAttribute);
     }
 
-    public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
+    public static AttributesImpl addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
         boolean replaced = false;
         for (int i = 0; i < attributes.getLength(); i++) {

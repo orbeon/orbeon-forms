@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -37,7 +35,9 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         final ContentHandler contentHandler = controller.getOutput();
 
         final String staticId = handlerContext.getId(attributes);
+        final String prefixedId = handlerContext.getIdPrefix() + staticId;
         final String effectiveId = handlerContext.getEffectiveId(attributes);
+
         final String elementName = "div";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
@@ -49,26 +49,17 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes, effectiveId));
 
         // Push context
-        handlerContext.pushComponentContext(staticId);
+        handlerContext.pushComponentContext(prefixedId);
 
         // Process shadow content if present
-        final Element shadowTree = containingDocument.getStaticState().getFullShadowTree(staticId);
+        final Element shadowTree = containingDocument.getStaticState().getFullShadowTree(prefixedId);
         if (shadowTree != null) {
-            // TODO: handle inclusion and namespaces using XIncludeProcessor facilities
-            TransformerUtils.writeDom4j(shadowTree, new ElementFilterContentHandler(controller) {
-                protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
-                    // We filter out XForms elements that are not controls
-                    return !XFormsControlFactory.isBuiltinControl(localname)
-                            && (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)
-                                || XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
-                                || XFormsConstants.XBL_NAMESPACE_URI.equals(uri));
-                }
+            // Tell the controller we are providing a new body
+            controller.startBody();
 
-                public void startDocument() throws SAXException {
-                }
-
-                public void endDocument() throws SAXException {
-                }
+            // Forward shadow content to handler
+            // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
+            TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentContentHandler(controller) {
 
                 private int level = 0;
 
@@ -88,6 +79,9 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
                         super.endElement(uri, localname, qName);
                 }
             });
+
+            // Tell the controller we are done with the new body
+            controller.endBody();
         }
     }
 

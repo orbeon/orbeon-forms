@@ -27,9 +27,16 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
+ * This is the controller for the handlers system.
  *
+ * The handler controller:
+ *
+ * o keeps a list of element handlers
+ * o reacts to a stream of SAX events
+ * o calls handlers when needed
+ * o handles repeated content
  */
-public class ElementHandlerController extends ForwardingContentHandler implements ElementHandlerContext, ContentHandler {
+public class ElementHandlerController implements ElementHandlerContext, ContentHandler {
 
     private Object elementHandlerContext;
     private DeferredContentHandler output;
@@ -46,7 +53,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     private XIncludeProcessor.OutputLocator locator;
 
-    private int level;
+    private int level = 0;
 
     // Class.forName is expensive, so we cache mappings
     private static Map classNameToHandlerClass = new HashMap();
@@ -68,14 +75,6 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public Object getElementHandlerContext() {
         return elementHandlerContext;
-    }
-
-    public String getParentHandlerExplodedQName() {
-        if (handlerInfos == null || handlerInfos.size() < 1)
-            return null;
-
-        final HandlerInfo parentHandlerInfo = (HandlerInfo) handlerInfos.get(handlerInfos.size() - 1);
-        return parentHandlerInfo.explodedQName;
     }
 
     public void setElementHandlerContext(Object elementHandlerContext) {
@@ -101,9 +100,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void startDocument() throws SAXException {
         try {
-            setContentHandler(output);
-            setForward(true);
-            super.startDocument();
+            output.startDocument();
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -111,7 +108,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void endDocument() throws SAXException {
         try {
-            super.endDocument();
+            output.endDocument();
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -119,54 +116,46 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         try {
+            // Increment level before, so that if callees like start() and startElement() use us, the level is correct
+            level++;
+
             namespaceSupport.startElement();
             elementNames.add(XMLUtils.buildExplodedQName(uri, localname));
 
-            if (!isFillingUpSAXStore) {
-
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.startElement(uri, localname, qName, attributes);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Look for a new handler
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
-                final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
-
-                final ElementHandler elementHandler;
-                if (handlerClassName != null) {
-                    // Found handler
-                    elementHandler = getHandlerByClassName(handlerClassName);
-                } else {
-                    // Search for URI-based handler
-                    final String uriHandlerClassName = (String) uriHandlerKeysToNames.get(uri);
-                    if (uriHandlerClassName != null) {
-                        // Found handler
-                        elementHandler = getHandlerByClassName(uriHandlerClassName);
-                    } else {
-                        elementHandler = null;
-                    }
-                }
+                final ElementHandler elementHandler = getHandler(uri, explodedQName);
 
                 if (elementHandler != null) {
+                    // New handler found
                     elementHandler.setContext(elementHandlerContext);
-                    elementHandler.setForward(elementHandler.isForwarding());
-                    elementHandler.setContentHandler(output);
-
-                    if (currentHandlerInfo != null)
-                        handlerInfos.push(currentHandlerInfo);
 
                     if (elementHandler.isRepeating()) {
+                        // Repeating handler will process its body later
                         currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler, attributes, this.locator);
-                        super.setContentHandler(currentHandlerInfo.saxStore);
                         isFillingUpSAXStore = true;
+                        // Push current handler
+                        handlerInfos.push(currentHandlerInfo);
                     } else {
+                        // Non-repeating handler processes its body immediately
                         currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler);
-                        super.setContentHandler(elementHandler);
+                        // Push current handler
+                        handlerInfos.push(currentHandlerInfo);
+                        // Signal start to current handler
                         elementHandler.start(uri, localname, qName, attributes);
                     }
                 } else {
-                    super.startElement(uri, localname, qName, attributes);
+                    // New handler not found, send to output
+                    output.startElement(uri, localname, qName, attributes);
                 }
-            } else {
-                super.startElement(uri, localname, qName, attributes);
             }
-
-            level++;
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -174,37 +163,50 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
         try {
-            level--;
 
             if (currentHandlerInfo != null && currentHandlerInfo.level == level) {
-                // End of handler
+                // End of current handler
 
-                if (currentHandlerInfo.elementHandler.isRepeating()) {
+                if (isFillingUpSAXStore) {
+                    // Was filling-up SAXStore
                     isFillingUpSAXStore = false;
-                    super.setContentHandler(currentHandlerInfo.elementHandler);
-                    level++;
+                    // Process body once
                     currentHandlerInfo.elementHandler.start(uri, localname, qName, currentHandlerInfo.attributes);
                     currentHandlerInfo.elementHandler.end(uri, localname, qName);
-                    level--;
                 } else {
+                    // Signal end to current handler
                     currentHandlerInfo.elementHandler.end(uri, localname, qName);
                 }
 
-                currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.pop() : null);
-                super.setContentHandler((currentHandlerInfo != null) ? (ContentHandler) currentHandlerInfo.elementHandler : output);
-
+                // Pop current handler
+                handlerInfos.pop();
+                currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
+            } else if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.endElement(uri, localname, qName);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
             } else {
-                super.endElement(uri, localname, qName);
+                // Just forward
+                output.endElement(uri, localname, qName);
             }
 
             elementNames.pop();
             namespaceSupport.endElement();
+
+            level--;
 
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
+    /**
+     * A repeated handler may call this 1 or more times to start handling the captured body.
+     *
+     * @throws SAXException
+     */
     public void repeatBody() throws SAXException {
         // Replay content of current SAXStore
         currentHandlerInfo.saxStore.replay(this);
@@ -214,9 +216,35 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         }
     }
 
+    /**
+     * A handler may call this to start providing new dynamic content to process.
+     */
+    public void startBody() {
+        // Just push null so that the contents is not subject to the isForwarding() test.
+        handlerInfos.push(null);
+        currentHandlerInfo = null;
+    }
+
+    /**
+     * A handler may call this to end providing new dynamic content to process.
+     */
+    public void endBody() {
+        handlerInfos.pop();
+        currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
+    }
+
     public void characters(char[] chars, int start, int length) throws SAXException {
         try {
-            super.characters(chars, start, length);
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.characters(chars, start, length);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.characters(chars, start, length);
+            }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -224,9 +252,18 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         try {
-            // Update global NamespaceSupport
-            namespaceSupport.startPrefixMapping(prefix, uri);
-            super.startPrefixMapping(prefix, uri);
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.startPrefixMapping(prefix, uri);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Update global NamespaceSupport
+                namespaceSupport.startPrefixMapping(prefix, uri);
+                // Send to output
+                output.startPrefixMapping(prefix, uri);
+            }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -234,7 +271,67 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void endPrefixMapping(String s) throws SAXException {
         try {
-            super.endPrefixMapping(s);
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.endPrefixMapping(s);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.endPrefixMapping(s);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.ignorableWhitespace(ch, start, length);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.ignorableWhitespace(ch, start, length);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void processingInstruction(String target, String data) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.processingInstruction(target, data);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.processingInstruction(target, data);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void skippedEntity(String name) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.skippedEntity(name);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.skippedEntity(name);
+            }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -264,8 +361,26 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         return locator;
     }
 
-    private ElementHandler getHandlerByClassName(String handlerClassName) {
+    private ElementHandler getHandler(String uri, String explodedQName) {
+        ElementHandler elementHandler;
+        final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
+        if (handlerClassName != null) {
+            // Found handler
+            elementHandler = getHandlerByClassName(handlerClassName);
+        } else {
+            // Search for URI-based handler
+            final String uriHandlerClassName = (String) uriHandlerKeysToNames.get(uri);
+            if (uriHandlerClassName != null) {
+                // Found handler
+                elementHandler = getHandlerByClassName(uriHandlerClassName);
+            } else {
+                elementHandler = null;
+            }
+        }
+        return elementHandler;
+    }
 
+    private ElementHandler getHandlerByClassName(String handlerClassName) {
         Class handlerClass = (Class) classNameToHandlerClass.get(handlerClassName);
         if (handlerClass == null) {
             try {

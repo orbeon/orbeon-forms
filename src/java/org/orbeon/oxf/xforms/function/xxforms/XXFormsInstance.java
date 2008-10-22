@@ -41,6 +41,7 @@ public class XXFormsInstance extends XFormsFunction {
         final Expression instanceIdExpression = argument[0];
         final String instanceId = XFormsUtils.namespaceId(containingDocument, instanceIdExpression.evaluateAsString(xpathContext));
 
+        // TODO: implement search through parent containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
         final XFormsInstance instance = containingDocument.findInstance(instanceId);
 
         // Return instance document if found

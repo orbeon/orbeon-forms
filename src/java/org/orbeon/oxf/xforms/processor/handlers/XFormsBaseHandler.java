@@ -359,13 +359,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             final XFormsStaticState staticState = containingDocument.getStaticState();
             final Element nestedElement;
             if (isLabel) {
-                nestedElement = staticState.getLabelElement(forId);
+                nestedElement = staticState.getLabelElement(forEffectiveId);
             } else if (isHelp) {
-                nestedElement = staticState.getHelpElement(forId);
+                nestedElement = staticState.getHelpElement(forEffectiveId);
             } else if (isHint) {
-                nestedElement = staticState.getHintElement(forId);
+                nestedElement = staticState.getHintElement(forEffectiveId);
             } else if (isAlert) {
-                nestedElement = staticState.getAlertElement(forId);
+                nestedElement = staticState.getAlertElement(forEffectiveId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }

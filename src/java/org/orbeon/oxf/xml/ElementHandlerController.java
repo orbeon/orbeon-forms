@@ -35,6 +35,8 @@ import java.util.Stack;
  * o reacts to a stream of SAX events
  * o calls handlers when needed
  * o handles repeated content
+ *
+ * TODO: Should use pools of handlers to reduce memory consumption.
  */
 public class ElementHandlerController implements ElementHandlerContext, ContentHandler {
 

@@ -1345,80 +1345,11 @@ public class XFormsStaticState {
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
                 public void startElement(Element element) {
 
-                    // Handle attribute forwarding
-                    final Attribute xblAttr = element.attribute(XFormsConstants.XBL_ATTR_QNAME);
-                    if (xblAttr != null) {
-                        // Detach attribute (not strictly necessary?)
-                        xblAttr.detach();
-                        // Get attribute value
-                        final String xblAttrString = xblAttr.getValue();
-                        final StringTokenizer st = new StringTokenizer(xblAttrString);
-                        while (st.hasMoreTokens()) {
-                            final String currentValue = st.nextToken();
-
-                            final int equalIndex = currentValue.indexOf('=');
-                            if (equalIndex == -1) {
-                                // No a=b pair, just a single QName
-                                final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue);
-                                if (!valueQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI)) {
-                                     // This is not xbl:text, copy the attribute
-                                    element.addAttribute(valueQName, boundElement.attributeValue(valueQName));
-                                } else {
-                                    // This is xbl:text
-                                    // "The xbl:text value cannot occur by itself in the list"
-                                }
-
-                            } else {
-                                // a=b pair
-                                final QName leftSideQName; {
-                                final String leftSide = currentValue.substring(0, equalIndex);
-                                    leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
-                                }
-                                final QName rightSideQName; {
-                                    final String rightSide = currentValue.substring(equalIndex + 1);
-                                    rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
-                                }
-
-                                final boolean isLeftSideXBLText = leftSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
-                                final boolean isRightSideXBLText = rightSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
-
-                                final String rightSideValue;
-                                if (!isRightSideXBLText) {
-                                     // Get attribute value
-                                    rightSideValue = boundElement.attributeValue(rightSideQName);
-                                } else {
-                                    // Get text value
-
-                                    // "any text nodes (including CDATA nodes and whitespace text nodes) that are
-                                    // explicit children of the bound element must have their data concatenated"
-                                    rightSideValue = boundElement.getText();// must use getText() and not stringValue()
-                                }
-
-                                if (rightSideValue != null) {// not sure if XBL says what should happen if the source attribute is not found 
-                                    if (!isLeftSideXBLText) {
-                                         // Set attribute value
-                                        element.addAttribute(leftSideQName, rightSideValue);
-                                    } else {
-                                        // Set text value
-
-                                        // "value of the attribute on the right-hand side are to be represented as text
-                                        // nodes underneath the shadow element"
-
-                                        // TODO: "If the element has any child nodes in the DOM (any nodes, including
-                                        // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
-                                        // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
-
-                                        element.setText(rightSideValue);
-                                    }
-                                }
-                            }
-                            // TODO: handle xbl:lang?
-                            // TODO: handle type specifiers?
-                        }
-                    }
-
                     // Handle xbl:content
-                    if (element.getQName().equals(XFormsConstants.XBL_CONTENT_QNAME)) {
+
+                    final boolean isXBLContent = element.getQName().equals(XFormsConstants.XBL_CONTENT_QNAME);
+                    final List resultingNodes;
+                    if (isXBLContent) {
                         final String includesAttribute = element.attributeValue("includes");
                         final List contentToInsert;
                         if (includesAttribute == null) {
@@ -1485,6 +1416,105 @@ public class XFormsStaticState {
 
                         // Remove <xbl:content> from shadow tree
                         element.detach();
+
+                        resultingNodes = contentToInsert;
+                    } else {
+                        // Element is simply kept
+                        resultingNodes = Collections.singletonList(element);
+                    }
+
+                    // Handle attribute forwarding
+                    final Attribute xblAttr = element.attribute(XFormsConstants.XBL_ATTR_QNAME);
+                    if (xblAttr != null) {
+                        // Detach attribute (not strictly necessary?)
+                        xblAttr.detach();
+                        // Get attribute value
+                        final String xblAttrString = xblAttr.getValue();
+                        final StringTokenizer st = new StringTokenizer(xblAttrString);
+                        while (st.hasMoreTokens()) {
+                            final String currentValue = st.nextToken();
+
+                            final int equalIndex = currentValue.indexOf('=');
+                            if (equalIndex == -1) {
+                                // No a=b pair, just a single QName
+                                final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue);
+                                if (!valueQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI)) {
+                                     // This is not xbl:text, copy the attribute
+                                    setAttribute(resultingNodes, valueQName, boundElement.attributeValue(valueQName));
+                                } else {
+                                    // This is xbl:text
+                                    // "The xbl:text value cannot occur by itself in the list"
+                                }
+
+                            } else {
+                                // a=b pair
+                                final QName leftSideQName; {
+                                final String leftSide = currentValue.substring(0, equalIndex);
+                                    leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
+                                }
+                                final QName rightSideQName; {
+                                    final String rightSide = currentValue.substring(equalIndex + 1);
+                                    rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
+                                }
+
+                                final boolean isLeftSideXBLText = leftSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
+                                final boolean isRightSideXBLText = rightSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
+
+                                final String rightSideValue;
+                                if (!isRightSideXBLText) {
+                                     // Get attribute value
+                                    rightSideValue = boundElement.attributeValue(rightSideQName);
+                                } else {
+                                    // Get text value
+
+                                    // "any text nodes (including CDATA nodes and whitespace text nodes) that are
+                                    // explicit children of the bound element must have their data concatenated"
+                                    rightSideValue = boundElement.getText();// must use getText() and not stringValue()
+                                }
+
+                                if (rightSideValue != null) {// not sure if XBL says what should happen if the source attribute is not found
+                                    if (!isLeftSideXBLText) {
+                                         // Set attribute value
+                                        setAttribute(resultingNodes, leftSideQName, rightSideValue);
+                                    } else {
+                                        // Set text value
+
+                                        // "value of the attribute on the right-hand side are to be represented as text
+                                        // nodes underneath the shadow element"
+
+                                        // TODO: "If the element has any child nodes in the DOM (any nodes, including
+                                        // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
+                                        // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
+
+                                        setText(resultingNodes, rightSideValue);
+                                    }
+                                }
+                            }
+                            // TODO: handle xbl:lang?
+                            // TODO: handle type specifiers?
+                        }
+                    }
+                }
+
+                private final void setAttribute(List nodes, QName attributeQName, String attributeValue) {
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Iterator i = nodes.iterator(); i.hasNext();) {
+                            final Node node = (Node) i.next();
+                            if (node instanceof Element) {
+                                ((Element) node).addAttribute(attributeQName, attributeValue);
+                            }
+                        }
+                    }
+                }
+
+                private final void setText(List nodes, String value) {
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Iterator i = nodes.iterator(); i.hasNext();) {
+                            final Node node = (Node) i.next();
+                            if (node instanceof Element) {
+                                ((Element) node).setText(value);
+                            }
+                        }
                     }
                 }
 

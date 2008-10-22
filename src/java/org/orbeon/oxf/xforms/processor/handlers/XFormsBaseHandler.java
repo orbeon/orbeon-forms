@@ -433,6 +433,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 final String helpImageClasses = classes.toString();
 
                 final AttributesImpl imgAttributes = new AttributesImpl();
+                imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, forEffectiveId + "-help-image");
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?

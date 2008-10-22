@@ -30,6 +30,7 @@
             <xforms:action ev:event="restore-instance">
                 <xforms:insert nodeset="xxforms:instance('input-instance')" origin="xxforms:instance('input-initial-instance')"/>
                 <xforms:insert nodeset="xxforms:instance('output-instance')" origin="xxforms:instance('output-initial-instance')"/>
+                <xforms:insert nodeset="xxforms:instance('dialog-instance')" origin="xxforms:instance('dialog-initial-instance')"/>
             </xforms:action>
 
             <xforms:action ev:event="xforms-model-construct-done">
@@ -43,7 +44,7 @@
         <xhtml:style type="text/css">
             .xforms-label { display: block }
         </xhtml:style>
-        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
+        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js">-->
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/calendar/calendar.js"/>
@@ -64,6 +65,10 @@
             <xforms:instance id="input-initial-instance">
                 <instance>
                     <field>gaga</field>
+                    <label>field</label>
+                    <hint>hint</hint>
+                    <help>help</help>
+                    <alert>alert</alert>
                     <type>string</type>
                     <copy/>
                     <time>20:12:21</time>
@@ -87,8 +92,20 @@
         <xhtml:h1>xforms:input</xhtml:h1>
         <xforms:group ref="/instance" model="input-model">
             <xforms:input ref="field" id="input-field">
-                <xforms:label>field</xforms:label>
+                <xforms:label ref="../label"/>
+                <xforms:hint ref="../hint"/>
+                <xforms:help ref="../help"/>
+                <xforms:alert ref="../alert"/>
             </xforms:input>
+            <xhtml:span>
+                <xhtml:span>
+                    <xforms:label ref="label" for="input-field-for"/>
+                    <xforms:hint ref="hint" for="input-field-for"/>
+                    <xforms:help ref="help" for="input-field-for"/>
+                    <xforms:alert ref="alert" for="input-field-for"/>
+                </xhtml:span>
+                <xforms:input ref="field" id="input-field-for"/>
+            </xhtml:span>
             <xforms:input ref="type" id="input-type">
                 <xforms:label>type</xforms:label>
                 <xforms:action ev:event="xforms-value-changed">
@@ -97,6 +114,18 @@
                     <xforms:revalidate/>
                     <xforms:refresh/>
                 </xforms:action>
+            </xforms:input>
+            <xforms:input ref="label" id="input-label">
+                <xforms:label>label</xforms:label>
+            </xforms:input>
+            <xforms:input ref="hint" id="input-hint">
+                <xforms:label>hint</xforms:label>
+            </xforms:input>
+            <xforms:input ref="help" id="input-help">
+                <xforms:label>help</xforms:label>
+            </xforms:input>
+            <xforms:input ref="alert" id="input-alert">
+                <xforms:label>alert</xforms:label>
             </xforms:input>
             <xforms:input ref="time" id="input-time">
                 <xforms:label>time</xforms:label>
@@ -143,6 +172,37 @@
             </xforms:input>
         </xforms:group>
         
+        <!-- Dialog -->
+        <xforms:model id="dialog-model">
+            <xforms:instance id="dialog-instance">
+                <instance/>
+            </xforms:instance>
+            <xforms:instance id="dialog-initial-instance">
+                <instance>
+                    <label>label</label>
+                </instance>
+            </xforms:instance>
+
+        </xforms:model>
+        <xxforms:dialog model="dialog-model" id="dialog-control">
+            <xforms:label ref="label" id="dialog-label"/>
+            <xhtml:p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
+                scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
+                into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
+                release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
+                software like Aldus PageMaker including versions of Lorem Ipsum.
+            </xhtml:p>
+        </xxforms:dialog>
+        <xforms:input ref="label" id="dialog-label-input">
+            <xforms:label>label</xforms:label>
+        </xforms:input>
+        <xforms:trigger id="dialog-show">
+            <xforms:label>Show</xforms:label>
+            <xxforms:show ev:event="DOMActivate" dialog="dialog-control"/>
+        </xforms:trigger>
+
 
         <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </xhtml:body>

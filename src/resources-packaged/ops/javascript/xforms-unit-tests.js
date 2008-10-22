@@ -108,9 +108,13 @@ ORBEON.testcases = {
                 var dateInput = ORBEON.util.Dom.getChildElementByIndex(dateControl, 0);
                 var valueBefore = dateInput.value;
                 dateInput.focus();
+                gaga = dateInput;
                 YAHOO.util.UserAction.click(dateInput);
                 YAHOO.util.UserAction.mousedown(dateInput); // Simulate mousedown as this is the event the calendar is listening on
                 YAHOO.util.Assert.areEqual(valueBefore, dateInput.value);
+                var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
+                dateInput.blur(); // Close the date picker
+
             });
         },
 
@@ -188,7 +192,7 @@ ORBEON.testcases = {
             });
         },
 
-        
+
         // When we send an invalid date-time to the server, we don't want to try to parse the result if it is the same
         // as what we just sent
         testInvalidDateTimeSentToServer: function() {
@@ -274,7 +278,74 @@ ORBEON.testcases = {
                     YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(control, "xforms-disabled"));
                 });
             });
-        }
+        },
+
+        // Changing the label
+        testChangeLabel: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var newLabel = "new label";
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-label", newLabel);
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var currentLabel = ORBEON.xforms.Controls.getLabelMessage(control);
+                    YAHOO.util.Assert.areEqual(newLabel, currentLabel);
+                    var control = ORBEON.util.Dom.getElementById("input-field-for");
+                    var currentLabel = ORBEON.xforms.Controls.getLabelMessage(control);
+                    YAHOO.util.Assert.areEqual(newLabel, currentLabel);
+                });
+            });
+        },
+
+        // Changing the hint
+        testChangeHint: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var newHint = "new hint";
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-hint", newHint);
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var currentHint = ORBEON.xforms.Controls.getHintMessage(control);
+                    YAHOO.util.Assert.areEqual(newHint, currentHint);
+                    var control = ORBEON.util.Dom.getElementById("input-field-for");
+                    var currentHint = ORBEON.xforms.Controls.getHintMessage(control);
+                    YAHOO.util.Assert.areEqual(newHint, currentHint);
+                });
+            });
+        },
+
+        // Changing the help
+        testChangeHelp: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var newHelp = "new help";
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-help", newHelp);
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var currentHelp = ORBEON.xforms.Controls.getHelpMessage(control);
+                    YAHOO.util.Assert.areEqual(newHelp, currentHelp);
+                    var control = ORBEON.util.Dom.getElementById("input-field-for");
+                    var currentHelp = ORBEON.xforms.Controls.getHelpMessage(control);
+                    YAHOO.util.Assert.areEqual(newHelp, currentHelp);
+                });
+            });
+        },
+
+        // Changing the alert
+        testChangeAlert: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var newAlert = "new alert";
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    ORBEON.xforms.Document.setValue("input-alert", newAlert);
+                }, function() {
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var currentAlert = ORBEON.xforms.Controls.getAlertMessage(control);
+                    YAHOO.util.Assert.areEqual(newAlert, currentAlert);
+                });
+            });
+        },
+
+        dummy: [] // So all the test functions can end with a comma
     }),
 
     outputTestCase: new YAHOO.tool.TestCase({
@@ -297,10 +368,39 @@ ORBEON.testcases = {
                     YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(field, "xforms-invalid-visited"));
                 });
             });
-        }
-    })
+        },
 
+        dummy: [] // So all the test functions can end with a comma
+    }),
+
+    dialogTestCase: new YAHOO.tool.TestCase({
+
+        name: "XForms Dialog",
+
+        _should: {
+            ignore: {
+                testChangeLabel: true
+            }
+        },
+
+        testChangeLabel: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                var newLabel = "new label";
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click("dialog-show");
+                    ORBEON.xforms.Document.setValue("dialog-label-input", newLabel);
+                }, function() {
+                    // Get label and check it has changed
+                });
+            });
+        },
+
+        dummy: [] // So all the test functions can end with a comma
+    }),
+
+    dummy: [] // So all the test cases can end with a comma
 };
+
 
 ORBEON.testing = {
 

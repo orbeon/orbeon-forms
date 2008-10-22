@@ -71,7 +71,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, inputControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, inputControl);
             handleMIPClasses(classes, getPrefixedId(), inputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
@@ -93,7 +93,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 }
             };
             select1Handler.setContext(getContext());
-            select1Handler.outputContent(attributes, staticId, effectiveId, localname, inputControl, items, isMany, true);
+            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, items, isMany, true);
 
         } else {
 

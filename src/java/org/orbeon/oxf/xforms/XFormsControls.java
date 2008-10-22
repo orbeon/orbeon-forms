@@ -408,6 +408,7 @@ public class XFormsControls {
         final XFormsContextStack currentContextStack = currentContainer.getContextStack();
         for (Iterator i = containerElement.elements().iterator(); i.hasNext();) {
             final Element currentControlElement = (Element) i.next();
+            final String currentControlURI = currentControlElement.getNamespaceURI();
             final String currentControlName = currentControlElement.getName();
 
             final String staticControlId = currentControlElement.attributeValue("id");
@@ -450,7 +451,7 @@ public class XFormsControls {
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 currentContextStack.popBinding();
-            } else if (XFormsControlFactory.isContainerControl(currentControlName)) {
+            } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
                 currentContextStack.pushBinding(pipelineContext, currentControlElement);
                 controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
@@ -474,7 +475,7 @@ public class XFormsControls {
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 currentContextStack.popBinding();
-            } else if (XFormsControlFactory.isCoreControl(currentControlName)) {
+            } else if (XFormsControlFactory.isCoreControl(currentControlURI, currentControlName)) {
                 // Handle leaf control
                 currentContextStack.pushBinding(pipelineContext, currentControlElement);
                 controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);

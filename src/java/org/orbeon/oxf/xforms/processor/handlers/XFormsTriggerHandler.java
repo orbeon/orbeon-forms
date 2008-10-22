@@ -101,7 +101,7 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, triggerControl);
             handleMIPClasses(classes, getPrefixedId(), triggerControl);
             containingDocument.getStaticState().appendClasses(classes, getPrefixedId());
             addCustomClasses(classes, triggerControl);

@@ -48,7 +48,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, textareaControl);
             handleMIPClasses(classes, getPrefixedId(), textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);

@@ -36,7 +36,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
 
             // Find classes to add
             final AttributesImpl newAttributes; {
-                final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+                final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
                 handleMIPClasses(classes, getPrefixedId(), xformsControl);
                 newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             }

@@ -486,7 +486,7 @@ public class ControlTree implements Cloneable {
 
         public void endVisitControl(Element controlElement, String effectiveControlId) {
             final String controlName = controlElement.getName();
-            if (XFormsControlFactory.isContainerControl(controlName)) {
+            if (XFormsControlFactory.isContainerControl(controlElement.getNamespaceURI(), controlName)) {
                 // Notify container controls that all children have been added
                 final XFormsContainerControl containerControl = (XFormsContainerControl) result.effectiveIdsToControls.get(effectiveControlId);
                 containerControl.childrenAdded();

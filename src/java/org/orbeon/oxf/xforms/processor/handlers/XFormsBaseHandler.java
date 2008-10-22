@@ -221,18 +221,18 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return reusableAttributes;
     }
 
-    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
-        return getInitialClasses(controlName, controlAttributes, xformsControl, null, false);
+    protected FastStringBuffer getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
+        return getInitialClasses(controlURI, controlName, controlAttributes, xformsControl, null, false);
     }
 
-    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
+    protected FastStringBuffer getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
 
         // Control name
         final FastStringBuffer sb;
         {
             // We only call xforms-control the actual controls as per the spec
             // TODO: no longer, XForms 1.1 has core and container controls
-            if (!XFormsControlFactory.isContainerControl(controlName))
+            if (!XFormsControlFactory.isContainerControl(controlURI, controlName))
                 sb = new FastStringBuffer("xforms-control xforms-");
             else
                 sb = new FastStringBuffer("xforms-");

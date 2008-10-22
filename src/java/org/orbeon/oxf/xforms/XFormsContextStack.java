@@ -640,7 +640,7 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            if (bindingElement != null && XFormsControlFactory.isContainerControl(bindingElement.getName())) {
+            if (bindingElement != null && XFormsControlFactory.isContainerControl(bindingElement.getNamespaceURI(), bindingElement.getName())) {
                 // We are a grouping control
                 final String elementId = currentBindingContext.getElementId();
                 if (contextId.equals(elementId)) {

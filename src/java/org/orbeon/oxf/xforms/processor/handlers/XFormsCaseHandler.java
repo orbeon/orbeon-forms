@@ -49,7 +49,7 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         }
 
         // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));

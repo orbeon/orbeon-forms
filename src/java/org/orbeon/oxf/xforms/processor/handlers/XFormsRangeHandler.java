@@ -45,7 +45,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, xformsControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, xformsControl);
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);

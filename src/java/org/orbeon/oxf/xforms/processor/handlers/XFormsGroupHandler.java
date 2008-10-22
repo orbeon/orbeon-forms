@@ -138,7 +138,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             return;
 
         // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
         handleMIPClasses(classes, getPrefixedId(), xformsControl);
 
         // Start xhtml:span or xhtml:fieldset

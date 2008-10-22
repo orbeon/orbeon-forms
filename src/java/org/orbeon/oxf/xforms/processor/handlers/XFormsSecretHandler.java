@@ -45,7 +45,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, secretControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, secretControl);
             handleMIPClasses(classes, getPrefixedId(), secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);

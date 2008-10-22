@@ -41,7 +41,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         isMinimalAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
         classes.append(" xforms-initially-hidden");
         classes.append(" xforms-dialog-");
         classes.append(dialogXFormsControl.getLevel());

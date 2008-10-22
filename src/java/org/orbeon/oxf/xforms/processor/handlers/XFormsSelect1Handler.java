@@ -109,7 +109,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
         final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
 
-        outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, isFull);
+        outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, items, isMany, isFull);
     }
 
     protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
@@ -118,7 +118,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             super.handleLabel(staticId, effectiveId, xformsControl, isTemplate);
     }
 
-    public void outputContent(Attributes attributes, String staticId, String effectiveId, String localname, final XFormsValueControl xformsControl, List items, final boolean isMany, final boolean isFull) throws SAXException {
+    public void outputContent(Attributes attributes, String staticId, String effectiveId, String uri, String localname, final XFormsValueControl xformsControl, List items, final boolean isMany, final boolean isFull) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -127,7 +127,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, xformsControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, xformsControl);
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);

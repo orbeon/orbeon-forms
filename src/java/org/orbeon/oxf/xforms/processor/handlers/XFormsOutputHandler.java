@@ -60,7 +60,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, outputControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, outputControl);
             handleMIPClasses(classes, getPrefixedId(), outputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }

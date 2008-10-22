@@ -91,7 +91,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 final FastStringBuffer classes;
                 {
                     // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
-                    classes = getInitialClasses(localname, attributes, xformsControl, appearance, isDefaultIncremental());
+                    classes = getInitialClasses(uri, localname, attributes, xformsControl, appearance, isDefaultIncremental());
                     // All MIP-related classes
                     handleMIPClasses(classes, prefixedId, xformsControl);
                     // Static classes: xforms-online, xforms-offline, ...

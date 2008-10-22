@@ -58,7 +58,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(localname, attributes, uploadControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, uploadControl);
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), uploadControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);

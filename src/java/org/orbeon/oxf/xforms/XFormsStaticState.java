@@ -1272,12 +1272,12 @@ public class XFormsStaticState {
             final String controlName = currentControlElement.getName();
             final String controlId = currentControlElement.attributeValue("id");
 
-            if (XFormsControlFactory.isContainerControl(controlName)) {
+            if (XFormsControlFactory.isContainerControl(currentControlElement.getNamespaceURI(), controlName)) {
                 // Handle XForms grouping controls
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 handleControlsStatic(controlElementVisitorListener, currentControlElement);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
-            } else if (XFormsControlFactory.isCoreControl(controlName) || componentBindings != null && componentBindings.get(currentControlElement.getQName()) != null) {
+            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName) || componentBindings != null && componentBindings.get(currentControlElement.getQName()) != null) {
                 // Handle core control or component
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);

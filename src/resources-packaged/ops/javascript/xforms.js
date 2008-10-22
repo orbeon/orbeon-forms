@@ -1451,35 +1451,11 @@ ORBEON.xforms.Controls = {
      * nodes after the control.
      */
     _getControlLabel: function(control, className) {
-
-        // Checks if the node is the one we are looking for
-        function isFound(candidate) {
-            return ORBEON.util.Dom.isElement(candidate)
-                    && ORBEON.util.Dom.hasClass(candidate, className)
-                    // If element has a "for" attribute, make sure it is for the right control
-                    && (candidate.htmlFor == null || candidate.htmlFor == control.id)
-                    // If candidate is the help image, make sure the following sibling (the help label) is for the right control
-                    && (className != "xforms-help-image" ||
-                            ORBEON.util.Dom.nextSiblingElement(candidate).htmlFor == control.id);
-        }
-
-        // Search for label in the 10 node that follow the control
-        var candidate = control.nextSibling;
-        for (var position = 0; position < 10; position++) {
-            if (candidate == null) break;
-            if (isFound(candidate)) return candidate;
-            candidate = candidate.nextSibling;
-        }
-
-        // Search for label in the 10 node that preceed the control
-        var candidate = control.previousSibling;
-        for (var position = 0; position < 10; position++) {
-            if (candidate == null) break;
-            if (isFound(candidate)) return candidate;
-            candidate = candidate.previousSibling;
-        }
-
-        return null;
+        var start = "xforms-".length;
+        var labelType = className.substring(start);
+        var labelID = control.id + "-" + labelType;
+        var labelElement = ORBEON.util.Dom.getElementById(labelID);
+        return labelElement;
     },
 
     _setMessage: function(control, className, message) {
@@ -1502,6 +1478,31 @@ ORBEON.xforms.Controls = {
                         ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
                 }
             }
+        }
+    },
+
+    getLabelMessage: function(control) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
+            if (control.tagName.toLowerCase() == "input") {
+                // Image
+                return control.alt;
+            } else {
+                // Link or button
+                return control.innerHTML;
+            }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-dialog")) {
+            // Dialog
+            var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            return labelDiv.innerHTML;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-group-appearance-xxforms-fieldset")) {
+            // Group with fieldset/legend
+            var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            if (legend != null)
+                return legend.innerHTML;
+        } else {
+            var labelElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-label");
+            return labelElement.innerHTML;
         }
     },
 
@@ -1987,6 +1988,19 @@ ORBEON.xforms.Controls = {
         if (ORBEON.xforms.Globals.currentFocusControlId != null) {
             var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
             if (focusedElement != null) focusedElement.blur();
+        }
+    },
+
+    /**
+     * Return the widget that applies to a given control.
+     */
+    getWidget: function(control) {
+        for (var widgetClass in ORBEON.widgets) {
+            var widget = ORBEON.widgets[widgetClass];
+            if (widget.extending != null && widget.appliesToControl(control)) {
+                return widget;
+                console.log(widgetClass);
+            }
         }
     }
 };
@@ -2991,6 +3005,25 @@ ORBEON.widgets.YUICalendar = function() {
             // Close calendar when user starts typing
             closeCalendar();
         }
+    }
+}();
+
+ORBEON.widgets.RTE = function() {
+    return {
+        extending: ORBEON.widgets.Base,
+
+        /**
+         * Function that returns true if and only if the this class applies to the control provided. This provides a
+         * way to implement conditions in addition to the one set on the classes the element must have.
+         */
+        appliesToControl: function(control) {},
+
+        /**
+         * Respond to the click event.
+         */
+        click: function(event, target) {},
+        blur: function(event, target) {},
+        keydown: function(event, target) {}
     }
 }();
 
@@ -4920,7 +4953,7 @@ ORBEON.xforms.Server = {
                                 // Submit form
                                 case "submission": {
                                     var submissionElement = actionElement.childNodes[actionIndex];
-                                    var showProcess = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
+                                    var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
                                     var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     if (replace == null) replace = "all";
@@ -4932,7 +4965,7 @@ ORBEON.xforms.Server = {
                                     var requestForm = ORBEON.util.Dom.getElementById(formID);
                                     if (replace == "all") {
                                         // Go to another page
-                                        if (showProcess != "false") {
+                                        if (showProgress != "false") {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }

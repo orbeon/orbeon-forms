@@ -44,27 +44,31 @@ public class XFormsControlFactory {
     public static final Map SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap();
 
     static {
-        CONTAINER_CONTROLS.put("group", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put("repeat", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put("switch", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put("case", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put("dialog", XFormsConstants.XXFORMS_NAMESPACE_URI);        // xxforms:dialog extension
+        // TODO: standardize on QName?
 
-        CORE_VALUE_CONTROLS.put("input", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("secret", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("textarea", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("output", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("upload", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("range", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("select", XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put("select1", XFormsConstants.XFORMS_NAMESPACE_URI);
+        // Standard controls
+        CONTAINER_CONTROLS.put(XFormsConstants.GROUP_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put(XFormsConstants.REPEAT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put(XFormsConstants.SWITCH_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.put(XFormsConstants.CASE_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
 
-        CORE_VALUE_CONTROLS.put("attribute", XFormsConstants.XXFORMS_NAMESPACE_URI);    // xxforms:attribute extension
-        CORE_VALUE_CONTROLS.put("text", XFormsConstants.XXFORMS_NAMESPACE_URI);         // xxforms:text extension
+        CORE_VALUE_CONTROLS.put(XFormsConstants.INPUT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.SECRET_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.TEXTAREA_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.OUTPUT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.UPLOAD_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.RANGE_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT1_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
 
         final Map coreNoValueControls = new HashMap();
-        coreNoValueControls.put("submit", XFormsConstants.XFORMS_NAMESPACE_URI);
-        coreNoValueControls.put("trigger", XFormsConstants.XFORMS_NAMESPACE_URI);
+        coreNoValueControls.put(XFormsConstants.SUBMIT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        coreNoValueControls.put(XFormsConstants.TRIGGER_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+
+        // Extension controls
+        CONTAINER_CONTROLS.put(XFormsConstants.XXFORMS_DIALOG_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_TEXT_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
 
         CORE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
         CORE_CONTROLS.putAll(coreNoValueControls);

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainer;
 /**
  * Control that represents a custom components.
  */
-public class XFormsComponentControl extends XFormsSingleNodeControl {// TODO: this is not really a single-node control, is it?
+public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
     public XFormsComponentControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);

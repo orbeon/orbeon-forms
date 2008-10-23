@@ -17,7 +17,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>

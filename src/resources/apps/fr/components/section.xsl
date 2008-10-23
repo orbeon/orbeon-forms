@@ -23,9 +23,10 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <xsl:template match="xhtml:body//fr:section">
+    <xsl:template match="xhtml:body//fr:section | xbl:binding/xbl:template//fr:section">
         <xsl:if test="normalize-space(@id) = ''">
             <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
         </xsl:if>

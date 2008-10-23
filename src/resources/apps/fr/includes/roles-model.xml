@@ -54,9 +54,13 @@
                                                     return if ($header-property-name != '')
                                                             then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
 
-            <!--<xforms:message level="xxforms:log-error">-->
-                <!--Roles extracted: <xforms:output value="instance('fr-roles-instance')/all-roles"/>-->
-            <!--</xforms:message>-->
+            <xforms:message level="xxforms:log-error">
+                ORBEON ROLES DEBUG INFORMATION:
+                Header name: <xforms:output value="$header-name"/>
+                Header property name: <xforms:output value="$header-property-name"/>
+                Tokens: <xforms:output value="$tokens"/>
+                Roles extracted: <xforms:output value="instance('fr-roles-instance')/all-roles"/>
+            </xforms:message>
 
             <!-- TODO: option of using servlet roles -->
 
@@ -141,6 +145,11 @@
             <xforms:action if="not($current-roles)">
                 <!-- TODO: in this case, nothing must be shown! -->
             </xforms:action>
+
+            <xforms:message level="xxforms:log-error">
+                ORBEON ROLES DEBUG INFORMATION:
+                Resulting permissions: <xforms:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
+            </xforms:message>
 
             <!--
                 Remember whether the page is authorized or not. Usually a container protection by path will be in

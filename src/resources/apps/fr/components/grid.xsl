@@ -23,10 +23,11 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Grid -->
-    <xsl:template match="xhtml:body//fr:grid">
+    <xsl:template match="xhtml:body//fr:grid | xbl:binding/xbl:template//fr:grid">
         <xsl:choose>
             <xsl:when test="$is-noscript and $is-noscript-table">
                 <xhtml:div class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
@@ -46,7 +47,7 @@
     </xsl:template>
 
     <!-- Grid row -->
-    <xsl:template match="xhtml:body//fr:grid//fr:tr">
+    <xsl:template match="xhtml:body//fr:grid//fr:tr | xbl:binding/xbl:template//fr:grid//fr:tr">
         <xsl:choose>
             <xsl:when test="$is-noscript and $is-noscript-table">
                 <xsl:apply-templates select="@* | node()"/>
@@ -60,7 +61,7 @@
     </xsl:template>
 
     <!-- Grid cell -->
-    <xsl:template match="xhtml:body//fr:tr/fr:td">
+    <xsl:template match="xhtml:body//fr:tr/fr:td | xbl:binding/xbl:template//fr:tr/fr:td">
         <xsl:choose>
             <xsl:when test="$is-noscript and $is-noscript-table">
                 <xhtml:div class="{string-join(('fr-grid-td', @class), ' ')}">

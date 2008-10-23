@@ -23,7 +23,7 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <!-- app/form (submission-page-summary.xml) -->
+    <!-- app/form (request-parameters.xml) -->
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 

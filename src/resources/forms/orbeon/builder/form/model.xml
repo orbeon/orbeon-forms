@@ -631,11 +631,13 @@
     <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
                        method="post" replace="none" resource="test:"/>
 
-    <!-- Submission to load initial components-->
+    <!-- Submission to load the components library -->
     <!-- TODO: should load components based on app config? -->
+    <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->
     <xforms:submission id="fb-load-components" serialization="none"
-                       method="get" resource="{xxforms:property('oxf.fb.components.uri.*.*')}"
-                       replace="instance" instance="fb-components-instance"/>
+                       method="get" resource="/fr/service/components/orbeon/library"
+                       replace="instance" instance="fb-components-instance"
+                       xxforms:readonly="true" xxforms:shared="application"/>
 
     <xforms:instance id="fb-components-instance">
         <!-- This will contain the default component available for the currently edited form -->

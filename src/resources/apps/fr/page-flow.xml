@@ -31,7 +31,7 @@
 
     <page id="summary"
           path-info="/fr/([^/]+)/([^/]+)(/summary/|/list/|/)?" matcher="oxf:perl5-matcher"
-          default-submission="summary/submission-page-summary.xml"
+          default-submission="request-parameters.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -39,7 +39,7 @@
 
     <!-- New document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(new)/" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
+          default-submission="request-parameters.xml"
           model="detail/read-form.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -48,7 +48,7 @@
 
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(edit)/([^/]+)/?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
+          default-submission="request-parameters.xml"
           model="detail/read-form.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -58,7 +58,7 @@
 
     <!-- View document as HTML -->
     <page path-info="/fr/([^/]+)/([^/]+)/(view)/([^/]+)/?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
+          default-submission="request-parameters.xml"
           model="detail/read-form.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -68,7 +68,7 @@
 
     <!-- View document as PDF -->
     <page path-info="/fr/([^/]+)/([^/]+)/(pdf)/([^/]+)/?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
+          default-submission="request-parameters.xml"
           model="detail/read-form.xpl" view="pdf-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -78,7 +78,7 @@
 
     <!-- Test form by retrieving form from the database first -->
     <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)/?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
+          default-submission="request-parameters.xml"
           model="test-model.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -162,7 +162,15 @@
     <!-- Service putting together Form Runner resources -->
     <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="i18n/fr-resources.xpl"  
-          default-submission="summary/submission-page-summary.xml">
+          default-submission="request-parameters.xml">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- ==== Loading of components ==== -->
+    <page path-info="/fr/service/components/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="components/load-components.xpl"
+          default-submission="request-parameters.xml">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>

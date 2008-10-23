@@ -386,15 +386,20 @@
             <xforms:model id="fields-date-model">
                 <xforms:instance id="fields-date-instance">
                     <date>
+                        <!-- Individual components of the date -->
                         <year/>
                         <month/>
                         <day/>
+                        <!-- Whether the resulting date is valid -->
+                        <is-valid/>
                     </date>
                 </xforms:instance>
+                <!-- Set the validity on the whole instance -->
+                <xforms:bind nodeset="." constraint="is-valid = 'true'"/>
 
             </xforms:model>
             <!-- Local controls -->
-            <xforms:group xbl:attr="ref bind">
+            <xforms:group xbl:attr="ref bind context">
                 <xhtml:style>
                     .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
                     .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
@@ -406,6 +411,7 @@
                     .fr-hidden-date-picker span.xforms-type-date { display: inline; z-index: 2; position: relative  }
 
                 </xhtml:style>
+
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
                 <xxforms:variable name="result" select="." as="node()*"/>
@@ -420,18 +426,24 @@
                     </xforms:action>
                 </xforms:group>
 
-                <xforms:group model="fields-date-model" class="fr-component-group">
+                <xforms:group model="fields-date-model" ref="." class="fr-component-group" id="fr-component-group">
+                    
                     <xforms:input ref="month" class="fr-width-2"/>
                     <xforms:input ref="day" class="fr-width-2"/>
                     <xforms:input ref="year" class="fr-width-4"/>
 
                     <!-- React to update to local values -->
                     <xforms:action ev:event="xforms-value-changed">
-                        <!-- Only proceed if all parts are integers -->
+                        <!-- Invalid by default -->
+                        <xforms:setvalue ref="is-valid">false</xforms:setvalue>
+                        <!-- Try to set computed date -->
                         <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
                             <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
-                            <!-- Only set value if the result is castable as a date -->
-                            <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                            <!-- Only set value if the result is castable as a date (this will handle invalid months, etc. but also dates like 2008-02-31) -->
+                            <xforms:action if="$date-string castable as xs:date">
+                                <xforms:setvalue ref="is-valid">true</xforms:setvalue>
+                                <xforms:setvalue ref="$result" value="$date-string"/>
+                            </xforms:action>
                         </xforms:action>
                     </xforms:action>
                 </xforms:group>
@@ -439,8 +451,12 @@
                 <!-- This builds a date picker hidden hidden behind a calendar image -->
                 <xhtml:span class="fr-hidden-date-picker">
                     <xhtml:img src="/ops/images/xforms/calendar.png" alt="Date Picker"/>
-                    <xforms:input ref="$result"/>
+                    <xforms:input ref="$result" id="fr-hidden-date-picker"/>
                 </xhtml:span>
+
+                <!-- Place date validity after the date picker -->
+                <!-- TODO: possibly, copy xforms:alert from bound element, but then how to set the for attribute properly? -->
+                <xforms:alert for="fr-component-group"/>
 
             </xforms:group>
         </xbl:template>

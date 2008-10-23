@@ -68,7 +68,7 @@
         <p:input name="data" href="#instance"/>
         <p:input name="xhtml" href="#xhtml-fr-xforms"/>
         <p:input name="request" href="#request"/>
-        <p:input name="instance" href="#parameters"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="config">
             <message xsl:version="2.0">
@@ -82,8 +82,8 @@
                 <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
 
                 <!-- App and form -->
-                <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
-                <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
+                <xsl:variable name="app" select="doc('input:parameters')/*/app" as="xs:string"/>
+                <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
 
                 <!-- Find fr-email-recipient controls and binds -->
 
@@ -139,8 +139,12 @@
                     <part name="text" content-type="text/plain">
                         <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
                     </part>
-                    <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
-                    <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                    <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
+                        <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
+                    </xsl:if>
+                    <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
+                        <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                    </xsl:if>
                 </body>
             </message>
         </p:input>

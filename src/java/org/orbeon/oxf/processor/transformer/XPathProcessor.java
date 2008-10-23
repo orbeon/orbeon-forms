@@ -15,23 +15,24 @@ package org.orbeon.oxf.processor.transformer;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.tree.DefaultText;
 import org.dom4j.tree.DefaultProcessingInstruction;
+import org.dom4j.tree.DefaultText;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
@@ -93,29 +94,19 @@ public class XPathProcessor extends ProcessorImpl {
 
                         if (result instanceof org.dom4j.Element || result instanceof org.dom4j.Document) {
                             // If element or document, serialize it to content handler
-                            final org.dom4j.Element elt = result instanceof org.dom4j.Element
+                            final org.dom4j.Element element = result instanceof org.dom4j.Element
                                     ? (org.dom4j.Element) result
                                     : ((org.dom4j.Document) result).getRootElement();
-                            final String sid = Dom4jUtils.makeSystemId(elt);
+                            final String systemId = Dom4jUtils.makeSystemId(element);
+                            // TODO: Should probably use Dom4jUtils.createDocumentCopyParentNamespaces() or equivalent to handle namespaces better
+                            // -> could maybe simply get the list of namespaces in scope on both sides, and output start/endPrefixMapping()
                             final DOMGenerator domGenerator = new DOMGenerator
-                                    (elt, "xpath result doc", DOMGenerator.ZeroValidity, sid);
+                                    (element, "xpath result doc", DOMGenerator.ZeroValidity, systemId);
                             final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
-                            domOutput.read(context, new ForwardingContentHandler(contentHandler) {
-                                public void startDocument() {
-                                }
-
-                                public void endDocument() {
-                                }
-                            });
+                            domOutput.read(context, new EmbeddedDocumentContentHandler(contentHandler));
                         } else if (result instanceof NodeInfo) {
                             final NodeInfo nodeInfo = (NodeInfo) result;
-                            TransformerUtils.writeTinyTree(nodeInfo, new ForwardingContentHandler(contentHandler) {
-                                public void startDocument() {
-                                }
-
-                                public void endDocument() {
-                                }
-                            });
+                            TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentContentHandler(contentHandler));
                         } else if (result instanceof DefaultProcessingInstruction) {
                             DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
                             contentHandler.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
@@ -128,7 +119,7 @@ public class XPathProcessor extends ProcessorImpl {
                             strVal = XMLUtils.removeScientificNotation(d);
                         } else if (result instanceof Boolean) {
                             strVal = ((Boolean) result).toString();
-                        } else if (result instanceof org.orbeon.saxon.om.FastStringBuffer) {
+                        } else if (result instanceof FastStringBuffer) {
                             strVal = result.toString();
                         } else {
                             String message = "Unsupported type returned by XPath expression: "

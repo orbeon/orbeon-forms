@@ -23,10 +23,11 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Helper for repeats -->
-    <xsl:template match="xhtml:body//fr:repeat">
+    <xsl:template match="xhtml:body//fr:repeat | xbl:binding/xbl:template//fr:repeat">
         <xsl:variable name="fr-repeat" select="."/>
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>

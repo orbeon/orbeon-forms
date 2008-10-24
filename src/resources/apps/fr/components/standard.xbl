@@ -426,7 +426,7 @@
                     </xforms:action>
                 </xforms:group>
 
-                <xforms:group model="fields-date-model" ref="." class="fr-component-group" id="fr-component-group">
+                <xforms:group model="fields-date-model" ref="." class="fr-component-group" xbl:attr="id">
                     
                     <xforms:input ref="month" class="fr-width-2"/>
                     <xforms:input ref="day" class="fr-width-2"/>
@@ -455,8 +455,7 @@
                 </xhtml:span>
 
                 <!-- Place date validity after the date picker -->
-                <!-- TODO: possibly, copy xforms:alert from bound element, but then how to set the for attribute properly? -->
-                <xforms:alert for="fr-component-group"/>
+                <xbl:content includes="xforms|alert" xbl:attr="for=id"/>
 
             </xforms:group>
         </xbl:template>

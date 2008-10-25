@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -73,8 +74,12 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                new String[] { "id", repeatControlInfo.getId(), "parent-indexes", parentIndexes, "start-suffix",
-                        Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix) });
+                new String[] {
+                        // Get prefixed id without suffix as templates are global 
+                        "id", XFormsUtils.getEffectiveIdNoSuffix(repeatControlInfo.getEffectiveId()),
+                        "parent-indexes", parentIndexes,
+                        "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
+                });
     }
 
     protected void diffOutOfBand(XFormsControl xformsControl1, XFormsControl xformsControl2) {

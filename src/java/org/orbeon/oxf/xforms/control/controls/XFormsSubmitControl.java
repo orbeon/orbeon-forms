@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -42,12 +43,16 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
-            final Object object = containingDocument.getObjectByEffectiveId(submissionId);// xxx fix not effective
+            final Object object = getContainer().getObjectByEffectiveId(submissionId);// xxx fix not effective
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 submission.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
             } else {
-                throw new ValidationException("xforms:submit submission attribute must point to an xforms:submission element: " + submissionId, getLocationData());
+                // "If there is a null search result for the target object and the source object is an XForms action such as
+                // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
+                            new String[] { "submission id", submissionId } );
             }
         }
         super.performDefaultAction(pipelineContext, event);

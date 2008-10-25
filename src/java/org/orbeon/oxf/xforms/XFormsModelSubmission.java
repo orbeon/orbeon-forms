@@ -910,7 +910,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     final Document resultingInstanceDocument
                                                             = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new XFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new XFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
@@ -922,7 +922,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new SharedXFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new SharedXFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }    
                                             } catch (Exception e) {

@@ -20,11 +20,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -32,12 +32,14 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.BufferedInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ProcessorUtils {
 
@@ -45,16 +47,9 @@ public class ProcessorUtils {
     public static final String DEFAULT_CONTENT_TYPE = XMLUtils.XML_CONTENT_TYPE2;
     //public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
-    public static final Map SUPPORTED_BINARY_TYPES = new HashMap();
-
     public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
     public static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
     public static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
-
-    static {
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "");
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "");
-    }
 
     public static LocationData getElementLocationData(Element element) {
         final Object elementData = element.getData();

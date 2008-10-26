@@ -22,12 +22,11 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.*;
@@ -63,6 +62,15 @@ import java.util.zip.GZIPInputStream;
 public class XFormsUtils {
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
+
+    // Binary types supported for upload, images, etc.
+    private static final Map SUPPORTED_BINARY_TYPES = new HashMap();
+    static {
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, "");
+    }
 
     /**
      * Iterate through nodes of the instance document and call the walker on each of them.
@@ -772,9 +780,9 @@ public class XFormsUtils {
     public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
         if (currentType.equals(newType))
             return value;
-        if (ProcessorUtils.SUPPORTED_BINARY_TYPES.get(currentType) == null)
+        if (SUPPORTED_BINARY_TYPES.get(currentType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        if (ProcessorUtils.SUPPORTED_BINARY_TYPES.get(newType) == null)
+        if (SUPPORTED_BINARY_TYPES.get(newType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
         if (currentType.equals(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME)) {

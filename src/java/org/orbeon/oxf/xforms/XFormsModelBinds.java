@@ -648,19 +648,14 @@ public class XFormsModelBinds {
         // NOTE: This may have been set by schema validation earlier in the validation process
         boolean isValid = InstanceData.getValid(currentNodeInfo);
 
-        // Bail is we are already invalid
-        if (!isValid) {
-            // NOTE: instance must already have been marked as invalid
-            return;
-        }
-
-        // Current required value (computed during previous recalculate)
+        // Current required value (computed during preceding recalculate)
         final boolean isRequired = InstanceData.getRequired(currentNodeInfo);
 
         // Node value, retrieved if needed
         String nodeValue = null;
 
         // Handle type MIP
+        // NOTE: We must always handle the type first because types are not only used by validation, but by controls
         if (bind.getType() != null) {
 
             // "The type model item property is not applied to instance nodes that contain child elements"

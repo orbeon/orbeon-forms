@@ -27,17 +27,62 @@
                 <instance xmlns="">
                     <date1/>
                     <date2/>
+                    <dateTime1/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="*" type="xforms:date"/>
+            <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
+            <xforms:bind nodeset="dateTime1" type="xforms:dateTime"/>
         </xforms:model>
         <!-- Include standard Form Runner components -->
         <xi:include href="oxf:/apps/fr/components/standard.xbl" xxi:omit-xml-base="true"/>
+        <!-- Example of dateTime component that looks like the built-in one -->
+        <xbl:xbl>
+            <xbl:binding id="dateTime-component" element="fr|dateTime">
+
+                <xbl:template>
+                    <!-- NOTE: Once new scoping rules are in place, the following group should work -->
+                    <xforms:group xbl:attr="ref bind">
+                        <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                        <xxforms:variable name="result" select="." as="node()*"/>
+                        <xforms:group ref="$result" appearance="xxforms:internal">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue model="dateTime-model" ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>
+                                <xforms:setvalue model="dateTime-model" ref="instance('dateTime-instance')/time" value="context()/substring-after(., 'T')"/>
+                            </xforms:action>
+                        </xforms:group>
+
+                        <!-- Local model containing the date and time  -->
+                        <xforms:model id="dateTime-model">
+                            <xforms:instance id="dateTime-instance">
+                                <values>
+                                    <date/>
+                                    <time/>
+                                </values>
+                            </xforms:instance>
+                            <xforms:bind nodeset="date" type="xs:date"/>
+                            <xforms:bind nodeset="time" type="xs:time"/>
+                        </xforms:model>
+
+                        <!-- Local controls -->
+                        <xforms:group model="dateTime-model" class="fr-component-group">
+                            <xforms:input ref="date"/>
+                            <xforms:input ref="time"/>
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="$result" value="concat(context()/date, 'T', context()/time)"/>
+                            </xforms:action>
+                        </xforms:group>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
         <xhtml:style type="text/css">
             .xforms-group-appearance-xxforms-fieldset { padding: .5em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+
+        <xhtml:h2>Date Controls</xhtml:h2>
 
         <xforms:group appearance="xxforms:fieldset">
             <xforms:label>Built-in Date Controls</xforms:label>
@@ -65,11 +110,29 @@
             <xforms:label>Fields Date Controls</xforms:label>
             <fr:fields-date ref="date1" id="date3">
                 <xforms:label>Date 1: </xforms:label>
+                <xforms:alert>Incorrect date</xforms:alert>
             </fr:fields-date>
 
             <fr:fields-date ref="date2" id="date4">
                 <xforms:label>Date 2: </xforms:label>
+                <xforms:alert>Incorrect date too</xforms:alert>
             </fr:fields-date>
+        </xforms:group>
+
+        <xhtml:h2>Date Time Controls</xhtml:h2>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>Built-in Date Time Controls</xforms:label>
+            <xforms:input ref="dateTime1">
+                <xforms:label>Date Time 1: </xforms:label>
+            </xforms:input>
+        </xforms:group>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>Custom Date Time Controls</xforms:label>
+            <fr:dateTime ref="dateTime1" id="dateTime1">
+                <xforms:label>Date Time 1: </xforms:label>
+            </fr:dateTime>
         </xforms:group>
 
         <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>

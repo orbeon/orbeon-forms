@@ -287,19 +287,11 @@
                     </xhtml:p>
                     <xhtml:p>
                         <!-- Display flag of selected country -->
-                        <xforms:output
-                            value="for $c in instance('countries-names-instance')/country[name = instance('instance')/country-name] return
-                                   if ($c) then
-                                       concat(
-                                        '&lt;img',
-                                          ' src=&#34;../apps/xforms-controls/images/flags/',
-                                            $c/us-code,
-                                            '-flag.gif&#34;',
-                                        '/&gt;'
-                                       )
-                                   else
-                                       ''"
-                                mediatype="text/html"/>
+                        <!-- NOTE: Here we could use xforms:output with a text/html mediatype, but this solution with AVTs is much more elegant -->
+                        <xxforms:variable name="country-name" select="instance('countries-names-instance')/country[name = instance('instance')/country-name]" as="xs:string"/>
+                        <xforms:group ref=".[$country-name != '']">
+                            <xhtml:img src="/apps/xforms-controls/images/flags/{$country-name/us-code}-flag.gif" alt=""/>
+                        </xforms:group>
                     </xhtml:p>
                 </xforms:group>
 

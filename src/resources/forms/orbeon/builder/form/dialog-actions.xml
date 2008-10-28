@@ -398,6 +398,7 @@
                     <xxforms:variable name="request-instance-name" select="SET ME" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xforms:insert nodeset="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
+                    <!--<xforms:insert nodeset="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
                     <!-- Set values if needed -->
                     <xforms:action context="instance('fr-service-request-instance')">
                         <!-- Setvalue actions will be here -->

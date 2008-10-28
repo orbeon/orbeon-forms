@@ -288,8 +288,10 @@
                         <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
-                    <!-- Set instance body -->
+                    <!-- Set instance document -->
                     <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                        <!--<xforms:delete context="." nodeset="node()"/>-->
+                        <!--<xforms:insert context="." origin="saxon:parse($request/body)"/>-->
                         <xforms:setvalue ref="*" value="$request/body"/>
                     </xforms:action>
 
@@ -335,6 +337,10 @@
             <!--<xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>-->
             <xforms:setvalue ref="$instance/request/body"
                              value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*"/>
+
+            <!--<xforms:setvalue ref="$instance/request/body"-->
+                             <!--value="saxon:serialize(xxforms:extract-document($model/xforms:instance[@id = concat($submission-name, '-instance')]/*, '#all'), xxforms:instance('fr-xsl-output-instance'))"/>-->
+
             <!-- TODO: is-soap -->
             <xforms:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxforms:username | $submission/@xxforms:password)"/>
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>
@@ -413,7 +419,7 @@
                                replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
-        <!-- Template for inserting an instance-->
+        <!-- Template for inserting an instance -->
         <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
             <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all">
                 <body/>

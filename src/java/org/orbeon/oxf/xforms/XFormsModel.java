@@ -28,8 +28,8 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -477,29 +477,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                                     container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                     break;
                                 }
-                                {
-                                    final Document tempDocument;
-                                    // TODO: Implement as per XSLT 2.0. For now, we just support #all.
-                                    // TODO: Must implement namespace fixup, the code below can break serialization
-                                    if ("#all".equals(xxformsExcludeResultPrefixes)) {
-                                        tempDocument = Dom4jUtils.createDocumentCopyElement((Element) children.get(0));
-                                    } else if (xxformsExcludeResultPrefixes != null) {
-                                        final StringTokenizer st = new StringTokenizer(xxformsExcludeResultPrefixes);
-                                        final Map prefixesToExclude = new HashMap();
-                                        while (st.hasMoreTokens()) {
-                                            prefixesToExclude.put(st.nextToken(), "");
-                                        }
-                                        tempDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0), prefixesToExclude);
-                                    } else {
-                                        tempDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
-                                    }
+                                // Extract document
+                                instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
-                                    if (!isReadonlyHint) {
-                                        instanceDocument = tempDocument;
-                                    } else {
-                                        instanceDocument = TransformerUtils.dom4jToTinyTree(tempDocument);
-                                    }
-                                }
                                 instanceSourceURI = null;
                                 xxformsUsername = null;
                                 xxformsPassword = null;

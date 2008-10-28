@@ -392,23 +392,35 @@ public class XFormsInsertAction extends XFormsAction {
         if (XFormsServer.logger.isDebugEnabled()) {
             if (didInsertNodes)
                 containingDocument.logDebug("xforms:insert", "inserted nodes",
-                        new String[] { "count", Integer.toString(insertedNodes.size()), "instance", modifiedInstance.getEffectiveId() });
+                        new String[] { "count", Integer.toString(insertedNodes.size()), "instance",
+                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null });
             else
                 containingDocument.logDebug("xforms:insert", "no node inserted");
         }
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        if (didInsertNodes) {
+        if (didInsertNodes && modifiedInstance  != null) {
+            // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
             containingDocument.getControls().markDirtySinceLastRequest(true);
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         // XFormsInstance handles index and repeat items updates 
-        {
+        if (modifiedInstance  != null) {
+            // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             final List insertedNodeInfos;
             if (didInsertNodes) {
                 final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
+//                if (modifiedInstance != null) {
+                    // If we have an instance, we also have a wrapper
+//                    documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
+//                } else {
+//                    // Otherwise, hard to get to the wrapper, so create a new one
+//                    final Document insertDocument = ((Node) insertedNodes.get(0)).getDocument();
+//                    documentWrapper = new DocumentWrapper(insertDocument, null, new Configuration());
+//                }
+
                 insertedNodeInfos = new ArrayList(insertedNodes.size());
                 for (Iterator i = insertedNodes.iterator(); i.hasNext();)
                     insertedNodeInfos.add(documentWrapper.wrap(i.next()));

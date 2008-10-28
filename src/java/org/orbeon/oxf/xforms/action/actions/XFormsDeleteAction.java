@@ -152,14 +152,19 @@ public class XFormsDeleteAction extends XFormsAction {
 
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:delete", "removed nodes",
-                        new String[] { "count", Integer.toString(deletedNodeInfos.size()), "instance", modifiedInstance.getEffectiveId() });
+                        new String[] { "count", Integer.toString(deletedNodeInfos.size()), "instance",
+                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null });
 
-            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-            containingDocument.getControls().markDirtySinceLastRequest(true);
+            if (modifiedInstance  != null) {
+                // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
+                
+                // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+                modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
+                containingDocument.getControls().markDirtySinceLastRequest(true);
 
-            // "4. If the delete is successful, the event xforms-delete is dispatched."
-            modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+                // "4. If the delete is successful, the event xforms-delete is dispatched."
+                modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+            }
         }
 
         return deletedNodeInfos;

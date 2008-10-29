@@ -468,38 +468,51 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // Create an id for the item (trying to make this unique)
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
 
-        // xhtml:span
-        final Attributes spanAttributes = getAttributes(new AttributesImpl(), null, null);
+        // Whether this is selected
+        boolean isSelected;
+        if (!handlerContext.isTemplate() && xformsControl != null) {
+            final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
+            final String controlValue = ((xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext)).trim();
+            isSelected = XFormsItemUtils.isSelected(isMany, controlValue, itemValue);
+        } else {
+            isSelected = false;
+        }
+
+        // xhtml:span enclosing input and label
+        final AttributesImpl spanAttributes = getAttributes(new AttributesImpl(), isSelected ? "xforms-selected" : "xforms-deselected", null);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
-        // xhtml:input
         {
-            final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-
+            // xhtml:span enclosing just the input
             reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
-            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
-            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
-            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+            {
+                // xhtml:input
+                final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
-            if (!handlerContext.isTemplate() && xformsControl != null) {
-                final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
-                final String controlValue = ((xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext)).trim();
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
+                reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
+                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
+                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
 
+                if (!handlerContext.isTemplate() && xformsControl != null) {
 
-                if (XFormsItemUtils.isSelected(isMany, controlValue, itemValue)) {
-                    reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
+                    if (isSelected) {
+                        reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
+                    }
+
+                    if (isFirst) {
+                        // Handle accessibility attributes
+                        handleAccessibilityAttributes(attributes, reusableAttributes);
+                    }
                 }
 
-                if (isFirst) {
-                    // Handle accessibility attributes
-                    handleAccessibilityAttributes(attributes, reusableAttributes);
-                }
+                handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
-
-            handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
             // We don't output the label within <input></input>, because XHTML won't display it.
 

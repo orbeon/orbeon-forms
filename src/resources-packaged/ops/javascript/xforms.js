@@ -1288,6 +1288,10 @@ ORBEON.xforms.Controls = {
                 var checkboxInput = checkboxInputs[checkboxInputIndex];
                 checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
             }
+
+            // Update classes on control
+            ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
+
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
@@ -1440,6 +1444,22 @@ ORBEON.xforms.Controls = {
                 if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
                     ORBEON.xforms.Controls.autosizeTextarea(control);
                 }
+            }
+        }
+    },
+
+    _setRadioCheckboxClasses: function(target) {
+        // Update xforms-selected/xforms-deselected classes on the parent <span> element
+        var checkboxInputs = target.getElementsByTagName("input");
+        for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
+            var checkboxInput = checkboxInputs[checkboxInputIndex];
+            var parentSpan = checkboxInput.parentNode.parentNode;
+            if (checkboxInput.checked) {
+                ORBEON.util.Dom.addClass(parentSpan, "xforms-selected")
+                ORBEON.util.Dom.removeClass(parentSpan, "xforms-deselected")
+            } else {
+                ORBEON.util.Dom.addClass(parentSpan, "xforms-deselected")
+                ORBEON.util.Dom.removeClass(parentSpan, "xforms-selected")
             }
         }
     },
@@ -2423,6 +2443,10 @@ ORBEON.xforms.Events = {
                     || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
                     || (ORBEON.util.Dom.hasClass(target, "xforms-input") && ORBEON.util.Dom.hasClass(target, "xforms-type-boolean"))) {
                 // Click on checkbox or radio button
+
+                // Update classes right away to give user visual feedback
+                ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
+
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",
                                 ORBEON.xforms.Controls.getCurrentValue(target), null)), false);

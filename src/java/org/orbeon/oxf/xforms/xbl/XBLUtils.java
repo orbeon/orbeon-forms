@@ -82,30 +82,13 @@ public class XBLUtils {
                         } else {
                             // Apply CSS selector
 
-                            // Poor man's CSS selector parser:
-                            // o input: foo|a foo|b, bar|a bar|b
-                            // o output: .//foo:a//foo:b|.//bar:a//bar:b
-                            // TODO: handle [att], [att=val], [att~=val], [att|=val]
-                            final FastStringBuffer sb = new FastStringBuffer(includesAttribute.length());
-                            final String[] selectors = StringUtils.split(includesAttribute, ',');
-                            for (int i = 0; i < selectors.length; i++) {
-                                final String selector = selectors[i];
-                                if (i > 0)
-                                    sb.append("|");
-                                sb.append(".//");
-                                final String[] pathElements = StringUtils.split(selector.trim(), ' ');
-                                for (int j = 0; j < pathElements.length; j++) {
-                                    final String pathElement = pathElements[j];
-                                    if (j > 0)
-                                        sb.append("//");
-                                    sb.append(pathElement.replace('|', ':').trim());
-                                }
-                            }
+                            // Convert CSS to XPath
+                            final String xpathExpression = cssToXPath(includesAttribute);
 
                             final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                             // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, sb.toString(), Dom4jUtils.getNamespaceContext(element),
+                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, xpathExpression, Dom4jUtils.getNamespaceContext(element),
                                     null, null, null, null, null);// TODO: locationData
 
                             if (elements.size() > 0) {
@@ -247,6 +230,61 @@ public class XBLUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Poor man's CSS selector parser:
+     *
+     * o input: foo|a foo|b, bar|a bar|b
+     * o output: .//foo:a//foo:b|.//bar:a//bar:b
+     *
+     * Also support the ">" combinator.
+     *
+     * TODO: handle [att], [att=val], [att~=val], [att|=val]
+     * TODO: does Flying Saucer have a reusable CSS parser? Could possibly be used here.
+     *
+     * @param cssSelector   CSS selector
+     * @return              XPath expression
+     */
+    private static String cssToXPath(String cssSelector) {
+
+        final FastStringBuffer sb = new FastStringBuffer(cssSelector.length());
+        final String[] selectors = StringUtils.split(cssSelector, ',');
+        for (int i = 0; i < selectors.length; i++) {
+            // For each comma-separated string
+            final String selector = selectors[i];
+            if (i > 0)
+                sb.append("|");
+            final String[] pathElements = StringUtils.split(selector.trim(), ' ');
+            boolean previousIsChild = false;
+            for (int j = 0; j < pathElements.length; j++) {
+                // For each path element
+                final String pathElement = pathElements[j];
+                if (j == 0) {
+                    // First path element
+                    if (">".equals(pathElement)) {
+                        sb.append("./");
+                        previousIsChild = true;
+                        continue;
+                    } else if (!previousIsChild) {
+                        sb.append(".//");
+                    }
+                } else {
+                    // Subsequent path element
+                    if (">".equals(pathElement)) {
+                        sb.append("/");
+                        previousIsChild = true;
+                        continue;
+                    } else if (!previousIsChild) {
+                        sb.append("//");
+                    }
+                }
+
+                sb.append(pathElement.replace('|', ':').trim());
+                previousIsChild = false;
+            }
+        }
+        return sb.toString();
     }
 
     /**

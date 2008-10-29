@@ -46,7 +46,7 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
 
         if (!(xformsControl instanceof XFormsSingleNodeControl)) {
             XFormsServer.logger.warn("Control referred to with @for attribute on <" + localname + "> element is not a single node control: "
-                    + xformsControl.getClass().getName());
+                    + ((xformsControl != null) ? xformsControl.getClass().getName() : null));
             return;
         }
 

@@ -37,6 +37,7 @@
                     <offline>false</offline>
                     <next-button/>
                     <previous-button/>
+                    <show-all-pages>false</show-all-pages>
                 </ui>
             </xforms:instance>
             <xforms:instance id="yes-no">
@@ -53,12 +54,14 @@
             </xforms:instance>
             <xforms:bind nodeset="instance('ui')">
                 <xforms:bind name="section" nodeset="section" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-1/descendant-or-self::*" relevant="$section = 1" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-2/descendant-or-self::*" relevant="$section = 2" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-3/descendant-or-self::*" relevant="$section = 3" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-1" relevant="$section = 1 or $show-all-pages = 'true'" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-2" relevant="$section = 2 or $show-all-pages = 'true'" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-3" relevant="$section = 3 or $show-all-pages = 'true'" xxforms:offline="true"/>
 
                 <xforms:bind nodeset="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
                 <xforms:bind nodeset="next-button" readonly="$section = '3'" xxforms:offline="true"/>
+
+                <xforms:bind nodeset="show-all-pages" name="show-all-pages" xxforms:offline="true"/>
             </xforms:bind>
 
             <xforms:action ev:event="xxforms-offline">
@@ -81,7 +84,9 @@
         </xhtml:script>
     </xhtml:head>
     <xhtml:body>
-        <xforms:input ref="section" id="section" style="display: none"/>
+        <xforms:input ref="section" id="section" style="display: inline"/>
+        <xforms:input ref="show-all-pages" id="show-all-pages" style="display: inline"/>
+
         <xhtml:p>
             <xforms:group ref="section-1">
                 <xforms:input ref="first-name">
@@ -111,6 +116,10 @@
             <xforms:trigger ref=".[offline = 'true']">
                 <xforms:label>Take online</xforms:label>
                 <xxforms:online ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
+                <xforms:label>Save to Gears</xforms:label>
+                <xxforms:offline-save ev:event="DOMActivate"/>
             </xforms:trigger>
             <!-- Next/previous -->
             <xforms:trigger ref="previous-button" id="previous">

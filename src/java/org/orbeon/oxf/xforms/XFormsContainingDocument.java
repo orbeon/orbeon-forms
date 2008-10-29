@@ -814,7 +814,7 @@ public class XFormsContainingDocument extends XFormsContainer {
             if (XFormsServer.logger.isDebugEnabled()) {
                 logDebug("containing document", "processing trusted event", new String[] { "target id", targetEffectiveId, "event name", eventName });
             }
-        } else if (!checkForAllowedEvents(eventName, eventTarget, handleGoingOnline)) {
+        } else if (!checkForAllowedEvents(pipelineContext, eventName, eventTarget, handleGoingOnline)) {
             // Event is not trusted and is not allowed
             return;
         }
@@ -884,9 +884,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         if (!handleGoingOnline) {
             // When not going online, each event is within its own start/end outermost action handler
             startOutermostActionHandler();
-        } else {
-            // When going online, ensure rebuild/revalidate before each event
-            rebuildRevalidateIfNeeded(pipelineContext);
         }
         {
             // Create event
@@ -1013,12 +1010,13 @@ public class XFormsContainingDocument extends XFormsContainer {
     /**
      * Check whether the external event is allowed on the gtiven target/
      *
+     * @param pipelineContext   pipeline context
      * @param eventName         event name
      * @param eventTarget       event target
      * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      * @return                  true iif the event is allowed
      */
-    private boolean checkForAllowedEvents(String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
+    private boolean checkForAllowedEvents(PipelineContext pipelineContext, String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measure that also ensures that somebody is not able to change values in an instance
@@ -1058,8 +1056,12 @@ public class XFormsContainingDocument extends XFormsContainer {
                 final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
 
                 if (handleGoingOnline) {
+                    // When going online, ensure rebuild/revalidate before each event
+                    rebuildRevalidateIfNeeded(pipelineContext);
+
                     // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                     // the MIPs need to be re-evaluated before being checked below
+                    getControls().cloneInitialStateIfNeeded();
                     xformsControl.markDirty();
                 }
 

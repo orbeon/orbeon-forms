@@ -477,7 +477,7 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
     </xforms:action>
 
-    <!-- Perform background submission upon xforms-sepect #fr-form-group for xforms:upload -->
+    <!-- Perform background submission upon xforms-select #fr-form-group for xforms:upload -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-select"
             if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and event('xxforms:binding')/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>

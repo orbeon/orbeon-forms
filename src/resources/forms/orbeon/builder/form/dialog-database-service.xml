@@ -228,7 +228,7 @@
         <!-- Template for the instance containing the SQL query -->
         <xforms:instance id="fb-database-query-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
-                <sql:datasource>jdbc/</sql:datasource>
+                <sql:datasource/>
                 <sql:query xmlns:xs="http://www.w3.org/2001/XMLSchema">SELECT * FROM customers
 WHERE first_name = &lt;sql:param type="xs:string" select=""/></sql:query>
             </sql:config>

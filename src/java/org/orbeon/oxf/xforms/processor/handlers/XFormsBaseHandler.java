@@ -358,14 +358,15 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // Statically obtain attributes information
             final XFormsStaticState staticState = containingDocument.getStaticState();
             final Element nestedElement;
+            final String forPrefixedId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId);
             if (isLabel) {
-                nestedElement = staticState.getLabelElement(forEffectiveId);
+                nestedElement = staticState.getLabelElement(forPrefixedId);
             } else if (isHelp) {
-                nestedElement = staticState.getHelpElement(forEffectiveId);
+                nestedElement = staticState.getHelpElement(forPrefixedId);
             } else if (isHint) {
-                nestedElement = staticState.getHintElement(forEffectiveId);
+                nestedElement = staticState.getHintElement(forPrefixedId);
             } else if (isAlert) {
-                nestedElement = staticState.getAlertElement(forEffectiveId);
+                nestedElement = staticState.getAlertElement(forPrefixedId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }

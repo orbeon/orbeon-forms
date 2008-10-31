@@ -946,7 +946,7 @@ public class XFormsStaticState {
                             fullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
 
                             // Generate compact shadow tree for this static id
-                            final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument);
+                            final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument, controlElement);
                             compactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                             // TODO: the nested ids must be passed with prefix, right?

@@ -250,7 +250,7 @@ public class XBLUtils {
             final Document annotedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings);
 
             if (XFormsServer.logger.isDebugEnabled()) {
-                XFormsContainingDocument.logDebugStatic("static state", "shadow tree",
+                XFormsContainingDocument.logDebugStatic("static state", "annotated shadow tree",
                         new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotedShadowTreeDocument) });
             }
 
@@ -333,19 +333,25 @@ public class XBLUtils {
     /**
      * Filter a shadow tree document to keep only XForms controls. This does not modify the input document.
      *
-     * @param shadowTreeDocument    full shadow tree document
-     * @return                      filtered shadow tree document
+     * @param fullShadowTree    full shadow tree document
+     * @return                  compact shadow tree document
      */
-    public static Document filterShadowTree(Document shadowTreeDocument) {
+    public static Document filterShadowTree(Document fullShadowTree, Element boundElement) {
 
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
         final LocationDocumentResult result= new LocationDocumentResult();
         identity.setResult(result);
 
-        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsFilterContentHandler(identity));
+        TransformerUtils.writeDom4j(fullShadowTree, new XFormsFilterContentHandler(identity));
+        final Document compactShadowTree = result.getDocument();
 
-        return result.getDocument();
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsContainingDocument.logDebugStatic("static state", "compact shadow tree",
+                    new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(compactShadowTree) });
+        }
+
+        return compactShadowTree;
     }
 }
 /**

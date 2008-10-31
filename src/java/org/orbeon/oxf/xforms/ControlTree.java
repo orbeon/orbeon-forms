@@ -142,7 +142,6 @@ public class ControlTree implements Cloneable {
             }
 
             controlsMap.put(control.getEffectiveId(), control);
-
         }
 
         // Add event if necessary

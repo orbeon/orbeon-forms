@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.orbeon.oxf.xml.SimpleForwardingContentHandler;
@@ -49,7 +50,7 @@ public class XBLUtils {
      * @param binding           corresponding <xbl:binding>
      * @return                  shadow tree document
      */
-    public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper, final Element boundElement, Element binding) {
+    public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper, final Element boundElement, Element binding, Map namespaceMappings) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -245,15 +246,33 @@ public class XBLUtils {
                 public void text(Text text) {}
             });
 
+            // Annotate tree
+            final Document annotedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings);
+
             if (XFormsServer.logger.isDebugEnabled()) {
                 XFormsContainingDocument.logDebugStatic("static state", "shadow tree",
-                        new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(shadowTreeDocument) });
+                        new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotedShadowTreeDocument) });
             }
 
-            return shadowTreeDocument;
+            return annotedShadowTreeDocument;
         } else {
             return null;
         }
+    }
+
+    private static Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings) {
+        // Create transformer
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+
+        // Set result
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
+        identity.setResult(documentResult);
+
+        // Write the document through the annotator and gather namespace mappings
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings)); // XXX TODO FIXME use from static state
+
+        // Return annotated document
+        return documentResult.getDocument();
     }
 
     /**

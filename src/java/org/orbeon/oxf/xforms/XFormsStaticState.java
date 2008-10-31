@@ -459,19 +459,22 @@ public class XFormsStaticState {
                         final Element currentBindingElement = (Element) j.next();
                         final String currentElementAttribute = currentBindingElement.attributeValue("element");
 
-                        // For now, only handle "prefix|name" selectors
-                        final QName currentQNameMatch
-                                = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'));
+                        if (currentElementAttribute != null) {
 
-                        // Create and remember factory for this QName
-                        componentsFactories.put(currentQNameMatch,
-                            new XFormsControlFactory.Factory() {
-                                public XFormsControl createXFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-                                    return new XFormsComponentControl(container, parent, element, name, effectiveId);
-                                }
-                            });
+                            // For now, only handle "prefix|name" selectors
+                            final QName currentQNameMatch
+                                    = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'));
 
-                        componentBindings.put(currentQNameMatch, currentBindingElement);
+                            // Create and remember factory for this QName
+                            componentsFactories.put(currentQNameMatch,
+                                new XFormsControlFactory.Factory() {
+                                    public XFormsControl createXFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                                        return new XFormsComponentControl(container, parent, element, name, effectiveId);
+                                    }
+                                });
+
+                            componentBindings.put(currentQNameMatch, currentBindingElement);
+                        }
                     }
                 }
 
@@ -924,7 +927,7 @@ public class XFormsStaticState {
                         // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
 
                         // If the document has a template, recurse into it
-                        final Document fullShadowTreeDocument = XBLUtils.generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement);
+                        final Document fullShadowTreeDocument = XBLUtils.generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap);
                         if (fullShadowTreeDocument != null) {
 
                             // Extract models from components instances

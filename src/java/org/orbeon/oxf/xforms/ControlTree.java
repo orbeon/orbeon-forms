@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -384,17 +381,32 @@ public class ControlTree implements Cloneable {
 
     /**
      * Find an effective control id based on a control id, following the branches of the
-     * current indexes of the repeat elements.
+     * current indexes of the repeat elements. age$age.1 - xforms-element-10
      */
-    public String findEffectiveControlId(String sourceId, String targetId) {
+    public String findEffectiveControlId(String sourceEffectiveId, String targetId) {
         // Don't iterate if we don't have controls
         if (this.children == null)
             return null;
 
-        return findEffectiveControlId(sourceId, targetId, this.children);
+        if (sourceEffectiveId != null && XFormsUtils.getEffectiveIdPrefix(sourceEffectiveId).length() > 0) {
+            // The source is within a particular component, so search only within that component
+
+            // Start from source control
+            XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceEffectiveId);
+            // Go down parents until component is found
+            while (!(componentControl instanceof XFormsComponentControl)) {
+                componentControl =  componentControl.getParent();
+            }
+
+            // Search from the root of the component
+            return findEffectiveControlId(sourceEffectiveId, targetId, ((XFormsComponentControl) componentControl).getChildren());
+        } else {
+            // Search from the root
+            return findEffectiveControlId(sourceEffectiveId, targetId, this.children);
+        }
     }
 
-    private String findEffectiveControlId(String sourceId, String targetId, List children) {
+    private String findEffectiveControlId(String sourceEffectiveId, String targetId, List children) {
         // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
         if (children != null && children.size() > 0) {
             for (Iterator i = children.iterator(); i.hasNext();) {
@@ -413,7 +425,7 @@ public class ControlTree implements Cloneable {
                     if (index > 0) {
                         final List newChildren = currentRepeatControl.getChildren();
                         if (newChildren != null && newChildren.size() > 0) {
-                            final String result = findEffectiveControlId(sourceId, targetId, Collections.singletonList(newChildren.get(index - 1)));
+                            final String result = findEffectiveControlId(sourceEffectiveId, targetId, Collections.singletonList(newChildren.get(index - 1)));
                             if (result != null)
                                 return result;
                         }
@@ -423,7 +435,7 @@ public class ControlTree implements Cloneable {
                     // Handle container control
                     final List newChildren = ((XFormsContainerControl) currentControl).getChildren();
                     if (newChildren != null && newChildren.size() > 0) {
-                        final String result = findEffectiveControlId(sourceId, targetId, newChildren);
+                        final String result = findEffectiveControlId(sourceEffectiveId, targetId, newChildren);
                         if (result != null)
                             return result;
                     }

@@ -41,16 +41,23 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
         // Find control effective id based on @for attribute
         final String controlEffectiveId = XFormsUtils.getRelatedEffectiveId(lhhaEffectiveId, forAttribute);
 
-        final XFormsControl xformsControl = handlerContext.isTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectByEffectiveId(controlEffectiveId);
+        final boolean isTemplate = handlerContext.isTemplate();
+        final XFormsControl xformsControl;
+        if (!isTemplate) {
+            // Get concrete control
+            xformsControl = (XFormsControl) containingDocument.getObjectByEffectiveId(controlEffectiveId);
 
-        if (!(xformsControl instanceof XFormsSingleNodeControl)) {
-            XFormsServer.logger.warn("Control referred to with @for attribute on <" + localname + "> element is not a single node control: "
-                    + ((xformsControl != null) ? xformsControl.getClass().getName() : null));
-            return;
+            if (!(xformsControl instanceof XFormsSingleNodeControl)) {
+                XFormsServer.logger.warn("Control referred to with @for attribute on <" + localname + "> element is not a single node control: "
+                        + ((xformsControl != null) ? xformsControl.getClass().getName() : null));
+                return;
+            }
+        } else {
+            // We can't get a control
+            xformsControl = null;
         }
 
         // Output element
-        handleLabelHintHelpAlert(forAttribute, controlEffectiveId, localname, (XFormsSingleNodeControl) xformsControl, handlerContext.isTemplate());
+        handleLabelHintHelpAlert(controlEffectiveId, localname, (XFormsSingleNodeControl) xformsControl, isTemplate);
     }
 }

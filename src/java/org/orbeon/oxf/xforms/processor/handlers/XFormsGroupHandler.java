@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
@@ -86,34 +84,17 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         }
 
         if (!isGroupInTable) {
-            // Gather information about the label and alert
+            // Gather information about label value and classes
 
-            final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
-            final String labelClassAttribute;
+            // Value
             if (handlerContext.isTemplate() || xformsControl == null) {
-                // Determine information statically
-
-                final Element groupElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(getPrefixedId())).getElement();
-                final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
-
                 labelValue = null;
-                labelClassAttribute = hasLabel ? labelElement.attributeValue("class") : null;
-
             } else {
-                // Determine information dynamically
-
                 labelValue = xformsControl.getLabel(pipelineContext);
-
-                if (hasLabel) {
-                    final Element groupElement = xformsControl.getControlElement();
-                    final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
-
-                    labelClassAttribute = labelElement.attributeValue("class");
-                } else {
-                    labelClassAttribute = null;
-                }
             }
 
+            // Label
+            final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
             if (hasLabel) {
                 labelClasses = new FastStringBuffer("xforms-label");
 
@@ -123,6 +104,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
                 }
 
                 // Copy over existing label classes if any
+                final String labelClassAttribute = containingDocument.getStaticState().getLabelElement(getPrefixedId()).attributeValue("class");
                 if (labelClassAttribute != null) {
                     labelClasses.append(' ');
                     labelClasses.append(labelClassAttribute);
@@ -240,7 +222,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             // styling in particular.
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
-            outputLabelFor(handlerContext, reusableAttributes, effectiveId, "label", labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, "label", handlerContext.getLabelElementName(), labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
         }
     }
 

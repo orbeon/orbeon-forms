@@ -41,7 +41,12 @@ public class HandlerContext {
     private final XFormsContainingDocument containingDocument;
     private final XFormsState encodedClientState;
     private final ExternalContext externalContext;
+
     private final String[] documentOrder;
+    private final String labelElementName;
+    private final String hintElementName;
+    private final String helpElementName;
+    private final String alertElementName;
 
     public final boolean isNoscript;
     public final boolean isNewXHTMLLayout;
@@ -60,7 +65,12 @@ public class HandlerContext {
         this.containingDocument = containingDocument;
         this.encodedClientState = encodedClientState;
         this.externalContext = externalContext;
+
         this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
+        this.labelElementName = XFormsProperties.getLabelElementName(containingDocument);
+        this.hintElementName = XFormsProperties.getHintElementName(containingDocument);
+        this.helpElementName = XFormsProperties.getHelpElementName(containingDocument);
+        this.alertElementName = XFormsProperties.getAlertElementName(containingDocument);
 
         this.isNoscript = XFormsProperties.isNoscript(containingDocument);
         this.isNewXHTMLLayout = XFormsProperties.isNewXHTMLLayout(containingDocument);
@@ -96,6 +106,22 @@ public class HandlerContext {
 
     final public String[] getDocumentOrder() {
         return documentOrder;
+    }
+
+    public String getLabelElementName() {
+        return labelElementName;
+    }
+
+    public String getHintElementName() {
+        return hintElementName;
+    }
+
+    public String getHelpElementName() {
+        return helpElementName;
+    }
+
+    public String getAlertElementName() {
+        return alertElementName;
     }
 
     final public boolean isRenderingEngineTrident() {

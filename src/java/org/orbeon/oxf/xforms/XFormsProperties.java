@@ -40,6 +40,11 @@ public class XFormsProperties {
     public static final String ORDER_PROPERTY = "order";
     public static final String DEFAULT_ORDER_PROPERTY = "label control help alert hint";
 
+    public static final String LABEL_ELEMENT_NAME_PROPERTY = "label-element";
+    public static final String HINT_ELEMENT_NAME_PROPERTY = "hint-element";
+    public static final String HELP_ELEMENT_NAME_PROPERTY = "help-element";
+    public static final String ALERT_ELEMENT_NAME_PROPERTY = "alert-element";
+
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
     private static final String READONLY_PROPERTY = "readonly";
 
@@ -159,6 +164,10 @@ public class XFormsProperties {
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
             new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
+            new PropertyDefinition(LABEL_ELEMENT_NAME_PROPERTY, "label", false),
+            new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "label", false),
+            new PropertyDefinition(HELP_ELEMENT_NAME_PROPERTY, "label", false),
+            new PropertyDefinition(ALERT_ELEMENT_NAME_PROPERTY, "label", false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true, false),
@@ -418,6 +427,22 @@ public class XFormsProperties {
 
     public static String getOrder(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, ORDER_PROPERTY);
+    }
+
+    public static String getLabelElementName(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, LABEL_ELEMENT_NAME_PROPERTY);
+    }
+
+    public static String getHintElementName(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, HINT_ELEMENT_NAME_PROPERTY);
+    }
+
+    public static String getHelpElementName(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, HELP_ELEMENT_NAME_PROPERTY);
+    }
+
+    public static String getAlertElementName(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, ALERT_ELEMENT_NAME_PROPERTY);
     }
 
     public static boolean isStaticReadonlyAppearance(XFormsContainingDocument containingDocument) {

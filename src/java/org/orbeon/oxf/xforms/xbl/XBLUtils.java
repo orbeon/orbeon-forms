@@ -41,6 +41,7 @@ import java.util.*;
  * XBL utilities.
  */
 public class XBLUtils {
+
     /**
      * Generate shadow content for the given control id and XBL binding.
      *
@@ -122,7 +123,8 @@ public class XBLUtils {
                     }
 
                     // Handle attribute forwarding
-                    final Attribute xblAttr = element.attribute(XFormsConstants.XBL_ATTR_QNAME);
+                    final Attribute xblAttr = element.attribute(XFormsConstants.XBL_ATTR_QNAME);    // standard xbl:attr (custom syntax)
+                    final Attribute xxblAttr = element.attribute(XFormsConstants.XXBL_ATTR_QNAME);  // extension xxbl:attr (XPath expression)
                     if (xblAttr != null) {
                         // Detach attribute (not strictly necessary?)
                         xblAttr.detach();
@@ -190,6 +192,28 @@ public class XBLUtils {
                             }
                             // TODO: handle xbl:lang?
                             // TODO: handle type specifiers?
+                        }
+                    } else if (xxblAttr != null) {
+                        // Detach attribute (not strictly necessary?)
+                        xxblAttr.detach();
+                        // Get attribute value
+                        final String xxblAttrString = xxblAttr.getValue();
+
+                        final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
+
+                        // TODO: don't use getNamespaceContext() as this is already computed for the bound element
+                        final List nodes = XPathCache.evaluate(pipelineContext, boundElementInfo, xxblAttrString, Dom4jUtils.getNamespaceContext(element),
+                                null, null, null, null, null);// TODO: locationData
+
+                        if (nodes.size() > 0) {
+                            for (Iterator i = nodes.iterator(); i.hasNext();) {
+                                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+                                    // This is an attribute
+                                    final Attribute currentAttribute = (Attribute) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                                    element.addAttribute(currentAttribute.getQName(), currentAttribute.getValue());
+                                }
+                            }
                         }
                     }
                 }

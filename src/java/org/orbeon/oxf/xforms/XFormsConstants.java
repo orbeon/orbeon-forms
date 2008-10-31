@@ -113,6 +113,12 @@ public class XFormsConstants {
     public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
     public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);
 
+    public static final String XXBL_PREFIX = "xxbl";
+    public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
+    public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
+    public static final QName XXBL_ATTR_QNAME = new QName("attr", XXBL_NAMESPACE);
+
+
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 
     public static final String XML_EVENTS_PREFIX = "ev";

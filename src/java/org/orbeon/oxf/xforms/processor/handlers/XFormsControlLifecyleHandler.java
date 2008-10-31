@@ -254,22 +254,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(staticId, effectiveId, "label", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, "label", xformsControl, isTemplate);
     }
 
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(staticId, effectiveId, "alert", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl, isTemplate);
     }
 
     protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(staticId, effectiveId, "hint", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl, isTemplate);
     }
 
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(staticId, effectiveId, "help", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsControl, isTemplate);
     }
 
     // Must be overridden by subclasses

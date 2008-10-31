@@ -358,10 +358,10 @@ public class XFormsControls {
     }
 
     /**
-     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
+     * Resolve an object. This optionally depends on a source control, and involves resolving whether the source is within a
      * repeat or a component.
      *
-     * @param effectiveSourceId  effective id of the source, or null
+     * @param effectiveSourceId  effective id of the source control, or null
      * @param targetId           id of the target
      * @return                   object, or null if not found
      */

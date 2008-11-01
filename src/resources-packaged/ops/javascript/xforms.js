@@ -1570,7 +1570,7 @@ ORBEON.xforms.Controls = {
             isValid = newValid != "false";
             if (isValid) {
                 ORBEON.util.Dom.removeClass(control, "xforms-invalid");
-                if (isVisited) ORBEON.util.Dom.removeClass(control, "xforms-invalid-visited");
+                ORBEON.util.Dom.removeClass(control, "xforms-invalid-visited");
             } else {
                 ORBEON.util.Dom.addClass(control, "xforms-invalid");
                 if (isVisited) ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
@@ -1584,7 +1584,7 @@ ORBEON.xforms.Controls = {
         if (alertElement != null) { // Some controls don't have validity indicator
             if (isValid && !isRequiredEmpty) {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
-                if (isVisited) ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
+                ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-inactive");
             } else {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-inactive");

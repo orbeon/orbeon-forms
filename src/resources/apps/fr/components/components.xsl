@@ -64,7 +64,7 @@
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <xsl:apply-templates select="node()"/>
             </xforms:group>
-            <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
     </xsl:template>
 
@@ -144,9 +144,19 @@
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
         <!-- Load components -->
-        <xsl:if test="$components-uri">
-            <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
-        </xsl:if>
+        <!-- TODO: FIXME: This is not efficient because it causes reloading every time -->
+        
+        <xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat('/fr/service/components/', $app, '/', $form, '?fr-unroll=true'), true()))"/>
+
+        <!--<xsl:if test="$components-uri">-->
+            <!--<xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>-->
+        <!--</xsl:if>-->
+        <!--<xsl:message>-->
+            <!--xxx-->
+                <!--<xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat('/fr/service/components/', $app, '/', $form), true()))"/>-->
+            <!--xxx-->
+        <!--</xsl:message>-->
+
 
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"

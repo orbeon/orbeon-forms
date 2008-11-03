@@ -3401,7 +3401,7 @@ controls - done evaluating controls {time (ms): "4"}</pre>
                     <xml-source>
                         <xhtml:body>
                             ...
-                            <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+                            <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
                         </xhtml:body>
                     </xml-source>
                     <p>

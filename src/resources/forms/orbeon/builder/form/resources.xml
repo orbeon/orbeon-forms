@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources>
+    <resource xml:lang="en">
+        <!-- Form metadata -->
+        <application-form-name>
+            <label>Application and Form Names</label>
+        </application-form-name>
+        <application-name>
+            <label>Application Name</label>
+            <hint>click to add</hint>
+            <alert>Must be non-empty and contain no blanks</alert>
+        </application-name>
+        <form-name>
+            <label>Form Name</label>
+            <hint>click to add</hint>
+            <alert>Must be non-empty and contain no blanks</alert>
+        </form-name>
+        <title>
+            <label>Form Title</label>
+            <hint>click to enter the form title</hint>
+            <alert>The form title is required</alert>
+        </title>
+        <description>
+            <label>Form Description</label>
+            <hint>click to enter an optional form description</hint>
+        </description>
+        <logo>
+            <label>Logo</label>
+            <hint>The logo appears at the top of your form</hint>
+        </logo>
+        <!-- Sections -->
+        <section-name>
+            <hint>click to enter a section title</hint>
+            <alert>The section title is required</alert>
+        </section-name>
+        <!-- Toolbox -->
+        <cut>
+            <label>Cut</label>
+        </cut>
+        <copy>
+            <label>Copy</label>
+        </copy>
+        <paste>
+            <label>Paste</label>
+        </paste>
+        <controls>
+            <label>Controls</label>
+        </controls>
+        <i18n>
+            <label>Internationalization</label>
+        </i18n>
+        <language>
+            <label>Current Language</label>
+        </language>
+        <advanced>
+            <label>Advanced</label>
+        </advanced>
+        <services-actions>
+            <label>Services &amp; Actions</label>
+        </services-actions>
+        <http-services>
+            <label>HTTP Services</label>
+        </http-services>
+        <database-services>
+            <label>Database Services</label>
+        </database-services>
+        <actions>
+            <label>Actions</label>
+        </actions>
+        <new-section>
+            <label>New Section</label>
+        </new-section>
+        <new-grid>
+            <label>New Grid</label>
+        </new-grid>
+        <change-schema>
+            <label>Change Schema</label>
+        </change-schema>
+        <upload-schema>
+            <label>Upload Schema</label>
+        </upload-schema>
+        <change-pdf>
+            <label>Change PDF</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>Upload PDF</label>
+        </upload-pdf>
+        <change-css>
+            <label>Change CSS</label>
+        </change-css>
+        <upload-css>
+            <label>Upload CSS</label>
+        </upload-css>
+        <show-source>
+            <label>Show Source</label>
+        </show-source>
+        <edit-source>
+            <label>Edit Source</label>
+        </edit-source>
+        <remove-service-question>
+            <label>Are you sure you want to delete service</label>
+        </remove-service-question>
+        <remove-action-question>
+            <label>Are you sure you want to delete action</label>
+        </remove-action-question>
+        <!-- Common -->
+        <add>
+            <label>Add</label>
+        </add>
+        <remove>
+            <label>Remove</label>
+        </remove>
+        <edit>
+            <label>Edit</label>
+        </edit>
+        <!-- TODO: i18n whole Form Builder -->
+    </resource>
+    <resource xml:lang="fr">
+        /Users/ebruchez/Documents/Orbeon/orbeon/src/resources/forms/orbeon/builder/form/resources.xml
+        <application-form-name>
+            <label>Nom de l'application et du formulaire</label>
+        </application-form-name>
+        <application-name>
+            <label>Nom de l'application</label>
+            <hint>nom de l'application</hint>
+            <alert>Le nom de l'application doit être un identifiant non vide</alert>
+        </application-name>
+        <form-name>
+            <label>Nom du formulaire</label>
+            <hint>nom du formulaire</hint>
+            <alert>Le nom du formulaire doit être un identifiant non vide</alert>
+        </form-name>
+        <title>
+            <label>Titre du formulaire</label>
+            <hint>titre du formulaire</hint>
+            <alert>Le titre de formulaire est requis</alert>
+        </title>
+        <description>
+            <label>Description du formulaire</label>
+            <hint>description du formulaire</hint>
+        </description>
+        <logo>
+            <label>Logo</label>
+            <hint>Le logo apparaît au sommet de votre formulaire</hint>
+        </logo>
+        <!-- Sections -->
+        <section-name>
+            <hint>cliquer pour entrer un titre de section</hint>
+            <alert>Le title de section est requis</alert>
+        </section-name>
+        <!-- Toolbox -->
+        <cut>
+            <label>Couper</label>
+        </cut>
+        <copy>
+            <label>Copier</label>
+        </copy>
+        <paste>
+            <label>Coller</label>
+        </paste>
+        <controls>
+            <label>Contrôles</label>
+        </controls>
+        <i18n>
+            <label>Internationalisation</label>
+        </i18n>
+        <language>
+            <label>Langue courante</label>
+        </language>
+        <advanced>
+            <label>Fonctions avancées</label>
+        </advanced>
+        <services-actions>
+            <label>Services &amp; actions</label>
+        </services-actions>
+        <http-services>
+            <label>Services HTTP</label>
+        </http-services>
+        <database-services>
+            <label>Services SQL</label>
+        </database-services>
+        <actions>
+            <label>Actions</label>
+        </actions>
+        <new-section>
+            <label>Nouvelle section</label>
+        </new-section>
+        <new-grid>
+            <label>Nouvelle grille</label>
+        </new-grid>
+        <change-schema>
+            <label>Changer schéma</label>
+        </change-schema>
+        <upload-schema>
+            <label>Importer schéma</label>
+        </upload-schema>
+        <change-pdf>
+            <label>Changer PDF</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>Importer PDF</label>
+        </upload-pdf>
+        <change-css>
+            <label>Changer CSS</label>
+        </change-css>
+        <upload-css>
+            <label>Importer CSS</label>
+        </upload-css>
+        <show-source>
+            <label>Voir source</label>
+        </show-source>
+        <edit-source>
+            <label>Editer source</label>
+        </edit-source>
+        <remove-service-question>
+            <label>Etes-vous sûr de vouloir supprimer le service</label>
+        </remove-service-question>
+        <remove-action-question>
+            <label>Etes-vous sûr de vouloir supprimer l'action</label>
+        </remove-action-question>
+        <!-- Common -->
+        <add>
+            <label>Ajouter</label>
+        </add>
+        <remove>
+            <label>Suppr.</label>
+        </remove>
+        <edit>
+            <label>Editer</label>
+        </edit>
+        <!-- TODO: i18n whole Form Builder -->
+    </resource>
+</resources>

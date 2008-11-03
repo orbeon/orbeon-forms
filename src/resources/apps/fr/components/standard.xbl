@@ -26,6 +26,16 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
+    <!-- Add Form Builder metadata -->
+    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+        <display-name lang="en">Custom Components</display-name>
+        <display-name lang="fr">Composants</display-name>
+        <icon lang="en">
+            <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
+            <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
+        </icon>
+    </metadata>
+
     <xbl:binding id="fr-color-binding-2" element="fr|rgb2">
 
         <!-- Orbeon Form Builder Component Metadata -->

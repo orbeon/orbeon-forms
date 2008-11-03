@@ -132,75 +132,8 @@
     </xforms:instance>
 
     <!-- All form resources -->
-    <xforms:instance id="fr-form-resources" xxforms:readonly="true">
-        <resources>
-            <resource xml:lang="en">
-                <application-form-name>
-                    <label>Application and Form Names</label>
-                </application-form-name>
-                <application-name>
-                    <label>Application Name</label>
-                    <hint>click to add</hint>
-                    <alert>Must be non-empty and contain no blanks</alert>
-                </application-name>
-                <form-name>
-                    <label>Form Name</label>
-                    <hint>click to add</hint>
-                    <alert>Must be non-empty and contain no blanks</alert>
-                </form-name>
-                <title>
-                    <label>Form Title</label>
-                    <hint>click to enter the form title</hint>
-                    <alert>The form title is required</alert>
-                </title>
-                <description>
-                    <label>Form Description</label>
-                    <hint>click to enter an optional form description</hint>
-                </description>
-                <logo>
-                    <label>Logo</label>
-                    <hint>The logo appears at the top of your form</hint>
-                </logo>
-                <section-name>
-                    <hint>click to enter a section title</hint>
-                    <alert>The section title is required</alert>
-                </section-name>
-                <!-- TODO: i18n whole Form Builder -->
-            </resource>
-            <resource xml:lang="fr">
-                <application-form-name>
-                    <label>Nom de l'application et du formulaire</label>
-                </application-form-name>
-                <application-name>
-                    <label>Nom de l'application</label>
-                    <hint>nom de l'application</hint>
-                    <alert>Le nom de l'application doit être un identifiant non vide</alert>
-                </application-name>
-                <form-name>
-                    <label>Nom du formulaire</label>
-                    <hint>nom du formulaire</hint>
-                    <alert>Le nom du formulaire doit être un identifiant non vide</alert>
-                </form-name>
-                <title>
-                    <label>Titre du formulaire</label>
-                    <hint>titre du formulaire</hint>
-                    <alert>Le titre de formulaire est requis</alert>
-                </title>
-                <description>
-                    <label>Description du formulaire</label>
-                    <hint>description du formulaire</hint>
-                </description>
-                <logo>
-                    <label>Logo</label>
-                    <hint>Le logo apparaît au sommet de votre formulaire</hint>
-                </logo>
-                <section-name>
-                    <hint>cliquer pour entrer un titre de section</hint>
-                    <alert>Le title de section est requis</alert>
-                </section-name>
-            </resource>
-        </resources>
-    </xforms:instance>
+    <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml" xxforms:readonly="true"/>
+    <!-- TODO: xxforms:shared="application" -->
 
     <!-- Instance containing the current language -->
     <xforms:instance id="fb-language-instance">
@@ -631,17 +564,21 @@
     <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
                        method="post" replace="none" resource="test:"/>
 
+    <!-- This contains the standard controls definitions -->
+    <xforms:instance id="fb-standard-controls-instance" src="oxf:/forms/orbeon/builder/form/standard-controls.xbl" xxforms:readonly="true"/>
+    <!-- TODO: xxforms:shared="application"-->
+
     <!-- Submission to load the components library -->
     <!-- TODO: should load components based on app config? -->
     <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->
     <xforms:submission id="fb-load-components" serialization="none"
                        method="get" resource="/fr/service/components/orbeon/library"
-                       replace="instance" instance="fb-components-instance"
-                       xxforms:readonly="true" xxforms:shared="application"/>
+                       replace="instance" instance="fb-components-instance" xxforms:readonly="true"/>
+    <!-- TODO: xxforms:shared="application"-->
 
     <xforms:instance id="fb-components-instance">
-        <!-- This will contain the default component available for the currently edited form -->
-        <xbl:xbl/>
+        <!-- This contains the components available for the currently edited form -->
+        <components/>
     </xforms:instance>
 
     <!-- Template for outer bind -->
@@ -715,180 +652,6 @@
             <xforms:help ref=""/>
             <xforms:alert ref="$fr-resources/detail/labels/alert"/>
         </xforms:input>
-    </xforms:instance>
-
-    <!-- Built-in controls -->
-    <!-- TODO: create XBL-like control metadata for those -->
-    <xforms:instance id="fb-controls-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi fr fb saxon xbl exforms">
-        <templates xmlns="">
-            <template label="Single-Line Text">
-                <xhtml:div class="input">
-                    <xforms:input id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:input>
-                </xhtml:div>
-            </template>
-            <template label="Multi-Line Text">
-                <xhtml:div id="" class="textarea">
-                    <xforms:textarea id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:textarea>
-                </xhtml:div>
-            </template>
-            <template label="Date" image="/apps/fr/style/images/silk/date.png">
-                <xhtml:div class="date-input">
-                    <xforms:input id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:input>
-                </xhtml:div>
-            </template>
-            <template label="Time" image="/apps/fr/style/images/silk/time.png">
-                <xhtml:div class="time-input">
-                    <xforms:input id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:input>
-                </xhtml:div>
-            </template>
-            <template label="Date and Time" image="/apps/fr/style/images/silk/clock_link.png">
-                <xhtml:div class="dateTime-input">
-                    <xforms:input id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:input>
-                </xhtml:div>
-            </template>
-            <template label="Dropdown">
-                <xhtml:div class="dropdown">
-                    <xforms:select1 id="" appearance="minimal" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:item>
-                            <xforms:label>[Select...]</xforms:label>
-                            <xforms:value/>
-                        </xforms:item>
-                        <xforms:itemset nodeset="">
-                            <xforms:label ref="label"/>
-                            <xforms:value ref="value"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:div>
-            </template>
-            <template label="Radio Buttons">
-                <xhtml:div class="radio">
-                    <xforms:select1 id="" appearance="full" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:itemset nodeset="">
-                            <xforms:label ref="label"/>
-                            <xforms:value ref="value"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:div>
-            </template>
-            <template label="Single list box">
-                <xhtml:div class="listbox">
-                    <xforms:select1 id="" appearance="compact" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:itemset nodeset="">
-                            <xforms:label ref="label"/>
-                            <xforms:value ref="value"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:div>
-            </template>
-            <template label="Checkboxes">
-                <xhtml:div class="checkbox">
-                    <xforms:select id="" appearance="full" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:itemset nodeset="">
-                            <xforms:label ref="label"/>
-                            <xforms:value ref="value"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:div>
-            </template>
-            <template label="Multi list box" image="/forms/orbeon/builder/images/listbox.png">
-                <xhtml:div class="listbox-multiple">
-                    <xforms:select id="" appearance="compact" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:itemset nodeset="">
-                            <xforms:label ref="label"/>
-                            <xforms:value ref="value"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:div>
-            </template>
-            <template label="Text Output" image="/apps/fr/style/images/silk/text_align_left.png">
-                <xhtml:div class="output">
-                    <xforms:output id="" ref="">
-                        <xforms:label ref=""/>
-                        <xforms:help ref=""/>
-                        <!-- No hint? -->
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:output>
-                </xhtml:div>
-            </template>
-            <template label="Button">
-                <xhtml:div class="button">
-                    <xforms:trigger id="">
-                        <xforms:label ref=""/>
-                        <xforms:help ref=""/>
-                        <!-- No hint? -->
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:trigger>
-                </xhtml:div>
-            </template>
-            <template label="Image" image="/apps/fr/style/images/silk/images.png">
-                <xhtml:div class="image">
-                    <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment">
-                        <xforms:label ref=""/>
-                        <xforms:help ref=""/>
-                        <!-- No hint? -->
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:output>
-                </xhtml:div>
-            </template>
-            <template label="Attachment" image="/apps/fr/style/images/silk/attach.png">
-                <xhtml:div class="upload">
-                    <xforms:upload id="" ref="" class="fr-attachment">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                        <xforms:filename ref="@filename"/>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xxforms:size ref="@size"/>
-                    </xforms:upload>
-                </xhtml:div>
-            </template>
-        </templates>
     </xforms:instance>
 
 </xforms:model>

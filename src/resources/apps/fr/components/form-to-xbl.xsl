@@ -29,7 +29,19 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <xsl:template match="/">
+
         <xbl:xbl>
+
+            <!-- Add Form Builder metadata -->
+            <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+                <display-name lang="en">Section Templates</display-name>
+                <display-name lang="fr">Modèles de sections</display-name>
+                <icon lang="en">
+                    <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
+                    <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
+                </icon>
+            </metadata>
+
             <xsl:apply-templates select="/xhtml:html/xhtml:body//fr:section"/>
         </xbl:xbl>
     </xsl:template>
@@ -128,7 +140,10 @@
                 </xforms:model>
 
 
-                <xforms:group>
+                <xforms:group model="{$component-id}-model">
+                    <!-- TODO: must change language dynamically -->
+                    <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
+
                     <!-- Copy section markup -->
                     <xsl:copy-of select="$fr-section/*"/>
 

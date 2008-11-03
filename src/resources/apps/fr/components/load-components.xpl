@@ -21,6 +21,7 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- XBL document -->
@@ -53,29 +54,56 @@
         <p:output name="data" id="template-xbl"/>
     </p:processor>
 
-    <p:processor name="oxf:url-generator">
-        <p:input name="config"  transform="oxf:unsafe-xslt" href="#parameters">
-            <config xsl:version="2.0">
-                <url>
-                    <!-- Create URI based on properties -->
-                    <xsl:value-of select="pipeline:property(string-join(('oxf.fb.components.uri', /*/app, /*/form), '.'))"/>
-                </url>
-                <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+    <!-- Get request information -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/parameters/parameter[name = 'fr-unroll']</include>
             </config>
         </p:input>
-        <p:output name="data" id="standard-xbl"/>
+        <p:output name="data" id="request"/>
     </p:processor>
+
+    <p:choose href="#request">
+        <p:when test="//parameter/value = 'true'">
+            <!-- Unroll the form (theme, components, inclusions) -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="../unroll-form.xpl"/>
+                <p:input name="instance" href="#parameters"/>
+                <p:input name="data" href="#template-xbl"/>
+                <p:output name="data" id="unrolled-template-xbl" debug="xxx"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#template-xbl"/>
+                <p:output name="data" id="unrolled-template-xbl" debug="xxx"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
+
+    <!--<p:processor name="oxf:url-generator">-->
+        <!--<p:input name="config"  transform="oxf:unsafe-xslt" href="#parameters">-->
+            <!--<config xsl:version="2.0">-->
+                <!--<url>-->
+                    <!--<xsl:value-of select="pipeline:property(string-join(('oxf.fb.components.uri', /*/app, /*/form), '.'))"/>-->
+                <!--</url>-->
+                <!--<forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>-->
+            <!--</config>-->
+        <!--</p:input>-->
+        <!--<p:output name="data" id="standard-xbl"/>-->
+    <!--</p:processor>-->
 
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#template-xbl"/>
+        <p:input name="data" href="#unrolled-template-xbl"/>
         <p:input name="parameters" href="#parameters"/>
         <p:input name="config">
-            <xbl:xbl xsl:version="2.0">
-                <xsl:copy-of select="/*/xbl:binding"/>
-                <xsl:copy-of select="doc(pipeline:property(string-join(('oxf.fb.components.uri', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '.')))/*/xbl:binding"/>
-            </xbl:xbl>
+            <!-- Return an aggregate so that each xbl:xbl can have its own metadata -->
+            <components xsl:version="2.0">
+                <xsl:copy-of select="/xbl:xbl"/>
+                <xsl:copy-of select="doc(pipeline:property(string-join(('oxf.fb.components.uri', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '.')))/xbl:xbl"/>
+            </components>
         </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>

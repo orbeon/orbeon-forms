@@ -305,9 +305,6 @@
                                         </fr:buttons>
 
                                         <!-- Section content -->
-                                        <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(fb:binding)*"/>
-                                        <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="QName()*"/>
-                                        <!--<xforms:output value="string-join(for $q in $components-qnames return xs:string($q), ' - ')"/>-->
 
                                         <!-- Iterate over known elements OR component elements -->
                                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid | *[resolve-QName(name(), .) = $components-qnames]" id="fb-section-content-repeat" xxforms:dnd="none">

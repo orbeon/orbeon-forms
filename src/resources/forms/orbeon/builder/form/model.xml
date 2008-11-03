@@ -66,11 +66,11 @@
     <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
     <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
 
+    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(fb:binding)*"/>
+    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="QName()*"/>
+
     <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
-    <xxforms:variable name="current-section-content-block" select="$current-top-level-block/fr:*[index('fb-section-content-repeat')]"/>
-    <xxforms:variable name="current-td" select="$current-section-content-block/
-                                        xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
-                                        xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+    <xxforms:variable name="current-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]" as="element()?"/>
 
     <!-- Main instance -->
     <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
@@ -207,6 +207,7 @@
 
             <publish-trigger/>
             <controls-triggers/>
+            <sections-triggers/>
 
             <xml-view/>
         </variables>
@@ -217,10 +218,9 @@
         <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-form-valid-instance') = 'false'"/>
         <!-- When are toolbar controls triggers enabled -->
         <xforms:bind nodeset="controls-triggers"
-                     readonly="$current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]
-                                                            or not($current-td/following-sibling::xhtml:td)
-                                                                    and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/*)))
-                                                        )"/>
+                     readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]
+                                                                        or not($current-td/following-sibling::xhtml:td)
+                                                                            and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/*)))))"/>
     </xforms:bind>
 
     <!-- React to a focus on a repeat -->
@@ -426,9 +426,7 @@
         <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
 
         <!-- Get new td -->
-        <xxforms:variable name="new-td" select="$current-section-content-block/
-            xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
-            xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+        <xxforms:variable name="new-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]"/>
         <xforms:action context="$new-td" if="not(exists(*))">
             <!-- We now have an empty cell for pasting -->
 

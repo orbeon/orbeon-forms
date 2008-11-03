@@ -30,8 +30,8 @@
     <xhtml:div class="fb-toolbox-inside">
 
         <xhtml:dl id="fb-toolbox-dl" class="accordion-menu">
-            <xhtml:dt id="fb-toolbox-controls-dt" class="a-m-t a-m-d-expand"><xforms:output value="$form-resources/controls/label"/></xhtml:dt>
-            <xhtml:dd class="a-m-d a-m-d-expand">
+            <xhtml:dt id="fb-toolbox-controls-dt" class="a-m-t a-m-d-expand fb-toolbox-section-title"><xforms:output value="$form-resources/controls/label"/></xhtml:dt>
+            <xhtml:dd class="a-m-d a-m-d-expand fb-toolbox-controls-section">
                 <xhtml:div class="bd">
                     <!-- XVC toolbox -->
                     <xhtml:div class="fb-tools fb-xvc">
@@ -160,17 +160,19 @@
                                 <!-- Display localized name -->
                                 <xforms:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
 
+                                <!--xxx <xforms:output value="string-join($current-td/ancestor::*/name(), '/')"/> xxx-->
+
                                 <xforms:repeat nodeset="xbl:binding" id="fb-components-template-repeat">
 
                                     <xxforms:variable name="binding" select="." as="element(xbl:binding)"/>
 
                                     <!-- Whether the component is a section component or not -->
-                                    <xxforms:variable name="is-section-component" select="tokenize(@class, '\s') = 'fr-section-component'" as="xs:boolean"/>
+                                    <xxforms:variable name="is-section-component" select="tokenize($binding/@class, '\s') = 'fr-section-component'" as="xs:boolean"/>
 
                                     <!--<xforms:output value="$is-section-component"/>-->
 
                                     <xhtml:div class="fb-tool">
-                                        <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/controls-triggers">
+                                        <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
                                             <xforms:label>
                                                 <xhtml:img src="{if ($binding/fb:metadata/fb:icon/fb:small-icon) then $binding/fb:metadata/fb:icon/fb:small-icon else '/apps/fr/style/images/silk/plugin.png'}" alt="" width="16" height="16"/>
                                                 <xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/>
@@ -178,8 +180,17 @@
                                             <xforms:action ev:event="DOMActivate" if="$is-section-component">
                                                 <!-- Insert a new section component -->
 
-                                                <!-- Is the current section empty (i.e. no children fr:*, or an empty grid)? -->
-                                                <xxforms:variable name="is-current-section-empty" select="$body/*[index('fb-top-level-repeat')][not(fr:*) or not(exists(fr:grid//(fr:td | xhtml:td)/*))]" as="xs:boolean"/>
+                                                <xxforms:variable name="current-section" select="$body/*[index('fb-top-level-repeat')]" as="element(fr:section)"/>
+
+                                                <!-- Is the current section empty (i.e. no children non-XForms elements, or an empty grid)? -->
+                                                <xxforms:variable name="is-current-section-empty" as="xs:boolean"
+                                                                  select="not(exists($current-section/*[namespace-uri() != 'http://www.w3.org/2002/xforms']))
+                                                                          or exists($current-section/fr:grid) and not(exists($current-section/fr:grid//(fr:td | xhtml:td)/*))"/>
+
+                                                <!--<xforms:message>-->
+                                                    <!--xxx <xforms:output value="$is-current-section-empty"/> xxx-->
+                                                <!--</xforms:message>-->
+
                                                 <xforms:action if="not($is-current-section-empty)">
                                                     <!-- Insert new section -->
                                                     <xforms:dispatch name="DOMActivate" target="insert-new-section-trigger"/>
@@ -207,9 +218,7 @@
                                                 <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
 
                                                 <!-- This ensures the context is recomputed -->
-                                                <xxforms:variable name="new-td" select="$current-section-content-block/
-                                                    xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
-                                                    xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+                                                <xxforms:variable name="new-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]"/>
                                                 <xforms:action context="$new-td" if="not(exists(*))">
                                                     <!-- Context is now on td and there is room for insertion -->
 

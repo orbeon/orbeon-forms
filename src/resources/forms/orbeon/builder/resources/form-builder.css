@@ -104,6 +104,9 @@ a.fb-edit-help-trigger img {
 
 #fb-toolbox .fb-metadata-settings select { width: 100% }
 
+.fb-toolbox-inside .fb-toolbox-controls-section { text-align: center }
+.fb-toolbox-inside dt { text-align: center }
+
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Itemset editor dialog */

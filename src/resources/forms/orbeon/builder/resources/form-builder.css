@@ -396,6 +396,11 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
 td:hover .fb-click-message { display: block }
 
+/* Read-only components */
+.fb-section-component .fb-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
+.xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
+.xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
+
 /* ***** Accordion Menu ********************************************************************************************* */
 
 dl.accordion-menu { margin: 0; padding: 0; width: 100% }

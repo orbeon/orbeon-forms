@@ -320,7 +320,9 @@
                                                                       then $component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))]/xbl:template
                                                                       else ()"/>
 
-                                            <xhtml:div class="fb-section-content">
+                                            <!--xxx <xforms:output value="$is-component"/> xxx-->
+
+                                            <xhtml:div class="fb-section-content{if ($is-component) then ' fb-section-component' else ''}">
                                                 <!-- Grid or component within top-level section -->
                                                 <xforms:group ref=".[$current-qname = xs:QName('fr:grid') or $is-component]">
                                                     <!-- Find grid to display -->

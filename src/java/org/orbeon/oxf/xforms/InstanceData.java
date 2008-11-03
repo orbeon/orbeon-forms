@@ -49,7 +49,7 @@ public class InstanceData {
 
     // All MIPs with their default values
     private boolean relevant = DEFAULT_RELEVANT;
-    private boolean readonly = DEFAULT_READONLY;
+    protected boolean readonly = DEFAULT_READONLY;
     private boolean required = DEFAULT_REQUIRED;
 
     private String type;
@@ -66,7 +66,12 @@ public class InstanceData {
     private String invalidBindIds;
     private List schemaErrors;
 
-    private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData();
+    private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
+        {
+            // Default for non-mutable nodes is to be read-only
+            this.readonly = true;
+        }
+    };
 
     private InstanceData() {
     }
@@ -162,7 +167,7 @@ public class InstanceData {
         if (nodeInfo instanceof NodeWrapper) {
             return getInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null) {
-            return DEFAULT_READONLY;
+            return true;// Default for non-mutable nodes is to be read-only
         } else {
             throw new OXFException("Cannot get readonly Model Item Property on null object.");
         }

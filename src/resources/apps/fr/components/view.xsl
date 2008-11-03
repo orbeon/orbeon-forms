@@ -70,12 +70,14 @@
                                     <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
                                     <xxforms:variable name="value" select="context()"/>
                                     <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                                    <xforms:trigger ref=".[$value != instance('fr-language-instance')]" appearance="minimal">
-                                        <xforms:label value="$label"/>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="instance('fr-language-instance')" value="$value"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
+                                    <xforms:group ref=".[$value != instance('fr-language-instance')]">
+                                        <xforms:trigger appearance="minimal">
+                                            <xforms:label value="$label"/>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="instance('fr-language-instance')" value="$value"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
+                                    </xforms:group>
                                     <xforms:output ref=".[$value = instance('fr-language-instance')]" value="$label"/>
                                 </xforms:repeat>
                             </xforms:group>

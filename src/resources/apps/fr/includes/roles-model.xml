@@ -66,6 +66,20 @@
 
             <!-- Handle configuration -->
             <xforms:send submission="fr-get-roles-submission"/>
+
+            <!--
+                Ok this is tricky:
+
+                * At this point fr-form-model has already been recalculated
+                * fr-form-model may use us (through $fr-roles) using xforms:bind/@calculate or other MIPs
+                * But we just set the value of all-roles here
+                * So we must recalculcate/revalidate fr-form-model after setting roles here
+
+            -->
+            <xforms:action if="instance('fr-roles-instance')/all-roles != ''">
+                <xforms:recalculate model="fr-form-model"/>
+                <xforms:revalidate model="fr-form-model"/>
+            </xforms:action>
         </xforms:action>
     </xforms:action>
 

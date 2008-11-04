@@ -162,6 +162,10 @@ ORBEON.util.IEDom = {
                     : (element.className + " " + className);
     },
 
+    setClasses: function(element, classNames) {
+        element.className = classNames;
+    },
+
     /**
      * Optimized version of YAHOO.util.Dom.removeClass(element, className).
      */
@@ -214,15 +218,19 @@ ORBEON.util.MozDom = {
         element.className = newClassName;
     },
 
+    _regenerateOrbeonClasses: function(element) {
+        element.orbeonClasses = {};
+        var classes = element.className.split(" ");
+        for (var i = 0; i < classes.length; i++)
+            element.orbeonClasses[classes[i]] = true;
+    },
+
     /**
      * Optimized version of YAHOO.util.Dom.hasClass(element, className).
      */
     hasClass: function(element, className) {
         if (!element.orbeonClasses) {
-            element.orbeonClasses = {};
-            var classes = element.className.split(" ");
-            for (var i = 0; i < classes.length; i++)
-                element.orbeonClasses[classes[i]] = true;
+            this._regenerateOrbeonClasses(element);
         }
         return element.orbeonClasses[className] == true;
     },
@@ -235,6 +243,11 @@ ORBEON.util.MozDom = {
             element.orbeonClasses[className] = true;
             this._regenerateClassName(element);
         }
+    },
+
+    setClasses: function(element, classNames) {
+        element.className = classNames;
+        this._regenerateOrbeonClasses(element);
     },
 
     /**
@@ -4596,7 +4609,7 @@ ORBEON.xforms.Server = {
                                                 var parentElement = documentElement.parentNode;
                                                 var newDocumentElement = document.createElement("span");
                                                 newDocumentElement.setAttribute("id", controlId);
-                                                newDocumentElement.classname = documentElementClasses.join(" ") + " xforms-static";
+                                                newDocumentElement.className = documentElementClasses.join(" ") + " xforms-static";
                                                 parentElement.replaceChild(newDocumentElement, documentElement);
                                                 // Remove alert
                                                 var alertElement = ORBEON.xforms.Controls._getControlLabel(newDocumentElement, "xforms-alert");
@@ -4753,7 +4766,7 @@ ORBEON.xforms.Server = {
                                             if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
                                                 // Hack for common broken IE attributes
                                                 if (nameAttribute == "class") {
-                                                    htmlElement.className = newAttributeValue;
+                                                    ORBEON.util.Dom.setClasses(htmlElement, newAttributeValue);
                                                 } else if (nameAttribute == "colspan") {
                                                     htmlElement.colSpan = newAttributeValue;
                                                 } else if (nameAttribute == "rowspan") {
@@ -4766,7 +4779,11 @@ ORBEON.xforms.Server = {
                                                     htmlElement.setAttribute(nameAttribute, newAttributeValue);
                                                 }
                                             } else {
-                                                htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                                if (nameAttribute == "class") {
+                                                    ORBEON.util.Dom.setClasses(htmlElement, newAttributeValue);
+                                                } else {
+                                                    htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                                }
                                             }
                                         }
                                     }

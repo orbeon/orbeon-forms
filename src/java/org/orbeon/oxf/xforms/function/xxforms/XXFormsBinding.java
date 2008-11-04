@@ -49,7 +49,7 @@ public class XXFormsBinding extends XFormsFunction {
             final NodeInfo boundNode = control.getBoundNode();
 
             if (boundNode == null)
-                return EmptyIterator.getInstance();;
+                return EmptyIterator.getInstance();
 
             return new ListIterator(Collections.singletonList(boundNode));
         } else if (object instanceof XFormsContainerControl) {

@@ -68,6 +68,7 @@
     font-size: inherit;/* override xforms.css */
     text-indent: 0;/* override xforms.css */
     background-image: none;/* override xforms.css */
+    white-space: normal;/* override xforms.css to allow for multiline alert messages */
 }
 .xforms-alert-active-visited {
     display: block;

@@ -95,23 +95,23 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                     final AttributesImpl imgAttributes = new AttributesImpl();
                     // @src="..."
                     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
-                    final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
-                    imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue.trim().equals("") ? XFormsConstants.DUMMY_IMAGE_URI : srcValue);
+                    final String srcValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
+                    imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
                 } else if (isHTMLMediaType) {
                     // HTML case
                     if (isConcreteControl) {
-                        final String displayValue = outputControl.getExternalValue(pipelineContext);
-                        XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
+                        final String htmlValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
+                        XFormsUtils.streamHTMLFragment(contentHandler, htmlValue, outputControl.getLocationData(), xhtmlPrefix);
                     }
                 } else {
                     // Regular text case
                     if (isConcreteControl) {
-                        final String displayValue = outputControl.getExternalValue(pipelineContext);
-                        if (displayValue != null && displayValue.length() > 0)
-                            contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                        final String textValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
+                        if (textValue != null && textValue.length() > 0)
+                            contentHandler.characters(textValue.toCharArray(), 0, textValue.length());
                     }
                 }
             }

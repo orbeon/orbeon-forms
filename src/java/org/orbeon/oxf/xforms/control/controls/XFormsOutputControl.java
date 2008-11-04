@@ -105,10 +105,12 @@ public class XFormsOutputControl extends XFormsValueControl {
                     updatedValue = proxyURI(pipelineContext, uri);
 
                 } else {
-                    updatedValue = "";
+                    // Return dummy image
+                    updatedValue = XFormsConstants.DUMMY_IMAGE_URI;;
                 }
             } else {
-                updatedValue = "";
+                // Return dummy image
+                updatedValue = XFormsConstants.DUMMY_IMAGE_URI;;
             }
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // Handle HTML mediatype
@@ -189,5 +191,18 @@ public class XFormsOutputControl extends XFormsValueControl {
         // XForms 1.1 but we do support it, with the idea that the bound node does not provide the value but provides
         // mips. Not sure if the code below makes sense after all then.
         return (valueAttribute == null) ? super.getType() : null;
+    }
+
+    public static String getExternalValue(PipelineContext pipelineContext, XFormsOutputControl control, String mediatypeValue) {
+        if (control != null) {
+            // Get control value
+            return control.getExternalValue(pipelineContext);
+        } else if (mediatypeValue != null && mediatypeValue.startsWith("image/")) {
+            // Return dummy image
+            return XFormsConstants.DUMMY_IMAGE_URI;
+        } else {
+            // Provide default for other types
+            return null;
+        }
     }
 }

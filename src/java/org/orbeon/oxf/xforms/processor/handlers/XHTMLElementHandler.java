@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -75,31 +73,8 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                         }
 
                         // Determine attribute value
-                        final String effectiveAttributeValue;
-                        {
-                            final String controlExternalValue;
-                            if (attributeControl != null) {
-                                // Get control value
-                                controlExternalValue = attributeControl.getExternalValue(pipelineContext);
-                            } else {
-                                // Notify that control cannot provide a value
-                                controlExternalValue = null;
-                            }
-
-                            if ("src".equals(attributeQName) && XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && "img".equals(localname)) {
-                                // Special case of xhtml:img/@src
-                                if (controlExternalValue != null && controlExternalValue.trim().length() > 0)
-                                    effectiveAttributeValue = controlExternalValue;
-                                else
-                                    effectiveAttributeValue = XFormsConstants.DUMMY_IMAGE_URI;
-                            } else if (controlExternalValue == null) {
-                                // No usable value
-                                effectiveAttributeValue = "";
-                            } else {
-                                // Use value as is
-                                effectiveAttributeValue = controlExternalValue;
-                            }
-                        }
+                        // NOTE: This also handles dummy images for the xhtml:img/@src case
+                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValue(pipelineContext, attributeControl, attributeQName);
 
                         // Set the value of the attribute
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),

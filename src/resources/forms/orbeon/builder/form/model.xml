@@ -132,8 +132,8 @@
     </xforms:instance>
 
     <!-- All form resources -->
-    <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml" xxforms:readonly="true"/>
-    <!-- TODO: xxforms:shared="application" -->
+    <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
+                     xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- Instance containing the current language -->
     <xforms:instance id="fb-language-instance">
@@ -563,16 +563,16 @@
                        method="post" replace="none" resource="test:"/>
 
     <!-- This contains the standard controls definitions -->
-    <xforms:instance id="fb-standard-controls-instance" src="oxf:/forms/orbeon/builder/form/standard-controls.xbl" xxforms:readonly="true"/>
-    <!-- TODO: xxforms:shared="application"-->
+    <xforms:instance id="fb-standard-controls-instance" src="oxf:/forms/orbeon/builder/form/standard-controls.xbl"
+                     xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- Submission to load the components library -->
     <!-- TODO: should load components based on app config? -->
     <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->
     <xforms:submission id="fb-load-components" serialization="none"
                        method="get" resource="/fr/service/components/orbeon/library"
-                       replace="instance" instance="fb-components-instance" xxforms:readonly="true"/>
-    <!-- TODO: xxforms:shared="application"-->
+                       replace="instance" instance="fb-components-instance"
+                       xxforms:readonly="true" xxforms:shared="application"/>
 
     <xforms:instance id="fb-components-instance">
         <!-- This contains the components available for the currently edited form -->

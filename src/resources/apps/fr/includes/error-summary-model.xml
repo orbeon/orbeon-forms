@@ -28,8 +28,9 @@
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 
     <xforms:action ev:event="xforms-model-construct-done">
-        <xforms:delete xxforms:iterate="instance('fr-errors-instance')/*" nodeset="."/>
-        <xforms:delete xxforms:iterate="instance('fr-visited-instance')/*" nodeset="."/>
+        <!-- Reset everything -->
+        <xforms:delete nodeset="instance('fr-errors-instance')/*"/>
+        <xforms:delete nodeset="instance('fr-visited-instance')/*"/>
     </xforms:action>
 
     <!-- Instance containing the current errors -->

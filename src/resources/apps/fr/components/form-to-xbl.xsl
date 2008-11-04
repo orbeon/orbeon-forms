@@ -139,8 +139,35 @@
 
                 </xforms:model>
 
+                <!-- Current node -->
+                <xxforms:variable name="result" select="." as="node()?"/>
+
+                <xforms:group ref="$result">
+                    <xforms:action ev:event="xforms-enabled">
+                        <!-- Section becomes visible -->
+                        <xforms:action model="{$component-id}-model">
+                            <xxforms:variable name="local-instance" select="." as="element()"/>
+                            <xforms:action if="$result/*">
+                                <!-- There are already some nodes, copy them in -->
+                                <xforms:delete nodeset="$local-instance/*"/>
+                                <xforms:insert context="$local-instance" origin="$result/*"/>
+                            </xforms:action>
+                            <xforms:action if="not($result/*)">
+                                <!-- No nodes, copy template out -->
+                                <xforms:insert context="$result" origin="$local-instance/*"/>
+                            </xforms:action>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:group>
 
                 <xforms:group model="{$component-id}-model">
+                    <!-- Synchronize data with external world upon local value change -->
+                    <!-- This assumes the element QNamse match, or the value is not copied -->
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xxforms:variable name="binding" select="event('xxforms:binding')" as="element()"/>
+                        <xforms:setvalue ref="$result/*[resolve-QName(name(), .) = resolve-QName(name($binding), $binding)]" value="$binding"/>
+                    </xforms:action>
+
                     <!-- TODO: must change language dynamically -->
                     <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
 

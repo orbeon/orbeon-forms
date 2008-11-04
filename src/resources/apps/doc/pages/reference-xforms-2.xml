@@ -1177,7 +1177,10 @@
                     <p>
                         In JavaScript, you get the current value of an XForms control <code>var value =
                         ORBEON.xforms.Document.getValue("myControl")</code> where <code>myControl</code> is the id of
-                        the XForms control, for instance: <code>&lt;xforms:input id="myControl"></code>.
+                        the XForms control, for instance: <code>&lt;xforms:input id="myControl"></code>. Note that
+                        within repeats, currently you have to pass an "effective id", which is the id as found within
+                        the HTML element. Effective ids usually have the form <code>myControl·1-2</code>, where the
+                        suffix indicates the levels of repetition.
                     </p>
                     <p>
                         You set the value of an XForms control with <code>ORBEON.xforms.Document.setValue("myControl",

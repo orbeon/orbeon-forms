@@ -425,6 +425,22 @@
                         </xml-source>
                     </li>
                     <li>
+                        <a name="xxforms-binding"/>
+                        <p>
+                            <code>xxforms:binding($control-id as xs:string) as node()*</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:binding()</code> function returns a control's binding, that is the node or
+                            nodes to which the control is bound. Use this function carefully, as depending on when this
+                            function is called during XForms processing, it may refer to stale nodes. Likely the safest
+                            use of <code>xxforms:binding()</code> is in response to UI events.
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <comment> Store the value of the element to which the first-name control is bound </comment>
+                            <xforms:setvalue ref="my-value" origin="xxforms:binding('first-name')"/>
+                        </xml-source>
+                    </li>
+                    <li>
                         <a name="xxforms-get-request-header"/>
                         <p>
                             <code>xxforms:get-request-header($header-name as xs:string) as xs:string*</code>

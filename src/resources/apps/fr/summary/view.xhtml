@@ -38,8 +38,16 @@
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Store resources from configuration instance -->
-                <xforms:insert nodeset="instance('fr-form-resources')"
-                               origin="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
+                <xxforms:variable name="resources-instance" as="element(xforms:instance)"
+                                  select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
+                <xforms:action if="not($resources-instance/@src)">
+                    <!-- Copy inline instance -->
+                    <xforms:insert nodeset="instance('fr-form-resources')" origin="$resources-instance/*"/>
+                </xforms:action>
+                <xforms:action if="$resources-instance/@src">
+                    <!-- Dereference @src -->
+                    <xforms:insert nodeset="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
+                </xforms:action>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
 

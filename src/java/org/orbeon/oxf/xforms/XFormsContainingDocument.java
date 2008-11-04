@@ -1400,7 +1400,11 @@ public class XFormsContainingDocument extends XFormsContainer {
         final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
         if (XFormsServer.logger.isDebugEnabled()) {
             if (analyzed)
-                logDebug("containing document", "performed static analysis", new String[] { "time", Long.toString(System.currentTimeMillis() - startTime) });
+                logDebug("containing document", "performed static analysis",
+                        new String[] {
+                                "time", Long.toString(System.currentTimeMillis() - startTime),
+                                "controls", Integer.toString(xformsStaticState.getControlInfoMap().size())
+                        });
             else
                 logDebug("containing document", "static analysis already available");
         }

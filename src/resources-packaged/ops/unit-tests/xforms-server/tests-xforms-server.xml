@@ -2060,11 +2060,11 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="xforms-element-4·1" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="xforms-element-4·1" readonly="true" label="City: ">San Francisco</xxf:control>
                         <xxf:control id="xforms-element-6·1" label="Position: ">1</xxf:control>
-                        <xxf:control id="xforms-element-4·2" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="xforms-element-4·2" readonly="true" label="City: ">Los Angeles</xxf:control>
                         <xxf:control id="xforms-element-6·2" label="Position: ">2</xxf:control>
-                        <xxf:control id="xforms-element-4·3" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="xforms-element-4·3" readonly="true" label="City: ">San Diego</xxf:control>
                         <xxf:control id="xforms-element-6·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
@@ -2459,48 +2459,56 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
+                        <xxf:control id="my-group·1" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·1">bloody</xxf:control>
                         <xxf:control id="repeat-current-output-2·1">bloody</xxf:control>
                         <xxf:control id="repeat-index-1·1">5</xxf:control>
                         <xxf:control id="repeat-index-2·1">5</xxf:control>
                         <xxf:control id="repeat-context-1·1">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·1">bloody</xxf:control>
+                        <xxf:control id="my-group·2" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·2">valencia</xxf:control>
                         <xxf:control id="repeat-current-output-2·2">valencia</xxf:control>
                         <xxf:control id="repeat-index-1·2">5</xxf:control>
                         <xxf:control id="repeat-index-2·2">5</xxf:control>
                         <xxf:control id="repeat-context-1·2">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·2">valencia</xxf:control>
+                        <xxf:control id="my-group·3" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·3">green</xxf:control>
                         <xxf:control id="repeat-current-output-2·3">green</xxf:control>
                         <xxf:control id="repeat-index-1·3">5</xxf:control>
                         <xxf:control id="repeat-index-2·3">5</xxf:control>
                         <xxf:control id="repeat-context-1·3">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·3">green</xxf:control>
+                        <xxf:control id="my-group·4" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·4">red</xxf:control>
                         <xxf:control id="repeat-current-output-2·4">red</xxf:control>
                         <xxf:control id="repeat-index-1·4">5</xxf:control>
                         <xxf:control id="repeat-index-2·4">5</xxf:control>
                         <xxf:control id="repeat-context-1·4">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·4">red</xxf:control>
+                        <xxf:control id="my-group·5" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·5">iPod</xxf:control>
                         <xxf:control id="repeat-current-output-2·5">iPod</xxf:control>
                         <xxf:control id="repeat-index-1·5">5</xxf:control>
                         <xxf:control id="repeat-index-2·5">5</xxf:control>
                         <xxf:control id="repeat-context-1·5">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·5">iPod</xxf:control>
+                        <xxf:control id="my-group·6" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·6">green</xxf:control>
                         <xxf:control id="repeat-current-output-2·6">green</xxf:control>
                         <xxf:control id="repeat-index-1·6">5</xxf:control>
                         <xxf:control id="repeat-index-2·6">5</xxf:control>
                         <xxf:control id="repeat-context-1·6">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·6">green</xxf:control>
+                        <xxf:control id="my-group·7" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·7">williams</xxf:control>
                         <xxf:control id="repeat-current-output-2·7">williams</xxf:control>
                         <xxf:control id="repeat-index-1·7">5</xxf:control>
                         <xxf:control id="repeat-index-2·7">5</xxf:control>
                         <xxf:control id="repeat-context-1·7">fruits</xxf:control>
                         <xxf:control id="repeat-context-2·7">williams</xxf:control>
+                        <xxf:control id="my-group·8" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·8">yellow</xxf:control>
                         <xxf:control id="repeat-current-output-2·8">yellow</xxf:control>
                         <xxf:control id="repeat-index-1·8">5</xxf:control>

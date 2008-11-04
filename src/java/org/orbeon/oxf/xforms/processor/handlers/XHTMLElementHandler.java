@@ -76,17 +76,28 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
                         // Determine attribute value
                         final String effectiveAttributeValue;
-                        if (attributeControl != null) {
-                            // Use value provided
-                            effectiveAttributeValue = attributeControl.getExternalValue(pipelineContext);
-                        } else {
-                            // Use blank value
+                        {
+                            final String controlExternalValue;
+                            if (attributeControl != null) {
+                                // Get control value
+                                controlExternalValue = attributeControl.getExternalValue(pipelineContext);
+                            } else {
+                                // Notify that control cannot provide a value
+                                controlExternalValue = null;
+                            }
 
                             if ("src".equals(attributeQName) && XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && "img".equals(localname)) {
                                 // Special case of xhtml:img/@src
-                                effectiveAttributeValue = XFormsConstants.DUMMY_IMAGE_URI;
+                                if (controlExternalValue != null && controlExternalValue.trim().length() > 0)
+                                    effectiveAttributeValue = controlExternalValue;
+                                else
+                                    effectiveAttributeValue = XFormsConstants.DUMMY_IMAGE_URI;
+                            } else if (controlExternalValue == null) {
+                                // No usable value
+                                effectiveAttributeValue = "";
                             } else {
-                                effectiveAttributeValue = "";   
+                                // Use value as is
+                                effectiveAttributeValue = controlExternalValue;
                             }
                         }
 

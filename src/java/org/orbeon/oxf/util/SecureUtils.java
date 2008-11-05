@@ -101,7 +101,8 @@ public class SecureUtils {
     }
 
     /**
-     * Encrypt a string of text using the given password. The result is converted to Base64 encoding.
+     * Encrypt a string of text using the given password. The result is converted to Base64 encoding without line
+     * breaks or spaces.
      *
      * @param pipelineContext   current PipelineContext
      * @param password          encryption password
@@ -117,7 +118,8 @@ public class SecureUtils {
     }
 
     /**
-     * Encrypt a byte array using the given password. The result is converted to Base64 encoding.
+     * Encrypt a byte array using the given password. The result is converted to Base64 encoding without line breaks
+     * or spaces.
      *
      * @param pipelineContext   current PipelineContext
      * @param password          encryption password
@@ -139,7 +141,8 @@ public class SecureUtils {
             // Encode with cipher
             // TODO: should probably use pool of cyphers instead of synchronization, which can cause contention here.
             synchronized(cipher) {
-                return Base64.encode(cipher.doFinal(bytes));
+                // Encode without putting line breaks between lines
+                return Base64.encode(cipher.doFinal(bytes), false);
             }
         } catch (Exception e) {
             throw new OXFException(e);

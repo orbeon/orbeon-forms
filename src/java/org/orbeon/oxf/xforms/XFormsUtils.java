@@ -172,19 +172,19 @@ public class XFormsUtils {
                 // Perform encryption
                 if (gzipByteArray == null) {
                     // The data was not compressed above
-                    return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode).replace((char) 0xa, ' ');
+                    return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode);
                 } else {
                     // The data was compressed above
-                    return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray).replace((char) 0xa, ' ');
+                    return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
                 }
             } else {
                 // No encryption
                 if (gzipByteArray == null) {
                     // The data was not compressed above
-                    return "X3" + Base64.encode(bytesToEncode).replace((char) 0xa, ' ');
+                    return "X3" + Base64.encode(bytesToEncode, false);
                 } else {
                     // The data was compressed above
-                    return "X4" + Base64.encode(gzipByteArray).replace((char) 0xa, ' ');
+                    return "X4" + Base64.encode(gzipByteArray, false);
                 }
             }
         } catch (Throwable e) {

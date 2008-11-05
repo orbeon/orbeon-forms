@@ -40,7 +40,7 @@ public class Base64 {
     static private final int  TWENTYFOURBITGROUP = 24;
     static private final int  EIGHTBIT           = 8;
     static private final int  SIXTEENBIT         = 16;
-    static private final int  SIXBIT             = 6;
+    //static private final int  SIXBIT             = 6;
     static private final int  FOURBYTE           = 4;
     static private final int  SIGN               = -128;
     static private final char PAD                = '=';
@@ -103,6 +103,17 @@ public class Base64 {
      * @return Encoded Base64 array
      */
     public static String encode(byte[] binaryData) {
+        return encode(binaryData, true);
+    }
+
+    /**
+     * Encodes hex octects into Base64
+     *
+     * @param binaryData    array containing binaryData
+     * @param useLineBreaks whether to use line breaks between blocks (using "false" is non-standard)
+     * @return Encoded Base64 array
+     */
+    public static String encode(byte[] binaryData, boolean useLineBreaks) {
 
         if (binaryData == null)
             return null;
@@ -118,7 +129,7 @@ public class Base64 {
         int      numberLines       = (numberQuartet-1)/19+1;
         char     encodedData[]     = null;
 
-        encodedData = new char[numberQuartet*4+numberLines-1];
+        encodedData = new char[numberQuartet * 4 + (useLineBreaks ? numberLines - 1 : 0)];
 
         byte k=0, l=0, b1=0,b2=0,b3=0;
 
@@ -160,7 +171,8 @@ public class Base64 {
 
                 i++;
             }
-            encodedData[encodedIndex++] = 0xa;
+            if (useLineBreaks)
+                encodedData[encodedIndex++] = 0xa;
         }
 
         for (; i<numberTriplets; i++) {
@@ -226,7 +238,7 @@ public class Base64 {
     /**
      * Decodes Base64 data into octects
      *
-     * @param binaryData Byte array containing Base64 data
+     * @param encoded String array containing Base64 data
      * @return Array containind decoded data.
      */
     public static byte[] decode(String encoded) {
@@ -248,7 +260,7 @@ public class Base64 {
             return new byte[0];
 
         byte     decodedData[]      = null;
-        byte     b1=0,b2=0,b3=0, b4=0, marker0=0, marker1=0;
+        byte     b1=0,b2=0,b3=0, b4=0;
         char     d1=0,d2=0,d3=0,d4=0;
 
         int i = 0;

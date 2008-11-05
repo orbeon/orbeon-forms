@@ -1,0 +1,163 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:foo="http://orbeon.org/oxf/xml/foo"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Twitter Status XBL Component Example</xhtml:title>
+        <!-- Main XForms model -->
+        <xforms:model/>
+        <!-- XBL bindings -->
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="foo-twitter-status-binding" element="foo|twitter-status">
+                <xbl:template>
+                    <!-- Local model -->
+                    <xforms:model id="foo-twitter-status-model">
+                        <xforms:instance id="foo-twitter-status-instance">
+                            <parameters>
+                                <id xbl:attr="xbl:text=username"/>
+                                <count xbl:attr="xbl:text=count">5</count>
+                            </parameters>
+                        </xforms:instance>
+
+                        <xforms:instance id="twitter-user-timeline-instance">
+                            <statuses>
+                                <!-- Example: -->
+                                <!--<status>-->
+                                    <!--<created_at>Fri Oct 24 22:25:01 +0000 2008</created_at>-->
+                                    <!--<id>974296158</id>-->
+                                    <!--<text>Bummer: &quot;New MacBook Pro Does Not Support 8GB RAM (for now)&quot; http://tinyurl.com/6egzsr</text>-->
+                                    <!--<source>&lt;a href=&quot;http://www.twhirl.org/&quot;&gt;twhirl&lt;/a&gt;</source>-->
+                                    <!--<truncated>false</truncated>-->
+                                    <!--<in_reply_to_status_id/>-->
+                                    <!--<in_reply_to_user_id/>-->
+                                    <!--<favorited>false</favorited>-->
+                                    <!--<user>-->
+                                        <!--<id>6087842</id>-->
+                                        <!--<name>Erik Bruchez</name>-->
+                                        <!--<screen_name>ebruchez</screen_name>-->
+                                        <!--<location>Hillsdale, California</location>-->
+                                        <!--<description/>-->
+                                        <!--<profile_image_url>-->
+                                            <!--http://s3.amazonaws.com/twitter_production/profile_images/59072394/MangaErik_normal.jpg-->
+                                        <!--</profile_image_url>-->
+                                        <!--<url/>-->
+                                        <!--<protected>false</protected>-->
+                                        <!--<followers_count>69</followers_count>-->
+                                    <!--</user>-->
+                                <!--</status>-->
+                            </statuses>
+                        </xforms:instance>
+
+                        <xforms:submission id="twitter-user-timeline-submission"
+                               serialization="none"
+                               resource="http://twitter.com/statuses/user_timeline/{id}.xml?count={count}"
+                               method="get"
+                               replace="instance"
+                               instance="twitter-user-timeline-instance"
+                               xxforms:username="orbeon_test"
+                               xxforms:password="orbeon">
+                            <xforms:action ev:event="xforms-submit-done"/>
+                        </xforms:submission>
+
+                        <xforms:send submission="twitter-user-timeline-submission" ev:event="xforms-model-construct-done"/>
+
+                    </xforms:model>
+                    <!-- CSS style -->
+                    <xhtml:style>
+                        .xbl-foo-twitter-status .xforms-repeat-selected-item-1 { background: transparent }
+                        .foo-twitter-statuses {
+                            border: 2px solid #9AE4E8;
+                            padding:0.5em;
+                            width: 40em
+                        }
+                        .foo-twitter-status {
+                            border-bottom: 1px dashed #D2DADA;
+                            padding: .25em
+                        }
+                        .foo-twitter-status img { border: none; margin-right: .5em }
+                        .foo-twitter-status .user { float: left; clear: both }
+                        .foo-twitter-status .message { display: inline }
+                        .foo-twitter-statuses .clear { clear: both }
+                    </xhtml:style>
+                    <!-- Local controls -->
+                    <xforms:group>
+                        <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+
+                        <xforms:group model="foo-twitter-status-model">
+                            <xforms:submit submission="twitter-user-timeline-submission">
+                                <xforms:label>
+                                    Get Timeline for <xforms:output value="id"/>
+                                </xforms:label>
+                            </xforms:submit>
+
+                            <xhtml:div class="foo-twitter-statuses">
+                                <xforms:repeat nodeset="instance('twitter-user-timeline-instance')/status">
+                                    <xhtml:div class="foo-twitter-status">
+                                        <xhtml:div class="user">
+                                            <xhtml:a href="http://twitter.com/{user/screen_name}">
+                                                <xhtml:img src="{user/profile_image_url}" alt="{user/name}"/>
+                                            </xhtml:a>
+                                        </xhtml:div>
+                                        <xhtml:div class="message">
+                                            <xhtml:div>
+                                                <xhtml:strong>
+                                                    <xhtml:a title="{user/name}" href="http://twitter.com/{user/screen_name}">
+                                                        <xforms:output value="user/screen_name"/>
+                                                    </xhtml:a>
+                                                </xhtml:strong>
+                                                <xhtml:span class="entry-content">
+                                                    <xforms:output mediatype="text/html" value="text"/>
+                                                </xhtml:span>
+                                                <xhtml:span class="meta entry-meta">
+                                                    <xhtml:a class="entry-date" rel="bookmark" href="http://twitter.com/TechCrunch/status/974414018">
+
+                                                    </xhtml:a>
+                                                    <xhtml:span>from<xforms:output mediatype="text/html" value="source"/></xhtml:span>
+                                                </xhtml:span>
+                                            </xhtml:div>
+                                        </xhtml:div>
+                                        <xhtml:div class="clear"/>
+                                    </xhtml:div>
+                                </xforms:repeat>
+                            </xhtml:div>
+                        </xforms:group>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+        <p>
+            This example shows how to build a configurable XBL component that retrieves a Twitter user's status
+            timeline.
+        </p>
+
+        <!-- Use component a few times -->
+        <foo:twitter-status id="twitter-1" username="orbeon" count="4"/>
+
+        <foo:twitter-status id="twitter-2" username="cnn"/>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
+    </xhtml:body>
+</xhtml:html>

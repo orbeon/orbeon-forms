@@ -336,7 +336,7 @@ public class XFormsUtils {
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
 
-            Dom4jUtils.visitSubtree(childElement, new ChildElementVisitorListener(acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -521,7 +521,7 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new ChildElementVisitorListener(pipelineContext, containingDocument, contextStack, acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(pipelineContext, containingDocument, contextStack, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -863,7 +863,7 @@ public class XFormsUtils {
     public static String rewriteURLAttributeIfNeeded(PipelineContext pipelineContext, Element element, String attributeName, String attributeValue) {
         final String rewrittenValue;
         if ("src".equals(attributeName) || "href".equals(attributeName)) {
-            rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+            rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else {
             rewrittenValue = attributeValue;
         }
@@ -1272,7 +1272,7 @@ public class XFormsUtils {
         return scriptId.replace('-', '_') + "_xforms_function";
     }
 
-    private static class ChildElementVisitorListener implements Dom4jUtils.VisitorListener {
+    private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
         private final PipelineContext pipelineContext;
         private final XFormsContainingDocument containingDocument;
         private final XFormsContextStack contextStack;
@@ -1283,7 +1283,7 @@ public class XFormsUtils {
         private final boolean hostLanguageAVTs;
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
-        public ChildElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = null;
             this.containingDocument = null;
             this.contextStack = null;
@@ -1295,7 +1295,7 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public ChildElementVisitorListener(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = pipelineContext;
             this.containingDocument = containingDocument;
             this.contextStack = contextStack;
@@ -1318,7 +1318,7 @@ public class XFormsUtils {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
                     protected XFormsContextStack getContextStack() {
-                        return ChildElementVisitorListener.this.contextStack;
+                        return LHHAElementVisitorListener.this.contextStack;
                     }
                 };
                 contextStack.pushBinding(pipelineContext, element);

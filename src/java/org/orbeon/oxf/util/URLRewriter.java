@@ -45,7 +45,7 @@ public class URLRewriter {
      * @return              rewritten URL string
      */
     public static String rewriteURL(ExternalContext.Request request, String urlString, int rewriteMode) {
-        // Case where a protocol is specified: the URL is left untouched
+        // Case where a protocol is specified: the URL is left untouched in any case
         if (NetUtils.urlHasProtocol(urlString))
             return urlString;
 
@@ -82,7 +82,7 @@ public class URLRewriter {
                 // Regular case, parse the URL
 
                 final URI baseURIWithPath = new URI("http", "example.org", request.getRequestPath(), null);
-                final URI resolvedURI = baseURIWithPath.resolve(urlString);
+                final URI resolvedURI = baseURIWithPath.resolve(urlString).normalize();// normalize to remove "..", etc.
 
                 // Append path, query and fragment
                 final String query = resolvedURI.getRawQuery();

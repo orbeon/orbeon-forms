@@ -191,7 +191,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             } else {
                 try {
                     final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
-                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
+                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)).normalize());// normalize to remove "..", etc.
                 } catch (URISyntaxException e) {
                     throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
                 }

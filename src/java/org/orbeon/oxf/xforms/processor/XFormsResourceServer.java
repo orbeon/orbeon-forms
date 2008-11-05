@@ -358,7 +358,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         }
                         // Rewrite URL and output it as an absolute path
                         try {
-                            final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim());
+                            final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim()).normalize();// normalize to remove "..", etc.
 
                             final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(),
                                     externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);

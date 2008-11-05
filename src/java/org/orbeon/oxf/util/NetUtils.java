@@ -533,7 +533,7 @@ public class NetUtils {
             } catch (URISyntaxException e) {
                 throw new OXFException(e);
             }
-            resolvedURIString = baseURI.resolve(href).toString();
+            resolvedURIString = baseURI.resolve(href).normalize().toString();// normalize to remove "..", etc.
         } else {
             resolvedURIString = href;
         }

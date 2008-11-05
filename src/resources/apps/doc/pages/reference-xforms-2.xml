@@ -421,8 +421,13 @@
                         </p>
                     </li>
                 </ul>
+                <p>
+                    In addition, the boolean <code>xxforms:show-progress</code> attribute allows specifying whether the
+                    client must enable the loading indicator when sending back delay events from the client. The default
+                    is <code>true</code> and the indicator is used.
+                </p>
                 <xml-source>
-                    <xforms:dispatch name="my-event" target="my-model" delay="2000"/>
+                    <xforms:dispatch name="my-event" target="my-model" delay="2000" xxforms:show-progress="false"/>
                 </xml-source>
                 <p>
                     For more information, please visit the <a

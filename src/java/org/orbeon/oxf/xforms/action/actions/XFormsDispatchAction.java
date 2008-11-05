@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -124,7 +125,14 @@ public class XFormsDispatchAction extends XFormsAction {
             // contain more than one event with the same name and target IDREF. It is the name and the target run-time
             // element that must be unique."
 
-            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay);
+            // Whether to tell the client to show a progress indicator when sending this event
+            final boolean showProgress;
+            {
+                final String showProgressString = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false);
+                showProgress = !"false".equals(showProgressString);
+            }
+
+            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress);
         }
     }
 }

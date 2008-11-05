@@ -680,7 +680,10 @@ public class XFormsServer extends ProcessorImpl {
                             final XFormsContainingDocument.DelayedEvent delayedEvent = (XFormsContainingDocument.DelayedEvent) i.next();
 
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
-                                    new String[] { "delay",  Long.toString(delayedEvent.getTime() - currentTime)} );
+                                    new String[] {
+                                            "delay",  Long.toString(delayedEvent.getTime() - currentTime),
+                                            "show-progress", Boolean.toString(delayedEvent.isShowProgress())
+                                    });
                             ch.text(delayedEvent.getEncodedDocument(pipelineContext));
                             ch.endElement();
                         }

@@ -33,7 +33,7 @@
                 <!-- Increment count -->
                 <xforms:setvalue ref="/instance/count" value=". + 1"/>
                 <!-- Dispatch new event -->
-                <xforms:dispatch name="my-event" target="my-model" delay="1000"/>
+                <xforms:dispatch name="my-event" target="my-model" delay="1000" xxforms:show-progress="true"/>
             </xforms:action>
 
         </xforms:model>

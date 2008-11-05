@@ -533,11 +533,11 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @param cancelable        whether the event is cancelable
      * @param delay             delay after which to dispatch the event
      */
-    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay) {
+    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay, boolean showProgress) {
         if (delayedEvents == null)
             delayedEvents = new ArrayList();
 
-        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay));
+        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress));
     }
 
     public List getDelayedEvents() {
@@ -550,13 +550,15 @@ public class XFormsContainingDocument extends XFormsContainer {
         private boolean bubbles;
         private boolean cancelable;
         private long time;
+        private boolean showProgress;
 
-        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time) {
+        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time, boolean showProgress) {
             this.eventName = eventName;
             this.targetStaticId = targetStaticId;
             this.bubbles = bubbles;
             this.cancelable = cancelable;
             this.time = time;
+            this.showProgress = showProgress;
         }
 
         public String getEncodedDocument(PipelineContext pipelineContext) {
@@ -570,6 +572,10 @@ public class XFormsContainingDocument extends XFormsContainer {
             eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
 
             return XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+        }
+
+        public boolean isShowProgress() {
+            return showProgress;
         }
 
         public long getTime() {

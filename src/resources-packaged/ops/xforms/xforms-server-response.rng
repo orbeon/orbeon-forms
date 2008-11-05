@@ -225,6 +225,14 @@
                             <optional>
                                 <attribute name="delay"/>
                             </optional>
+                            <optional>
+                                <attribute name="show-progress">
+                                    <choice>
+                                        <value>true</value>
+                                        <value>false</value>
+                                    </choice>
+                                </attribute>
+                            </optional>
                             <!-- Encoded server event(s) -->
                             <data type="string"/>
                         </element>

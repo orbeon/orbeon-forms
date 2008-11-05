@@ -2074,10 +2074,6 @@ ORBEON.xforms.Events = {
         }
     },
 
-    _keyCodeModifiesField: function(c) {
-        return c != 9 && c != 13 && c != 16 && c != 17 && c != 18;
-    },
-
     focus: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             // Control elements
@@ -2254,15 +2250,30 @@ ORBEON.xforms.Events = {
         }
     },
 
+    /**
+     * Rational:
+     *      Remember that the user is editing this field, so don't overwrite when we receive an event
+     *      from the server
+     * Testing on key code:
+     *      Ignore some key codes that won't modify the value of the field
+     * Testing on type control:
+     *      We only do this for text fields and text areas, because for other inputs (say select/select1) the user
+     *      can press a key that doesn't change the value of the field, in which case we *do* want to update the
+     *      control with a new value coming from the server.
+     */
+    _isChangingKey: function(control, keyCode) {
+        return keyCode != 9 && keyCode != 13 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
+            (ORBEON.util.Dom.hasClass(control, "xforms-input") || ORBEON.util.Dom.hasClass(control, "xforms-secret")
+                    || ORBEON.util.Dom.hasClass(control, "xforms-textarea"));
+    },
+
     keydown: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-            // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
-            // Ignore some key codes that won't modify the value of the field
-            if (ORBEON.xforms.Events._keyCodeModifiesField(event.keyCode))
+            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id] =
-                ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
-                        : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
+                    ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
+                            : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
             if (ORBEON.widgets.JSCalendar.appliesToControl(target)) {
                 ORBEON.widgets.JSCalendar.keydown(event, target);
             } else if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
@@ -2300,7 +2311,7 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-select1-open"))
                 ORBEON.xforms.Globals.autoCompleteLastKeyCode[target.id] = event.keyCode;
             // Remember we have received the keyup for this element
-            if (ORBEON.xforms.Events._keyCodeModifiesField(event.keyCode))
+            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
             if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {

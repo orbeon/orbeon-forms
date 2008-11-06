@@ -150,10 +150,14 @@
         </xforms:instance>
 
         <xforms:bind nodeset="instance('fb-details-editor-instance')">
+            <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
             <xforms:bind nodeset="control-name"
-                             constraint=". = ../original-control-name
-                                            or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
-                                                and not(concat(normalize-space(), '-control') = $body//*/@id)" type="xs:NCName"/>
+                         type="xs:NCName"
+                         calculate="normalize-space()"
+                         readonly="false()"
+                         constraint=". = ../original-control-name
+                                        or not(concat(., '-section') = $body//fr:section/@id)
+                                            and not(concat(., '-control') = $body//*/@id)"/>
             <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 

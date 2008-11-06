@@ -168,10 +168,14 @@
         </xforms:instance>
 
         <xforms:bind nodeset="instance('fb-section-details-instance')">
+            <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
             <xforms:bind nodeset="section-name"
+                         type="xs:NCName"
+                         calculate="normalize-space()"
+                         readonly="false()"
                          constraint=". = ../original-section-name
-                                        or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
-                                            and not(concat(normalize-space(), '-control') = $body//*/@id)" type="xs:NCName"/>
+                                        or not(concat(., '-section') = $body//fr:section/@id)
+                                            and not(concat(., '-control') = $body//*/@id)"/>
             <xforms:bind nodeset="relevant | readonly" type="xxforms:xpath2" required="false()"/>
             <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>

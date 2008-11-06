@@ -85,7 +85,7 @@ public class EmailProcessor extends ProcessorImpl {
     public static final String EMAIL_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/email";
 
     private static final String DEFAULT_MULTIPART = "mixed";
-    private static final String DEFAULT_TEXT_ENCODING = "iso-8859-1";
+    private static final String DEFAULT_TEXT_ENCODING = "utf-8";
 
     public EmailProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, EMAIL_CONFIG_NAMESPACE_URI));
@@ -303,8 +303,8 @@ public class EmailProcessor extends ProcessorImpl {
             content = handleInlinePartContent(partDocument, contentType);
         }
 
-        if (!(XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
-            // This is binary content
+        if (!XMLUtils.isTextContentType(contentType)) {
+            // This is binary content (including application/xml)
             if (content instanceof FileItem) {
                 final FileItem fileItem = (FileItem) content;
                 parentPart.setDataHandler(new DataHandler(new DataSource() {
@@ -329,7 +329,7 @@ public class EmailProcessor extends ProcessorImpl {
                 parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
             }
         } else {
-            // This is text content
+            // This is text content (including text/xml)
             if (content instanceof FileItem) {
                 // The text content was encoded when written to the FileItem
                 final FileItem fileItem = (FileItem) content;

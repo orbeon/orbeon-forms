@@ -111,7 +111,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                 final GroupContext initialGroupContext = new GroupContext(contentByte,stamper.getAcroFields(), height, currentPage,
                 		Collections.singletonList(instanceDocumentInfo), 1,
                         0, 0, "Courier", 14, 15.9f);
-                handleGroup(pipelineContext, initialGroupContext, configDocument.getRootElement().elements(), functionLibrary);
+                handleGroup(pipelineContext, initialGroupContext, configDocument.getRootElement().elements(), functionLibrary, reader);
 
                 // Handle preview grid (NOTE: This can be heavy in memory.)
                 if ("true".equalsIgnoreCase(showGrid)) {
@@ -237,10 +237,13 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
         }
     }
 
-    private void handleGroup(PipelineContext pipelineContext, GroupContext groupContext, List statements, FunctionLibrary functionLibrary) throws DocumentException, IOException {
+    private void handleGroup(PipelineContext pipelineContext, GroupContext groupContext, List statements, FunctionLibrary functionLibrary, PdfReader reader) throws DocumentException, IOException {
 
         final NodeInfo contextNode = (NodeInfo) groupContext.contextNodeSet.get(groupContext.contextPosition - 1);
         final Map variableToValueMap = new HashMap();
+
+
+        variableToValueMap.put("page-count", new Integer(reader.getNumberOfPages()));
         variableToValueMap.put("page-number", new Integer(groupContext.pageNumber));
         variableToValueMap.put("page-height", new Float(groupContext.pageHeight));
 
@@ -293,7 +296,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                 if (fontSize != null)
                     newGroupContext.fontSize = Float.parseFloat(fontSize);
 
-                handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
+                handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary, reader);
 
             } else if (elementName.equals("repeat")) {
                 // Handle repeat
@@ -317,7 +320,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                     newGroupContext.offsetX = groupContext.offsetX + (iterationIndex - 1) * offsetIncrementX;
                     newGroupContext.offsetY = groupContext.offsetY + (iterationIndex - 1) * offsetIncrementY;
 
-                    handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
+                    handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary, reader);
                 }
             } else if (elementName.equals("field")) {
 

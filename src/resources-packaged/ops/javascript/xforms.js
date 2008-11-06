@@ -5952,12 +5952,34 @@ function xformsNormalizeEndlines(text) {
 function xformsAppendRepeatSuffix(id, suffix) {
     if (suffix == "")
         return id;
+
+    // Remove "-" at the beginning of the suffix, if any
     if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
         suffix = suffix.substring(1);
-    if (id.indexOf(XFORMS_SEPARATOR_1) == -1)
-        return id + XFORMS_SEPARATOR_1 + suffix;
-    else
-        return id + XFORMS_SEPARATOR_2 + suffix;
+
+    // Rational: for label, hind, help, and alert cases, the suffix needs to be added before the -xyz.
+    // So here we remove the -xyz suffix from ID, and we we will add it afterwards
+    var possibleLabelSuffixes = ["-label", "-hint", "-help", "-alert"];
+    var labelSuffix = null;
+    for (var labelSuffixIndex = 0; labelSuffixIndex < possibleLabelSuffixes.length; labelSuffixIndex++) {
+        var possibleLabelSuffix = possibleLabelSuffixes[labelSuffixIndex];
+        var lastIndex = id.lastIndexOf(possibleLabelSuffix);
+        if (lastIndex != -1 && lastIndex + possibleLabelSuffix.length == id.length) {
+            labelSuffix = possibleLabelSuffix;
+            id = id.slice(0, lastIndex);
+            break;
+        }
+    }
+
+    // Add suffix with the right separator
+    id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+    id += suffix;
+
+    // If we had a label suffit, add it at the end
+    if (labelSuffix != null)
+        id += labelSuffix;
+
+    return id;
 }
 
 /**

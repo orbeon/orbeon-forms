@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
 import java.io.*;
 import java.net.*;
 import java.text.ParseException;
@@ -979,34 +980,112 @@ public class NetUtils {
         }
 
         // Forward cookies for session handling
+        final Map requestHeadersMap = externalContext.getRequest().getHeaderMap();
+        boolean sessionCookieSet = false;
         if (username == null) {
 
-            final ExternalContext.Session session = externalContext.getSession(false);
-            if (session != null) {
-                indentedLogger.logDebug("connection", "setting cookie",
-                    new String[] { "JSESSIONID", session.getId() });
+            // START NEW ALGORITHM
 
-                headersMap.put("Cookie", "JSESSIONID=" + session.getId());
-            }
+            // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
+            // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
+            // Websphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
+            // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
 
             // TODO: ExternalContext must provide direct access to cookies
-            final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-            if (cookies != null) {
-                for (int i = 0; i < cookies.length; i++) {
-                    final String cookie = cookies[i];
-                    // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
-                    if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
-                        indentedLogger.logDebug("connection", "forwarding cookie",
-                            new String[] { "cookie", cookie });
-                        headersMap.put("Cookie", cookie);
+            final Object nativeRequest = externalContext.getNativeRequest();
+            if (nativeRequest instanceof HttpServletRequest) {
+                final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
+                final Cookie[] cookies = httpServletRequest.getCookies();
+
+                StringBuffer sb = new StringBuffer();
+
+                if (cookies != null) {
+                    for (int i = 0; i < cookies.length; i++) {
+                        final Cookie cookie = cookies[i];
+
+                        // This is the standard JSESSIONID cookie
+                        final boolean isJsessionId = cookie.getName().equals("JSESSIONID");
+                        // Remember if we've seen JSESSIONID
+                        sessionCookieSet |= isJsessionId;
+
+                        // Forward JSESSIONID and JSESSIONIDSSO for JBoss
+                        if (isJsessionId || cookie.getName().equals("JSESSIONIDSSO")) {
+                            // Multiple cookies in the header, separated with ";"
+                            if (sb.length() > 0)
+                                sb.append("; ");
+
+                            sb.append(cookie.getName());
+                            sb.append('=');
+                            sb.append(cookie.getValue());
+                        }
+                    }
+
+                    if (sb.length() > 0) {
+                        // One or more cookies were set
+                        final String cookieString = sb.toString();
+                        indentedLogger.logDebug("connection", "forwarding cookies", new String[] { "cookie", cookieString });
+                        headersMap.put("Cookie", cookieString);
+
+//                            CookieTools.getCookieHeaderValue(cookie, sb);
                     }
                 }
             }
+
+            // 2. If there is no incoming JSESSIONID cookie, try to make our own cookie. This may fail with e.g.
+            // Websphere.
+            if (!sessionCookieSet) {
+                final ExternalContext.Session session = externalContext.getSession(false);
+
+                if (session != null) {
+
+                    // This will work with Tomcat, but may not work with other app servers
+                    headersMap.put("Cookie", "JSESSIONID=" + session.getId());
+
+                    if (indentedLogger.isDebugEnabled()) {
+
+                        String incomingSessionHeader = null;
+                        final String[] cookieHeaders = (String[]) externalContext.getRequest(   ).getHeaderValuesMap().get("cookie");
+                        if (cookieHeaders != null) {
+                            for (int i = 0; i < cookieHeaders.length; i++) {
+                                final String cookie = cookieHeaders[i];
+                                if (cookie.indexOf("JSESSIONID") != -1) {
+                                    incomingSessionHeader = cookie;
+                                }
+                            }
+                        }
+
+                        String incomingSessionCookie = null;
+                        if (externalContext.getNativeRequest() instanceof HttpServletRequest) {
+                            final Cookie[] cookies = ((HttpServletRequest) externalContext.getNativeRequest()).getCookies();
+                            if (cookies != null) {
+                                for (int i = 0; i < cookies.length; i++) {
+                                    final Cookie cookie = cookies[i];
+                                    if (cookie.getName().equals("JSESSIONID")) {
+                                        incomingSessionCookie = cookie.getValue();
+                                    }
+                                }
+                            }
+                        }
+
+                        indentedLogger.logDebug("connection", "setting cookie",
+                            new String[] {
+                                    "new session", Boolean.toString(session.isNew()),
+                                    "session id", session.getId(),
+                                    "requested session id", externalContext.getRequest().getRequestedSessionId(),
+                                    "incoming JSESSIONID cookie", incomingSessionCookie,
+                                    "incoming JSESSIONID header", incomingSessionHeader
+                            });
+                    }
+                }
+            }
+
+            // END NEW ALGORITHM
         }
 
         // Forward headers if needed
+        // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ JSESSIONID
         if (headersToForwardMap != null) {
-            final Map requestHeadersMap = externalContext.getRequest().getHeaderMap();
+
             for (Iterator i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String currentHeaderName = (String) currentEntry.getValue();

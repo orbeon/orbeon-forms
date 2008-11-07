@@ -741,31 +741,42 @@ public class XFormsServer extends ProcessorImpl {
                     if (containingDocument.goingOffline() && !isOfflineEvents) {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "offline");
 
-                        // We send all the changes between the initial state and the time the form go offline, so when
-                        // reloading the page the client can apply those changes when the page is reloaded from the
-                        // client-side database.
+                        if (xformsDecodedInitialClientState != null) {
+                            // Do not run this if xformsDecodedInitialClientState is null. The general rule is that
+                            // when going offline, xformsDecodedInitialClientState must not be null so we can compute
+                            // the list of diffs to send to the client. However, there is one exception: going back
+                            // offline in response to an Ajax request asking to go online: currently, the client is
+                            // unable to pass back the initial dynamic state, so we are unable to produce the list of
+                            // changes. So we just response xxforms:offline and that's it. The client must then not go
+                            // back online.
 
-                        final StringWriter writer = new StringWriter();
-                        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                        identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
-                        identity.setResult(new StreamResult(writer));
 
-                        // Output response into writer. We ask for all events, and passing a flag telling that we are
-                        // processing offline events so as to avoid recursion
-                        outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
+                            // Send all the changes between the initial state and the time the form go offline, so when
+                            // reloading the page the client can apply those changes when the page is reloaded from the
+                            // client-side database.
+                            final StringWriter writer = new StringWriter();
+                            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                            identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
+                            identity.setResult(new StreamResult(writer));
 
-                        // List of events needed to update the page from the time the page was initially sent to the
-                        // client until right before sending the xxforms:offline event.
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "events");
-                        ch.text(writer.toString());
-                        ch.endElement();
+                            // Output response into writer. We ask for all events, and passing a flag telling that we are
+                            // processing offline events so as to avoid recursion
 
-                        // List of offline bind mappings. This allows the client to perform simple handling of
-                        // validation, relevance, readonly, and required for xforms:bind[@xxforms:offline = 'true'].
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "mappings");
-                        final String offlineBindMappings = XFormsModelBinds.getOfflineBindMappings(containingDocument);
-                        ch.text(offlineBindMappings);
-                        ch.endElement();
+                            outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
+
+                            // List of events needed to update the page from the time the page was initially sent to the
+                            // client until right before sending the xxforms:offline event.
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "events");
+                            ch.text(writer.toString());
+                            ch.endElement();
+
+                            // List of offline bind mappings. This allows the client to perform simple handling of
+                            // validation, relevance, readonly, and required for xforms:bind[@xxforms:offline = 'true'].
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "mappings");
+                            final String offlineBindMappings = XFormsModelBinds.getOfflineBindMappings(containingDocument);
+                            ch.text(offlineBindMappings);
+                            ch.endElement();
+                        }
 
                         ch.endElement();
                     }

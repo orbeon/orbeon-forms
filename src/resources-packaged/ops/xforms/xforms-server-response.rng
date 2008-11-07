@@ -310,14 +310,16 @@
                     </optional>
                     <optional>
                         <element name="xxforms:offline">
-                            <element name="xxforms:events">
-                                <!-- Contains serialized form of all events to replay up to this response -->
-                                <data type="string"/>
-                            </element>
-                            <element name="xxforms:mappings">
-                                <!-- Contains mips and variable mappings for offline binds -->
-                                <data type="string"/>
-                            </element>
+                            <optional><!-- Is not present when going offline in response to a request to going online, see XFormsServer.java -->
+                                <element name="xxforms:events">
+                                    <!-- Contains serialized form of all events to replay up to this response -->
+                                    <data type="string"/>
+                                </element>
+                                <element name="xxforms:mappings">
+                                    <!-- Contains mips and variable mappings for offline binds -->
+                                    <data type="string"/>
+                                </element>
+                            </optional>
                         </element>
                     </optional>
                 </element>

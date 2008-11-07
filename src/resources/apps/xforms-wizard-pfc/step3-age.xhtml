@@ -19,9 +19,7 @@
     <xhtml:head>
         <xhtml:title>XForms Wizard - Step 3</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance>
-                <xi:include href="input:instance"/>
-            </xforms:instance>
+            <xforms:instance src="input:instance"/>
             <xforms:submission id="main" ref="/" action="/xforms-wizard-pfc/age" method="post"/>
         </xforms:model>
     </xhtml:head>

@@ -13,7 +13,8 @@
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        instance-passing="forward">
 
     <page id="xforms-wizard-pfc-firstname" path-info="/xforms-wizard-pfc/" default-submission="initial-instance.xml" view="step1-firstname.xhtml">
         <action when="/form/action = 'next'" >

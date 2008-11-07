@@ -37,7 +37,6 @@
         <application id="xforms-google-suggests" label="Google Suggests"/>
         <application id="xforms-html-area" label="HTML Area"/>
         <application id="xforms-upload" label="Upload Control"/>
-        <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
         <application id="xforms-cart" label="Shopping Cart"/>
         <application id="xforms-sql-address-book" label="SQL Address Book"/>
@@ -58,6 +57,7 @@
     </section>
     <section label="Page Flow">
         <application id="pfc-atm" label="ATM Page Flow"/>
+        <application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>
     </section>
     <section label="Integrating with Java">
         <application id="java-properties" label="Java Properties"/>

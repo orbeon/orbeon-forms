@@ -178,7 +178,7 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Element e) {
-        return domToString(e, true, false);
+        return domToString(e, false, false);
     }
 
     public static String domToString(final Document d, final boolean trm, final boolean cmpct) {
@@ -187,7 +187,7 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Document d) {
-        return domToString(d, true, false);
+        return domToString(d, false, false);
     }
 
     public static String domToString(final Text txt, final boolean t, final boolean c) {
@@ -195,7 +195,7 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Text t) {
-        return domToString(t, true, false);
+        return domToString(t, false, false);
     }
 
     /**
@@ -225,7 +225,7 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Node nd) {
-        return domToString(nd, true, false);
+        return domToString(nd, false, false);
     }
 
     /**

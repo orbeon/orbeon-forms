@@ -135,6 +135,10 @@
                         </resources>
                     </xforms:instance>
 
+                    <!-- This is also at the top-level in components.xsl -->
+                    <!-- TODO: would be ideal if read-onliness on outer instance would simply propagate here -->
+                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf', 'email')"/>
+
                     <!-- Actions -->
 
                 </xforms:model>

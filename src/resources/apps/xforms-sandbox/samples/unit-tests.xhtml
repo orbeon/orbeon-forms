@@ -44,7 +44,7 @@
         <xhtml:style type="text/css">
             .xforms-label { display: block }
         </xhtml:style>
-        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js">-->
+        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/calendar/calendar.js"/>
@@ -52,6 +52,7 @@
         <xhtml:script type="text/javascript">
             ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 ORBEON.testing.run();
+    //                ORBEON.testing.run("inputTestCase", "testClickOnDate");
             });
         </xhtml:script>
     </xhtml:head>

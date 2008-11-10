@@ -21,7 +21,16 @@
 
     <xhtml:head>
         <xhtml:title>Offline MIPS</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
+        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-online-and-succeed go-online-and-fail">
+
+            <xforms:action ev:event="go-online-and-succeed">
+                <!-- Do nothing -->
+            </xforms:action>
+
+            <xforms:action ev:event="go-online-and-fail">
+                <xforms:send submission="simulate-submission"/>
+                <!-- Do nothing -->
+            </xforms:action>
 
             <xforms:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/null" replace="instance">
                 <xforms:action ev:event="xforms-submit-error">

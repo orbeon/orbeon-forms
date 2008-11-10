@@ -21,7 +21,7 @@
 
     <xhtml:head>
         <xhtml:title>Offline Summary</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="check-offline-status" >
+        <xforms:model xxforms:offline="true" id="main-model">
             <xforms:instance id="instance">
                 <instance>
                     <is-offline/>
@@ -29,28 +29,23 @@
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/loading" relevant=". = 'true'"/>
-            <xxforms:script ev:event="check-offline-status">
-                var isOffline = ORBEON.xforms.Document.isFormOffline(FORM_URL);
-                console.log("Summary is offline for URL", FORM_URL, isOffline);
-                ORBEON.xforms.Document.setValue("is-offline", isOffline);
-            </xxforms:script>
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:dispatch name="check-offline-status" target="main-model"/>
-            </xforms:action>
         </xforms:model>
         <xhtml:script type="text/javascript">
             var FORM_URL = window.location.href.substring(0, window.location.href.lastIndexOf("/")) + "/offline-mips";
             ORBEON.xforms.Offline.reset();
+            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                function checkOffline() {
+                    var isOffline = ORBEON.xforms.Document.isFormOffline(FORM_URL);
+                    console.log("Summary is offline for URL", FORM_URL, isOffline);
+                    ORBEON.xforms.Document.setValue("is-offline", isOffline);
+                }
+                checkOffline();
+                window.setInterval(checkOffline, 1000);
+            });
         </xhtml:script>
     </xhtml:head>
     <xhtml:body>
         <xforms:input ref="is-offline" id="is-offline" style="display: none"/>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Load offline-mips</xforms:label>
-                <xforms:load ev:event="DOMActivate" resource="offline-mips"/>
-            </xforms:trigger>
-        </xhtml:p>
         <xhtml:p>
             Form offline-mips is
             <xhtml:b>
@@ -58,25 +53,42 @@
             </xhtml:b>
         </xhtml:p>
         <xhtml:p>
+            <!-- Go offline -->
             <xforms:trigger ref=".[is-offline = 'false']" id="take-offline-from-summary">
                 <xforms:label>Take offline-mips offline</xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:setvalue ref="/instance/loading" value="'true'"/>
                     <xxforms:script>
                         ORBEON.xforms.Document.takeOfflineFromSummary(FORM_URL, function() {
-                            ORBEON.xforms.Document.dispatchEvent("main-model", "check-offline-status");
                             ORBEON.xforms.Document.setValue("loading", "false")
                         });
                     </xxforms:script>
                 </xforms:action>
             </xforms:trigger>
-            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary">
-                <xforms:label>Take online-mips online</xforms:label>
+            <!-- Back online, succeeding -->
+            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-succeed">
+                <xforms:label>Take online-mips online and succeed</xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:setvalue ref="/instance/loading" value="'true'"/>
                     <xxforms:script>
-                        ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function() {
-                            ORBEON.xforms.Document.dispatchEvent("main-model", "check-offline-status");
+                        ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function(formWindow) {
+                            formWindow.ORBEON.xforms.Document.dispatchEvent("main-model", "go-online-and-succeed");
+                        }, function(formWindow) {
+                            console.log("Is form offline: ", formWindow.ORBEON.xforms.Document.isFormOffline(FORM_URL));
+                            ORBEON.xforms.Document.setValue("loading", "false")
+                        });
+                    </xxforms:script>
+                </xforms:action>
+            </xforms:trigger>
+            <!-- Back online, failing -->
+            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-fail">
+                <xforms:label>Take online-mips online and fail</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="/instance/loading" value="'true'"/>
+                    <xxforms:script>
+                        ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function(formWindow) {
+                            formWindow.ORBEON.xforms.Document.dispatchEvent("main-model", "go-online-and-fail");
+                        }, function() {
                             ORBEON.xforms.Document.setValue("loading", "false")
                         });
                     </xxforms:script>

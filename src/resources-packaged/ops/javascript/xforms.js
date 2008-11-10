@@ -1137,19 +1137,16 @@ ORBEON.xforms.Document = {
      * @param formOnlineListener    An optional function which will be called when the form has been taken online.
      *                              This function receives window in which the form is loaded as parameter.
      */
-    takeOnlineFromSummary: function(url, formOnlineListener) {
+    takeOnlineFromSummary: function(url, beforeOnlineListener, formOnlineListener) {
         ORBEON.xforms.Offline.init();
         ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
             // Calling listener to notify that the form is now completely online
             if (formOnlineListener) {
-                var waitingForFormOnlineIntervalID = window.setInterval(function() {
-                    if (! ORBEON.xforms.Document.isFormOffline(url)) {
-                        window.clearInterval(waitingForFormOnlineIntervalID);
-                        formOnlineListener(offlineIframe.contentWindow);
-                    }
-                }, 100);
+                offlineIframe.contentWindow.ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
+                    formOnlineListener(offlineIframe.contentWindow);
+                });
             }
-            offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
+            offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline(beforeOnlineListener);
         });
     }
 };
@@ -4221,12 +4218,30 @@ ORBEON.xforms.Server = {
                 var newDynamicStateTriggersReplace = false;
 
                 var xmlNamespace = null; // xforms namespace
-                //Getting xforms namespace
+                // Getting xforms namespace
                 for (var j = 0; j < responseRoot.attributes.length; j++) {
                     if (responseRoot.attributes[j].nodeValue == XXFORMS_NAMESPACE_URI) {
                         var attrName = responseRoot.attributes[j].name;
                         xmlNamespace = attrName.substr(attrName.indexOf(":") + 1);
                         break;
+                    }
+                }
+
+                // If the last request was taking the form offline
+                if (ORBEON.xforms.Offline.lastRequestIsTakeOnline) {
+                    ORBEON.xforms.Offline.lastRequestIsTakeOnline = false;
+                    // See if we are still offline (if there is a /xxf:event-response/xxf:action/xxf:offline)
+                    var actionElements = ORBEON.util.Dom.getElementsByName(responseRoot, "action", xmlNamespace);
+                    var offlineElements = ORBEON.util.Dom.getElementsByName(actionElements[0], "offline", xmlNamespace);
+                    if (offlineElements.length == 1) {
+                        // Server is asking us to stay offline
+                        ORBEON.xforms.Offline.isOnline = false;
+                        return;
+                    } else {
+                        // Remove form from store and database
+                        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
+                        ORBEON.xforms.Offline.formStore.remove(window.location.href);
+                        // Then we'll continue processing of the request as usual
                     }
                 }
 
@@ -5269,6 +5284,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 ORBEON.xforms.Offline = {
 
     isOnline: true,                                 // True if we are online, false otherwise
+    lastRequestIsTakeOnline: false,                 // Set when we take the form online
     hasGears: false,                                // True if Gears is installed
     gearsDatabase: null,                            // The Gears SQL database
     formStore: null,                                // The Gears ResourceStore
@@ -5580,7 +5596,7 @@ ORBEON.xforms.Offline = {
      * Called when the form is taken back online.
      * Send the events that have been stored in the database to the server.
      */
-    takeOnline: function() {
+    takeOnline: function(beforeOnlineListener) {
         ORBEON.xforms.Offline.init();
 
         // Update the static state and dynamic state with the one from the database
@@ -5593,6 +5609,7 @@ ORBEON.xforms.Offline = {
         // Get all events from the database to create events array
         var eventsString = resultSet.fieldByName("offline_events");
         eventsString = ORBEON.xforms.Offline._decrypt(eventsString, ORBEON.xforms.Offline.getEncryptionKey());
+        ORBEON.xforms.Offline.lastRequestIsTakeOnline = true;
         ORBEON.xforms.Offline.isOnline = true; // Need to set this early, otherwise even won't reach the server
         if (eventsString != "") {
             var eventsStringArray = eventsString.split(" ");
@@ -5618,12 +5635,12 @@ ORBEON.xforms.Offline = {
             ORBEON.xforms.Server.fireEvents(events, false);
         }
 
-        // Remove form from store and database
-        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
-        ORBEON.xforms.Offline.formStore.remove(window.location.href);
-
         // Tell the server we are going online
         ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
+
+        // Give a chance to some code to run before the online event is sent to the server
+        if (!YAHOO.lang.isUndefined(beforeOnlineListener))
+            beforeOnlineListener(window);
     },
 
     /**

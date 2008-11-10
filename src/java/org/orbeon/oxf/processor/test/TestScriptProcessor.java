@@ -160,8 +160,8 @@ public class TestScriptProcessor extends ProcessorImpl {
             Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
             Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
-            String expectedDataString = Dom4jUtils.domToString(expectedDocument);
-            String actualDataString = Dom4jUtils.domToString(actualDocument);
+            String expectedDataString = Dom4jUtils.domToString(expectedDocument, true, false);
+            String actualDataString = Dom4jUtils.domToString(actualDocument, true, false);
 
             if (!expectedDataString.equals(actualDataString))
                 throw new OXFException("Assertion failed: output '" + outputName + "' got '" + actualDataString +  " ', but expected '" + expectedDataString + "'.");

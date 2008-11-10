@@ -404,7 +404,9 @@ ORBEON.testcases = {
 
 ORBEON.testing = {
 
-    // Tests that rely on instances having a certain value should start by callng this utility function
+    /**
+     * Tests that rely on instances having a certain value should start by callng this utility function
+     */
     executeWithInitialInstance: function(testCase, testFunction) {
         ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
             ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
@@ -427,10 +429,45 @@ ORBEON.testing = {
         testCase.wait();
     },
 
-    run: function() {
+    /**
+     * Test driver.
+     *
+     * @param onlyRunTestCase       Optional string: which test case to run. If not specified, will run all the test cases.
+     * @param onlyRunTestFunction   Optional string: which test function to run. Only make sense if a testCase is specified.
+     *                              If a testCase is specified but no testFunction is specifed, then runs all the test functions
+     *                              in the specified test case.
+     */
+    run: function(onlyRunTestCase, onlyRunTestFunction) {
+
         var testLogger = new YAHOO.tool.TestLogger();
-        for (var testcaseID in ORBEON.testcases)
+
+        // Go through test cases
+        for (var testcaseID in ORBEON.testcases) {
+            var addThisTestCase = true;
+            if (!YAHOO.lang.isUndefined(onlyRunTestCase)) {
+                var currentTestCase = ORBEON.testcases[testcaseID];
+                // Make sure the test case defined _should.ignore
+                if (YAHOO.lang.isUndefined(currentTestCase._should))
+                    currentTestCase._should = {};
+                if (YAHOO.lang.isUndefined(currentTestCase._should.ignore))
+                    currentTestCase._should.ignore = {};
+
+                // Go through test functions
+                for (var testFunctionID in currentTestCase) {
+                    // Test function start with "test"
+                    if (testFunctionID.indexOf("test") == 0) {
+                        if (onlyRunTestCase != testcaseID || 
+                                (!YAHOO.lang.isUndefined(onlyRunTestFunction) && onlyRunTestFunction != testFunctionID)) {
+                            currentTestCase._should.ignore[testFunctionID] = true;
+                        }
+                    }
+                }
+                addThisTestCase = onlyRunTestCase == testcaseID;
+            }
+
+            // Add test to run
             YAHOO.tool.TestRunner.add(ORBEON.testcases[testcaseID]);
+        }
         YAHOO.tool.TestRunner.run();
     }
 }

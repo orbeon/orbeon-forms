@@ -120,6 +120,18 @@
             <xsd:attribute name="target" type="xsd:string" use="optional"/>
             <xsd:attribute name="relevant" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="validate" type="xsd:boolean" use="optional"/>
+            <xsd:attribute name="mode" use="optional">
+                <xsd:simpleType>
+                    <xsd:union memberTypes="xforms:QNameButNotNCNAME">
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                                <xsd:enumeration value="synchronous"/>
+                                <xsd:enumeration value="asynchronous"/>
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:union>
+                </xsd:simpleType>
+            </xsd:attribute>
             <xsd:attribute name="method" use="required">
                 <xsd:simpleType>
                     <xsd:union memberTypes="xforms:QNameButNotNCNAME">
@@ -132,7 +144,6 @@
                                 <xsd:enumeration value="urlencoded-post"/>
                                 <xsd:enumeration value="delete"/>
                             </xsd:restriction>
-
                         </xsd:simpleType>
                     </xsd:union>
                 </xsd:simpleType>

@@ -146,7 +146,7 @@
         <!-- Load components -->
         <!-- TODO: FIXME: This is not efficient because it causes reloading every time -->
         
-        <xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat('/fr/service/components/', $app, '/', $form, '?fr-unroll=true'), true()))"/>
+        <xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat(pipeline:property('oxf.fr.appserver.uri'), '/fr/service/components/', $app, '/', $form, '?fr-unroll=true'), true()))"/>
 
         <!--<xsl:if test="$components-uri">-->
             <!--<xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>-->

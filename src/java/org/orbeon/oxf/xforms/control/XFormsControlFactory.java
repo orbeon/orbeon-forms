@@ -224,7 +224,7 @@ public class XFormsControlFactory {
             factory = container.getContainingDocument().getStaticState().getComponentFactory(element.getQName());
 
         if (factory == null)
-            throw new OXFException("Invalid control name: " + Dom4jUtils.qNameToexplodedQName(element.getQName()));
+            throw new OXFException("Invalid control name: " + Dom4jUtils.qNameToExplodedQName(element.getQName()));
 
         // Create and return the control
         return factory.createXFormsControl(container, parent, element, controlName, effectiveId);

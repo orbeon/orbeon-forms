@@ -51,7 +51,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     throw new OXFException("Missing or empty processor name!");
 
                 if (processorQName != null)
-                    logger.debug("Binding name: " + Dom4jUtils.qNameToexplodedQName(processorQName));
+                    logger.debug("Binding name: " + Dom4jUtils.qNameToExplodedQName(processorQName));
                 if (processorURI != null)
                     logger.debug("Binding name: " + processorURI);
 
@@ -62,7 +62,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     if (logger.isDebugEnabled())
                         logger.debug("To class: " + className);
 
-                    final String defaultName = (processorQName != null) ? Dom4jUtils.qNameToexplodedQName(processorQName) : processorURI;
+                    final String defaultName = (processorQName != null) ? Dom4jUtils.qNameToExplodedQName(processorQName) : processorURI;
                     final QName defaultQName = (processorQName != null) ? processorQName : new QName(processorURI);
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
@@ -105,7 +105,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                     throw new OXFException("Missing or empty processor name!");
 
                                 if (processorQName != null)
-                                    logger.debug("Binding name: " + Dom4jUtils.qNameToexplodedQName(processorQName));
+                                    logger.debug("Binding name: " + Dom4jUtils.qNameToExplodedQName(processorQName));
                                 if (processorURI != null)
                                     logger.debug("Binding name: " + processorURI);
 

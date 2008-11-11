@@ -55,7 +55,7 @@ public abstract class XFormsAction {
         for (Iterator i = actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME).iterator(); i.hasNext();) {
             final Element currentContextInfo = (Element) i.next();
 
-            final String name = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, "name"));
+            final String name = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, "name"));
             if (name == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
 

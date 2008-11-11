@@ -131,8 +131,14 @@ public class XFormsDispatchAction extends XFormsAction {
                 final String showProgressString = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false);
                 showProgress = !"false".equals(showProgressString);
             }
+            final String progressMessage;
+            if (showProgress) {
+                progressMessage = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME, false);
+            } else {
+                progressMessage = null;
+            }
 
-            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress);
+            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress, progressMessage);
         }
     }
 }

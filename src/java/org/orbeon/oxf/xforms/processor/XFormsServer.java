@@ -682,7 +682,8 @@ public class XFormsServer extends ProcessorImpl {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                                     new String[] {
                                             "delay",  Long.toString(delayedEvent.getTime() - currentTime),
-                                            "show-progress", Boolean.toString(delayedEvent.isShowProgress())
+                                            "show-progress", Boolean.toString(delayedEvent.isShowProgress()),
+                                            "progress-message", delayedEvent.isShowProgress() ? delayedEvent.getProgressMessage() : null
                                     });
                             ch.text(delayedEvent.getEncodedDocument(pipelineContext));
                             ch.endElement();

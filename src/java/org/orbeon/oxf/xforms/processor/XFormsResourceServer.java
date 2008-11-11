@@ -100,6 +100,10 @@ public class XFormsResourceServer extends ProcessorImpl {
                     else
                         response.setContentType("application/octet-stream");
 
+                    // Handle as attachment
+                    // TODO: should try to provide extension?
+                    response.setHeader("Content-Disposition", "attachement; " + filename);
+
                     // Copy stream out
                     InputStream is = null;
                     try {

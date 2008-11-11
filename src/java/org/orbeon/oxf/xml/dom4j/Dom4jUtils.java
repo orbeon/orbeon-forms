@@ -475,7 +475,7 @@ public class Dom4jUtils {
     /**
      * Encode a QName to an exploded QName (also known as a "Clark name") String.
      */
-    public static String qNameToexplodedQName(QName qName) {
+    public static String qNameToExplodedQName(QName qName) {
         return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
 

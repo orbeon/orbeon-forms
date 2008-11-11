@@ -253,7 +253,7 @@ public class InstanceData {
                 final Element element = (Element) node;
                 final QName typeQName = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME);
                 if (typeQName != null)
-                    return Dom4jUtils.qNameToexplodedQName(typeQName);
+                    return Dom4jUtils.qNameToExplodedQName(typeQName);
             }
             return null;
         } else {

@@ -35,9 +35,9 @@ import java.util.List;
  */
 public class XFormsSelect1Control extends XFormsValueControl {
 
-    public static final String TREE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
-    public static final String MENU_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
-    public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
+    public static final String TREE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
+    public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
+    public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
     private String xxformsRefresh;
     private List items;

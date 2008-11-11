@@ -60,7 +60,7 @@ public class Event extends XFormsFunction {
         final QName attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName);
 
         // Simply ask the event for the attribute
-        return event.getAttribute(Dom4jUtils.qNameToexplodedQName(attributeQName));
+        return event.getAttribute(Dom4jUtils.qNameToExplodedQName(attributeQName));
     }
 
     // The following copies StaticContext namespace information

@@ -80,7 +80,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
         } else {
             // Create xhtml:span or xhtml:div
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            // For IE we need to generate a div here for IE, which doesn't support working with innterHTML on spans.
+            // We need to generate a div here for IE, which doesn't support working with innerHTML on spans.
             final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
             final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
@@ -89,7 +89,23 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
 
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
             {
-                if (isImageMediatype) {
+                if (XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes))) {
+                    // Download appearance
+
+                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                    final AttributesImpl imgAttributes = new AttributesImpl();
+                    final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
+                    imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, imgAttributes);
+
+                    final String labelValue = (xformsControl != null) ? xformsControl.getLabel(pipelineContext) : null;
+                    final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
+                    outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+
+                } else if (isImageMediatype) {
                     // Case of image media type with URI
                     final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                     final AttributesImpl imgAttributes = new AttributesImpl();

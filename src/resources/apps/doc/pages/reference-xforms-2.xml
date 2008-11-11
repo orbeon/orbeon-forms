@@ -422,12 +422,20 @@
                     </li>
                 </ul>
                 <p>
-                    In addition, the boolean <code>xxforms:show-progress</code> attribute allows specifying whether the
+                    The boolean <code>xxforms:show-progress</code> attribute allows specifying whether the
                     client must enable the loading indicator when sending back delay events from the client. The default
                     is <code>true</code> and the indicator is used.
                 </p>
                 <xml-source>
                     <xforms:dispatch name="my-event" target="my-model" delay="2000" xxforms:show-progress="false"/>
+                </xml-source>
+                <p>
+                    The <code>xxforms:progress-message</code> attribute allows specifying a custom progress message when
+                    <code>xxforms:show-progress</code> is <code>true</code>. By default, the standard progres message is
+                    used.
+                </p>
+                <xml-source>
+                    <xforms:dispatch name="my-event" target="my-model" delay="2000" xxforms:show-progress="true" xxforms:progress-message="Autosave..."/>
                 </xml-source>
                 <p>
                     For more information, please visit the <a
@@ -1516,6 +1524,12 @@
                                 </li>
                                 <li>
                                     <code>delay</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:show-progress</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:progress-message</code>
                                 </li>
                             </ul>
                         </li>

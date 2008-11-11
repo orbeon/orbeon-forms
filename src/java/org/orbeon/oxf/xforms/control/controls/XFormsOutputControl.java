@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.List;
@@ -32,6 +33,8 @@ import java.util.List;
  * Represents an xforms:output control.
  */
 public class XFormsOutputControl extends XFormsValueControl {
+
+    private static final String DOWNLOAD_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME);
 
     // Optional display format
     private String format;
@@ -84,39 +87,17 @@ public class XFormsOutputControl extends XFormsValueControl {
 
         final String internalValue = getValue(pipelineContext);
         final String updatedValue;
-        if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
-            // Handle image mediatype
-            final String typeName = getBuiltinTypeName();
-            if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
-                if (typeName == null || "anyURI".equals(typeName)) {// we picked xs:anyURI as default
-                    // xs:anyURI type
-                    if (!urlNorewrite) {
-                        // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
-                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-                        updatedValue = proxyURI(pipelineContext, rewrittenURI);
-                    } else {
-                        // Otherwise we leave the value as is
-                        updatedValue = internalValue;
-                    }
-                } else if ("base64Binary".equals(typeName)) {
-                    // xs:base64Binary type
-
-                    final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
-                    updatedValue = proxyURI(pipelineContext, uri);
-
-                } else {
-                    // Return dummy image
-                    updatedValue = XFormsConstants.DUMMY_IMAGE_URI;;
-                }
-            } else {
-                // Return dummy image
-                updatedValue = XFormsConstants.DUMMY_IMAGE_URI;;
-            }
+        if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
+            // Download appearance
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "");
+        } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+            // Image mediatype
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI);// use dummy image so that client always has something to load
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
-            // Handle HTML mediatype
+            // HTML mediatype
             updatedValue = internalValue;
         } else {
-            // Handle other mediatypes
+            // Other mediatypes
             if (valueAttribute == null) {
                 // There is a single-node binding, so the format may be used
                 final String formattedValue = getValueUseFormat(pipelineContext, format);
@@ -128,6 +109,37 @@ public class XFormsOutputControl extends XFormsValueControl {
         }
 
         setExternalValue(updatedValue);
+    }
+
+    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue) {
+        String updatedValue;
+        final String typeName = getBuiltinTypeName();
+        if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
+            if (typeName == null || "anyURI".equals(typeName)) {// we picked xs:anyURI as default
+                // xs:anyURI type
+                if (!urlNorewrite) {
+                    // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
+                    final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    updatedValue = proxyURI(pipelineContext, rewrittenURI);
+                } else {
+                    // Otherwise we leave the value as is
+                    updatedValue = internalValue;
+                }
+            } else if ("base64Binary".equals(typeName)) {
+                // xs:base64Binary type
+
+                final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
+                updatedValue = proxyURI(pipelineContext, uri);
+
+            } else {
+                // Return dummy image
+                updatedValue = defaultValue;
+            }
+        } else {
+            // Return dummy image
+            updatedValue = defaultValue;
+        }
+        return updatedValue;
     }
 
     /**
@@ -159,8 +171,8 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
-        if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
-            // We just need to prepend the context
+        if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+            // We just need to prepend the context because the URL is proxied
             final String externalValue = getExternalValue(pipelineContext);
             if (externalValue != null && !externalValue.trim().equals("")) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);

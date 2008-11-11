@@ -192,7 +192,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 ASTProcessorCall processorCall = (ASTProcessorCall) statement;
 
                 final LocationData processorLocationData = processorCall.getLocationData();
-                final String processorNameOrURI = (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) : processorCall.getURI());
+                final String processorNameOrURI = (processorCall.getName() != null ? Dom4jUtils.qNameToExplodedQName(processorCall.getName()) : processorCall.getURI());
 
                 if (processorCall.getEncapsulation() == null) {
                     // Direct call

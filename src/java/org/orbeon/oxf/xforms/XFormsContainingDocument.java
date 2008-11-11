@@ -532,12 +532,14 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @param bubbles           whether the event bubbles
      * @param cancelable        whether the event is cancelable
      * @param delay             delay after which to dispatch the event
+     * @param showProgress      whether to show the progress indicator when submitting the event
+     * @param progressMessage   message to show if the progress indicator is visible
      */
-    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay, boolean showProgress) {
+    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay, boolean showProgress, String progressMessage) {
         if (delayedEvents == null)
             delayedEvents = new ArrayList();
 
-        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress));
+        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress, progressMessage));
     }
 
     public List getDelayedEvents() {
@@ -551,14 +553,16 @@ public class XFormsContainingDocument extends XFormsContainer {
         private boolean cancelable;
         private long time;
         private boolean showProgress;
+        private String progressMessage;
 
-        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time, boolean showProgress) {
+        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time, boolean showProgress, String progressMessage) {
             this.eventName = eventName;
             this.targetStaticId = targetStaticId;
             this.bubbles = bubbles;
             this.cancelable = cancelable;
             this.time = time;
             this.showProgress = showProgress;
+            this.progressMessage = progressMessage;
         }
 
         public String getEncodedDocument(PipelineContext pipelineContext) {
@@ -576,6 +580,10 @@ public class XFormsContainingDocument extends XFormsContainer {
 
         public boolean isShowProgress() {
             return showProgress;
+        }
+
+        public String getProgressMessage() {
+            return progressMessage;
         }
 
         public long getTime() {

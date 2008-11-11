@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
  */
 public class XFormsTextareaControl extends XFormsValueControl {
 
-    private static final String AUTOSIZE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
+    private static final String AUTOSIZE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
 
     public XFormsTextareaControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);

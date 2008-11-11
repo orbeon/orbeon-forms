@@ -232,6 +232,9 @@
                                         <value>false</value>
                                     </choice>
                                 </attribute>
+                                <optional>
+                                    <attribute name="progress-message"/>
+                                </optional>
                             </optional>
                             <!-- Encoded server event(s) -->
                             <data type="string"/>

@@ -94,7 +94,7 @@ public class ProcessorDefinition {
 
     public String toString() {
         final StringBuffer sb = new StringBuffer("[");
-        sb.append(Dom4jUtils.qNameToexplodedQName(getName()));
+        sb.append(Dom4jUtils.qNameToExplodedQName(getName()));
         for (Iterator i = getEntries().entrySet().iterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final String key = (String) currentEntry.getKey();

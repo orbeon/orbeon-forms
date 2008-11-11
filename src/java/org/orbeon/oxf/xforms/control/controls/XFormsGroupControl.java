@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainer;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -27,7 +25,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
  */
 public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
 
-    public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
+    public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
 
     public XFormsGroupControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);

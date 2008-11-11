@@ -4163,7 +4163,7 @@ ORBEON.xforms.Server = {
 
             // Get existing div which is above the form that issued this request
             var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
-            while (existingPortletDiv != null && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
+            while (existingPortletDiv != null && existingPortletDiv.className && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
                 existingPortletDiv = existingPortletDiv.parentNode;
 
             // Remove content from existing div

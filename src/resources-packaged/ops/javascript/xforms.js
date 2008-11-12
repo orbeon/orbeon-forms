@@ -104,6 +104,7 @@ var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
+var DEFAULT_LOADING_TEXT = "Loading...";
 
 // These variables are not set by default, but if set will be used by this code:
 //
@@ -3808,7 +3809,7 @@ ORBEON.xforms.Init = {
 
 ORBEON.xforms.Server = {
 
-    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, additionalAttribs) {
+    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
         this.form = YAHOO.lang.isObject(form) ? form
             : YAHOO.lang.isString(targetId) ? ORBEON.xforms.Controls.getForm(ORBEON.util.Dom.getElementById(targetId)) : null;
@@ -3819,6 +3820,8 @@ ORBEON.xforms.Server = {
         this.bubbles = YAHOO.lang.isUndefined(bubbles) ? null: bubbles;
         this.cancelable = YAHOO.lang.isUndefined(cancelable) ? null: cancelable;
         this.ignoreErrors = YAHOO.lang.isUndefined(ignoreErrors) ? null: ignoreErrors;
+        this.showProgress = YAHOO.lang.isBoolean(showProgress) ? showProgress : true;
+        this.progressMessage = YAHOO.lang.isUndefined(progressMessage) ? null: progressMessage;
         this.additionalAttribs = YAHOO.lang.isUndefined(additionalAttribs) ? null: additionalAttribs;
     },
 
@@ -3958,12 +3961,6 @@ ORBEON.xforms.Server = {
                 ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;
                 var formID = ORBEON.xforms.Globals.requestForm.id;
 
-                // Mark this as loading
-                ORBEON.xforms.Globals.requestInProgress = true;
-                var delayBeforeDisplayLoading = ORBEON.util.Utils.getProperty(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY);
-                if (delayBeforeDisplayLoading == 0) xformsDisplayLoading();
-                else window.setTimeout(xformsDisplayLoading, delayBeforeDisplayLoading);
-
                 // Remove from this list of ids that changed the id of controls for
                 // which we have received the keyup corresponding to the keydown
                 for (var id  in ORBEON.xforms.Globals.changedIdsRequest) {
@@ -3973,6 +3970,8 @@ ORBEON.xforms.Server = {
 
                 ORBEON.xforms.Globals.requestIgnoreErrors = true;
                 var sendInitialDynamicState = false;
+                var showProgress = false;
+                var progressMessage;
                 for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                     var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
                     // Figure out if we will be ignoring error during this request or not
@@ -3983,6 +3982,19 @@ ORBEON.xforms.Server = {
                     if (event.eventName == "xxforms-all-events-required" || event.eventName == "xxforms-offline") {
                         sendInitialDynamicState = true;
                     }
+                    // Figure out if any of the events asks for the progress to be shown (the default)
+                    if (event.showProgress)
+                        showProgress = true;
+                    // Figure out if all the events have the same progress message
+                    if (YAHOO.lang.isString(event.progressMessage)) {
+                        // Only use the event's progressMessage if it is equal to the value of progressMessage we already have
+                        progressMessage = eventIndex == 0 ? event.progressMessage
+                                : progressMessage == event.progressMessage ? event.progressMessage
+                                : null;
+                    } else {
+                        progressMessage = null;
+                    }
+
                     // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
                     var eventElement = ORBEON.util.Dom.getElementById(event.targetId);
                     if (event.eventName == 'DOMActivate') {
@@ -3991,6 +4003,16 @@ ORBEON.xforms.Server = {
                         else if (ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
                             sendInitialDynamicState = true; // Case of going offline
                     }
+                }
+
+                // Mark this as loading
+                ORBEON.xforms.Globals.requestInProgress = true;
+
+                // Show loading indicator, unless all the events asked us not to display it
+                if (showProgress) {
+                    var delayBeforeDisplayLoading = ORBEON.util.Utils.getProperty(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY);
+                    if (delayBeforeDisplayLoading == 0) xformsDisplayLoading(progressMessage);
+                    else window.setTimeout(function() { xformsDisplayLoading(progressMessage); }, delayBeforeDisplayLoading);
                 }
 
                 // Build request
@@ -5031,7 +5053,8 @@ ORBEON.xforms.Server = {
                                         //  after the given delay.
                                         var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
                                         window.setTimeout(function () {
-                                            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.getElementById(formID), null, null, serverEvents, "server-events");
+                                            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.getElementById(formID), null, null,
+                                                    serverEvents, "server-events", null, null, null, showProgress, progressMessage);
                                             ORBEON.xforms.Server.fireEvents([event]);
                                         }, delay);
                                     }
@@ -5297,7 +5320,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         else {
             draggableRepeatDiv.id = this.sourceControlID;
         }
-        var event = new ORBEON.xforms.Server.Event(null, draggableRepeatDiv.id, null, null, "xxforms-dnd", null, null, null,
+        var event = new ORBEON.xforms.Server.Event(null, draggableRepeatDiv.id, null, null, "xxforms-dnd", null, null, null, null, null,
                 ["dnd-start", this.startPosition, "dnd-end", this.endPosition]);
         ORBEON.xforms.Server.fireEvents([event], false)
 
@@ -6150,7 +6173,7 @@ function xformsLogProperties(object) {
     xformsLog(message);
 }
 
-function xformsDisplayIndicator(state) {
+function xformsDisplayIndicator(state, progressMessage) {
     var form = ORBEON.xforms.Globals.requestForm;
     // Form can be null if an incremental event happens around the same time as an non-incremental event. Both were sent
     // but the incremental run an executeNextRequest after the response arrived. If the response replaces the HTML,
@@ -6159,8 +6182,11 @@ function xformsDisplayIndicator(state) {
         var formID = form.id;
         switch (state) {
             case "loading":
-                if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
-                    ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", true);
+                var formLoadingLoadingOverlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
+                if (formLoadingLoadingOverlay != null) {
+                    ORBEON.util.Dom.setStringValue(formLoadingLoadingOverlay.element,
+                        progressMessage == null ? DEFAULT_LOADING_TEXT : progressMessage);
+                    formLoadingLoadingOverlay.cfg.setProperty("visible", true);
                     ORBEON.xforms.Controls.updateLoadingPosition(formID);
                 }
                 if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
@@ -6410,9 +6436,9 @@ function xformsGetClassForRepeatId(repeatId) {
     return "xforms-repeat-selected-item-" + depth;
 }
 
-function xformsDisplayLoading() {
+function xformsDisplayLoading(progressMessage) {
     if (ORBEON.xforms.Globals.requestInProgress == true)
-        xformsDisplayIndicator("loading");
+        xformsDisplayIndicator("loading", progressMessage);
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page

@@ -76,6 +76,7 @@
         <p:input name="data" href="#form-data"/>
         <p:input name="xhtml" href="#form-document"/>
         <p:input name="request" href="#request"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:input name="config">
             <config xsl:version="2.0"
                     xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -86,6 +87,7 @@
                 <xsl:variable name="data" select="/*" as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
                 <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
+                <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
 
                 <!-- Get current resources -->
                 <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
@@ -100,7 +102,7 @@
 
                 <!-- Barcode -->
                 <xsl:variable name="barcode-value" select="$request/parameters/parameter[name = 'document']/value" as="xs:string?"/>
-                <xsl:if test="normalize-space($barcode-value) != ''">
+                <xsl:if test="normalize-space($barcode-value) != '' and pipeline:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
                     <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
                         <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
                     </group>

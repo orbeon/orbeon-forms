@@ -492,6 +492,6 @@
                        ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
                        method="post" replace="none" resource="test:">
         <xi:include href="persistence-model-headers.xml"/>
-   </xforms:submission>
+    </xforms:submission>
 
 </xforms:model>

@@ -239,10 +239,13 @@ html body .xforms-form .xforms-repeat-template {
 }
 
 .xforms-case-selected {
+    visibility: visible;
+    position: static;
 }
 
 .xforms-case-deselected {
-    display: none;
+    visibility: hidden;
+    position: absolute;
 }
 
 .xforms-case-begin-end {

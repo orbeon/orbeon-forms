@@ -1995,6 +1995,13 @@ ORBEON.xforms.Controls = {
     showDialog: function(controlId, neighbor) {
         var divElement = ORBEON.util.Dom.getElementById(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+        // Reapply those classes. Those are classes added by YUI when creating the dialog, but they are then removed
+        // by YUI if you close the dialog using the "X". So when opening the dialog, we add those again, just to make sure.
+        // A better way to handle this would be to create the YUI dialog every time when we open it, instead of doing this
+        // during initialization.
+        ORBEON.util.Dom.addClass(yuiDialog.innerElement, "yui-module");
+        ORBEON.util.Dom.addClass(yuiDialog.innerElement, "yui-overlay");
+        ORBEON.util.Dom.addClass(yuiDialog.innerElement, "yui-panel");
         // Fixes cursor Firefox issue; more on this in dialog init code
         yuiDialog.element.style.display = "block";
         // Show the dialog
@@ -3766,7 +3773,8 @@ ORBEON.xforms.Init = {
         var isDraggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
         var isVisible = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
         var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
-        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden"); // mmh, should we move this further down after render()?
+        // Make the dialog "visible", otherwise it doesn't initialize correctly
+        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
 
         // Create dialog object
         if (isMinimal) {

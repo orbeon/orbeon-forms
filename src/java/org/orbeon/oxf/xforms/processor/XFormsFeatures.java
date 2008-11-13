@@ -225,12 +225,6 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/yui/examples/treeview/assets/js/CheckOnClickNode.js", "/ops/yui/examples/treeview/assets/js/CheckOnClickNode-min.js") {
-                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-                public String getFeatureName() { return "tree"; }
-            },
             new ResourceConfig("/ops/yui/menu/menu.js", "/ops/yui/menu/menu-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);

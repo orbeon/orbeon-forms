@@ -19,6 +19,9 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
  * 
@@ -32,6 +35,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     private boolean relevant;
     private boolean valid;
     private String type;
+    private Map customMips;
 
     public XFormsSingleNodeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -70,6 +74,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     public String getType() {
         getMIPsIfNeeded();
         return type;
+    }
+
+    public Map getCustomMIPs() {
+        getMIPsIfNeeded();
+        return customMips;
     }
 
     /**
@@ -117,6 +126,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     this.valid = InstanceData.getValid(currentNodeInfo);
                     this.type = InstanceData.getType(currentNodeInfo);
 
+                    // Custom MIPs
+                    this.customMips = InstanceData.getAllCustom(currentNodeInfo);
+                    if (this.customMips != null)
+                        this.customMips = new HashMap(this.customMips);
+
                     // Handle global read-only setting
                     if (XFormsProperties.isReadonly(containingDocument))
                         this.readonly = true;
@@ -128,6 +142,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     this.relevant = false;
                     this.valid = true;// by default, a control is not invalid
                     this.type = null;
+                    this.customMips = null;
                 }
             } else {
                 // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
@@ -136,6 +151,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 this.relevant = (currentItem instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentItem) : false; // inherit relevance anyway
                 this.valid = true;// by default, a control is not invalid
                 this.type = null;
+                this.customMips = null;
             }
             mipsRead = true;
         }

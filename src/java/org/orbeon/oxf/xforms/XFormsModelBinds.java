@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.Attribute;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -624,6 +625,27 @@ public class XFormsModelBinds {
             // Mark node
             InstanceData.setReadonly(currentNodeInfo, true);
         }
+
+        final Map customMips = bind.getCustomMips();
+        if (customMips != null && customMips.size() > 0) {
+            for (Iterator i = customMips.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final String key = (String) entry.getKey();
+                final String expression = (String) entry.getValue();
+
+                try {
+                    final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeset, position, expression,
+                            containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
+                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(),
+                            bind.getLocationData().getSystemID(), bind.getLocationData());
+
+                    InstanceData.setCustom(currentNodeInfo, key, stringResult);
+                } catch (Exception e) {
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
+                            bind.getBindElement(), new String[] { "name", key, "expression", expression }));
+                }
+            }
+        }
     }
 
     private boolean evaluateBooleanExpression1(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
@@ -845,11 +867,12 @@ public class XFormsModelBinds {
         private List nodeset;       // actual nodeset for this bind
 
         private List childrenIterations; // List<BindIteration>
+        private Map customMips;          // Map<String name, String expression>
 
         public Bind(PipelineContext pipelineContext, Element bindElement, boolean isSingleNodeContext) {
             this.bindElement = bindElement;
-            this.id = bindElement.attributeValue("id");
-            this.name = bindElement.attributeValue("name");
+            this.id = bindElement.attributeValue(XFormsConstants.ID_QNAME);
+            this.name = bindElement.attributeValue(XFormsConstants.NAME_QNAME);
 
             // Remember variables
             if (name != null)
@@ -858,6 +881,22 @@ public class XFormsModelBinds {
             // If this bind is marked for offline handling, remember it
             if ("true".equals(bindElement.attributeValue(XFormsConstants.XXFORMS_OFFLINE_QNAME)))
                 offlineBinds.add(this);
+
+            // Remember custom MIPs
+            {
+                for (Iterator iterator = bindElement.attributeIterator(); iterator.hasNext();) {
+                    final Attribute attribute = (Attribute) iterator.next();
+                    final QName attributeQName = attribute.getQName();
+                    final String prefix = attributeQName.getNamespacePrefix();
+                    if (prefix != null && prefix.length() > 0 && !attributeQName.getNamespaceURI().equals(XFormsConstants.XFORMS_NAMESPACE_URI)) {
+                        // Any QName-but-not-NCName which is not in the XForms namespace
+                        if (customMips == null)
+                            customMips = new HashMap();
+                        // E.g. foo:bar="true()" => "foo-bar" -> "true()"
+                        customMips.put(attribute.getQualifiedName().replace(':', '-'), attribute.getValue());
+                    }
+                }
+            }
 
             // Compute nodeset for this bind
             contextStack.pushBinding(pipelineContext, bindElement);
@@ -943,31 +982,35 @@ public class XFormsModelBinds {
         }
 
         public String getRelevant() {
-            return bindElement.attributeValue("relevant");
+            return bindElement.attributeValue(XFormsConstants.RELEVANT_QNAME);
         }
 
         public String getCalculate() {
-            return bindElement.attributeValue("calculate");
+            return bindElement.attributeValue(XFormsConstants.CALCULATE_QNAME);
         }
 
         public String getType() {
-            return bindElement.attributeValue("type");
+            return bindElement.attributeValue(XFormsConstants.TYPE_QNAME);
         }
 
         public String getConstraint() {
-            return bindElement.attributeValue("constraint");
+            return bindElement.attributeValue(XFormsConstants.CONSTRAINT_QNAME);
         }
 
         public String getRequired() {
-            return bindElement.attributeValue("required");
+            return bindElement.attributeValue(XFormsConstants.REQUIRED_QNAME);
         }
 
         public String getReadonly() {
-            return bindElement.attributeValue("readonly");
+            return bindElement.attributeValue(XFormsConstants.READONLY_QNAME);
         }
 
         public String getXXFormsExternalize() {
             return bindElement.attributeValue(XFormsConstants.XXFORMS_EXTERNALIZE_QNAME);
+        }
+
+        public Map getCustomMips() {
+            return customMips;
         }
     }
 

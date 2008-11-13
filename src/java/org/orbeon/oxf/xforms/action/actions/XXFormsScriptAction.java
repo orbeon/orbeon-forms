@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -32,6 +33,9 @@ public class XXFormsScriptAction extends XFormsAction {
         final String eventObserverEffectiveId = eventObserver.getEffectiveId();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        containingDocument.addScriptToRun(actionElement.attributeValue("id"), targetId, eventObserverEffectiveId);
+        // Get static prefixed id of the xxforms:script element
+        final String actionId = XFormsUtils.getEffectiveIdPrefix(targetId) + actionElement.attributeValue("id");
+
+        containingDocument.addScriptToRun(actionId, targetId, eventObserverEffectiveId);
     }
 }

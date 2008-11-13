@@ -33,6 +33,9 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Map;
+import java.util.Iterator;
+
 /**
  * Base class for all XHTML and XForms element handlers.
  */
@@ -112,6 +115,22 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                             sb.append(" xforms-required-empty");
                         else
                             sb.append(" xforms-required-filled");
+                    }
+                }
+                final Map customMIPs = xformsControl.getCustomMIPs();
+                if (customMIPs != null) {
+                    for (Iterator i = customMIPs.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry entry = (Map.Entry) i.next();
+                        final String name = (String) entry.getKey();
+                        final String value = (String) entry.getValue();
+
+                        if (sb.length() > 0)
+                            sb.append(' ');
+
+                        // TODO: encode so that there are no spaces
+                        sb.append(name);
+                        sb.append('-');
+                        sb.append(value);
                     }
                 }
                 final String typeName = xformsControl.getBuiltinTypeName();

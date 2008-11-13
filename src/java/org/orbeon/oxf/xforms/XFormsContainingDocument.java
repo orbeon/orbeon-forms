@@ -371,16 +371,17 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public Object resolveObjectById(String effectiveSourceId, String targetId) {
 
-        // Search in parent (models and this)
+        // Search in controls
+        // NOTE: we do this first now, because resolution of ids within components has priority
         {
-            final Object resultObject = super.resolveObjectById(effectiveSourceId, targetId);
+            final Object resultObject = xformsControls.resolveObjectById(effectiveSourceId, targetId);
             if (resultObject != null)
                 return resultObject;
         }
 
-        // Search in controls
+        // Search in parent (models and this)
         {
-            final Object resultObject = xformsControls.resolveObjectById(effectiveSourceId, targetId);
+            final Object resultObject = super.resolveObjectById(effectiveSourceId, targetId);
             if (resultObject != null)
                 return resultObject;
         }

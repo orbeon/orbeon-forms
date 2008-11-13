@@ -352,16 +352,17 @@ public class XFormsUtils {
      * Get the value of a label, help, hint or alert related to a particular control.
      *
      * @param pipelineContext       current PipelineContext
-     * @param containingDocument    current XFormsContainingDocument
+     * @param container             current XFormsContainer
      * @param control               control
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XFormsContainer container,
                                                     XFormsControl control, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
+        final XFormsContainingDocument containingDocument = container.getContainingDocument();
         final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
         final String value;
         if (lhhaElement == null) {
@@ -371,7 +372,7 @@ public class XFormsUtils {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(control);
             contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
+            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         } else {
             // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
@@ -397,7 +398,7 @@ public class XFormsUtils {
 
             // Push binding relative to context established above and evaluate
             contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, lhhaElement, acceptHTML, containsHTML);
+            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         }
         return value;
@@ -436,14 +437,14 @@ public class XFormsUtils {
      * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
      *
      * @param pipelineContext       current PipelineContext
-     * @param containingDocument    current XFormsContainingDocument
+     * @param container             current XFormsContainer
      * @param contextStack          context stack for XPath evaluation
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+    public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainer container,
                                          final XFormsContextStack contextStack,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
@@ -478,7 +479,7 @@ public class XFormsUtils {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
-                            valueAttribute, containingDocument.getStaticState().getNamespaceMappings(childElement),
+                            valueAttribute, container.getContainingDocument().getStaticState().getNamespaceMappings(childElement),
                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                             contextStack.getFunctionContext(), null,
                             (LocationData) childElement.getData());
@@ -505,7 +506,7 @@ public class XFormsUtils {
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
-                    currentModel.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                    currentModel.getContainer(null).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
                     return null;
                 }
             }
@@ -521,7 +522,7 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(pipelineContext, containingDocument, contextStack, acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(pipelineContext, container, contextStack, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -1269,12 +1270,12 @@ public class XFormsUtils {
      * @return          JavaScript function name
      */
     public static String scriptIdToScriptName(String scriptId) {
-        return scriptId.replace('-', '_') + "_xforms_function";
+        return scriptId.replace('-', '_').replace('$', '_') + "_xforms_function";
     }
 
     private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
         private final PipelineContext pipelineContext;
-        private final XFormsContainingDocument containingDocument;
+        private final XFormsContainer container;
         private final XFormsContextStack contextStack;
         private final boolean acceptHTML;
         private final boolean[] containsHTML;
@@ -1285,7 +1286,7 @@ public class XFormsUtils {
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
         public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = null;
-            this.containingDocument = null;
+            this.container = null;
             this.contextStack = null;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
@@ -1295,9 +1296,9 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public LHHAElementVisitorListener(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PipelineContext pipelineContext, XFormsContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = pipelineContext;
-            this.containingDocument = containingDocument;
+            this.container = container;
             this.contextStack = contextStack;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
@@ -1314,7 +1315,7 @@ public class XFormsUtils {
                 if (pipelineContext == null)
                     throw new OXFException("xforms:output must not show-up in static itemset: " + childElement.getName());
 
-                final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null) {
+                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
                     protected XFormsContextStack getContextStack() {
@@ -1370,7 +1371,7 @@ public class XFormsUtils {
                         if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
                             // This is an AVT, use attribute control to produce the output
                             final XXFormsAttributeControl attributeControl
-                                    = new XXFormsAttributeControl(containingDocument, element, currentAttributeValue);
+                                    = new XXFormsAttributeControl(container, element, currentAttributeValue);
 
                             contextStack.pushBinding(pipelineContext, element);
                             {

@@ -47,12 +47,12 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     /**
      * Special constructor used for label, etc. content AVT handling.
      *
-     * @param containingDocument    containing document
+     * @param container             container
      * @param element               control element (should not be used here)
      * @param avtExpression         attribute template expression
      */
-    public XXFormsAttributeControl(XFormsContainingDocument containingDocument, Element element, String avtExpression) {
-        super(containingDocument, null, element, element.getName(), null);
+    public XXFormsAttributeControl(XFormsContainer container, Element element, String avtExpression) {
+        super(container, null, element, element.getName(), null);
         this.valueAttribute = avtExpression;
     }
 

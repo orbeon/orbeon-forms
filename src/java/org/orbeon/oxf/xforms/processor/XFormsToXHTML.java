@@ -345,7 +345,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
-        // Make sure we have up to date controls (should already be the case)
+        // Make sure we have up to date controls
         final XFormsControls xformsControls = containingDocument.getControls();
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
         xformsControls.evaluateControlValuesIfNeeded(pipelineContext);

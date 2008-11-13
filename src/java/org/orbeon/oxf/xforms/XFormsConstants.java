@@ -140,20 +140,19 @@ public class XFormsConstants {
     public static final String XXFORMS_SIZE_ELEMENT_NAME = "size";
     public static final QName XXFORMS_SIZE_ELEMENT_QNAME = new QName(XXFORMS_SIZE_ELEMENT_NAME, XXFORMS_NAMESPACE);
 
-    public static final String XXFORMS_VALID_ATTRIBUTE_NAME = "valid";
-    public static final QName XXFORMS_VALID_ATTRIBUTE_QNAME = new QName(XXFORMS_VALID_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME = "invalid-bind-ids";
-    public static final QName XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME = new QName(XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_RELEVANT_ATTRIBUTE_NAME = "relevant";
-    public static final QName XXFORMS_RELEVANT_ATTRIBUTE_QNAME = new QName(XXFORMS_RELEVANT_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_REQUIRED_ATTRIBUTE_NAME = "required";
-    public static final QName XXFORMS_REQUIRED_ATTRIBUTE_QNAME = new QName(XXFORMS_REQUIRED_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_READONLY_ATTRIBUTE_NAME = "readonly";
-    public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_TYPE_ATTRIBUTE_NAME = "type";
-    public static final QName XXFORMS_TYPE_ATTRIBUTE_QNAME = new QName(XXFORMS_TYPE_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_NODE_IDS_ATTRIBUTE_NAME = "node-ids";
-    public static final QName XXFORMS_NODE_IDS_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
+    public static final String VALID_ATTRIBUTE_NAME = "valid";
+    public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";
+    public static final String REQUIRED_ATTRIBUTE_NAME = "required";
+    public static final String READONLY_ATTRIBUTE_NAME = "readonly";
+
+    public static final QName RELEVANT_QNAME = new QName("relevant");
+    public static final QName CALCULATE_QNAME = new QName("calculate");
+    public static final QName READONLY_QNAME = new QName("readonly");
+    public static final QName REQUIRED_QNAME = new QName("required");
+    public static final QName TYPE_QNAME = new QName("type");
+    public static final QName CONSTRAINT_QNAME = new QName("constraint");
+
+    public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_STATIC_STATE_QNAME = new QName("static-state", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DYNAMIC_STATE_QNAME = new QName("dynamic-state", XXFORMS_NAMESPACE);
@@ -185,6 +184,9 @@ public class XFormsConstants {
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
     public static final String XFORMS_SUBMIT_REPLACE_TEXT = "text";
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
+
+    public static final QName ID_QNAME = new QName("id");
+    public static final QName NAME_QNAME = new QName("name");
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";

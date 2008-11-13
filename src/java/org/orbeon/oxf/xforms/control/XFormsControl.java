@@ -166,7 +166,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isAlertEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
-                alert = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, true, tempContainsHTML);
+                alert = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, true, tempContainsHTML);
                 isHTMLAlert = alert != null && tempContainsHTML[0];
             }
             isAlertEvaluated = true;
@@ -188,7 +188,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isHelpEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
-                help = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, true, tempContainsHTML);
+                help = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, true, tempContainsHTML);
                 isHTMLHelp = help != null && tempContainsHTML[0];
             }
             isHelpEvaluated = true;
@@ -210,7 +210,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isHintEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
-                hint = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
+                hint = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
 
                 isHTMLHint = hint != null && tempContainsHTML[0];
             }
@@ -233,7 +233,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isLabelEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
-                label = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, containingDocument, this, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
+                label = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
 
                 isHTMLLabel = label != null && tempContainsHTML[0];
             }

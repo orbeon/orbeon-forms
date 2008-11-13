@@ -107,29 +107,29 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 // Model item properties
                                 if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isReadonly() != xformsSingleNodeControl2.isReadonly()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                    attributesImpl.addAttribute("", XFormsConstants.READONLY_ATTRIBUTE_NAME,
+                                            XFormsConstants.READONLY_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isReadonly()));
                                     doOutputElement = true;
                                 }
                                 if (isNewRepeatIteration && xformsSingleNodeControl2.isRequired()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRequired() != xformsSingleNodeControl2.isRequired()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                    attributesImpl.addAttribute("", XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
+                                            XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRequired()));
                                     doOutputElement = true;
                                 }
                                 if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() // NOTE: we output if we ARE relevant as the default is non-relevant
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                    attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
+                                            XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
                                     doOutputElement = true;
                                 }
                                 if (isNewRepeatIteration && !xformsSingleNodeControl2.isValid()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isValid() != xformsSingleNodeControl2.isValid()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                    attributesImpl.addAttribute("", XFormsConstants.VALID_ATTRIBUTE_NAME,
+                                            XFormsConstants.VALID_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isValid()));
                                     doOutputElement = true;
                                 }
@@ -296,8 +296,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 // Repeat iteration only handles relevance
                                 if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                    attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
+                                            XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
                                     doOutputElement = true;
                                 }
@@ -323,8 +323,8 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                         // The only information we send is the non-relevance of the control if needed
                         if (xformsSingleNodeControl1.isRelevant()) {
-                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                        XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                            attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
+                                        XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                         ContentHandlerHelper.CDATA, Boolean.toString(false));
 
                             if (!(xformsSingleNodeControl1 instanceof XFormsRepeatIterationControl)) {

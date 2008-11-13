@@ -20,10 +20,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
+import org.apache.commons.collections.map.LinkedMap;
 
 import java.util.*;
 
@@ -591,31 +593,40 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Main event dispatching entry.
      */
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent originalEvent) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("event", "dispatching", new String[] { "name", event.getEventName(), "id", event.getTargetObject().getEffectiveId(), "location", event.getLocationData().toString() });
+            containingDocument.logDebug("event", "dispatching", new String[] { "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location", originalEvent.getLocationData().toString() });
         }
 
-        final XFormsEventTarget targetObject = event.getTargetObject();
+        final XFormsEventTarget targetObject = originalEvent.getTargetObject();
         try {
             if (targetObject == null)
-                throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
+                throw new ValidationException("Target object null for event: " + originalEvent.getEventName(), getLocationData());
 
             // Find all event handler containers
+            final List boundaries = new ArrayList();        // List<XFormsEventObserver>
+            final Map eventsForBoundaries = new LinkedMap();// Map<String effectiveId, XFormsEvent event>
             final List eventObservers = new ArrayList();
             {
                 XFormsEventObserver eventObserver
                         = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
                 while (eventObserver != null) {
-
-                    // Add container except if it is a repeat, as we use repeat iterations instead
-                    if (!(eventObserver instanceof XFormsRepeatControl))
+                    if (!(eventObserver instanceof XFormsRepeatControl)) {
+                        // Add container except if it is a repeat, as we use repeat iterations instead
                         eventObservers.add(eventObserver);
 
-                    // Stop propagation on model container or component boundary
-                    if (eventObserver instanceof XFormsContainer || eventObserver instanceof XFormsComponentControl)
-                        break;
+                        if (eventObserver instanceof XFormsContainer || eventObserver instanceof XFormsComponentControl) {
+                            if (originalEvent instanceof XFormsUIEvent) {
+                                // UI events need to be regargetted
+                                boundaries.add(eventObserver);
+                                eventsForBoundaries.put(eventObserver.getEffectiveId(), null);
+                            } else {
+                                // Stop propagation on model container or component boundary for all non-UI events
+                                break;
+                            }
+                        }
+                    }
 
                     // Find parent
                     eventObserver = eventObserver.getParentEventObserver(this);
@@ -627,6 +638,25 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 
             // Go from root to leaf
             Collections.reverse(eventObservers);
+            Collections.reverse(boundaries);
+
+            // Get event according to its target
+            int nextBoundaryIndex = 0;
+            String nextBoundaryEffectiveId;
+            XFormsEvent retargettedEvent;
+
+            // Handle event retargetting
+            if (boundaries.size() == 0) {
+                // Original event all the way
+                nextBoundaryEffectiveId = null;
+                retargettedEvent = originalEvent;
+            } else {
+                // Start with retargetted event
+                final XFormsEventObserver observer = (XFormsEventObserver) boundaries.get(nextBoundaryIndex);
+                nextBoundaryEffectiveId = observer.getEffectiveId();
+                retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                nextBoundaryIndex++;
+            }
 
             // Capture phase
             for (Iterator i = eventObservers.iterator(); i.hasNext();) {
@@ -642,12 +672,12 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
                             if (!eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(event.getEventName())
-                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
+                                    && eventHandler.isMatchEventName(retargettedEvent.getEventName())
+                                    && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
-                                startHandleEvent(event);
+                                startHandleEvent(retargettedEvent);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, retargettedEvent);
                                 } finally {
                                     endHandleEvent();
                                 }
@@ -656,25 +686,76 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                             }
                         }
                         // Cancel propagation if requested and if authorized by event
-                        if (!propagate && event.isCancelable())
+                        if (!propagate && retargettedEvent.isCancelable())
                             break;
+                    }
+                }
+
+                // Handle event retargetting
+                if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
+
+                    if (nextBoundaryIndex == boundaries.size()) {
+                        // Original event
+                        nextBoundaryEffectiveId = null;
+                        retargettedEvent = originalEvent;
+                    } else {
+                        // Retargetted event
+                        final XFormsEventObserver observer = (XFormsEventObserver) boundaries.get(nextBoundaryIndex);
+                        nextBoundaryEffectiveId = observer.getEffectiveId();
+                        retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                        nextBoundaryIndex++;
+                    }
+
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        containingDocument.logDebug("event", "retargetting", new String[] {
+                                "name", originalEvent.getEventName(),
+                                "original id", originalEvent.getTargetObject().getEffectiveId(),
+                                "new id", retargettedEvent.getTargetObject().getEffectiveId()
+                        });
                     }
                 }
             }
 
-            // Go from leaf to root
-            Collections.reverse(eventObservers);
-
             // Bubbling phase
-            if (propagate && event.isBubbles()) {
+            if (propagate && originalEvent.isBubbles()) {
+
+                // Go from leaf to root
+                Collections.reverse(eventObservers);
+                Collections.reverse(boundaries);
+
+                // Handle event retargetting
+                if (boundaries.size() > 0) {
+                    nextBoundaryIndex--;
+                    final XFormsEventObserver observer = (XFormsEventObserver) boundaries.get(nextBoundaryIndex);
+                    nextBoundaryEffectiveId = observer.getEffectiveId();
+                }
+
                 for (Iterator i = eventObservers.iterator(); i.hasNext();) {
                     final XFormsEventObserver currentEventObserver = (XFormsEventObserver) i.next();
                     final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
+                    // Handle event retargetting
+                    if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
+
+                        // Retargetted event
+                        final XFormsEventObserver observer = (XFormsEventObserver) boundaries.get(nextBoundaryIndex);
+                        nextBoundaryEffectiveId = observer.getEffectiveId();
+                        retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                        nextBoundaryIndex--;
+
+                        if (XFormsServer.logger.isDebugEnabled()) {
+                            containingDocument.logDebug("event", "retargetting", new String[] {
+                                    "name", originalEvent.getEventName(),
+                                    "original id", originalEvent.getTargetObject().getEffectiveId(),
+                                    "new id", retargettedEvent.getTargetObject().getEffectiveId()
+                            });
+                        }
+                    }
+
                     // Process "action at target"
                     // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
                     if (currentEventObserver == targetObject) {
-                        currentEventObserver.performTargetAction(pipelineContext, XFormsContainer.this, event);
+                        currentEventObserver.performTargetAction(pipelineContext, XFormsContainer.this, retargettedEvent);
                     }
 
                     // Process event handlers
@@ -683,12 +764,12 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
                             if (eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(event.getEventName())
-                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
+                                    && eventHandler.isMatchEventName(retargettedEvent.getEventName())
+                                    && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
-                                startHandleEvent(event);
+                                startHandleEvent(retargettedEvent);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, retargettedEvent);
                                 } finally {
                                     endHandleEvent();
                                 }
@@ -704,10 +785,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
             }
 
             // Perform default action is allowed to
-            if (performDefaultAction || !event.isCancelable()) {
-                startHandleEvent(event);
+            if (performDefaultAction || !originalEvent.isCancelable()) {
+                startHandleEvent(originalEvent);
                 try {
-                    targetObject.performDefaultAction(pipelineContext, event);
+                    targetObject.performDefaultAction(pipelineContext, originalEvent);
                 } finally {
                     endHandleEvent();
                 }
@@ -721,7 +802,21 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                     : null;
 
             throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
-                    new String[] { "event", event.getEventName(), "target id", targetObject.getEffectiveId() }));
+                    new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
         }
+    }
+
+    private XFormsEvent getRetargettedEvent(Map eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
+        XFormsEvent retargettedEvent = (XFormsEvent) eventsForBoundaries.get(boundaryId);
+
+        // Event already created, just return it
+        if (retargettedEvent != null)
+            return retargettedEvent;
+
+        // Clone original event, retarget it, and remember it
+        retargettedEvent = originalEvent.retarget(newEventTarget);
+        eventsForBoundaries.put(boundaryId, retargettedEvent);
+
+        return retargettedEvent;
     }
 }

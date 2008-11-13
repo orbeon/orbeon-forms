@@ -166,7 +166,7 @@ public class XFormsContextStack {
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
             final XFormsModel xformsModel = container.getDefaultModel();
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
+            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
         } else if (eventObserver instanceof XFormsControl) {
             setBinding((XFormsControl) eventObserver);
         } else if (eventObserver instanceof XFormsModel) {

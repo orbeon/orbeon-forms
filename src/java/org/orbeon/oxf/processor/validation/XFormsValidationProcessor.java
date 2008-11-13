@@ -281,7 +281,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                                 // We only annotate if we are in a relevant element
                                 AttributesImpl newAttributes = new AttributesImpl(attributes);
                                 newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ERROR_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_PREFIX + ":" + XXFORMS_ERROR_ATTRIBUTE_NAME, "CDATA", exception.getMessage());
-                                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_PREFIX + ":" + XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME, "CDATA", "false");
+                                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.VALID_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_PREFIX + ":" + XFormsConstants.VALID_ATTRIBUTE_NAME, "CDATA", "false");
                                 attributes = newAttributes;
                             }
                         }

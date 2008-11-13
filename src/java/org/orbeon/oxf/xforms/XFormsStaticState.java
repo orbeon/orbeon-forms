@@ -414,28 +414,11 @@ public class XFormsStaticState {
             }
         }
 
-        // Extract scripts
+        // Extract top-level scripts
         {
-            // Find all xforms:script elements
             final Document staticStateDocument = staticStateElement.getDocument();
             final DocumentWrapper documentInfo = new DocumentWrapper(staticStateDocument, null, xpathConfiguration);
-            final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
-                        "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
-                    BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
-
-            if (scripts.size() > 0) {
-                xxformsScripts = new HashMap();
-                for (Iterator i = scripts.iterator(); i.hasNext();) {
-                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-                    final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-
-                    // Remember script content
-                    xxformsScripts.put(scriptElement.attributeValue("id"), scriptElement.getStringValue());
-                    // Detach as the element is no longer needed within the controls
-                    scriptElement.detach();
-                }
-                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(scripts.size()) });
-            }
+            extractScripts(pipelineContext, documentInfo, "");
         }
 
         // Extract components
@@ -480,6 +463,26 @@ public class XFormsStaticState {
 
                 XFormsContainingDocument.logDebugStatic("static state", "created top-level XBL documents",
                         new String[] { "xbl:xbl count", Integer.toString(xblCount), "xbl:binding count", Integer.toString(xblBindingCount)});
+            }
+        }
+    }
+
+    private void extractScripts(PipelineContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+        final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
+                    "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
+                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+        if (scripts.size() > 0) {
+            if (xxformsScripts == null)
+                xxformsScripts = new HashMap();
+            for (Iterator i = scripts.iterator(); i.hasNext();) {
+                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
+                // Remember script content
+                xxformsScripts.put(prefix + scriptElement.attributeValue("id"), scriptElement.getStringValue());
+                // Detach as the element is no longer needed within the controls
+                //scriptElement.detach();
             }
         }
     }
@@ -846,6 +849,9 @@ public class XFormsStaticState {
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
             analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer);
 
+            if (xxformsScripts != null && xxformsScripts.size() > 0)
+                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(xxformsScripts.size()) });
+
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
@@ -949,8 +955,13 @@ public class XFormsStaticState {
                             final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument, controlElement);
                             compactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
-                            // TODO: the nested ids must be passed with prefix, right?
+                            // Find new prefix
                             final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
+
+                            // Extract scripts within this shadow tree
+                            final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
+                            extractScripts(pipelineContext, compactShadowTreeWrapper, newPrefix);
+
                             analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
                         }
                     }

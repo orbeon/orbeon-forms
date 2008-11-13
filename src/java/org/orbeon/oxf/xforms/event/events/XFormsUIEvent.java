@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -127,5 +128,11 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else {
             return super.getAttribute(name);
         }
+    }
+
+    public XFormsEvent retarget(XFormsEventTarget newTargetObject) {
+        final XFormsUIEvent newEvent = (XFormsUIEvent) super.retarget(newTargetObject);
+        newEvent.targetXFormsControl = (XFormsControl) newTargetObject;
+        return newEvent;
     }
 }

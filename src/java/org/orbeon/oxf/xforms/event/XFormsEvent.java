@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * XFormsEvent represents an XForms event passed to all events and actions.
  */
-public abstract class XFormsEvent {
+public abstract class XFormsEvent implements Cloneable {
 
     private static final String XXFORMS_TYPE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "type");
     private static final String XXFORMS_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target");
@@ -102,14 +103,13 @@ public abstract class XFormsEvent {
 
     public SequenceIterator getAttribute(String name) {
         if ("target".equals(name) || XXFORMS_TARGET_ATTRIBUTE.equals(name)) {// first is legacy name
-            // Return the target id
+            // Return the target static id
 
             if ("target".equals(name)) {
                 XFormsServer.logger.warn("event('target') is deprecated. Use event('xxforms:target') instead.");
             }
 
-            final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getId() : targetObject.getEffectiveId();
-            return new ListIterator(Collections.singletonList(new StringValue(originalId)));
+            return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));
         } else if ("event".equals(name) || XXFORMS_TYPE_ATTRIBUTE.equals(name)) {// first is legacy name
             // Return the event type
 
@@ -141,5 +141,22 @@ public abstract class XFormsEvent {
      */
     protected PipelineContext getPipelineContext() {
         return StaticExternalContext.getStaticContext().getPipelineContext();
+    }
+
+    public XFormsEvent retarget(XFormsEventTarget newTargetObject) {
+        final XFormsEvent newEvent;
+        try {
+            newEvent = (XFormsUIEvent) this.clone();
+            newEvent.targetObject = newTargetObject;
+        } catch (CloneNotSupportedException e) {
+            throw new OXFException(e);// should not happen because we are clonable
+        }
+
+        return newEvent;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        // Default implementation is good enough
+        return super.clone();
     }
 }

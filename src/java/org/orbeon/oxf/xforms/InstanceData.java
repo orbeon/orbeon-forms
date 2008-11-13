@@ -46,6 +46,7 @@ public class InstanceData {
     private static final boolean DEFAULT_READONLY = false;
     private static final boolean DEFAULT_REQUIRED = false;
     private static final boolean DEFAULT_VALID = true;
+    private static final String DEFAULT_CUSTOM = null;
 
     // All MIPs with their default values
     private boolean relevant = DEFAULT_RELEVANT;
@@ -66,6 +67,9 @@ public class InstanceData {
     private String invalidBindIds;
     private List schemaErrors;
 
+    // Custom MIPs
+    private Map customMips = null;
+
     private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
         {
             // Default for non-mutable nodes is to be read-only
@@ -82,6 +86,38 @@ public class InstanceData {
 
     public LocationData getLocationData() {
         return locationData;
+    }
+
+    public static void setCustom(NodeInfo nodeInfo, String name, String value) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
+        if (existingInstanceData == null) {
+            if (value == DEFAULT_CUSTOM) {
+                // Not changing from the default so don't even create object
+                return;
+            } else {
+                // Changing from the default
+                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
+                if (newInstanceData.customMips == null)
+                    newInstanceData.customMips = new HashMap();
+                newInstanceData.customMips.put(name, value);
+            }
+        } else {
+            if (existingInstanceData.customMips == null)
+                existingInstanceData.customMips = new HashMap();
+            existingInstanceData.customMips.put(name, value);
+        }
+    }
+
+    public static Map getAllCustom(NodeInfo nodeInfo) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return (existingInstanceData == null) ? null : existingInstanceData.customMips;
+    }
+
+    public static String getCustom(NodeInfo nodeInfo, String name) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return (String) ((existingInstanceData == null)
+                ? DEFAULT_CUSTOM
+                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name));
     }
 
     public static void setRelevant(NodeInfo nodeInfo, boolean relevant) {

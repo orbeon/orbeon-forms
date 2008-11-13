@@ -14,7 +14,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
         <title>XForms with Dojo</title>
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.1.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"/>
+            <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.1.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"/>
 		<script type="text/javascript">dojo.require("dojox.layout.ContentPane");</script>
         <link type="text/css" href="../../config/theme/orbeon.css" rel="stylesheet"/>
         <link type="text/css" href="../../config/theme/xforms.css" rel="stylesheet"/>

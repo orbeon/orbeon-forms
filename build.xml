@@ -458,7 +458,6 @@
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/slider"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
@@ -476,9 +475,6 @@
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="yui/treeview/treeview"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/slider/slider"/>
         </antcall>
 
         <!-- From YUI examples -->

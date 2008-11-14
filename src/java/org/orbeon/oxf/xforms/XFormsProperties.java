@@ -75,6 +75,7 @@ public class XFormsProperties {
     private static final String TIME_FORMAT_INPUT_PROPERTY = "format.input.time";
 
     private static final String DATEPICKER_PROPERTY = "datepicker";
+    private static final String XHTML_EDITOR_PROPERTY = "xhtml-editor";
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
@@ -213,7 +214,8 @@ public class XFormsProperties {
             new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true),// dynamic
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
-            new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true)
+            new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true),
+            new PropertyDefinition(XHTML_EDITOR_PROPERTY, "yui", true)
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;
@@ -479,6 +481,10 @@ public class XFormsProperties {
 
     public static String getDatePicker(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, DATEPICKER_PROPERTY);
+    }
+
+    public static String getXHTMLEditor(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, XHTML_EDITOR_PROPERTY);
     }
 
     public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {

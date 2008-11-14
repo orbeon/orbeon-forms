@@ -31,7 +31,18 @@ public class XFormsFeatures {
             new FeatureConfig("tree", new String[] { "select", "select1" }, XFormsSelect1Control.TREE_APPEARANCE),
             new FeatureConfig("menu", "select1", XFormsSelect1Control.MENU_APPEARANCE),
             new FeatureConfig("autocomplete", "select1", XFormsSelect1Control.AUTOCOMPLETE_APPEARANCE),
-            new FeatureConfig("htmlarea", "textarea", "text/html"),
+            new FeatureConfig("fckeditor", "textarea", "text/html") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return super.isInUse(containingDocument, appearancesMap)
+                            && !"yui".equals(XFormsProperties.getHTMLEditor(containingDocument));
+                }
+            },
+            new FeatureConfig("yuirte", "textarea", "text/html") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return super.isInUse(containingDocument, appearancesMap)
+                            && "yui".equals(XFormsProperties.getHTMLEditor(containingDocument));
+                }
+            },
             new FeatureConfig("dialog", "dialog"),
             new FeatureConfig("offline") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
@@ -150,10 +161,11 @@ public class XFormsFeatures {
             },
             new ResourceConfig("/ops/yui/menu/assets/skins/sam/menu.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
+                    return isMenuInUse(appearancesMap) || isYUIRTEInUse(containingDocument, appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
             },
+            // HTML area
             // NOTE: This doesn't work, probably because FCK editor files must be loaded in an iframe
 //            new ResourceConfig("/ops/fckeditor/editor/skins/default/fck_editor.css", null) {
 //                public boolean isInUse(Map appearancesMap) {
@@ -161,6 +173,18 @@ public class XFormsFeatures {
 //                }
 //                public String getFeatureName() { return "htmlarea"; }
 //            },
+            new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", "/ops/yui/editor/assets/skins/sam/editor-min.css") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return isYUIRTEInUse(containingDocument, appearancesMap);
+                }
+                public String getFeatureName() { return "yuirte"; }
+            },
+            new ResourceConfig("/ops/yui/button/assets/skins/sam/button.css", "/ops/yui/button/assets/skins/sam/button-min.css") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return isYUIRTEInUse(containingDocument, appearancesMap);
+                }
+                public String getFeatureName() { return "yuirte"; }
+            },
             // Other standard stylesheets
             new ResourceConfig("/config/theme/xforms.css", null),
             new ResourceConfig("/config/theme/error.css", null)
@@ -227,16 +251,34 @@ public class XFormsFeatures {
             },
             new ResourceConfig("/ops/yui/menu/menu.js", "/ops/yui/menu/menu-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
+                    return isMenuInUse(appearancesMap) || isYUIRTEInUse(containingDocument, appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
             },
             // HTML area
             new ResourceConfig("/ops/fckeditor/fckeditor.js", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return isHtmlAreaInUse(appearancesMap);
+                    return isFCKEditorInUse(containingDocument, appearancesMap);
                 }
-                public String getFeatureName() { return "htmlarea"; }
+                public String getFeatureName() { return "fckeditor"; }
+            },
+            new ResourceConfig("/ops/yui/element/element-beta.js", "/ops/yui/element/element-beta-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return isYUIRTEInUse(containingDocument, appearancesMap);
+                }
+                public String getFeatureName() { return "yuirte"; }
+            },
+            new ResourceConfig("/ops/yui/button/button.js", "/ops/yui/button/button-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return isYUIRTEInUse(containingDocument, appearancesMap);
+                }
+                public String getFeatureName() { return "yuirte"; }
+            },
+            new ResourceConfig("/ops/yui/editor/editor.js", "/ops/yui/editor/editor-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return isYUIRTEInUse(containingDocument, appearancesMap);
+                }
+                public String getFeatureName() { return "yuirte"; }
             },
             // Autocomplete
             new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {
@@ -371,6 +413,14 @@ public class XFormsFeatures {
 
         protected boolean isHtmlAreaInUse(Map appearancesMap) {
             return isInUse(appearancesMap, "textarea", "text/html");
+        }
+
+        protected boolean isFCKEditorInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+            return isHtmlAreaInUse(appearancesMap) && !"yui".equals(XFormsProperties.getHTMLEditor(containingDocument));
+        }
+
+        protected boolean isYUIRTEInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+            return isHtmlAreaInUse(appearancesMap) && "yui".equals(XFormsProperties.getHTMLEditor(containingDocument));
         }
 
         protected boolean isDialogInUse(Map appearancesMap) {

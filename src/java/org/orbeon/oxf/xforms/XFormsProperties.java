@@ -75,7 +75,7 @@ public class XFormsProperties {
     private static final String TIME_FORMAT_INPUT_PROPERTY = "format.input.time";
 
     private static final String DATEPICKER_PROPERTY = "datepicker";
-    private static final String XHTML_EDITOR_PROPERTY = "xhtml-editor";
+    private static final String XHTML_EDITOR_PROPERTY = "htmleditor";
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
@@ -483,7 +483,7 @@ public class XFormsProperties {
         return getStringProperty(containingDocument, DATEPICKER_PROPERTY);
     }
 
-    public static String getXHTMLEditor(XFormsContainingDocument containingDocument) {
+    public static String getHTMLEditor(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, XHTML_EDITOR_PROPERTY);
     }
 

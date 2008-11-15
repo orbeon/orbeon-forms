@@ -64,5 +64,6 @@
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                 value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
     <property as="xs:string"  name="oxf.xforms.datepicker"                           value="yui"/>  <!-- jcalendar or yui -->
+    <property as="xs:string"  name="oxf.xforms.htmleditor"                           value="yui"/>  <!-- fck or yui -->
 
 </properties>

@@ -59,6 +59,7 @@ var OFFLINE_SUPPORT_PROPERTY = "offline";
 var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
 var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
 var DATE_PICKER_PROPERTY = "datepicker";
+var HTML_EDITOR_PROPERTY = "htmleditor";
 
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
@@ -85,6 +86,7 @@ var XFORMS_OFFLINE_SUPPORT = false;
 var XFORMS_FORMAT_INPUT_TIME = "[h]:[m]:[s] [P]";
 var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
 var XFORMS_DATEPICKER = "yui";
+var XFORMS_HTMLEDITOR = "yui";
 
 var APPLICATION_RESOURCES_VERSION = "1.0";
 
@@ -885,7 +887,8 @@ ORBEON.util.Utils = {
             case FORMAT_INPUT_TIME_PROPERTY: { return XFORMS_FORMAT_INPUT_TIME; }
             case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
             case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
-            }
+            case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
+        }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
     },
@@ -1235,8 +1238,12 @@ ORBEON.xforms.Controls = {
             return selectValue;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-            var editorInstance = FCKeditorAPI.GetInstance(control.name);
-            return editorInstance.GetXHTML();
+            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                return ORBEON.widgets.RTE.getValue(control);
+            } else {
+                var editorInstance = FCKeditorAPI.GetInstance(control.name);
+                return editorInstance.GetXHTML();
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-static"))) {
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
@@ -1366,26 +1373,32 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
-            var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-            var doUpdate =
-                    // Update only if the new value is different than the value already have in the HTML area
-                    xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
+            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                // YUI RTE
+                ORBEON.widgets.RTE.setValue(control, previousServerValue, newControlValue);
+            } else {
+                // FCK
+                var htmlEditor = FCKeditorAPI.GetInstance(control.name);
+                var doUpdate =
+                        // Update only if the new value is different than the value already have in the HTML area
+                        xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
                         // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
                         // If there is no previousServerValue, go ahead and update field
                         && (previousServerValue == null || htmlEditor.GetXHTML() == previousServerValue);
-            if (doUpdate) {
-                // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
-                // as we loose our listeners after using the later
-                htmlEditor.EditorDocument.body.innerHTML = newControlValue;
-                // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
-                // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
-                // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
-                // since the last time we sent the value to the serer. The bottom line is that we are going to compare
-                // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
-                // server accounts for the slight difference there might be in those 2 representations.
-                ORBEON.xforms.Globals.serverValue[control.id] = htmlEditor.GetXHTML();
-                control.value = newControlValue;
-                control.previousValue = newControlValue;
+                if (doUpdate) {
+                    // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
+                    // as we loose our listeners after using the later
+                    htmlEditor.EditorDocument.body.innerHTML = newControlValue;
+                    // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                    // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                    // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                    // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                    // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                    // server accounts for the slight difference there might be in those 2 representations.
+                    ORBEON.xforms.Globals.serverValue[control.id] = htmlEditor.GetXHTML();
+                    control.value = newControlValue;
+                    control.previousValue = newControlValue;
+                }
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")) {
             // Select tree
@@ -2071,7 +2084,12 @@ ORBEON.xforms.Events = {
                         || ORBEON.util.Dom.hasClass(element, "xforms-help-image")
                         || ORBEON.util.Dom.hasClass(element, "xforms-alert")) {
                     // We found our XForms element
-                    return element;
+
+                    // HACK: With the YUI RTE, the xforms-control and other classes get copied to a div generated by the RTE.
+                    // When we get an event on that div, we just want to ignore it (it's not really an event for the RTE).
+                    // This is a hack, because a better way to handle this would be to figure why those classes are copied
+                    // and prevent that copy from happening.
+                    return element.id == "" ? null : element;
                 }
             }
             // Go to parent and continue search
@@ -2107,14 +2125,18 @@ ORBEON.xforms.Events = {
             if (targetControlElement != null && currentFocusControlElement != targetControlElement
                     && !ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
 
+                // The RTE interested in knowing when anyone gets a focus event
+                ORBEON.widgets.RTE.focusOnAnyFormControl(targetControlElement);
+
                 // Handle special value changes upon losing focus
 
                 // HTML area and trees does not throw value change event, so we send the value change to the server
                 // when we get the focus on the next control
                 var changeValue = false;
-                if (currentFocusControlElement != null) {// can be null on first focus
+                if (currentFocusControlElement != null) { // Can be null on first focus
                     if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
-                            && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
+                            && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")
+                            && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "fck") {
                         // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
                         var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
                         currentFocusControlElement.value = editorInstance.GetXHTML();
@@ -2124,7 +2146,7 @@ ORBEON.xforms.Events = {
                         changeValue = true;
                     } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
                             && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-control")
-                            && !ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
+                            && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
                             && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-trigger")) {
                         // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
                         // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
@@ -2133,15 +2155,15 @@ ORBEON.xforms.Events = {
                         changeValue = true;
                     }
                     // Send value change if needed
-                    if (changeValue)
+                    if (changeValue) {
                         xformsValueChanged(currentFocusControlElement, null);
+                    }
 
                     // Handle DOMFocusOut
                     // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
                     // DOMFocusOut, but it is hard to detect correctly
                     events.push(new ORBEON.xforms.Server.Event(null, currentFocusControlElement.id, null, null, "DOMFocusOut"));
                     ORBEON.xforms.Server.fireEvents(events, false)
-
                 }
 
                 // Handle DOMFocusIn
@@ -3077,21 +3099,103 @@ ORBEON.widgets.YUICalendar = function() {
 }();
 
 ORBEON.widgets.RTE = function() {
+
+    // === PRIVATE ===
+
+    rteEditors = {};            // Maps control ID to YUI RTE object
+    isIncremental = {};         // Maps control ID to boolean telling us if this control is in incremental model
+    editorWithFocus = null;     // The control ID of the RTE editor that has the focus, null if none
+
+    function sendChangeToServer(controlID) {
+        yuiRTE = rteEditors[controlID];
+        var event = new ORBEON.xforms.Server.Event(null, controlID, null,
+                yuiRTE.getEditorHTML(), "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.Server.fireEvents([event], true);
+    }
+
+    /**
+     * Event handler called by the RTE every time there is an event which can could potentialy change the content
+     * of the editor.
+     */
+    function changeEvent(controlID) {
+
+        // Simulate blur on previous, focus on this
+        var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
+        if (currentFocusControlId != controlID) {
+            // If previous control was an RTE, send blur to it
+            if (rteEditors[currentFocusControlId] != null) {
+                ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.getElementById(currentFocusControlId) });
+            }
+            // Send focus to current control
+            ORBEON.xforms.Events.focus({ target: ORBEON.util.Dom.getElementById(controlID) });
+        }
+
+        // Simulate keyup
+        ORBEON.xforms.Events.keydown({ target: ORBEON.util.Dom.getElementById(currentFocusControlId) });
+        ORBEON.xforms.Events.keyup({ target: ORBEON.util.Dom.getElementById(currentFocusControlId) });
+    }
+
+    // === PUBLIC ===
+
     return {
         extending: ORBEON.widgets.Base,
 
         /**
-         * Function that returns true if and only if the this class applies to the control provided. This provides a
-         * way to implement conditions in addition to the one set on the classes the element must have.
+         * Initializes the RTE editor for a particular control.
          */
-        appliesToControl: function(control) {},
+        init: function(control) {
+            // Create RTE object
+            var yuiRTE = new YAHOO.widget.Editor(control, {
+                height: "300px",
+                width: "550px"
+            });
+            // Register event listener for user interacting with the control
+            yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
+            yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
+            // Store information about this RTE
+            rteEditors[control.id] = yuiRTE;
+            isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
+            // Transform text area into RTE on the page
+            yuiRTE.on("afterRender", function() {
+                var yuiDivBeforeTextArea = ORBEON.util.Dom.getChildElementByIndex(control.parentNode, 0);
+            });
+            yuiRTE.render();
+        },
 
         /**
-         * Respond to the click event.
+         * Called on any focus event of other form controls on the page
          */
-        click: function(event, target) {},
-        blur: function(event, target) {},
-        keydown: function(event, target) {}
+        focusOnAnyFormControl: function(control) {
+            var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
+            // If the focus went to another control (not RTE) and the current is a an RTE
+            if (rteEditors[control.id] == null && rteEditors[currentFocusControlId] != null) {
+                // Send blur to that RTE
+                ORBEON.xforms.Events.change({ target: ORBEON.util.Dom.getElementById(currentFocusControlId) });
+                ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.getElementById(currentFocusControlId) });
+            }
+        },
+
+        /**
+         * Called to set the value of the RTE
+         */
+        setValue: function(control, previousServerValue, newValue) {
+            var yuiRTE = rteEditors[control.id];
+            var doUpdate =
+                    // Update only if the new value is different than the value already have in the HTML area
+                    xformsNormalizeEndlines(yuiRTE.getEditorHTML()) != xformsNormalizeEndlines(newValue)
+                    // Update only if the value in the HTML area is the same now as it was when we sent it to the server
+                    // If there is no previousServerValue, go ahead and update field
+                    && (previousServerValue == null || yuiRTE.getEditorHTML() == previousServerValue);
+            if (doUpdate) {
+                yuiRTE.setEditorHTML(newValue);
+                ORBEON.xforms.Globals.serverValue[control.id] = newValue;
+            }
+        },
+
+        getValue: function(control) {
+            var yuiRTE = rteEditors[control.id];
+            return yuiRTE.getEditorHTML();
+        }
     }
 }();
 
@@ -3720,30 +3824,37 @@ ORBEON.xforms.Init = {
      * Initialize HTML areas.
      */
     _htmlArea: function (htmlArea) {
-        var fckEditor = new FCKeditor(htmlArea.name);
-        if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
-            ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
-
-        fckEditor.BasePath = ORBEON.xforms.Globals.baseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
-        fckEditor.ToolbarSet = "OPS";
-
-        // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
-        var type_check = typeof USER_LANGUAGE;
-        if (type_check != 'undefined') {
-            fckEditor.Config["AutoDetectLanguage"] = false;
-            fckEditor.Config["DefaultLanguage"] = (USER_LANGUAGE != '') ? USER_LANGUAGE : 'en';
-        }
-        // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable
-        type_check = typeof FCK_CUSTOM_CONFIG;
-        if (type_check != 'undefined')
-            fckEditor.Config["CustomConfigurationsPath"] = fckEditor.BasePath + FCK_CUSTOM_CONFIG;
-
-        if (ORBEON.xforms.Globals.fckEditorLoading) {
-            ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);
+        if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+            ORBEON.widgets.RTE.init(htmlArea);
         } else {
-            ORBEON.xforms.Globals.fckEditorLoading = true;
-            fckEditor.ReplaceTextarea();
-            ORBEON.xforms.Controls.updateHTMLAreaClasses(ORBEON.util.Dom.getElementById(fckEditor.InstanceName));
+
+            // Initialize FCK editor
+
+            var fckEditor = new FCKeditor(htmlArea.name);
+            if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
+                ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
+
+            fckEditor.BasePath = ORBEON.xforms.Globals.baseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
+            fckEditor.ToolbarSet = "OPS";
+
+            // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
+            var type_check = typeof USER_LANGUAGE;
+            if (type_check != 'undefined') {
+                fckEditor.Config["AutoDetectLanguage"] = false;
+                fckEditor.Config["DefaultLanguage"] = (USER_LANGUAGE != '') ? USER_LANGUAGE : 'en';
+            }
+            // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable
+            type_check = typeof FCK_CUSTOM_CONFIG;
+            if (type_check != 'undefined')
+                fckEditor.Config["CustomConfigurationsPath"] = fckEditor.BasePath + FCK_CUSTOM_CONFIG;
+
+            if (ORBEON.xforms.Globals.fckEditorLoading) {
+                ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);
+            } else {
+                ORBEON.xforms.Globals.fckEditorLoading = true;
+                fckEditor.ReplaceTextarea();
+                ORBEON.xforms.Controls.updateHTMLAreaClasses(ORBEON.util.Dom.getElementById(fckEditor.InstanceName));
+            }
         }
     },
 
@@ -4672,7 +4783,7 @@ ORBEON.xforms.Server = {
 
                                         // Save new value sent by server (upload controls don't carry their value the same way as other controls)
                                         var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
-                                        if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload"))
+                                        if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) 
                                             ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
 
                                         // Handle migration of control from non-static to static if needed
@@ -4785,7 +4896,7 @@ ORBEON.xforms.Server = {
                                             // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed
                                             // by handling this on the server-side with custom MIPS.
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") && relevant == null) {
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-visited");
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-visited"); 
                                                 if (ORBEON.util.Dom.hasClass(documentElement, "xforms-invalid"))
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-invalid-visited");
                                             }

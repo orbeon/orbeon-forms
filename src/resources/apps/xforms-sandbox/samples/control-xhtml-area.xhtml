@@ -7,17 +7,25 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
+        <xhtml:title>HTML Editor</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
             <xforms:instance>
-                <gaga>Some text here</gaga>
+                <gaga>Some &lt;b>text&lt;/b> here</gaga>
             </xforms:instance>
         </xforms:model>
+        <!--<xhtml:script type='text/javascript'  src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'/>-->
     </xhtml:head>
     <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Add "42"</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="/gaga" value="concat(., '42')"/>
+        </xforms:trigger>
         <xhtml:h2>text/html texarea</xhtml:h2>
-        <xhtml:p>
-            <xforms:textarea mediatype="text/html" ref="/gaga"/>
-        </xhtml:p>
+        <xhtml:div>
+            <xforms:textarea id="xhtml-editor" mediatype="text/html" ref="/gaga"/>
+            <xforms:textarea ref="/gaga" id="textarea-control-1"/>
+            <xforms:textarea ref="/gaga" id="textarea-control-2"/>
+        </xhtml:div>
         <xhtml:h2>text/html output</xhtml:h2>
         <xhtml:p>
             <xforms:output mediatype="text/html" ref="/gaga"/>

@@ -4437,7 +4437,6 @@ ORBEON.xforms.Server = {
                     if (offlineElements.length == 1) {
                         // Server is asking us to stay offline
                         ORBEON.xforms.Offline.isOnline = false;
-                        return;
                     } else {
                         // Remove form from store and database
                         ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
@@ -5331,11 +5330,13 @@ ORBEON.xforms.Server = {
                                 // Take form offline
                                 case "offline": {
                                     var offlineElement = actionElement.childNodes[actionIndex];
-                                    var eventsElement = ORBEON.util.Dom.getElementsByName(offlineElement, "events", xmlNamespace)[0];
-                                    var mappingsElement = ORBEON.util.Dom.getElementsByName(offlineElement, "mappings", xmlNamespace)[0];
-                                    var replayResponse = ORBEON.util.Dom.getStringValue(eventsElement);
-                                    var mappings = ORBEON.util.Dom.getStringValue(mappingsElement);
-                                    ORBEON.xforms.Offline.takeOffline(replayResponse, formID, mappings);
+                                    var eventsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "events", xmlNamespace);
+                                    var mappingsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "mappings", xmlNamespace);
+                                    if (eventsElements.length != 0 && mappingsElements.length != 0) {
+                                        var replayResponse = ORBEON.util.Dom.getStringValue(eventsElements[0]);
+                                        var mappings = ORBEON.util.Dom.getStringValue(mappingsElements[0]);
+                                        ORBEON.xforms.Offline.takeOffline(replayResponse, formID, mappings);
+                                    }
                                 }
                             }
                         }

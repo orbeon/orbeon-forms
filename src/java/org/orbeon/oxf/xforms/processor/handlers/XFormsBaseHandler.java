@@ -484,6 +484,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
         if (lhhaType != null) {
+            // E.g. foo$bar.1-2-3 -> foo$bar-alert.1-2-3
+//            final String newId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId) + "-" + lhhaType + XFormsUtils.getEffectiveIdSuffixWithSeparator(forEffectiveId);
+//            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id",  newId);
+
+            // E.g. foo$bar.1-2-3 -> foo$bar.1-2-3-alert
             newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", forEffectiveId + "-" + lhhaType);
         } else {
             newAttribute = new AttributesImpl(attributes);

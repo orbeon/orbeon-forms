@@ -1441,7 +1441,7 @@ public class XFormsUtils {
      * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned does not start with a separator.
      *
      * @param effectiveId   effective id to check
-     * @return              postfix if any, "" if none, null if effectiveId was null
+     * @return              suffix if any, "" if none, null if effectiveId was null
      */
     public static String getEffectiveIdSuffix(String effectiveId) {
         if (effectiveId == null)
@@ -1450,6 +1450,24 @@ public class XFormsUtils {
         final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
         if (suffixIndex != -1) {
             return effectiveId.substring(suffixIndex + 1);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned starts with a separator.
+     *
+     * @param effectiveId   effective id to check
+     * @return              suffix if any, "" if none, null if effectiveId was null
+     */
+    public static String getEffectiveIdSuffixWithSeparator(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            return effectiveId.substring(suffixIndex);
         } else {
             return "";
         }

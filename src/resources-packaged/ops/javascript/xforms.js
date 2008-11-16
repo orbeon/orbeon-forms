@@ -2419,8 +2419,11 @@ ORBEON.xforms.Events = {
             // Alert tooltip
             if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")
                     && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-alert-as-tooltip")) {
+                // NOTE: control may be null if we have <div for="">. Using target.getAttribute("for") returns a proper
+                // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
+                // do anything if there is no control found.
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
-                if (ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
                     var message = ORBEON.xforms.Controls.getAlertMessage(control);
                     YAHOO.util.Dom.generateId(target);
                     ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);

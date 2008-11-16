@@ -4352,48 +4352,6 @@ ORBEON.xforms.Server = {
                 dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: true, executeScripts: true, adjustPaths: true, referencePath: "/" });
                 ORBEON.xforms.Init.document();
             }
-
-//            if (false) {
-//            var scriptURLs = new Array();       // URLs of all external scripts
-//            var inlineScripts = new Array();    // inline <script> elements
-//
-//            // Add children to newPortletDiv
-//            while (newPortletDiv.childNodes.length > 0) {
-//                var currentElement = newPortletDiv.firstChild;
-//                if (currentElement.nodeType == ELEMENT_TYPE && currentElement.tagName.toLowerCase() == 'script') {
-//                    // Found a script
-//                    if (currentElement.src != null && currentElement.src != "") {// IE returns an empty src
-////                        alert("src: " + currentElement.src);
-//                        scriptURLs.push(currentElement.getAttribute("src"));
-//                    } else {
-//                        inlineScripts.push(currentElement);
-//                    }
-//                    // Make sure to remove it
-//                    newPortletDiv.removeChild(currentElement);
-//                } else {
-//                    // Just copy
-//                    existingPortletDiv.appendChild(currentElement);
-//                }
-//            }
-//
-//            YAHOO.util.Get.script(scriptURLs, { onSuccess: function() {
-////                ORBEON.xforms.Init.document();
-//
-//                // Add all inline scripts first so that things like xformsPageLoadedServer are defined
-//                for (var i = 0; i < inlineScripts.length; i++) {
-//                    if (inlineScripts[i].text != "") {
-//                        var n = document.createElement('script');
-//                        n.type = "text/javascript";
-//                        n.text = inlineScripts[i].text;
-//                        existingPortletDiv.appendChild(n);
-//                    }
-//                }
-//
-//                // Perform initialization again after all external scripts have loaded
-//                ORBEON.xforms.Init.document();
-//            }});
-//            }
-
         } else {
             if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
                 // The XML docucment does not come in o.responseXML: parse o.responseText.

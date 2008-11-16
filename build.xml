@@ -542,7 +542,7 @@
     </target>
 
     <target name="orbeon-minify-one-js" unless="min.uptodate">
-        <java classname="com.yahoo.platform.yui.compressor.YUICompressor" classpath="${lib.dir}/yuicompressor-2.3.5.jar" fork="true" failonerror="true">
+        <java classname="com.yahoo.platform.yui.compressor.YUICompressor" classpath="${lib.dir}/yuicompressor-2.4.1.jar" fork="true" failonerror="true">
             <arg value="${resources-packaged.dir}/ops/${name}.js"/>
             <arg value="-o"/>
             <arg value="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>

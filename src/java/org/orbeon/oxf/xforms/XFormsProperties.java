@@ -265,7 +265,7 @@ public class XFormsProperties {
     private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
     /**
-     * Return a PropertyDefinition given a property nam.
+     * Return a PropertyDefinition given a property name.
      *
      * @param propertyName  property name
      * @return              PropertyDefinition

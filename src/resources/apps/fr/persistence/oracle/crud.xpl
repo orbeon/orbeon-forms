@@ -60,7 +60,7 @@
                 <document>
                     <xsl:copy-of select="doc('input:instance')"/>
                 </document>
-                <timestamp><xsl:value-of select="current-dateTime()"/></timestamp>
+                <timestamp><xsl:value-of select="adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration('PT0H'))"/></timestamp>
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
                 <app><xsl:value-of select="$matcher-groups[1]"/></app>
@@ -105,6 +105,7 @@
                             <sql:execute>
                                 <sql:query>
                                     select
+                                        last_modified,
                                         <xsl:if test="not($is-attachment)">t.xml.getClobVal() xml</xsl:if>
                                         <xsl:if test="$is-attachment">file_content</xsl:if>
                                     from <xsl:value-of select="$table-name"/> t
@@ -123,18 +124,23 @@
                                         and deleted = 'N'
                                 </sql:query>
                                 <sql:result-set>
-                                    <sql:row-iterator>
-                                        <xsl:choose>
-                                            <xsl:when test="$is-attachment">
-                                                <blob>
-                                                    <sql:get-column-value column="file_content" type="xs:base64Binary"/>
-                                                </blob>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <sql:get-column-value column="xml" type="odt:xmlFragment"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </sql:row-iterator>
+                                    <sql-out>
+                                        <sql:row-iterator>
+                                            <last-modified>
+                                                <sql:get-column-value column="last_modified" type="xs:dateTime"/>
+                                            </last-modified>
+                                            <data>
+                                                <xsl:choose>
+                                                    <xsl:when test="$is-attachment">
+                                                        <sql:get-column-value column="file_content" type="xs:base64Binary"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <sql:get-column-value column="xml" type="odt:xmlFragment"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </data>
+                                        </sql:row-iterator>
+                                    </sql-out>
                                 </sql:result-set>
                             </sql:execute>
                         </sql:connection>
@@ -159,7 +165,14 @@
                                 <encoding>utf-8</encoding>
                             </config>
                         </p:input>
-                        <p:input name="data" href="#sql-out"/>
+                        <p:input name="data" transform="oxf:unsafe-xslt" href="#sql-out">
+                            <!-- We don't use XPointer here because XPointer doesn't deal correctly with namespaces -->
+                            <xsl:stylesheet version="2.0">
+                                <xsl:template match="/">
+                                    <xsl:copy-of select="/sql-out/data/*"/>
+                                </xsl:template>
+                            </xsl:stylesheet>
+                        </p:input>
                         <p:output name="data" id="converted"/>
                     </p:processor>
                 </p:when>
@@ -169,7 +182,7 @@
                         <p:input name="data" href="#sql-out"/>
                         <p:input name="config">
                             <document xsi:type="xs:base64Binary" xsl:version="2.0">
-                                <xsl:value-of select="/*"/>
+                                <xsl:value-of select="/sql-out/data"/>
                             </document>
                         </p:input>
                         <p:output name="data" id="converted"/>
@@ -179,11 +192,18 @@
 
             <!-- Serialize out as is -->
             <p:processor name="oxf:http-serializer">
-                <p:input name="config">
-                    <config>
+                <p:input name="config" transform="oxf:unsafe-xslt" href="#sql-out">
+                    <config xsl:version="2.0">
                         <cache-control>
                             <use-local-cache>false</use-local-cache>
                         </cache-control>
+                        <header>
+                            <name>Last-Modified</name>
+                            <value>
+                                <!-- Format the date -->
+                                <xsl:value-of select="format-dateTime(xs:dateTime(/sql-out/last-modified), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>
+                            </value>
+                        </header>
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

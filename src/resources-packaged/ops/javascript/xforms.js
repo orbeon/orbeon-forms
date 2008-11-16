@@ -4330,53 +4330,66 @@ ORBEON.xforms.Server = {
         var responseXML = o.responseXML;
         if (!YAHOO.lang.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
 
-            // Parse content we receive into a new div we create just for that purpose
-            var temporaryContainer = document.createElement("div");
-            temporaryContainer.innerHTML = o.responseText;
-            var newPortletDiv = ORBEON.util.Dom.getChildElementByIndex(temporaryContainer, 0);
+            if (dojox && dojox.html && dojox.html.set) {
+                // Parse content we receive into a new div we create just for that purpose
+                var temporaryContainer = document.createElement("div");
+                temporaryContainer.innerHTML = o.responseText;
+                var newPortletDiv = ORBEON.util.Dom.getChildElementByIndex(temporaryContainer, 0);
 
-            // Get existing div which is above the form that issued this request
-            var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
-            while (existingPortletDiv != null && existingPortletDiv.className && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
-                existingPortletDiv = existingPortletDiv.parentNode;
+                // Get existing div which is above the form that issued this request
+                var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
+                while (existingPortletDiv != null && existingPortletDiv.className && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
+                    existingPortletDiv = existingPortletDiv.parentNode;
 
-            // Remove content from existing div
-            while (existingPortletDiv.childNodes.length > 0)
-                existingPortletDiv.removeChild(existingPortletDiv.firstChild);
- 
-            var scriptURLs = new Array();       // URLs of all external scripts
-            var inlineScripts = new Array();    // inline <script> elements
+                // Remove content from existing div
+                while (existingPortletDiv.childNodes.length > 0)
+                    existingPortletDiv.removeChild(existingPortletDiv.firstChild);
 
-            // Add children to newPortletDiv
-            while (newPortletDiv.childNodes.length > 0) {
-                var currentElement = newPortletDiv.firstChild;
-                if (currentElement.nodeType == ELEMENT_TYPE && currentElement.tagName.toLowerCase() == 'script') {
-                    // Found a script
-                    if (currentElement.getAttribute("src") != null) {
-                        scriptURLs.push(currentElement.getAttribute("src"));
-                    } else {
-                        inlineScripts.push(currentElement);
-                    }
-                    // Make sure to remove it
-                    newPortletDiv.removeChild(currentElement);
-                } else {
-                    // Just copy
-                    existingPortletDiv.appendChild(currentElement);
-                }
+                // Replace the content and re-initialize XForms
+                dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: true, executeScripts: true, adjustPaths: true, referencePath: "/" });
+                ORBEON.xforms.Init.document();
             }
 
-            YAHOO.util.Get.script(scriptURLs, { onSuccess: function() {
-//                alert("scripts loaded");
-
-                // Add all inline scripts first so that things like xformsPageLoadedServer are defined
-                for (var i = 0; i < inlineScripts.length; i++) {
-//                    window.document.getElementsByTagName("head")[0].appendChild(inlineScripts[i]);
-                    existingPortletDiv.appendChild(inlineScripts[i]);
-                }
-
-                // Perform initialization again after all external scripts have loaded
-                ORBEON.xforms.Init.document();
-            }});
+//            if (false) {
+//            var scriptURLs = new Array();       // URLs of all external scripts
+//            var inlineScripts = new Array();    // inline <script> elements
+//
+//            // Add children to newPortletDiv
+//            while (newPortletDiv.childNodes.length > 0) {
+//                var currentElement = newPortletDiv.firstChild;
+//                if (currentElement.nodeType == ELEMENT_TYPE && currentElement.tagName.toLowerCase() == 'script') {
+//                    // Found a script
+//                    if (currentElement.src != null && currentElement.src != "") {// IE returns an empty src
+////                        alert("src: " + currentElement.src);
+//                        scriptURLs.push(currentElement.getAttribute("src"));
+//                    } else {
+//                        inlineScripts.push(currentElement);
+//                    }
+//                    // Make sure to remove it
+//                    newPortletDiv.removeChild(currentElement);
+//                } else {
+//                    // Just copy
+//                    existingPortletDiv.appendChild(currentElement);
+//                }
+//            }
+//
+//            YAHOO.util.Get.script(scriptURLs, { onSuccess: function() {
+////                ORBEON.xforms.Init.document();
+//
+//                // Add all inline scripts first so that things like xformsPageLoadedServer are defined
+//                for (var i = 0; i < inlineScripts.length; i++) {
+//                    if (inlineScripts[i].text != "") {
+//                        var n = document.createElement('script');
+//                        n.type = "text/javascript";
+//                        n.text = inlineScripts[i].text;
+//                        existingPortletDiv.appendChild(n);
+//                    }
+//                }
+//
+//                // Perform initialization again after all external scripts have loaded
+//                ORBEON.xforms.Init.document();
+//            }});
+//            }
 
         } else {
             if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {

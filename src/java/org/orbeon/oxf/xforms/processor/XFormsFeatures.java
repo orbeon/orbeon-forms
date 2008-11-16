@@ -224,6 +224,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/animation/animation.js", "/ops/yui/animation/animation-min.js"),
             new ResourceConfig("/ops/yui/dragdrop/dragdrop.js", "/ops/yui/dragdrop/dragdrop-min.js"),
             new ResourceConfig("/ops/yui/container/container.js", "/ops/yui/container/container-min.js"),
+//            new ResourceConfig("/ops/yui/get/get.js", "/ops/yui/get/get-min.js"),
 
             new ResourceConfig("/ops/yui/calendar/calendar.js", "/ops/yui/calendar/calendar-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {

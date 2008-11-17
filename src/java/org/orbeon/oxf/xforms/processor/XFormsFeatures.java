@@ -163,7 +163,10 @@ public class XFormsFeatures {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap) || isYUIRTEInUse(containingDocument, appearancesMap);
                 }
-                public String getFeatureName() { return "menu"; }
+                private final String[] FEATURE_NAMES = new String[] { "menu", "yuirte" };
+                protected String[] getFeatureNames() {
+                    return FEATURE_NAMES;
+                }
             },
             // HTML area
             // NOTE: This doesn't work, probably because FCK editor files must be loaded in an iframe
@@ -254,7 +257,10 @@ public class XFormsFeatures {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap) || isYUIRTEInUse(containingDocument, appearancesMap);
                 }
-                public String getFeatureName() { return "menu"; }
+                private final String[] FEATURE_NAMES = new String[] { "menu", "yuirte" };
+                protected String[] getFeatureNames() {
+                    return FEATURE_NAMES;
+                }
             },
             // HTML area
             new ResourceConfig("/ops/fckeditor/fckeditor.js", null) {
@@ -370,17 +376,32 @@ public class XFormsFeatures {
 
         public boolean isInUseByFeatureMap(Map featureMap) {
             // Default to true but can be overridden
-            final String featureName = getFeatureName();
-
-            if (featureName == null)
+            final String[] featureNames = getFeatureNames();
+            if (featureNames == null)
                 return true;
 
-            final FeatureConfig featureConfig = (FeatureConfig) featureMap.get(featureName);
-            return featureConfig != null;
+            for (int i = 0; i < featureNames.length; i++) {
+                final FeatureConfig featureConfig = (FeatureConfig) featureMap.get(featureNames[i]);
+                // At least one feature uses this resource
+                if (featureConfig != null)
+                    return true;
+            }
+
+            // Not found
+            return false;
         }
 
         protected String getFeatureName() {
             return null;
+        }
+
+        protected String[] getFeatureNames() {
+            // Default implementation just calls getFeatureName() as a given resource is usually used by just one feature
+            final String featureName = getFeatureName();
+            if (featureName == null)
+                return null;
+            else
+                return new String[] { featureName };
         }
 
         public static boolean isInUse(Map appearancesMap, String controlName) {
@@ -412,7 +433,7 @@ public class XFormsFeatures {
             return isInUse(appearancesMap, "select1", XFormsSelect1Control.AUTOCOMPLETE_APPEARANCE);
         }
 
-        protected boolean isHtmlAreaInUse(Map appearancesMap) {
+        private boolean isHtmlAreaInUse(Map appearancesMap) {
             return isInUse(appearancesMap, "textarea", "text/html");
         }
 

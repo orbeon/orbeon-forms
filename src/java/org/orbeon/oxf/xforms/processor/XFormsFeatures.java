@@ -173,13 +173,13 @@ public class XFormsFeatures {
 //                }
 //                public String getFeatureName() { return "htmlarea"; }
 //            },
-            new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", "/ops/yui/editor/assets/skins/sam/editor-min.css") {
+            new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isYUIRTEInUse(containingDocument, appearancesMap);
                 }
                 public String getFeatureName() { return "yuirte"; }
             },
-            new ResourceConfig("/ops/yui/button/assets/skins/sam/button.css", "/ops/yui/button/assets/skins/sam/button-min.css") {
+            new ResourceConfig("/ops/yui/button/assets/skins/sam/button.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isYUIRTEInUse(containingDocument, appearancesMap);
                 }

@@ -319,7 +319,7 @@
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
             </zipfileset>
-            <zipfileset dir="${war.dir}/WEB-INF/resources/ops/javascript" prefix="ops/javascript">
+            <zipfileset dir="${war.dir}/WEB-INF/resources/ops" prefix="ops">
                 <include name="**/*.js"/>
             </zipfileset>
         </jar>
@@ -455,6 +455,7 @@
     </target>
 
     <target name="orbeon-minify-js" depends="init">
+        <!-- Store those under ${war.dir}/WEB-INF/resources so they can be used in dev mode -->
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
@@ -727,7 +728,13 @@
             <param name="build.root" value="${build.root}"/>
         </antcall>
         <zip zipfile="${build.distrib.dir}/${project.name}.war">
-            <fileset dir="${war.dir}"/>
+            <zipfileset dir="${war.dir}">
+                <!-- This is already added to orbeon-resources-public.jar -->
+                <exclude name="WEB-INF/resources/ops"/>
+                <!-- These shouldn't be there, but just in case filter them out -->
+                <exclude name="WEB-INF/exist-data/*.dbx"/>
+                <exclude name="WEB-INF/exist-data/*.log"/>
+            </zipfileset>
             <zipfileset dir="${resources.dir}" prefix="WEB-INF/resources">
                 <exclude name="apps/doc/**/*.eps"/>
                 <exclude name="apps/doc/**/*.jsp"/>

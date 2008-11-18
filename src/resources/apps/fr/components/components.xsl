@@ -23,6 +23,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -39,10 +40,13 @@
     <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
+
     <xsl:variable name="is-detail" select="doc('input:instance')/*/mode != ''" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
     <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>
+
+    <xsl:variable name="components" select="doc('input:components')/*" as="element(components)"/>
 
     <!-- Properties -->
     <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
@@ -143,10 +147,8 @@
 
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
-        <!-- Load components -->
-        <!-- TODO: FIXME: This is not efficient because it causes reloading every time -->
-        
-        <xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat(pipeline:property('oxf.fr.appserver.uri'), '/fr/service/components/', $app, '/', $form, '?fr-unroll=true'), true()))"/>
+        <!-- Insert components -->
+        <xsl:copy-of select="$components/xbl:xbl"/>
 
         <!--<xsl:if test="$components-uri">-->
             <!--<xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>-->
@@ -156,7 +158,6 @@
                 <!--<xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat('/fr/service/components/', $app, '/', $form), true()))"/>-->
             <!--xxx-->
         <!--</xsl:message>-->
-
 
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"

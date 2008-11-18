@@ -133,7 +133,7 @@
 
     <!-- ==== Loading of components ==== -->
     <page path-info="/fr/service/components/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="components/load-components.xpl"
+          model="components/prepare-components.xpl"
           default-submission="request-parameters.xml">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>

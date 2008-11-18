@@ -188,7 +188,7 @@
     <!-- Submission to test the form -->
     <xforms:submission id="fb-test-form-submission"
             ref="instance('fr-form-instance')" method="post" replace="all"
-            resource="/fr/orbeon/builder/test" xxforms:target="_blank" xxforms:show-progress="false"/>
+            resource="/fr/orbeon/builder/test/" xxforms:target="_blank" xxforms:show-progress="false"/>
 
     <!-- TODO: check where local variable can be used instead -->
     <xforms:instance id="fb-variables">

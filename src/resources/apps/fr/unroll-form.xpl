@@ -24,6 +24,8 @@
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the form -->
     <p:param type="input" name="data"/>
+    <!-- Components -->
+    <p:param type="input" name="components"/>
     <!-- XHTML+XForms -->
     <p:param type="output" name="data"/>
 
@@ -77,8 +79,11 @@
         <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="config" href="components/components.xsl"/>
-        <p:output name="data" id="after-components"/>
         <p:input name="request" href="#request"/>
+        <p:input name="components" href="#components"/>
+
+        <p:output name="data" id="after-components"/>
+
         <!-- This is here just so that we can reload the form when the properties or the resources change -->
         <p:input name="properties-xforms" href="oxf:/config/properties-xforms.xml"/>
         <p:input name="properties-form-runner" href="oxf:/config/properties-form-runner.xml"/>

@@ -418,7 +418,7 @@ ORBEON.util.Dom = {
         parentElement.replaceChild(newInputElement, inputElement);
         // For non-W3C compliant browsers we must re-register listeners on the new upload element we just created
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-            ORBEON.xforms.Init.registerListenersOnFormElement(newInputElement);
+            ORBEON.xforms.Init.registerChangeListenerOnFormElement(newInputElement);
         }
 
         return null;
@@ -3252,14 +3252,27 @@ ORBEON.xforms.Init = {
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
 
-    registerListenersOnFormElements: function() {
+    registerChangeListenerOnFormElements: function() {
         for (var i = 0; i < document.forms.length; i++) {
             var form = document.forms[i];
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
                 var elementCount = form.elements.length;
                 for (var j = 0; j < elementCount; j++) {
                     var element = form.elements[j];
-                    ORBEON.xforms.Init.registerListenersOnFormElement((element));
+                    ORBEON.xforms.Init.registerChangeListenerOnFormElement((element));
+                }
+            }
+        }
+    },
+
+    removeChangeListenerOnFormElements: function() {
+        for (var i = 0; i < document.forms.length; i++) {
+            var form = document.forms[i];
+            if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
+                var elementCount = form.elements.length;
+                for (var j = 0; j < elementCount; j++) {
+                    var element = form.elements[j];
+                    ORBEON.xforms.Init.removeChangeListenerOnFormElement((element));
                 }
             }
         }
@@ -3268,8 +3281,12 @@ ORBEON.xforms.Init = {
     /**
      * For IE, since we haven't found a way to have one listener on the whole document the "change" event.
      */
-    registerListenersOnFormElement: function(element) {
+    registerChangeListenerOnFormElement: function(element) {
         YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
+    },
+
+    removeChangeListenerOnFormElement: function(element) {
+        YAHOO.util.Event.removeListener(element, "change", ORBEON.xforms.Events.change);
     },
 
     registerDraggableListenersOnRepeatElements: function() {
@@ -3397,16 +3414,18 @@ ORBEON.xforms.Init = {
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
 
-        // Register events in the capture phase for W3C-compliant browsers.
+        // Register event handlers using capture phase for W3C-compliant browsers
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-            ORBEON.xforms.Init.registerListenersOnFormElements();
+            ORBEON.xforms.Init.registerChangeListenerOnFormElements();
             if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+                // Use YUI
                 YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
                 YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
                 YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
             }
         } else {
             if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+                // Use DOM API
                 document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
                 document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
                 document.addEventListener("change", ORBEON.xforms.Events.change, true);
@@ -4351,6 +4370,32 @@ ORBEON.xforms.Server = {
                 while (existingPortletDiv != null && existingPortletDiv.className && !ORBEON.util.Dom.hasClass(existingPortletDiv, "orbeon-portlet-div"))
                     existingPortletDiv = existingPortletDiv.parentNode;
 
+                // Remove top-level event handlers in case the user interacts with newly added elements before
+                // ORBEON.xforms.Init.document() has completed
+                if (ORBEON.xforms.Globals.topLevelListenerRegistered) {
+                    if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                        YAHOO.util.Event.removeListener(document, "focusin", ORBEON.xforms.Events.focus);
+                        YAHOO.util.Event.removeListener(document, "focusout", ORBEON.xforms.Events.blur);
+                        YAHOO.util.Event.removeListener(document, "change", ORBEON.xforms.Events.change);
+                    } else {
+                        document.removeEventListener("focus", ORBEON.xforms.Events.focus, true);
+                        document.removeEventListener("blur", ORBEON.xforms.Events.blur, true);
+                        document.removeEventListener("change", ORBEON.xforms.Events.change, true);
+                    }
+
+                    YAHOO.util.Event.removeListener(document, "keypress", ORBEON.xforms.Events.keypress);
+                    YAHOO.util.Event.removeListener(document, "keydown", ORBEON.xforms.Events.keydown);
+                    YAHOO.util.Event.removeListener(document, "keyup", ORBEON.xforms.Events.keyup);
+                    YAHOO.util.Event.removeListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
+                    YAHOO.util.Event.removeListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
+                    YAHOO.util.Event.removeListener(document, "click", ORBEON.xforms.Events.click);
+                    YAHOO.util.Event.removeListener(window, "resize", ORBEON.xforms.Events.resize);
+                    YAHOO.widget.Overlay.windowScrollEvent.unsubscribe(ORBEON.xforms.Events.scrollOrResize);
+                    YAHOO.widget.Overlay.windowResizeEvent.unsubscribe(ORBEON.xforms.Events.scrollOrResize);
+
+                    ORBEON.xforms.Globals.topLevelListenerRegistered = false;
+                }
+
                 // Remove content from existing div
                 while (existingPortletDiv.childNodes.length > 0)
                     existingPortletDiv.removeChild(existingPortletDiv.firstChild);
@@ -4547,7 +4592,7 @@ ORBEON.xforms.Server = {
                                         // Initialize newly added form elements. We don't need to do this for IE, because with
                                         // IE when an element is cloned, the clone has the same event listeners as the original.
                                         if (ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
-                                            ORBEON.xforms.Init.registerListenersOnFormElements();
+                                            ORBEON.xforms.Init.registerChangeListenerOnFormElements();
                                             ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                         }
                                     }
@@ -4711,7 +4756,7 @@ ORBEON.xforms.Server = {
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = documentElement;
                                                 // Re-register handlers on the newly created control
-                                                ORBEON.xforms.Init.registerListenersOnFormElement(documentElement);
+                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(documentElement);
                                             } else {
                                                 // Version for compliant browsers
                                                 documentElement.innerHTML = sb.join("");

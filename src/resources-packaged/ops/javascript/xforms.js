@@ -295,6 +295,9 @@ ORBEON.util.Dom = {
      * 2) This performs caching of element ids, so when the same element is requested many times in a row we'll be
      *    able to respond just by looking at the cache, instead of calling document.getElementById. This has a
      *    significant impact in particular when copying many repeat items on Firefox.
+     * 
+     * NOTE: At the moment we do not remove element from this cache, e.g. when repeat iterations are removed. This mean
+     * that getElementById() may return elements that are no longer in the main document.
      */
     getElementById: function(controlId) {
         var result = ORBEON.xforms.Globals.idToElement[controlId];
@@ -796,9 +799,8 @@ ORBEON.util.DateTime = {
      * This function s not related to the algo, it's for
      * getReadable()'s purposes only.
      *
-     * @param int s An integer value
+     * @param s An integer value
      * @return string The input padded with a zero if it's one number int
-     * @see getReadable()
      */
     _padAZero: function(s) {
         s = s.toString();
@@ -2111,7 +2113,9 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             // Control elements
             var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId) : null;
+            // NOTE: Below we use getElementByIdNoCache() because it may happen that the element has been removed from
+            // a repeat iteration. The id cache should be improved to handle this better so we don't have to do this.
+            var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.getElementByIdNoCache(ORBEON.xforms.Globals.currentFocusControlId) : null;
 
             if (targetControlElement != null) {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list

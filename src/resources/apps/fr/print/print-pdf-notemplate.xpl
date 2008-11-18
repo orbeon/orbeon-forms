@@ -22,9 +22,9 @@
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Unrolled XHTML+XForms -->
-    <p:param type="input" name="xforms" debug="xxxxforms"/>
+    <p:param type="input" name="xforms"/>
     <!-- Request parameters -->
-    <p:param type="input" name="parameters" debug="xxxxparams"/>
+    <p:param type="input" name="parameters"/>
     <!-- PDF document -->
     <p:param type="output" name="data"/>
 

@@ -730,10 +730,10 @@
         <zip zipfile="${build.distrib.dir}/${project.name}.war">
             <zipfileset dir="${war.dir}">
                 <!-- This is already added to orbeon-resources-public.jar -->
-                <exclude name="WEB-INF/resources/ops"/>
+                <exclude name="WEB-INF/resources/ops/**"/>
                 <!-- These shouldn't be there, but just in case filter them out -->
-                <exclude name="WEB-INF/exist-data/*.dbx"/>
-                <exclude name="WEB-INF/exist-data/*.log"/>
+                <exclude name="WEB-INF/exist-data*/*.dbx"/>
+                <exclude name="WEB-INF/exist-data*/*.log"/>
             </zipfileset>
             <zipfileset dir="${resources.dir}" prefix="WEB-INF/resources">
                 <exclude name="apps/doc/**/*.eps"/>

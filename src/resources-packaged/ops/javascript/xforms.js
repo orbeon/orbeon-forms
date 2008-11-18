@@ -2968,7 +2968,7 @@ ORBEON.widgets.YUICalendar = function() {
 
     var RESOURCES = {
         "en": {
-            "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "Septembre",  "October",  "November",  "December" ],
+            "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "September",  "October",  "November",  "December" ],
             "WEEKDAYS_SHORT": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
             "START_WEEKDAY": 0
         },
@@ -3150,7 +3150,8 @@ ORBEON.widgets.RTE = function() {
 
     // === PUBLIC ===
 
-    return {
+    var PUBLIC = {
+
         extending: ORBEON.widgets.Base,
 
         /**
@@ -3209,7 +3210,9 @@ ORBEON.widgets.RTE = function() {
             var yuiRTE = rteEditors[control.id];
             return yuiRTE.getEditorHTML();
         }
-    }
+    };
+
+    return PUBLIC;
 }();
 
 

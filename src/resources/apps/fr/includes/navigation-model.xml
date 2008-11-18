@@ -32,13 +32,17 @@
     <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
          URL design perspective having the language better identifies the resource -->
 
+    <xforms:submission id="fr-edit-switch-script-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"/>
+
     <xforms:submission id="fr-print-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/print?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 
     <xforms:submission id="fr-pdf-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/pdf?fr-language={xxforms:instance('fr-language-instance')}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 
@@ -49,7 +53,7 @@
 
     <!-- Send the current form by email -->
     <xforms:submission id="fr-email-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/email?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/email/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
 
 </xforms:model>

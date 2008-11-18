@@ -19,6 +19,6 @@
     <form/>
     <!-- Document id -->
     <document/>
-    <!-- Mode (new, edit, view) -->
+    <!-- Mode (new, edit, view, etc.) -->
     <mode/>
 </request>

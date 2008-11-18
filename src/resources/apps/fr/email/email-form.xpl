@@ -38,7 +38,7 @@
 
     <!-- Extract request parameters (app, form, document, and mode) from URL -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../print/request-parameters.xpl"/>
+        <p:input name="config" href="../request-parameters.xpl"/>
         <p:output name="data" id="parameters"/>
     </p:processor>
 

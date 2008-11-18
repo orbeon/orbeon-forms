@@ -74,7 +74,7 @@
         </xforms:action>
 
         <!-- Load current form configuration -->
-        <xxforms:variable name="source-form" select="xxforms:get-request-attribute('oxf.fr.form')"/>
+        <xxforms:variable name="source-form" select="xxforms:get-request-attribute('fr-form-definition')"/>
         <xforms:action if="exists($source-form)">
             <!-- Got it from the request -->
             <xforms:message level="xxforms:log-info">Got source form from request.</xforms:message>
@@ -85,28 +85,40 @@
             <xforms:message level="xxforms:log-info">Could not get source form from request. Trying submission instead.</xforms:message>
             <xforms:send submission="get-source-form-submission"/>
         </xforms:action>
-        
-        <!-- A document id is provided -->
-        <xforms:action if="$parameters/document != ''">
-            <!-- Display document with that id -->
-            <xforms:send submission="fr-get-document-submission"/>
-        </xforms:action>
-        <!-- No document id is provided and we are not in print view -->
-        <xxforms:variable name="is-new-document" select="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf', 'email'))"/>
-        <xforms:action if="$is-new-document">
-            <!-- Create random document id -->
-            <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
-            <!-- Do we call a service to initialize the instance? -->
-            <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))">
-                <xforms:send submission="fr-get-instance-from-service"/>
+
+        <!-- Whether a document id is provided -->
+        <xxforms:variable name="is-document-id-provided" select="$parameters/document != ''" as="xs:boolean"/>
+        <xforms:action if="$is-document-id-provided">
+            <!-- A document id is provided -->
+            <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
+            <xforms:action if="$form-data">
+                <!-- An id is provided, but the form data is also available in the request, so we use that first -->
+                <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
             </xforms:action>
-            <!-- Do we accept data posted to this page? -->
-            <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
-                <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
-                <!-- Do we have data posted to this form? -->
-                <xforms:action if="$form-data">
-                    <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
-                    <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+            <xforms:action if="not($form-data)">
+                <!-- Load document with that id from persistence layer -->
+                <xforms:send submission="fr-get-document-submission"/>
+            </xforms:action>
+        </xforms:action>
+        <xforms:action if="not($is-document-id-provided)">
+            <!-- No document id is provided -->
+            <!-- Are we in new/edit mode -->
+            <xxforms:variable name="is-new-document" select="not($parameters/mode = ('view', 'pdf', 'email'))" as="xs:boolean"/>
+            <xforms:action if="$is-new-document">
+                <!-- Create random document id -->
+                <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+                <!-- Do we call a service to initialize the instance? -->
+                <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))">
+                    <xforms:send submission="fr-get-instance-from-service"/>
+                </xforms:action>
+                <!-- Do we accept data posted to this page? -->
+                <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
+                    <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
+                    <!-- Do we have data posted to this form? -->
+                    <xforms:action if="$form-data">
+                        <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
+                        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+                    </xforms:action>
                 </xforms:action>
             </xforms:action>
         </xforms:action>

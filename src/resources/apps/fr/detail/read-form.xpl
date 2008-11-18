@@ -73,7 +73,7 @@
             <p:processor name="oxf:scope-serializer">
                 <p:input name="config">
                     <config>
-                        <key>oxf.fr.form</key>
+                        <key>fr-form-definition</key>
                         <scope>request</scope>
                     </config>
                 </p:input>

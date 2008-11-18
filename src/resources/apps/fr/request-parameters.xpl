@@ -13,6 +13,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -21,41 +23,35 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <!-- Unrolled XHTML+XForms -->
-    <p:param type="input" name="xforms" debug="xxxxforms"/>
-    <!-- Request parameters -->
-    <p:param type="input" name="parameters" debug="xxxxparams"/>
-    <!-- PDF document -->
+    <!-- Requset parameters document -->
     <p:param type="output" name="data"/>
 
-    <!-- Call XForms epilogue -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="/ops/pfc/xforms-epilogue.xpl"/>
-        <p:input name="data" href="#xforms"/>
-        <p:input name="model-data"><null xsi:nil="true"/></p:input>
-        <p:input name="instance" href="#parameters"/>
-        <p:output name="xformed-data" id="xformed-data"/>
-    </p:processor>
-
-    <!-- Remove XHTML prefixes because of a bug in Flying Saucer -->
-    <p:processor name="oxf:qname-converter">
+    <!-- Extract page detail (app, form, document, and mode) from URL -->
+    <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <match>
-                    <uri>http://www.w3.org/1999/xhtml</uri>
-                </match>
-                <replace>
-                    <prefix/>
-                </replace>
+                <include>/request/request-path</include>
             </config>
         </p:input>
-        <p:input name="data" href="#xformed-data"/>
-        <p:output name="data" id="xhtml-data"/>
+        <p:output name="data" id="request"/>
+    </p:processor>
+    <p:processor name="oxf:perl5-matcher">
+        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(new|edit|view|pdf|email)(/([^/]+))?/?</config></p:input>
+        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
+        <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
-    <!-- Serialize HTML to PDF -->
-    <p:processor name="oxf:xhtml-to-pdf">
-        <p:input name="data" href="#xhtml-data"/>
+    <!-- Put app, form, and mode in format understood by read-form.xpl -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#matcher-groups"/>
+        <p:input name="config">
+            <request xsl:version="2.0">
+                <app><xsl:value-of select="/result/group[1]"/></app>
+                <form><xsl:value-of select="/result/group[2]"/></form>
+                <document><xsl:value-of select="/result/group[5]"/></document>
+                <mode><xsl:value-of select="/result/group[3]"/></mode>
+            </request>
+        </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>
 

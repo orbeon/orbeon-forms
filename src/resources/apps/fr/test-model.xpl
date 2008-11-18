@@ -23,7 +23,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <!-- Page detail (app, form, document, and mode) -->
+    <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>
@@ -72,7 +72,7 @@
     <p:processor name="oxf:scope-serializer">
         <p:input name="config">
             <config>
-                <key>oxf.fr.form</key>
+                <key>fr-form-definition</key>
                 <scope>request</scope>
             </config>
         </p:input>

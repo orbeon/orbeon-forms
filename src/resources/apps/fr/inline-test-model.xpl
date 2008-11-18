@@ -41,7 +41,7 @@
     </p:processor>
 
     <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/([^/]+/)?(test)</config></p:input>
+        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(test)/?</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -60,7 +60,7 @@
                 <app><xsl:value-of select="/*/group[1]"/></app>
                 <form><xsl:value-of select="/*/group[2]"/></form>
                 <document/>
-                <mode><xsl:value-of select="/*/group[4]"/></mode>
+                <mode><xsl:value-of select="/*/group[3]"/></mode>
             </request>
         </p:input>
         <p:output name="data" ref="instance"/>

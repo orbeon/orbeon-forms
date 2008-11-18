@@ -32,18 +32,24 @@
         </xsl:if>
         <xhtml:div id="fr-view">
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
-                       class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
+                       class="{if (doc('input:instance')/*/mode = 'view') then ' fr-print-mode' else ''}">
                 <xhtml:div class="fr-header">
-                    <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf', 'email'))">
+                    <xsl:if test="not(doc('input:instance')/*/mode = ('view', 'pdf', 'email'))">
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
                             <xhtml:div class="fr-noscript-choice" style="float: left">
                                 <xforms:group ref=".[not(property('xxforms:noscript'))]">
-                                    <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?fr-noscript=true"><xforms:output value="$fr-resources/summary/labels/noscript"/></xhtml:a>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label><xforms:output value="$fr-resources/summary/labels/noscript"/></xforms:label>
+                                        <xforms:send ev:event="DOMActivate" submission="fr-edit-switch-script-submission"/>
+                                    </xforms:trigger>
                                     <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
                                 </xforms:group>
                                 <xforms:group ref=".[property('xxforms:noscript')]">
-                                    <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?"><xforms:output value="$fr-resources/summary/labels/script"/></xhtml:a>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label><xforms:output value="$fr-resources/summary/labels/script"/></xforms:label>
+                                        <xforms:send ev:event="DOMActivate" submission="fr-edit-switch-script-submission"/>
+                                    </xforms:trigger>
                                 </xforms:group>
                             </xhtml:div>
                         </xsl:if>
@@ -257,7 +263,7 @@
                                     <xhtml:div class="fr-buttons">
                                         <xsl:choose>
                                             <!-- In print and test modes, only include a close button -->
-                                            <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
+                                            <xsl:when test="doc('input:instance')/*/mode = ('view', 'test')">
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <fr:close-button/>

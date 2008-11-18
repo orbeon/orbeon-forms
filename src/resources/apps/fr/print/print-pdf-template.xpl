@@ -22,24 +22,29 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <!-- Unrolled XHTML+XForms with filled-out instance data -->
+    <!-- Unrolled XHTML+XForms -->
     <p:param type="input" name="xforms"/>
     <!-- Request parameters -->
     <p:param type="input" name="parameters"/>
     <!-- PDF document -->
     <p:param type="output" name="data"/>
 
-    <!-- Extract data only -->
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="#xforms#xpointer((//xforms:instance[@id = 'fr-form-instance'])[1]/*)"/>
-        <p:output name="data" id="form-data"/>
+    <!-- Get form data -->
+    <p:processor name="oxf:scope-generator">
+        <p:input name="config">
+            <config>
+                <key>fr-form-data</key>
+                <scope>request</scope>
+            </config>
+        </p:input>
+        <p:input name="data" id="form-data"/>
     </p:processor>
 
     <!-- Obtain original form document -->
     <p:processor name="oxf:scope-generator">
         <p:input name="config">
             <config>
-                <key>oxf.fr.form</key>
+                <key>fr-form-definition</key>
                 <scope>request</scope>
             </config>
         </p:input>

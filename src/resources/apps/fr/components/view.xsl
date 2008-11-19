@@ -32,7 +32,7 @@
         </xsl:if>
         <xhtml:div id="fr-view">
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
-                       class="{if ($mode = 'view') then ' fr-print-mode' else ''}">
+                       class="{if ($mode = ('view', 'pdf', 'email')) then ' fr-print-mode' else ''}">
                 <xhtml:div class="fr-header">
                     <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
                         <!-- Switch script/noscript -->

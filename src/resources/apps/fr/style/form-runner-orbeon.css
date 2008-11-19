@@ -199,4 +199,9 @@ p, fieldset, table { margin-bottom: 1em }
 /* This is also used for PDF generation */
 @media print {
     body { background-color: white; background-image: none }
+    .fr-separator { background-color: gray }
+    h1, h2, h3 { color: black }
+    a, .xforms-trigger-appearance-xxforms-minimal { color: black }
+    .fr-metadata .fr-form-title, .fr-toc { color: black }
+    .fr-section-container div.fr-collapsible { color: black }
 }

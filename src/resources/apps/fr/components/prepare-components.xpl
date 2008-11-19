@@ -71,6 +71,7 @@
                 <p:input name="config" href="../unroll-form.xpl"/>
                 <p:input name="instance" href="#parameters"/>
                 <p:input name="data" href="#template-xbl"/>
+                <!-- Don't pass components, obviously! -->
                 <p:input name="components"><components/></p:input>
                 <p:output name="data" id="unrolled-template-xbl"/>
             </p:processor>
@@ -129,14 +130,14 @@
                 <cache-control>
                     <use-local-cache>false</use-local-cache>
                 </cache-control>
-                <header>
-                    <name>Last-Modified</name>
-                    <value>
+                <!--<header>-->
+                    <!--<name>Last-Modified</name>-->
+                    <!--<value>-->
                         <!-- Format the date -->
-                        <!-- TODO: extract meaningful date! -->
-                        <xsl:value-of select="format-dateTime(xs:dateTime('2008-11-10T00:00:00'), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>
-                    </value>
-                </header>
+                        <!-- TODO: extract meaningful date in eXist CRUD! -->
+                        <!--<xsl:value-of select="format-dateTime(xs:dateTime('2008-11-10T00:00:00'), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>-->
+                    <!--</value>-->
+                <!--</header>-->
             </config>
         </p:input>
         <p:input name="data" href="#components-xml"/>

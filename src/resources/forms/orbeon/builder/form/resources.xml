@@ -116,6 +116,9 @@
         <remove-action-question>
             <label>Are you sure you want to delete action</label>
         </remove-action-question>
+        <reload-components>
+            <label>Reload Components</label>
+        </reload-components>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -231,6 +234,9 @@
         <remove-action-question>
             <label>Etes-vous sûr de vouloir supprimer l'action</label>
         </remove-action-question>
+        <reload-components>
+            <label>Recharger les composants</label>
+        </reload-components>
         <!-- Common -->
         <add>
             <label>Ajouter</label>

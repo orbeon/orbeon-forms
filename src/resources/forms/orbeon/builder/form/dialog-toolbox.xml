@@ -30,7 +30,10 @@
     <xhtml:div class="fb-toolbox-inside">
 
         <xhtml:dl id="fb-toolbox-dl" class="accordion-menu">
-            <xhtml:dt id="fb-toolbox-controls-dt" class="a-m-t a-m-d-expand fb-toolbox-section-title"><xforms:output value="$form-resources/controls/label"/></xhtml:dt>
+            <!-- Controls -->
+            <xhtml:dt id="fb-toolbox-controls-dt" class="a-m-t a-m-d-expand fb-toolbox-section-title">
+                <xforms:output value="$form-resources/controls/label"/>
+            </xhtml:dt>
             <xhtml:dd class="a-m-d a-m-d-expand fb-toolbox-controls-section">
                 <xhtml:div class="bd">
                     <!-- XVC toolbox -->
@@ -68,6 +71,16 @@
                             <xforms:action ev:event="DOMActivate">
                                 <!-- Paste control -->
                                 <xforms:dispatch name="fb-paste-control" target="fr-form-model"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                        <!-- Reload components -->
+                        <xforms:trigger appearance="minimal" class="fb-reload-components-trigger">
+                            <xforms:label>
+                                <xhtml:img src="../../../../apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
+                                <xforms:send submission="fb-load-components"/>
                             </xforms:action>
                         </xforms:trigger>
                     </xhtml:div>
@@ -139,13 +152,13 @@
                         <!-- Add grids -->
                         <xforms:group context="$current-top-level-block" appearance="xxforms:internal">
                             <xhtml:div class="fb-tool">
-                                <xforms:trigger appearance="full">
+                                <xforms:trigger appearance="full" ref="instance('fb-variables')/grids-triggers">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                                         <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                        <xforms:insert context="$current-top-level-block" nodeset="fr:section | fr:repeat | fr:grid"
                                                        at="index('fb-section-content-repeat')" position="after"
                                                        origin="instance('fb-grid-1-template')"/>
                                     </xforms:action>
@@ -160,16 +173,12 @@
                                 <!-- Display localized name -->
                                 <xforms:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
 
-                                <!--xxx <xforms:output value="string-join($current-td/ancestor::*/name(), '/')"/> xxx-->
-
                                 <xforms:repeat nodeset="xbl:binding" id="fb-components-template-repeat">
 
                                     <xxforms:variable name="binding" select="." as="element(xbl:binding)"/>
 
                                     <!-- Whether the component is a section component or not -->
                                     <xxforms:variable name="is-section-component" select="tokenize($binding/@class, '\s') = 'fr-section-component'" as="xs:boolean"/>
-
-                                    <!--<xforms:output value="$is-section-component"/>-->
 
                                     <xhtml:div class="fb-tool">
                                         <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
@@ -290,6 +299,12 @@
                             </xforms:group>
                         </xhtml:div>
                     </xforms:repeat>
+
+                    <!--<xforms:trigger appearance="minimal">-->
+                        <!--<xforms:label>test</xforms:label>-->
+                        <!--<xxforms:invalidate-instances ev:event="DOMActivate"/>-->
+                    <!--</xforms:trigger>-->
+
                 </xhtml:div>
             </xhtml:dd>
             <xhtml:dt id="fb-toolbox-i18n-dt" class="a-m-t"><xforms:output value="$form-resources/i18n/label"/></xhtml:dt>

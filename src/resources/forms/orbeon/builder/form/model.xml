@@ -208,6 +208,7 @@
             <publish-trigger/>
             <controls-triggers/>
             <sections-triggers/>
+            <grids-triggers/>
 
             <xml-view/>
         </variables>
@@ -221,6 +222,8 @@
                      readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]
                                                                         or not($current-td/following-sibling::xhtml:td)
                                                                             and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/*)))))"/>
+        <!-- When are grids triggers enabled -->
+        <xforms:bind nodeset="grids-triggers" readonly="$current-td/ancestor::xbl:binding"/>
     </xforms:bind>
 
     <!-- React to a focus on a repeat -->

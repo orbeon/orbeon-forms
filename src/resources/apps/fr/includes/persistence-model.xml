@@ -94,6 +94,9 @@
             <xforms:action if="$form-data">
                 <!-- An id is provided, but the form data is also available in the request, so we use that first -->
                 <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
+                <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
+                     mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
+                <xforms:setvalue ref="instance('fr-persistence-instance')/initial-data-status">dirty</xforms:setvalue>
             </xforms:action>
             <xforms:action if="not($form-data)">
                 <!-- Load document with that id from persistence layer -->
@@ -129,8 +132,7 @@
         <xforms:revalidate/>
 
         <!-- Set the initial data status -->
-        <!--<xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>-->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="../initial-data-status"/>
     </xforms:action>
 
     <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
@@ -385,10 +387,12 @@
 
     <xforms:instance id="fr-persistence-instance">
         <save xmlns="">
-            <!-- Whether an attempt to submit was ever done -->
-            <save-attempted>false</save-attempted>
+            <!-- Initial data status -->
+            <initial-data-status>clean</initial-data-status>
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
             <data-status>clean</data-status>
+            <!-- Whether an attempt to submit was ever done -->
+            <save-attempted>false</save-attempted>
             <!-- Success or error message to display -->
             <message/>
             <!-- Error document returned -->
@@ -468,7 +472,6 @@
     <!-- Mark status as dirty if data changes -->
     <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
     <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-
 
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-value-changed">

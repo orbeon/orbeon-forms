@@ -138,6 +138,33 @@
         </xforms:trigger>
     </xsl:template>
 
+    <xsl:template match="fr:workflow-review-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/submit" xxforms:modal="true" id="fr-workflow-review-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
+            </xforms:label>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:workflow-edit-button">
+        <xforms:trigger xxforms:modal="true" id="fr-workflow-edit-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/previous.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
+            </xforms:label>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:workflow-send-button">
+        <xforms:trigger xxforms:modal="true" id="fr-workflow-send-button">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
+            </xforms:label>
+        </xforms:trigger>
+    </xsl:template>
+
     <xsl:template match="fr:close-button">
 
         <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just

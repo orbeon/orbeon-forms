@@ -16,7 +16,7 @@
     <![CDATA[
     function unload_handler(){
         try{
-            if (!ORBEON.xforms.Document.isReloading() && ORBEON.xforms.Document.getValue('fr-data-status-input') == 'dirty'){
+            if (!ORBEON.xforms.Document.isReloading() && ORBEON.xforms.Document.getValue('fr-data-safe-input') != 'true'){
               return "You may lose some unsaved changes.";
             }
         } catch (ex) {

@@ -96,6 +96,9 @@
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
                 <submit-document>Submit</submit-document>
+                <workflow-review>Review</workflow-review>
+                <workflow-edit>Edit</workflow-edit>
+                <workflow-send>Send</workflow-send>
                 <return>Back to Forms</return>
                 <discard>Forget Changes</discard>
                 <language-choice>Language</language-choice>
@@ -225,6 +228,9 @@
                 <save-locally>Sauvegarde Locale</save-locally>
                 <save-offline>Sauvegarde Or-ligne</save-offline>
                 <submit-document>Envoyer</submit-document>
+                <workflow-review>Revue</workflow-review>
+                <workflow-send>Envoyer</workflow-send>
+                <workflow-edit>Edition</workflow-edit>
                 <return>Retour</return>
                 <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>
@@ -354,6 +360,9 @@
                 <save-locally>Guardar en su computador</save-locally>
                 <save-offline>Guardar Sin conexión</save-offline>
                 <submit-document>Enviar</submit-document>
+                <workflow-review>[Review]</workflow-review>
+                <workflow-edit>[Edit]</workflow-edit>
+                <workflow-send>[Send]</workflow-send>
                 <return>Volver al formulario</return>
                 <discard>No guardar los cambios</discard>
                 <language-choice>Idioma</language-choice>

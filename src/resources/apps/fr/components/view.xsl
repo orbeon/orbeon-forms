@@ -32,24 +32,31 @@
         </xsl:if>
         <xhtml:div id="fr-view">
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
-                       class="{if (doc('input:instance')/*/mode = 'view') then ' fr-print-mode' else ''}">
+                       class="{if ($mode = 'view') then ' fr-print-mode' else ''}">
                 <xhtml:div class="fr-header">
-                    <xsl:if test="not(doc('input:instance')/*/mode = ('view', 'pdf', 'email'))">
+                    <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
                             <xhtml:div class="fr-noscript-choice" style="float: left">
-                                <xforms:group ref=".[not(property('xxforms:noscript'))]">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label><xforms:output value="$fr-resources/summary/labels/noscript"/></xforms:label>
-                                        <xforms:send ev:event="DOMActivate" submission="fr-edit-switch-script-submission"/>
-                                    </xforms:trigger>
-                                    <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
-                                </xforms:group>
-                                <xforms:group ref=".[property('xxforms:noscript')]">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label><xforms:output value="$fr-resources/summary/labels/script"/></xforms:label>
-                                        <xforms:send ev:event="DOMActivate" submission="fr-edit-switch-script-submission"/>
-                                    </xforms:trigger>
+                                <xforms:group appearance="xxforms:internal">
+                                    <xforms:group ref=".[not(property('xxforms:noscript'))]">
+                                        <xforms:trigger appearance="minimal">
+                                            <xforms:label><xforms:output value="$fr-resources/summary/labels/noscript"/></xforms:label>
+                                        </xforms:trigger>
+                                        <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
+                                    </xforms:group>
+                                    <xforms:group ref=".[property('xxforms:noscript')]">
+                                        <xforms:trigger appearance="minimal">
+                                            <xforms:label><xforms:output value="$fr-resources/summary/labels/script"/></xforms:label>
+                                        </xforms:trigger>
+                                    </xforms:group>
+                                    <!-- React to activation of both triggers -->
+                                    <xforms:action ev:event="DOMActivate">
+                                        <!-- Set data-safe-override -->
+                                        <xforms:setvalue model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
+                                        <!-- Send submission -->
+                                        <xforms:send submission="fr-edit-switch-script-submission"/>
+                                    </xforms:action>
                                 </xforms:group>
                             </xhtml:div>
                         </xsl:if>
@@ -262,38 +269,43 @@
                                     <!-- Buttons -->
                                     <xhtml:div class="fr-buttons">
                                         <xsl:choose>
-                                            <!-- In print and test modes, only include a close button -->
-                                            <xsl:when test="doc('input:instance')/*/mode = ('view', 'test')">
+                                            <!-- Use user-provided buttons -->
+                                            <xsl:when test="fr:buttons">
+                                                <xsl:apply-templates select="fr:buttons/node()"/>
+                                            </xsl:when>
+                                            <!-- Test mode -->
+                                            <xsl:when test="$mode = ('test')">
+                                                <!-- List of buttons we include based on property -->
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <fr:close-button/>
+                                                        <xsl:for-each select="$test-buttons">
+                                                            <xsl:element name="fr:{.}-button"/>
+                                                        </xsl:for-each>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
                                             </xsl:when>
                                             <!-- In view mode  -->
-                                            <xsl:when test="doc('input:instance')/*/mode = ('view')">
+                                            <xsl:when test="$mode = ('view')">
+                                                <!-- List of buttons we include based on property -->
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <fr:back-button/>
-                                                        <fr:pdf-button/>
+                                                        <xsl:for-each select="$view-buttons">
+                                                            <xsl:element name="fr:{.}-button"/>
+                                                        </xsl:for-each>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
                                             </xsl:when>
                                             <!-- In PDF mode, don't include anything -->
-                                            <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
-                                            <!-- Use user-provided buttons -->
-                                            <xsl:when test="fr:buttons">
-                                                <xsl:apply-templates select="fr:buttons/node()"/>
-                                            </xsl:when>
+                                            <xsl:when test="$mode = ('pdf')"/>
                                             <!-- Use default buttons -->
                                             <xsl:otherwise>
                                                 <!-- Message shown next to the buttons -->
                                                 <xhtml:div class="fr-buttons-message">
                                                     <xforms:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                                                 </xhtml:div>
-                                                <!-- List of buttons we inculde on the detail page based on property -->
+                                                <!-- List of buttons we include based on property -->
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <xsl:for-each select="$buttons">
@@ -364,8 +376,8 @@
             <!-- Hidden field to communicate to the client the current section to collapse or expand -->
             <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/id" id="fr-current-section-id-input" class="xforms-disabled"/>
             <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" id="fr-current-section-repeat-indexes-input" class="xforms-disabled"/>
-            <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
-            <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
+            <!-- Hidden field to communicate to the client whether the data is safe -->
+            <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe" id="fr-data-safe-input" class="xforms-disabled"/>
         </xhtml:span>
 
     </xsl:template>

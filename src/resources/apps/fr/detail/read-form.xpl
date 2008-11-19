@@ -83,9 +83,7 @@
         <p:otherwise>
             <!-- Null document -->
             <p:processor name="oxf:identity">
-                <p:input name="data">
-                    <null xsi:nil="true"/>
-                </p:input>
+                <p:input name="data"><null xsi:nil="true"/></p:input>
                 <p:output name="data" ref="data"/>
             </p:processor>
         </p:otherwise>

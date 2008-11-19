@@ -18,6 +18,7 @@
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xhtml="http://www.w3.org/1999/xhtml"
           xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:saxon="http://saxon.sf.net/"
           xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
@@ -153,8 +154,14 @@
 
     <!-- Obtain PDF data for attachment -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../print/print-pdf.xpl"/>
-        <p:input name="instance" href="#instance"/>
+        <p:input name="config" href="../detail/detail-model.xpl"/>
+        <p:input name="instance"><null xsi:nil="true"/></p:input>
+        <p:output name="data" id="xhtml"/>
+    </p:processor>
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../print/pdf-view.xpl"/>
+        <p:input name="instance" href="#parameters"/>
+        <p:input name="data" href="#xhtml"/>
         <p:output name="data" id="form-pdf"/>
     </p:processor>
 

@@ -31,7 +31,7 @@
             <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
         </xsl:if>
 
-        <xsl:variable name="open" as="xs:boolean" select="if (doc('input:instance')/*/mode = 'view') then true() else if (@open = 'false') then false() else true()"/>
+        <xsl:variable name="open" as="xs:boolean" select="if ($mode = 'view') then true() else if (@open = 'false') then false() else true()"/>
         <xsl:variable name="section-id" as="xs:string" select="@id"/>
 
         <xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>

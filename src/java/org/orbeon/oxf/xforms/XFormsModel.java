@@ -452,8 +452,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                         final String xxformsPassword;
                         final String xxformsValidation = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
-                        containingDocument.startHandleOperation("model", "loading instance (including handling returned body)");
-                        // TODO: log "instance", instanceId
+                        containingDocument.startHandleOperation("model", "loading instance (including handling returned body)",
+                                new String[] { "instance id", instanceContainerElement.attributeValue("id") });
                         {
                             final String instanceResource;
                             {
@@ -882,11 +882,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     public void doRevalidate(final PipelineContext pipelineContext) {
 
         if (instances != null && (mustBindValidate || mustSchemaValidate)) {
-            // TODO: use containingDocument.startHandleOperation()
             if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
-
-            final long revalidateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+                containingDocument.startHandleOperation("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
             // Clear validation state
             for (Iterator i = instances.iterator(); i.hasNext();) {
@@ -931,10 +928,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                 }
             }
 
-            if (XFormsServer.logger.isDebugEnabled()) {
-                final long revalidateTime = System.currentTimeMillis() - revalidateStartTime;
-                containingDocument.logDebug("model", "done revalidating", new String[] { "model id", getEffectiveId(), "time", Long.toString(revalidateTime) });
-            }
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.endHandleOperation();
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always

@@ -100,8 +100,7 @@ public class XFormsModelBinds {
     public void rebuild(PipelineContext pipelineContext) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing rebuild", new String[] { "model id", model.getEffectiveId() });
-        // TODO: use containingDocument.startHandleOperation()
+            containingDocument.startHandleOperation("model", "performing rebuild", new String[] { "model id", model.getEffectiveId() });
 
         // Reset everything
         contextStack.resetBindingContext(pipelineContext, model);
@@ -118,6 +117,9 @@ public class XFormsModelBinds {
             final Bind currentBind = new Bind(pipelineContext, currentBindElement, true);
             topLevelBinds.add(currentBind);
         }
+
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.endHandleOperation();
     }
 
     /**
@@ -127,11 +129,8 @@ public class XFormsModelBinds {
      */
     public void applyCalculateBinds(final PipelineContext pipelineContext) {
 
-        // TODO: use containingDocument.startHandleOperation()
         if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing recalculate", new String[] { "model id", model.getEffectiveId() });
-
-        final long recalculateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            containingDocument.startHandleOperation("model", "performing recalculate", new String[] { "model id", model.getEffectiveId() });
 
         // Reset context stack just to re-evaluate the variables
         contextStack.resetBindingContext(pipelineContext, model);
@@ -150,10 +149,8 @@ public class XFormsModelBinds {
             applyComputedExpressionBinds(pipelineContext);
         }
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            final long recalculateTime = System.currentTimeMillis() - recalculateStartTime;
-            containingDocument.logDebug("model", "done recalculating", new String[] { "time", Long.toString(recalculateTime) });
-        }
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.endHandleOperation();
     }
 
     /**
@@ -275,8 +272,8 @@ public class XFormsModelBinds {
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
 
-        // TODO: use containingDocument.startHandleOperation()
-        final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.startHandleOperation("model", "getting offline bind mappings");
 
         final Map effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
@@ -401,10 +398,8 @@ public class XFormsModelBinds {
 
         final String result = sb.toString();
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            final long elapsedTime = System.currentTimeMillis() - startTime;
-            containingDocument.logDebug("binds", "done computing offline information", new String[] { "time", Long.toString(elapsedTime) });
-        }
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.endHandleOperation();
 
         return result;
     }
@@ -655,11 +650,11 @@ public class XFormsModelBinds {
             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
     }
 
-    private boolean evaluateBooleanExpression2(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
-        return XPathCache.evaluateAsBoolean(pipelineContext,
-            nodeset, position, xpathExpression, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
-            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
-    }
+//    private boolean evaluateBooleanExpression2(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
+//        return XPathCache.evaluateAsBoolean(pipelineContext,
+//            nodeset, position, xpathExpression, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
+//            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
+//    }
 
     private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {
 

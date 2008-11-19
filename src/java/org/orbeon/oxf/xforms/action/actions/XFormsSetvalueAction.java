@@ -99,15 +99,21 @@ public class XFormsSetvalueAction extends XFormsAction {
     public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                                      XFormsEventTarget eventTarget, NodeInfo currentNode,
                                      String valueToSet, String type, boolean isCalculate) {
+
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
-        if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
+        final boolean changed = !currentValue.equals(valueToSet);
 
-            if (XFormsServer.logger.isDebugEnabled()) {
-                final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet,
-                        "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A" });
-            }
+        if (XFormsServer.logger.isDebugEnabled()) {
+            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+            containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet,
+                    "changed", Boolean.toString(changed),
+                    "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A" });
+        }
 
+        // We take the liberty of not requiring RRR and marking the instance dirty if the value hasn't actually changed
+        if (changed) {
+
+            // Actually set the value
             XFormsInstance.setValueForNodeInfo(pipelineContext, containingDocument, eventTarget, currentNode, valueToSet, type);
 
             if (!isCalculate) {

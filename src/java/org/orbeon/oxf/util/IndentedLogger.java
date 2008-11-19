@@ -74,6 +74,14 @@ public class IndentedLogger {
         logIndentLevel++;
     }
 
+    public void startHandleOperation(String type, String message, String[] parameters) {
+        if (logger.isDebugEnabled()) {
+            stack.push(new Operation(type, message));
+            logDebug(type, "start " + message, parameters);
+        }
+        logIndentLevel++;
+    }
+
     public void endHandleOperation() {
         logIndentLevel--;
         if (logger.isDebugEnabled()) {

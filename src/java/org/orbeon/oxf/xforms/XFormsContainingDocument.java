@@ -1290,6 +1290,10 @@ public class XFormsContainingDocument extends XFormsContainer {
         indentedLogger.startHandleOperation(type, message);
     }
 
+    public void startHandleOperation(String type, String message, String[] parameters) {
+        indentedLogger.startHandleOperation(type, message, parameters);
+    }
+
     public void endHandleOperation() {
         indentedLogger.endHandleOperation();
     }

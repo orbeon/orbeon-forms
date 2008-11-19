@@ -33,9 +33,11 @@ public class XFormsConstants {
     public static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
         
     static {
+        // TODO: should probably just use this for warnings. Also see XFormsActions: bad to duplicate.
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SCRIPT_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SHOW_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_HIDE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_INVALIDATE_INSTANCES_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_ONLINE_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_SAVE_ACTION, "");

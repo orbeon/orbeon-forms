@@ -69,6 +69,17 @@ public class XFormsModelBinds {
     private List offlineBinds = new ArrayList();                // List<Bind>
     private Map variableNamesToIds = new HashMap();             // Map<String, String> of name to id
 
+    private XFormsModelSchemaValidator xformsValidator;
+
+    private static final Map BUILTIN_XFORMS_SCHEMA_TYPES = new HashMap();
+
+    static {
+        BUILTIN_XFORMS_SCHEMA_TYPES.put("dayTimeDuration", "");
+        BUILTIN_XFORMS_SCHEMA_TYPES.put("yearMonthDuration", "");
+        BUILTIN_XFORMS_SCHEMA_TYPES.put("email", "");
+        BUILTIN_XFORMS_SCHEMA_TYPES.put("card-number", "");
+    }
+
     /**
      * Create an instance of XFormsModelBinds if the given model has xforms:bind elements.
      *
@@ -725,7 +736,24 @@ public class XFormsModelBinds {
                     final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
                     final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
-                    if (isBuiltInXFormsType && nodeValue.length() == 0) {
+                    final boolean isBuiltInXFormsSchemaType = isBuiltInXFormsType && BUILTIN_XFORMS_SCHEMA_TYPES.get(typeLocalname) != null;
+
+                    if (isBuiltInXFormsSchemaType) {
+                        // xforms:dayTimeDuration, xforms:yearMonthDuration, xforms:email, xforms:card-number
+                        if (xformsValidator == null) {
+                            xformsValidator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd");
+                            xformsValidator.loadSchemas(pipelineContext);
+                        }
+
+                        final String validationError =
+                            xformsValidator.validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName, bind.getLocationData(), bind.getId());
+
+                        if (validationError != null) {
+                            isValid = false;
+                            InstanceData.addSchemaError(currentNodeInfo, validationError, nodeValue, bind.getId());
+                        }
+
+                    } else if (isBuiltInXFormsType && nodeValue.length() == 0) {
                         // Don't consider the node invalid if the string is empty with xforms:* types
                     } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
                         // Built-in schema or XForms type

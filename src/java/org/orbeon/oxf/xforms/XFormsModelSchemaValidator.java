@@ -109,6 +109,10 @@ public class XFormsModelSchemaValidator {
         }
     }
 
+    public XFormsModelSchemaValidator(String schemaURI) {
+        this.schemaURIs = new String[] { schemaURI };
+    }
+
     public boolean hasSchema() {
         return schemaGrammar != null;
     }

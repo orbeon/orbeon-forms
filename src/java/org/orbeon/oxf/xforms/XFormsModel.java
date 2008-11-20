@@ -336,7 +336,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                 schemaValidator = new XFormsModelSchemaValidator(modelElement);
                 schemaValidator.loadSchemas(pipelineContext);
 
-                mustSchemaValidate = schemaValidator != null && schemaValidator.hasSchema();
+                mustSchemaValidate = schemaValidator.hasSchema();
             }
         }
     }

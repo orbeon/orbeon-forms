@@ -193,8 +193,8 @@
                                     </xsl:call-template>
                                 </xsl:if>
                             </xhtml:div>
-                            <!-- Noscript help section -->
-                            <xsl:if test="$is-noscript">
+                            <!-- Noscript help section (shown only in edit mode) -->
+                            <xsl:if test="$is-noscript and $mode = 'edit'">
                                 <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                 <xhtml:div class="xforms-help-panel">
                                     <xhtml:h2>

@@ -230,7 +230,7 @@
                 <submit-document>Envoyer</submit-document>
                 <workflow-review>Revue</workflow-review>
                 <workflow-send>Envoyer</workflow-send>
-                <workflow-edit>Edition</workflow-edit>
+                <workflow-edit>Editer</workflow-edit>
                 <return>Retour</return>
                 <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>

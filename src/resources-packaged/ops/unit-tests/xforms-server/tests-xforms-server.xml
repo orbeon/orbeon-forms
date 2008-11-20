@@ -2978,8 +2978,11 @@
                                         <instance>
                                             <emails>
                                                 <email/>
-                                                <email>orbeon@example.org</email>
-                                                <email>orbeon+test@example.org</email>
+                                                <email>editors@example.com</email>>
+                                                <email>~my_mail+{nospam}$?@sub-domain.example.info</email>
+                                                <email>editors@(this is a comment)example.info</email>
+                                                <email>editors{at}example{dot}info</email>
+                                                <email>mailto:editors@example.com</email>
                                                 <email>a</email>
                                                 <email>a@</email>
                                                 <email>a@b</email>
@@ -3019,8 +3022,11 @@
                                 <instance>
                                     <emails>
                                         <email/>
-                                        <email>orbeon@example.org</email>
-                                        <email>orbeon+test@example.org</email>
+                                        <email>editors@example.com</email>>
+                                        <email>~my_mail+{nospam}$?@sub-domain.example.info</email>
+                                        <email>editors@(this is a comment)example.info</email>
+                                        <email>editors{at}example{dot}info</email>
+                                        <email>mailto:editors@example.com</email>
                                         <email>a</email>
                                         <email>a@</email>
                                         <email>a@b</email>
@@ -3034,6 +3040,9 @@
                                     <email>true</email>
                                     <email>true</email>
                                     <email>true</email>
+                                    <email>false</email>
+                                    <email>false</email>
+                                    <email>false</email>
                                     <email>false</email>
                                     <email>false</email>
                                     <email>true</email>

@@ -191,7 +191,7 @@
                 <xforms:output value="$fr-resources/detail/labels/email"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="fr-email-submission"/>
+                <xforms:send submission="fr-email-service-submission"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>

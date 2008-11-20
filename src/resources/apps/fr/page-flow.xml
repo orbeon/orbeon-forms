@@ -27,7 +27,7 @@
         </action>
     </page>
 
-    <!-- ==== Pages ==== -->
+    <!-- ==== Pages ================================================================================================ -->
 
     <!-- Summary -->
     <page id="summary"
@@ -58,8 +58,6 @@
         <setvalue ref="/*/document" matcher-group="4"/>
     </page>
 
-    <!-- ==== "Inline" functionality (form data is posted) ==== -->
-
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(test)/?" matcher="oxf:perl5-matcher"
           model="inline-test-model.xpl" view="html-view.xpl">
@@ -68,11 +66,7 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
-    <!-- Email document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(email)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
-          view="email/email-form.xpl"/>
-
-    <!-- ==== Built-in eXist-based Persistence Services ==== -->
+    <!-- ==== Built-in eXist-based Persistence Services ============================================================ -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -92,7 +86,7 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
-    <!-- ==== Built-in Oracle-based Persistence Services ==== -->
+    <!-- ==== Built-in Oracle-based Persistence Services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -112,7 +106,7 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
-    <!-- ==== Built-in Resource Manager-Based Persistence Services ==== -->
+    <!-- ==== Built-in Resource Manager-Based Persistence Services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -121,7 +115,7 @@
         <setvalue ref="/*/resource" matcher-group="1"/>
     </page>
 
-    <!-- ==== Internationalization ==== -->
+    <!-- ==== Internationalization ================================================================================= -->
 
     <!-- Service putting together Form Runner resources -->
     <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
@@ -131,7 +125,7 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
-    <!-- ==== Loading of components ==== -->
+    <!-- ==== Loading of components ================================================================================ -->
     <page path-info="/fr/service/components/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           model="components/prepare-components.xpl"
           default-submission="request-parameters.xml">
@@ -139,16 +133,27 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
-    <!-- ==== Other Services ==== -->
+    <!-- ==== Other Services ======================================================================================= -->
+
+    <!-- Email document -->
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+          view="email/email-form.xpl"/>
+
+    <!-- Create PDF -->
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+          view="print/print-form.xpl"/>
 
     <!-- Generate HTML to be saved -->
     <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>
 
     <!-- Serve document previously produced -->
-    <page path-info="/fr/service/import-export/serve" model="import-export/serve.xpl" default-submission="import-export/serve-instance.xml">
+    <page path-info="/fr/service/import-export/serve" model="import-export/serve.xpl"
+          default-submission="import-export/serve-instance.xml">
         <setvalue ref="/instance/uuid" parameter="uuid"/>
         <setvalue ref="/instance/filename" parameter="filename"/>
     </page>
+
+    <!-- ==== Custom Services and Pages ============================================================================ -->
 
     <!-- Custom services provided by the application -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"

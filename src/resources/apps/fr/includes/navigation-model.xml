@@ -51,9 +51,4 @@
         <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
     </xforms:action>
 
-    <!-- Send the current form by email -->
-    <xforms:submission id="fr-email-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/email/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
-
 </xforms:model>

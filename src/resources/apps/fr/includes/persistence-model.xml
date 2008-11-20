@@ -511,8 +511,11 @@
         <!-- If the document was saved because of a "send", handle the rest of the submission process -->
         <xforms:action if="instance('fr-persistence-instance')/submit-or-save-or-send = 'send'">
 
+            <!-- Create PDF is requested -->
+            <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.pdf', $app, $form), '.'))" submission="fr-pdf-service-submission"/>
+
             <!-- Send email if requested -->
-            <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.email', $app, $form), '.'))" submission="fr-email-submission"/>
+            <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.email', $app, $form), '.'))" submission="fr-email-service-submission"/>
 
             <!-- Navigate to the confirmation page -->
             <xforms:send submission="fr-workflow-confirmation-submission"/>
@@ -520,10 +523,25 @@
 
     </xforms:action>
 
-    <!-- Send the current form to a confirmation page -->
+    <!-- Send to confirmation page -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.'))}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all"/>
+        method="post" ref="instance('fr-workflow-confirmation-instance')" replace="all"/>
+
+    <!-- Call email service -->
+    <xforms:submission id="fr-email-service-submission"
+        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/email/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
+
+    <!-- Call PDF service -->
+    <xforms:submission id="fr-pdf-service-submission"
+        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/pdf/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxforms:instance('fr-form-instance')"
+        replace="instance" instance="fr-workflow-confirmation-instance"/>
+
+    <xforms:instance id="fr-workflow-confirmation-instance">
+        <uri/>
+    </xforms:instance>
 
     <!-- React to failed submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission">

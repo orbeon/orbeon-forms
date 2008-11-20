@@ -93,6 +93,12 @@ public class XFormsSetvalueAction extends XFormsAction {
         } else {
             // Node doesn't exist, don't do anything
             // NOP
+            if (XFormsServer.logger.isDebugEnabled()) {
+                containingDocument.logDebug("setvalue", "not setting instance value", new String[] {
+                        "reason", "destination node not found",
+                        "value", valueToSet
+                });
+            }
         }
     }
 

@@ -451,6 +451,41 @@
                     href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
                 </p>
             </section>
+            <a name="xforms11-types"/>
+            <section>
+                <title>XForms 1.1 Types</title>
+                <p>
+                    Orbeon Forms supports the following XForms types:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>xforms:dayTimeDuration</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>xforms:yearMonthDuration</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>xforms:email</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>xforms:card-number</code>
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    These types can be used on binds, e.g.:
+                </p>
+                <xml-source>
+                    <xforms:bind nodeset="my-email" type="xforms:email" required="true()"/>
+                </xml-source>
+            </section>
             <a name="xforms11-function"/>
             <section>
                 <title>XForms 1.1 Functions</title>

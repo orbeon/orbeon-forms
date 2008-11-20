@@ -81,6 +81,7 @@ public class FileSerializer extends ProcessorImpl {
         private String directory;
         private String file;
         private String scope;
+        private boolean proxyResult;
         private String url;
         private boolean append;
         private boolean makeDirectories;
@@ -103,6 +104,8 @@ public class FileSerializer extends ProcessorImpl {
 
             // Scope
             scope = XPathUtils.selectStringValueNormalize(document, "/config/scope");
+            // Proxy result
+            proxyResult = ProcessorUtils.selectBooleanValue(document, "/config/proxy-result", false);
             // URL
             url = XPathUtils.selectStringValueNormalize(document, "/config/url");
 
@@ -143,6 +146,10 @@ public class FileSerializer extends ProcessorImpl {
 
         public String getScope() {
             return scope;
+        }
+
+        public boolean isProxyResult() {
+            return proxyResult;
         }
 
         public String getUrl() {
@@ -305,10 +312,18 @@ public class FileSerializer extends ProcessorImpl {
                     storeLocation.createNewFile();
 
                     // Get the url of the file
-                    final String url = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
+                    final String resultURL;
+                    {
+                        final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
+                        if ("session".equals(config.getScope()) && config.isProxyResult())
+                            resultURL = NetUtils.proxyURI(pipelineContext, localURL, config.getRequestedContentType());
+                        else
+                            resultURL = localURL;
+                    }
+
                     contentHandler.startDocument();
                     contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
-                    contentHandler.characters(url.toCharArray(), 0, url.length());
+                    contentHandler.characters(resultURL.toCharArray(), 0, resultURL.length());
                     contentHandler.endElement("", "url", "url");
                     contentHandler.endDocument();
                 }

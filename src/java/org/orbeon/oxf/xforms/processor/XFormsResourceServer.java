@@ -34,39 +34,6 @@ import java.util.*;
  */
 public class XFormsResourceServer extends ProcessorImpl {
 
-    public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
-    public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.xforms.resources.dynamic.";
-
-    public static class DynamicResource {
-        private String uri;
-        private String mediatype;
-        private long size;
-        private long lastModified;
-
-        public DynamicResource(String uri, String mediatype, long size, long lastModified) {
-            this.uri = uri;
-            this.mediatype = mediatype;
-            this.size = size;
-            this.lastModified = lastModified;
-        }
-
-        public String getURI() {
-            return uri;
-        }
-
-        public String getMediatype() {
-            return mediatype;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        public long getLastModified() {
-            return lastModified;
-        }
-    }
-
     public XFormsResourceServer() {
     }
 
@@ -78,13 +45,13 @@ public class XFormsResourceServer extends ProcessorImpl {
         final String requestPath = request.getRequestPath();
         final String filename = requestPath.substring(requestPath.lastIndexOf('/') + 1);
 
-        if (requestPath.startsWith(DYNAMIC_RESOURCES_PATH)) {
+        if (requestPath.startsWith(NetUtils.DYNAMIC_RESOURCES_PATH)) {
             // Dynamic resource requested
 
             final ExternalContext.Session session = externalContext.getSession(false);
             if (session != null) {
                 // Store mapping into session
-                final DynamicResource resource = (DynamicResource) session.getAttributesMap().get(DYNAMIC_RESOURCES_SESSION_KEY + filename);
+                final NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap().get(NetUtils.DYNAMIC_RESOURCES_SESSION_KEY + filename);
 
                 if (resource != null && resource.getURI() != null) {
                     // Found URI, stream it out
@@ -95,8 +62,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                     if (resource.getSize() > 0)
                         response.setContentLength((int) resource.getSize());// NOTE: Why does this API (and Servlet counterpart) take an int?
 
-                    if (resource.getMediatype() != null)
-                        response.setContentType(resource.getMediatype());
+                    if (resource.getContentType() != null)
+                        response.setContentType(resource.getContentType());
                     else
                         response.setContentType("application/octet-stream");
 

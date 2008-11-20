@@ -35,9 +35,38 @@
                     </element>
                 </optional>
             </interleave>
-            <element name="scope">
-                <data type="string"/>
-            </element>
+            <choice>
+                <interleave>
+                    <!-- For request and application, proxy-result cannot be true -->
+                    <element name="scope">
+                        <choice>
+                            <value>request</value>
+                            <value>application</value>
+                        </choice>
+                    </element>
+                    <optional>
+                        <element name="proxy-result">
+                            <value>false</value>
+                        </element>
+                    </optional>
+                </interleave>
+                <interleave>
+                    <!-- For session, proxy-result may be true -->
+                    <element name="scope">
+                        <choice>
+                            <value>session</value>
+                        </choice>
+                    </element>
+                    <optional>
+                        <element name="proxy-result">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
+                </interleave>
+            </choice>
         </choice>
         <optional>
             <element name="content-type">

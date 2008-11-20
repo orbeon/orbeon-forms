@@ -117,7 +117,7 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>If data written to a temporary file</td>
+                    <td rowspan="2">If data written to a temporary file</td>
                     <td>scope</td>
                     <td>Can be <code>request</code>, <code>session</code>, or <code>application</code></td>
                     <td>
@@ -128,6 +128,22 @@
                         </ul>
                     </td>
                     <td><i>none</i></td>
+                </tr>
+                <tr>
+                    <td>proxy-result</td>
+                    <td>boolean</td>
+                    <td>
+                        <p>
+                            Whether the resulting URL must be proxied. If <code>false</code>, the URL is a temporary
+                            server-side URL. If <code>true</code>, the URL is an absolute path which can be used from
+                            the web browser to retrieve the temporary file. The path does not contain the servlet
+                            context.
+                        </p>
+                        <p>
+                            This can only be <code>true</code> if the <code>&lt;scope></code> element is <code>session</code>.
+                        </p>
+                    </td>
+                    <td>false</td>
                 </tr>
                 <tr>
                     <td colspan="2">content-type</td>

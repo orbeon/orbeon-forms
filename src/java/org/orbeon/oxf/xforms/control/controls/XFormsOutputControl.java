@@ -18,12 +18,10 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -120,7 +118,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 if (!urlNorewrite) {
                     // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
                     final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-                    updatedValue = proxyURI(pipelineContext, rewrittenURI);
+                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, mediatypeAttribute);
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -129,7 +127,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:base64Binary type
 
                 final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
-                updatedValue = proxyURI(pipelineContext, uri);
+                updatedValue = NetUtils.proxyURI(pipelineContext, uri, mediatypeAttribute);
 
             } else {
                 // Return dummy image
@@ -140,34 +138,6 @@ public class XFormsOutputControl extends XFormsValueControl {
             updatedValue = defaultValue;
         }
         return updatedValue;
-    }
-
-    /**
-     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
-     * session.
-     *
-     * @param pipelineContext   PipelineContext to obtain session
-     * @param uri               server URI to transform
-     * @return                  client URI
-     */
-    private String proxyURI(PipelineContext pipelineContext, String uri) {
-
-        // Create a digest, so that for a given URI we always get the same key
-        final String digest = SecureUtils.digestString(uri, "MD5", "hex");
-
-        // Get session
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
-
-        if (session != null) {
-            // Store mapping into session
-            session.getAttributesMap().put(XFormsResourceServer.DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new XFormsResourceServer.DynamicResource(uri, mediatypeAttribute, -1, System.currentTimeMillis()));
-        }
-
-        // Rewrite new URI to absolute path without the context
-        return externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
-                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
     }
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {

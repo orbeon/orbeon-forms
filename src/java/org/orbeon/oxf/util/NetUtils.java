@@ -30,8 +30,8 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
 import java.text.ParseException;
@@ -43,6 +43,10 @@ import java.util.regex.Pattern;
 public class NetUtils {
 
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
+
+    public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
+    // Resources are served by the XForms server. It is not ideal to refer to XForms-related functionality from here.
+    public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
 
     /**
      * @see #decodeQueryString(CharSequence, boolean)
@@ -1276,13 +1280,13 @@ public class NetUtils {
         } else if (!httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf"))) {
             // TODO: implement writing to file: and oxf:
             // SHOULD be supported (should probably support oxf: as well)
-            throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
+            throw new OXFException("submission URL scheme not yet implemented: " + scheme);
         } else if (scheme.equals("mailto")) {
             // TODO: implement sending mail
             // MAY be supported
-            throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
+            throw new OXFException("submission URL scheme not yet implemented: " + scheme);
         } else {
-            throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
+            throw new OXFException("submission URL scheme not supported: " + scheme);
         }
     }
 
@@ -1311,6 +1315,65 @@ public class NetUtils {
                 new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
         } else {
             indentedLogger.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
+        }
+    }
+
+    /**
+     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
+     * session.
+     *
+     * @param pipelineContext   PipelineContext to obtain session
+     * @param uri               server URI to transform
+     * @param contentType       type of the content referred to by the URI, or null if unknown
+     * @return                  client URI
+     */
+    public static String proxyURI(PipelineContext pipelineContext, String uri, String contentType) {
+
+        // Create a digest, so that for a given URI we always get the same key
+        final String digest = SecureUtils.digestString(uri, "MD5", "hex");
+
+        // Get session
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
+
+        if (session != null) {
+            // Store mapping into session
+            session.getAttributesMap().put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
+                    new DynamicResource(uri, contentType, -1, System.currentTimeMillis()));
+        }
+
+        // Rewrite new URI to absolute path without the context
+        return externalContext.getResponse().rewriteResourceURL(DYNAMIC_RESOURCES_PATH + digest,
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+    }
+
+    public static class DynamicResource {
+        private String uri;
+        private String contentType;
+        private long size;
+        private long lastModified;
+
+        public DynamicResource(String uri, String contentType, long size, long lastModified) {
+            this.uri = uri;
+            this.contentType = contentType;
+            this.size = size;
+            this.lastModified = lastModified;
+        }
+
+        public String getURI() {
+            return uri;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public long getLastModified() {
+            return lastModified;
         }
     }
 }

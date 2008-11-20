@@ -180,7 +180,7 @@
             <xforms:action context="$new-bind">
                 <!-- Set built-in type if needed -->
                 <xforms:insert if="$instance/builtin-type != ''" context="$new-bind"
-                               origin="xxforms:attribute('type', concat(if ($instance/required = 'true') then 'xs:' else 'xforms:', $instance/builtin-type))"/>
+                               origin="xxforms:attribute('type', concat(if ($instance/required = 'true' and not($instance/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number'))) then 'xs:' else 'xforms:', $instance/builtin-type))"/>
 
                 <!-- Set schema type if needed -->
                 <!-- TODO: Handle namespace and prefix for namespace -->
@@ -301,6 +301,7 @@
                     <type>date</type>
                     <type>boolean</type>
                     <type>anyURI</type>
+                    <type>email</type>
                 </choices>
                 <choices>
                     <label>String Types</label>

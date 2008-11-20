@@ -160,6 +160,16 @@
                 <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
+
+                <!-- Set default value for app and form if needed -->
+                <!-- Do this declaratively so we don't depend on order of execution of submissions -->
+                <xforms:bind nodeset="$app-query" readonly="false()"
+                             calculate="for $a in xxforms:instance('fr-permissions')/app[1][not(@name = '*')] return
+                                            if (not(normalize-space()) and $a) then $a/@name else ."/>
+                <xforms:bind nodeset="$form-query" readonly="false()"
+                             calculate="for $f in xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/form[1][not(@name = '*')] return
+                                            if (not(normalize-space()) and $f) then $f/@name else ."/>
+
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
@@ -238,12 +248,6 @@
                     </xforms:action>
                 </xforms:action>
 
-            </xforms:action>
-
-            <!-- Set default value for app and form if needed -->
-            <xforms:action ev:event="xforms-submit-done" ev:observer="fr-get-roles-submission">
-                <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')" ref="$app-query" value="context()/@name"/>
-                <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]/form[1]" if="not(../@name = '*' or @name = '*')" ref="$form-query" value="context()/@name"/>
             </xforms:action>
 
             <!-- Summary data -->

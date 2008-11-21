@@ -90,7 +90,18 @@
                     </li>
                     <li>
                         <p>
-                            <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.5.2.
+                            <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.6.0.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Local configuration properties.</b> You can create a local property file,
+                            <code>config/properties-local.xml</code>, for your own Orbeon Forms configuration
+                            properties. These add to and override existing properties. This new mechanism facilitates
+                            upgrades of Orbeon Forms, as property files no longer have to be merged.
+                        </p>
+                        <p>
+                            See also <a href="reference-properties">Properties File</a>.
                         </p>
                     </li>
                     <li>

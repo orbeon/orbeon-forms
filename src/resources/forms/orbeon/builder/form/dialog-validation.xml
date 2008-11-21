@@ -112,6 +112,14 @@
                         <xforms:hint>Boolean XPath expression</xforms:hint>
                     </xforms:input>
 
+                    <xforms:input ref="default" incremental="true">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
+                            <xhtml:span>Initial Value</xhtml:span>
+                        </xforms:label>
+                        <xforms:hint>XPath expression</xforms:hint>
+                    </xforms:input>
+
                     <xforms:input ref="calculate" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
@@ -211,6 +219,12 @@
                 <xforms:delete if="normalize-space($instance/readonly) = ''" context="$new-bind"
                                nodeset="@readonly"/>
 
+                <!-- Set default value if needed -->
+                <xforms:insert if="normalize-space($instance/default) != ''" context="$new-bind"
+                               origin="xxforms:attribute('xxforms:default', normalize-space($instance/default))"/>
+                <xforms:delete if="normalize-space($instance/default) = ''" context="$new-bind"
+                               nodeset="@xxforms:default"/>
+
                 <!-- Set calculated value if needed -->
                 <xforms:insert if="normalize-space($instance/calculate) != ''" context="$new-bind"
                                origin="xxforms:attribute('calculate', normalize-space($instance/calculate))"/>
@@ -253,6 +267,9 @@
             <xforms:setvalue ref="$instance/required" value="starts-with($current-bind/@type, 'xs:')"/>
         </xforms:action>
 
+        <!-- Set default -->
+        <xforms:setvalue ref="$instance/default" value="$current-bind/@xxforms:default"/>
+
         <!-- Set calculate -->
         <xforms:setvalue ref="$instance/calculate" value="$current-bind/@calculate"/>
     </xforms:action>
@@ -267,6 +284,7 @@
                 <relevant/>
                 <readonly/>
 
+                <default/>
                 <calculate/>
                 <schema-type/>
                 <alert/>
@@ -281,7 +299,7 @@
 
         <xforms:bind nodeset="instance('fb-validation-editor-instance')">
             <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
-            <xforms:bind nodeset="relevant | readonly | constraint | calculate" type="xxforms:xpath2" required="false()"/>
+            <xforms:bind nodeset="relevant | readonly | constraint | default | calculate" type="xxforms:xpath2" required="false()"/>
             <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 

@@ -497,6 +497,39 @@
         <a name="extensions"/>
         <section>
             <title>Extensions</title>
+            <a name="xxforms-default-mip"/>
+            <section>
+                <title>Custom MIP to Specify default instance values</title>
+                <p>
+                    In XForms, default or initial values can be set by pre-populating an instance document's elements
+                    and attributes with initial data, for example:
+                </p>
+                <xml-source>
+                    <xforms:instance>
+                        <form>
+                            <username>jdoe</username>
+                            ...
+                        </form>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    For dynamic values, for example coming from request parameters or session values, there is no
+                    declarative notation and you must use <code>xforms-submit-done</code> or
+                    <code>xforms-submit-ready</code>, which is sometimes cumbersome:
+                </p>
+                <xml-source>
+                    <xforms:setvalue ev:event="xforms-model-construct-done" ref="username" value="xxforms:get-request-header('MY_USER')"/>
+                </xml-source>
+                <p>
+                    For convenience, Orbeon Forms support an extension model item property:
+                    <code>xxforms:default</code>. It works like the standard <code>calculate</code>, except that it is
+                    evaluated only once, just before the first evaluation of the <code>calculate</code> expressions if
+                    any.
+                </p>
+                <xml-source>
+                    <xforms:bind nodeset="username" xxforms:default="xxforms:get-request-header('MY_USER')"/>
+                </xml-source>
+            </section>
             <a name="lhha-for"/>
             <section>
                 <title>Standalone Label, Hint, Help and Alert Elements</title>

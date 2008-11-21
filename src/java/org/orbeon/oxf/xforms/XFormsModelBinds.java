@@ -69,7 +69,9 @@ public class XFormsModelBinds {
     private List offlineBinds = new ArrayList();                // List<Bind>
     private Map variableNamesToIds = new HashMap();             // Map<String, String> of name to id
 
-    private XFormsModelSchemaValidator xformsValidator;
+    private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
+
+    private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
 
     private static final Map BUILTIN_XFORMS_SCHEMA_TYPES = new HashMap();
 
@@ -101,6 +103,11 @@ public class XFormsModelBinds {
         this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
 
         this.bindElements = bindElements;
+
+        // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
+        // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
+        // initialization. So the assignation below is ok.
+        this.isFirstCalculate = containingDocument.isInitializing();
     }
 
     /**
@@ -145,6 +152,17 @@ public class XFormsModelBinds {
 
         // Reset context stack just to re-evaluate the variables
         contextStack.resetBindingContext(pipelineContext, model);
+
+        if (isFirstCalculate) {
+            // Handle default values
+            iterateBinds(pipelineContext, new BindRunner() {
+                public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+                    handleXXFormsDefaultBinds(pipelineContext, bind, nodeset, position);
+                }
+            });
+            // This will be false from now on as we have done our first handling of calculate binds
+            isFirstCalculate = false;
+        }
 
         // Handle calculations
         // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
@@ -534,6 +552,30 @@ public class XFormsModelBinds {
         }
     }
 
+    private void handleXXFormsDefaultBinds(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+
+        // Handle xxforms:default MIP
+        if (bind.getXXFormsDefault() != null) {
+            // Compute default value
+            try {
+                final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+
+                final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeset, position, bind.getXXFormsDefault(),
+                        containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
+                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(),
+                        bind.getLocationData().getSystemID(), bind.getLocationData());
+
+                // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
+                // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
+                XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, model, currentNodeInfo, stringResult, null, true);
+
+            } catch (Exception e) {
+                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
+                        bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
+            }
+        }
+    }
+
     private void handleCalculateBinds(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
         // Handle calculate MIP
         if (bind.getCalculate() != null) {
@@ -910,9 +952,11 @@ public class XFormsModelBinds {
                 for (Iterator iterator = bindElement.attributeIterator(); iterator.hasNext();) {
                     final Attribute attribute = (Attribute) iterator.next();
                     final QName attributeQName = attribute.getQName();
-                    final String prefix = attributeQName.getNamespacePrefix();
-                    if (prefix != null && prefix.length() > 0 && !attributeQName.getNamespaceURI().equals(XFormsConstants.XFORMS_NAMESPACE_URI)) {
-                        // Any QName-but-not-NCName which is not in the XForms namespace
+                    final String attributePrefix = attributeQName.getNamespacePrefix();
+                    final String attributeURI = attributeQName.getNamespaceURI();
+                    if (attributePrefix != null && attributePrefix.length() > 0
+                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI) || attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI))) {
+                        // Any QName-but-not-NCName which is not in the xforms or xxforms namespace
                         if (customMips == null)
                             customMips = new HashMap();
                         // E.g. foo:bar="true()" => "foo-bar" -> "true()"
@@ -1026,6 +1070,10 @@ public class XFormsModelBinds {
 
         public String getReadonly() {
             return bindElement.attributeValue(XFormsConstants.READONLY_QNAME);
+        }
+
+        public String getXXFormsDefault() {
+            return bindElement.attributeValue(XFormsConstants.XXFORMS_DEFAULT_QNAME);
         }
 
         public String getXXFormsExternalize() {

@@ -227,6 +227,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OFFLINE_QNAME = new QName("offline", XXFORMS_NAMESPACE);
 

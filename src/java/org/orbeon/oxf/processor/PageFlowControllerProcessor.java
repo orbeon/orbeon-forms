@@ -786,6 +786,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             || (actionElement.element("result") != null
                             && actionElement.element("result").attributeValue("when") != null)) {
 
+                        // Help diagnose missing action/@action
+                        if (internalActionData == null) {
+                            throw new OXFException("Found <result when=\"...\"> but <action> element is missing an action attribute.");
+                        }
+
                         // Test based on action
                         addStatement(new ASTChoose(new ASTHrefId(internalActionData)) {{
                             for (Iterator k = actionElement.elements("result").iterator(); k.hasNext();) {

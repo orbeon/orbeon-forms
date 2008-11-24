@@ -28,7 +28,7 @@
  * - The static state is stored in
  *      ORBEON.xforms.Globals.formStaticState[formID].value
  *
- * Modifcations to the state information:
+ * Modifications to the state information:
  *
  * - When the page is loaded if the client state is empty, the dynamic state is stored in the client state.
  * - When a response to an Ajax response is received the new dynamic state is stored right away.
@@ -3657,8 +3657,9 @@ ORBEON.xforms.Init = {
         }
 
         // Run code sent by server
-        if (typeof xformsPageLoadedServer != "undefined" && !ORBEON.xforms.Globals.fckEditorLoading)
+        if (typeof xformsPageLoadedServer != "undefined" && !ORBEON.xforms.Globals.fckEditorLoading) {
             xformsPageLoadedServer();
+        }
 
         // Run call-back function interested in knowing when the form is initialized
         if (window.parent.childWindowOrbeonReady) {
@@ -4399,6 +4400,11 @@ ORBEON.xforms.Server = {
                 // Remove content from existing div
                 while (existingPortletDiv.childNodes.length > 0)
                     existingPortletDiv.removeChild(existingPortletDiv.firstChild);
+
+                // Clear existing custom JavaScript initialization function if any
+                if (typeof xformsPageLoadedServer != "undefined") {
+                    xformsPageLoadedServer = undefined;
+                }
 
                 // Replace the content and re-initialize XForms
                 dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: true, executeScripts: true, adjustPaths: true, referencePath: "/" });

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * xxforms:get-parameter($a as xs:string) xs:string*
+ * xxforms:get-request-parameter($a as xs:string) xs:string*
  *
  * Return the value(s) of the given HTTP request parameter. Only supported during initialization.
  */

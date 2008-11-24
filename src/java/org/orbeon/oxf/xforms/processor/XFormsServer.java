@@ -468,8 +468,8 @@ public class XFormsServer extends ProcessorImpl {
         if (loads != null && loads.size() > 0) {
             // Handle xforms:load response
 
-            // Get last load only (or should we use first one?)
-            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(loads.size() - 1);
+            // Get first load only
+            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
 
             // Send redirect
             final String absoluteURL = URLRewriter.rewriteURL(externalContext.getRequest(), load.getResource(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);

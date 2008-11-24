@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
@@ -37,6 +38,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
+import java.io.IOException;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -341,7 +344,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     public static void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                final ContentHandler contentHandler, final XFormsState encodedClientState) throws SAXException {
+                                final ContentHandler contentHandler, final XFormsState encodedClientState) throws SAXException, IOException {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
@@ -350,35 +353,61 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
         xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
-        // Register handlers on controller (the other handlers are registered by the body handler)
-        {
-            controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
-            controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+        final List loads = containingDocument.getLoadsToRun();
+        if (containingDocument.isGotSubmissionReplaceAll()) {
+            // 1. Got a submission with replace="all"
 
-            // Register a handler for AVTs on HTML elements
-            final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
-            if (hostLanguageAVTs) {
-                controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
-                controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, null);
+            // NOP: Response already sent out by a submission
+            // TODO: modify XFormsModelSubmission accordingly
+            containingDocument.logDebug("XForms initialization", "handling response for submission with replace=\"all\"");
+        } else if (loads != null && loads.size() > 0) {
+            // 2. Got at least one xforms:load
+
+            // Send redirect out
+
+            // Get first load only
+            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
+
+            // Send redirect
+            final String absoluteURL = URLRewriter.rewriteURL(externalContext.getRequest(), load.getResource(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+            containingDocument.logDebug("XForms initialization", "handling response for xforms:load", new String[] { "url", absoluteURL });
+            externalContext.getResponse().sendRedirect(absoluteURL, null, false, false);
+
+            // Still send out a null document to signal that no further processing must take place
+            XMLUtils.streamNullDocument(contentHandler);
+        } else {
+            // 3. Regular case: produce an XHTML document out
+
+            // Register handlers on controller (the other handlers are registered by the body handler)
+            {
+                controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
+                controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+
+                // Register a handler for AVTs on HTML elements
+                final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
+                if (hostLanguageAVTs) {
+                    controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
+                    controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, null);
+                }
+
+                // Swallow XForms elements that are unknown
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, null);
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, null);
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI, null);
             }
 
-            // Swallow XForms elements that are unknown
-            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, null);
-            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, null);
-            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI, null);
+            // Set final output
+            controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
+            // Set handler context
+            controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, encodedClientState, externalContext));
+            // Process the entire input
+            annotatedDocument.replay(new ExceptionWrapperContentHandler(controller, "converting XHTML+XForms document to XHTML"));
+
+            // Process asynchronous submissions
+            // NOTE: Given the complexity of the epilogue, this could cause the page to stop loading until all submissions
+            // are processed.
+            containingDocument.processAsynchronousSubmissions();
         }
-
-        // Set final output
-        controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
-        // Set handler context
-        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, encodedClientState, externalContext));
-        // Process the entire input
-        annotatedDocument.replay(new ExceptionWrapperContentHandler(controller, "converting XHTML+XForms document to XHTML"));
-
-        // Process asynchronous submissions
-        // NOTE: Given the complexity of the epilogue, this could cause the page to stop loading until all submissions
-        // are processed.
-        containingDocument.processAsynchronousSubmissions();
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,

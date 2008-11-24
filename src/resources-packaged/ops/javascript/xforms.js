@@ -3046,13 +3046,21 @@ ORBEON.widgets.YUICalendar = function() {
 
         click: function(event, target) {
 
-            // Create YUI calendar the first time this is used
             if (calendarDiv == null) {
+                // Try to get existing div
+
+                // This typically can happen with portlets if the div has already been created
+                calendarDiv = ORBEON.util.Dom.getElementById("orbeon-calendar-div");
+            }
+            if (calendarDiv == null) {
+                // Still null, create YUI calendar the first time this is used
+
                 // Create div for the YUI calendar widget
                 calendarDiv = document.createElement("div");
                 calendarDiv.id = "orbeon-calendar-div";
                 document.body.appendChild(calendarDiv);
-
+            }
+            if (yuiCalendar == null) {
                 // Create YUI calendar
                 yuiCalendar = new YAHOO.widget.Calendar(calendarDiv.id);
 
@@ -4397,14 +4405,20 @@ ORBEON.xforms.Server = {
                     ORBEON.xforms.Globals.topLevelListenerRegistered = false;
                 }
 
-                // Remove content from existing div
-                while (existingPortletDiv.childNodes.length > 0)
-                    existingPortletDiv.removeChild(existingPortletDiv.firstChild);
+                // Run custom clean-up function
+                // NOTE: For now, global function, so we don't undefine it after calling it
+                if (typeof xformsPageUnloadedServer != "undefined") {
+                    xformsPageUnloadedServer();
+                }
 
                 // Clear existing custom JavaScript initialization function if any
                 if (typeof xformsPageLoadedServer != "undefined") {
                     xformsPageLoadedServer = undefined;
                 }
+
+                // Remove content from existing div
+                while (existingPortletDiv.childNodes.length > 0)
+                    existingPortletDiv.removeChild(existingPortletDiv.firstChild);
 
                 // Replace the content and re-initialize XForms
                 dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: true, executeScripts: true, adjustPaths: true, referencePath: "/" });

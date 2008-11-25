@@ -116,7 +116,7 @@
 
             <xforms:action ev:event="fr-summary-pdf">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-test">

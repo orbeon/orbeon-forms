@@ -37,7 +37,7 @@
                 <scope>request</scope>
             </config>
         </p:input>
-        <p:input name="data" id="form-data"/>
+        <p:output name="data" id="form-data"/>
     </p:processor>
 
     <!-- Obtain original form document -->
@@ -77,7 +77,7 @@
     </p:processor>
 
     <!-- Create mapping file -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#form-data"/>
         <p:input name="xhtml" href="#form-document"/>
         <p:input name="request" href="#request"/>

@@ -3102,7 +3102,7 @@ ORBEON.widgets.YUICalendar = function() {
             YAHOO.util.Dom.setStyle(calendarDiv, "display", "block");
 
             // Position calendar below field
-            inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            inputField = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0];
             var xy = YAHOO.util.Dom.getXY(inputField);
             xy[1] = xy[1] + 20;
             YAHOO.util.Dom.setXY(calendarDiv, xy);
@@ -3110,7 +3110,11 @@ ORBEON.widgets.YUICalendar = function() {
 
         blur: function(event, target) {
             if (mouseOverCalendar) {
-                window.setTimeout(function() { inputField.focus(); }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                window.setTimeout(function() {
+                    // With IE it turns out we can get to this point with inputField == null in some cases
+                    if (inputField != null)
+                        inputField.focus();
+                }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
             } else {
                 closeCalendar();
             }

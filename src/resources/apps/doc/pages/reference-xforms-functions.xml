@@ -628,6 +628,27 @@
                         </p>
                     </li>
                     <li>
+                        <a name="xxforms-invalid-binds"/>
+                        <p>
+                            <code>xxforms:invalid-binds($node as node()?) as xs:string*</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:invalid-binds()</code> function returns a sequence of strings. If the node
+                            was made invalid because of an <code>&lt;xforms:bind></code> element, then the id of that
+                            bind element is present in the list.
+                        </p>
+                        <p>
+                            This function is useful to help determine the reason why a node is invalid:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:bind nodeset="age" constraint=". ge 21" id="age-limit"/>
+                            ...
+                            <xforms:action if="xxforms:invalid-binds(event('xxforms:binding')) = 'age-limit'">
+                                ...
+                            </xforms:action>
+                        </xml-source>
+                    </li>
+                    <li>
                         <a name="xxforms-mutable-document"/>
                         <p>
                             <code>xxforms:mutable-document($node as node()) as document-node()</code>

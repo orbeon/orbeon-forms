@@ -396,6 +396,7 @@ public class InstanceData {
             existingInstanceData.valueValid = DEFAULT_VALID;
             existingInstanceData.constraint = DEFAULT_VALID;
             existingInstanceData.type = null;
+            existingInstanceData.invalidBindIds = null;
             if (existingInstanceData.schemaErrors != null)
                 existingInstanceData.schemaErrors.clear();
         }

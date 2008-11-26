@@ -4425,7 +4425,8 @@ ORBEON.xforms.Server = {
                     existingPortletDiv.removeChild(existingPortletDiv.firstChild);
 
                 // Replace the content and re-initialize XForms
-                dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: true, executeScripts: true, adjustPaths: true, referencePath: "/" });
+                // NOTE: renderStyles: false: for now, tell Dojo not to process CSS within content, as this seems to cause JavaScript errors down the line.
+                dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: false, executeScripts: true, adjustPaths: true, referencePath: "/" });
                 ORBEON.xforms.Init.document();
             }
         } else {

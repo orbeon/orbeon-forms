@@ -27,45 +27,6 @@
         </action>
     </page>
 
-    <!-- ==== Pages ================================================================================================ -->
-
-    <!-- Summary -->
-    <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)(/summary/|/list/|/)?" matcher="oxf:perl5-matcher"
-          default-submission="request-parameters.xml"
-          model="summary/view.xhtml" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-    </page>
-
-    <!-- New, edit or view document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
-          model="detail/detail-model.xpl" view="html-view.xpl">
-    </page>
-
-    <!-- View document as PDF -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
-          model="detail/detail-model.xpl" view="print/pdf-view.xpl">
-    </page>
-
-    <!-- Test form by retrieving form from the database first -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)/?" matcher="oxf:perl5-matcher"
-          default-submission="request-parameters.xml"
-          model="test-model.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/mode" matcher-group="3"/>
-        <setvalue ref="/*/document" matcher-group="4"/>
-    </page>
-
-    <!-- Test form "inline" (when being edited) with new empty document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)/?" matcher="oxf:perl5-matcher"
-          model="inline-test-model.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/mode" matcher-group="3"/>
-    </page>
-
     <!-- ==== Built-in eXist-based Persistence Services ============================================================ -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
@@ -167,6 +128,48 @@
     <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/page/${2}.xhtml"/>
 
+    <!-- ==== Pages ================================================================================================ -->
+
+    <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
+
+    <!-- Summary -->
+    <page id="summary"
+          path-info="/fr/([^/]+)/([^/]+)(/summary/|/list/|/)?" matcher="oxf:perl5-matcher"
+          default-submission="request-parameters.xml"
+          model="summary/view.xhtml" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- New, edit or view document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+          model="detail/detail-model.xpl" view="html-view.xpl">
+    </page>
+
+    <!-- View document as PDF -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+          model="detail/detail-model.xpl" view="print/pdf-view.xpl">
+    </page>
+
+    <!-- Test form by retrieving form from the database first -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)/?" matcher="oxf:perl5-matcher"
+          default-submission="request-parameters.xml"
+          model="test-model.xpl" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+        <setvalue ref="/*/document" matcher-group="4"/>
+    </page>
+
+    <!-- Test form "inline" (when being edited) with new empty document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)/?" matcher="oxf:perl5-matcher"
+          model="inline-test-model.xpl" view="html-view.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+    </page>
+
+    <!-- ==== Standard epilogue ==================================================================================== -->
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -29,7 +29,8 @@
     <!-- PDF document -->
     <p:param type="output" name="data"/>
 
-    <!-- Get form data -->
+    <!-- Get form data if it exists -->
+    <!-- This will be the case if somebody has POSTed the data and detail-model.xpl has stored it into the request -->
     <p:processor name="oxf:scope-generator">
         <p:input name="config">
             <config>
@@ -37,8 +38,41 @@
                 <scope>request</scope>
             </config>
         </p:input>
-        <p:output name="data" id="form-data"/>
+        <p:output name="data" id="request-form-data"/>
     </p:processor>
+
+    <!-- If no request form data found, get form data -->
+    <p:choose href="#request-form-data">
+        <p:when test="not(/null/@xsi:nil='true')">
+            <!-- Data found, just forward -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#request-form-data"/>
+                <p:output name="data" id="form-data"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- Retrieve data from persistence layer -->
+            <!-- This is necessary in the case of PDF template only, because in the other cases the data is loaded by XForms -->
+            <p:processor name="oxf:url-generator">
+            <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
+                <config xsl:version="2.0">
+
+                    <!-- Create URI based on properties -->
+                    <xsl:variable name="resource"
+                                  select="concat(pipeline:property('oxf.fr.appserver.uri'),
+                                            pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'data'), '.')),
+                                            '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
+                    <url>
+                        <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                    </url>
+                    <!-- Forward the same headers that the XForms engine forwards -->
+                    <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                </config>
+            </p:input>
+            <p:output name="data" id="form-data"/>
+        </p:processor>
+        </p:otherwise>
+    </p:choose>
 
     <!-- Obtain original form document -->
     <p:processor name="oxf:scope-generator">

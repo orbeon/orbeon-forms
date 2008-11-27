@@ -56,7 +56,8 @@
     margin-left: .2em;
     vertical-align: middle;
     width: 16px;
-    height: 16px
+    height: 16px;
+    cursor: pointer;
 }
 
 .xforms-help {

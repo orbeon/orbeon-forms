@@ -1439,4 +1439,23 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Call-back from super class models initialization
         xformsControls.initialize(pipelineContext);
     }
+
+    private Stack eventStack = new Stack();
+
+    public void startHandleEvent(XFormsEvent event) {
+        eventStack.push(event);
+        startHandleOperation();
+    }
+
+    public void endHandleEvent() {
+        eventStack.pop();
+        endHandleOperation();
+    }
+
+    /**
+     * Return the event being processed by the current event handler, null if no event is being processed.
+     */
+    public XFormsEvent getCurrentEvent() {
+        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
+    }
 }

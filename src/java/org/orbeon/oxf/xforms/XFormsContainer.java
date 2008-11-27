@@ -571,25 +571,6 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         return getContainer();
     }
 
-    private Stack eventStack = new Stack();
-
-    private void startHandleEvent(XFormsEvent event) {
-        eventStack.push(event);
-        containingDocument.startHandleOperation();
-    }
-
-    private void endHandleEvent() {
-        eventStack.pop();
-        containingDocument.endHandleOperation();
-    }
-
-    /**
-     * Return the event being processed by the current event handler, null if no event is being processed.
-     */
-    public XFormsEvent getCurrentEvent() {
-        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
-    }
-
     /**
      * Main event dispatching entry.
      */
@@ -675,11 +656,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                                     && eventHandler.isMatchEventName(retargettedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
-                                startHandleEvent(retargettedEvent);
+                                containingDocument.startHandleEvent(retargettedEvent);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, retargettedEvent);
+                                    eventHandler.handleEvent(pipelineContext, currentEventObserver.getContainer(containingDocument), currentEventObserver, retargettedEvent);
                                 } finally {
-                                    endHandleEvent();
+                                    containingDocument.endHandleEvent();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
@@ -755,7 +736,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                     // Process "action at target"
                     // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
                     if (currentEventObserver == targetObject) {
-                        currentEventObserver.performTargetAction(pipelineContext, XFormsContainer.this, retargettedEvent);
+                        currentEventObserver.performTargetAction(pipelineContext, currentEventObserver.getContainer(containingDocument), retargettedEvent);
                     }
 
                     // Process event handlers
@@ -767,11 +748,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                                     && eventHandler.isMatchEventName(retargettedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
-                                startHandleEvent(retargettedEvent);
+                                containingDocument.startHandleEvent(retargettedEvent);
                                 try {
-                                    eventHandler.handleEvent(pipelineContext, XFormsContainer.this, currentEventObserver, retargettedEvent);
+                                    eventHandler.handleEvent(pipelineContext, currentEventObserver.getContainer(containingDocument), currentEventObserver, retargettedEvent);
                                 } finally {
-                                    endHandleEvent();
+                                    containingDocument.endHandleEvent();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
@@ -786,11 +767,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 
             // Perform default action is allowed to
             if (performDefaultAction || !originalEvent.isCancelable()) {
-                startHandleEvent(originalEvent);
+                containingDocument.startHandleEvent(originalEvent);
                 try {
                     targetObject.performDefaultAction(pipelineContext, originalEvent);
                 } finally {
-                    endHandleEvent();
+                    containingDocument.endHandleEvent();
                 }
             }
         } catch (Exception e) {

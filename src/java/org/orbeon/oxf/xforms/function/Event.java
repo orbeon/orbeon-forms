@@ -43,7 +43,7 @@ public class Event extends XFormsFunction {
         final String attributeName = instanceIdExpression.evaluateAsString(xpathContext);
 
         // Get the current event
-        final XFormsEvent event = getContainer(xpathContext).getCurrentEvent();
+        final XFormsEvent event = getContainingDocument(xpathContext).getCurrentEvent();
 
         return getEventAttribute(event, attributeName);
     }

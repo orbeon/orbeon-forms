@@ -27,7 +27,7 @@ public class XXFormsEvent extends Event {
         final String attributeName = instanceIdExpression.evaluateAsString(xpathContext);
 
         // Get the current event's original event
-        final XFormsEvent event = getContainer(xpathContext).getCurrentEvent().getOriginalEvent();
+        final XFormsEvent event = getContainingDocument(xpathContext).getCurrentEvent().getOriginalEvent();
 
         return getEventAttribute(event, attributeName);
     }

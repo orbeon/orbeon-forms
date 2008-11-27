@@ -55,6 +55,8 @@ public abstract class XFormsEvent implements Cloneable {
 //    const unsigned short      AT_TARGET                      = 2;
 //    const unsigned short      BUBBLING_PHASE                 = 3;
 
+    private XFormsEvent originalEvent;  // original event (for retargetted event)
+
     private String eventName;
     private XFormsEventTarget targetObject;
     private boolean bubbles;
@@ -148,11 +150,16 @@ public abstract class XFormsEvent implements Cloneable {
         try {
             newEvent = (XFormsUIEvent) this.clone();
             newEvent.targetObject = newTargetObject;
+            newEvent.originalEvent = this;
         } catch (CloneNotSupportedException e) {
             throw new OXFException(e);// should not happen because we are clonable
         }
 
         return newEvent;
+    }
+
+    public XFormsEvent getOriginalEvent() {
+        return originalEvent != null ? originalEvent : this;
     }
 
     public Object clone() throws CloneNotSupportedException {

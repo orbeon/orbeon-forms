@@ -45,6 +45,10 @@ public class Event extends XFormsFunction {
         // Get the current event
         final XFormsEvent event = getContainer(xpathContext).getCurrentEvent();
 
+        return getEventAttribute(event, attributeName);
+    }
+
+    protected SequenceIterator getEventAttribute(XFormsEvent event, String attributeName) {
         // TODO: Currently the spec doesn't specify what happens when we call event() outside of an event handler
         if (event == null)
             return EmptyIterator.getInstance();

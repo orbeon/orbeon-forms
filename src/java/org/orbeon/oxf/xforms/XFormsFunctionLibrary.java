@@ -127,6 +127,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         // Orbeon XXForms functions
 
+        // xxforms:event()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}event", XXFormsEvent.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}case", XXFormsCase.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 

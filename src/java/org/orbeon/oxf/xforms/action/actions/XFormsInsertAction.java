@@ -241,6 +241,7 @@ public class XFormsInsertAction extends XFormsAction {
                 }
             }
 
+            // Remove instance data from cloned nodes and perform Document node adjustment
             for (int i = 0; i < clonedNodesTemp.size(); i++) {
                 final Node clonedNodeTemp = (Node) clonedNodesTemp.get(i);
 
@@ -250,9 +251,15 @@ public class XFormsInsertAction extends XFormsAction {
                     InstanceData.remove(clonedNodeTemp);
                 else if (clonedNodeTemp instanceof Document) {
                     final Element clonedNodeTempRootElement = clonedNodeTemp.getDocument().getRootElement();
-                    InstanceData.remove(clonedNodeTempRootElement);
-                    // We can never really insert a document into anything, but we assume that this means the root element
-                    clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
+
+                    if (clonedNodeTempRootElement == null) {
+                        // Can be null in rare cases of documents without root element
+                        clonedNodesTemp.set(i, null); // we support having a null node further below, so set this to null
+                    } else {
+                        InstanceData.remove(clonedNodeTempRootElement);
+                        // We can never really insert a document into anything at this point, but we assume that this means the root element
+                        clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
+                    }
                 }
             }
             clonedNodes = clonedNodesTemp;
@@ -290,7 +297,7 @@ public class XFormsInsertAction extends XFormsAction {
                 boolean hasTextNode = false;
                 for (int i = 0; i < clonedNodes.size(); i++) {
                     final Node clonedNode = (Node) clonedNodes.get(i);
-                    hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
+                    hasTextNode |= clonedNode != null && clonedNode.getNodeType() == Node.TEXT_NODE;
                 }
                 if (hasTextNode)
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
@@ -360,20 +367,22 @@ public class XFormsInsertAction extends XFormsAction {
                         for (int i = 0; i < clonedNodes.size(); i++) {
                             final Node clonedNode = (Node) clonedNodes.get(i);
 
-                            if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
-                                // Element, text, comment, processing instruction node
-                                siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
-                                insertedNodes.add(clonedNode);
-                                hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
-                                addIndex++;
-                            } else {
-                                // We never insert attributes or namespace nodes as siblings
-                                if (XFormsServer.logger.isDebugEnabled())
-                                    containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
-                                            new String[] {
-                                                    "type", clonedNode.getNodeTypeName(),
-                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
-                                            } );
+                            if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
+                                if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
+                                    // Element, text, comment, processing instruction node
+                                    siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
+                                    insertedNodes.add(clonedNode);
+                                    hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
+                                    addIndex++;
+                                } else {
+                                    // We never insert attributes or namespace nodes as siblings
+                                    if (XFormsServer.logger.isDebugEnabled())
+                                        containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
+                                                new String[] {
+                                                        "type", clonedNode.getNodeTypeName(),
+                                                        "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
+                                                } );
+                                }
                             }
                         }
 
@@ -463,29 +472,31 @@ public class XFormsInsertAction extends XFormsAction {
             for (int i = 0; i < clonedNodes.size(); i++) {
                 final Node clonedNode = (Node) clonedNodes.get(i);
 
-                if (clonedNode instanceof Attribute) {
-                    // Add attribute to element
-                    final Attribute clonedAttribute = (Attribute) clonedNode;
-                    final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
-                    if (existingAttribute != null)
-                        insertContextElement.remove(existingAttribute);
-//                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
-//                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
+                if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
+                    if (clonedNode instanceof Attribute) {
+                        // Add attribute to element
+                        final Attribute clonedAttribute = (Attribute) clonedNode;
+                        final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
+                        if (existingAttribute != null)
+                            insertContextElement.remove(existingAttribute);
+    //                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
+    //                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
 
-                    // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but the
-                    // XForms spec shouldn't rely on attribute order. We could try to keep the order, but it is harder
-                    // as we have to deal with removing duplicate attributes and find a reasonable insertion strategy.
+                        // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but the
+                        // XForms spec shouldn't rely on attribute order. We could try to keep the order, but it is harder
+                        // as we have to deal with removing duplicate attributes and find a reasonable insertion strategy.
 
-                    insertContextElement.add(clonedAttribute);
-                    insertedNodes.add(clonedAttribute);
+                        insertContextElement.add(clonedAttribute);
+                        insertedNodes.add(clonedAttribute);
 
-                } else if (!(clonedNode instanceof Document)) {
-                    // Add other node to element
-                    insertContextElement.content().add(otherNodeIndex++, clonedNode);
-                    insertedNodes.add(clonedNode);
-                } else {
-                    // "If a cloned node cannot be placed at the target location due to a node type conflict, then the
-                    // insertion for that particular clone node is ignored."
+                    } else if (!(clonedNode instanceof Document)) {
+                        // Add other node to element
+                        insertContextElement.content().add(otherNodeIndex++, clonedNode);
+                        insertedNodes.add(clonedNode);
+                    } else {
+                        // "If a cloned node cannot be placed at the target location due to a node type conflict, then the
+                        // insertion for that particular clone node is ignored."
+                    }
                 }
             }
             return insertedNodes;

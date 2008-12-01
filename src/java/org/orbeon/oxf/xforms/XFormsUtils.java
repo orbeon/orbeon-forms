@@ -1492,7 +1492,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Return the parts of an effective id prefix, e.g. for $foo$bar return new String[] { "foo", "bar" }
+     * Return the parts of an effective id prefix, e.g. for foo$bar$my-input return new String[] { "foo", "bar" }
      *
      * @param effectiveId   effective id to check
      * @return              array of parts, empty array if no parts, null if effectiveId was null

@@ -885,7 +885,7 @@
                             <code>event('xxforms:target') as xs:string</code>
                         </p>
                         <p>
-                            Return the id of the event target.
+                            Return the static id of the event target.
                         </p>
                     </li>
                     <li>
@@ -962,6 +962,15 @@
                         <p>
                             Return the event target's current repeat indexes, if any, starting from the ancestor
                             repeat.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:target-prefixes') as xs:string*</code>
+                        </p>
+                        <p>
+                            Return the event target's id prefixes, if any, starting from the ancestor components. This
+                            will be empty unless the target is within an XBL component.
                         </p>
                     </li>
                 </ul>

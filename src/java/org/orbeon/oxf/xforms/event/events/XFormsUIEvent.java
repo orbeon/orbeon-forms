@@ -40,6 +40,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
     private static final String XXFORMS_HINT_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "hint");
     private static final String XXFORMS_HELP_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "help");
     private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+    private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
 
     private XFormsControl targetXFormsControl;
 
@@ -120,6 +121,21 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 for (int i = 0; i < parts.length; i++) {
                     final Integer currentIndex = parts[i];
                     tokens.add(new StringValue(currentIndex.toString()));
+                }
+                return new ListIterator(tokens);
+            } else {
+                return EmptyIterator.getInstance();
+            }
+        } else if (XXFORMS_TARGET_PREFIXES_ATTRIBUTE.equals(name)) {
+
+            final String effectiveTargetId = targetXFormsControl.getEffectiveId();
+            final String[] parts = XFormsUtils.getEffectiveIdPrefixParts(effectiveTargetId);
+
+            if (parts.length > 0) {
+                final List tokens = new ArrayList(parts.length);
+                for (int i = 0; i < parts.length; i++) {
+                    final String currentPart = parts[i];
+                    tokens.add(new StringValue(currentPart));
                 }
                 return new ListIterator(tokens);
             } else {

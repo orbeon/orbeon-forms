@@ -40,7 +40,7 @@
 
     <!-- Template for error information -->
     <xforms:instance id="fr-error-template" xxforms:readonly="true">
-        <error xmlns="" id="" indexes="" label="" alert=""/>
+        <error xmlns="" id="" indexes="" label="" alert="" binds=""/>
     </xforms:instance>
 
     <!-- Instance containing visited controls -->
@@ -63,12 +63,13 @@
     <xforms:setvalue ev:event="xxforms-valid" ev:observer="fr-form-instance" ref="instance('fr-form-valid-instance')">true</xforms:setvalue>
 
     <!-- Handle "control visited" events on #fr-form-group -->
-    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
+    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
+    <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusOut xforms-value-changed"
-                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')"
+
                    context="instance('fr-visited-instance')">
-        <xxforms:variable name="target" select="event('xxforms:target')"/>
-        <xxforms:variable name="indexes" select="string-join(event('xxforms:repeat-indexes'), '-')"/>
+        <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
         <!-- Do the insertion only if we don't know already that this control has been visited -->
         <xforms:action if="empty(control[@id = $target and @indexes = $indexes])">
             <xforms:insert context="." nodeset="control" origin="instance('fr-visited-template')"/>
@@ -80,37 +81,48 @@
     </xforms:action>
 
     <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->
-    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
+    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
+    <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-invalid"
-                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('xxforms:label'))"
+                   if="normalize-space(xxforms:event('xxforms:label'))"
                    context="instance('fr-errors-instance')">
 
+        <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
+
         <!-- Insert if the value is invalid or if it is required but empty -->
-        <xxforms:variable name="current-error" select="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
+        <xxforms:variable name="current-error" select="error[@id = $target and @indexes = $indexes]"/>
         <!-- Just update the label and alert if it already exists -->
         <xforms:action if="exists($current-error)" context="$current-error">
-            <xforms:setvalue ref="$current-error/@alert" value="event('xxforms:alert')"/>
-            <xforms:setvalue ref="$current-error/@label" value="event('xxforms:label')"/>
+            <xforms:setvalue ref="$current-error/@alert" value="xxforms:event('xxforms:alert')"/>
+            <xforms:setvalue ref="$current-error/@label" value="xxforms:event('xxforms:label')"/>
+            <xforms:setvalue ref="$current-error/@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
         </xforms:action>
         <!-- Otherwise insert new element and sets its values -->
         <xforms:action if="not(exists($current-error))">
             <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
             <xforms:action context="error[last()]">
-                <xforms:setvalue ref="@id" value="event('xxforms:target')"/>
-                <xforms:setvalue ref="@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
-                <xforms:setvalue ref="@alert" value="event('xxforms:alert')"/>
-                <xforms:setvalue ref="@label" value="event('xxforms:label')"/>
+                <xforms:setvalue ref="@id" value="$target"/>
+                <xforms:setvalue ref="@indexes" value="string-join(xxforms:event('xxforms:repeat-indexes'), '-')"/>
+                <xforms:setvalue ref="@alert" value="xxforms:event('xxforms:alert')"/>
+                <xforms:setvalue ref="@label" value="xxforms:event('xxforms:label')"/>
+                <xforms:setvalue ref="@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
             </xforms:action>
         </xforms:action>
     </xforms:action>
 
     <!-- Handle xforms-valid event on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-valid"
-                   if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and instance('fr-errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"
-                   context="instance('fr-errors-instance')">
-        <!-- Don't remove error if the value is required but empty -->
-        <xforms:delete nodeset="error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
+    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
+    <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-valid">
+
+        <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
+
+        <xforms:action context="instance('fr-errors-instance')" if="error[@id = $target and @indexes = $indexes]">
+            <xforms:delete nodeset="error[@id = $target and @indexes = $indexes]"/>
+        </xforms:action>
     </xforms:action>
 
     <!-- Only count errors for controls that have been visited -->

@@ -35,6 +35,11 @@
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
             <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
 
+            <xxforms:variable name="has-roles" select="xxforms:instance('fr-roles-instance')/has-roles = 'true'" as="xs:boolean"/>
+            <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xxforms:variable name="form-query" select="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xxforms:variable name="initial-app-value" select="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
+
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Store resources from configuration instance -->
@@ -149,10 +154,6 @@
                 </search>
             </xforms:instance>
 
-            <xxforms:variable name="has-roles" select="xxforms:instance('fr-roles-instance')/has-roles = 'true'" as="xs:boolean"/>
-            <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xxforms:variable name="form-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-
             <xforms:bind nodeset="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
                 <xforms:bind nodeset="query/@search-field" relevant=". = 'true'"/>
@@ -163,18 +164,23 @@
 
                 <!-- Set default value for app and form if needed -->
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
-                <!-- NOTE: The (for ..., .)[1] expression makes sure that if no app for form is found, we don't blank the value but keep it -->
                 <xforms:bind nodeset="$app-query" readonly="false()"
-                             calculate="(for $a in xxforms:instance('fr-permissions')/app[1][not(@name = '*')] return
-                                             if (not(normalize-space()) and $a) then $a/@name else ., .)[1]"/>
+                             calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
+                <!-- Ajust value for form if there is an app constraint and a form constraint -->
                 <xforms:bind nodeset="$form-query" readonly="false()"
-                             calculate="(for $f in xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/form[1][not(@name = '*')] return
-                                             if (not(normalize-space()) and $f) then $f/@name else ., .)[1]"/>
+                             calculate="(for $a in xxforms:instance('fr-permissions')/app[@name = $app-query]
+                                             return if ($a/form[@name = .]) then .
+                                                 else if ($a/form[1][@name = '*']) then .
+                                                     else $a/form[1]/@name, .)[1]"/>
+                <!-- Force exact query match if there is an app constraint -->
+                <xforms:bind nodeset="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
+                <!-- Force exact query match if there is a form constraint -->
+                <xforms:bind nodeset="$form-query/@match" readonly="false()" calculate="if (xxforms:instance('fr-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
 
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
-                <query xmlns="" name="" path="" type="" control="" search-field=""/>
+                <query xmlns="" name="" path="" type="" control="" search-field="" match="substring"/>
             </xforms:instance>
 
             <!-- Paging information -->
@@ -369,7 +375,7 @@
         <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
+            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <xforms:group class="fr-summary-search">
 
@@ -378,6 +384,21 @@
                         <xforms:label ref="$fr-resources/summary/labels/free-search"/>
                     </xforms:input>
 
+                    <!-- Send search -->
+                    <xforms:trigger id="fr-search-trigger">
+                        <xforms:label>
+                            <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt="Search" title="Search"/>
+                            <xhtml:span>Search</xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:send submission="search-submission"/>
+                        </xforms:action>
+                    </xforms:trigger>
+
+                    <p>
+                    - or -
+                    </p>
+                    
                     <!-- Special form builder search: use input or select1 for app/form name -->
                     <xforms:group ref=".[$is-form-builder and $has-roles]" class="fr-summary-search-items">
                         <div class="fr-summary-search-item">
@@ -400,6 +421,13 @@
                                         <xforms:label ref="@name"/>
                                         <xforms:value ref="@name"/>
                                     </xforms:itemset>
+
+                                    <xforms:action ev:event="xforms-value-changed">
+                                        <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
+                                        <xforms:setvalue ref="$form-query"/>
+                                        <!-- Update search results when selection changes (recalculate is done automatically as well) -->
+                                        <xforms:send submission="search-submission"/>
+                                    </xforms:action>
                                 </xforms:select1>
                             </xforms:group>
                         </div>
@@ -424,6 +452,9 @@
                                         <xforms:label ref="@name"/>
                                         <xforms:value ref="@name"/>
                                     </xforms:itemset>
+
+                                    <!-- Update search results when selection changes -->
+                                    <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                                 </xforms:select1>
                             </xforms:group>
                         </div>
@@ -435,7 +466,7 @@
                         <div class="fr-summary-search-item">
                             <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
 
-                            <xforms:group  ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
+                            <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
                                 <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                 <!-- input -->
@@ -469,9 +500,9 @@
                             </xforms:group>
                         </div>
                     </xforms:repeat>
-                    
-                    <!-- Send search when values change -->
-                    <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+
+                    <!-- Search also when user presses "enter" in a field -->
+                    <xforms:send ev:event="DOMActivate" submission="search-submission"/>
 
                     <div class="fr-clear"/>
                 </xforms:group>

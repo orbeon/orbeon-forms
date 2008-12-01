@@ -106,12 +106,22 @@
                                         <!-- Don't take document that have been deleted -->
                                         and data.deleted = 'N'
                                         <!-- Conditions on searcheable columns -->
-                                        <xsl:for-each select="/search/query[@path and . != '']">
-                                            and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
-                                                like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                        <xsl:for-each select="/search/query[@path and normalize-space() != '']">
+                                            <xsl:choose>
+                                                <xsl:when test="@match = 'exact'">
+                                                    <!-- Exact match -->
+                                                    and extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')
+                                                    = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <!-- Substring, case-insensitive match -->
+                                                    and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
+                                                    like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
-                                        <xsl:if test="/search/query[empty(@path) and . != '']">
+                                        <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
                                              and contains(data.xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
                                         </xsl:if>
                                     order by created desc

@@ -20,6 +20,7 @@
     display: block;     /* So control is not displayed next to the help icon but on a new line */
     /*margin-top: 0.3em;  *//* Insert some space between the label / help and the control */
     /*clear: both;*/
+    margin-bottom: .1em;
 }
 
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background-image: url(logo-bg.gif) }
@@ -57,17 +58,21 @@
     *width: auto;/* HACK: IE 7 misbehaves here, so don't use 100% */
 }
 
+.fr-search-trigger {}
+
+.fr-summary-search p { margin-bottom: 0 }
+
 .fr-paging-buttons { padding-top: .5em }
 .fr-paging-buttons button { vertical-align: middle }
 .fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
 
-.fr-search-input input {
-    background-image: url(search.gif);
-    background-position: right center;
-    background-repeat: no-repeat;
-    padding-right: 16px;
-}
+/*.fr-search-input input {*/
+    /*background-image: url(search.gif);*/
+    /*background-position: right center;*/
+    /*background-repeat: no-repeat;*/
+    /*padding-right: 16px;*/
+/*}*/
 
 /* Controls added just to expose instance nodes to JavaScript */
 .fr-expose-to-javascript { display: none }

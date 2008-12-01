@@ -39,8 +39,8 @@
                                             }/data/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
                                             }&amp;query={
-                                                concat(/*/query[1],
-                                                       string-join(for $query in /*/query[position() gt 1]
+                                                concat(/*/query[empty(@path)],
+                                                       string-join(for $query in /*/query[@path and normalize-space() != '']
                                                          return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
                                             }&amp;sort-key={/*/sort-key}&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
@@ -75,11 +75,18 @@
                 <!-- Dynamically build where clause -->
                 <xsl:template match="where">
                     <xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>
-                    <xsl:for-each select="$instance/query[@path]">
+                    <xsl:for-each select="$instance/query[@path and normalize-space() != '']">
                         <xsl:variable name="position" select="position()" as="xs:integer"/>
-                        <xsl:if test="normalize-space(.) != ''">
-                            and $resource/*/<xsl:value-of select="@path"/>[contains(., $value[<xsl:value-of select="$position"/>])]
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="@match = 'exact'">
+                                <!-- Exact match -->
+                                and $resource/*/<xsl:value-of select="@path"/>[. = $value[<xsl:value-of select="$position"/>]]
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Substring, case-insensitive match -->
+                                and $resource/*/<xsl:value-of select="@path"/>[contains(lower-case(.), lower-case($value[<xsl:value-of select="$position"/>]))]
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:for-each>
                 </xsl:template>
                 <!-- Dynamically build detail result -->

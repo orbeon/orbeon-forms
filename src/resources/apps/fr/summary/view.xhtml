@@ -163,12 +163,13 @@
 
                 <!-- Set default value for app and form if needed -->
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
+                <!-- NOTE: The (for ..., .)[1] expression makes sure that if no app for form is found, we don't blank the value but keep it -->
                 <xforms:bind nodeset="$app-query" readonly="false()"
-                             calculate="for $a in xxforms:instance('fr-permissions')/app[1][not(@name = '*')] return
-                                            if (not(normalize-space()) and $a) then $a/@name else ."/>
+                             calculate="(for $a in xxforms:instance('fr-permissions')/app[1][not(@name = '*')] return
+                                             if (not(normalize-space()) and $a) then $a/@name else ., .)[1]"/>
                 <xforms:bind nodeset="$form-query" readonly="false()"
-                             calculate="for $f in xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/form[1][not(@name = '*')] return
-                                            if (not(normalize-space()) and $f) then $f/@name else ."/>
+                             calculate="(for $f in xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/form[1][not(@name = '*')] return
+                                             if (not(normalize-space()) and $f) then $f/@name else ., .)[1]"/>
 
             </xforms:bind>
 

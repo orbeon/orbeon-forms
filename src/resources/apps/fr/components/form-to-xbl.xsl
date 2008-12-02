@@ -175,8 +175,8 @@
                     <!-- TODO: must change language dynamically -->
                     <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
 
-                    <!-- Copy section markup -->
-                    <xsl:copy-of select="$fr-section/*"/>
+                    <!-- Copy grids within section-->
+                    <xsl:copy-of select="$fr-section/fr:grid"/>
 
                 </xforms:group>
 

@@ -69,13 +69,15 @@
                                             </xforms:output>
                                         </xforms:group>
                                         <!-- File chooser -->
-                                        <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
-                                            <xforms:label class="fb-xforms-disabled"/>
-                                            <xforms:filename ref="@filename"/>
-                                            <xforms:mediatype ref="@mediatype"/>
-                                            <xxforms:size ref="@size"/>
-                                        </xforms:upload>
-                                        <xforms:hint ref="$form-resources/logo/hint"/>
+                                        <xforms:group ref=".[xxforms:property('oxf.fb.metadata.logo')]">
+                                            <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
+                                                <xforms:label class="fb-xforms-disabled"/>
+                                                <xforms:filename ref="@filename"/>
+                                                <xforms:mediatype ref="@mediatype"/>
+                                                <xxforms:size ref="@size"/>
+                                                <xforms:hint ref="$form-resources/logo/hint"/>
+                                            </xforms:upload>
+                                        </xforms:group>
                                     </xforms:group>
                                 </xhtml:td>
                                 <xhtml:td>

@@ -24,4 +24,6 @@
     <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
 
+    <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
+
 </properties>

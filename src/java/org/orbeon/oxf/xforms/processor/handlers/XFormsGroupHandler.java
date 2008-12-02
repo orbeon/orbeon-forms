@@ -170,20 +170,21 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
             // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
             // automatically handles ids and element names
+            if (!handlerContext.isNoScript()) {
+                savedOutput = controller.getOutput();
+                outputInterceptor = new OutputInterceptor(savedOutput, groupElementQName, new OutputInterceptor.Listener() {
+                    public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
+                        // Delimiter: begin group
+                        outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
+                    }
+                });
+                // TODO: is the use of XFormsElementFilterContentHandler necessary now?
+                controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
 
-            savedOutput = controller.getOutput();
-            outputInterceptor = new OutputInterceptor(savedOutput, groupElementQName, new OutputInterceptor.Listener() {
-                public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
-                    // Delimiter: begin group
-                    outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
-                }
-            });
-            // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-            controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
-
-            // Set control classes
-            outputInterceptor.setAddedClasses(classes);
+                // Set control classes
+                outputInterceptor.setAddedClasses(classes);
+            }
 
             // Don't support label, help, alert, or hint and other appearances, only the content!
         }
@@ -204,13 +205,15 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
         } else {
 
-            // Restore output
-            controller.setOutput(savedOutput);
+            if (!handlerContext.isNoScript()) {
+                // Restore output
+                controller.setOutput(savedOutput);
 
-            // Delimiter: end repeat
-            outputInterceptor.flushCharacters(true, true);
-            outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                    outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
+                // Delimiter: end repeat
+                outputInterceptor.flushCharacters(true, true);
+                outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
+            }
 
             // Don't support help, alert, or hint!
         }

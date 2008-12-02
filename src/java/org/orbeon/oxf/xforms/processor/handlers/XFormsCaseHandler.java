@@ -57,39 +57,43 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
-        // Place interceptor
-        currentSavedOutput = handlerContext.getController().getOutput();
-        currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
-            public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
-                // Output begin delimiter
-                outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
-            }
-        });
+        // Place interceptor if needed
+        if (!handlerContext.isNoScript()) {
+            currentSavedOutput = handlerContext.getController().getOutput();
+            currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
+                public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
+                    // Output begin delimiter
+                    outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                }
+            });
 
-        currentOutputInterceptor.setAddedClasses(new FastStringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
+            currentOutputInterceptor.setAddedClasses(new FastStringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
 
-        // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
+            // TODO: is the use of XFormsElementFilterContentHandler necessary now?
+            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
+        }
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
-        currentOutputInterceptor.flushCharacters(true, true);
+        if (!handlerContext.isNoScript()) {
+            currentOutputInterceptor.flushCharacters(true, true);
 
-        // Restore output
-        handlerContext.getController().setOutput(currentSavedOutput);
+            // Restore output
+            handlerContext.getController().setOutput(currentSavedOutput);
 
-        if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
-            // Output end delimiter
-            currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
-                currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
-        } else {
-            // Output start and end delimiter using xhtml:span
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
-            currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
+                // Output end delimiter
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
+                    currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            } else {
+                // Output start and end delimiter using xhtml:span
+                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            }
         }
     }
 }

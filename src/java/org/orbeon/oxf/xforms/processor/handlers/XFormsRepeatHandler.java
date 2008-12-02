@@ -53,7 +53,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
 
         // Place interceptor on output
         final DeferredContentHandler savedOutput = handlerContext.getController().getOutput();
-        final OutputInterceptor outputInterceptor = new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
+        final OutputInterceptor outputInterceptor = handlerContext.isNoScript() ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
             public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                 // Delimiter: begin repeat
                 outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
@@ -63,7 +63,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
             }
         });
         // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
+        if (outputInterceptor != null)
+            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
 
         if (isConcreteControl && (isTopLevelRepeat || !isMustGenerateTemplate)) {
 
@@ -72,7 +73,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
 
             // Unroll repeat
             for (int i = 1; i <= currentRepeatIterations; i++) {
-                if (i > 1) {
+                if (outputInterceptor != null && i > 1) {
                     // Delimiter: between repeat entries
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                             outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
@@ -96,7 +97,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                     // Add classes such as DnD classes, etc.
                     addRepeatClasses(addedClasses, attributes);
                 }
-                outputInterceptor.setAddedClasses(addedClasses);
+                if (outputInterceptor != null)
+                    outputInterceptor.setAddedClasses(addedClasses);
 
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, false, isCurrentIterationSelected);
@@ -105,7 +107,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                 } catch (Exception e) {
                     throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData(), "unrolling xforms:repeat control", repeatControl.getControlElement()));
                 }
-                outputInterceptor.flushCharacters(true, true);
+                if (outputInterceptor != null)
+                    outputInterceptor.flushCharacters(true, true);
                 handlerContext.popRepeatContext();
             }
         }
@@ -113,7 +116,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         // Generate template
         if (isMustGenerateTemplate && !handlerContext.isNoScript()) {// don't generate templates in noscript mode as they won't be used
 
-            if (!outputInterceptor.isMustGenerateFirstDelimiters()) {
+            if (outputInterceptor != null && !outputInterceptor.isMustGenerateFirstDelimiters()) {
                 // Delimiter: between repeat entries
                 outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
@@ -125,17 +128,19 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
             // Add classes such as DnD classes, etc.
             addRepeatClasses(addedClasses, attributes);
 
-            outputInterceptor.setAddedClasses(addedClasses);
+            if (outputInterceptor != null)
+                outputInterceptor.setAddedClasses(addedClasses);
 
             // Apply the content of the body for this iteration
             handlerContext.pushRepeatContext(true, 0, false, false);
             handlerContext.getController().repeatBody();
-            outputInterceptor.flushCharacters(true, true);
+            if (outputInterceptor != null)
+                outputInterceptor.flushCharacters(true, true);
             handlerContext.popRepeatContext();
         }
 
         // If no delimiter has been generated, try to find one!
-        if (outputInterceptor.getDelimiterNamespaceURI() == null) {
+        if (outputInterceptor != null && outputInterceptor.getDelimiterNamespaceURI() == null) {
 
             outputInterceptor.setForward(false); // prevent interceptor to output anything
 
@@ -149,7 +154,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         handlerContext.getController().setOutput(savedOutput);
 
         // Delimiter: end repeat
-        outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+        if (outputInterceptor != null)
+            outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
     }
 

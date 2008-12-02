@@ -76,7 +76,7 @@
                         <!-- Reload components -->
                         <xforms:trigger appearance="minimal" class="fb-reload-components-trigger">
                             <xforms:label>
-                                <xhtml:img src="../../../../apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
+                                <xhtml:img src="/apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>

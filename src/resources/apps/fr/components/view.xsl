@@ -194,7 +194,7 @@
                                 </xsl:if>
                             </xhtml:div>
                             <!-- Noscript help section (shown only in edit mode) -->
-                            <xsl:if test="$is-noscript and $mode = 'edit'">
+                            <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
                                 <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                 <xhtml:div class="xforms-help-panel">
                                     <xhtml:h2>
@@ -215,22 +215,15 @@
                                         <xhtml:div class="fr-status-icons">
                                             <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
                                                 <!-- Form is invalid -->
-                                                <!-- TODO: i18n of title -->
                                                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>
                                             </xforms:group>
                                             <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'true']">
                                                 <!-- Form is valid -->
-                                                <!-- TODO: i18n of title -->
                                                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>
                                             </xforms:group>
                                             <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                                                 <!-- Data is dirty -->
-                                                <!-- TODO: i18n of title -->
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="Unsaved Changes" title="Unsaved Changes"/>
-                                                <!--<xhtml:p class="fr-unsaved-data">-->
-                                                    <!-- TODO: i18n -->
-                                                    <!--Your document contains unsaved changes.-->
-                                                <!--</xhtml:p>-->
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>
                                             </xforms:group>
                                         </xhtml:div>
                                     </xsl:if>

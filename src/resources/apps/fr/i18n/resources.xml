@@ -25,6 +25,7 @@
             <summary-title>Your Form Contains the Following Errors</summary-title>
             <some>Errors on Form</some>
             <none>No Errors on Form</none>
+            <unsaved>Unsaved Changes</unsaved>
         </errors>
         <email>
             <subject>Orbeon Forms: Confirmation</subject>
@@ -157,6 +158,7 @@
             <summary-title>Votre formulaire contient les erreurs suivantes</summary-title>
             <some>Ce formulaire contient des erreurs</some>
             <none>Ce formulaire ne contient pas d'erreurs</none>
+            <unsaved>Modifications non sauvegardées</unsaved>
         </errors>
         <email>
             <subject>Orbeon Forms: Confirmation</subject>
@@ -289,6 +291,7 @@
             <summary-title>Su formulario contiene los siguientes errores</summary-title>
             <some>Errores en el formulario</some>
             <none>No hay errores en el formulario</none>
+            <unsaved>[Unsaved Changes]</unsaved>
         </errors>
         <email>
             <subject>[Orbeon Forms: Confirmation]</subject>

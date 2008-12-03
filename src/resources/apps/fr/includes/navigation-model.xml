@@ -32,6 +32,10 @@
     <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
          URL design perspective having the language better identifies the resource -->
 
+    <xforms:submission id="fr-edit-switch-script-summary-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        method="get" serialization="none" replace="all" validate="false"/>
+
     <xforms:submission id="fr-edit-switch-script-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"/>

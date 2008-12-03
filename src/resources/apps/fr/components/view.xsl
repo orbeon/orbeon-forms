@@ -55,7 +55,16 @@
                                         <!-- Set data-safe-override -->
                                         <xforms:setvalue model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
                                         <!-- Send submission -->
-                                        <xforms:send submission="fr-edit-switch-script-submission"/>
+                                        <xsl:choose>
+                                            <xsl:when test="$mode = 'summary'">
+                                                <!-- Submission for summary mode -->
+                                                <xforms:send submission="fr-edit-switch-script-summary-submission"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <!-- Submission for other modes -->
+                                                <xforms:send submission="fr-edit-switch-script-submission"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </xforms:action>
                                 </xforms:group>
                             </xhtml:div>

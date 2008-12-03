@@ -106,7 +106,7 @@
         <xforms:action if="not($is-document-id-provided)">
             <!-- No document id is provided -->
             <!-- Are we in new/edit mode -->
-            <xxforms:variable name="is-new-document" select="not($parameters/mode = ('view', 'pdf', 'email'))" as="xs:boolean"/>
+            <xxforms:variable name="is-new-document" select="$parameters/mode = ('new', 'edit')" as="xs:boolean"/>
             <xforms:action if="$is-new-document">
                 <!-- Create random document id -->
                 <xforms:setvalue ref="$document" value="digest(string(random(true)), 'MD5', 'hex')"/>

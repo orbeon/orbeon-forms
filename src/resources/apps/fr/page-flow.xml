@@ -139,6 +139,7 @@
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode">summary</setvalue>
     </page>
 
     <!-- New, edit or view document -->

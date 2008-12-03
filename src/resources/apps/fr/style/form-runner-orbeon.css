@@ -195,6 +195,9 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 
+/* Add background to static read-only fields */
+.xforms-static { background-color: #EEE }
+
 /* ***** Print and PDF ********************************************************************************************** */
 
 /* This is also used for PDF generation */

@@ -285,6 +285,14 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}encode-iso9075-14", XXFormsEncodeISO9075.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:doc-base64
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}doc-base64", XXFormsDocBase64.class, XXFormsDocBase64.DOC_BASE64, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+
+        // xxforms:doc-base64-available
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}doc-base64-available", XXFormsDocBase64.class, XXFormsDocBase64.DOC_BASE64_AVAILABLE, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:extract-document
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}extract-document", XXFormsExtractDocument.class, 0, 1, 3, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);

@@ -669,6 +669,28 @@
                         </p>
                     </li>
                     <li>
+                        <a name="xxforms-doc-base64"/>
+                        <p>
+                            <code>xxforms:doc-base64($href as xs:string) as xs:string</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:doc-base64()</code> function reads a resource identified by the given URL,
+                            and returns the content of the file as a Base64-encoded string. It is a dynamic XPath error
+                            if the resource cannot be read.
+                        </p>
+                    </li>
+                    <li>
+                        <a name="xxforms-doc-base64-available"/>
+                        <p>
+                            <code>xxforms:doc-base64-available($href as xs:string) as xs:boolean</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:doc-base64-available()</code> function reads a resource identified by the
+                            given URL. It returns <code>true()</code> if the file can be read, <code>false()</code>
+                            otherwise.
+                        </p>
+                    </li>
+                    <li>
                         <a name="xxforms-mutable-document"/>
                         <p>
                             <code>xxforms:mutable-document($node as node()) as document-node()</code>

@@ -16,6 +16,9 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -88,6 +91,19 @@ abstract public class XFormsFunction extends SystemFunction {
         } else {
             return null;
         }
+    }
+
+    public PipelineContext getOrCreatePipelineContext() {
+        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+        PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+
+        // Found existing pipeline context
+        if (pipelineContext != null)
+            return pipelineContext;
+
+        // Create new pipeline context
+        XFormsServer.logger.warn("Cannot find pipeline context from static context. Creating new pipeline context.");
+        return new PipelineContext();
     }
 
     public static class Context implements XPathCache.FunctionContext {

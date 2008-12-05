@@ -46,6 +46,7 @@ public class TransformerURIResolver implements URIResolver {
     private PipelineContext pipelineContext;
     private String prohibitedInput;
     private boolean handleXInclude;
+    private String mode;
 
     /**
      * Create a URI resolver.
@@ -56,10 +57,24 @@ public class TransformerURIResolver implements URIResolver {
      * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
      */
     public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
+        this(processor, pipelineContext, prohibitedInput, handleXInclude, null);
+    }
+
+    /**
+     * Create a URI resolver with a mode.
+     *
+     * @param processor         processor of which inputs will be read for "input:*"
+     * @param pipelineContext   pipeline context
+     * @param prohibitedInput   name of an input which triggers and exception if read (usually "data" or "config")
+     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
+     * @param mode              "xml", "html", "text" or "binary"
+     */
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude, String mode) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
         this.prohibitedInput = prohibitedInput;
         this.handleXInclude = handleXInclude;
+        this.mode = mode;
     }
 
     /**
@@ -95,7 +110,7 @@ public class TransformerURIResolver implements URIResolver {
                     // with HTTP and HTTPS. When would it make sense to use local caching?
                     final String protocol = url.getProtocol();
                     final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
-                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, null, null, null, cacheUseLocalCache);
+                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, mode, null, null, cacheUseLocalCache);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }

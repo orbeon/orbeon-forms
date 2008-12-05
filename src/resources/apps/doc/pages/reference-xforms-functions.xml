@@ -649,22 +649,22 @@
                         </xml-source>
                     </li>
                     <li>
-                        <a name="xxforms-encode-iso9075"/>
+                        <a name="xxforms-encode-iso9075-14"/>
                         <p>
-                            <code>xxforms:encode-iso9075($value as xs:string) as xs:string</code>
+                            <code>xxforms:encode-iso9075-14($value as xs:string) as xs:string</code>
                         </p>
                         <p>
-                            The <code>xxforms:encode-iso9075()</code> function encodes a string according to ISO
+                            The <code>xxforms:encode-iso9075-14()</code> function encodes a string according to ISO
                             9075-14:2003. The purpose is to escape any character which is not valid in an XML name.
                         </p>
                     </li>
                     <li>
-                        <a name="xxforms-decode-iso9075"/>
+                        <a name="xxforms-decode-iso9075-14"/>
                         <p>
-                            <code>xxforms:decode-iso9075($value as xs:string) as xs:string</code>
+                            <code>xxforms:decode-iso9075-14($value as xs:string) as xs:string</code>
                         </p>
                         <p>
-                            The <code>xxforms:decode-iso9075()</code> function decodes a string according to ISO
+                            The <code>xxforms:decode-iso9075-14()</code> function decodes a string according to ISO
                             9075-14:2003.
                         </p>
                     </li>

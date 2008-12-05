@@ -278,11 +278,11 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:decode-iso9075
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}decode-iso9075", XXFormsDecodeISO9075.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}decode-iso9075-14", XXFormsDecodeISO9075.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:encode-iso9075
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}encode-iso9075", XXFormsEncodeISO9075.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}encode-iso9075-14", XXFormsEncodeISO9075.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:extract-document

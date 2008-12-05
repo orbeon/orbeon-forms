@@ -49,7 +49,7 @@
     <!-- Make sure to encode path using ISO 9075-14:2003 -->
     <xxforms:variable name="alfresco-path"
     	select="string-join(for $p in tokenize(xxforms:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.')), '/')
-    				return xxforms:encode-iso9075($p), '/')" as="xs:string"/>
+    				return xxforms:encode-iso9075-14($p), '/')" as="xs:string"/>
 
     <!-- ===== Public interface ==================================================================================== -->
 
@@ -72,7 +72,7 @@
 
         <!-- Set encoded child node name based on name -->
         <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:parent/alf-cml:childName"
-                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxforms:encode-iso9075(instance('alfresco-send-document-request')/name))"/>
+                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxforms:encode-iso9075-14(instance('alfresco-send-document-request')/name))"/>
 
         <!-- Set content and type -->
         <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="instance('alfresco-send-document-request')/content"/>

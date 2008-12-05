@@ -62,6 +62,7 @@
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="components-uri" select="pipeline:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="has-alfresco" select="pipeline:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
         <xsl:copy>
@@ -209,6 +210,10 @@
         <xi:include href="../includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
         <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
+        <xsl:if test="$has-alfresco">
+            <!-- This model handles Alfresco integration -->
+            <xi:include href="../alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
+        </xsl:if>
 
         <!-- Copy and annotate existing main model -->
         <xsl:copy>

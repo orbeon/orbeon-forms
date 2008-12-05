@@ -34,6 +34,10 @@ public class XPathCacheStaticContext extends IndependentContext {
 
     private static final URIResolver URI_RESOLVER = new XPathCacheURIResolver();
 
+    // NOTE: It would be nice to use TransformerURIResolver, but currently doing so will NPE because there is no
+    // ExternalContext available.
+//    private static final URIResolver URI_RESOLVER = new TransformerURIResolver(false);
+
     // Whether whis context
     private final boolean allowAllVariables;
 

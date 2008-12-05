@@ -56,7 +56,7 @@
             </config>
         </p:input>
         <p:input name="data" href="#form-pdf"/>
-        <p:output name="data" ref="data" debug="xxxxxxxxxxx"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

@@ -20,7 +20,7 @@
 <!--
     This XForms model implements the interface to Alfresco through the Web Services API.
 -->
-<xforms:model id="alfresco-model"
+<xforms:model id="fr-alfresco-model"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:exforms="http://www.exforms.org/exf/1-0"
@@ -37,7 +37,18 @@
         xmlns:secext="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
         xmlns:utility="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 
-    <!-- Alfresco interface -->
+    <!-- Global parameters -->
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')" as="element()"/>
+    <xxforms:variable name="app" select="$parameters/app" as="xs:string"/>
+    <xxforms:variable name="form" select="$parameters/form" as="xs:string"/>
+
+    <!-- Connection parameters depending on app/form -->
+    <xxforms:variable name="alfresco-uri" select="xxforms:property(string-join(('oxf.fr.alfresco.uri', $app, $form), '.'))" as="xs:anyURI"/>
+    <xxforms:variable name="alfresco-username" select="xxforms:property(string-join(('oxf.fr.alfresco.username', $app, $form), '.'))" as="xs:string"/>
+    <xxforms:variable name="alfresco-credentials" select="xxforms:property(string-join(('oxf.fr.alfresco.credentials', $app, $form), '.'))" as="xs:string"/>
+    <xxforms:variable name="alfresco-path" select="xxforms:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.'))" as="xs:string"/>
+
+    <!-- ===== Public interface ==================================================================================== -->
 
     <xforms:instance id="alfresco-send-document-request">
         <request xmlns="">
@@ -53,6 +64,7 @@
         <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[1]/alf-cml:value" value="instance('alfresco-send-document-request')/name"/>
         <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[2]/alf-cml:value" value="instance('alfresco-send-document-request')/title"/>
         <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[3]/alf-cml:value" value="instance('alfresco-send-document-request')/description"/>
+
         <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="instance('alfresco-send-document-request')/content"/>
 
         <!-- Clear error -->
@@ -71,6 +83,7 @@
         <!-- Display success message if ok -->
         <xforms:action if="instance('alfresco-error')/got-error = 'false'">
             <xforms:setvalue ref="instance('alfresco-send-document-request')/content"/>
+            <!-- TODO: i18n -->
             <xforms:message>Document envoyé avec succès.</xforms:message>
         </xforms:action>
         <!-- Display error if any -->
@@ -95,22 +108,25 @@
         </error>
     </xforms:instance>
 
-    <!-- ============================================================ -->
+    <!-- ===== Authentication ====================================================================================== -->
 
     <!-- Authentication service -->
     <xforms:instance id="alfresco-auth-ws-request">
         <soap:Envelope>
             <soap:Body>
                 <startSession xmlns="http://www.alfresco.org/ws/service/authentication/1.0">
-                    <username>admin</username>
-                    <password>admin</password>
+                    <!-- This is filled-out when the instance is submitted -->
+                    <username/>
+                    <password/>
                 </startSession>
             </soap:Body>
         </soap:Envelope>
     </xforms:instance>
 
     <xforms:instance id="alfresco-auth-ws-response">
+        <soap:Envelope/>
         <!-- Example response -->
+        <!--
         <soap:Envelope>
             <soap:Body>
                 <startSessionResponse xmlns="http://www.alfresco.org/ws/service/authentication/1.0">
@@ -122,6 +138,7 @@
                 </startSessionResponse>
             </soap:Body>
         </soap:Envelope>
+        -->
     </xforms:instance>
 
     <xforms:instance id="alfresco-auth-headers">
@@ -140,9 +157,16 @@
     </xforms:instance>
 
     <xforms:submission ref="instance('alfresco-auth-ws-request')" id="alfresco-auth-submission"
-        method="post" action="http://localhost:18080/alfresco/api/AuthenticationService"
+        method="post" action="{$alfresco-uri}api/AuthenticationService"
+        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-auth-ws-response">
+
+        <xforms:action ev:event="xforms-submit">
+            <!-- Fill-out credentials -->
+            <xforms:setvalue ref=".//alf-auth:username" value="$alfresco-username"/>
+            <xforms:setvalue ref=".//alf-auth:password" value="$alfresco-credentials"/>
+        </xforms:action>
 
         <xforms:action ev:event="xforms-submit-done">
             <!-- Create SOAP headers for other services -->
@@ -152,7 +176,7 @@
         </xforms:action>
     </xforms:submission>
 
-    <!-- ============================================================ -->
+    <!-- ===== Create new reference ================================================================================ -->
 
     <!-- Create new reference -->
     <xforms:instance id="alfresco-create-ws-request">
@@ -168,7 +192,8 @@
                                     <scheme>workspace</scheme>
                                     <address>SpacesStore</address>
                                 </store>
-                                <path>/app:company_home/app:guest_home</path>
+                                <!-- This is filled-out when the instance is submitted -->
+                                <path/>
                                 <associationType>{http://www.alfresco.org/model/content/1.0}contains</associationType>
                                 <!-- TODO: Really not sure what this is vs. the name property. Alfresco examples are not clear. -->
                                 <childName>{http://www.alfresco.org/model/content/1.0}form</childName>
@@ -197,6 +222,9 @@
     </xforms:instance>
 
     <xforms:instance id="alfresco-create-ws-response">
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"/>
+        <!-- Example response -->
+        <!--
         <soapenv:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
             <soapenv:Body>
@@ -218,21 +246,25 @@
                 </updateResponse>
             </soapenv:Body>
         </soapenv:Envelope>
+        -->
     </xforms:instance>
 
     <xforms:submission ref="instance('alfresco-create-ws-request')" id="alfresco-create-submission"
-        method="post" action="http://localhost:18080/alfresco/api/RepositoryService"
+        method="post" action="{$alfresco-uri}/api/RepositoryService"
+        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-create-ws-response">
 
         <xforms:action ev:event="xforms-submit">
+            <!-- Set path -->
+            <xforms:setvalue ref=".//alf-cml:path" value="$alfresco-path"/>
             <!-- Set authentication headers -->
             <xforms:delete nodeset="instance('alfresco-create-ws-request')/soap:Header"/>
             <xforms:insert context="instance('alfresco-create-ws-request')" origin="instance('alfresco-auth-headers')"/>
         </xforms:action>
     </xforms:submission>
 
-    <!-- ============================================================ -->
+    <!-- ==== Post content ========================================================================================= -->
 
     <!-- Post content -->
     <xforms:instance id="alfresco-post-content-ws-request">
@@ -260,11 +292,12 @@
     </xforms:instance>
 
     <xforms:instance id="alfresco-post-content-ws-response">
-        <dumy/>
+        <dummy/>
     </xforms:instance>
 
     <xforms:submission ref="instance('alfresco-post-content-ws-request')" id="alfresco-post-content-submission"
-        method="post" action="http://localhost:18080/alfresco/api/ContentService"
+        method="post" action="{$alfresco-uri}/api/ContentService"
+        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-post-content-ws-response">
 

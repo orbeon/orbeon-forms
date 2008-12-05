@@ -153,6 +153,7 @@
     </p:processor>
 
     <!-- Obtain PDF data for attachment -->
+    <!-- TODO: add option to get PDF from temp file -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../detail/detail-model.xpl"/>
         <p:input name="instance"><null xsi:nil="true"/></p:input>

@@ -20,10 +20,10 @@
               xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
-              xmlns:exist="http://exist.sourceforge.net/NS/exist"
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
@@ -531,33 +531,32 @@
                 <xxforms:variable name="form-title" select="($form-titles[@xml:lang = xxforms:instance('fr-language-instance')], $form-titles[1])[1]" as="xs:string"/>
                 <xxforms:variable name="form-description" select="($form-descriptions[@xml:lang = xxforms:instance('fr-language-instance')], $form-descriptions[1])[1]" as="xs:string"/>
 
-                <!-- Set description -->
-                <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/description" value="$form-description"/>
-
                 <!-- Send PDF data if requested -->
-                <xforms:action if="false() and xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
-                    <!-- Get PDF data as Base64 -->
-                    <!-- TODO: properly read source document -->
+                <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
+                    <!-- Get URI of PDF data -->
                     <xxforms:variable name="pdf-uri" select="pipeline:rewriteResourceURI(concat(xxforms:property('oxf.fr.appserver.uri'), instance('fr-workflow-confirmation-instance')), true())" as="xs:anyURI"/>
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/content" value="doc($pdf-uri)"/>
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/mimetype">application/pdf</xforms:setvalue>
-                    <!-- Set name and title -->
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/name" value="concat($form-title, ' (#', $document, ').pdf')"/>
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/title" value="$form-title"/>
-                    <!-- Send data to Alfresco -->
-                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document"/>
+
+                    <!-- Send everything to Alfresco -->
+                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                        <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').pdf')"/>
+                        <xxforms:context name="fr:title" select="$form-title"/>
+                        <xxforms:context name="fr:description" select="$form-description"/>
+                        <xxforms:context name="fr:mimetype" select="'application/pdf'"/>
+                        <!-- Content as Base64 -->
+                        <xxforms:context name="fr:content" select="xxforms:doc-base64($pdf-uri)"/>
+                    </xforms:dispatch>
                 </xforms:action>
                 <!-- Send XML data if requested -->
                 <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-xml', $app, $form), '.'))">
-                    <!-- XML data -> string -> Base64 -->
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/content"
-                                     value="saxon:string-to-base64Binary(saxon:serialize(xxforms:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/mimetype">application/xml</xforms:setvalue>
-                    <!-- Set name and title -->
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/name" value="concat($form-title, ' (#', $document, ').xml')"/>
-                    <xforms:setvalue ref="xxforms:instance('alfresco-send-document-request')/title" value="$form-title"/>
                     <!-- Send data to Alfresco -->
-                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document"/>
+                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                        <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').xml')"/>
+                        <xxforms:context name="fr:title" select="$form-title"/>
+                        <xxforms:context name="fr:description" select="$form-description"/>
+                        <xxforms:context name="fr:mimetype" select="'application/xml'"/>
+                        <!-- XML data -> string -> Base64 -->
+                        <xxforms:context name="fr:content" select="saxon:string-to-base64Binary(saxon:serialize(xxforms:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
+                    </xforms:dispatch>
                 </xforms:action>
             </xforms:action>
 

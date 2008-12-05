@@ -29,6 +29,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:alf-auth="http://www.alfresco.org/ws/service/authentication/1.0"
@@ -53,30 +54,19 @@
 
     <!-- ===== Public interface ==================================================================================== -->
 
-    <!-- TODO: use xxforms:context instead to pass to alfresco-send-document -->
-    <xforms:instance id="alfresco-send-document-request">
-        <request xmlns="">
-            <name/>
-            <title/>
-            <description/>
-            <content/>
-            <mimetype/>
-        </request>
-    </xforms:instance>
-
     <xforms:action ev:event="alfresco-send-document">
         <!-- Set properties provided by the user -->
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[1]/alf-cml:value" value="instance('alfresco-send-document-request')/name"/>
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[2]/alf-cml:value" value="instance('alfresco-send-document-request')/title"/>
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[3]/alf-cml:value" value="instance('alfresco-send-document-request')/description"/>
+        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[1]/alf-cml:value" value="event('fr:name')"/>
+        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[2]/alf-cml:value" value="event('fr:title')"/>
+        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[3]/alf-cml:value" value="event('fr:description')"/>
 
         <!-- Set encoded child node name based on name -->
         <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:parent/alf-cml:childName"
-                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxforms:encode-iso9075-14(instance('alfresco-send-document-request')/name))"/>
+                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxforms:encode-iso9075-14(event('fr:name')))"/>
 
         <!-- Set content and type -->
-        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="instance('alfresco-send-document-request')/content"/>
-        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:format/alf-content:mimetype" value="instance('alfresco-send-document-request')/mimetype"/>
+        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="event('fr:content')"/>
+        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:format/alf-content:mimetype" value="event('fr:mimetype')"/>
 
         <!-- Clear error -->
         <xforms:setvalue ref="instance('alfresco-error')/got-error" value="false()"/>
@@ -93,12 +83,12 @@
         </xforms:action>
         <!-- Display success message if ok -->
         <xforms:action if="instance('alfresco-error')/got-error = 'false'">
-            <xforms:setvalue ref="instance('alfresco-send-document-request')/content"/>
-            <!-- TODO: i18n -->
+            <!-- TODO: proper error message handling -->
             <xforms:message>Document envoyé avec succès.</xforms:message>
         </xforms:action>
         <!-- Display error if any -->
         <xforms:action if="instance('alfresco-error')/got-error = 'true'">
+            <!-- TODO: proper error message handling -->
             <xforms:message>
                 Alfresco error:
                 <xforms:output value="instance('alfresco-error')/message"/>

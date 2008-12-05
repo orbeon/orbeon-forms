@@ -45,11 +45,6 @@
     background-position: left center;
 }
 
-/* Hide inline alerts for noscript mode */
-/*html body .xforms-noscript .xforms-alert-active {*/
-    /*display: none;*/
-/*}*/
-
 .xforms-help-image {
     display: -moz-inline-box;
     display: inline-block;

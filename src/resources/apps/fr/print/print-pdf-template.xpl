@@ -177,16 +177,22 @@
                                         <xsl:choose>
                                             <xsl:when test="local-name($control) = 'select' and $control/@appearance = 'full'">
                                                 <!-- Checkboxes: use control value and match export values in PDF -->
-                                                <!--<field acro-field-name="'{$field-name}.{$control-value}'" value="'X'"/>-->
+                                                <!-- TODO: This doesn't work as Acrobat doesn't handle space-separated values -->
                                                 <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
                                             </xsl:when>
                                             <xsl:when test="local-name($control) = 'select1' and $control/@appearance = 'full'">
                                                 <!-- Radio buttons: use control value and match export values in PDF -->
                                                 <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
                                             </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- Other selection controls: just use the label -->
+                                            <xsl:when test="local-name($control) = 'select1'">
+                                                <!-- Other single-selection controls: just use label -->
                                                 <field acro-field-name="'{$field-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <!-- Other multiple-selection controls: just use the label -->
+                                                <field acro-field-name="'{$field-name}'"
+                                                       value="'{string-join(for $v in tokenize($control-value, '\s')
+                                                                    return $control-resources/item[value = $v]/label, ' - ')}'"/>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:when>

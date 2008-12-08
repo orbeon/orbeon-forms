@@ -49,14 +49,14 @@
                 <errors-count>Errors in Your Form</errors-count>
             </titles>
             <messages>
-                <intro><i>Please select a form in order to perform an operation, or select "New Form" to create a new blank form.</i></intro>
+                <intro><i>Please select a document in order to perform an operation, or select "New" to create a new blank document.</i></intro>
                 <no-form-found><i>No form data was found.</i></no-form-found>
             </messages>
             <labels>
-                <new-form>New Form</new-form>
+                <new-form>New</new-form>
                 <import-forms>Import Forms</import-forms>
-                <edit-form>Edit Form</edit-form>
-                <delete-form>Delete Form</delete-form>
+                <edit-form>Edit</edit-form>
+                <delete-form>Delete</delete-form>
                 <view-readonly>View HTML</view-readonly>
                 <view-xml>View XML</view-xml>
                 <view-pdf>View PDF</view-pdf>
@@ -182,7 +182,7 @@
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
             <messages>
-                <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau formulaire.</i></intro>
+                <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau document.</i></intro>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
             </messages>
             <labels>
@@ -315,14 +315,14 @@
                 <errors-count>Errores en su formulario</errors-count>
             </titles>
             <messages>
-                <intro><i>Por favor, seleccione un formulario para llevar a cabo una operación, o seleccione "Nuevo Formulario" para crear un nuevo formulario en blanco.</i></intro>
+                <intro><i>Por favor, seleccione un documento para llevar a cabo una operación, o seleccione "Nuevo" para crear un nuevo documento en blanco.</i></intro>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>
             </messages>
             <labels>
-                <new-form>Nuevo Formulario</new-form>
+                <new-form>Nuevo</new-form><!-- Formulario -->
                 <import-forms>Importar Formulario</import-forms>
-                <edit-form>Editar Formulario</edit-form>
-                <delete-form>Eliminar Formulario</delete-form>
+                <edit-form>Editar</edit-form><!-- Formulario -->
+                <delete-form>Eliminar</delete-form><!-- Formulario -->
                 <view-readonly>Ver HTML</view-readonly>
                 <view-xml>Ver XML</view-xml>
                 <view-pdf>Ver PDF</view-pdf>

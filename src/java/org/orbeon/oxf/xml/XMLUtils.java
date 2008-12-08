@@ -250,6 +250,9 @@ public class XMLUtils {
     /**
      * Return whether the given mediatype is considered as XML.
      *
+     * TODO: This does test on the mediatype only, but we need one to check the content type as well for the case
+     * "text/html; charset=foobar"
+     *
      * @param mediatype mediatype or null
      * @return          true if not null and XML mediatype, false otherwise
      */

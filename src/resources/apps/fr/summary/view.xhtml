@@ -218,6 +218,10 @@
                 <configuration xmlns=""/>
             </xforms:instance>
 
+            <xforms:instance id="fr-selection-instance">
+                <selection xmlns=""/>
+            </xforms:instance>
+
             <!-- Extract summary configuration information from the XHTML document -->
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
@@ -530,6 +534,7 @@
                         <table class="fr-summary-table">
                             <thead>
                                 <tr>
+                                    <!--<th/>-->
                                     <th class="fr-summary-repeat-column-number"><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
                                     <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
                                     <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
@@ -549,67 +554,86 @@
                             </thead>
                             <tbody>
                                 <xforms:repeat nodeset="document" id="documents-repeat">
+                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
+
                                     <tr>
-                                        <td class="fr-summary-repeat-column-number">
-                                            <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
-                                            <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
-                                            <!-- Expose to JavaScript name of this form -->
-                                            <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
+                                        <!--<td>-->
+                                            <!--<xforms:select appearance="full" ref="instance('fr-selection-instance')">-->
+                                                <!--<xforms:item>-->
+                                                    <!--<xforms:label/>-->
+                                                    <!--<xforms:value value="concat('v', $position)"/>-->
+                                                <!--</xforms:item>-->
+                                            <!--</xforms:select>-->
+                                        <!--</td>-->
+                                        <xforms:group appearance="xxforms:internal">
+                                            <!-- Upon focus on the row, edit document -->
+                                            <!--<xforms:dispatch ev:event="DOMFocusIn" target="fr-form-model" name="fr-summary-edit"/>-->
 
-                                            <!-- Just output the number -->
-                                            <xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
-                                            <!-- Trigger to select the row in noscript mode -->
-                                            <xforms:trigger ref=".[property('xxforms:noscript')]">
-                                                <xforms:label value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
-                                            </xforms:trigger>
-                                        </td>
-                                        <td>
-                                            <xforms:group ref="@created">
-                                                <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                            </xforms:group>
-                                        </td>
-                                        <td>
-                                            <xforms:group ref="@last-modified">
-                                                <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                            </xforms:group>
-                                        </td>
-                                        <xforms:repeat nodeset="details/detail" id="document-details-repeat">
+                                            <td class="fr-summary-repeat-column-number">
+                                                <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
+                                                <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
+                                                <!-- Expose to JavaScript name of this form -->
+                                                <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
+
+                                                <!-- Just output the number -->
+                                                <xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                                <!-- Trigger to select the row in noscript mode -->
+                                                <xforms:trigger ref=".[property('xxforms:noscript')]">
+                                                    <xforms:label value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                                </xforms:trigger>
+                                            </td>
                                             <td>
-                                                <!-- control to make data accessible to JavaScript -->
-                                                <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
-
-                                                <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
-
-                                                <!-- input -->
-                                                <xforms:group ref=".[$query/@control = 'input']">
-                                                    <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
-                                                    <xforms:group ref=".[$type = 'date']">
-                                                        <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                    </xforms:group>
-                                                    <xforms:group ref=".[$type = 'time']">
-                                                        <xforms:output value="if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                    </xforms:group>
-                                                    <xforms:group ref=".[$type = 'dateTime']">
-                                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                    </xforms:group>
-                                                    <xforms:group ref=".[not($type = ('date', 'time', 'dateTime'))]">
-                                                        <xforms:output value="."/>
-                                                    </xforms:group>
-                                                </xforms:group>
-
-                                                <!-- textarea -->
-                                                <xforms:group ref=".[$query/@control = 'textarea']">
-                                                    <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
-                                                </xforms:group>
-
-                                                <!-- select1 -->
-                                                <xforms:group ref=".[$query/@control = 'select1']">
-                                                    <xforms:output value="."/>
-                                                    <!-- TODO: Obtain value from itemset -->
-                                                    <!--instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(xxforms:context('documents-repeat')/@name, 's-itemset')]/*/*-->
+                                                <xforms:group ref="@created">
+                                                    <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                 </xforms:group>
                                             </td>
-                                        </xforms:repeat>
+                                            <td>
+                                                <xforms:group ref="@last-modified">
+                                                    <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                </xforms:group>
+                                            </td>
+                                            <xforms:repeat nodeset="details/detail" id="document-details-repeat">
+                                                <td>
+                                                    <!-- control to make data accessible to JavaScript -->
+                                                    <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
+
+                                                    <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
+
+                                                    <!-- input -->
+                                                    <xforms:group ref=".[$query/@control = 'input']">
+                                                        <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
+                                                        <xforms:group ref=".[$type = 'date']">
+                                                            <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                        </xforms:group>
+                                                        <xforms:group ref=".[$type = 'time']">
+                                                            <xforms:output value="if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                        </xforms:group>
+                                                        <xforms:group ref=".[$type = 'dateTime']">
+                                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                        </xforms:group>
+                                                        <xforms:group ref=".[not($type = ('date', 'time', 'dateTime'))]">
+                                                            <xforms:output value="."/>
+                                                        </xforms:group>
+                                                    </xforms:group>
+
+                                                    <!-- textarea -->
+                                                    <xforms:group ref=".[$query/@control = 'textarea']">
+                                                        <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
+                                                    </xforms:group>
+
+                                                    <!-- select -->
+                                                    <xforms:group ref=".[$query/@control = 'select']">
+                                                        <xforms:output model="fr-persistence-model"
+                                                                       value="string-join(for $v in tokenize(context(), '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')"/>
+                                                    </xforms:group>
+
+                                                    <!-- select1 -->
+                                                    <xforms:group ref=".[$query/@control = 'select1']">
+                                                        <xforms:output model="fr-persistence-model" value="$form-resources/*[local-name() = $query/@name]/item[value = context()]/label"/>
+                                                    </xforms:group>
+                                                </td>
+                                            </xforms:repeat>
+                                        </xforms:group>
                                     </tr>
                                 </xforms:repeat>
                                 <xforms:group ref=".[not(document)]">

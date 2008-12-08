@@ -132,9 +132,15 @@
                                     <!-- Description in chosen language or first one if not found -->
                                     <xxforms:variable name="description"
                                                       select="($source-form-metadata/description[@xml:lang = $metadata-lang],
-                                                                $source-form-metadata/description[1],
-                                                                instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
-                                                                instance('fr-form-metadata')/description[1])[1]"/>
+                                                               $source-form-metadata/description[1],
+                                                               instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
+                                                               instance('fr-form-metadata')/description[1])[1]"/>
+
+                                    <!-- Logo -->
+                                    <xxforms:variable name="logo-uri"
+                                                      select="(($source-form-metadata/logo,
+                                                                instance('fr-form-metadata')/logo,
+                                                                concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]"/>
 
                                     <!--xxx noscript xxx-->
                                     <!--<xforms:output value="property('xxforms:noscript')"/>                            -->
@@ -155,7 +161,7 @@
                                                         <xhtml:tr>
                                                             <xhtml:td rowspan="2">
                                                                 <xsl:if test="$default-logo-uri">
-                                                                    <xforms:output class="fr-logo" value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                                    <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
                                                                 </xsl:if>
                                                             </xhtml:td>
                                                             <xhtml:td>

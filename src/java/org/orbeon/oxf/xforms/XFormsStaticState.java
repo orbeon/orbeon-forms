@@ -1054,7 +1054,7 @@ public class XFormsStaticState {
                     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
                     // don't check things like event handlers.
                     final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
-                            "exists(./(xforms:choices | xforms:item | xforms:itemset)/xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
+                            "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
                             null, null, null, null, locationData)).booleanValue();
 
                     // Remember information

@@ -895,13 +895,13 @@ ORBEON.util.Utils = {
         return null;
     },
 
-    hideModalProgressPanel:function() {
+    hideModalProgressPanel: function() {
         if (ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel.hide();
         }
     },
 
-    displayModalProgressPanel:function() {
+    displayModalProgressPanel: function() {
         if (!ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel =
             new YAHOO.widget.Panel("wait", {
@@ -3176,8 +3176,7 @@ ORBEON.widgets.RTE = function() {
         init: function(control) {
             // Create RTE object
             var yuiRTE = new YAHOO.widget.Editor(control, {
-                height: "300px",
-                width: "550px"
+                // Don't set width/height (done in CSS)
             });
             // Register event listener for user interacting with the control
             yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });

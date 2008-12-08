@@ -139,6 +139,9 @@
     overflow: hidden;
 }
 
+/* Default size for YUI RTE (seems to work!) */
+textarea.xforms-mediatype-text-html { width: 550px; height: 300px }
+
 .xforms-select1-appearance-minimal {
     font-family: Arial,Helvetica,Geneva,sans-serif
 }

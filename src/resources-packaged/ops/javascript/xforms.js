@@ -1273,7 +1273,12 @@ ORBEON.xforms.Controls = {
      */
     setCurrentValue: function(control, newControlValue, displayValue, previousServerValue, uploadState, uploadFilename, uploadMediatype, uploadSize) {
         var isStaticReadonly = ORBEON.util.Dom.hasClass(control, "xforms-static");
-        if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
+            // XForms output with xxforms:download appearance
+            var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
+            var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
+            anchor.setAttribute("href", newOutputControlValue);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {

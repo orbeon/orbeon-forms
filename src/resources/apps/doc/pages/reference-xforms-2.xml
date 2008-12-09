@@ -2659,6 +2659,45 @@
                         and an icon appears indicating that background processing is taking place.
                     </p>
                 </section>
+                <a name="xxforms-download-appearance"/>
+                <section>
+                    <title><code>xxforms:download</code> Appearance on <code>&lt;xforms:output></code></title>
+                    <p>
+                        <code>&lt;xforms:output></code> supports the <code>xxforms:download</code> appearance, which
+                        causes the the resource identified by the single-node binding to be downloadable through a
+                        link.
+                    </p>
+                    <p>
+                        Like <code>&lt;xforms:upload></code>, when using this appearance,
+                        <code>&lt;xforms:mediatype></code> and <code>&lt;xforms:filename></code> children elements are
+                        allowed (but not the <code>&lt;xxforms:size></code> element). When serving the file, if these
+                        elements are present, they are passed to the resulting HTTP response to provide mediatype and
+                        file name hints to the browser. Example:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="my-instance">
+                            <instance>
+                                <file mediatype="" filename="" size=""/>
+                            </instance>
+                        </xforms:instance>
+                        ...
+                        <xforms:upload ref="file">
+                            <xforms:label>Upload</xforms:label>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xforms:filename ref="@filename"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
+
+                        <xforms:output ref="file" appearance="xxforms:download">
+                            <xforms:label>Download</xforms:label>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xforms:filename ref="@filename"/>
+                        </xforms:output>
+                    </xml-source>
+                    <p>
+                        The data type for the resource must be <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
+                    </p>
+                </section>
             </section>
         </section>
         <a name="configuration"/>

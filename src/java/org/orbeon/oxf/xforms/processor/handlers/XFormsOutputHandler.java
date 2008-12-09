@@ -101,7 +101,15 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     final AttributesImpl imgAttributes = new AttributesImpl();
                     final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
-                    imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+
+                    if (hrefValue == null || hrefValue.trim().equals("")) {
+                        // No URL so make sure a click doesn't cause navigation, and add class
+                        imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                        imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-readonly");
+                    } else {
+                        // URL value
+                        imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+                    }
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, imgAttributes);
 

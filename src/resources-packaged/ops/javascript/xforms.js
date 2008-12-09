@@ -1277,7 +1277,14 @@ ORBEON.xforms.Controls = {
             // XForms output with xxforms:download appearance
             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
             var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
-            anchor.setAttribute("href", newOutputControlValue);
+            if (newOutputControlValue == "") {
+                anchor.setAttribute("href", "#");
+                YAHOO.util.Dom.addClass(anchor, "xforms-readonly");
+            } else {
+                anchor.setAttribute("href", newOutputControlValue);
+                YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
+            }
+
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;

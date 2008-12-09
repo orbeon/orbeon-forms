@@ -48,20 +48,65 @@
                 <!--<p:output name="data" id="data2"/>-->
             <!--</p:processor>-->
 
+            <!-- Apply XForms preprocessing if needed -->
+            <p:choose href="aggregate('null')"><!-- dummy test input -->
+                <p:when test="p:property('oxf.epilogue.xforms.preprocessing') = true()">
+
+                    <!-- Get preprocessing URI from property -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('config', aggregate('null')#xpointer(p:property('oxf.epilogue.xforms.preprocessing.uri')))"/>
+                        <p:output name="data" id="preprocessing-config"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="#preprocessing-config"/>
+                        <p:output name="data" id="preprocessing"/>
+                    </p:processor>
+
+                    <!-- Apply preprocessing step -->
+                    <!-- TODO: detection of XSLT or XPL? -->
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="data" href="#data"/>
+                        <p:input name="config" href="#preprocessing"/>
+                        <p:output name="data" id="preprocessed-view"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- No preprocessing -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#data"/>
+                        <p:output name="data" id="preprocessed-view"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+
             <!-- Apply XForms widgets if needed -->
-            <p:choose href="#request-info"><!-- dummy test input -->
-                <p:when test="p:property('oxf.epilogue.xforms.widgets')">
+            <p:choose href="aggregate('null')"><!-- dummy test input -->
+                <p:when test="p:property('oxf.epilogue.xforms.widgets') = true()">
+
+                    <!-- Get widgets URI from property -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('config', aggregate('null')#xpointer(p:property('oxf.epilogue.xforms.widgets.uri')))"/>
+                        <p:output name="data" id="widgets-config"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="#widgets-config"/>
+                        <p:output name="data" id="aggregate"/>
+                    </p:processor>
+
+                    <!-- Apply widgets -->
                     <p:processor name="oxf:xslt">
                         <!--<p:input name="data" href="#data2"/>-->
-                        <p:input name="data" href="#data"/>
-                        <p:input name="config" href="/config/xforms-widgets.xsl"/>
+                        <p:input name="data" href="#preprocessed-view"/>
+                        <p:input name="config" href="#aggregate"/>
                         <p:output name="data" id="widgeted-view"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>
                     <!-- No theme -->
                     <p:processor name="oxf:identity">
-                        <p:input name="data" href="#data"/>
+                        <p:input name="data" href="#preprocessed-view"/>
                         <p:output name="data" id="widgeted-view"/>
                     </p:processor>
                 </p:otherwise>

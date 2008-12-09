@@ -45,7 +45,7 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Label is handled differently
     }
 

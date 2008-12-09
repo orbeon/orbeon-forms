@@ -1327,7 +1327,7 @@ public class NetUtils {
      * @param contentType       type of the content referred to by the URI, or null if unknown
      * @return                  client URI
      */
-    public static String proxyURI(PipelineContext pipelineContext, String uri, String contentType) {
+    public static String proxyURI(PipelineContext pipelineContext, String uri, String filename, String contentType) {
 
         // Create a digest, so that for a given URI we always get the same key
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
@@ -1339,7 +1339,7 @@ public class NetUtils {
         if (session != null) {
             // Store mapping into session
             session.getAttributesMap().put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new DynamicResource(uri, contentType, -1, System.currentTimeMillis()));
+                    new DynamicResource(uri, filename, contentType, -1, System.currentTimeMillis()));
         }
 
         // Rewrite new URI to absolute path without the context
@@ -1349,12 +1349,14 @@ public class NetUtils {
 
     public static class DynamicResource {
         private String uri;
+        private String filename;
         private String contentType;
         private long size;
         private long lastModified;
 
-        public DynamicResource(String uri, String contentType, long size, long lastModified) {
+        public DynamicResource(String uri, String filename, String contentType, long size, long lastModified) {
             this.uri = uri;
+            this.filename = filename;
             this.contentType = contentType;
             this.size = size;
             this.lastModified = lastModified;
@@ -1362,6 +1364,10 @@ public class NetUtils {
 
         public String getURI() {
             return uri;
+        }
+
+        public String getFilename() {
+            return filename;
         }
 
         public String getContentType() {

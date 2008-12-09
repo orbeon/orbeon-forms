@@ -112,10 +112,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, items, isMany, isFull);
     }
 
-    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
         if (isStaticReadonly(xformsControl) || !isFull || !handlerContext.isNoScript())
-            super.handleLabel(staticId, effectiveId, xformsControl, isTemplate);
+            super.handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
     }
 
     public void outputContent(Attributes attributes, String staticId, String effectiveId, String uri, String localname, final XFormsValueControl xformsControl, List items, final boolean isMany, final boolean isFull) throws SAXException {

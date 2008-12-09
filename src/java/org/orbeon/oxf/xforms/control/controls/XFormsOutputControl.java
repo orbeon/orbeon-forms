@@ -43,6 +43,9 @@ public class XFormsOutputControl extends XFormsValueControl {
     // XForms 1.1 mediatype attribute
     private String mediatypeAttribute;
 
+    // For xxforms:download appearance
+    private FileInfo fileInfo;
+
     private boolean urlNorewrite;
 
     public XFormsOutputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
@@ -51,6 +54,22 @@ public class XFormsOutputControl extends XFormsValueControl {
         this.mediatypeAttribute = element.attributeValue("mediatype");
         this.valueAttribute = element.attributeValue("value");
         this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);
+
+        fileInfo = new FileInfo(this, getContextStack(), element);
+    }
+
+    protected void evaluate(PipelineContext pipelineContext) {
+        super.evaluate(pipelineContext);
+
+        getState(pipelineContext);
+        getFileMediatype(pipelineContext);
+        getFileName(pipelineContext);
+        getFileSize(pipelineContext);
+    }
+
+    public void markDirty() {
+        super.markDirty();
+        fileInfo.markDirty();
     }
 
     protected void evaluateValue(PipelineContext pipelineContext) {
@@ -87,10 +106,11 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "");
+            final String dynamicMediatype = fileInfo.getFileMediatype(pipelineContext);
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI);// use dummy image so that client always has something to load
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);// use dummy image so that client always has something to load
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -109,7 +129,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue) {
+    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
         if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
@@ -118,7 +138,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 if (!urlNorewrite) {
                     // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
                     final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, mediatypeAttribute);
+                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, fileInfo.getFileName(pipelineContext), mediatype);
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -127,7 +147,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:base64Binary type
 
                 final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
-                updatedValue = NetUtils.proxyURI(pipelineContext, uri, mediatypeAttribute);
+                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype);
 
             } else {
                 // Return dummy image
@@ -175,6 +195,34 @@ public class XFormsOutputControl extends XFormsValueControl {
         return (valueAttribute == null) ? super.getType() : null;
     }
 
+    public String getState(PipelineContext pipelineContext) {
+        return fileInfo.getState(pipelineContext);
+    }
+
+    public String getFileMediatype(PipelineContext pipelineContext) {
+        return fileInfo.getFileMediatype(pipelineContext);
+    }
+
+    public String getFileName(PipelineContext pipelineContext) {
+        return fileInfo.getFileName(pipelineContext);
+    }
+
+    public String getFileSize(PipelineContext pipelineContext) {
+        return fileInfo.getFileSize(pipelineContext);
+    }
+
+    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
+        fileInfo.setMediatype(pipelineContext, mediatype);
+    }
+
+    public void setFilename(PipelineContext pipelineContext, String filename) {
+        fileInfo.setFilename(pipelineContext, filename);
+    }
+
+    public void setSize(PipelineContext pipelineContext, String size) {
+        fileInfo.setSize(pipelineContext, size);
+    }
+
     public static String getExternalValue(PipelineContext pipelineContext, XFormsOutputControl control, String mediatypeValue) {
         if (control != null) {
             // Get control value
@@ -186,5 +234,12 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Provide default for other types
             return null;
         }
+    }
+
+    public Object clone() {
+        final XFormsOutputControl cloned = (XFormsOutputControl) super.clone();
+        // NOTE: this keeps old refs to control/contextStack, is it ok?
+        cloned.fileInfo = (FileInfo) fileInfo.clone();
+        return cloned;
     }
 }

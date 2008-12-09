@@ -219,7 +219,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         if (!isInternalAppearance && !isGroupInTable && !isFieldsetAppearance) {// regular group
             // Output an xhtml:label element if and only if there is an xforms:label element. This help with
             // styling in particular.

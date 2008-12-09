@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
@@ -38,24 +39,12 @@ import java.net.URI;
  */
 public class XFormsUploadControl extends XFormsValueControl {
 
-    private Element mediatypeElement;
-    private Element filenameElement;
-    private Element sizeElement;
-
-    private boolean isStateEvaluated;
-    private String state;
-    private boolean isMediatypeEvaluated;
-    private String mediatype;
-    private boolean isSizeEvaluated;
-    private String size;
-    private boolean isFilenameEvaluated;
-    private String filename;
+    private FileInfo fileInfo;
 
     public XFormsUploadControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
-        mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
-        filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
-        sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
+
+        fileInfo = new FileInfo(this, getContextStack(), element);
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
@@ -69,10 +58,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     public void markDirty() {
         super.markDirty();
-        isStateEvaluated = false;
-        isMediatypeEvaluated = false;
-        isSizeEvaluated = false;
-        isFilenameEvaluated = false;
+        fileInfo.markDirty();
     }
 
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
@@ -166,8 +152,100 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     public String getState(PipelineContext pipelineContext) {
+        return fileInfo.getState(pipelineContext);
+    }
+
+    public String getFileMediatype(PipelineContext pipelineContext) {
+        return fileInfo.getFileMediatype(pipelineContext);
+    }
+
+    public String getFileName(PipelineContext pipelineContext) {
+        return fileInfo.getFileName(pipelineContext);
+    }
+
+    public String getFileSize(PipelineContext pipelineContext) {
+        return fileInfo.getFileSize(pipelineContext);
+    }
+
+    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
+        fileInfo.setMediatype(pipelineContext, mediatype);
+    }
+
+    public void setFilename(PipelineContext pipelineContext, String filename) {
+        fileInfo.setFilename(pipelineContext, filename);
+    }
+
+    public void setSize(PipelineContext pipelineContext, String size) {
+        fileInfo.setSize(pipelineContext, size);
+    }
+
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
+
+        if (obj == null || !(obj instanceof XFormsUploadControl))
+            return false;
+
+        if (this == obj)
+            return true;
+
+        final XFormsUploadControl other = (XFormsUploadControl) obj;
+
+        if (!XFormsUtils.compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getFileMediatype(pipelineContext), other.getFileMediatype(pipelineContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getFileSize(pipelineContext), other.getFileSize(pipelineContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getFileName(pipelineContext), other.getFileName(pipelineContext)))
+            return false;
+
+        return super.equalsExternal(pipelineContext, obj);
+    }
+
+    public Object clone() {
+        final XFormsUploadControl cloned = (XFormsUploadControl) super.clone();
+        // NOTE: this keeps old refs to control/contextStack, is it ok?
+        cloned.fileInfo = (FileInfo) fileInfo.clone();
+        return cloned;
+    }
+}
+
+class FileInfo implements Cloneable {
+
+    private XFormsValueControl control;
+    private XFormsContextStack contextStack;
+
+    private Element mediatypeElement;
+    private Element filenameElement;
+    private Element sizeElement;
+
+    private boolean isStateEvaluated;
+    private String state;
+    private boolean isMediatypeEvaluated;
+    private String mediatype;
+    private boolean isSizeEvaluated;
+    private String size;
+    private boolean isFilenameEvaluated;
+    private String filename;
+
+    FileInfo(XFormsValueControl control, XFormsContextStack contextStack, Element element) {
+        this.control = control;
+        this.contextStack =  contextStack;
+
+        mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
+        filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
+        sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
+    }
+
+    public void markDirty() {
+        isStateEvaluated = false;
+        isMediatypeEvaluated = false;
+        isSizeEvaluated = false;
+        isFilenameEvaluated = false;
+    }
+
+    public String getState(PipelineContext pipelineContext) {
         if (!isStateEvaluated) {
-            final boolean isEmpty = getValue(pipelineContext) == null || getValue(pipelineContext).length() == 0;
+            final boolean isEmpty = control.getValue(pipelineContext) == null || control.getValue(pipelineContext).length() == 0;
             state = isEmpty ? "empty" : "file";
             isStateEvaluated = true;
         }
@@ -199,8 +277,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     private String getInfoValue(PipelineContext pipelineContext, Element element) {
-        final XFormsContextStack contextStack = getContextStack();
-        contextStack.setBinding(this);
+        contextStack.setBinding(control);
         contextStack.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode == null) {
@@ -235,35 +312,20 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (element == null || value == null)
             return;
 
-        final XFormsContextStack contextStack = getContextStack();
-        contextStack.setBinding(this);
+        contextStack.setBinding(control);
         contextStack.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, this, currentSingleNode, value, null, false);
+            XFormsSetvalueAction.doSetValue(pipelineContext, control.getContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
             contextStack.popBinding();
         }
     }
 
-    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
-
-        if (obj == null || !(obj instanceof XFormsUploadControl))
-            return false;
-
-        if (this == obj)
-            return true;
-
-        final XFormsUploadControl other = (XFormsUploadControl) obj;
-
-        if (!XFormsUtils.compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
-            return false;
-        if (!XFormsUtils.compareStrings(getFileMediatype(pipelineContext), other.getFileMediatype(pipelineContext)))
-            return false;
-        if (!XFormsUtils.compareStrings(getFileSize(pipelineContext), other.getFileSize(pipelineContext)))
-            return false;
-        if (!XFormsUtils.compareStrings(getFileName(pipelineContext), other.getFileName(pipelineContext)))
-            return false;
-
-        return super.equalsExternal(pipelineContext, obj);
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new OXFException(e);
+        }
     }
 }

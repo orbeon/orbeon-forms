@@ -148,7 +148,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 } else if ("label".equals(current)) {
                     // xforms:label
                     if (hasLocalLabel())
-                        handleLabel(staticId, effectiveId, xformsControl, isTemplate);
+                        handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
                 } else if ("alert".equals(current)) {
                     // xforms:alert
                     if (hasLocalAlert())
@@ -180,7 +180,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 } else if ("label".equals(current)) {
                     // xforms:label
                     if (hasLocalLabel())
-                        handleLabel(staticId, effectiveId, xformsControl, isTemplate);
+                        handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
                 } else if ("alert".equals(current)) {
                     // xforms:alert
                     if (hasLocalAlert())
@@ -252,7 +252,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return false;
     }
 
-    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl, isTemplate);
     }

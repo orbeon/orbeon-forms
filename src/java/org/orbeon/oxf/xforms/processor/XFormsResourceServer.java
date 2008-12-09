@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -67,9 +68,19 @@ public class XFormsResourceServer extends ProcessorImpl {
                     else
                         response.setContentType("application/octet-stream");
 
+                    // File name visible by the user
+                    final String contentFilename = resource.getFilename() != null ? resource.getFilename() : filename;
+
                     // Handle as attachment
-                    // TODO: should try to provide extension?
-                    response.setHeader("Content-Disposition", "attachement; " + filename);
+                    // TODO: should try to provide extension based on mediatype if file name is not provided?
+                    // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
+                    try {
+//                        response.setHeader("Content-Disposition", "?utf-8?b?" + Base64.encode(("attachement; filename=" + contentFilename).getBytes("UTF-8")) +"?=");
+                        response.setHeader("Content-Disposition", "attachement; filename=" + URLEncoder.encode(contentFilename, "UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        // Will not happen
+                        throw new OXFException(e);
+                    }
 
                     // Copy stream out
                     InputStream is = null;

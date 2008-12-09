@@ -418,6 +418,22 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         } else {
             // New repeat nodeset is now empty
 
+            final ControlTree currentControlTree = controls.getCurrentControlTree();
+
+            // Remove control information for iterations that disappear
+            final List oldChildren = getChildren();
+            if (oldChildren != null) {
+                for (int i = 0; i < oldChildren.size(); i++) {
+
+                    if (isDebugEnabled) {
+                        containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
+                    }
+
+                    // Deindex old iteration
+                    currentControlTree.deindexSubtree((XFormsContainerControl) oldChildren.get(i), true, true);
+                }
+            }
+
             if (isDebugEnabled) {
                 if (getIndex() != 0)
                     containingDocument.logDebug("repeat", "setting index to 0");

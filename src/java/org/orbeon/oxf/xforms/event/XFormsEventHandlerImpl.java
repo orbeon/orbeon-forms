@@ -48,7 +48,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         this.ancestorObserverStaticId = ancestorObserverStaticId;
 
         // Gather observers
-        // NOTE: Supporting space-separated handlers is an extension
+        // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
         {
             final String observerAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
             if (observerAttribute != null) {
@@ -64,7 +64,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Gather event names
-        // NOTE: Supporting space-separated event names is an extension
+        // NOTE: Supporting space-separated event names is an extension, which may make it into XML Events 2
         {
             final String eventAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
             eventNames = new HashMap();
@@ -75,7 +75,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Gather target ids
-        // NOTE: Supporting space-separated target ids is an extension
+        // NOTE: Supporting space-separated target ids is an extension, which may make it into XML Events 2
         {
             final String targetAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_TARGET_ATTRIBUTE_QNAME);
             if (targetAttribute == null) {

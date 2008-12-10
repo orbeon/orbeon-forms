@@ -169,6 +169,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         final Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[]{});
                         Object messageEmitter = getMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         if (messageEmitter == null) {
+                            // TODO: this doesn't work w/ Saxon 9 because makeMessageEmitter() is private
                             Method makeMessageEmitter = saxonTransformer.getClass().getMethod("makeMessageEmitter", new Class[]{});
                             messageEmitter = makeMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         }

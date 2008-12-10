@@ -3072,6 +3072,9 @@ ORBEON.widgets.YUICalendar = function() {
                 calendarDiv.id = "orbeon-calendar-div";
                 document.body.appendChild(calendarDiv);
             }
+            // Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
+            YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex++); 
+
             if (yuiCalendar == null) {
                 // Create YUI calendar
                 yuiCalendar = new YAHOO.widget.Calendar(calendarDiv.id);
@@ -3107,6 +3110,8 @@ ORBEON.widgets.YUICalendar = function() {
                 yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
                 yuiCalendar.cfg.setProperty("pagedate", date, false);
             }
+            // This doesn't work, see above where we set the z-index on orbeon-calendar-div
+//            yuiCalendar.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
             yuiCalendar.cfg.applyConfig();
 
             // Show calendar
@@ -3202,6 +3207,8 @@ ORBEON.widgets.RTE = function() {
             });
             yuiRTE.render();
         },
+
+        // TODO: destroy()
 
         /**
          * Called on any focus event of other form controls on the page
@@ -3703,10 +3710,17 @@ ORBEON.xforms.Init = {
      * well.
      */
     insertedElement: function(element) {
+        // TODO: Also need destructors for controls
         if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
             if (ORBEON.util.Dom.hasClass(element, "xforms-select1-appearance-xxforms-autocomplete")) {
+                // Autocomplete
                 ORBEON.xforms.Init._autoComplete(element);
+            } else if (ORBEON.util.Dom.hasClass(element, "xforms-textarea")
+                           && ORBEON.util.Dom.hasClass(element, "xforms-mediatype-text-html")) {
+                // HTML area
+                ORBEON.xforms.Init._htmlArea(element);
             }
+            // Recurse
             for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
                 var child = element.childNodes[childIndex];
                 if (child.nodeType == ORBEON.util.Dom.ELEMENT_TYPE)

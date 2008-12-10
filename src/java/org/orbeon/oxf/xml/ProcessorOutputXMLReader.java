@@ -47,7 +47,17 @@ public class ProcessorOutputXMLReader extends XMLFilterImpl {
         if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
             return;
 
-        // Otherwise we throw
-        throw new SAXNotRecognizedException("Feature: " + name);
+        // Otherwise delegate (this will throw)
+        super.setFeature(name, state);
+    }
+
+    public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+        // We accept it, however we are unable at the moment to send comments to a lexical handler
+        // E.g. Saxon 9 sets this property
+        if (name.equals("http://xml.org/sax/properties/lexical-handler"))
+            return;
+
+        // Otherwise delegate (this will throw)
+        super.setProperty(name, value);
     }
 }

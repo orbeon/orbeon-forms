@@ -40,7 +40,7 @@
                 This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.
             </p>
             <p>
-                <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of November 2008. The
+                <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of December 2008. The
                 latest stable release of Orbeon Forms is 3.6.</b>
             </p>
         </section>
@@ -50,6 +50,29 @@
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
+                    <li>
+                        <p>
+                            <b>Form Runner environment.</b> Orbeon Form Runner is the Orbeon Forms runtime environment.
+                            Form Runner manages form definitions and form data, handles search, validation, and takes
+                            care of the plumbing necessary to capture, save, import and export form data.
+                        </p>
+                        <p>
+                            Form Runner is built on top of core Orbeon Forms technologies, including the XForms and XPL
+                            engines.
+                        </p>
+                        <p>
+                            For an example, see the Books example. [TODO + link]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Form Builder editor.</b> Orbeon Form Builder is a visual form designer which allows you
+                            to build and deploy forms in minutes right from your web browser.
+                        </p>
+                        <p>
+                            [TODO + link]
+                        </p>
+                    </li>
                     <li>
                         <p>
                             <b>Noscript mode.</b> The "noscript mode" in Orbeon Forms allows you to use a single
@@ -64,33 +87,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>Reusable user interface components.</b> Orbeon Forms now implements a complete system of
-                            reusable components, based on the <a href="http://www.w3.org/TR/xbl/">XBL specification</a>.
-                            This allows you to define and reuse UI components in your forms. There is no limit to the
-                            types of components you can build: examples include special date selectors, color pickers,
-                            reusable address blocks, etc.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Improved date and time controls.</b> You can now type in dates, and the date picker is by
-                            default the YUI date picker. We have also added controls for <code>xs:time</code> and
-                            <code>xs:dateTime</code> types. The date picker is localized in English, French and
-                            Spanish.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Access request and session directly from XForms.</b> In the past, accessing request and
-                            session information from XForms required using the page flow controller or possibly a page
-                            model written in XPL. Now, you can use <a
-                            href="http://www.orbeon.com/ops/doc/reference-xforms-functions#orbeon-extensions">XPath
-                            functions</a> to do so.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.6.0.
+                            <b>Firefox 3 support.</b> Orbeon Forms version 3.6 had a known bug with Firefox 3. This
+                            issue is now resolved.
                         </p>
                     </li>
                     <li>
@@ -106,210 +104,449 @@
                     </li>
                     <li>
                         <p>
-                            <b>Inline XML Schema support.</b> XForms supports using XML Schemas which are embedded
-                            within the <code>&lt;xforms:model></code> element. Orbeon Forms now supports this feature.
-                            This is particularly useful when you create a new schema which is just used within an XForms
-                            document, or to define a series of simple types used for validation.
+                            <b>Performance improvements.</b>
                         </p>
-                        <xml-source>
-                            <xforms:model>
-                                <comment> A simple inline XML Schema </comment>
-                                <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
-                                    <xs:simpleType name="link">
-                                        <xs:restriction base="xs:string">
-                                            <xs:pattern value="(https?\://([^/?#]+)/([^?#]*)(\?([^?#]+))?(#(.*))?)?"/>
-                                        </xs:restriction>
-                                    </xs:simpleType>
-                                </xs:schema>
-                                <comment> More XForms model constructs below </comment>
-                                ...
-                            </xforms:model>
-                        </xml-source>
-                        <p>
-                            The XML Schema definitions are directly available to the model, in particular to binds:
-                        </p>
-                        <xml-source>
-                            <xforms:bind nodeset="my-link" type="link"/>
-                        </xml-source>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
+                                    <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a> feature. This allows
+                                    sessions associated with live pages in a user's browser to stay active, therefore
+                                    preventing situations where the user gets back to a form and gets session expiration errors.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a>.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Versioned resources.</b> Orbeon Forms now supports versioning of resources such as CSS,
+                                    JavaScript, and images. This allows more aggressive client-side caching, thereby reducing
+                                    page loading times as well as server load.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#versioned-resources">Versioned Resources</a> for the full
+                                    documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
-                            <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a> feature. This allows
-                            sessions associated with live pages in a user's browser to stay active, therefore
-                            preventing situations where the user gets back to a form and gets session expiration errors.
+                            <b>Enhanced user interface controls.</b>
                         </p>
-                        <p>
-                            See also <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a>.
-                        </p>
-                        <p>
-                            This feature is kindly sponsored by Teleflex.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Reusable user interface components.</b> Orbeon Forms now implements a complete
+                                    system of reusable components, based on the <a href="http://www.w3.org/TR/xbl/">XBL
+                                    2 specification</a>. This allows you to define and reuse UI components in your
+                                    forms. There is no limit to the types of components you can build: examples include
+                                    special date selectors, color pickers, reusable address blocks, etc.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Improved date and time controls.</b> You can now type in dates, and the date
+                                    picker is by default the YUI date picker. We have also added controls for
+                                    <code>xs:time</code> and <code>xs:dateTime</code> types. The date picker is
+                                    localized in English, French and Spanish.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>New YUI controls.</b> Orbeon Forms now use the YUI date picker as well as the
+                                    YUI Rich Text Editor. The older JSCalendar and FCKeditor implementations are
+                                    still available through properties.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Modal triggers.</b> Usually, activating a trigger on the client doesn't prevent
+                                    further actions in the user interface. Sometimes, it is however useful to block such
+                                    further actions until some processing is complete, for example calling a submission
+                                    that saves a document.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#modal-trigger">Modal Trigger Behavior</a> for documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Improved handling of alerts.</b> In XForms the behavior of
+                                    <code>xforms:alert</code> is not built-in. Instead, the behavior was initially
+                                    planned to be controlled through CSS. Previous versions of Orbeon Forms displayed
+                                    an alert icon and message (if provided) only if the value associated with the
+                                    control was invalid. Orbeon Forms now by default shows the control in alert state
+                                    when the value is invalid, but also when it is required but empty.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Versioned resources.</b> Orbeon Forms now supports versioning of resources such as CSS,
-                            JavaScript, and images. This allows more aggressive client-side caching, thereby reducing
-                            page loading times as well as server load.
+                            <b>Enhanced XForms 1.1 support.</b> In particular:
                         </p>
-                        <p>
-                            See <a href="reference-xforms-2#versioned-resources">Versioned Resources</a> for the full
-                            documentation.
-                        </p>
-                        <p>
-                            This feature is kindly sponsored by Teleflex.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Much improved repeat handling, especially in conjunction with
+                                    <code>&lt;xforms:insert></code>, <code>&lt;xforms:delete></code>, index updates, and
+                                    event dispatching.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#output-mediatype">Media Type for
+                                    <code>&lt;xforms:output></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#insert-origin-attribute"><code>origin</code> Attribute
+                                    on <code>&lt;xforms:insert></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#insert-context-attribute"><code>context</code>
+                                    Attribute on <code>&lt;xforms:insert></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#validate-relevant-attributes"><code>validate</code> and
+                                    <code>relevant</code> Attributes on <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#serialization-attribute"><code>serialization</code>
+                                    Attribute on <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#asynchronous-submissions">Preliminary Support for
+                                    Asynchronous Handling of <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-2#dispatch-delay">Preliminary Support for delay Attribute
+                                    on <code>&lt;xforms:dispatch></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    New <a href="reference-xforms-2#xforms11-types">XForms 1.1 Types</a>, in particular the very useful
+                                    <code>xforms:email</code> type.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    New <a href="reference-xforms-2#xforms11-functions">XForms 1.1 Functions</a>.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Attribute Value Templates (AVTs) on XHTML elements.</b> AVTs were already supported on <a
-                            href="reference-xforms-2#avts-xforms">some XForms elements</a>. You can now use AVTs on
-                            XHTML elements as well. This allows you to use XForms to influence aspects of XHTML such as
-                            <code>class</code>, <code>style</code> or <code>colspan</code> attributes.
+                            <b>Core XForms support improvements.</b>
                         </p>
-                        <p>
-                            See <a href="reference-xforms-2#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
-                        </p>
-                        <p>
-                            This feature is kindly sponsored by Teleflex.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Inline XML Schema support with XForms.</b> XForms supports using XML Schemas which are
+                                    embedded within the <code>&lt;xforms:model></code> element. Orbeon Forms now supports this
+                                    feature. This is particularly useful when you create a new schema which is just used within
+                                    an XForms document, or to define a series of simple types used for validation.
+                                </p>
+                                <xml-source>
+                                    <xforms:model>
+                                        <comment> A simple inline XML Schema </comment>
+                                        <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+                                            <xs:simpleType name="link">
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(https?\://([^/?#]+)/([^?#]*)(\?([^?#]+))?(#(.*))?)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:schema>
+                                        <comment> More XForms model constructs below </comment>
+                                        ...
+                                    </xforms:model>
+                                </xml-source>
+                                <p>
+                                    The XML Schema definitions are directly available to the model, in particular to binds:
+                                </p>
+                                <xml-source>
+                                    <xforms:bind nodeset="my-link" type="link"/>
+                                </xml-source>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Event handling improvements.</b> The XML Events <code>ev:observer</code>
+                                    attribute used to be only supported within a model to refer to a nested instance. It
+                                    is now globally supported. Support for the more rarely needed
+                                    <code>ev:target</code> attribute has been added as well.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-ng#events-observer-target">Using the
+                                    <code>ev:observer</code> and <code>ev:target</code> Attributes</a>.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Variables within controls, models and actions.</b> You can now declare variables usable
-                            from any XPath expression in an XForms document, using the <code>xxforms:variable</code> (or
-                            <code>exforms:variable</code>) element. Variables are extremely useful, for example to avoid
-                            repeating long XPath expressions, or to give an XPath expression unambiguous access to data
-                            computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
-                            elements.
+                            <b>XPath functions additions and improvements.</b>
                         </p>
-                        <p>
-                            See <a href="reference-xforms-2#variables">Variables</a> for documentation.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Access request and session directly from XForms.</b> In the past, accessing
+                                    request and session information from XForms required using the page flow controller
+                                    or possibly a page model written in XPL. Now, you can use <a
+                                    href="http://www.orbeon.com/ops/doc/reference-xforms-functions#orbeon-extensions">XPath
+                                    functions</a> to do so.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b><code>exforms:iterate</code> attribute on actions.</b> In particular, these
+                                    additions make it much easier to iterate over nodes within actions.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
+                                    Sequences</a> for documentation and a complete example.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>More utility XPath functions.</b> Additional utility functions have been added,
+                                    notably <code>xxforms:element()</code>, <code>xxforms:attribute()</code>,
+                                    <code>xxforms:bind()</code>, <code>xxforms:case()</code>,
+                                    <code>xxforms:property()</code>, and enhancements to the standard
+                                    <code>property()</code> function.
+                                </p>
+                                <p>
+                                    See also <a
+                                    href="http://www.orbeon.com/ops/doc/reference-xforms-functions#orbeon-extensions">XPath
+                                    functions</a> for more information.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b><code>exforms:iterate</code> attribute and XForms 1.1 <code>context()</code>
-                            function.</b> In particular, these additions make it much easier to iterate over nodes
-                            within actions.
+                            <b>More freedom with XForms constructs.</b>
                         </p>
-                        <p>
-                            See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
-                            Sequences</a> for documentation and a complete example.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Free positioning of label, help, hint and alert elements.</b> [TODO @for]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>XForms models can be positioned in more places, including within dialogs.</b>
+                                    [TODO]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Support for <code>&lt;xforms:output></code> within
+                                    <code>&lt;xhtml:title></code>.</b> This allows dynamically controlling, from XForms,
+                                    the title of the page. For example, the title can be updated to report the current
+                                    number of errors on a form. [TODO]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Attribute Value Templates (AVTs) on XHTML elements.</b> AVTs were already supported on <a
+                                    href="reference-xforms-2#avts-xforms">some XForms elements</a>. You can now use AVTs on
+                                    XHTML elements as well. This allows you to use XForms to influence aspects of XHTML such as
+                                    <code>class</code>, <code>style</code> or <code>colspan</code> attributes.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Support for AVTs on XHTML elements outside HTML body.</b> This in particular
+                                    allows dynamically setting, from XForms, a document's language, with the
+                                    <code>lang</code> and/or <code>xml:lang</code> attributes on the
+                                    <code>&lt;html></code> element. [TODO]
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b><code>ev:observer</code> and <code>ev:target</code> attributes on action handlers.</b>
-                            The XML Events <code>ev:observer</code> attribute used to be only supported within a model
-                            to refer to a nested instance. It is now globally supported. Support for the more rarely
-                            needed <code>ev:target</code> attribute has been added as well.
+                            <b>Other extensions to XForms constructs.</b>
                         </p>
-                        <p>
-                            See also <a href="reference-xforms-ng#events-observer-target">Using the
-                            <code>ev:observer</code> and <code>ev:target</code> Attributes</a>.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Variables within controls, models and actions.</b> You can now declare variables usable
+                                    from any XPath expression in an XForms document, using the <code>xxforms:variable</code> (or
+                                    <code>exforms:variable</code>) element. Variables are extremely useful, for example to avoid
+                                    repeating long XPath expressions, or to give an XPath expression unambiguous access to data
+                                    computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
+                                    elements.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#variables">Variables</a> for documentation.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Generalized <code>context</code> attribute on XForms elements.</b> XForms 1.1
+                                    introduces the <code>context</code> attribute on <code>&lt;xforms:insert></code>
+                                    and <code>&lt;xforms:delete></code>. Orbeon Forms now supports this convenient
+                                    attribute on all elements changing the XPath evaluation context, including controls,
+                                    actions, binds, and submissions. Further versions of XForms are likely to extend
+                                    support this way.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#context-attribute">Generalized <code>context</code>
+                                    attribute</a> for the documentation.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <code>ev:event</code>, <code>ev:observer</code> and <code>ev:target</code> all
+                                    support multiple space-separated event names and identifiers. This is an extension
+                                    to XML Events 1, which is planned for XML Events 2.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-2#events-multiple">Multiple Event Names,
+                                    Observers and Targets on Event Handlers</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Declarative dynamic default instance values.</b> [TODO xxforms:default]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Outputting server log messages with <code>xforms:message</code>.</b>
+                                    <code>xforms:message</code> supports new level values:
+                                    <code>xxforms:log-debug</code>, <code>xxforms:log-info</code>,
+                                    <code>xxforms:log-warn</code> and <code>xxforms:log-error</code>. These cause the
+                                    message to be logged on the server using the levels "debug", "info", "warn" and
+                                    "error" as per the log4j terminology. Messages output with these levels appear in
+                                    the Orbeon Forms logs depending on the configuration of <code>log4j.xml</code>. For
+                                    example:
+                                </p>
+                                <xml-source show-namespaces="false">
+                                    <xforms:submission>
+                                        ...
+                                        <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error">
+                                            A submission error occurred:
+                                            <xforms:output value="event('error-type')"/>
+                                        </xforms:message>
+                                    </xforms:submission>
+                                </xml-source>
+                                <p>
+                                    See also <a href="reference-xforms-ng#xforms-message">Displaying Messages with the
+                                    <code>xforms:message</code> Action</a>.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Modal triggers.</b> Usually, activating a trigger on the client doesn't prevent further
-                            actions in the user interface. Sometimes, it is however useful to block such further actions
-                            until some processing is complete, for example calling a submission that saves a document.
+                            <b>Upgrades to core libraries.</b>
                         </p>
-                        <p>
-                            See <a href="reference-xforms-2#modal-trigger">Modal Trigger Behavior</a> for documentation.
-                        </p>
-                        <p>
-                            This feature is kindly sponsored by Teleflex.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.6.0.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>New eXist database.</b> Orbeon Forms now uses eXist 1.2.4.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
-                            <b>Generalized <code>context</code> attribute on XForms elements.</b> XForms 1.1 introduces
-                            the <code>context</code> attribute on <code>&lt;xforms:insert></code> and
-                            <code>&lt;xforms:delete></code>. Orbeon Forms now supports this convenient attribute on all
-                            elements changing the XPath evaluation context, including controls, actions, binds, and
-                            submissions. Further versions of XForms are likely to extend support this way.
+                            <b>XML pipelines improvements.</b>
                         </p>
-                        <p>
-                            See <a href="reference-xforms-ng#context-attribute">Generalized <code>context</code>
-                            attribute</a> for the documentation.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Change to handling of alerts.</b> In XForms the behavior of <code>xforms:alert</code>
-                            is not built-in. Instead, the behavior was initially planned to be controlled through CSS.
-                            Previous versions of Orbeon Forms displayed an alert icon and message (if provided) only if
-                            the value associated with the control was invalid. Orbeon Forms now by default shows the
-                            control in alert state when the value is invalid, but also when it is required but empty.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Outputting server log messages with <code>xforms:message</code>.</b>
-                            <code>xforms:message</code> supports new level values: <code>xxforms:log-debug</code>,
-                            <code>xxforms:log-info</code>, <code>xxforms:log-warn</code> and
-                            <code>xxforms:log-error</code>. These cause the message to be logged on the server using the
-                            levels "debug", "info", "warn" and "error" as per the log4j terminology. Messages output
-                            with these levels appear in the Orbeon Forms logs depending on the configuration of
-                            <code>log4j.xml</code>. For example:
-                        </p>
-                        <xml-source show-namespaces="false">
-                            <xforms:submission>
-                                ...
-                                <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error">
-                                    A submission error occurred:
-                                    <xforms:output value="event('error-type')"/>
-                                </xforms:message>
-                            </xforms:submission>
-                        </xml-source>
-                        <p>
-                            See also <a href="reference-xforms-ng#xforms-message">Displaying Messages with the
-                            <code>xforms:message</code> Action</a>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Inline transformations in XPL.</b> Often, processor configurations must be determined
-                            dynamicaly. XSLT is typically used for that purpose, but this can lead to heavier code.
-                            Inline transformations simplify the syntax by allowing transformations directly embedded
-                            within processor inputs:
-                        </p>
-                        <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                            <p:processor name="oxf:url-generator">
-                                <p:input name="config" transform="oxf:xslt" href="#instance">
-                                    <comment> This is an inline transformation </comment>
-                                    <config>
-                                        <url>http://www.example.org/</url>
-                                        <mode>
-                                            <xsl:value-of select="/instance/mode"/>
-                                        </mode>
-                                    </config>
-                                </p:input>
-                                <p:output name="data" id="example-document"/>
-                            </p:processor>
-                        </xml-source>
-                        <p>
-                            See also <a href="reference-xpl-pipelines#inline-transformations">Embedding Transformations
-                            within Inputs</a>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Temporary files in the file serializer.</b> The file serializer can now automatically
-                            create temporary files and write to those temporary files. It will also delete temporary
-                            files, based on a "scope" parameter you specify in the configuration. As with the Scope
-                            generator and Scope serializer, you can set the scope to either "request", "session", or
-                            "application".
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Epilogue pipeline configurable with properties.</b> These <a
-                            href="reference-properties#epilogue">properties</a> in particular allow you to pick the
-                            theme stylesheet, enable XHTML output, etc.
-                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Inline transformations in XPL.</b> Often, processor configurations must be
+                                    determined dynamicaly. XSLT is typically used for that purpose, but this can lead to
+                                    heavier code. Inline transformations simplify the syntax by allowing
+                                    transformations directly embedded within processor inputs:
+                                </p>
+                                <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                    <p:processor name="oxf:url-generator">
+                                        <p:input name="config" transform="oxf:xslt" href="#instance">
+                                            <comment> This is an inline transformation </comment>
+                                            <config>
+                                                <url>http://www.example.org/</url>
+                                                <mode>
+                                                    <xsl:value-of select="/instance/mode"/>
+                                                </mode>
+                                            </config>
+                                        </p:input>
+                                        <p:output name="data" id="example-document"/>
+                                    </p:processor>
+                                </xml-source>
+                                <p>
+                                    See also <a href="reference-xpl-pipelines#inline-transformations">Embedding
+                                    Transformations within Inputs</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Temporary files in the file serializer.</b> The file serializer can now
+                                    automatically create temporary files and write to those temporary files. It will
+                                    also delete temporary files, based on a "scope" parameter you specify in the
+                                    configuration. As with the Scope generator and Scope serializer, you can set the
+                                    scope to either "request", "session", or "application".
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Epilogue pipeline configurable with properties.</b> These <a
+                                    href="reference-properties#epilogue">properties</a> in particular allow you to pick
+                                    the theme stylesheet, enable XHTML output, etc.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Chart Processor enhancements.</b> The chart processor now support two new types
+                                    of chart: XY charts and time series. For charts that show a lot of data points, you
+                                    can also limit the number of labels shown in the categories axis with the new
+                                    <code>max-number-of-labels</code> option.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Zip and unzip processors.</b> [TODO]
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <p>
@@ -317,14 +554,6 @@
                             are running by running <code>java -jar orbeon-cli.jar -v</code> from the command line. The
                             FAQ has more on how to know <a href="/doc/home-faq#orbeon-version">which version of Orbeon
                             Forms</a> you are running.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Chart Processor enhancements.</b> The chart processor now support two new types of
-                            chart: XY charts and time series. For charts that show a lot of data points, you can also
-                            limit the number of labels shown in the categories axis with the new
-                            <code>max-number-of-labels</code> option.
                         </p>
                     </li>
                 </ul>
@@ -428,7 +657,7 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     <li>
 
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311719&amp;group_id=168&amp;atid=350207">
-                            #311719: Alert doesn't update properly within repeat
+                            #311719: Regression: Alert doesn't update properly within repeat
                         </a>
                     </li>
                     <li>
@@ -462,12 +691,12 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311554&amp;group_id=168&amp;atid=350207">
-                            #311554: XForms Controls example: autocomplete list no longer display country flag
+                            #311554: Regression: XForms Controls example: autocomplete list no longer display country flag
                         </a>
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311540&amp;group_id=168&amp;atid=350207">
-                            #311540: When a node is set as required, type=xs:date has no effect
+                            #311540: Regression: When a node is set as required, type=xs:date has no effect
                         </a>
 
                     </li>
@@ -1001,7 +1230,7 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310442&amp;group_id=168&amp;atid=350207">
-                            #310442: HTML area does not send value change events anymore with IE
+                            #310442: Regression: HTML area does not send value change events anymore with IE
                         </a>
                     </li>
                     <li>

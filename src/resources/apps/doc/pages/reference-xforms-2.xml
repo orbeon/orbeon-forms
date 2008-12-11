@@ -120,7 +120,7 @@
             <title>XForms 1.1 Support</title>
             <a name="output-mediatype"/>
             <section>
-                <title>Media Type for <code>xforms:output</code></title>
+                <title>Media Type for <code>&lt;xforms:output></code></title>
                 <p>
                     In XForms 1.0, <code>xforms:output</code> is only used to display text. However, XForms 1.1 supports
                     a <code>mediatype</code> attribute on that element allowing display of other media types.
@@ -244,10 +244,10 @@
             </section>
             <a name="insert-origin-attribute"/>
             <section>
-                <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
+                <title><code>origin</code> Attribute on <code>&lt;xforms:insert></code> Action</title>
                 <p>
                     Orbeon Forms supports the XForms 1.1 <code>origin</code> attribute on the
-                    <code>xforms:insert</code> action. This attribute allows specifying the source node to use as
+                    <code>&lt;xforms:insert></code> action. This attribute allows specifying the source node to use as
                     template. This allows storing templates separately from the node-set specified by the
                     <code>nodeset</code> attribute. For example:
                 </p>
@@ -275,10 +275,10 @@
             </section>
             <a name="insert-context-attribute"/>
             <section>
-                <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
+                <title><code>context</code> Attribute on <code>&lt;xforms:insert></code> Action</title>
                 <p>
                     Orbeon Forms supports the XForms 1.1 <code>context</code> attribute on the
-                    <code>xforms:insert</code> action. This attribute allows specifying a context for insertion,
+                    <code>&lt;xforms:insert></code> action. This attribute allows specifying a context for insertion,
                     which along with the <code>origin</code> attribute allows inserting content into elements:
                 </p>
                 <xml-source show-namespaces="false">

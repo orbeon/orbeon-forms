@@ -444,6 +444,12 @@
                             </li>
                             <li>
                                 <p>
+                                    <b>Dataypes to validate XML and XPath 2 expressions.</b> [TODO xxforms:xml and
+                                    xxforms:xpath2]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
                                     <b>Outputting server log messages with <code>xforms:message</code>.</b>
                                     <code>xforms:message</code> supports new level values:
                                     <code>xxforms:log-debug</code>, <code>xxforms:log-info</code>,

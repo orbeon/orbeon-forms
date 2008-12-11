@@ -1954,7 +1954,8 @@
                 <ul>
                     <li>
                         If you have deployed Orbeon Forms, go to the example home page; the version number will be
-                        displayed at the bottom of the page.
+                        displayed at the bottom of the page. In addition, there is a <code>generator</code> meta tag in
+                        the source of each page.
                     </li>
                     <li>
                         From the command line, uncompress <code>orbeon.war</code>, go to the <code>WEB-INF</code>

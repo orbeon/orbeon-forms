@@ -2043,9 +2043,10 @@ ORBEON.xforms.Controls = {
         yuiDialog.element.style.display = "block";
         // Show the dialog
         yuiDialog.show();
-        // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
-        var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
-        yuiDialog.cfg.setProperty("constraintoviewport", constrain);
+        // By default try to display the dialog inside the viewport, but this can be overridden with constrain="false"
+        // This doesn't get the "constrain" attribute from the right place anyway
+//        var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
+//        yuiDialog.cfg.setProperty("constraintoviewport", constrain);
         // Make sure that this dialog is on top of everything else
         yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
         // Position the dialog either at the center of the viewport or relative of a neighbor
@@ -2654,12 +2655,13 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Controls.updateLoadingPosition(formID);
         }
         // Ajust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
-        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
-            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
-            if (yuiDialog.cfg.getProperty("visible") && yuiDialog.cfg.getProperty("constraintoviewport")) {
-                yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
-            }
-        }
+        // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
+//        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
+//            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
+//            if (yuiDialog.cfg.getProperty("visible") && yuiDialog.cfg.getProperty("constraintoviewport")) {
+//                yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
+//            }
+//        }
     },
 
     sliderValueChange: function(offset) {

@@ -242,7 +242,7 @@ html body .xforms-form .xforms-repeat-template {
     position: static;
 }
 
-.xforms-case-deselected {
+.xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
     visibility: hidden;
     position: absolute;
 }

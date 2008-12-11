@@ -267,7 +267,7 @@
                                                         <!-- Instance holder, with extra attributes if needed -->
                                                         <xxforms:context name="instance-holder"
                                                                          select="xxforms:element($new-control-name,
-                                                                                    if ($control-type = 'xs:anyURI')
+                                                                                    if ($control-type = ('xs:anyURI', 'xforms:anyURI'))
                                                                                     then (xxforms:attribute('filename'), xxforms:attribute('mediatype'), xxforms:attribute('size'))
                                                                                     else ())"/>
                                                         <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>

@@ -76,9 +76,33 @@
     </xbl:binding>
 
     <!--
+    <xbl:binding id="fb-textarea" element="xforms|textarea">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Autosize Text</display-name>
+            BETTER LABEL
+            <display-name lang="fr">Texte "autosize"</display-name>
+            <icon lang="en">
+                ICONS
+                <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:textarea id="" ref="" incremental="true" appearance="xxforms:autosize">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:textarea>
+            </template>
+        </metadata>
+    </xbl:binding>
+    -->
+
+    <!--
     TODO:
         o icon
-        o filter HTML: YUI doesn't do it, right?
+        o filter HTML: YUI doesn't do it, right? plus server-side filtering is needed
         
     <xbl:binding id="fb-htmlarea" element="xforms|textarea">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -109,7 +133,7 @@
                 <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
             </icon>
-            <datatype>xs:date</datatype>
+            <datatype>xforms:date</datatype>
             <template>
                 <xforms:input id="" ref="" incremental="true">
                     <xforms:label ref=""/>
@@ -129,7 +153,7 @@
                 <small-icon>/apps/fr/style/images/silk/time.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
             </icon>
-            <datatype>xs:time</datatype>
+            <datatype>xforms:time</datatype>
             <template>
                 <xforms:input id="" ref="" incremental="true">
                     <xforms:label ref=""/>
@@ -149,7 +173,7 @@
                 <small-icon>/apps/fr/style/images/silk/clock_link.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
             </icon>
-            <datatype>xs:dateTime</datatype>
+            <datatype>xforms:dateTime</datatype>
             <template>
                 <xforms:input id="" ref="" incremental="true">
                     <xforms:label ref=""/>
@@ -189,7 +213,7 @@
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
+            <datatype>xforms:string</datatype>
             <template>
                 <xforms:select1 id="" appearance="minimal" ref="">
                     <xforms:label ref=""/>
@@ -352,6 +376,7 @@
                 <small-icon>/apps/fr/style/images/silk/images.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/images.png</large-icon>
             </icon>
+            <datatype>xforms:anyURI</datatype>
             <template>
                 <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment">
                     <xforms:label ref=""/>
@@ -371,6 +396,7 @@
                 <small-icon>/apps/fr/style/images/silk/attach.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/attach.png</large-icon>
             </icon>
+            <datatype>xforms:anyURI</datatype>
             <template>
                 <xforms:upload id="" ref="" class="fr-attachment">
                     <xforms:label ref=""/>

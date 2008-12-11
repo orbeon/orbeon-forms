@@ -87,10 +87,10 @@
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
 
-        <include name="exist-1_2_2.jar"/>
-        <include name="exist-modules-1_2_2.jar"/>
-        <include name="exist-optional-1_2_2.jar"/>
-        <include name="exist-ngram-module-1_2_2.jar"/>
+        <include name="exist-1_2_4.jar"/>
+        <include name="exist-modules-1_2_4.jar"/>
+        <include name="exist-optional-1_2_4.jar"/>
+        <include name="exist-ngram-module-1_2_4.jar"/>
 
         <include name="exist-antlr-2_7_6.jar"/>
         <include name="exist-jgroups-all-exist.jar"/>
@@ -414,7 +414,6 @@
         <mkdir dir="${build.doc.dir}/javadoc"/>
         <javadoc destdir="${build.doc.dir}/javadoc" classpathref="class.path">
             <link href="http://java.sun.com/j2se/1.3/docs/api/"/>
-            <link href="http://xml.apache.org/xalan-j/apidocs/"/>
             <link href="http://xml.apache.org/xerces2-j/javadocs/api/"/>
             <link href="http://jakarta.apache.org/tomcat/tomcat-4.0-doc/servletapi/"/>
             <link href="http://dom4j.org/apidocs/"/>

@@ -10,7 +10,8 @@
 # 3) Run this script from the eXist root directory
 
 ORBEON_HOME=../orbeon
-VERSION=1_2_2
+VERSION=1_2_4
+export ANT_OPTS=-Xmx256m
 rm lib/endorsed/xercesImpl-2.9.1.jar
 rm lib/endorsed/xalan-2.7.0.jar
 cp $ORBEON_HOME/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/

@@ -137,9 +137,40 @@
             <title>Liferay Deployment</title>
             <p>
                 The Orbeon Forms WAR can be directly deployed into the <a href="http://www.liferay.com/">Liferay</a>
-                portal. Follow the following steps with Liferay 4.2.1:
+                portal. Follow the following steps (the screenshots below are from Liferay 4.2.1, but the steps apply to
+                both Liferay 4 and 5):
             </p>
             <ol>
+                <li>
+                    <p>
+                        This step only applies to Liferay 5; if you are using Liferay 4, please skip this and go
+                        directly to the next step. While Liferay 4 lazy loads portlets, because of performance
+                        related issues, Liferay 5 is aggressively loading portlets when the web application is being
+                        deployed. So with Liferay 5, the initialization order is as follows:
+                    </p>
+                    <p>
+                        <ol>
+                            <li>Servlet context listeners are initialized.</li>
+                            <li>Portlets are initialized.</li>
+                            <li>Servlets are initialized.</li>
+                        </ol>
+                    </p>
+                    <p>
+                        For the Orbeon Forms portlet to be able to run, code which is executed by either the Orbeon Forms
+                        servlet context listener, or the Orbeon Forms servlet needs to run first. Since servlets are
+                        initialized after portlets, the only option is to have this code executed from the servlet context
+                        listener. By default, servlet context listeners are commented in <code>web.xml</code>, so you
+                        will need to uncomment those.
+                    </p>
+                    <p>
+                        Uncompress the <code>orbeon.war</code>, edit <code>WEB-INF/web.xml</code>. Uncomment the code
+                        between "Uncomment this for the context listener processors" and "End context listener
+                        processors", as well as the <code>&lt;listener></code> which references
+                        <code>org.orbeon.oxf.webapp.OPSServletContextListenerDelegate</code>. Then compress back the
+                        data you have extracted to recreate the <code>orbeon.war</code> with this modified
+                        <code>web.xml</code>.
+                    </p>
+                </li>
                 <li>
                     <p>
                         Either enable Auto Deploy in the Liferay Admin portlet and drop <code>orbeon.war</code> into the

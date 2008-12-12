@@ -351,14 +351,7 @@ public class NetUtils {
             int mtchEnd = 0;
             while ( m.find() )
             {
-                if ( m.start() != mtchEnd ) {
-                    //  We have detected something like a=b=c=d.  That is we noticed that the last
-                    //  match ended on 'b' and that this match starts on 'c'.  Since we skipped
-                    //  something there must be a problem.
-                    throw new OXFException( "Malformed URL: " + qry );
-                }
                 mtchEnd = m.end();
-
                 try {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
                     // denoted ( with parens ) in the expression.  Hence we start with group 1.

@@ -398,6 +398,17 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // Remember that this id was used
             ids.put(newIdAttribute[0], "");
 
+            // Prefix observer ID
+            if (portlet) {
+                final int observerIndex = attributes.getIndex(XFormsConstants.XML_EVENTS_NAMESPACE_URI, "observer");
+                if (observerIndex != -1) {
+                    final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                    String newObserverAttributeUnprefixed = newAttributes.getValue(observerIndex);
+                    newAttributes.setValue(observerIndex, containerNamespace + newObserverAttributeUnprefixed);
+                    attributes = newAttributes;
+                }
+            }
+
             currentId++;
         } else {
             // Don't process ids

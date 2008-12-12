@@ -2,7 +2,7 @@
 <portlet-app>
     <portlet>
         <portlet-name>OrbeonFormsPortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortletDelegate</portlet-class>
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>edit</portlet-mode>

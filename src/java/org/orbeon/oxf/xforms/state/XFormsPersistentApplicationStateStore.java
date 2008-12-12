@@ -140,8 +140,12 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         {
             final XFormsPersistentApplicationStateStore newStateStore = new XFormsPersistentApplicationStateStore();
 
-            // Expire remaining persistent entries with session information
-            newStateStore.expireAllPersistentWithSession();
+            // Expire persistent entries
+            // NOTE: Not sure why we used to remove only those with session information. For now we remove everthing as
+            // a session is expected, but mainly this is because removing an entire collection is faster than removing
+            // individual resources.
+            newStateStore.expireAllPersistentUseCollection();
+//            newStateStore.expireAllPersistentWithSession();
 //            newStateStore.expireAllPersistent();
 
             // Keep new store in application scope
@@ -358,6 +362,21 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         final Document result = executeQuery(query);
         final int count = Integer.parseInt(result.getRootElement().getStringValue());
         debug("expired " + count + " persistent entries.");
+    }
+
+    public void expireAllPersistentUseCollection() {
+
+        final String query = "xquery version \"1.0\";" +
+            "                 declare namespace xmldb=\"http://exist-db.org/xquery/xmldb\";" +
+            "                 declare namespace util=\"http://exist-db.org/xquery/util\";" +
+            "                 <result>" +
+            "                   {" +
+            "                     xmldb:remove('" + XFormsProperties.getStoreCollection() + "')" +
+            "                   }" +
+            "                 </result>";
+
+        executeQuery(query);
+        debug("expired all persistent entries.");
     }
 
     private Document executeQuery(String query) {

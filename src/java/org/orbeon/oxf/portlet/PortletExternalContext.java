@@ -457,9 +457,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public String rewriteResourceURL(String urlString, int rewriteMode) {
             // NOTE: We could encode the URL a la WSRP, but for resources, we can always produce an URL here, so we
             // just do so!
-
-            // It seems reasonable to always produce an absolute path unless the URL is already absolute.
-            return URLRewriter.rewriteURL(getRequest(), urlString, Response.REWRITE_MODE_ABSOLUTE_PATH);
+            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
         public String getNamespacePrefix() {

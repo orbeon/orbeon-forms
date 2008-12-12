@@ -322,16 +322,6 @@
                             </li>
                             <li>
                                 <p>
-                                    <b><code>exforms:iterate</code> attribute on actions.</b> In particular, these
-                                    additions make it much easier to iterate over nodes within actions.
-                                </p>
-                                <p>
-                                    See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
-                                    Sequences</a> for documentation and a complete example.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
                                     <b>More utility XPath functions.</b> Additional utility functions have been added,
                                     notably <code>xxforms:element()</code>, <code>xxforms:attribute()</code>,
                                     <code>xxforms:bind()</code>, <code>xxforms:case()</code>,
@@ -439,6 +429,16 @@
                             </li>
                             <li>
                                 <p>
+                                    <b><code>exforms:iterate</code> attribute on actions.</b> In particular, these
+                                    additions make it much easier to iterate over nodes within actions.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
+                                    Sequences</a> for documentation and a complete example.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
                                     <b>Declarative dynamic default instance values.</b> [TODO xxforms:default]
                                 </p>
                             </li>
@@ -508,7 +508,7 @@
                                     <p:processor name="oxf:url-generator">
                                         <p:input name="config" transform="oxf:xslt" href="#instance">
                                             <comment> This is an inline transformation </comment>
-                                            <config>
+                                            <config xsl:version="2.0">
                                                 <url>http://www.example.org/</url>
                                                 <mode>
                                                     <xsl:value-of select="/instance/mode"/>

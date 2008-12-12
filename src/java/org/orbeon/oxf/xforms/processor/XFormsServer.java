@@ -547,7 +547,7 @@ public class XFormsServer extends ProcessorImpl {
                                     // We need to submit the event so that the portlet can load the new path
                                     final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
                                     eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
-                                    eventElement.addAttribute("resource", load.getResource());
+                                    eventElement.setText(load.getResource());
                                     // NOTE: don't care about the target for portlets
                                     eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
                                     requireClientSubmission = true;
@@ -860,7 +860,11 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
 //        final String clientSubmisssionURL;
         final String target;
-        if ("all".equals(activeSubmission.getReplace())) {
+        final String activeSubmissionReplace = activeSubmission == null ? "all" : activeSubmission.getReplace();
+        final String activeSubmissionResolvedXXFormsTarget = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();
+        final String activeSubmissionShowProgress = (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false";
+
+        if ("all".equals(activeSubmissionReplace)) {
             // Replace all
 
             // TODO: Set action ("action", clientSubmisssionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
@@ -871,7 +875,7 @@ public class XFormsServer extends ProcessorImpl {
 //                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 //
 //            clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
-            target = activeSubmission.getResolvedXXFormsTarget();
+            target = activeSubmissionResolvedXXFormsTarget;
         } else {
             // Replace instance
 //            clientSubmisssionURL = externalContext.getRequest().getRequestURL();
@@ -882,8 +886,8 @@ public class XFormsServer extends ProcessorImpl {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
                 new String[]{
                         "method", "POST",
-                        "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false",
-                        "replace", activeSubmission.getReplace(),
+                        "show-progress", activeSubmissionShowProgress,
+                        "replace", activeSubmissionReplace,
                         (target != null) ? "target" : null, target
                 });
     }

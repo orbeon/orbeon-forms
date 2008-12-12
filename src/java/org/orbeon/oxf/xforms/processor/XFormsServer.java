@@ -860,6 +860,9 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
 //        final String clientSubmisssionURL;
         final String target;
+
+        // activeSubmission submission can be null when are running as a portlet and handling an <xforms:load>, which
+        // when executed from within a portlet is ran as very much like the replace="all" submissions.
         final String activeSubmissionReplace = activeSubmission == null ? "all" : activeSubmission.getReplace();
         final String activeSubmissionResolvedXXFormsTarget = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();
         final String activeSubmissionShowProgress = (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false";

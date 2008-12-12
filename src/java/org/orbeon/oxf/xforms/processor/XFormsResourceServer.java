@@ -52,7 +52,22 @@ public class XFormsResourceServer extends ProcessorImpl {
             final ExternalContext.Session session = externalContext.getSession(false);
             if (session != null) {
                 // Store mapping into session
-                final NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap().get(NetUtils.DYNAMIC_RESOURCES_SESSION_KEY + filename);
+                final String lookupKey = NetUtils.DYNAMIC_RESOURCES_SESSION_KEY + filename;
+                NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap().get(lookupKey);
+
+                if (resource == null) {
+                    // When the resource is not saved in in the servlet session, but in the portlet session, the portlet
+                    // server stores in the session the key prefixed with ID assigned to the portlet. If we can't find the
+                    // resource straight away based on the lookupKey, we go through all the key/value pairs in the session
+                    // and try to find a key that ends with the lookupKey.
+                    for (Iterator keyIterator = session.getAttributesMap().keySet().iterator(); keyIterator.hasNext();) {
+                        String candidateKey = (String) keyIterator.next();
+                        if (candidateKey.endsWith(lookupKey)) {
+                            resource = (NetUtils.DynamicResource) session.getAttributesMap().get(candidateKey);
+                            break;
+                        }
+                    }
+                }
 
                 if (resource != null && resource.getURI() != null) {
                     // Found URI, stream it out

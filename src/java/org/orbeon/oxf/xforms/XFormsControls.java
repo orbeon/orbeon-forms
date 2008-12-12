@@ -58,6 +58,10 @@ public class XFormsControls {
         currentControlTree = initialControlTree;
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     public boolean isDirtySinceLastRequest() {
         return dirtySinceLastRequest;
     }

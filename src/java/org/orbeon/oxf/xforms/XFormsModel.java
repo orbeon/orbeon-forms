@@ -573,6 +573,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                                     if (isApplicationSharedHint) {
                                         final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelEffectiveId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
                                         setInstance(sharedXFormsInstance, false);
+                                        
+                                        containingDocument.endHandleOperation();
                                         continue;
                                     }
 
@@ -1357,9 +1359,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         setAllDeferredFlags(true);
 
         // Mark new instance nodes to which controls are bound for event dispatching
-        if (!newInstance.isReadOnly()) {// replacing a read-only instance does not cause value change events at the moment
-
-            final XFormsControls xformsControls = containingDocument.getControls();
+        final XFormsControls xformsControls = containingDocument.getControls();
+        if (!newInstance.isReadOnly()               // replacing a read-only instance does not cause value change events at the moment
+                && xformsControls.isInitialized()) {// no point in doing anything if there are no controls yet
 
             // Update control bindings if needed
             // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling

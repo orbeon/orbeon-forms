@@ -347,23 +347,6 @@ public class InstanceData {
         return result.iterator();
     }
 
-    public static void updateConstraint(NodeInfo nodeInfo, boolean constraint) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (constraint == DEFAULT_VALID) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.constraint = constraint;
-            }
-        } else {
-            // Never go back from default
-            existingInstanceData.constraint &= constraint;
-        }
-    }
-
     public static void updateValueValid(NodeInfo nodeInfo, boolean valueValid, String modelBindId) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
         if (existingInstanceData == null) {

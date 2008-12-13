@@ -906,7 +906,7 @@ public class XFormsModelBinds {
 
                 // Update node with MIP value
                 isValid &= valid;
-                InstanceData.updateConstraint(currentNodeInfo, valid);
+                InstanceData.updateValueValid(currentNodeInfo, valid, bind.getId());
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
                         bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));

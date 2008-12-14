@@ -3075,7 +3075,7 @@ ORBEON.widgets.YUICalendar = function() {
                 document.body.appendChild(calendarDiv);
             }
             // Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
-            YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex++); 
+            YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex++);
 
             if (yuiCalendar == null) {
                 // Create YUI calendar
@@ -5147,8 +5147,14 @@ ORBEON.xforms.Server = {
                                                 }
                                                 if (cursor.nodeType == ELEMENT_TYPE) {
                                                     if (cursor.id == "xforms-case-end-" + controlId) break;
-                                                    ORBEON.util.Dom.addClass(cursor, visible ? "xforms-case-selected" : "xforms-case-deselected");
-                                                    ORBEON.util.Dom.removeClass(cursor, visible ? "xforms-case-deselected" : "xforms-case-selected");
+                                                    if (visible) {
+                                                        ORBEON.util.Dom.addClass(cursor, "xforms-case-selected");
+                                                        ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected");
+                                                        ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
+                                                    } else {
+                                                        ORBEON.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
+                                                        ORBEON.util.Dom.removeClass(cursor, "xforms-case-selected");
+                                                    }
 
                                                     children[children.length] = cursor;
                                                 }

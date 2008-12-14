@@ -237,6 +237,12 @@ html body .xforms-form .xforms-repeat-template {
     display: none;
 }
 
+
+/**
+ * For xforms-case-selected/deselected, we use set the hide/show sections with "visibility/position" instead of
+ * "display" as recommended by by YUI. Not doing so causes issues to the slider when shown in a section of the
+ *  page which is hidden when the slider is initialized.
+ */
 .xforms-case-selected {
     visibility: visible;
     position: static;
@@ -247,7 +253,22 @@ html body .xforms-form .xforms-repeat-template {
     position: absolute;
 }
 
-.xforms-case-begin-end {
+/**
+ * Using visibility: hidden; position: absolute; on table rows and cells causes display problems on IE. So here we
+ * have to use display: none. This means that some controls (i.e. slider) won't work if they are in a cell which
+ * is initially hidden when the page is loaded.
+ */
+tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
+        td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selecte {
+    display: none;
+}
+
+/**
+ * Hidding sections of the page after the page is loaded with visibility: hidden; position: absolute; causes display
+ * problems on IE. (For instance with the controls example, where some form controls are not showing when going
+ * back and forth between tabs.) So at "runtime" we hide sections of the page with display: none.
+ */
+.xforms-case-deselected-subsequent {
     display: none;
 }
 

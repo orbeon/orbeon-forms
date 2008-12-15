@@ -137,10 +137,14 @@
                                                                instance('fr-form-metadata')/description[1])[1]"/>
 
                                     <!-- Logo -->
-                                    <xxforms:variable name="logo-uri"
+                                    <xxforms:variable name="logo-uri-no-appserver"
                                                       select="(($source-form-metadata/logo,
                                                                 instance('fr-form-metadata')/logo,
-                                                                concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]"/>
+                                                                '{$default-logo-uri}')[normalize-space() != ''])[1]"/>
+                                    <xxforms:variable name="logo-uri"
+                                                      select="if (starts-with($logo-uri-no-appserver, 'http://') or starts-with($logo-uri-no-appserver, 'https://'))
+                                                              then $logo-uri-no-appserver
+                                                              else concat(pipeline:property('oxf.fr.appserver.uri'), $logo-uri-no-appserver)"/>
 
                                     <!--xxx noscript xxx-->
                                     <!--<xforms:output value="property('xxforms:noscript')"/>                            -->

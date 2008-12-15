@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
+      id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-service-model">
 
     <xforms:label>Service Editor</xforms:label>
 
@@ -357,8 +357,8 @@
         <xforms:setfocus control="fb-service-name-input"/>
     </xforms:action>
 
-    <!-- Model for the submission editor -->
-    <xforms:model id="fb-submission-model">
+    <!-- Model for the service editor -->
+    <xforms:model id="fb-service-model">
 
         <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 

@@ -4863,6 +4863,11 @@ ORBEON.xforms.Server = {
                                                 itemIndex++;
                                             }
                                         }
+
+                                        // Call custom listener if any (temporary until we have a good API for custom components)
+                                        if (typeof xformsItemsetUpdatedListener != "undefined") {
+                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
+                                        }
                                     }
                                 }
                             }

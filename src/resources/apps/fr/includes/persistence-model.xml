@@ -35,18 +35,21 @@
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-model-construct-done">
 
-        <!-- Initialize form, data, and new service URIs from properties properties -->
+        <!-- Initialize form service URI -->
         <xforms:setvalue ref="instance('fr-uris-instance')/form-collection"
-                         value="concat(xxforms:property('oxf.fr.appserver.uri'),
-                                    xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.')))"/>
+                         value="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
+        <!-- Initialize data service URI -->
         <xforms:setvalue ref="instance('fr-uris-instance')/data-collection"
-                         value="concat(xxforms:property('oxf.fr.appserver.uri'),
-                                    xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.')))"/>
-        <xxforms:variable name="new-service-uri" select="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
+                         value="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.'))"/>
+        <!-- Initialize new service URI -->
         <xforms:setvalue ref="instance('fr-uris-instance')/new-service-uri"
-                         value="if (starts-with($new-service-uri, '/'))
-                            then concat(xxforms:property('oxf.fr.appserver.uri'), $new-service-uri)
-                            else $new-service-uri"/>
+                         value="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
+        
+        <!-- Add appserver in from of URIs, unless those are already full URIs that start with http:// or https:// -->
+        <xforms:action xxforms:iterate="instance('fr-uris-instance')/*">
+            <xforms:setvalue if="not(starts-with(., 'http://') or starts-with(., 'https://'))"
+                             ref="." value="concat(xxforms:property('oxf.fr.appserver.uri'), .)"/>
+        </xforms:action>
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>

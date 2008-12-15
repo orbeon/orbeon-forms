@@ -573,7 +573,7 @@
     <!-- TODO: should load components based on app config? -->
     <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->
     <xforms:submission id="fb-load-components" serialization="none"
-                       method="get" resource="/fr/service/components/orbeon/library"
+                       method="get" resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/components/orbeon/library"
                        replace="instance" instance="fb-components-instance"
                        xxforms:readonly="true" xxforms:shared="application"/>
 

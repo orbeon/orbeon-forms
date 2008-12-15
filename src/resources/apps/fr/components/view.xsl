@@ -198,7 +198,10 @@
                                 <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
                                 <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
                                     <!-- Main form content -->
-                                    <xsl:apply-templates select="fr:body/node()"/>
+                                    <xsl:apply-templates select="fr:body/node()">
+                                        <!-- Dialogs are handled later -->
+                                        <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
+                                    </xsl:apply-templates>
                                 </xforms:group>
 
                                 <!-- Error summary (if at bottom) -->
@@ -355,6 +358,14 @@
             </xsl:if>
 
         </xhtml:div>
+
+        <!-- Form-specific dialogs -->
+        <xsl:apply-templates select="fr:body//xxforms:dialog">
+            <!-- Make sure dialogs are handled -->
+            <xsl:with-param name="include-dialogs" select="true()" tunnel="yes" as="xs:boolean"/>
+        </xsl:apply-templates>
+
+        <!-- Misc standard dialogs -->
         <xi:include href="../import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
         <xi:include href="../includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
         <xi:include href="../includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
@@ -388,6 +399,14 @@
             <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe" id="fr-data-safe-input" class="xforms-disabled"/>
         </xhtml:span>
 
+    </xsl:template>
+
+    <!-- Special handling for dialogs, as we include them at the top-level and not within fr-form-group -->
+    <xsl:template match="xxforms:dialog">
+        <xsl:param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
+        <xsl:if test="$include-dialogs">
+            <xsl:next-match/>
+        </xsl:if>
     </xsl:template>
 
     <!-- Noscript control help entry -->

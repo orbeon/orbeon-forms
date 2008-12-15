@@ -257,6 +257,7 @@
 
             <!-- Use a global variable to determine whether we must continue -->
             <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">false</xforms:setvalue>
+            <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
 
             <!-- Iterate over attachment controls while there is no submission error -->
             <!--<xforms:action xxforms:iterate="$attachment-binds">-->
@@ -503,7 +504,7 @@
 
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
 
-        <!-- If the document was saved because of a "submit", handle the rest of the submission process -->
+        <!-- If the document was saved because of a "submit", handle the rest of the submission process in dialog -->
         <xforms:action if="instance('fr-persistence-instance')/submit-or-save-or-send = 'submit'">
             <!-- Show the submission result dialog -->
             <xxforms:show dialog="fr-submission-result-dialog">
@@ -519,52 +520,58 @@
                                 or xxforms:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))
                                 or xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))" submission="fr-pdf-service-submission"/>
 
-            <!-- Send to Alfresco if requested -->
-            <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))">
+            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                <!-- Send to Alfresco if requested -->
+                <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))">
 
-                <!-- Form definition -->
-                <xxforms:variable name="html" select="instance('fr-source-form-instance')" as="element(xhtml:html)"/>
+                    <!-- Form definition -->
+                    <xxforms:variable name="html" select="instance('fr-source-form-instance')" as="element(xhtml:html)"/>
 
-                <!-- Pass metadata with current language, or first language if current language is not found -->
-                <xxforms:variable name="form-titles" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/title" as="xs:string"/>
-                <xxforms:variable name="form-descriptions" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/description" as="xs:string"/>
-                <xxforms:variable name="form-title" select="($form-titles[@xml:lang = xxforms:instance('fr-language-instance')], $form-titles[1])[1]" as="xs:string"/>
-                <xxforms:variable name="form-description" select="($form-descriptions[@xml:lang = xxforms:instance('fr-language-instance')], $form-descriptions[1])[1]" as="xs:string"/>
+                    <!-- Pass metadata with current language, or first language if current language is not found -->
+                    <xxforms:variable name="form-titles" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/title" as="xs:string"/>
+                    <xxforms:variable name="form-descriptions" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/description" as="xs:string"/>
+                    <xxforms:variable name="form-title" select="($form-titles[@xml:lang = xxforms:instance('fr-language-instance')], $form-titles[1])[1]" as="xs:string"/>
+                    <xxforms:variable name="form-description" select="($form-descriptions[@xml:lang = xxforms:instance('fr-language-instance')], $form-descriptions[1])[1]" as="xs:string"/>
 
-                <!-- Send PDF data if requested -->
-                <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
-                    <!-- Get URI of PDF data -->
-                    <xxforms:variable name="pdf-uri" select="pipeline:rewriteResourceURI(concat(xxforms:property('oxf.fr.appserver.uri'), instance('fr-workflow-confirmation-instance')), true())" as="xs:anyURI"/>
+                    <!-- Send PDF data if requested -->
+                    <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
+                        <!-- Get URI of PDF data -->
+                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteResourceURI(concat(xxforms:property('oxf.fr.appserver.uri'), instance('fr-workflow-confirmation-instance')), true())" as="xs:anyURI"/>
 
-                    <!-- Send everything to Alfresco -->
-                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
-                        <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').pdf')"/>
-                        <xxforms:context name="fr:title" select="$form-title"/>
-                        <xxforms:context name="fr:description" select="$form-description"/>
-                        <xxforms:context name="fr:mimetype" select="'application/pdf'"/>
-                        <!-- Content as Base64 -->
-                        <xxforms:context name="fr:content" select="xxforms:doc-base64($pdf-uri)"/>
-                    </xforms:dispatch>
-                </xforms:action>
-                <!-- Send XML data if requested -->
-                <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-xml', $app, $form), '.'))">
-                    <!-- Send data to Alfresco -->
-                    <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
-                        <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').xml')"/>
-                        <xxforms:context name="fr:title" select="$form-title"/>
-                        <xxforms:context name="fr:description" select="$form-description"/>
-                        <xxforms:context name="fr:mimetype" select="'application/xml'"/>
-                        <!-- XML data -> string -> Base64 -->
-                        <xxforms:context name="fr:content" select="saxon:string-to-base64Binary(saxon:serialize(xxforms:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
-                    </xforms:dispatch>
+                        <!-- Send everything to Alfresco -->
+                        <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                            <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').pdf')"/>
+                            <xxforms:context name="fr:title" select="$form-title"/>
+                            <xxforms:context name="fr:description" select="$form-description"/>
+                            <xxforms:context name="fr:mimetype" select="'application/pdf'"/>
+                            <!-- Content as Base64 -->
+                            <xxforms:context name="fr:content" select="xxforms:doc-base64($pdf-uri)"/>
+                        </xforms:dispatch>
+                    </xforms:action>
+                    <!-- Send XML data if requested -->
+                    <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-xml', $app, $form), '.'))">
+                        <!-- Send data to Alfresco -->
+                        <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                            <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').xml')"/>
+                            <xxforms:context name="fr:title" select="$form-title"/>
+                            <xxforms:context name="fr:description" select="$form-description"/>
+                            <xxforms:context name="fr:mimetype" select="'application/xml'"/>
+                            <!-- XML data -> string -> Base64 -->
+                            <xxforms:context name="fr:content" select="saxon:string-to-base64Binary(saxon:serialize(xxforms:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
+                        </xforms:dispatch>
+                    </xforms:action>
                 </xforms:action>
             </xforms:action>
 
-            <!-- Send email if requested -->
-            <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.email', $app, $form), '.'))" submission="fr-email-service-submission"/>
+            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                <!-- Send email if requested -->
+                <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.email', $app, $form), '.'))" submission="fr-email-service-submission"/>
+            </xforms:action>
 
-            <!-- Navigate to the confirmation page -->
-            <xforms:send submission="fr-workflow-confirmation-submission"/>
+            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                <!-- Navigate to the confirmation page -->
+                <xforms:send submission="fr-workflow-confirmation-submission"/>
+            </xforms:action>
         </xforms:action>
 
     </xforms:action>
@@ -589,11 +596,39 @@
         <uri/>
     </xforms:instance>
 
-    <!-- React to failed submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission">
+    <!-- React to failed submission when saving, updating, getting, creating PDF, sending to Alfresco, sending email,
+         or sending to workflow -->
+    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-persistence-model"
+                   ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission fr-workflow-confirmation-submission">
+        <!-- Remember there was an error -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
+        <!-- Log error -->
+        <xforms:message level="xxforms:log-error">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+        <!-- Set error message and show error section in UI -->
+        <xforms:action if="event('error-type') = 'validation-error'">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
+            <xforms:toggle case="fr-message-validation-error"/>
+        </xforms:action>
+        <xforms:action if="event('error-type') != 'validation-error'">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                    value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
+            <xforms:toggle case="fr-message-fatal-error"/>
+        </xforms:action>
+    </xforms:action>
+
+    <!-- TODO: duplicated for now from above, which is no good; we need to implement the @handler attribute and
+         ev:listener to allow for a single xforms:action element, but two ev:listener registrations -->
+    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-alfresco-model">
+        <!-- Remember there was an error -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
+        <!-- Log error -->
+        <xforms:message level="xxforms:log-error">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
+        <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+        <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>

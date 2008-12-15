@@ -70,11 +70,12 @@
 
         <!-- Clear error -->
         <xforms:setvalue ref="instance('alfresco-error')/got-error" value="false()"/>
-        <!-- Authenticate -->
+
+        <!-- 1. Authenticate -->
         <xforms:send submission="alfresco-auth-submission"/>
-        <!-- Create new document -->
+        <!-- 2. Create new document -->
         <xforms:send if="instance('alfresco-error')/got-error = 'false'" submission="alfresco-create-submission"/>
-        <!-- Upload document -->
+        <!-- 3. Upload document -->
         <xforms:action if="instance('alfresco-error')/got-error = 'false'">
             <!-- Propagate UUID -->
             <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:uuid" value="instance('alfresco-create-ws-response')//*[local-name() = 'uuid']"/>
@@ -82,30 +83,27 @@
             <xforms:send submission="alfresco-post-content-submission"/>
         </xforms:action>
         <!-- Display success message if ok -->
-        <xforms:action if="instance('alfresco-error')/got-error = 'false'">
-            <!-- TODO: proper error message handling -->
-            <xforms:message>Document envoyé avec succès.</xforms:message>
-        </xforms:action>
+        <!--<xforms:action if="instance('alfresco-error')/got-error = 'false'">-->
+            <!--<xforms:message>Document envoyé avec succès.</xforms:message>-->
+        <!--</xforms:action>-->
         <!-- Display error if any -->
-        <xforms:action if="instance('alfresco-error')/got-error = 'true'">
-            <!-- TODO: proper error message handling -->
-            <xforms:message>
-                Alfresco error:
-                <xforms:output value="instance('alfresco-error')/message"/>
-            </xforms:message>
-        </xforms:action>
+        <!--<xforms:action if="instance('alfresco-error')/got-error = 'true'">-->
+            <!--<xforms:message>-->
+                <!--Alfresco error: <xforms:output value="instance('alfresco-error')/message"/>-->
+            <!--</xforms:message>-->
+        <!--</xforms:action>-->
     </xforms:action>
 
     <!-- Remember any submission error -->
     <xforms:action ev:event="xforms-submit-error">
         <xforms:setvalue ref="instance('alfresco-error')/got-error" value="true()"/>
-        <xforms:setvalue ref="instance('alfresco-error')/message" value="event('body')"/>
+        <!--<xforms:setvalue ref="instance('alfresco-error')/message" value="event('body')"/>-->
     </xforms:action>
 
     <xforms:instance id="alfresco-error">
         <error xmlns="">
             <got-error>false</got-error>
-            <message/>
+            <!--<message/>-->
         </error>
     </xforms:instance>
 

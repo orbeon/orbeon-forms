@@ -393,9 +393,6 @@
                             <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt="Search" title="Search"/>
                             <xhtml:span>Search</xhtml:span>
                         </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:send submission="search-submission"/>
-                        </xforms:action>
                     </xforms:trigger>
 
                     <xforms:group ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">

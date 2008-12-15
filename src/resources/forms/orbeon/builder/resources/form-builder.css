@@ -228,7 +228,7 @@ a.fb-edit-help-trigger img {
 
 /* For section alert, restore to something closer from the old-style alert icons */
 #fb-details-group .fr-section-title .xforms-alert-active {
-    background: transparent url(../../../ops/images/xforms/exclamation.png) no-repeat left center;
+    background: transparent url(../../../../ops/images/xforms/exclamation.png) no-repeat left center;
     display: inline-block;
     font-size: 0;
     height: 16px;

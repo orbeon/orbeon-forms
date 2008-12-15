@@ -514,6 +514,7 @@
 
         <!-- If the document was saved because of a "send", handle the rest of the submission process -->
         <xforms:action if="instance('fr-persistence-instance')/submit-or-save-or-send = 'send'">
+            <!-- TODO: move this to separate model (fr-send-model or fr-workflow-model) -->
 
             <!-- Create PDF if requested -->
             <xforms:send if="xxforms:property(string-join(('oxf.fr.detail.send.pdf', $app, $form), '.'))

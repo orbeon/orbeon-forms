@@ -66,7 +66,6 @@
         <xsd:attribute name="tabindex" type="xsd:integer" use="optional"/>
         <xsd:attribute name="class" type="xsd:string" use="optional"/>
         <xsd:attribute name="context" type="xsd:string" use="optional"/>
-        <xsd:attribute name="iterate" type="xsd:string" use="optional"/>
         <xsd:anyAttribute namespace="##other" processContents="lax"/>
     </xsd:attributeGroup>
 

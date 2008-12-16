@@ -82,7 +82,14 @@
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="xxforms:instance('errors-state')/submitted">true</xforms:setvalue>
-                <xxforms:show dialog="fr-clear-confirm-dialog"/>
+                <xforms:action if="not(property('xxforms:noscript'))">
+                    <!-- Open confirmation dialog -->
+                    <xxforms:show dialog="fr-clear-confirm-dialog"/>
+                </xforms:action>
+                <xforms:action if="property('xxforms:noscript')">
+                    <!-- Clear directly -->
+                    <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
+                </xforms:action>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>

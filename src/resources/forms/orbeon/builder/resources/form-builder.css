@@ -213,7 +213,7 @@ a.fb-edit-help-trigger img {
 #fb-details-group .fr-section-title .fr-inplace-edit .fr-inplace-buttons,
     #fb-details-group .fr-section-title:hover .fr-inplace-buttons { display: inline }
 
-#fb-details-group .fr-section-title .fr-inplace-buttons {
+#fb-details-group .fr-section-title .fr-inplace-view .fr-inplace-buttons {
     margin-left: .5em;
     margin-right: .5em;
     padding-right: .2em;/* not sure why we need this, but there is some visual padding to the left so use this to balance */

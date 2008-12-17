@@ -340,7 +340,7 @@
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
         <xforms:bind nodeset="instance('fb-bindings-editor-instance')">
-            <xforms:bind nodeset="name" type="xs:NCName"
+            <xforms:bind nodeset="name" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
             <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>

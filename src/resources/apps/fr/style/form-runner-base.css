@@ -24,18 +24,13 @@
 /* ***** XForms Controls ******************************************************************************************** */
 
 /* Make sure disabled items take precendence over display: block on other classes */
-#fr-view .xforms-disabled, .xforms-dialog .xforms-disabled { display: none }
-#fr-view .xforms-repeat-template, .xforms-dialog .xforms-repeat-template { display: none }
-#fr-view label.xforms-alert-inactive, .xforms-dialog label.xforms-alert-inactive { display: none }
-#fr-view .xforms-disabled .xforms-label, .xforms-dialog .xforms-disabled .xforms-label { display: none }
-#fr-view .xforms-case-deselected, .xforms-dialog .xforms-case-deselected { display: none }
-#fr-view .xforms-case-deselected .xforms-label, .xforms-dialog .xforms-case-deselected .xforms-label { display: none }
-#fr-view .fr-hidden, .xforms-dialog .fr-hidden { display: none }
-/* Make sure xforms-disabled takes precendence over display: block on other classes */
-/* TODO: should be covered by above rules, remove when we are confident */
-/*.fr-grid label.xforms-disabled, .fr-grid span.xforms-disabled, .fr-grid div.xforms-disabled  {*/
-    /*display: none;*/
-/*}*/
+#fr-view .xforms-disabled { display: none }
+#fr-view .xforms-repeat-template { display: none }
+#fr-view label.xforms-alert-inactive { display: none }
+#fr-view .xforms-disabled .xforms-label { display: none }
+#fr-view .xforms-case-deselected { display: none }
+#fr-view .xforms-case-deselected .xforms-label { display: none }
+#fr-view .fr-hidden { display: none }
 
 /* Nicely position the help image */
 .xforms-help-image {

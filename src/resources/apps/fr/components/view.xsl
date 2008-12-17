@@ -189,6 +189,9 @@
                             </xsl:choose>
                             <xhtml:div class="yui-g fr-body">
 
+                                <!-- Optional message (mostly for view mode) -->
+                                <xsl:call-template name="fr-explanation"/>
+
                                 <!-- Table of contents -->
                                 <xsl:call-template name="fr-toc"/>
 
@@ -361,39 +364,41 @@
                 </xhtml:div>
             </xsl:if>
 
+            <!-- Dialogs -->
+            <xforms:group id="fr-dialogs-group" appearance="xxforms:internal">
+                <!-- Form-specific dialogs -->
+                <xsl:apply-templates select="fr:body//xxforms:dialog">
+                    <!-- Make sure dialogs are handled -->
+                    <xsl:with-param name="include-dialogs" select="true()" tunnel="yes" as="xs:boolean"/>
+                </xsl:apply-templates>
+
+                <!-- Misc standard dialogs -->
+                <xi:include href="../import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
+                <xi:include href="../includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
+                <xi:include href="../includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
+
+                <!-- Error Details dialog -->
+                <xxforms:dialog id="fr-error-details-dialog">
+                    <xforms:label>Error Details</xforms:label>
+                    <xhtml:div>
+                        <xhtml:div class="fr-dialog-message">
+                            <xforms:output mediatype="text/html" model="fr-persistence-model" value="instance('fr-persistence-instance')/error"/>
+                        </xhtml:div>
+                    </xhtml:div>
+                    <xhtml:div class="fr-dialog-buttons">
+                        <xforms:group>
+                            <xxforms:hide ev:event="DOMActivate" dialog="fr-error-details-dialog"/>
+                            <xforms:trigger>
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
+                                </xforms:label>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:div>
+                </xxforms:dialog>
+            </xforms:group>
         </xhtml:div>
-
-        <!-- Form-specific dialogs -->
-        <xsl:apply-templates select="fr:body//xxforms:dialog">
-            <!-- Make sure dialogs are handled -->
-            <xsl:with-param name="include-dialogs" select="true()" tunnel="yes" as="xs:boolean"/>
-        </xsl:apply-templates>
-
-        <!-- Misc standard dialogs -->
-        <xi:include href="../import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
-        <xi:include href="../includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
-        <xi:include href="../includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
-
-        <!-- Error Details dialog -->
-        <xxforms:dialog id="fr-error-details-dialog">
-            <xforms:label>Error Details</xforms:label>
-            <xhtml:div>
-                <xhtml:div class="fr-dialog-message">
-                    <xforms:output mediatype="text/html" model="fr-persistence-model" value="instance('fr-persistence-instance')/error"/>
-                </xhtml:div>
-            </xhtml:div>
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:group>
-                    <xxforms:hide ev:event="DOMActivate" dialog="fr-error-details-dialog"/>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
-                        </xforms:label>
-                    </xforms:trigger>
-                </xforms:group>
-            </xhtml:div>
-        </xxforms:dialog>
 
         <xhtml:span class="fr-hidden">
             <!-- Hidden field to communicate to the client the current section to collapse or expand -->
@@ -501,6 +506,16 @@
                 <xhtml:div class="fr-separator">&#160;</xhtml:div>
             </xsl:if>
         </xforms:group>
+    </xsl:template>
+
+    <!-- Explanation message -->
+    <xsl:template name="fr-explanation">
+        <!-- TODO
+        <xhtml:div class="fr-explanation">
+            xxx
+        </xhtml:div>
+        <xhtml:div class="fr-separator">&#160;</xhtml:div>
+        -->
     </xsl:template>
 
     <!-- Table of contents UI -->

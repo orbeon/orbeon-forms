@@ -399,7 +399,7 @@
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
         <xforms:bind nodeset="instance('fb-submission-editor-instance')">
-            <xforms:bind nodeset="id" type="xs:NCName"
+            <xforms:bind nodeset="id" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
                                         or not(../submission-id = $model/xforms:submission/@id
                                             or ../instance-id = $model/xforms:instance/@id)"/>
@@ -413,7 +413,7 @@
                          calculate="if (../is-soap = 'true')
                                     then string-join(('application/soap+xml', if (normalize-space(../soap-action) != '') then concat('action=', normalize-space(../soap-action)) else ()), '; ')
                                     else ../serialization"/>
-            <xforms:bind nodeset="request/body" type="xxforms:xml"/>
+            <xforms:bind nodeset="request/body" type="xxforms:xml" required="true()"/>
             <xforms:bind nodeset="response/error-type" readonly="true()"/>
             <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>

@@ -146,7 +146,7 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-review-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/submit" xxforms:modal="true" id="fr-workflow-review-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/workflow-review" xxforms:modal="true" id="fr-workflow-review-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
@@ -155,7 +155,7 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-edit-button">
-        <xforms:trigger xxforms:modal="true" id="fr-workflow-edit-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/workflow-edit" xxforms:modal="true" id="fr-workflow-edit-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/previous.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
@@ -164,7 +164,7 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-send-button">
-        <xforms:trigger xxforms:modal="true" id="fr-workflow-send-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/workflow-send" xxforms:modal="true" id="fr-workflow-send-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>

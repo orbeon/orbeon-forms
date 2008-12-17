@@ -16,6 +16,7 @@
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
               xmlns:xforms="http://www.w3.org/2002/xforms"
               xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:exforms="http://www.exforms.org/exf/1-0"
               xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
               xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -475,6 +476,9 @@
         <triggers xmlns="">
             <save/>
             <submit/>
+            <workflow-review/>
+            <workflow-edit/>
+            <workflow-send/>
             <discard/>
         </triggers>
     </xforms:instance>
@@ -490,7 +494,13 @@
         <xforms:bind nodeset="save" readonly="not(property('xxforms:noscript'))
             and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>
         <xforms:bind nodeset="submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
+        <xforms:bind nodeset="workflow-edit" readonly="exforms:readonly(../submit)"/>
+        <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../submit)"/>
     </xforms:bind>
+
+    <!-- HACK: recalc this model when instance validity changes, so that the triggers instance in particular is kept up to date -->
+    <xforms:recalculate ev:event="xxforms-invalid xxforms-valid" ev:observer="fr-form-instance"/>
 
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">

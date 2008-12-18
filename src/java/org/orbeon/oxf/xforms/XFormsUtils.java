@@ -1010,6 +1010,30 @@ public class XFormsUtils {
     }
 
     /**
+     * Return an element's xml:base value, checking ancestors as well.
+     *
+     * @param element   element to check
+     * @return          xml:base value or null if not found
+     */
+    public static String resolveXMLang(Element element) {
+        // Allow for null Element
+        if (element == null)
+            return null;
+
+        // Collect xml:base values
+        Element currentElement = element;
+        do {
+            final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_LANG_QNAME);
+            if (xmlBaseAttribute != null)
+                return xmlBaseAttribute;
+            currentElement = currentElement.getParent();
+        } while(currentElement != null);
+
+        // Not found
+        return null;
+    }
+
+    /**
      * Resolve f:url-norewrite attributes on this element, taking into account ancestor f:url-norewrite attributes for
      * the resolution.
      *

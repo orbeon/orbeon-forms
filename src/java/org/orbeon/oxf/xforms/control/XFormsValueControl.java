@@ -103,6 +103,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             // Format according to type
             final String typeName = getBuiltinTypeName();
             if (typeName != null) {
+//                final String lang = XFormsUtils.resolveXMLang(getControlElement());// this could be done as part of the static analysis?
+//                format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName, lang);
                 format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName);
             }
 

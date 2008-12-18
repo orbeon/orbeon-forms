@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ public class XFormsProperties {
 
     private static final String SKIP_SCHEMA_VALIDATION_PROPERTY = "skip-schema-validation";
 
+//    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
     private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.";
     private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
     private static final String DATE_FORMAT_PROPERTY = "format.date";
@@ -453,6 +456,37 @@ public class XFormsProperties {
 
     public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName) {
         return getStringProperty(containingDocument, TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName);
+    }
+
+    /**
+     * Get a format string given the given type and language.
+     *
+     * @param containingDocument    containing document
+     * @param typeName              type name, e.g. "date", "dateTime", etc.
+     * @param lang                  language, null, "en", "fr-CH"
+     * @return                      format string, null if not found
+     */
+    public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName, String lang) {
+        final FastStringBuffer sb = new FastStringBuffer(TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX);
+
+        if (lang == null) {
+            sb.append("*.*.");
+        } else {
+            final String[] langElements = StringUtils.split(lang, '-');
+            // Support e.g. "en" or "fr-CH"
+            for (int i = 0; i < 2; i++) {
+                if (i < langElements.length) {
+                    sb.append(langElements[i]);
+                    sb.append('.');
+                } else {
+                    sb.append("*.");
+                }
+            }
+        }
+
+        sb.append(typeName);
+
+        return getStringProperty(containingDocument, sb.toString());
     }
 
     public static String getTypeInputFormat(XFormsContainingDocument containingDocument, String typeName) {

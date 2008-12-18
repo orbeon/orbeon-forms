@@ -109,7 +109,7 @@
     <!-- Rewrite all URLs in XHTML documents -->
     <p:processor name="oxf:xhtml-rewrite" >
         <p:input name="rewrite-in" href="#themed-data"/>
-        <p:output name="rewrite-out" id="rewritten-data" />
+        <p:output name="rewrite-out" id="rewritten-data"/>
     </p:processor>
     <!-- Move from XHTML namespace to no namespace -->
     <p:processor name="oxf:qname-converter">

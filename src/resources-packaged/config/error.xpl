@@ -78,7 +78,9 @@
     <p:processor name="oxf:html-converter">
         <p:input name="config">
             <config>
-                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
+                <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
                 <version>4.01</version>
                 <encoding>utf-8</encoding>
                 <indent>true</indent>

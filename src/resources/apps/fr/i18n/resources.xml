@@ -31,6 +31,14 @@
             <subject>Orbeon Forms: Confirmation</subject>
             <body>Please find attached the form in PDF and XML format.</body>
         </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
         <summary>
             <titles>
                 <summary-title>Summary</summary-title>
@@ -164,6 +172,13 @@
             <subject>Orbeon Forms: Confirmation</subject>
             <body>Veuillez trouver en attachement le formulaire au formats XML et PDF.</body>
         </email>
+        <print>
+            <formats>
+                <date>Le [D] [Mn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>Le [D] [Mn] [Y] à [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
         <summary>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -297,6 +312,13 @@
             <subject>[Orbeon Forms: Confirmation]</subject>
             <body>[Please find attached the form in PDF and XML format.]</body>
         </email>
+        <print>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
         <summary>
             <titles>
                 <summary-title>Síntesis</summary-title>

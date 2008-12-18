@@ -134,7 +134,7 @@
                 <xsl:variable name="current-resources" select="$resources-instance/resource[@xml:lang = $request-language]" as="element(resource)"/>
 
                 <xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>
-                <xsl:variable name="fr-current-resources" select="($fr-resources/(resource[xml:lang = $request-language], resource[1]))[1]" as="element(resource)"/>
+                <xsl:variable name="fr-current-resources" select="($fr-resources/resource[@xml:lang = $request-language], $fr-resources/resource[1])[1]" as="element(resource)"/>
 
                 <!-- Template -->
                 <template href="input:template" show-grid="false"/>
@@ -198,26 +198,23 @@
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
                                         <!-- Date -->
-                                        <!-- TODO: format comes from under <summary> -->
                                         <field acro-field-name="'{$field-name}'"
                                                value="'{if ($control-value castable as xs:date)
-                                                        then format-date(xs:date($control-value), $fr-current-resources/summary/formats/date, $request-language, (), ())
+                                                        then format-date(xs:date($control-value), $fr-current-resources/print/formats/date, $request-language, (), ())
                                                         else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'time'">
                                         <!-- Time -->
-                                        <!-- TODO: format comes from under <summary> -->
                                         <field acro-field-name="'{$field-name}'"
                                                value="'{if ($control-value castable as xs:time)
-                                                        then format-time(xs:time($control-value), $fr-current-resources/summary/formats/time, $request-language, (), ())
+                                                        then format-time(xs:time($control-value), $fr-current-resources/print/formats/time, $request-language, (), ())
                                                         else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'dateTime'">
                                         <!-- Date and time -->
-                                        <!-- TODO: format comes from under <summary> -->
                                         <field acro-field-name="'{$field-name}'"
                                                value="'{if ($control-value castable as xs:dateTime)
-                                                        then format-dateTime(xs:dateTime($control-value), $fr-current-resources/summary/formats/dateTime, $request-language, (), ())
+                                                        then format-dateTime(xs:dateTime($control-value), $fr-current-resources/print/formats/dateTime, $request-language, (), ())
                                                         else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:otherwise>

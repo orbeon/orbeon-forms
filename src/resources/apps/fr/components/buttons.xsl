@@ -88,7 +88,7 @@
                 </xforms:action>
                 <xforms:action if="property('xxforms:noscript')">
                     <!-- Clear directly -->
-                    <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
+                    <xforms:dispatch name="fr-clear" target="fr-persistence-model"/>
                 </xforms:action>
             </xforms:action>
         </xforms:trigger>

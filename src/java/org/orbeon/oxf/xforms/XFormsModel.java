@@ -1352,16 +1352,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         // Set the instance on this model
         setInstance(newInstance, true);
 
-        // The controls will be dirty
-        containingDocument.getControls().markDirtySinceLastRequest(true);
-
         // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
-        setAllDeferredFlags(true);
+        final XFormsModel.DeferredActionContext deferredActionContext = getDeferredActionContext();
+        if (deferredActionContext != null) {
+            deferredActionContext.rebuild = true;
+            deferredActionContext.recalculate = true;
+            deferredActionContext.revalidate = true;
+        }
 
         // Mark new instance nodes to which controls are bound for event dispatching
         final XFormsControls xformsControls = containingDocument.getControls();
         if (!newInstance.isReadOnly()               // replacing a read-only instance does not cause value change events at the moment
                 && xformsControls.isInitialized()) {// no point in doing anything if there are no controls yet
+
+            // The controls will be dirty
+            containingDocument.getControls().markDirtySinceLastRequest(true);
+    
+            // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
+            if (deferredActionContext != null) {
+                deferredActionContext.refresh = true;
+            }
 
             // Update control bindings if needed
             // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling

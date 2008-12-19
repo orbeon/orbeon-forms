@@ -44,7 +44,7 @@ public class LDAPProcessor extends ProcessorImpl {
     public static final String LDAP_VERSION = "java.naming.ldap.version";
     public static final String DEFAULT_LDAP_VERSION = "3";
 
-    private static final String CTX_ENV = "java.naming.ldap.attributes.binary";
+    //private static final String CTX_ENV = "java.naming.ldap.attributes.binary";
     private static final String DEFAULT_CTX = "com.sun.jndi.ldap.LdapCtxFactory";
 
     public static final String HOST_PROPERTY = "host";
@@ -154,10 +154,11 @@ public class LDAPProcessor extends ProcessorImpl {
                         delete(ctx, (Delete) command);
                         outputSuccess(contentHandler, "delete");
                     } else if (command instanceof Search) {
-                        String[] attrs = null;
-                        Object[] objs = config.getAttributes().toArray();
-                        if (objs instanceof String[])
-                            attrs = (String[]) objs;
+                        // There was incorrect code here earlier testing on instanceof String[], which broke stuff. For
+                        // now assume all attrs are strings.
+                        final List attributesList = config.getAttributes();
+                        final String[] attrs = new String[attributesList.size()];
+                        attributesList.toArray(attrs);
 
                         List results = search(ctx, config.getRootDN(), command.getName(), attrs);
                         serialize(results, config, contentHandler);
@@ -393,10 +394,6 @@ public class LDAPProcessor extends ProcessorImpl {
 
         public List getAttributes() {
             return attributes;
-        }
-
-        public void setAttributes(List attributes) {
-            this.attributes = attributes;
         }
 
         public void addAttribute(String attr) {

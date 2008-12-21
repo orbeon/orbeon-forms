@@ -4863,11 +4863,6 @@ ORBEON.xforms.Server = {
                                                 itemIndex++;
                                             }
                                         }
-
-                                        // Call custom listener if any (temporary until we have a good API for custom components)
-                                        if (typeof xformsItemsetUpdatedListener != "undefined") {
-                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
-                                        }
                                     }
                                 }
                             }
@@ -5425,6 +5420,27 @@ ORBEON.xforms.Server = {
                                         var replayResponse = ORBEON.util.Dom.getStringValue(eventsElements[0]);
                                         var mappings = ORBEON.util.Dom.getStringValue(mappingsElements[0]);
                                         ORBEON.xforms.Offline.takeOffline(replayResponse, formID, mappings);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Call custom itemset listener if any (temporary until we have a good API for custom components)
+                        // NOTE: We call this here so that xxforms:script has an opportunity to run first
+                        if (typeof xformsItemsetUpdatedListener != "undefined") {
+                            for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                                // Change values in an itemset
+                                if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+                                    var itemsetsElement = actionElement.childNodes[actionIndex];
+                                    for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
+                                        if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+                                            var itemsetElement = itemsetsElement.childNodes[j];
+                                            var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+                                            var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
+
+                                            // Call custom listener
+                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
+                                        }
                                     }
                                 }
                             }

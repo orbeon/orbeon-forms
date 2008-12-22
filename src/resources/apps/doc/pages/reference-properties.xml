@@ -17,7 +17,7 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Properties File</title>
+        <title>Configuration Properties</title>
     </header>
     <body>
         <section>
@@ -556,6 +556,29 @@
                                 </li>
                             </ul>
                         </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>oxf.epilogue.theme.error</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.theme.error</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Specifies the theme stylesheet to use on the error page</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:anyURI</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>oxf:/config/theme-error.xsl</code></td>
                     </tr>
                 </table>
             </section>

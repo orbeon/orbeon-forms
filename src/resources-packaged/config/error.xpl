@@ -40,15 +40,15 @@
     </p:processor>
 
     <!-- Apply theme -->
+    <p:processor name="oxf:url-generator">
+		<p:input name="config" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme.error')))"/>
+		<p:output name="data" id="theme"/>
+	</p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#document"/>
         <p:input name="request" href="#request"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0">
-                <xsl:import href="oxf:/config/theme-plain.xsl"/>
-                <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
-            </xsl:stylesheet>
-        </p:input>
+		<p:input name="config" href="#theme"/>
         <p:output name="data" id="themed"/>
     </p:processor>
 

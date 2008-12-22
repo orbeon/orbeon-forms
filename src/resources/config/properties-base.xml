@@ -28,6 +28,7 @@
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.use-theme"                          value="true"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.theme.error"                        value="oxf:/config/theme-error.xsl"/>
     <property as="xs:anyURI"  name="oxf.epilogue.theme.portlet"                      value="oxf:/config/theme-portlet-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
     <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>

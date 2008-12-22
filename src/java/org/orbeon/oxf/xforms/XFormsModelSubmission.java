@@ -332,7 +332,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 {
                     // Resolved method AVT
                     final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
-                    resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName));
+                    resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, false));
 
                     // Get actual method based on the method attribute
                     actualHttpMethod = getActualHttpMethod(resolvedMethod);

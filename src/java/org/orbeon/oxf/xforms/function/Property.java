@@ -50,7 +50,7 @@ public class Property extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final String propertyNameString = argument[0].evaluateAsString(xpathContext);
-        final QName propertyNameQName = Dom4jUtils.extractTextValueQName(namespaceMappings, propertyNameString);
+        final QName propertyNameQName = Dom4jUtils.extractTextValueQName(namespaceMappings, propertyNameString, false);
 
         // Never return any property containing the string "password" as a first line of defense
         if (propertyNameString.toLowerCase().indexOf("password") != -1) {

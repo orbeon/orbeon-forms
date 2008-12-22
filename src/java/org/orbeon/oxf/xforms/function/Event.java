@@ -61,7 +61,7 @@ public class Event extends XFormsFunction {
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
 //        final Map namespaceMappings = getContainingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
 
-        final QName attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName);
+        final QName attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName, false);
 
         // Simply ask the event for the attribute
         return event.getAttribute(Dom4jUtils.qNameToExplodedQName(attributeQName));

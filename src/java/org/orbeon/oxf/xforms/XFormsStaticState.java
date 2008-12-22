@@ -446,7 +446,7 @@ public class XFormsStaticState {
 
                             // For now, only handle "prefix|name" selectors
                             final QName currentQNameMatch
-                                    = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'));
+                                    = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'), false);
 
                             // Create and remember factory for this QName
                             componentsFactories.put(currentQNameMatch,
@@ -886,9 +886,16 @@ public class XFormsStaticState {
             if (currentNodeInfo instanceof NodeWrapper) {
                 final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                // Make sure this is a known action name
                 if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
-                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
+                    // This is a known action name
+                    // TODO: The code below excludes cases like <xforms:model><xform:action ev:event="abc"><xforms:setvalue ev:event="def">
+
+//                    final Element parentElement = currentElement.getParent();
+//                    final String observerAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
+//                    if (isEventObserver(parentElement) || observerAttribute != null) {
+                        // Either 1) the parent is an observer or 2) there is an explicit ev:observer attribute  
+                        XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
+//                    }
                 }
             }
         }

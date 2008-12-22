@@ -138,7 +138,7 @@ public class XBLUtils {
                             final int equalIndex = currentValue.indexOf('=');
                             if (equalIndex == -1) {
                                 // No a=b pair, just a single QName
-                                final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue);
+                                final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue, true);
                                 if (!valueQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI)) {
                                      // This is not xbl:text, copy the attribute
                                     setAttribute(resultingNodes, valueQName, boundElement.attributeValue(valueQName));
@@ -151,11 +151,11 @@ public class XBLUtils {
                                 // a=b pair
                                 final QName leftSideQName; {
                                 final String leftSide = currentValue.substring(0, equalIndex);
-                                    leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
+                                    leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide, true);
                                 }
                                 final QName rightSideQName; {
                                     final String rightSide = currentValue.substring(equalIndex + 1);
-                                    rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
+                                    rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide, true);
                                 }
 
                                 final boolean isLeftSideXBLText = leftSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);

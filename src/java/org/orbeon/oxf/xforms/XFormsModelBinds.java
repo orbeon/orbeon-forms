@@ -374,7 +374,7 @@ public class XFormsModelBinds {
                                 // Output type MIP as an exploded QName
                                 final String typeMip = currentBind.getType();
                                 if (typeMip != null) {
-                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
+                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip, false);
                                     mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToExplodedQName(typeMipQName), null);
                                 }
 

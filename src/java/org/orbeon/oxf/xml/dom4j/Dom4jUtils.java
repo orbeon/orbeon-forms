@@ -391,7 +391,7 @@ public class Dom4jUtils {
      * scope. Return null if the attribute is not found.
      */
     public static QName extractAttributeValueQName(Element element, String attributeName) {
-        return extractTextValueQName(element, element.attributeValue(attributeName));
+        return extractTextValueQName(element, element.attributeValue(attributeName), false);
     }
 
     /**
@@ -399,7 +399,7 @@ public class Dom4jUtils {
      * scope. Return null if the attribute is not found.
      */
     public static QName extractAttributeValueQName(Element element, QName attributeQName) {
-        return extractTextValueQName(element, element.attributeValue(attributeQName));
+        return extractTextValueQName(element, element.attributeValue(attributeQName), false);
     }
 
     /**
@@ -407,29 +407,31 @@ public class Dom4jUtils {
      * Return null if the text is empty.
      */
     public static QName extractTextValueQName(Element element) {
-        return extractTextValueQName(element, element.getStringValue());
+        return extractTextValueQName(element, element.getStringValue(), false);
     }
 
     /**
      * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
      * Return null if the text is empty.
      *
-     * @param element       Element containing the attribute
-     * @param qNameString   QName to analyze
-     * @return              a QName object or null if not found
+     * @param element                   Element containing the attribute
+     * @param qNameString               QName to analyze
+     * @param unprefixedIsNoNamespace   if true, an unprefixed value is in no namespace; if false, it is in the default namespace
+     * @return                          a QName object or null if not found
      */
-    public static QName extractTextValueQName(Element element, String qNameString) {
-        return extractTextValueQName(getNamespaceContext(element), qNameString);
+    public static QName extractTextValueQName(Element element, String qNameString, boolean unprefixedIsNoNamespace) {
+        return extractTextValueQName(getNamespaceContext(element), qNameString, unprefixedIsNoNamespace);
     }
 
     /**
      * Extract a QName from a string value, given namespace mappings. Return null if the text is empty.
      *
-     * @param namespaces    prefix -> URI mappings
-     * @param qNameString   QName to analyze
-     * @return              a QName object or null if not found
+     * @param namespaces                prefix -> URI mappings
+     * @param qNameString               QName to analyze
+     * @param unprefixedIsNoNamespace   if true, an unprefixed value is in no namespace; if false, it is in the default namespace
+     * @return                          a QName object or null if not found
      */
-    public static QName extractTextValueQName(Map namespaces, String qNameString) {
+    public static QName extractTextValueQName(Map namespaces, String qNameString, boolean unprefixedIsNoNamespace) {
         if (qNameString == null)
             return null;
         qNameString = qNameString.trim();
@@ -443,8 +445,13 @@ public class Dom4jUtils {
         if (colonIndex == -1) {
             prefix = "";
             localName = qNameString;
-            final String nsURI = (String) namespaces.get(prefix);
-            namespaceURI = nsURI == null ? "" : nsURI;
+            if (unprefixedIsNoNamespace) {
+                namespaceURI = "";
+            } else {
+
+                final String nsURI = (String) namespaces.get(prefix);
+                namespaceURI = nsURI == null ? "" : nsURI;
+            }
         } else if (colonIndex == 0) {
             throw new OXFException("Empty prefix for QName: " + qNameString);
         } else {

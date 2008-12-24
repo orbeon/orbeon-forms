@@ -218,7 +218,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                                 final String applicationVersion = URLRewriter.getApplicationResourceVersion();
                                 if (applicationVersion != null) {
                                     // This is not an XForms property but we want to expose it on the client 
-                                    dynamicProperties.put(URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY, "1.0");
+                                    dynamicProperties.put(URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY, applicationVersion);
                                 }
                             }
                         }

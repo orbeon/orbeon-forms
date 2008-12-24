@@ -88,8 +88,6 @@ var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
 var XFORMS_DATEPICKER = "yui";
 var XFORMS_HTMLEDITOR = "yui";
 
-var APPLICATION_RESOURCES_VERSION = "1.0";
-
 /**
  * Constants
  */

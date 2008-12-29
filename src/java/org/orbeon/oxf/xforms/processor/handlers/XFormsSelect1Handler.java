@@ -127,7 +127,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
         } else {
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, xformsControl);
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, xformsControl, appearance, isDefaultIncremental());
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);

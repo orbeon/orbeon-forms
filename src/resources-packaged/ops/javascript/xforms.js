@@ -117,7 +117,7 @@ var ORBEON = ORBEON || {};
 ORBEON.util = ORBEON.util || {};
 ORBEON.xforms = ORBEON.xforms || {};
 ORBEON.widgets = ORBEON.widgets || {};
-ORBEON.xforms.Globals = ORBEON.xforms.Globals || {}
+ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};
 
 /**
  * Global constants and variable
@@ -393,7 +393,7 @@ ORBEON.util.Dom = {
 
     stringToDom: function(xmlString) {
         if (document.implementation.createDocument) {
-            return (new DOMParser()).parseFromString(xmlString, "application/xml")
+            return (new DOMParser()).parseFromString(xmlString, "application/xml");
         } else if (window.ActiveXObject) {
             var dom = new ActiveXObject("Microsoft.XMLDOM");
             dom.async = "false";
@@ -978,7 +978,7 @@ ORBEON.xforms.Document = {
         if (!ORBEON.xforms.Offline.isOnline)
             ORBEON.xforms.Controls.setCurrentValue(control, newValue);
         var event = new ORBEON.xforms.Server.Event(null, control.id, null, newValue, "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
     },
 
     /**
@@ -1125,7 +1125,7 @@ ORBEON.xforms.Document = {
                     offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
                 });
             }
-        }, 100)
+        }, 100);
         // We first capture the form
         ORBEON.xforms.Offline.formStore.capture(url, function (url, success, captureId) {
             // When capture is done, set a flag.
@@ -1451,12 +1451,12 @@ ORBEON.xforms.Controls = {
             var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
             // Set values in DOM
             if (uploadState == "empty") {
-                ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file")
-                ORBEON.util.Dom.addClass(control, "xforms-upload-state-empty")
+                ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file");
+                ORBEON.util.Dom.addClass(control, "xforms-upload-state-empty");
             }
             if (uploadState == "file") {
-                ORBEON.util.Dom.removeClass(control, "xforms-upload-state-empty")
-                ORBEON.util.Dom.addClass(control, "xforms-upload-state-file")
+                ORBEON.util.Dom.removeClass(control, "xforms-upload-state-empty");
+                ORBEON.util.Dom.addClass(control, "xforms-upload-state-file");
 
                 // Clear upload input by replacing the control
                 ORBEON.util.Dom.clearUploadControl(control);
@@ -1491,11 +1491,11 @@ ORBEON.xforms.Controls = {
             var checkboxInput = checkboxInputs[checkboxInputIndex];
             var parentSpan = checkboxInput.parentNode.parentNode;
             if (checkboxInput.checked) {
-                ORBEON.util.Dom.addClass(parentSpan, "xforms-selected")
-                ORBEON.util.Dom.removeClass(parentSpan, "xforms-deselected")
+                ORBEON.util.Dom.addClass(parentSpan, "xforms-selected");
+                ORBEON.util.Dom.removeClass(parentSpan, "xforms-deselected");
             } else {
-                ORBEON.util.Dom.addClass(parentSpan, "xforms-deselected")
-                ORBEON.util.Dom.removeClass(parentSpan, "xforms-selected")
+                ORBEON.util.Dom.addClass(parentSpan, "xforms-deselected");
+                ORBEON.util.Dom.removeClass(parentSpan, "xforms-selected");
             }
         }
     },
@@ -1608,7 +1608,7 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
     },
 
-    setValid: function(control, newValid, isRequiredEmpty) {
+    setValid: function(control, newValid) {
         // Update class xforms-invalid on the control
         var isValid;
         var isVisited = ORBEON.util.Dom.hasClass(control, "xforms-visited");
@@ -1627,8 +1627,8 @@ ORBEON.xforms.Controls = {
 
         // Update class on alert label
         var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
-        if (alertElement != null) { // Some controls don't have validity indicator
-            if (isValid && !isRequiredEmpty) {
+        if (alertElement != null) { // Some controls don't have an alert
+            if (isValid) {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-inactive");
@@ -2073,7 +2073,7 @@ ORBEON.xforms.Controls = {
             var widget = ORBEON.widgets[widgetClass];
             if (widget.extending != null && widget.appliesToControl(control)) {
                 return widget;
-                console.log(widgetClass);
+//                console.log(widgetClass);
             }
         }
     }
@@ -2188,7 +2188,7 @@ ORBEON.xforms.Events = {
                     // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
                     // DOMFocusOut, but it is hard to detect correctly
                     events.push(new ORBEON.xforms.Server.Event(null, currentFocusControlElement.id, null, null, "DOMFocusOut"));
-                    ORBEON.xforms.Server.fireEvents(events, false)
+                    ORBEON.xforms.Server.fireEvents(events, false);
                 }
 
                 // Handle DOMFocusIn
@@ -2198,7 +2198,7 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
 
                 // Fire events
-                ORBEON.xforms.Server.fireEvents(events, true)
+                ORBEON.xforms.Server.fireEvents(events, true);
             }
 
         } else {
@@ -2212,13 +2212,13 @@ ORBEON.xforms.Events = {
             if (targetControlElement != null) {
 
                 // Keep track of visited controls
-                if (! ORBEON.util.Dom.hasClass(targetControlElement, "xforms-visited")) {
+                if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-visited")) {
                     ORBEON.util.Dom.addClass(targetControlElement, "xforms-visited");
                     ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(ORBEON.xforms.Events._blurSetInvalidVisited, targetControlElement, true);
                 }
 
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
-                    // This is an event for an XForms control
+                    // This is an event for an XForms control which is not a dialog
 
                     // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
                     // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the
@@ -2236,8 +2236,8 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * Called for a given control (this) that has receieved a blur after the following Ajax response
-     * has been received.
+     * Called for a given control (this) that has received a blur after the following Ajax response
+     * has been received. Goal is to prevent flashing of alert information when the control becomes visited.
      */
     _blurSetInvalidVisited: function() {
         var control = this;
@@ -2255,7 +2255,7 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
                 // For upload controls, generate an xforms-select event when a file is selected
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "xforms-select");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
             } else {
                 // When we move out from a field, we don't receive the keyup events corresponding to keypress
                 // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
@@ -2301,7 +2301,7 @@ ORBEON.xforms.Events = {
                 // Fire change event
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null,
                         ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
             }
         }
     },
@@ -2353,7 +2353,7 @@ ORBEON.xforms.Events = {
                         new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change"),
                         new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate")
                     ];
-                    ORBEON.xforms.Server.fireEvents(events, false)
+                    ORBEON.xforms.Server.fireEvents(events, false);
                 }
             }
         }
@@ -2371,7 +2371,7 @@ ORBEON.xforms.Events = {
             // Incremental control: treat keypress as a value change event
             if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
             }
 
             // If value is required, add/remove xforms-required-empty appropriately
@@ -2520,7 +2520,7 @@ ORBEON.xforms.Events = {
                     // event for buttons.
                     ORBEON.xforms.Events.focus(event);
                     var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
-                    ORBEON.xforms.Server.fireEvents([event], false)
+                    ORBEON.xforms.Server.fireEvents([event], false);
 
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
@@ -2531,7 +2531,7 @@ ORBEON.xforms.Events = {
                 // Update classes right away to give user visual feedback
                 ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
 
             } else if (ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
                 // Click on calendar inside input field
@@ -2543,7 +2543,7 @@ ORBEON.xforms.Events = {
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
                 // Click on remove icon in upload control
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
                 // Click on menu item
 
@@ -2581,7 +2581,7 @@ ORBEON.xforms.Events = {
                 // Send value change to server
                 var itemValue = currentLevel[1];
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, itemValue, "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
                 // Close the menu
                 ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
@@ -2596,7 +2596,7 @@ ORBEON.xforms.Events = {
                 if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
                     var event = new ORBEON.xforms.Server.Event(null, control.id, null, null, "xforms-help");
-                    ORBEON.xforms.Server.fireEvents([event], false)
+                    ORBEON.xforms.Server.fireEvents([event], false);
 
                 } else {
                     // If the servers tells us there are no event handlers for xforms-help in the page,
@@ -2676,7 +2676,7 @@ ORBEON.xforms.Events = {
         var menu = userObject["menu"];
         var value = userObject["value"];
         var event = new ORBEON.xforms.Server.Event(null, menu.id, null, value, "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
     },
 
     /**
@@ -2687,7 +2687,7 @@ ORBEON.xforms.Events = {
         var dialogId = me;
         var dialog = ORBEON.util.Dom.getElementById(dialogId);
         var event = new ORBEON.xforms.Server.Event(null, dialog.id, null, null, "xxforms-dialog-close");
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
     },
 
     /**
@@ -2839,7 +2839,7 @@ ORBEON.xforms.Events = {
             }
             if (!foundDropDownParent) {
                 var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
-                ORBEON.xforms.Server.fireEvents([event], false)
+                ORBEON.xforms.Server.fireEvents([event], false);
             }
         }
     },
@@ -2854,8 +2854,7 @@ ORBEON.xforms.Events = {
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Utils.getProperty(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY)) {
             var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
-            ORBEON.xforms.Server.fireEvents([event], false)
-
+            ORBEON.xforms.Server.fireEvents([event], false);
         }
     },
 
@@ -2882,7 +2881,7 @@ ORBEON.xforms.Events = {
                 form.appendChild(heartBeatDiv);
             }
             var event = new ORBEON.xforms.Server.Event(null, heartBeatDiv.id, null, null, "xxforms-session-heartbeat");
-            ORBEON.xforms.Server.fireEvents([event], false)
+            ORBEON.xforms.Server.fireEvents([event], false);
         }
     },
 
@@ -2925,7 +2924,7 @@ ORBEON.widgets.JSCalendar = function() {
             inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
             var element = inputField.parentNode;
             var event = new ORBEON.xforms.Server.Event(null, element.id, null, ORBEON.xforms.Controls.getCurrentValue(element), "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false)
+            ORBEON.xforms.Server.fireEvents([event], false);
         }
     }
 
@@ -3036,7 +3035,7 @@ ORBEON.widgets.YUICalendar = function() {
         var jsDate = yuiCalendar.getSelectedDates()[0];
         inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
         var event = new ORBEON.xforms.Server.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
         closeCalendar();
     }
 
@@ -3680,7 +3679,7 @@ ORBEON.xforms.Init = {
                         //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
                     } else {
                         var event = new ORBEON.xforms.Server.Event(form, null, null, null, "xxforms-all-events-required");
-                        ORBEON.xforms.Server.fireEvents([event], false)
+                        ORBEON.xforms.Server.fireEvents([event], false);
                     }
                 }
             }
@@ -3797,7 +3796,7 @@ ORBEON.xforms.Init = {
                     var currentValue = node.data.value;
                     for (var valueIndex = 0; valueIndex < values.length; valueIndex++) {
                         if (currentValue == values[valueIndex]) {
-                            node.check()
+                            node.check();
                             break;
                         }
                     }
@@ -3866,7 +3865,7 @@ ORBEON.xforms.Init = {
                 var subMenuItem = new YAHOO.widget.MenuItem(name);
                 subMenu.addItem(subMenuItem);
                 // Add sub-sub menu
-                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem)
+                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem);
             }
             menuItem.cfg.setProperty("submenu", subMenu);
         }
@@ -4624,7 +4623,7 @@ ORBEON.xforms.Server = {
                                                     newTemplateNode = templateNodes[templateNodeIndex];
                                                 } else {
                                                     // Clone again
-                                                    newTemplateNode = templateNodes[templateNodeIndex].cloneNode(true)
+                                                    newTemplateNode = templateNodes[templateNodeIndex].cloneNode(true);
                                                 }
                                                 if (newTemplateNode.nodeType == ELEMENT_TYPE) {
                                                     // Decrement nestedRepeatLevel when we we exit a nested repeat
@@ -4861,6 +4860,11 @@ ORBEON.xforms.Server = {
                                                 itemIndex++;
                                             }
                                         }
+
+                                        // Call custom listener if any (temporary until we have a good API for custom components)
+                                        if (typeof xformsItemsetUpdatedListener != "undefined") {
+                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
+                                        }
                                     }
                                 }
                             }
@@ -4953,9 +4957,9 @@ ORBEON.xforms.Server = {
 
                                         // Update input control type
                                         if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                            var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date"
-                                            var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time"
-                                            var isDateTimeType = type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime"
+                                            var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date";
+                                            var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time";
+                                            var isDateTimeType = type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime";
                                             //var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean"
                                             //var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string"
 
@@ -4984,7 +4988,7 @@ ORBEON.xforms.Server = {
                                                 ORBEON.util.Dom.addClass(firstInput, "xforms-type-date");
                                                 secondInput = document.createElement("input");
                                                 secondInput.setAttribute("type", "text");
-                                                secondInput.className = "xforms-input-input xforms-type-time"
+                                                secondInput.className = "xforms-input-input xforms-type-time";
                                                 documentElement.appendChild(secondInput);
                                             }
                                         }
@@ -5046,7 +5050,7 @@ ORBEON.xforms.Server = {
                                             ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                         // Store validity, label, hint, help in element
                                         var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
-                                        ORBEON.xforms.Controls.setValid(documentElement, newValid, isRequiredEmpty);
+                                        ORBEON.xforms.Controls.setValid(documentElement, newValid);
 
                                         // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
@@ -5337,7 +5341,7 @@ ORBEON.xforms.Server = {
                                         var callback = {
                                             upload: ORBEON.xforms.Server.handleUploadResponse,
                                             failure: ORBEON.xforms.Server.handleFailure
-                                        }
+                                        };
                                         YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback);
                                     }
                                     ORBEON.xforms.Globals.formServerEvents[formID].value = "";
@@ -5425,24 +5429,24 @@ ORBEON.xforms.Server = {
 
                         // Call custom itemset listener if any (temporary until we have a good API for custom components)
                         // NOTE: We call this here so that xxforms:script has an opportunity to run first
-                        if (typeof xformsItemsetUpdatedListener != "undefined") {
-                            for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
-                                // Change values in an itemset
-                                if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
-                                    var itemsetsElement = actionElement.childNodes[actionIndex];
-                                    for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
-                                        if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
-                                            var itemsetElement = itemsetsElement.childNodes[j];
-                                            var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
-                                            var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
-
-                                            // Call custom listener
-                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+//                        if (typeof xformsItemsetUpdatedListener != "undefined") {
+//                            for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+//                                // Change values in an itemset
+//                                if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+//                                    var itemsetsElement = actionElement.childNodes[actionIndex];
+//                                    for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
+//                                        if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+//                                            var itemsetElement = itemsetsElement.childNodes[j];
+//                                            var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+//                                            var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
+//
+//                                            // Call custom listener
+//                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
                     }
                 }
 
@@ -5547,14 +5551,14 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         YAHOO.util.Dom.setStyle(proxy, "visibility", "");
         var motion = new YAHOO.util.Motion(
-                proxy, {
-            points: {
-                to: YAHOO.util.Dom.getXY(srcElement)
-            }
-        },
-                0.2,
-                YAHOO.util.Easing.easeOut
-                )
+            proxy, {
+                points: {
+                    to: YAHOO.util.Dom.getXY(srcElement)
+                }
+            },
+            0.2,
+            YAHOO.util.Easing.easeOut
+        );
         var proxyid = proxy.id;
         var thisid = this.id;
 
@@ -5587,7 +5591,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         }
         var event = new ORBEON.xforms.Server.Event(null, draggableRepeatDiv.id, null, null, "xxforms-dnd", null, null, null, null, null,
                 ["dnd-start", this.startPosition, "dnd-end", this.endPosition]);
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
 
     }
 });
@@ -6113,15 +6117,14 @@ ORBEON.xforms.Offline = {
                 if (mips.constraint) {
                     var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
                     if (constraint != null)
-                    isValid = isValid && constraint;
+                        isValid = isValid && constraint;
                 }
 
                 // Required
-                var requiredButEmpty;
                 if (mips.required) {
                     var required = evaluateXPath(mips.required.value, xpathContext);
                     if (required != null)
-                    requiredButEmpty = controlValue == "" && required;
+                        isValid &= !(controlValue == "" && required);
                 }
 
                 // Relevant
@@ -6147,7 +6150,7 @@ ORBEON.xforms.Offline = {
                     }
                 }
 
-                ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
+                ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false");
             }
         });
     },
@@ -6517,7 +6520,7 @@ function xformsValueChanged(target, other) {
         var incremental = other == null && ORBEON.util.Dom.hasClass(target, "xforms-incremental");
         var otherID = YAHOO.lang.isObject(other) ? other.id : null;
         var event = new ORBEON.xforms.Server.Event(null, target.id, otherID, newValue, "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], incremental)
+        ORBEON.xforms.Server.fireEvents([event], incremental);
     }
     return valueChanged;
 }
@@ -6529,7 +6532,7 @@ function xformsHandleClick(event) {
     if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-trigger"))
             && !ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
         var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
-        ORBEON.xforms.Server.fireEvents([event], false)
+        ORBEON.xforms.Server.fireEvents([event], false);
     }
     return false;
 }
@@ -6669,7 +6672,7 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
         if (childNode.nodeType == ELEMENT_TYPE) {
             if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
             xformsAddSuffixToIds(childNode, idSuffix, repeatDepth);
-            if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++
+            if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
         }
     }
 }

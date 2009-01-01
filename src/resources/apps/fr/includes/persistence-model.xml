@@ -365,8 +365,12 @@
 
     <!-- Submission to create/update the XML form -->
     <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here -->
+    <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
+         enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
+         code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
+         form instance is created. -->
     <xforms:submission id="fr-create-update-submission"
-            validate="true" method="put"
+            validate="false" method="put"
             ref="event('holder')" xxforms:ensure-uploads="false"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
             replace="text" target="instance('fr-create-update-submission-response')">

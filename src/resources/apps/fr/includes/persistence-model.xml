@@ -64,7 +64,7 @@
         <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'container'">
             <!-- Case where we get the username and roles from the container -->
             <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-remote-user()"/>
-            <xforms:message level="xxforms:log-info">Roles: <xforms:output value="xxforms:property('oxf.fr.authentication.container.roles')"/></xforms:message>
+            <xforms:message level="xxforms:log-debug">Roles: <xforms:output value="xxforms:property('oxf.fr.authentication.container.roles')"/></xforms:message>
             <xforms:action xxforms:iterate="tokenize(xxforms:property('oxf.fr.authentication.container.roles'), '\s')">
                 <xxforms:variable name="role" select="."/>
                 <xforms:action if="xxforms:is-user-in-role($role)">
@@ -82,12 +82,12 @@
         <xxforms:variable name="source-form" select="xxforms:get-request-attribute('fr-form-definition')"/>
         <xforms:action if="exists($source-form)">
             <!-- Got it from the request -->
-            <xforms:message level="xxforms:log-info">Got source form from request.</xforms:message>
+            <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>
             <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
         </xforms:action>
         <xforms:action if="not(exists($source-form))">
             <!--  Try submission -->
-            <xforms:message level="xxforms:log-info">Could not get source form from request. Trying submission instead.</xforms:message>
+            <xforms:message level="xxforms:log-debug">Could not get source form from request. Trying submission instead.</xforms:message>
             <xforms:send submission="get-source-form-submission"/>
         </xforms:action>
 
@@ -253,7 +253,7 @@
                               select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
                                         or @id = $attachment-controls/@bind]"/>
 
-            <!--<xforms:message level="xxforms:log-error">-->
+            <!--<xforms:message level="xxforms:log-debug">-->
                 <!--xxx 0-->
                 <!--<xforms:output value="count($attachment-controls)"/>-->
             <!--</xforms:message>-->
@@ -291,7 +291,7 @@
                     <xxforms:variable name="binds" select="$bind/ancestor-or-self::xforms:bind"/>
                     <xxforms:variable name="expression" select="string-join($binds/@nodeset, '/')"/>
 
-                    <!--<xforms:message level="xxforms:log-error">-->
+                    <!--<xforms:message level="xxforms:log-debug">-->
                         <!--xxx <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
                         <!--xxx <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
                         <!--xxx <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
@@ -317,7 +317,7 @@
                                                         $document, '/', $new-filename)"/>
 
 
-                            <!--<xforms:message level="xxforms:log-error">-->
+                            <!--<xforms:message level="xxforms:log-debug">-->
                                 <!--<xforms:output value="$upload-extension"/> - -->
                                 <!--<xforms:output value="$upload-has-extension"/> - -->
                                 <!--<xforms:output value="$new-id"/> - -->
@@ -621,8 +621,8 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-error">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
-        <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
@@ -643,8 +643,8 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-error">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
-        <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"

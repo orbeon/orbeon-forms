@@ -45,7 +45,7 @@
                     <!--<xforms:insert context="/" origin="xxforms:html-to-xml(event('response-body'))"/>-->
                     <xforms:delete while="/*/*" nodeset="/*/*"/>
                     <xforms:setvalue ref="/*" value="event('response-body')"/>
-                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                     <!-- TODO: Propagate error to caller -->
                 </xforms:action>
             </xforms:submission>

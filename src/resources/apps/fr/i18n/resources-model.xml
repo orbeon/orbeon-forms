@@ -62,12 +62,12 @@
         <!-- Use language provided as a request parameter if it exists -->
         <xforms:action if="$lang = ''">
             <xforms:setvalue ref="$lang" value="xxforms:get-request-parameter('fr-language')"/>
-            <xforms:message if="$lang != ''" level="xxforms:log-info">Setting language from request: <xforms:output value="$lang"/></xforms:message>
+            <xforms:message if="$lang != ''" level="xxforms:log-debug">Setting language from request: <xforms:output value="$lang"/></xforms:message>
         </xforms:action>
         <!-- Else use language from session if it exists -->
         <xforms:action if="$lang = ''">
             <xforms:setvalue ref="$lang" value="xxforms:get-session-attribute('fr-language')"/>
-            <xforms:message if="$lang != ''" level="xxforms:log-info">Setting language from session: <xforms:output value="$lang"/></xforms:message>
+            <xforms:message if="$lang != ''" level="xxforms:log-debug">Setting language from session: <xforms:output value="$lang"/></xforms:message>
         </xforms:action>
         <!-- Else use default language in resources if no language was found or if language found does not exist in resources -->
         <xforms:action if="$lang = '' or not(xs:string($lang) = xxforms:instance('fr-form-resources')/resource/@xml:lang)">
@@ -75,7 +75,7 @@
             <xxforms:variable name="default-language" select="instance('fr-default-language-instance')" as="xs:string"/>
             <!-- Try first to get default language, or just take first language if default doesn't exist -->
             <xforms:setvalue ref="$lang" value="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $default-language], resource[1])[1]/@xml:lang"/>
-            <xforms:message level="xxforms:log-info">Setting language using default: <xforms:output value="$lang"/></xforms:message>
+            <xforms:message level="xxforms:log-debug">Setting language using default: <xforms:output value="$lang"/></xforms:message>
         </xforms:action>
 
         <!-- Update resources -->
@@ -97,7 +97,7 @@
     <xforms:action ev:event="xforms-model-construct-done">
         <xforms:setvalue ref="instance('fr-default-language-instance')"
                          value="xxforms:property(string-join(('oxf.fr.default-language', xxforms:instance('fr-parameters-instance')/app, xxforms:instance('fr-parameters-instance')/form), '.'))"/>
-        <xforms:message level="xxforms:log-info">Getting default language: <xforms:output value="instance('fr-default-language-instance')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Getting default language: <xforms:output value="instance('fr-default-language-instance')"/></xforms:message>
         <xforms:send submission="fr-get-fr-resources"/>
     </xforms:action>
 

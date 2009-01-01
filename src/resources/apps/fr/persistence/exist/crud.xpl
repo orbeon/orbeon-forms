@@ -96,7 +96,7 @@
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete while="/*/*" nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
-                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
@@ -116,7 +116,7 @@
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete while="/*/*" nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
-                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
@@ -136,7 +136,7 @@
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete while="/*/*" nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
-                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>

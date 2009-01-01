@@ -160,7 +160,7 @@
                 <!-- TODO: in this case, nothing must be shown! -->
             </xforms:action>
 
-            <xforms:message level="xxforms:log-error">
+            <xforms:message level="xxforms:log-debug">
                 ORBEON ROLES DEBUG INFORMATION:
                 Resulting permissions: <xforms:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
             </xforms:message>

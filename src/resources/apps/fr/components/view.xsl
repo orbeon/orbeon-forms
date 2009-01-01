@@ -233,7 +233,7 @@
                             <!-- Buttons and status section -->
                             <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                             <xhtml:div class="yui-g fr-buttons-block">
-                                <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+                                <xforms:group id="fr-buttons-group" model="fr-persistence-model">
 
                                     <!-- Status icons for detail page -->
                                     <xsl:if test="$is-detail">

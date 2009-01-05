@@ -5012,6 +5012,11 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // Other control just have a new value (and optional display value)
                                                 ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue);
+
+                                                // Call custom listener if any (temporary until we have a good API for custom components)
+                                                if (typeof xformsValueChangedListener != "undefined") {
+                                                    xformsValueChangedListener(controlId, newControlValue);
+                                                }
                                             }
                                             // Mark field field as visited when its value changes, unless the new value is given to us when the field becomes relevant
                                             // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed

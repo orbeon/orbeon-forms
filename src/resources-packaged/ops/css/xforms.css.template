@@ -254,6 +254,15 @@ html body .xforms-form .xforms-repeat-template {
 }
 
 /**
+ * On IE6 and IE7, if the hidden case contains a table which has visibility: hidden, position: absolute, then the
+ * border of the table can "show through" the hidden element. To avoid this, we try to override any border than might
+ * have been set on a table inside a deselected element.
+ */
+body #xforms-form .xforms-case-deselected tr td {
+    border: none;
+}
+
+/**
  * Using visibility: hidden; position: absolute; on table rows and cells causes display problems on IE. So here we
  * have to use display: none. This means that some controls (i.e. slider) won't work if they are in a cell which
  * is initially hidden when the page is loaded.

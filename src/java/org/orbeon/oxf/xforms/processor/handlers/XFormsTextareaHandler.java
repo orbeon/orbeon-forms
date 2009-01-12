@@ -31,6 +31,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
+    // TODO: make these AVTs like in xforms:input
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "rows", "cols" };
 
     public XFormsTextareaHandler() {

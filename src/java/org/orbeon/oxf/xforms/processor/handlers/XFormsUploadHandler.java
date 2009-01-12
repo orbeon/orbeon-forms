@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -29,8 +28,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * Handle xforms:upload.
  */
 public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
-
-    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size" };
 
     public XFormsUploadHandler() {
         super(false);
@@ -81,9 +78,6 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                 // disable pasting in the file. See http://tinyurl.com/6dcd6a
                 reusableAttributes.addAttribute("", "unselectable", "unselectable", ContentHandlerHelper.CDATA, "on");
                 // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
-
-                // Copy special attributes in xxforms namespace
-                copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, reusableAttributes);

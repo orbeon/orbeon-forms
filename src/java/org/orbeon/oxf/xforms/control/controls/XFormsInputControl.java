@@ -19,9 +19,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,16 +33,61 @@ import java.util.Map;
  */
 public class XFormsInputControl extends XFormsValueControl {
 
-    // Optional display format
-    private String format;
+    // TODO: would be nice to make extension attributes generic instead of hardcoded
+//    private static final String[] XXFORMS_ATTRIBUTES = { "size", "maxlength", "autocomplete" };
+
+    private boolean isSizeEvaluated;
+    private boolean isMaxlengthEvaluated;
+    private boolean isAutocompleteEvaluated;
+
+    private String size;
+    private String maxlength;
+    private String autocomplete;
 
     public XFormsInputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
-        this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
     }
 
-    public String getFormat() {
-        return format;
+    protected void evaluate(PipelineContext pipelineContext) {
+        super.evaluate(pipelineContext);
+
+        getSize(pipelineContext);
+        getMaxlength(pipelineContext);
+        getAutocomplete(pipelineContext);
+    }
+
+    public void markDirty() {
+        super.markDirty();
+        isSizeEvaluated = false;
+        isMaxlengthEvaluated = false;
+        isAutocompleteEvaluated = false;
+    }
+
+    public String getSize(PipelineContext pipelineContext) {
+        if (!isSizeEvaluated) {
+            final String attributeValue = getControlElement().attributeValue(XFormsConstants.XXFORMS_SIZE_QNAME);
+            size = (attributeValue == null) ? null : evaluateAvt(pipelineContext, attributeValue);
+            isSizeEvaluated = true;
+        }
+        return size;
+    }
+
+    public String getMaxlength(PipelineContext pipelineContext) {
+        if (!isMaxlengthEvaluated) {
+            final String attributeValue = getControlElement().attributeValue(XFormsConstants.XXFORMS_MAXLENGTH_QNAME);
+            maxlength = (attributeValue == null) ? null : evaluateAvt(pipelineContext, attributeValue);
+            isMaxlengthEvaluated = true;
+        }
+        return maxlength;
+    }
+
+    public String getAutocomplete(PipelineContext pipelineContext) {
+        if (!isAutocompleteEvaluated) {
+            final String attributeValue = getControlElement().attributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
+            autocomplete = (attributeValue == null) ? null : evaluateAvt(pipelineContext, attributeValue);
+            isAutocompleteEvaluated = true;
+        }
+        return autocomplete;
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
@@ -178,7 +225,7 @@ public class XFormsInputControl extends XFormsValueControl {
      * @return                  formatted value
      */
     public String getReadonlyValueUseFormat(PipelineContext pipelineContext) {
-        return getValueUseFormat(pipelineContext, format);
+        return getValueUseFormat(pipelineContext, getControlElement().attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE)));
     }
 
     private String format(PipelineContext pipelineContext, String typeName, String formatName) {
@@ -225,5 +272,75 @@ public class XFormsInputControl extends XFormsValueControl {
         } else {
             return null;
         }
+    }
+
+    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+        final XFormsInputControl inputControlInfo1 = (XFormsInputControl) other;
+        final XFormsInputControl inputControlInfo2 = this;
+
+        boolean added = false;
+//        for (int i = 0; i < XXFORMS_ATTRIBUTES.length; i++) {
+//            final String xxformsAttribute = XXFORMS_ATTRIBUTES[i];
+//
+//            final String value1 = (inputControlInfo1 == null) ? null : inputControlInfo1.getExtensionAttributeValue(pipelineContext, xxformsAttribute);
+//            final String value2 = inputControlInfo2.getExtensionAttributeValue(pipelineContext, xxformsAttribute);
+//
+//            if (!XFormsUtils.compareStrings(value1, value2)) {
+//                final String attributeValue = value2 != null ? value2 : "";
+//                added |= addAttributeIfNeeded(attributesImpl, xxformsAttribute, attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+//            }
+//        }
+
+        {
+            // size
+            final String sizeValue1 = (inputControlInfo1 == null) ? null : inputControlInfo1.getSize(pipelineContext);
+            final String sizeValue2 = inputControlInfo2.getSize(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
+                final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // maxlength
+            final String maxlengthValue1 = (inputControlInfo1 == null) ? null : inputControlInfo1.getMaxlength(pipelineContext);
+            final String maxlengthValue2 = inputControlInfo2.getMaxlength(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(maxlengthValue1, maxlengthValue2)) {
+                final String attributeValue = maxlengthValue2 != null ? maxlengthValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "maxlength", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // autocomplete
+            final String autocompleteValue1 = (inputControlInfo1 == null) ? null : inputControlInfo1.getAutocomplete(pipelineContext);
+            final String autocompleteValue2 = inputControlInfo2.getAutocomplete(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(autocompleteValue1, autocompleteValue2)) {
+                final String attributeValue = autocompleteValue2 != null ? autocompleteValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "autocomplete", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+
+        return added;
+    }
+
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
+        if (obj == null || !(obj instanceof XFormsInputControl))
+            return false;
+
+        if (this == obj)
+            return true;
+
+        final XFormsInputControl other = (XFormsInputControl) obj;
+
+        if (!XFormsUtils.compareStrings(getSize(pipelineContext), other.getSize(pipelineContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getMaxlength(pipelineContext), other.getMaxlength(pipelineContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getAutocomplete(pipelineContext), other.getAutocomplete(pipelineContext)))
+            return false;
+
+        return super.equalsExternal(pipelineContext, obj);
     }
 }

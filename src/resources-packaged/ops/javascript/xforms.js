@@ -311,7 +311,7 @@ ORBEON.util.Dom = {
         var result = document.getElementById(controlId);
         if (result && (result.id != controlId) && document.all) {
             result = null;
-            documentAll = document.all[controlId];
+            var documentAll = document.all[controlId];
             if (documentAll) {
                 if (documentAll.length) {
                     for (var i = 0; i < documentAll.length; i++) {
@@ -494,7 +494,7 @@ ORBEON.util.String = {
         text = ORBEON.util.String.replace(text, '&', '&amp;');
         return ORBEON.util.String.replace(text, '<', '&lt;');
     }
-}
+};
 
 /**
  * Utility functions dealing with dates and times.
@@ -842,7 +842,7 @@ ORBEON.util.DateTime = {
         }
         return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
     }
-}
+};
 
 /**
  * Utility methods that don't in any other category
@@ -926,7 +926,7 @@ ORBEON.util.Utils = {
         }
             return count;
     }
-}
+};
 
 /**
  * This object contains function designed to be called from JavaScript code
@@ -1263,36 +1263,33 @@ ORBEON.xforms.Controls = {
      *
      * @param control           HTML element for the control we want to update
      * @param newControlValue   New value
-     * @param displayValue      Optional display value when different from newControlValue
-     * @param uploadState       Optional
-     * @param uploadFilename    Optional
-     * @param uploadMediatype   Optional
-     * @param uploadSize        Optional
+     * @param attribute1        Optional
+     * @param attribute2        Optional
+     * @param attribute3        Optional
+     * @param attribute4        Optional
      */
-    setCurrentValue: function(control, newControlValue, displayValue, previousServerValue, uploadState, uploadFilename, uploadMediatype, uploadSize) {
+    setCurrentValue: function(control, newControlValue, previousServerValue, attribute1, attribute2, attribute3, attribute4) {
         var isStaticReadonly = ORBEON.util.Dom.hasClass(control, "xforms-static");
         if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
             // XForms output with xxforms:download appearance
-            var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
             var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
-            if (newOutputControlValue == "") {
+            if (newControlValue == "") {
                 anchor.setAttribute("href", "#");
                 YAHOO.util.Dom.addClass(anchor, "xforms-readonly");
             } else {
-                anchor.setAttribute("href", newOutputControlValue);
+                anchor.setAttribute("href", newControlValue);
                 YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
             }
 
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
-            var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                image.src = newOutputControlValue;
+                image.src = newControlValue;
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-                control.innerHTML = newOutputControlValue;
+                control.innerHTML = newControlValue;
             } else {
-                ORBEON.util.Dom.setStringValue(control, newOutputControlValue);
+                ORBEON.util.Dom.setStringValue(control, newControlValue);
             }
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:
@@ -1373,7 +1370,7 @@ ORBEON.xforms.Controls = {
                 inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-            // XForms input
+            // Regular XForms input (not boolean, date, time or dateTime)
             var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
@@ -1382,6 +1379,26 @@ ORBEON.xforms.Controls = {
             }
             if (inputField.value != newControlValue)
                 inputField.value = newControlValue;
+
+            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
+            if (attribute1 != null) {
+                if (attribute1 == "")
+                    inputField.removeAttribute("size");
+                else
+                    inputField.size = attribute1;
+            }
+            if (attribute2 != null) {
+                if (attribute2 == "")
+                    inputField.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
+                else
+                    inputField.maxLength = attribute2;// setAttribute() doesn't work with IE 6
+            }
+            if (attribute3 != null) {
+                if (attribute2 == "")
+                    inputField.removeAttribute("autocomplete");
+                else
+                    inputField.autocomplete = attribute3;
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
@@ -1431,7 +1448,7 @@ ORBEON.xforms.Controls = {
             // Make sure the tree is open enough so the node with the new value is visible
             var yuiTree = ORBEON.xforms.Globals.treeYui[control.id];
             ORBEON.xforms.Controls.treeOpenSelectedVisible(yuiTree, [newControlValue]);
-                    // Deselect old value, select new value
+            // Deselect old value, select new value
             var oldNode = yuiTree.getNodeByProperty("value", control.value);
             var newNode = yuiTree.getNodeByProperty("value", newControlValue);
             if (oldNode != null)
@@ -1450,25 +1467,25 @@ ORBEON.xforms.Controls = {
             var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
             var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
             // Set values in DOM
-            if (uploadState == "empty") {
+            if (attribute1 == "empty") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file");
                 ORBEON.util.Dom.addClass(control, "xforms-upload-state-empty");
             }
-            if (uploadState == "file") {
+            if (attribute1 == "file") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-empty");
                 ORBEON.util.Dom.addClass(control, "xforms-upload-state-file");
 
                 // Clear upload input by replacing the control
                 ORBEON.util.Dom.clearUploadControl(control);
             }
-            if (uploadFilename != null)
-                ORBEON.util.Dom.setStringValue(fileNameSpan, uploadFilename);
-            if (uploadMediatype != null)
-                ORBEON.util.Dom.setStringValue(mediatypeSpan, uploadMediatype);
-            if (uploadSize != null) {
-                var displaySize = uploadSize > 1024 * 1024 ? Math.round(uploadSize / (1024 * 1024) * 10) / 10 + " MB"
-                        : uploadSize > 1024 ? Math.round(uploadSize / 1024 * 10) / 10 + " KB"
-                        : uploadSize + " B";
+            if (attribute2 != null)
+                ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
+            if (attribute3 != null)
+                ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
+            if (attribute4 != null) {
+                var displaySize = attribute4 > 1024 * 1024 ? Math.round(attribute4 / (1024 * 1024) * 10) / 10 + " MB"
+                        : attribute4 > 1024 ? Math.round(attribute4 / 1024 * 10) / 10 + " KB"
+                        : attribute4 + " B";
                 ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
             }
         } else if (typeof(control.value) == "string") {
@@ -2908,7 +2925,7 @@ ORBEON.widgets.Base = function() {
         click: function(event, target) {},
         blur: function(event, target) {},
         keydown: function(event, target) {}
-    }
+    };
 }();
 
 ORBEON.widgets.JSCalendar = function() {
@@ -2976,7 +2993,7 @@ ORBEON.widgets.JSCalendar = function() {
             // Close calendar when user starts typing
             calendar.hide();
         }
-    }
+    };
 }();
 
 ORBEON.widgets.YUICalendar = function() {
@@ -3140,7 +3157,7 @@ ORBEON.widgets.YUICalendar = function() {
             // Close calendar when user starts typing
             closeCalendar();
         }
-    }
+    };
 }();
 
 ORBEON.widgets.RTE = function() {
@@ -4891,7 +4908,6 @@ ORBEON.xforms.Server = {
                                         var relevant = ORBEON.util.Dom.getAttribute(controlElement, "relevant");
                                         var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                         var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
-                                        var displayValue = ORBEON.util.Dom.getAttribute(controlElement, "display-value");
 
                                         var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
@@ -5000,7 +5016,7 @@ ORBEON.xforms.Server = {
                                         // Update value
                                         if (isControl) {
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
-                                                // Additional parameters for upload control
+                                                // Additional attributes for xforms:upload
                                                 // <xxforms:control id="xforms-control-id"
                                                 //    state="empty|file"
                                                 //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
@@ -5008,16 +5024,23 @@ ORBEON.xforms.Server = {
                                                 var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
                                                 var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue, state, filename, mediatype, size);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue, state, filename, mediatype, size);
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                                // Additional attributes for xforms:input
+                                                var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                                var maxlength = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
+                                                var autocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue, size, maxlength, autocomplete);
                                             } else {
-                                                // Other control just have a new value (and optional display value)
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue);
-
-                                                // Call custom listener if any (temporary until we have a good API for custom components)
-                                                if (typeof xformsValueChangedListener != "undefined") {
-                                                    xformsValueChangedListener(controlId, newControlValue);
-                                                }
+                                                // Other control just have a new value
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue);
                                             }
+
+                                            // Call custom listener if any (temporary until we have a good API for custom components)
+                                            if (typeof xformsValueChangedListener != "undefined") {
+                                                xformsValueChangedListener(controlId, newControlValue);
+                                            }
+
                                             // Mark field field as visited when its value changes, unless the new value is given to us when the field becomes relevant
                                             // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed
                                             // by handling this on the server-side with custom MIPS.

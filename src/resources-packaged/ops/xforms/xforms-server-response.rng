@@ -57,30 +57,65 @@
                                         <optional>
                                             <attribute name="help"/>
                                         </optional>
-                                        <optional>
-                                            <attribute name="mediatype"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="state">
-                                                <choice>
-                                                    <value>empty</value>
-                                                    <value>file</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="size">
+                                        <choice>
+                                            <!-- Optional attributes for xforms:output -->
+                                            <group>
                                                 <optional>
-                                                    <data type="nonNegativeInteger"/>
+                                                    <attribute name="mediatype"/>
                                                 </optional>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="filename"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="display-value"/>
-                                        </optional>
+                                            </group>
+                                            <!-- Optional attributes for xforms:upload -->
+                                            <group>
+                                                <optional>
+                                                    <attribute name="mediatype"/>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="state">
+                                                        <choice>
+                                                            <value>empty</value>
+                                                            <value>file</value>
+                                                        </choice>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="size">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="filename"/>
+                                                </optional>
+                                            </group>
+                                            <!-- Optional attributes for xforms:input -->
+                                            <group>
+                                                <optional>
+                                                    <attribute name="size">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="maxlength">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="autocomplete">
+                                                        <choice>
+                                                            <value>on</value>
+                                                            <value>off</value>
+                                                        </choice>
+                                                    </attribute>
+                                                </optional>
+                                            </group>
+                                            <!-- Other controls -->
+                                            <empty/>
+                                        </choice>
                                         <ref name="model-item-properties"/>
                                         <optional>
                                             <attribute name="static">

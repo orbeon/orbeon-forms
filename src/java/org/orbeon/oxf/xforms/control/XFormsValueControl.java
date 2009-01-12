@@ -70,6 +70,27 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     /**
+     * Evaluate an attribute of the control as an AVT.
+     *
+     * @param pipelineContext   current pipeline contextStack
+     * @param avt               value of the attribute
+     * @return                  value of the AVT or null if cannot be computed
+     */
+    protected String evaluateAvt(PipelineContext pipelineContext, String avt) {
+        final XFormsContextStack contextStack = getContextStack();
+        contextStack.setBinding(this);
+        if (getBoundNode() == null) {
+            // TODO: in the future we should be able to try evaluating anyway
+            return null;
+        } else {
+            final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
+            return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(),
+                        bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        contextStack.getFunctionContext(), prefixToURIMap, getLocationData(), avt);
+        }
+    }
+
+    /**
      * Notify the control that its value has changed due to external user interaction. The value passed is a value as
      * understood by the UI layer.
      *

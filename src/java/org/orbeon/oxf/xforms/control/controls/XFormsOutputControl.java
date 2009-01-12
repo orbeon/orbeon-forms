@@ -22,8 +22,10 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.List;
 
@@ -234,6 +236,23 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Provide default for other types
             return null;
         }
+    }
+
+    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+        final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) other;
+        final XFormsOutputControl outputControlInfo2 = this;
+
+        // Mediatype
+        final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
+        final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
+
+        boolean added = false;
+        if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
+            final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
+            added |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+        }
+
+        return added;
     }
 
     public Object clone() {

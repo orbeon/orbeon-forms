@@ -24,9 +24,11 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +76,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles) {
 
         final String oldValue = getValue(pipelineContext);
 
@@ -201,6 +203,56 @@ public class XFormsUploadControl extends XFormsValueControl {
         return super.equalsExternal(pipelineContext, obj);
     }
 
+    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+
+        final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) other;
+        final XFormsUploadControl uploadControlInfo2 = this;
+
+        boolean added = false;
+        {
+            // State
+            final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
+            final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
+                final String attributeValue = stateValue2 != null ? stateValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // Mediatype
+            final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
+            final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
+                final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // Filename
+            final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
+            final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
+                final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // Size
+            final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
+            final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
+                final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+
+        return added;
+    }
+
     public Object clone() {
         final XFormsUploadControl cloned = (XFormsUploadControl) super.clone();
         // NOTE: this keeps old refs to control/contextStack, is it ok?
@@ -209,6 +261,9 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 }
 
+/*
+ * File information used e.g. by upload and output controls.
+ */
 class FileInfo implements Cloneable {
 
     private XFormsValueControl control;
@@ -231,9 +286,9 @@ class FileInfo implements Cloneable {
         this.control = control;
         this.contextStack =  contextStack;
 
-        mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
-        filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
-        sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
+        mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_QNAME);
+        filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_QNAME);
+        sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_QNAME);
     }
 
     public void markDirty() {

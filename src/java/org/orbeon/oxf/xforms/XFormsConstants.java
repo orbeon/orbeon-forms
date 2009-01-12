@@ -135,12 +135,16 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
 
-    public static final String XFORMS_FILENAME_ELEMENT_NAME = "filename";
-    public static final QName XFORMS_FILENAME_ELEMENT_QNAME = new QName(XFORMS_FILENAME_ELEMENT_NAME, XFORMS_NAMESPACE);
-    public static final String XFORMS_MEDIATYPE_ELEMENT_NAME = "mediatype";
-    public static final QName XFORMS_MEDIATYPE_ELEMENT_QNAME = new QName(XFORMS_MEDIATYPE_ELEMENT_NAME, XFORMS_NAMESPACE);
-    public static final String XXFORMS_SIZE_ELEMENT_NAME = "size";
-    public static final QName XXFORMS_SIZE_ELEMENT_QNAME = new QName(XXFORMS_SIZE_ELEMENT_NAME, XXFORMS_NAMESPACE);
+    public static final String XFORMS_FILENAME_NAME = "filename";
+    public static final QName XFORMS_FILENAME_QNAME = new QName(XFORMS_FILENAME_NAME, XFORMS_NAMESPACE);
+    public static final String XFORMS_MEDIATYPE_NAME = "mediatype";
+    public static final QName XFORMS_MEDIATYPE_QNAME = new QName(XFORMS_MEDIATYPE_NAME, XFORMS_NAMESPACE);
+    public static final String XXFORMS_SIZE_NAME = "size";
+    public static final QName XXFORMS_SIZE_QNAME = new QName(XXFORMS_SIZE_NAME, XXFORMS_NAMESPACE);
+    public static final String XXFORMS_MAXLENGTH_NAME = "maxlength";
+    public static final QName XXFORMS_MAXLENGTH_QNAME = new QName(XXFORMS_MAXLENGTH_NAME, XXFORMS_NAMESPACE);
+    public static final String XXFORMS_AUTOCOMPLETE_NAME = "autocomplete";
+    public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName(XXFORMS_AUTOCOMPLETE_NAME, XXFORMS_NAMESPACE);
 
     public static final String VALID_ATTRIBUTE_NAME = "valid";
     public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";

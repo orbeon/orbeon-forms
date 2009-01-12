@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -35,8 +34,6 @@ import java.util.List;
  * Handle xforms:input.
  */
 public class XFormsInputHandler extends XFormsControlLifecyleHandler {
-
-    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength", "autocomplete" };
 
     public XFormsInputHandler() {
         super(false);
@@ -133,6 +130,19 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                     inputClasses.append(" xforms-type-");
                                     inputClasses.append(firstType);
                                 }
+
+                                // Output extension attributes
+                                final String size = inputControl.getSize(pipelineContext);
+                                if (size != null)
+                                    reusableAttributes.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, size);
+
+                                final String maxlength = inputControl.getMaxlength(pipelineContext);
+                                if (maxlength != null)
+                                    reusableAttributes.addAttribute("", "maxlength", "maxlength", ContentHandlerHelper.CDATA, maxlength);
+                                
+                                final String autocomplete = inputControl.getAutocomplete(pipelineContext);
+                                if (autocomplete != null)
+                                    reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, autocomplete);
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }
@@ -140,9 +150,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
                             handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
-
-                            // Copy special attributes in xxforms namespace
-                            copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
 
                             // Handle accessibility attributes
                             handleAccessibilityAttributes(attributes, reusableAttributes);

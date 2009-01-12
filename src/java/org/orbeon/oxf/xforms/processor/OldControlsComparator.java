@@ -180,65 +180,8 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 }
                             }
 
-                            if (xformsSingleNodeControl2 instanceof XFormsOutputControl) {
-                                // Output xforms:output-specific information
-                                final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsSingleNodeControl1;
-                                final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsSingleNodeControl2;
-
-                                // Mediatype
-                                final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
-                                final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
-
-                                if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
-                                    final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                                }
-                            } else if (xformsSingleNodeControl2 instanceof XFormsUploadControl) {
-                                // Output xforms:upload-specific information
-                                final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsSingleNodeControl1;
-                                final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsSingleNodeControl2;
-
-                                {
-                                    // State
-                                    final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
-                                    final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
-
-                                    if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
-                                        final String attributeValue = stateValue2 != null ? stateValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                                    }
-                                }
-                                {
-                                    // Mediatype
-                                    final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
-                                    final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
-
-                                    if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
-                                        final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                                    }
-                                }
-                                {
-                                    // Filename
-                                    final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
-                                    final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
-
-                                    if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
-                                        final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                                    }
-                                }
-                                {
-                                    // Size
-                                    final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
-                                    final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
-
-                                    if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
-                                        final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-                                    }
-                                }
-                            }
+                            // Output control-specific attributes
+                            doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewRepeatIteration);
 
                             // Get current value if possible for this control
                             // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the

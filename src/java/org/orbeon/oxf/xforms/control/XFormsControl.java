@@ -27,12 +27,14 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -582,6 +584,28 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             result = rawValue;
         }
         return result;
+    }
+
+    /**
+     * Add attributes differences for custom attributes.
+     *
+     * @param pipelineContext       current pipeline context
+     * @param originalControl       original control, possibly null
+     * @param attributesImpl        attributes to add to
+     * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
+     * @return                      true if any attribute was added, false otherwise
+     */
+    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+        return false;
+    }
+
+    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
+        if (isNewRepeatIteration && isDefaultValue) {
+            return false;
+        } else {
+            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
+            return true;
+        }
     }
 
     /**

@@ -66,9 +66,9 @@ public class XFormsResourceServer extends ProcessorImpl {
                     
                     // TODO: for Safari, try forcing application/octet-stream
                     // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
-                    if (resource.getContentType() != null)
-                        response.setContentType(resource.getContentType());
-                    else
+//                    if (resource.getContentType() != null)
+//                        response.setContentType(resource.getContentType());
+//                    else
                         response.setContentType("application/octet-stream");
 
                     // File name visible by the user
@@ -87,9 +87,12 @@ public class XFormsResourceServer extends ProcessorImpl {
 
                     // Copy stream out
                     InputStream is = null;
+                    OutputStream os = null;
                     try {
                         is = URLFactory.createURL(resource.getURI()).openStream();
-                        NetUtils.copyStream(is, response.getOutputStream());
+                        os = response.getOutputStream();
+                        NetUtils.copyStream(is, os);
+                        os.flush();
                     } catch (Exception e) {
                         XFormsServer.logger.error("Exception copying stream", e);
                     } finally {
@@ -97,7 +100,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                             try {
                                 is.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.error("Exception closing stream", e);
+                                XFormsServer.logger.error("Exception closing input stream", e);
+                            }
+                        }
+                        if (os != null) {
+                            try {
+                                os.close();
+                            } catch (IOException e) {
+                                XFormsServer.logger.error("Exception closing output stream", e);
                             }
                         }
                     }

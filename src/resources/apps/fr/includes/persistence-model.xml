@@ -131,18 +131,19 @@
             </xforms:action>
         </xforms:action>
 
+    </xforms:action>
+
+    <xforms:action ev:event="xforms-ready">
+        <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
+        <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
+
         <!-- Force all this so we can safely set the data status -->
         <xforms:rebuild/>
         <xforms:recalculate/>
         <xforms:revalidate/>
-
+        <xforms:refresh/>
         <!-- Set the initial data status -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="../initial-data-status"/>
-    </xforms:action>
-
-    <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
-    <xforms:action ev:event="xforms-ready">
-        <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
     </xforms:action>
 
     <!-- Clear operation -->
@@ -659,8 +660,8 @@
     </xforms:action>
 
     <!-- Mark status as dirty if data changes -->
-    <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-    <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+    <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete"
+                     ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
 
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-value-changed">
@@ -682,7 +683,7 @@
 
     <!-- Perform background submission upon xforms-select for xforms:upload -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group fr-dialogs-group" ev:event="xforms-select"
-            if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and event('xxforms:binding')/(@filename and @mediatype and @size)">
+            if="for $b in xxforms:event('xxforms:binding') return $b/root()/* is xxforms:instance('fr-form-instance') and $b/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>
 

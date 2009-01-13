@@ -388,17 +388,42 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-upload" element="xforms|upload">
+    <!--<xbl:binding id="fb-upload" element="xforms|upload">-->
+        <!--<metadata xmlns="http://orbeon.org/oxf/xml/form-builder">-->
+            <!--<display-name lang="en">Attachment</display-name>-->
+            <!--<display-name lang="fr">Annexe</display-name>-->
+            <!--<icon lang="en">-->
+                <!--<small-icon>/apps/fr/style/images/silk/attach.png</small-icon>-->
+                <!--<large-icon>/apps/fr/style/images/silk/attach.png</large-icon>-->
+            <!--</icon>-->
+            <!--<datatype>xforms:anyURI</datatype>-->
+            <!--<template>-->
+                <!--<xforms:upload id="" ref="" class="fr-attachment">-->
+                    <!--<xforms:label ref=""/>-->
+                    <!--<xforms:hint ref=""/>-->
+                    <!--<xforms:help ref=""/>-->
+                    <!--<xforms:alert ref="$fr-resources/detail/labels/alert"/>-->
+                    <!--<xforms:filename ref="@filename"/>-->
+                    <!--<xforms:mediatype ref="@mediatype"/>-->
+                    <!--<xxforms:size ref="@size"/>-->
+                <!--</xforms:upload>-->
+            <!--</template>-->
+        <!--</metadata>-->
+    <!--</xbl:binding>-->
+
+    <xbl:binding id="fr-attachment" element="fr|attachment">
+
+        <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Attachment</display-name>
-            <display-name lang="fr">Annexe</display-name>
+            <display-name lang="fr">Fichier annexé</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/attach.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/attach.png</large-icon>
             </icon>
-            <datatype>xforms:anyURI</datatype>
+            <datatype>xs:anyURI</datatype>
             <template>
-                <xforms:upload id="" ref="" class="fr-attachment">
+                 <fr:attachment id="" ref="" class="fr-attachment">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -406,9 +431,22 @@
                     <xforms:filename ref="@filename"/>
                     <xforms:mediatype ref="@mediatype"/>
                     <xxforms:size ref="@size"/>
-                </xforms:upload>
+                </fr:attachment>
             </template>
         </metadata>
+
+        <xbl:template>
+            <xforms:upload xbl:attr="context ref bind">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert,xforms|filename,xforms|mediatype,xxforms:size"/>
+            </xforms:upload>
+            <xforms:output appearance="xxforms:download" xbl:attr="context ref bind">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/down.gif" alt=""/>
+                    <xhtml:span>Download</xhtml:span>
+                </xforms:label>
+                <xbl:content includes="xforms|filename,xforms|mediatype"/>
+            </xforms:output>
+        </xbl:template>
     </xbl:binding>
 
 </xbl:xbl>

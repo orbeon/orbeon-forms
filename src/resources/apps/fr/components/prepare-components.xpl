@@ -66,7 +66,7 @@
 
     <p:choose href="#request">
         <p:when test="//parameter/value = 'true'">
-            <!-- Unroll the form (theme, inclusions, NO components) -->
+            <!-- Unroll the form (theme, inclusions, NO components) for runtime use -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="../unroll-form.xpl"/>
                 <p:input name="instance" href="#parameters"/>
@@ -104,11 +104,25 @@
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#unrolled-template-xbl"/>
+        <p:input name="request" href="#request"/>
         <p:input name="parameters" href="#parameters"/>
         <p:input name="standard-xbl" href="#standard-xbl"/>
         <p:input name="config">
             <!-- Return an aggregate so that each xbl:xbl can have its own metadata -->
             <components xsl:version="2.0">
+                <xsl:choose>
+                    <xsl:when test="doc('input:request')//parameter/value = 'true'">
+                        <xbl:xbl>
+                            <!-- Only copy bindings with templates because there may be some bindings for xforms:* controls
+                                 which are used only for their metadata by Form Builder -->
+                            <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl/xbl:binding[xbl:template]"/>
+                        </xbl:xbl>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Copy all bindings for design time -->
+                        <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:copy-of select="/xbl:xbl"/>
                 <xsl:copy-of select="doc('input:standard-xbl')/xbl:xbl"/>
             </components>
@@ -133,9 +147,9 @@
                 <!--<header>-->
                     <!--<name>Last-Modified</name>-->
                     <!--<value>-->
-                        <!-- Format the date -->
-                        <!-- TODO: extract meaningful date in eXist CRUD! -->
-                        <!--<xsl:value-of select="format-dateTime(xs:dateTime('2008-11-10T00:00:00'), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>-->
+                         <!-- Format the date -->
+                         <!-- TODO: extract meaningful date in eXist CRUD! -->
+                        <!--<xsl:value-of select="format-dateTime(xs:dateTime('2008-11-18T00:00:00'), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>-->
                     <!--</value>-->
                 <!--</header>-->
             </config>

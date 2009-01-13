@@ -565,10 +565,6 @@
     <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
                        method="post" replace="none" resource="test:"/>
 
-    <!-- This contains the standard controls definitions -->
-    <xforms:instance id="fb-standard-controls-instance" src="oxf:/forms/orbeon/builder/form/standard-controls.xbl"
-                     xxforms:readonly="true" xxforms:shared="application"/>
-
     <!-- Submission to load the components library -->
     <!-- TODO: should load components based on app config? -->
     <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->

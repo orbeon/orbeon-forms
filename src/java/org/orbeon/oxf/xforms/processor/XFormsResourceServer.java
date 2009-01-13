@@ -63,7 +63,8 @@ public class XFormsResourceServer extends ProcessorImpl {
 
                     if (resource.getSize() > 0)
                         response.setContentLength((int) resource.getSize());// NOTE: Why does this API (and Servlet counterpart) take an int?
-
+                    
+                    // TODO: for Safari, try forcing application/octet-stream
                     if (resource.getContentType() != null)
                         response.setContentType(resource.getContentType());
                     else

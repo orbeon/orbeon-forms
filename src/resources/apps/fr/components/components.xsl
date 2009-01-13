@@ -61,7 +61,6 @@
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s')" as="xs:string*"/>
-    <xsl:variable name="components-uri" select="pipeline:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="has-alfresco" select="pipeline:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
@@ -152,15 +151,6 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
         <!-- Insert components -->
         <xsl:copy-of select="$components/xbl:xbl"/>
-
-        <!--<xsl:if test="$components-uri">-->
-            <!--<xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>-->
-        <!--</xsl:if>-->
-        <!--<xsl:message>-->
-            <!--xxx-->
-                <!--<xsl:copy-of select="doc(pipeline:rewriteResourceURI(concat('/fr/service/components/', $app, '/', $form), true()))"/>-->
-            <!--xxx-->
-        <!--</xsl:message>-->
 
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"

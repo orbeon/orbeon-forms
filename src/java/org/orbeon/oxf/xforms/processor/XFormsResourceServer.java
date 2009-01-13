@@ -58,13 +58,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                 if (resource != null && resource.getURI() != null) {
                     // Found URI, stream it out
 
-                    if (resource.getLastModified() > 0)
-                        response.setCaching(resource.getLastModified(), false, false);
+                    // Set caching headers
+                    response.setCaching(resource.getLastModified(), false, false);
 
                     if (resource.getSize() > 0)
                         response.setContentLength((int) resource.getSize());// NOTE: Why does this API (and Servlet counterpart) take an int?
                     
                     // TODO: for Safari, try forcing application/octet-stream
+                    // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
                     if (resource.getContentType() != null)
                         response.setContentType(resource.getContentType());
                     else

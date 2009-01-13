@@ -1346,9 +1346,10 @@ public class NetUtils {
      * @param pipelineContext   PipelineContext to obtain session
      * @param uri               server URI to transform
      * @param contentType       type of the content referred to by the URI, or null if unknown
+     * @param lastModified      last modification timestamp
      * @return                  client URI
      */
-    public static String proxyURI(PipelineContext pipelineContext, String uri, String filename, String contentType) {
+    public static String proxyURI(PipelineContext pipelineContext, String uri, String filename, String contentType, long lastModified) {
 
         // Create a digest, so that for a given URI we always get the same key
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
@@ -1360,7 +1361,7 @@ public class NetUtils {
         if (session != null) {
             // Store mapping into session
             session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new DynamicResource(uri, filename, contentType, -1, System.currentTimeMillis()));
+                    new DynamicResource(uri, filename, contentType, -1, lastModified));
         }
 
         // Rewrite new URI to absolute path without the context

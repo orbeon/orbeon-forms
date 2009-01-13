@@ -109,10 +109,11 @@ public class XFormsOutputControl extends XFormsValueControl {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
             final String dynamicMediatype = fileInfo.getFileMediatype(pipelineContext);
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
+            // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not desirable in most cases
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute, 0);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);// use dummy image so that client always has something to load
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute, System.currentTimeMillis());// use dummy image so that client always has something to load
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -131,7 +132,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype) {
+    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype, long lastModified) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
         if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
@@ -140,7 +141,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 if (!urlNorewrite) {
                     // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
                     final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, fileInfo.getFileName(pipelineContext), mediatype);
+                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -149,7 +150,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:base64Binary type
 
                 final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
-                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype);
+                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
 
             } else {
                 // Return dummy image

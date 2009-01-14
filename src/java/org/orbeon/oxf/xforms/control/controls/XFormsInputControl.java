@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.MatchProcessor;
+import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -23,10 +25,15 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.DateValue;
+import org.orbeon.saxon.value.TimeValue;
+import org.orbeon.saxon.value.CalendarValue;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.GregorianCalendar;
+import java.util.Calendar;
 
 /**
  * Represents an xforms:input control.
@@ -142,39 +149,172 @@ public class XFormsInputControl extends XFormsValueControl {
                 if (!externalValue.equals("true"))
                     externalValue = "false";
             } else if (XFormsProperties.isNoscript(containingDocument)) {
+                // Noscript mode: value must be pre-processed on the server (in Ajax mode, ISO value is sent to server if possible)
+
                 if ( "date".equals(typeName)) {
                     // Date input
-
-                    // TODO: parse date according to format, see _dateParsePatterns in xforms.js; put in ISODateUtils
-
+                    externalValue = externalValue.trim();
+                    final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+                    externalValue = parse(matcher, DATE_PARSE_PATTERNS, externalValue);
                 } else if ("time".equals(typeName)) {
                     // Time input
-
-                    // TODO: parse time according to format, see _timeParsePatterns in xforms.js; put in ISODateUtils
-
+                    externalValue = externalValue.trim();
+                    final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+                    externalValue = parse(matcher, TIME_PARSE_PATTERNS, externalValue);
                 } else if ("dateTime".equals(typeName)) {
                     // Date + time input
+                    externalValue = externalValue.trim();
 
+                    // Split into date and time parts
                     // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
-                    final int separatorIndex = externalValue.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+                    final String datePart = getDateTimeDatePart(externalValue, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+                    final String timePart = getDateTimeTimePart(externalValue, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
 
-                    final String datePart;
-                    final String timePart;
-                    if (separatorIndex == -1) {
-                        datePart = externalValue;
-                        timePart = "";
+                    if (datePart.length() == 0 && timePart.length() == 0) {
+                        // Special case of empty parts
+                        externalValue = "";;
                     } else {
-                        datePart = externalValue.substring(0, separatorIndex);
-                        timePart = externalValue.substring(separatorIndex + 1);
+                        // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
+                        final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+                        externalValue = parse(matcher, DATE_PARSE_PATTERNS, datePart) + 'T' + parse(matcher, TIME_PARSE_PATTERNS, timePart);
                     }
-
-                    // TODO: parse date and time according to format, see above
                 }
             }
         }
 
         return externalValue;
     }
+
+    private static String getDateTimeDatePart(String value, char separator) {
+        final int separatorIndex = value.indexOf(separator);
+        if (separatorIndex == -1) {
+            return value;
+        } else {
+            return value.substring(0, separatorIndex).trim();
+        }
+    }
+
+    private static String getDateTimeTimePart(String value, char separator) {
+        final int separatorIndex = value.indexOf(separator);
+        if (separatorIndex == -1) {
+            return "";
+        } else {
+            return value.substring(separatorIndex + 1).trim();
+        }
+    }
+
+    private String parse(Perl5MatchProcessor matcher, ParsePattern[] patterns, String value) {
+        for (int i = 0; i < patterns.length; i++) {
+            final ParsePattern currentPattern = patterns[i];
+            final MatchProcessor.Result result = matcher.match(currentPattern.getRe(), value);
+            if (result.matches) {
+                // Pattern matches
+                return currentPattern.handle(result);
+            }
+        }
+
+        // Return value unmodified
+        return value;
+    }
+
+    private interface ParsePattern {
+        public String getRe();
+        public String handle(MatchProcessor.Result result);
+    }
+
+    // See also patterns on xforms.js
+    private static ParsePattern[] DATE_PARSE_PATTERNS = new ParsePattern[] {
+            // mm/dd/yyyy (American style)
+            new ParsePattern() {
+                public String getRe() {
+                    return "^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{2,4})$";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String year = (String) result.groups.get(2);
+                    final String month = (String) result.groups.get(0);
+                    final String day = (String) result.groups.get(1);
+                    // TODO: year on 2 or 3 digits
+                    final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
+                    return value.getStringValue();
+                }
+            },
+            // mm/dd (American style without year)
+            new ParsePattern() {
+                public String getRe() {
+                    return "^(\\d{1,2})\\/(\\d{1,2})$";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String year = Integer.toString(new GregorianCalendar().get(Calendar.YEAR));// current year
+                    final String month = (String) result.groups.get(0);
+                    final String day = (String) result.groups.get(1);
+                    final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
+                    return value.getStringValue();
+                }
+            },
+            // dd.mm.yyyy (Swiss style)
+            new ParsePattern() {
+                public String getRe() {
+                    return "^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2,4})$";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String year = (String) result.groups.get(2);
+                    final String month = (String) result.groups.get(1);
+                    final String day = (String) result.groups.get(0);
+                    // TODO: year on 2 or 3 digits
+                    final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
+                    return value.getStringValue();
+                }
+            },
+            // yyyy-mm-dd (ISO style)
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{2,4})-(\\d{1,2})-(\\d{1,2})";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String year = (String) result.groups.get(0);
+                    final String month = (String) result.groups.get(1);
+                    final String day = (String) result.groups.get(2);
+                    // TODO: year on 2 or 3 digits
+                    final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
+                    return value.getStringValue();
+                }
+            }
+    };
+
+    // See also patterns on xforms.js
+    private static ParsePattern[] TIME_PARSE_PATTERNS = new ParsePattern[] {
+            // hh:mm:ss
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{1,2}):(\\d{1,2}):(\\d{1,2})";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String hours = (String) result.groups.get(0);
+                    final String minutes = (String) result.groups.get(1);
+                    final String seconds = (String) result.groups.get(2);
+                    final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), Byte.parseByte(seconds), 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            },
+            // hh:mm
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{1,2}):(\\d{1,2})";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String hours = (String) result.groups.get(0);
+                    final String minutes = (String) result.groups.get(1);
+                    final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            }
+    };
 
     /**
      * Convenience method for handler: return the value of the first input field.
@@ -186,9 +326,14 @@ public class XFormsInputControl extends XFormsValueControl {
         final String result;
 
         final String typeName = getBuiltinTypeName();
-        if ("date".equals(typeName) || "time".equals(typeName) || "dateTime".equals(typeName)) {
+        if ("date".equals(typeName) || "time".equals(typeName)) {
             // Format value specially
-            result = format(pipelineContext, typeName, getFirstValueType());
+            result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
+        } else if ("dateTime".equals(typeName)) {
+            // Format value specially
+            // Extract date part
+            final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
+            result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
         } else {
             // Regular case, use external value
             result = getExternalValue(pipelineContext);
@@ -209,7 +354,9 @@ public class XFormsInputControl extends XFormsValueControl {
         final String typeName = getBuiltinTypeName();
         if ("dateTime".equals(typeName)) {
             // Format value specially
-            result = format(pipelineContext, typeName, getSecondValueType());
+            // Extract time part
+            final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
+            result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
         } else {
             // N/A
             result = null;
@@ -228,14 +375,17 @@ public class XFormsInputControl extends XFormsValueControl {
         return getValueUseFormat(pipelineContext, getControlElement().attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE)));
     }
 
-    private String format(PipelineContext pipelineContext, String typeName, String formatName) {
+    private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {
         // Assume xs: prefix for default formats
         final Map prefixToURIMap = new HashMap();
         prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
+        final Map variables = new HashMap();
+        variables.put("v", value);
+
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null) {
-            // Can't format
+            // No need to format
             return null;
         } else {
             // Format
@@ -244,13 +394,13 @@ public class XFormsInputControl extends XFormsValueControl {
             getContextStack().setBinding(this);
 
             final String xpathExpression =
-                    "if (. castable as xs:" + typeName + ") then format-" + typeName + "(xs:" + typeName + "(.), '"
-                            + XFormsProperties.getTypeInputFormat(containingDocument, formatName)
-                            + "', 'en', (), ()) else .";
+                    "if ($v castable as xs:" + valueType + ") then format-" + valueType + "(xs:" + valueType + "($v), '"
+                            + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
+                            + "', 'en', (), ()) else $v";
 
             return XPathCache.evaluateAsString(pipelineContext, boundNode,
                     xpathExpression,
-                    prefixToURIMap, getContextStack().getCurrentVariables(),
+                    prefixToURIMap, variables,
                     XFormsContainingDocument.getFunctionLibrary(),
                     getContextStack().getFunctionContext(), null, getLocationData());
         }

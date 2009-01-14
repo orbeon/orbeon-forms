@@ -71,7 +71,6 @@ public class ISODateUtils {
         return format.format(date);
     }
 
-
     public static String getRFC1123Date(long time) {
         return RFC1123_DATE.format(new Long(time));
     }

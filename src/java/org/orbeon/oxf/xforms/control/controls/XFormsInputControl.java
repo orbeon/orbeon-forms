@@ -224,6 +224,18 @@ public class XFormsInputControl extends XFormsValueControl {
 
     // See also patterns on xforms.js
     private static ParsePattern[] DATE_PARSE_PATTERNS = new ParsePattern[] {
+            // TODO: remaining regexps from xforms.js?
+            // Today
+            // Tomorrow
+            // Yesterday
+            // 4th
+            // 4th Jan
+            // 4th Jan 2003
+            // Jan 4th
+            // Jan 4th 2003
+            // next Tuesday - this is suspect due to weird meaning of "next"
+            // last Tuesday
+
             // mm/dd/yyyy (American style)
             new ParsePattern() {
                 public String getRe() {
@@ -287,6 +299,52 @@ public class XFormsInputControl extends XFormsValueControl {
 
     // See also patterns on xforms.js
     private static ParsePattern[] TIME_PARSE_PATTERNS = new ParsePattern[] {
+            // TODO: remaining regexps from xforms.js?
+            // Now
+
+            // p.m.
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{1,2}):(\\d{1,2}):(\\d{1,2})(?:p| p)";
+                }
+                public String handle(MatchProcessor.Result result) {
+                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    if (hoursByte < 12) hoursByte += 12;
+
+                    final String minutes = (String) result.groups.get(1);
+                    final String seconds = (String) result.groups.get(2);
+                    final TimeValue value = new TimeValue(hoursByte, Byte.parseByte(minutes), Byte.parseByte(seconds), 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            },
+            // p.m., no seconds
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{1,2}):(\\d{1,2})(?:p| p)";
+                }
+                public String handle(MatchProcessor.Result result) {
+                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    if (hoursByte < 12) hoursByte += 12;
+
+                    final String minutes = (String) result.groups.get(1);
+                    final TimeValue value = new TimeValue(hoursByte, Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            },
+            // p.m., hour only
+            new ParsePattern() {
+                public String getRe() {
+                    return "(\\d{1,2})(?:p| p)";
+                }
+                public String handle(MatchProcessor.Result result) {
+                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    if (hoursByte < 12) hoursByte += 12;
+
+                    final TimeValue value = new TimeValue(hoursByte, (byte) 0, (byte) 0, 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            },
+
             // hh:mm:ss
             new ParsePattern() {
                 public String getRe() {

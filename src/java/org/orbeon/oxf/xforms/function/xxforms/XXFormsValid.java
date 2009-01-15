@@ -42,10 +42,6 @@ public class XXFormsValid extends XFormsFunction {
         final Expression recurseExpression = (argument == null || argument.length < 2) ? null : argument[1];
         final boolean recurse = (recurseExpression != null) ? ExpressionTool.effectiveBooleanValue(recurseExpression.iterate(xpathContext)) : false;
 
-        // Whether to check required-but-empty
-        final Expression requiredButEmptyExpression = (argument == null || argument.length < 3) ? null : argument[2];
-        final boolean requiredButEmpty = (requiredButEmptyExpression != null) ? ExpressionTool.effectiveBooleanValue(requiredButEmptyExpression.iterate(xpathContext)) : false;
-
         // "If the node-set is empty then the function returns false."
         if (item == null || !(item instanceof NodeInfo))
             return BooleanValue.FALSE;
@@ -53,12 +49,12 @@ public class XXFormsValid extends XFormsFunction {
         final boolean result;
         if (recurse && item instanceof NodeWrapper) {
             // Recurse starting with the current node
-            // NOTE: Don't recurse if we don't have a NodeWrapper, as those con't support MIPs anyway yet
+            // NOTE: Don't recurse if we don't have a NodeWrapper, as those don't support MIPs anyway yet
             final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
-            result = XFormsSubmissionUtils.isSatisfiesValidRequired(getContainingDocument(xpathContext), node, true, true, requiredButEmpty);
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired(getContainingDocument(xpathContext), node, true, true, true);
         } else {
             // Just return the value associated with this node
-            result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, requiredButEmpty);
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, true);
         }
         return BooleanValue.get(result);
     }

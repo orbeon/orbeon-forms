@@ -580,13 +580,12 @@
                     <li>
                         <a name="xxforms-valid"/>
                         <p>
-                            <code>xxforms:valid($node as node(), $recurse as xs:boolean, $check-required-empty as xs:boolean) as xs:boolean</code>
+                            <code>xxforms:valid($node as node(), $recurse as xs:boolean) as xs:boolean</code>
                         </p>
                         <p>
                             The <code>xxforms:valid()</code> function returns the validity of a instance data node
                             or of a subtree of instance data. It recurses into attribute and descendant nodes if the
-                            optional second argument is <code>true()</code>. It takes into account nodes which are
-                            required but empty if the optional third argument is <code>true()</code>.
+                            optional second argument is <code>true()</code>.
                         </p>
                         <p>
                             Because of the way the XForms processing model is defined, the evaluation of
@@ -597,6 +596,7 @@
                             using <code>xxforms:valid()</code> to control, for example, whether a button is
                             read-only or relevant will not work.
                         </p>
+                        <!-- Commented out as I don't think we really want to advertize this since we never use it at Orbeon:
                         <p>
                             However, Orbeon Forms allows you to switch the computation of the
                             <code>required</code>, <code>readonly</code> MIPs to after validation to cover this use
@@ -622,10 +622,7 @@
                                 <xforms:label>Save</xforms:label>
                             </xforms:trigger>
                         </xml-source>
-                        <p>
-                            The <code>xxforms:repeat-current()</code> function must be called from within an
-                            <code>xforms:repeat</code> element.
-                        </p>
+                        -->
                     </li>
                     <li>
                         <a name="xxforms-invalid-binds"/>

@@ -201,10 +201,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:valid
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 1, 3, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 1, 2, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:type
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}type", XXFormsType.class, 0, 1, 1, Type.QNAME_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);

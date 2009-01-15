@@ -185,10 +185,35 @@
         </user-agent>
     </xforms:instance>
 
+    <!-- Form to test -->
+    <xforms:instance id="fr-form-to-test-instance">
+        <dummy xmlns=""/>
+    </xforms:instance>
+
     <!-- Submission to test the form -->
     <xforms:submission id="fb-test-form-submission"
-            ref="instance('fr-form-instance')" method="post" replace="all"
-            resource="/fr/orbeon/builder/test/" xxforms:target="_blank" xxforms:show-progress="false"/>
+            ref="instance('fr-form-to-test-instance')" method="post" replace="all"
+            resource="/fr/orbeon/builder/test/" xxforms:target="_blank" xxforms:show-progress="false">
+
+        <!-- Prepare submission -->
+        <!-- See also dialog-publish.xml -->
+        <xforms:action ev:event="xforms-submit">
+            <!-- Copy form -->
+            <xforms:insert nodeset="instance('fr-form-to-test-instance')" origin="instance('fr-form-instance')"/>
+            <!-- Insert in-scope components -->
+            <xforms:insert nodeset="instance('fr-form-to-test-instance')/xhtml:head/*"
+                           origin="instance('fb-components-instance')/xbl:xbl[xbl:binding]"/>
+            <!-- Remove bindings that don't have a template as those will cause issues if they map to xforms:* -->
+            <xforms:delete nodeset="instance('fr-form-to-test-instance')/xhtml:head/xbl:xbl/xbl:binding[not(xbl:template)]"/>
+        </xforms:action>
+
+        <!-- Clean-up after submission -->
+        <xforms:action ev:event="xforms-submit-done xforms-submit-error">
+            <!-- Remove form content in order to save memory -->
+            <xforms:insert nodeset="instance('fr-form-to-test-instance')" origin="xxforms:element('dummy')"/>
+        </xforms:action>
+
+    </xforms:submission>
 
     <!-- TODO: check where local variable can be used instead -->
     <xforms:instance id="fb-variables">

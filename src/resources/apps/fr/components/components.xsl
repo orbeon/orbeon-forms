@@ -46,8 +46,6 @@
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
     <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>
 
-    <xsl:variable name="components" select="doc('input:components')/*" as="element(components)"/>
-
     <!-- Properties -->
     <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-noscript-link" select="pipeline:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
@@ -149,8 +147,6 @@
 
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
-        <!-- Insert components -->
-        <xsl:copy-of select="$components/xbl:xbl"/>
 
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"
@@ -189,7 +185,8 @@
         <!-- This model handles i18n resources -->
         <xi:include href="../i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles offline functionality through Google Gears -->
-        <xi:include href="../offline/offline-model.xml" xxi:omit-xml-base="true"/>
+        <!-- NOTE: commenting this out for now as Form Runner does not yet work 100% in offline mode -->
+        <!--<xi:include href="../offline/offline-model.xml" xxi:omit-xml-base="true"/>-->
         <!-- This model handles form sections -->
         <xi:include href="../includes/sections-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles error summary -->
@@ -199,7 +196,9 @@
         <!-- This model handles navigation functionality -->
         <xi:include href="../includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
-        <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
+        <xsl:if test="$view-buttons = ('save-locally')">
+            <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
+        </xsl:if>
         <xsl:if test="$has-alfresco">
             <!-- This model handles Alfresco integration -->
             <xi:include href="../alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>

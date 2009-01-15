@@ -174,43 +174,6 @@
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 
-    <!-- Publish form operation -->
-    <xforms:action ev:event="fr-publish-form">
-        <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
-        <!-- Determine the URI of the collection to deploy to -->
-        <xxforms:variable name="app" select="event('application')"/>
-        <xxforms:variable name="form" select="event('form')"/>
-        <xxforms:variable name="collection-no-appserver"
-                          select="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
-        <xxforms:variable name="collection"
-                          select="if (starts-with($collection-no-appserver, 'http://') or starts-with($collection-no-appserver, 'https://')) then $collection-no-appserver
-                                  else concat(xxforms:property('oxf.fr.appserver.uri'), $collection-no-appserver)"/>
-        <xforms:send submission="fr-publish-form-submission">
-            <xxforms:context name="collection" select="$collection"/>
-            <xxforms:context name="application" select="$app"/>
-            <xxforms:context name="form" select="$form"/>
-        </xforms:send>
-    </xforms:action>
-
-    <!-- Instance to store the result of the create/update submission -->
-    <xforms:instance id="fr-publish-form-submission-response">
-        <response xmlns=""/>
-    </xforms:instance>
-
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here -->
-    <xforms:submission id="fr-publish-form-submission" xxforms:ensure-uploads="false"
-            ref="xxforms:instance('fr-form-instance')" method="put"
-            resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
-            replace="text" target="instance('fr-publish-form-submission-response')">
-        <xi:include href="persistence-model-headers.xml"/>
-        <!--<xforms:message ev:event="xforms-submit">-->
-            <!--zzz-->
-            <!--<xforms:output value="event('application')"/>-->
-            <!--xxx-->
-            <!--<xforms:output value="event('form')"/>-->
-        <!--</xforms:message>-->
-    </xforms:submission>
-
     <!-- Respond to save button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">save</xforms:setvalue>

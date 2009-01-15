@@ -30,19 +30,11 @@
     <!-- XHTML+XForms -->
     <p:param type="output" name="data"/>
 
-    <!-- Get components -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../components/get-components.xpl"/>
-        <p:input name="instance" href="#instance"/>
-        <p:output name="components" id="components"/>
-    </p:processor>
-
     <!-- Unroll the form (theme, components, inclusions) -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../unroll-form.xpl"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="data" href="#data"/>
-        <p:input name="components" href="#components"/>
         <p:output name="data" id="unrolled-form"/>
     </p:processor>
 

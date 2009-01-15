@@ -20,6 +20,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
@@ -55,11 +56,11 @@
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <!-- Clear submission result -->
-                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+                            <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
                             <!-- TODO: make sure form is saved -->
-                            <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                                <xxforms:context name="application" select="$metadata-instance/application-name"/>
-                                <xxforms:context name="form" select="$metadata-instance/form-name"/>
+                            <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
+                                <xxforms:context name="fb:application" select="$metadata-instance/application-name"/>
+                                <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
                             </xforms:dispatch>
                         </xforms:action>
                     </xforms:trigger>
@@ -70,11 +71,11 @@
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <!-- Clear submission result -->
-                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+                            <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
                             <!-- TODO: make sure form is saved -->
-                            <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                                <xxforms:context name="application" select="$metadata-instance/application-name"/>
-                                <xxforms:context name="form" select="$metadata-instance/form-name"/>
+                            <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
+                                <xxforms:context name="fb:application" select="$metadata-instance/application-name"/>
+                                <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
                             </xforms:dispatch>
                             <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary/" xxforms:target="_blank"/>
                         </xforms:action>
@@ -92,7 +93,7 @@
                     The form was published successfully.
                 </xhtml:p>
                 <!-- Display response content if present -->
-                <xxforms:variable name="response" model="fr-persistence-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
+                <xxforms:variable name="response" model="fr-publish-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
                 <xforms:group ref=".[normalize-space($response) != '']" class="fb-publish-message">
                     <xforms:output value="$response" mediatype="text/html"/>
                 </xforms:group>
@@ -126,24 +127,92 @@
     <!-- Initialize dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
         <!-- Clear publish submission response -->
-        <xforms:setvalue model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
+        <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
         <!-- Open start area -->
         <xforms:toggle case="fb-publish-dialog-message-start"/>
     </xforms:action>
 
-    <!-- Respond to successful publish submission -->
-    <xforms:action ev:event="xforms-submit-done" ev:observer="fr-publish-form-submission">
-        <!-- Clear response if not HTML -->
-        <xforms:setvalue if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-            model="fr-persistence-model" ref="instance('fr-publish-form-submission-response')"/>
-        <!-- Open success area -->
-        <xforms:toggle case="fb-publish-dialog-success"/>
-    </xforms:action>
+    <!-- Local model -->
+    <xforms:model id="fr-publish-model">
+        <!-- Publish form operation -->
+        <xforms:action ev:event="fr-publish-form">
+            <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
+            <!-- Determine the URI of the collection to deploy to -->
+            <xxforms:variable name="app" select="event('fb:application')"/>
+            <xxforms:variable name="form" select="event('fb:form')"/>
+            <xxforms:variable name="collection-no-appserver"
+                              select="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
+            <xxforms:variable name="collection"
+                              select="if (starts-with($collection-no-appserver, 'http://') or starts-with($collection-no-appserver, 'https://')) then $collection-no-appserver
+                                      else concat(xxforms:property('oxf.fr.appserver.uri'), $collection-no-appserver)"/>
+            <xforms:send submission="fr-publish-form-submission">
+                <xxforms:context name="fb:collection" select="$collection"/>
+                <xxforms:context name="fb:application" select="$app"/>
+                <xxforms:context name="fb:form" select="$form"/>
+            </xforms:send>
+        </xforms:action>
 
-    <!-- Respond to unsuccessful publish submission -->
-    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-publish-form-submission">
-        <!-- Open error area -->
-        <xforms:toggle case="fb-publish-dialog-error"/>
-    </xforms:action>
+        <!-- Instance to store the result of the create/update submission -->
+        <xforms:instance id="fr-publish-form-submission-response">
+            <response xmlns=""/>
+        </xforms:instance>
+
+        <!-- Form to submit -->
+        <xforms:instance id="fr-form-to-publish-instance">
+            <dummy xmlns=""/>
+        </xforms:instance>
+
+        <!-- Submission to publish the form -->
+        <xforms:submission id="fr-publish-form-submission"
+                ref="instance('fr-form-to-publish-instance')" method="put"
+
+                resource="{event('fb:collection')}/crud/{event('fb:application')}/{event('fb:form')}/form/form.xhtml"
+                replace="text" target="instance('fr-publish-form-submission-response')">
+            <!-- Headers to pass -->
+            <xi:include href="oxf:/apps/fr/includes/persistence-model-headers.xml"/>
+
+            <!-- Prepare submission -->
+            <!-- See also model.xml -->
+            <xforms:action ev:event="xforms-submit">
+                <!-- Copy form -->
+                <xforms:insert nodeset="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
+                <!-- Insert in-scope components -->
+                <xforms:insert nodeset="instance('fr-form-to-publish-instance')/xhtml:head/*"
+                               origin="xxforms:instance('fb-components-instance')/xbl:xbl[xbl:binding]"/>
+                <!-- Remove bindings that don't have a template as those will cause issues if they map to xforms:* -->
+                <xforms:delete nodeset="instance('fr-form-to-publish-instance')/xhtml:head/xbl:xbl/xbl:binding[not(xbl:template)]"/>
+            </xforms:action>
+
+            <!-- Clean-up after submission -->
+            <xforms:action ev:event="xforms-submit-done xforms-submit-error">
+                <!-- Remove form content in order to save memory -->
+                <xforms:insert nodeset="instance('fr-form-to-publish-instance')" origin="xxforms:element('dummy')"/>
+            </xforms:action>
+
+            <!--<xforms:message ev:event="xforms-submit">-->
+                <!--zzz-->
+                <!--<xforms:output value="event('fb:application')"/>-->
+                <!--xxx-->
+                <!--<xforms:output value="event('fb:form')"/>-->
+            <!--</xforms:message>-->
+
+            <!-- Respond to successful publish submission -->
+            <xforms:action ev:event="xforms-submit-done">
+                <!-- Clear response if not HTML -->
+                <xforms:setvalue if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
+                    ref="instance('fr-publish-form-submission-response')"/>
+                <!-- Open success area -->
+                <xforms:toggle case="fb-publish-dialog-success"/>
+            </xforms:action>
+
+            <!-- Respond to unsuccessful publish submission -->
+            <xforms:action ev:event="xforms-submit-error">
+                <!-- Open error area -->
+                <xforms:toggle case="fb-publish-dialog-error"/>
+            </xforms:action>
+
+        </xforms:submission>
+
+    </xforms:model>
 
 </xxforms:dialog>

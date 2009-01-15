@@ -29,6 +29,7 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
     private DeferredContentHandler currentSavedOutput;
     private OutputInterceptor currentOutputInterceptor;
     private String currentCaseEffectiveId;
+    private boolean isVisible;
 
     public XFormsCaseHandler() {
         super(false, true);
@@ -38,7 +39,6 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
         // Determine whether this case is visible
-        final boolean isVisible;
         if (!handlerContext.isTemplate()) {
             final XFormsCaseControl caseControl = (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId (currentCaseEffectiveId);
 
@@ -48,18 +48,19 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
             isVisible = false;
         }
 
-        // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
-
-        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
-        newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
-
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+        currentSavedOutput = handlerContext.getController().getOutput();
 
         // Place interceptor if needed
         if (!handlerContext.isNoScript()) {
-            currentSavedOutput = handlerContext.getController().getOutput();
+            // Find classes to add
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
+
+            final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
+            newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
+
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+
             currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                     // Output begin delimiter
@@ -72,6 +73,9 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
 
             // TODO: is the use of XFormsElementFilterContentHandler necessary now?
             handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
+        } else if (!isVisible) {
+            // Case not visible, set output to a black hole
+            handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());
         }
     }
 
@@ -94,6 +98,9 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
                 currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
                     xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
             }
+        } else if (!isVisible) {
+            // Case not visible, restore output
+            handlerContext.getController().setOutput(currentSavedOutput);
         }
     }
 }

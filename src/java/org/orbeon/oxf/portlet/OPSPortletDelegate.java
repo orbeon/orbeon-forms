@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * OPSPortlet and OPSPortletDelegate are the Portlet (JSR-168) entry point of OPS. OPSPortlet simply delegates to
@@ -216,7 +218,8 @@ public class OPSPortletDelegate extends GenericPortlet {
             Map bufferedResponseParameters
                     = (Map) request.getPortletSession().getAttribute(OXF_PORTLET_OUTPUT_PARAMS);
 
-            if (bufferedResponse != null && request.getParameterMap().equals(bufferedResponseParameters)) {
+            // NOTE: Compare for deep equality as it seems that portlet containers may copy/update the parameter Map
+			if (bufferedResponse != null && deepEquals(request.getParameterMap(), bufferedResponseParameters)) {
                 // The result of an action with the current parameters was a
                 // stream that we cached. Replay that stream and replace URLs.
                 // CHECK: what about mode / state? If they change, we ignore them totally.
@@ -240,6 +243,58 @@ public class OPSPortletDelegate extends GenericPortlet {
         } catch (Exception e) {
             throw new PortletException(OXFException.getRootThrowable(e));
         }
+    }
+
+    /**
+	 * Checking two maps for deep equality.
+	 */
+    private static boolean deepEquals(Map map1, Map map2) {
+
+        if ((map1 == null) && (map2 == null)) {
+            return true;
+        }
+
+        if ((map1 == null) || (map2 == null)) {
+            return false;
+        }
+
+        final Set keySet1 = map1.keySet();
+        final Set keySet2 = map2.keySet();
+
+        if (keySet1.size() != keySet2.size()) {
+            return false;
+        }
+
+        final Iterator it1 = keySet1.iterator();
+        final Iterator it2 = keySet1.iterator();
+
+        while (it1.hasNext()) {
+
+            final Object key1 = it1.next();
+            final Object value1 = map1.get(key1);
+            final Object key2 = it2.next();
+            final Object value2 = map2.get(key2);
+
+            if (!key1.getClass().getName().equals(key2.getClass().getName())) {
+                return false;
+            }
+
+            if (!value1.getClass().getName().equals(value2.getClass().getName())) {
+                return false;
+            }
+
+            if (value1 instanceof Object[]) {
+                if (!java.util.Arrays.equals((Object[]) value1, (Object[]) value2)) {
+                    return false;
+                }
+            } else {
+                if (!value1.equals(value2)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

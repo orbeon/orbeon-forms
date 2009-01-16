@@ -847,7 +847,8 @@ public class XFormsStaticState {
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
-            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer);
+            // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
+            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, true);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
                 XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(xxformsScripts.size()) });
@@ -862,7 +863,8 @@ public class XFormsStaticState {
                 final String modelPrefixedId = (String) currentEntry.getKey();
                 final Document modelDocument = (Document) currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
-                extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
+                // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
+                extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
             }
 
             isAnalyzed = true;
@@ -872,12 +874,16 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix) {
+    private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
+
+        // Two expressions depending on whether handlers within models are excluded or not
+        final String xpathExpression = excludeModels ?
+                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::xforms:* | parent::xxforms:*)/@id]" :
+                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and (parent::xforms:* | parent::xxforms:*)/@id]";
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,
-                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and (parent::xforms:* | parent::xxforms:*)/@id]",
-                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+                xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         // Check them all
         for (Iterator i = actionHandlers.iterator(); i.hasNext();) {
@@ -902,12 +908,12 @@ public class XFormsStaticState {
     }
 
     private void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,
-                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer) {
+                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
         // Extract event handlers for this tree of controls
-        extractEventHandlers(pipelineContext, controlsDocumentInfo, prefix);
+        extractEventHandlers(pipelineContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
 
         // Visit tree
         visitAllControlStatic(startElement, new XFormsStaticState.ControlElementVisitorListener() {
@@ -969,7 +975,8 @@ public class XFormsStaticState {
                             final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
                             extractScripts(pipelineContext, compactShadowTreeWrapper, newPrefix);
 
-                            analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
+                            // NOTE: Say we don't want to exclude gathering event handlers within nested models
+                            analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer, false);
                         }
                     }
                 }

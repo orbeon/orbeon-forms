@@ -577,7 +577,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent originalEvent) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("event", "dispatching", new String[] { "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location", originalEvent.getLocationData().toString() });
+            containingDocument.startHandleOperation("event", "dispatching", new String[] { "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location", originalEvent.getLocationData().toString() });
         }
 
         final XFormsEventTarget targetObject = originalEvent.getTargetObject();
@@ -784,6 +784,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 
             throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
                     new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
+        }
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            containingDocument.endHandleOperation();
         }
     }
 

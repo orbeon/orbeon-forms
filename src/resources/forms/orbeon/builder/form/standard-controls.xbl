@@ -135,7 +135,7 @@
             </icon>
             <datatype>xforms:date</datatype>
             <template>
-                <xforms:input id="" ref="" incremental="true">
+                <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -155,7 +155,7 @@
             </icon>
             <datatype>xforms:time</datatype>
             <template>
-                <xforms:input id="" ref="" incremental="true">
+                <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -175,7 +175,7 @@
             </icon>
             <datatype>xforms:dateTime</datatype>
             <template>
-                <xforms:input id="" ref="" incremental="true">
+                <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>

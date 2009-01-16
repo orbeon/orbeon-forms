@@ -204,11 +204,11 @@
 
                                 <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
                                 <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
-                                    <!-- Main form content -->
-                                    <xsl:apply-templates select="fr:body/node()">
-                                        <!-- Dialogs are handled later -->
-                                        <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
-                                    </xsl:apply-templates>
+                                        <!-- Main form content -->
+                                        <xsl:apply-templates select="fr:body/node()">
+                                            <!-- Dialogs are handled later -->
+                                            <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
+                                        </xsl:apply-templates>
                                 </xforms:group>
 
                                 <!-- Error summary (if at bottom) -->

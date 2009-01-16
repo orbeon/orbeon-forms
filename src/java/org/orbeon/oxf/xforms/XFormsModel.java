@@ -1474,7 +1474,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         }
     }
 
-    public void rebuildRevalidateIfNeeded(PipelineContext pipelineContext) {
+    public void rebuildRecalculateIfNeeded(PipelineContext pipelineContext) {
         if (deferredActionContext != null) {
             if (deferredActionContext.rebuild) {
                 doRebuild(pipelineContext);

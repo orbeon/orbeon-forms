@@ -383,7 +383,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // this seems however unneeded.
 
                         // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-                        modelForInstance.rebuildRevalidateIfNeeded(pipelineContext);
+                        modelForInstance.rebuildRecalculateIfNeeded(pipelineContext);
                     }
                 } else {
                     // Case where no instance was found

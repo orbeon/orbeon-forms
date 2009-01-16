@@ -501,17 +501,17 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    public void rebuildRevalidateIfNeeded(PipelineContext pipelineContext) {
+    public void rebuildRecalculateIfNeeded(PipelineContext pipelineContext) {
         // Handle this container
         for (Iterator i = models.iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.rebuildRevalidateIfNeeded(pipelineContext);
+            currentModel.rebuildRecalculateIfNeeded(pipelineContext);
         }
         // Recurse into children containers
         if (childrenContainers != null) {
             for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
                 final XFormsContainer currentContainer = (XFormsContainer) i.next();
-                currentContainer.rebuildRevalidateIfNeeded(pipelineContext);
+                currentContainer.rebuildRecalculateIfNeeded(pipelineContext);
             }
         }
     }

@@ -1072,7 +1072,7 @@ public class XFormsContainingDocument extends XFormsContainer {
 
                 if (handleGoingOnline) {
                     // When going online, ensure rebuild/revalidate before each event
-                    rebuildRevalidateIfNeeded(pipelineContext);
+                    rebuildRecalculateIfNeeded(pipelineContext);
 
                     // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                     // the MIPs need to be re-evaluated before being checked below
@@ -1437,6 +1437,11 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     protected void initializeNestedControls(PipelineContext pipelineContext) {
         // Call-back from super class models initialization
+
+        // This is important because if controls use binds, those must be up to date
+        rebuildRecalculateIfNeeded(pipelineContext);
+
+        // Initialize controls
         xformsControls.initialize(pipelineContext);
     }
 

@@ -1,0 +1,93 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Bug test</xhtml:title>
+        <xforms:model id="fr-persistence-model">
+
+            <xforms:instance id="fr-persistence-instance">
+                <save xmlns="">
+                    <data-status>clean</data-status>
+                </save>
+            </xforms:instance>
+
+            <xforms:instance id="fr-triggers-instance">
+                <triggers xmlns="">
+                    <save/>
+                </triggers>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('fr-triggers-instance')">
+                <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+            </xforms:bind>
+
+            <xforms:submission id="fr-get-document-submission" serialization="none"
+                               method="get" resource="oxf:/apps/xforms-sandbox/samples/bug-events-data.xml"
+                               replace="instance" xxforms:instance="fr-form-instance"/>
+
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:send submission="fr-get-document-submission"/>
+            </xforms:action>
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:rebuild/>
+                <xforms:recalculate/>
+                <xforms:revalidate/>
+                <xforms:refresh/>
+
+                <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="'clean'"/>
+            </xforms:action>
+
+        </xforms:model>
+        <xforms:model id="fr-form-model">
+            <xforms:instance id="fr-form-instance">
+                <book>
+                    <title/>
+                </book>
+            </xforms:instance>
+            <xforms:bind id="title-bind" nodeset="title"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:p>
+            This example simplifies some logic of Form Runner to enable/disable the Save button depending on whether
+            data is clean or dirty. This used to be broken but now <a
+            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=312406&amp;group_id=168&amp;atid=350207">fixed</a>.
+            Proper behavior is that the Save button is disabled upon page load.
+        </xhtml:p>
+
+        <xforms:group model="fr-form-model">
+
+            <xforms:input bind="title-bind">
+                <xforms:label>Note</xforms:label>
+            </xforms:input>
+
+            <xforms:setvalue ev:event="xforms-value-changed xforms-enabled" model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" value="'dirty'"/>
+
+        </xforms:group>
+
+        <xforms:trigger ref="instance('fr-triggers-instance')/save">
+            <xforms:label>Save</xforms:label>
+        </xforms:trigger>
+
+    </xhtml:body>
+</xhtml:html>

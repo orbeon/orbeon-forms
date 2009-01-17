@@ -101,6 +101,8 @@
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:input name="config" href="#aggregate"/>
                         <p:output name="data" id="widgeted-view"/>
+                        <!-- This is here just so that we can reload the form when the properties or the resources change -->
+                        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

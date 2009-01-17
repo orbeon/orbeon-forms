@@ -33,10 +33,6 @@
     <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
     <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"               value="false"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"           value=""/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                     value="true"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                 value="oxf:/config/xforms-widgets.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.embeddable"                         value="false"/>
 
     <!-- Processor-specific properties -->

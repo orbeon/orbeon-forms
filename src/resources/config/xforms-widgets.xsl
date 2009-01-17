@@ -20,7 +20,8 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:variable name="has-widgets" as="xs:boolean" select="exists(//widget:*)"/>
 
@@ -38,7 +39,7 @@
             <!-- Include XBL components -->
             <xsl:copy-of select="doc('oxf:/config/xforms-widgets.xbl')"/>
 
-            <xsl:if test="$has-widgets">
+            <xsl:if test="$has-widgets or pipeline:property('oxf.epilogue.xforms.inspector')">
                 <!-- NOTE: Would be nice to do this with the xbl:style element -->
                 <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css" media="all"/>
             </xsl:if>
@@ -144,6 +145,13 @@
             </xforms:label>
             <!-- Process the rest of the stuff -->
             <xsl:apply-templates select="node() except (xforms:label, xxforms:img)"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="xhtml:body[pipeline:property('oxf.epilogue.xforms.inspector')]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+            <widget:xforms-instance-inspector id="orbeon-xforms-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
         </xsl:copy>
     </xsl:template>
 

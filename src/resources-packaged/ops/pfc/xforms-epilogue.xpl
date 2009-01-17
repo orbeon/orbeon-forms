@@ -96,7 +96,7 @@
                     </p:processor>
 
                     <!-- Apply widgets -->
-                    <p:processor name="oxf:xslt">
+                    <p:processor name="oxf:unsafe-xslt">
                         <!--<p:input name="data" href="#data2"/>-->
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:input name="config" href="#aggregate"/>

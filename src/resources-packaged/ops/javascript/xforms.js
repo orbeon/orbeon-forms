@@ -2090,7 +2090,6 @@ ORBEON.xforms.Controls = {
             var widget = ORBEON.widgets[widgetClass];
             if (widget.extending != null && widget.appliesToControl(control)) {
                 return widget;
-//                console.log(widgetClass);
             }
         }
     }

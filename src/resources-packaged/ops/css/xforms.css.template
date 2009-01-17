@@ -240,47 +240,38 @@ html body .xforms-form .xforms-repeat-template {
 
 
 /**
- * For xforms-case-selected/deselected, we use set the hide/show sections with "visibility/position" instead of
- * "display" as recommended by by YUI. Not doing so causes issues to the slider when shown in a section of the
- *  page which is hidden when the slider is initialized.
+ * XForms Switch / Case
+ * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
  */
-.xforms-case-selected {
-    visibility: visible;
-    position: static;
-}
 
-.xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
-    visibility: hidden;
-    position: absolute;
-}
+    .xforms-case-selected {
+        visibility: visible;
+        position: static;
+    }
 
-/**
- * On IE6 and IE7, if the hidden case contains a table which has visibility: hidden, position: absolute, then the
- * border of the table can "show through" the hidden element. To avoid this, we try to override any border than might
- * have been set on a table inside a deselected element.
- */
-body #xforms-form .xforms-case-deselected tr td {
-    border: none;
-}
+    .xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
+        visibility: hidden;
+        position: absolute;
+    }
 
-/**
- * Using visibility: hidden; position: absolute; on table rows and cells causes display problems on IE. So here we
- * have to use display: none. This means that some controls (i.e. slider) won't work if they are in a cell which
- * is initially hidden when the page is loaded.
- */
-tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
-        td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selecte {
-    display: none;
-}
+    .xforms-case-begin-end {
+        display: none;
+    }
 
-/**
- * Hidding sections of the page after the page is loaded with visibility: hidden; position: absolute; causes display
- * problems on IE. (For instance with the controls example, where some form controls are not showing when going
- * back and forth between tabs.) So at "runtime" we hide sections of the page with display: none.
- */
-.xforms-case-deselected-subsequent {
-    display: none;
-}
+    body #xforms-form .xforms-case-deselected tr td {
+        border: none;
+    }
+
+    tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
+            th.xforms-case-deselected, .xforms-case-deselected th.xforms-case-selected,
+            td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selected {
+        display: none;
+    }
+
+    .xforms-case-deselected-subsequent {
+        display: none;
+    }
+
 
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
 .xforms-upload-state-file .xforms-upload-select { display: none; }

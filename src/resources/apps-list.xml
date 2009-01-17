@@ -17,7 +17,7 @@
     </section>
     <section label="Form Builder (ALPHA)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (ALPHA)"/>
-        <application id="fr/orbeon/bookcast/summary" label="Books Form"/>
+        <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
         <application id="fr/orbeon/provinces/summary" label="Provinces Form"/>
     </section>
     <section label="XForms Tutorial Apps">

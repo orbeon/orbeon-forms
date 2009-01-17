@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <head>
+        <title>Bookshelf Form</title>
+        <xforms:model id="fr-form-model" xxforms:help-tooltip="false">
+            <!-- Inline schema -->
+            <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+                <!-- Individual book element -->
+                <xs:element name="book">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="details" type="details"/>
+                            <xs:element name="notes" type="notes"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:complexType name="details">
+                    <xs:sequence>
+                        <xs:element name="title" type="xs:string"/>
+                        <xs:element name="author" type="xs:string"/>
+                        <xs:element name="language" type="language"/>
+                        <xs:element name="link" type="link"/>
+                        <xs:element name="rating" type="rating"/>
+                        <xs:element name="image" type="image"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:complexType name="notes">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="note" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <!-- Type for image -->
+                <xs:complexType name="image">
+                    <xs:simpleContent>
+                        <xs:extension base="xs:anyURI">
+                            <xs:attribute name="filename"/>
+                            <xs:attribute name="mediatype"/>
+                            <xs:attribute name="size"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+
+                <!-- Type for rating -->
+                <xs:simpleType name="rating">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                        <xs:enumeration value="3"/>
+                        <xs:enumeration value="4"/>
+                        <xs:enumeration value="5"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for language -->
+                <xs:simpleType name="language">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="es"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for link -->
+                <xs:simpleType name="link">
+                    <xs:restriction base="xs:string">
+                        <!-- Approximative regexp for HTTP URLs -->
+                        <xs:pattern value="(https?\://([^/?#]+)(/([^?#]*)(\?([^?#]+))?(#(.*))?)?)?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:schema>
+
+            <!-- Instance that contains all the books -->
+            <xforms:instance id="fr-form-instance" xxforms:validation="strict">
+                <book xmlns="">
+                    <details>
+                        <title/>
+                        <author/>
+                        <language/>
+                        <link/>
+                        <rating/>
+                        <image filename="" mediatype="" size=""/>
+                    </details>
+                    <notes>
+                        <note/>
+                    </notes>
+                </book>
+            </xforms:instance>
+
+            <xforms:bind id="fr-form-binds" nodeset=".">
+                <xforms:bind id="details-bind" nodeset="details">
+                    <xforms:bind id="title-bind" nodeset="title" required="true()"/>
+                    <xforms:bind id="author-bind" nodeset="author" required="true()"/>
+                    <xforms:bind id="language-bind" nodeset="language"/>
+                    <xforms:bind id="image-bind" nodeset="image" type="xs:anyURI"/>
+                </xforms:bind>
+                <xforms:bind id="notes-bind" nodeset="notes">
+                    <xforms:bind id="note-bind" nodeset="note"/>
+                </xforms:bind>
+            </xforms:bind>
+
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata xmlns="">
+                    <application-name>orbeon</application-name>
+                    <form-name>bookcast</form-name>
+                    <title xml:lang="en">Orbeon Forms Bookshelf</title>
+                    <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
+                    <title xml:lang="fr">Orbeon Forms Bookshelf</title>
+                    <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
+                    <author>Orbeon, Inc.</author>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xforms:instance>
+
+            <!-- Attachments -->
+            <xforms:instance id="fr-form-attachments">
+                <attachments xmlns="">
+                    <css mediatype="text/css" filename="" size=""/>
+                    <!-- Fix this once we have proper template -->
+                    <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xforms:instance>
+
+            <!-- XForms instance containing all the resources -->
+            <xforms:instance id="fr-form-resources">
+                <resources xmlns="">
+                    <resource xml:lang="en">
+                        <details>
+                            <label>Book Details</label>
+                            <help>This section contains details about the book.</help>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                            <!--<help>This section contains notes about the book.</help>-->
+                            <help/>
+                        </notes>
+                        <title>
+                            <label>Title</label>
+                            <hint>Book title</hint>
+                            <help>This input contains the book title. For example...</help>
+                            <alert>The book title is missing</alert>
+                        </title>
+                        <author>
+                            <label>Author</label>
+                            <help>This input contains the book's author name.</help>
+                            <hint>Book author</hint>
+                            <alert>The author name is missing</alert>
+                        </author>
+                        <language>
+                            <label>Language</label>
+                            <hint>Book language</hint>
+                            <help>This contains the book language. For example...</help>
+                            <alert>The language selected is invalid</alert>
+                            <item>
+                                <label>English</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>French</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>Spanish</label>
+                                <value>es</value>
+                            </item>
+                        </language>
+                        <link>
+                            <label>Link</label>
+                            <hint>Optional link to external resource</hint>
+                            <help>This input contains a link to an external resource. For example...</help>
+                            <alert>The link must be a valid HTTP or HTTPS URL</alert>
+                        </link>
+                        <rating>
+                            <label>Rating</label>
+                            <hint>Your rating</hint>
+                            <help>This contains your rating about the book. For example...</help>
+                            <alert>The rating selected is invalid</alert>
+                            <item>
+                                <label>None</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                        </rating>
+                        <image>
+                            <label>Book Cover</label>
+                            <hint></hint>
+                            <help></help>
+                            <alert></alert>
+                        </image>
+                        <note>
+                            <label>Note</label>
+                            <hint>Notes about this book</hint>
+                            <help>These notes contain your own comments about the book. For example...</help>
+                            <alert>The notes are invalid</alert>
+                        </note>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <details>
+                            <label>Détails du livre</label>
+                            <help>Cette section contient les détails du livre.</help>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                            <help>Cette section contient des notes à propos du livre.</help>
+                        </notes>
+                        <title>
+                            <label>Titre</label>
+                            <hint>Titre du livre</hint>
+                            <help>Ce champ contient le titre du livre, par exemple...</help>
+                            <alert>Le titre du livre manque</alert>
+                        </title>
+                        <author>
+                            <label>Auteur</label>
+                            <help>Ce champ contient le nom de l'auteur du livre.</help>
+                            <hint>Auteur du livre</hint>
+                            <alert>L'auteur du livre manque</alert>
+                        </author>
+                        <language>
+                            <label>Langue</label>
+                            <hint>Langue du livre</hint>
+                            <help>Ce champ contient la langue du livre, par exemple...</help>
+                            <alert>La langue sélectionnée est invalide</alert>
+                            <item>
+                                <label>Anglais</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>Français</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>Espagnol</label>
+                                <value>es</value>
+                            </item>
+                        </language>
+                        <link>
+                            <label>Lien</label>
+                            <hint>Lien optionnel vers une ressource externe</hint>
+                            <help>Ce champ contient un lien vers une ressource externe, par exemple...</help>
+                            <alert>Le lien doit être un URL HTTP ou HTTPS valide</alert>
+                        </link>
+                        <rating>
+                            <label>Evaluation</label>
+                            <hint>Votre évaluation</hint>
+                            <help>Ce champ contient votre évaluation du livre, par exemple...</help>
+                            <alert>L'évaluation sélectionnée est invalide</alert>
+                            <item>
+                                <label>Aucune</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                        </rating>
+                        <image>
+                            <label>Couverture</label>
+                            <hint></hint>
+                            <help></help>
+                            <alert></alert>
+                        </image>
+                        <note>
+                            <label>Note</label>
+                            <hint>Notes au sujet de ce livre</hint>
+                            <help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
+                            <alert>Cette note n'est pas valide</alert>
+                        </note>
+                    </resource>
+                </resources>
+            </xforms:instance>
+
+            <xforms:instance id="note-template">
+                <note xmlns=""/>
+            </xforms:instance>
+
+        </xforms:model>
+    </head>
+    <body>
+        <fr:view>
+            <xforms:label>XForms Bookcast</xforms:label>
+            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+            <fr:body>
+                <fr:section id="details-section" bind="details-bind">
+                    <xforms:label ref="$form-resources/details/label"/>
+                    <xforms:help ref="$form-resources/details/help"/>
+                    <fr:grid columns="4">
+                        <fr:tr>
+                            <fr:td>
+                                <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search" incremental="true">
+                                    <xforms:label ref="$form-resources/title/label"/>
+                                    <xforms:hint ref="$form-resources/title/hint"/>
+                                    <xforms:help ref="$form-resources/title/help"/>
+                                    <xforms:alert ref="$form-resources/title/alert"/>
+                                </xforms:input>
+                            </fr:td>
+                            <fr:td>
+                                <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search" incremental="true">
+                                    <xforms:label ref="$form-resources/author/label"/>
+                                    <xforms:hint ref="$form-resources/author/hint"/>
+                                    <xforms:help ref="$form-resources/author/help"/>
+                                    <xforms:alert ref="$form-resources/author/alert"/>
+                                </xforms:input>
+                            </fr:td>
+                            <fr:td rowspan="2">
+                                <xforms:select1 id="rating-control" ref="rating" appearance="full">
+                                    <xforms:label ref="$form-resources/rating/label"/>
+                                    <xforms:hint ref="$form-resources/rating/hint"/>
+                                    <xforms:help ref="$form-resources/rating/help"/>
+                                    <xforms:alert ref="$form-resources/rating/alert"/>
+                                    <xforms:itemset nodeset="$form-resources/rating/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </fr:td>
+                            <fr:td rowspan="2">
+                                <xforms:upload id="image-control" ref="image">
+                                    <xforms:label ref="$form-resources/image/label"/>
+                                    <xforms:hint ref="$form-resources/image/hint"/>
+                                    <xforms:help ref="$form-resources/image/help"/>
+                                    <xforms:alert ref="$form-resources/image/alert"/>
+                                    <xforms:filename ref="@filename"/>
+                                    <xforms:mediatype ref="@mediatype"/>
+                                    <xxforms:size ref="@size"/>
+                                </xforms:upload>
+                                <xforms:output ref="image" mediatype="image/*"/>
+                            </fr:td>
+                        </fr:tr>
+                        <fr:tr>
+                            <fr:td>
+                                <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/language/label"/>
+                                    <xforms:hint ref="$form-resources/language/hint"/>
+                                    <xforms:help ref="$form-resources/language/help"/>
+                                    <xforms:alert ref="$form-resources/language/alert"/>
+                                    <xforms:item>
+                                        <xforms:label>Choose One...</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="$form-resources/language/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </fr:td>
+                            <fr:td>
+                                <xforms:input id="link-control" ref="link" incremental="true">
+                                    <xforms:label ref="$form-resources/link/label"/>
+                                    <xforms:hint ref="$form-resources/link/hint"/>
+                                    <xforms:help ref="$form-resources/link/help"/>
+                                    <xforms:alert ref="$form-resources/link/alert"/>
+                                </xforms:input>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
+                </fr:section>
+
+                <fr:section id="notes-section" bind="notes-bind">
+                    <xforms:label ref="$form-resources/notes/label"/>
+                    <xforms:help ref="$form-resources/notes/help"/>
+                    <fr:grid columns="1">
+                        <fr:tr>
+                            <fr:td>
+                                <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
+                                    <xforms:label>Note</xforms:label>
+                                    <fr:body>
+                                        <fr:tr>
+                                            <fr:td>
+                                                <xforms:textarea id="note-control" ref="." appearance="xxforms:autosize" incremental="true">
+                                                    <xforms:label ref="$form-resources/note/label"/>
+                                                    <xforms:hint ref="$form-resources/note/hint"/>
+                                                    <xforms:help ref="$form-resources/note/help"/>
+                                                    <xforms:alert ref="$form-resources/note/alert"/>
+                                                </xforms:textarea>
+                                            </fr:td>
+                                        </fr:tr>
+                                    </fr:body>
+                                </fr:repeat>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </body>
+</html>

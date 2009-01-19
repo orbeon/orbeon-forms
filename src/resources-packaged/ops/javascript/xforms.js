@@ -2707,6 +2707,19 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * Event listener on dialogs called by YUI when the dialog is shown.
+     */
+	dialogShow: function(type, args, me) {
+		if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+            // On IE6, when the dialog is opened for the second time, part of the dialog are not visible.
+            // Setting the class again on the dialog gives notch to IE and is hack to get around this issue.
+            var dialogId = me;
+			var dialog = ORBEON.util.Dom.getElementById(dialogId);
+			dialog.className = dialog.className;
+		}
+    },
+
+    /**
      * Called when the "close" button is pressed in help dialog.
      */
     helpDialogButtonClose: function(_dummy, formID) {
@@ -4008,6 +4021,7 @@ ORBEON.xforms.Init = {
                 constraintoviewport: true,
                 underlay: "shadow"
             });
+			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);//SAN
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         }

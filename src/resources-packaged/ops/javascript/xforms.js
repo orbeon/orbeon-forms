@@ -4087,7 +4087,7 @@ ORBEON.xforms.Server = {
     },
 
     fireEvents: function(events, incremental) {
-        if (! ORBEON.xforms.Offline.isOnline) {
+        if (!ORBEON.xforms.Offline.isOnline) {
             // Go through all events
             var valueChangeEvents = [];
             for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
@@ -4162,23 +4162,43 @@ ORBEON.xforms.Server = {
             {
                 var seenControlValue = {};
                 var newEvents = [];
-                for (var eventIndex = ORBEON.xforms.Globals.eventQueue.length - 1; eventIndex >= 0; eventIndex--) {
+
+                for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                     // Extract information from event array
                     var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+
+                    //ORBEON.util.Utils.logMessage("event before: " + eventIndex + ", " + event.eventName + ", " + event.targetId + ", " + event.value);
+
                     if (event.eventName == "xxforms-value-change-with-focus-change") {
-                        // Don't send change value if there is already a change value for the same control
+                        // Value change is handled specially as values are collapsed
+
                         if (seenControlValue[event.targetId] == null) {
-                            seenControlValue[event.targetId] = true;
-                            // Don't send change value if the server already knows about the value of this control
+                            // Haven't yet seen this control in current block of events
+
+                            // Don't send change value 1) for xforms:upload or 2) if the server already knows about the value of this control
                             if (ORBEON.util.Dom.hasClass(ORBEON.util.Dom.getElementById(event.targetId), "xforms-upload") ||
                                 (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
                                         && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
+
+                                // Add event
+                                seenControlValue[event.targetId] = event;
                                 ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
-                                newEvents.unshift(event);
+                                newEvents.push(event);
                             }
+                        } else {
+                            // Have seen this control already in current block of events
+
+                            // Keep latest value
+                            seenControlValue[event.targetId].value = event.value;
+                            // Update server value
+                            ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
                         }
                     } else {
-                        newEvents.unshift(event);
+                        // Any non-value change event is a boundary between event blocks
+                        seenControlValue = {};
+
+                        // Add event
+                        newEvents.push(event);
                     }
                 }
                 ORBEON.xforms.Globals.eventQueue = newEvents;
@@ -4186,6 +4206,13 @@ ORBEON.xforms.Server = {
 
             // Check again that we have events to send after collapsing
             if (ORBEON.xforms.Globals.eventQueue.length > 0) {
+
+//                for (var eventIndex = ORBEON.xforms.Globals.eventQueue.length - 1; eventIndex >= 0; eventIndex--) {
+//                    // Extract information from event array
+//                    var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+//
+//                    ORBEON.util.Utils.logMessage("event after: " + eventIndex + ", " + event.eventName + ", " + event.targetId + ", " + event.value);
+//                }
 
                 // Save the form for this request
                 ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;

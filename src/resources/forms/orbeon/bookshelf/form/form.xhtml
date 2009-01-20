@@ -345,7 +345,7 @@
                 <fr:section id="details-section" bind="details-bind">
                     <xforms:label ref="$form-resources/details/label"/>
                     <xforms:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="4">
+                    <fr:grid columns="3">
                         <fr:tr>
                             <fr:td>
                                 <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search" incremental="true">
@@ -363,19 +363,7 @@
                                     <xforms:alert ref="$form-resources/author/alert"/>
                                 </xforms:input>
                             </fr:td>
-                            <fr:td rowspan="2">
-                                <xforms:select1 id="rating-control" ref="rating" appearance="full">
-                                    <xforms:label ref="$form-resources/rating/label"/>
-                                    <xforms:hint ref="$form-resources/rating/hint"/>
-                                    <xforms:help ref="$form-resources/rating/help"/>
-                                    <xforms:alert ref="$form-resources/rating/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/rating/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </fr:td>
-                            <fr:td rowspan="2">
+                            <fr:td rowspan="3">
                                 <xforms:upload id="image-control" ref="image">
                                     <xforms:label ref="$form-resources/image/label"/>
                                     <xforms:hint ref="$form-resources/image/hint"/>
@@ -412,6 +400,20 @@
                                     <xforms:help ref="$form-resources/link/help"/>
                                     <xforms:alert ref="$form-resources/link/alert"/>
                                 </xforms:input>
+                            </fr:td>
+                        </fr:tr>
+                        <fr:tr>
+                            <fr:td>
+                                <xforms:select1 id="rating-control" ref="rating" appearance="minimal">
+                                    <xforms:label ref="$form-resources/rating/label"/>
+                                    <xforms:hint ref="$form-resources/rating/hint"/>
+                                    <xforms:help ref="$form-resources/rating/help"/>
+                                    <xforms:alert ref="$form-resources/rating/alert"/>
+                                    <xforms:itemset nodeset="$form-resources/rating/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>

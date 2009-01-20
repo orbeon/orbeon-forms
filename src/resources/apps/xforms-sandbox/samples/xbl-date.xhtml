@@ -33,8 +33,8 @@
             <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
             <xforms:bind nodeset="dateTime1" type="xforms:dateTime"/>
         </xforms:model>
-        <!-- Include standard Form Runner components -->
-        <xi:include href="oxf:/apps/fr/components/standard.xbl" xxi:omit-xml-base="true"/>
+        <!-- Include custom Form Runner components -->
+        <xi:include href="oxf:/forms/orbeon/builder/form/custom-controls.xbl" xxi:omit-xml-base="true"/>
         <!-- Example of dateTime component that looks like the built-in one -->
         <xbl:xbl>
             <xbl:binding id="dateTime-component" element="fr|dateTime">

@@ -16,7 +16,7 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Form Builder properties -->
-    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/apps/fr/components/standard.xbl"/>
+    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/form/custom-controls.xbl"/>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>

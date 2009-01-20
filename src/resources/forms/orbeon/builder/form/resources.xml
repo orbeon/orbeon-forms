@@ -129,6 +129,7 @@
         <edit>
             <label>Edit</label>
         </edit>
+        <!-- Dialogs -->
         <!-- TODO: i18n whole Form Builder -->
         <apply>
             <label>Apply</label>
@@ -144,7 +145,7 @@
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: first-name</hint>
+                <hint>E.g.: "first-name"</hint>
             </control-name>
             <classes>
                 <label>Summary Page</label>
@@ -162,6 +163,24 @@
                 </item>
             </classes>
         </dialog-control-details>
+        <dialog-section-details>
+            <dialog-title>Edit Section Details</dialog-title>
+            <control-name>
+                <label>Section Name</label>
+                <alert>Name is already in use or incorrect</alert>
+                <hint>E.g.: "address"</hint>
+            </control-name>
+            <visibility>
+                <label>Visibility</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </visibility>
+            <readonly>
+                <label>Read-Only</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </readonly>
+        </dialog-section-details>
     </resource>
     <resource xml:lang="fr">
         /Users/ebruchez/Documents/Orbeon/orbeon/src/resources/forms/orbeon/builder/form/resources.xml
@@ -279,6 +298,7 @@
         <edit>
             <label>Editer</label>
         </edit>
+        <!-- Dialogs -->
         <!-- TODO: i18n whole Form Builder -->
         <apply>
             <label>Appliquer</label>
@@ -294,7 +314,7 @@
             <control-name>
                 <label>Nom du contrôle</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>E.g.: nom-de-famille</hint>
+                <hint>E.g.: "nom-de-famille"</hint>
             </control-name>
             <classes>
                 <label>Page de sommaire</label>
@@ -312,5 +332,23 @@
                 </item>
             </classes>
         </dialog-control-details>
+        <dialog-section-details>
+            <dialog-title>Détails de la section</dialog-title>
+            <control-name>
+                <label>Nom de la section</label>
+                <alert>Le nom est déjà utilisé ou incorrect</alert>
+                <hint>E.g.: "address"</hint>
+            </control-name>
+            <visibility>
+                <label>Visibilité</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </visibility>
+            <readonly>
+                <label>Lecture seule</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </readonly>
+        </dialog-section-details>
     </resource>
 </resources>

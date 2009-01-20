@@ -25,7 +25,7 @@
 
       id="fb-section-details-dialog" appearance="minimal" model="fb-section-details-model" level="modal">
 
-    <xforms:label>Edit Section Details</xforms:label>
+    <xforms:label ref="$form-resources/dialog-section-details/dialog-title"/>
 
     <xhtml:div>
         <xhtml:div class="fr-grid">
@@ -33,43 +33,48 @@
                 <xforms:input ref="section-name" incremental="true" id="fb-section-name-input">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                        <xhtml:span>Section Name</xhtml:span>
+                        <xhtml:span><xforms:output value="$form-resources/dialog-section-details/control-name/label"/></xhtml:span>
                     </xforms:label>
-                    <xforms:alert>Name is already in use or incorrect</xforms:alert>
-                    <xforms:hint>E.g.: "address"</xforms:hint>
+                    <xforms:alert ref="$form-resources/dialog-section-details/control-name/alert"/>
+                    <xforms:hint ref="$form-resources/dialog-section-details/control-name/hint"/>
                     <!-- Close and save upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
+                    <!-- NOTE: Check the validity of the instance before dispatching, because we can't, like in the case
+                         of the button, make it read-only -->
+                    <xforms:dispatch ev:event="DOMActivate"
+                                     if="xxforms:valid(instance('fb-section-details-instance'), true())"
+                                     name="xxforms-dialog-close" target="fb-section-details-dialog"/>
+
                 </xforms:input>
 
                 <xforms:input ref="relevant" incremental="true">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                        <xhtml:span>Visibility</xhtml:span>
+                        <xhtml:span><xforms:output value="$form-resources/dialog-section-details/visibility/label"/></xhtml:span>
                     </xforms:label>
-                    <xforms:alert>Incorrect XPath expression</xforms:alert>
-                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                    <xforms:alert ref="$form-resources/dialog-section-details/visibility/alert"/>
+                    <xforms:hint ref="$form-resources/dialog-section-details/visibility/hint"/>
                 </xforms:input>
 
                 <xforms:input ref="readonly" incremental="true">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                        <xhtml:span>Read-Only</xhtml:span>
+                        <xhtml:span><xforms:output value="$form-resources/dialog-section-details/readonly/label"/></xhtml:span>
                     </xforms:label>
-                    <xforms:alert>Incorrect XPath expression</xforms:alert>
-                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                    <xforms:alert ref="$form-resources/dialog-section-details/readonly/alert"/>
+                    <xforms:hint ref="$form-resources/dialog-section-details/readonly/hint"/>
                 </xforms:input>
             </xhtml:div>
         </xhtml:div>
 
         <xhtml:div class="fr-dialog-buttons">
             <xforms:trigger ref="save-trigger">
-                <xforms:label>Apply</xforms:label>
+                <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
             </xforms:trigger>
-            or
+            <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal">
-                <xforms:label>Cancel</xforms:label>
+                <xforms:label ref="$form-resources/cancel/label"/>
                 <!-- Close and cancel upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog">
                     <xxforms:context name="fb:save" select="false()"/>

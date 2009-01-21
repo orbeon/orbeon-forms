@@ -332,6 +332,12 @@
                 <label>Publish and Open</label>
             </publish-and-open>
         </dialog-publish>
+        <dialog-add-language>
+            <dialog-title>Add Language</dialog-title>
+            <new-language>
+                <label>Add the following language:</label>
+            </new-language>
+        </dialog-add-language>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -668,6 +674,13 @@
                 <label>Publier et ouvrir</label>
             </publish-and-open>
         </dialog-publish>
+        <dialog-add-language>
+            <dialog-title>Ajouter une langue</dialog-title>
+            <new-language>
+                <label>Ajouter la langue suivante :</label>
+            </new-language>
+        </dialog-add-language>
+        <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
             <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante ?</delete-grid>

@@ -25,17 +25,18 @@
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-add-language-dialog" appearance="minimal" level="modeless">
-    
-    <xforms:label>Add Language</xforms:label>
+
+    <xforms:label ref="$form-resources/dialog-add-language/dialog-title"/>
+
     <xhtml:div>
         <xforms:group>
             <xforms:group class="fb-hide-alert">
                 <xhtml:div class="fr-grid">
                     <xhtml:div class="fr-grid-content">
                         <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
-                            <xforms:label>Add the following language:</xforms:label>
+                            <xforms:label ref="$form-resources/dialog-add-language/new-language/label"/>
                             <xforms:item>
-                                <xforms:label>[Select...]</xforms:label>
+                                <xforms:label ref="$form-resources/select/label"/>
                                 <xforms:value/>
                             </xforms:item>
                             <!-- All the languages except the languages already selected -->
@@ -50,7 +51,7 @@
             </xforms:group>
             <xhtml:span>
                 <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
-                    <xforms:label>Add</xforms:label>
+                    <xforms:label ref="$form-resources/add/label"/>
                     <xforms:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->
                         <xforms:action context="$resources">
@@ -72,9 +73,9 @@
                         <xforms:revalidate model="fr-form-model"/> 
                     </xforms:action>
                 </xforms:trigger>
-                or
+                <xforms:output value="$form-resources/or/label"/>
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                    <xforms:label>Cancel</xforms:label>
+                    <xforms:label ref="$form-resources/cancel/label"/>
                 </xforms:trigger>
             </xhtml:span>
         </xforms:group>

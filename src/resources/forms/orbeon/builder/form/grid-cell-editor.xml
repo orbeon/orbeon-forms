@@ -57,9 +57,7 @@
                     <xforms:action if="exists($delete-td/*)">
                         <!-- Ask confirmation -->
                         <xxforms:show dialog="fb-confirmation-dialog">
-                            <xxforms:context name="fr:message"
-                                             select="concat('Are you sure you want to expand the current cell? ',
-                                                        'One control will be deleted.')"/>
+                            <xxforms:context name="fr:message" select="$form-resources/messages/expand-cell"/>
                             <xxforms:context name="fr:confirmation-target" select="'fb-expand-cell-down-trigger'"/>
                         </xxforms:show>
                     </xforms:action>

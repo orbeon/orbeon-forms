@@ -344,10 +344,9 @@
                                         <!-- Ask confirmation -->
                                         <xxforms:show dialog="fb-confirmation-dialog">
                                             <xxforms:context name="fr:message"
-                                                             select="concat('Are you sure you want to delete all resources for language ''',
+                                                             select="concat($form-resources/messages/delete-resources, ' ''',
                                                                          xxforms:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
                                                                          '''?')"/>
-
                                             <xxforms:context name="fr:confirmation-target" select="'fb-language-remove'"/>
                                         </xxforms:show>
                                     </xforms:action>
@@ -465,7 +464,7 @@
                                                 <!-- Ask confirmation -->
                                                 <xxforms:show dialog="fb-confirmation-dialog">
                                                     <xxforms:context name="fr:message"
-                                                                     select="concat($form-resources/remove-service-question/label, ' ''',
+                                                                     select="concat($form-resources/messages/delete-service/label, ' ''',
                                                                                  $submission-name,
                                                                                  '''?')"/>
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-submission-remove'"/>
@@ -518,7 +517,7 @@
                                                 <!-- Ask confirmation -->
                                                 <xxforms:show dialog="fb-confirmation-dialog">
                                                     <xxforms:context name="fr:message"
-                                                                     select="concat($form-resources/remove-service-question/label, ' ''',
+                                                                     select="concat($form-resources/messages/delete-service/label, ' ''',
                                                                                  $submission-name,
                                                                                  '''?')"/>
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-database-service-remove'"/>
@@ -571,7 +570,7 @@
                                                 <!-- Ask confirmation -->
                                                 <xxforms:show dialog="fb-confirmation-dialog">
                                                     <xxforms:context name="fr:message"
-                                                                     select="concat($form-resources/remove-action-question/label, ' ''',
+                                                                     select="concat($form-resources/messages/delete-action/label, ' ''',
                                                                                  $binding-name,
                                                                                  '''?')"/>
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-binding-remove'"/>

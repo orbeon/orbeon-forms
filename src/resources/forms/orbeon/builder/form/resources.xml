@@ -110,12 +110,6 @@
         <edit-source>
             <label>Edit Source</label>
         </edit-source>
-        <remove-service-question>
-            <label>Are you sure you want to delete service</label>
-        </remove-service-question>
-        <remove-action-question>
-            <label>Are you sure you want to delete action</label>
-        </remove-action-question>
         <reload-components>
             <label>Reload Components</label>
         </reload-components>
@@ -137,6 +131,9 @@
         <cancel>
             <label>Cancel</label>
         </cancel>
+        <delete>
+            <label>Delete</label>
+        </delete>
         <or>
             <label>or</label>
         </or>
@@ -187,7 +184,7 @@
         <dialog-validation-details>
             <dialog-title>Edit Validation Properties</dialog-title>
             <types>
-                <label>Types</label>
+                <label>Data Type</label>
             </types>
             <builtin-type>
                 <label>Built-in Type</label>
@@ -314,6 +311,22 @@
                 <hint>Message to display when the control data is incorrect or missing</hint>
             </alert>
         </dialog-validation-details>
+        <dialog-confirmation>
+            <dialog-title>Confirm</dialog-title>
+        </dialog-confirmation>
+        <!-- Messages -->
+        <messages>
+            <delete-section>Are you sure you want to delete the current section?</delete-section>
+            <delete-grid>Are you sure you want to delete the current grid?</delete-grid>
+            <delete-column>Are you sure you want to delete the current column?</delete-column>
+            <delete-row>Are you sure you want to delete the current row?</delete-row>
+            <expand-cell>Are you sure you want to expand the current cell? One control will be deleted.</expand-cell>
+            <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
+            <delete-service>Are you sure you want to delete service</delete-service>
+            <delete-action>Are you sure you want to delete action</delete-action>
+            <control-will-be-deleted> control will be deleted.</control-will-be-deleted>
+            <controls-will-be-deleted> controls will be deleted.</controls-will-be-deleted>
+        </messages>
     </resource>
     <resource xml:lang="fr">
         /Users/ebruchez/Documents/Orbeon/orbeon/src/resources/forms/orbeon/builder/form/resources.xml
@@ -412,12 +425,6 @@
         <edit-source>
             <label>Editer source</label>
         </edit-source>
-        <remove-service-question>
-            <label>Etes-vous sûr de vouloir supprimer le service</label>
-        </remove-service-question>
-        <remove-action-question>
-            <label>Etes-vous sûr de vouloir supprimer l'action</label>
-        </remove-action-question>
         <reload-components>
             <label>Recharger les composants</label>
         </reload-components>
@@ -439,9 +446,15 @@
         <cancel>
             <label>Annuler</label>
         </cancel>
+        <delete>
+            <label>Supprimer</label>
+        </delete>
         <or>
             <label>ou</label>
         </or>
+        <select>
+            <label>[Sélectionner...]</label>
+        </select>
         <dialog-control-details>
             <dialog-title>Détails du contrôle</dialog-title>
             <control-name>
@@ -486,7 +499,7 @@
         <dialog-validation-details>
             <dialog-title>Propriétés de validation</dialog-title>
             <types>
-                <label>Types</label>
+                <label>Type de donnée</label>
             </types>
             <builtin-type>
                 <label>Type de base</label>
@@ -613,5 +626,20 @@
                 <hint>Message à afficher lorsque la donnée est incorrecte ou manquante</hint>
             </alert>
         </dialog-validation-details>
+        <dialog-confirmation>
+            <dialog-title>Confirmation</dialog-title>
+        </dialog-confirmation>
+        <messages>
+            <delete-section>Etes-vous sûr de vouloir supprimer la section courante?</delete-section>
+            <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante?</delete-grid>
+            <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante?</delete-column>
+            <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante?</delete-row>
+            <expand-cell>Etes-vous sûr de vouloir étendre la cellule courante? Un contrôle sera supprimé.</expand-cell>
+            <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
+            <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
+            <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
+            <control-will-be-deleted> contrôle sera supprimé.</control-will-be-deleted>
+            <controls-will-be-deleted> contrôles seront supprimés.</controls-will-be-deleted>
+        </messages>
     </resource>
 </resources>

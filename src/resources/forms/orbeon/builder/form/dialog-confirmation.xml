@@ -24,7 +24,8 @@
 
       id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
     
-    <xforms:label>Confirm</xforms:label>
+    <xforms:label ref="$form-resources/dialog-confirmation/dialog-title"/>
+
     <xhtml:div>
         <xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="fr-dialog-icon"/>
         <xhtml:div class="fr-dialog-message">
@@ -34,11 +35,17 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xforms:trigger>
-                <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/delete/label"/></xhtml:span>
+                </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
             </xforms:trigger>
             <xforms:trigger id="fb-confirmation-dialog-cancel-trigger">
-                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
             </xforms:trigger>
         </xforms:group>

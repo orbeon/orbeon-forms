@@ -140,6 +140,9 @@
         <or>
             <label>or</label>
         </or>
+        <select>
+            <label>[Select...]</label>
+        </select>
         <dialog-control-details>
             <dialog-title>Edit Control Details</dialog-title>
             <control-name>
@@ -181,6 +184,136 @@
                 <hint>Boolean XPath expression</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-validation-details>
+            <dialog-title>Edit Validation Properties</dialog-title>
+            <types>
+                <label>Types</label>
+            </types>
+            <builtin-type>
+                <label>Built-in Type</label>
+                <hint>Built-in data type</hint>
+                
+                <choices>
+                    <choices>
+                        <label>Common Types</label>
+                        <type label="Any string" allow-empty="true">string</type>
+                        <type label="Double-precision floating-point number">double</type>
+                        <type label="Decimal number">decimal</type>
+                        <type label="Integer number">integer</type>
+                        <type label="Date and time">dateTime</type>
+                        <type label="Date">date</type>
+                        <type label="Time">time</type>
+                        <type label="Boolean">boolean</type>
+                        <type label="Any URI">anyURI</type>
+                        <type label="Email address">email</type>
+                    </choices>
+                    <choices>
+                        <label>Number Types</label>
+                        <type label="Simple-precision floating-point number">float</type>
+                        <type label="Double-precision floating-point number">double</type>
+                        <type label="Decimal number">decimal</type>
+                        <type label="Integer number">integer</type>
+
+                        <type label="Positive integer">positiveInteger</type>
+                        <type label="Non-positive integer">nonPositiveInteger</type>
+                        <type label="Negative integer">negativeInteger</type>
+                        <type label="Non-negative integer">nonNegativeInteger</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Time Types</label>
+                        <type label="Date and time">dateTime</type>
+                        <type label="Date">date</type>
+                        <type label="Time">time</type>
+                        <type label="Duration">duration</type>
+                        <type label="Year and month">gYearMonth</type>
+                        <type label="Month and day">gMonthDay</type>
+                        <type label="Year">gYear</type>
+                        <type label="Month">gMonth</type>
+                        <type label="Day">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>String Types</label>
+                        <type label="Any string" allow-empty="true">string</type>
+                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                    </choices>
+                    <choices>
+                        <label>Other Types</label>
+                        <type label="Boolean">boolean</type>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Base64-encoded binary" allow-empty="true">base64Binary</type>
+                        <type label="Hexadecimal-encoded binary" allow-empty="true">hexBinary</type>
+                        <type label="Any URI">anyURI</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Schema Type</label>
+                <hint>Type from an imported schema</hint>
+            </schema-type>
+            <required>
+                <label>Required</label>
+                <hint>Whether the data is required</hint>
+                <item>
+                    <label>Yes</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>No</label>
+                    <value>false</value>
+                </item>
+            </required>
+            <constraint>
+                <label>Constraint</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </constraint>
+            <visibility>
+                <label>Visibility</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </visibility>
+            <readonly>
+                <label>Read-Only</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </readonly>
+            <default>
+                <label>Initial Value</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>XPath expression</hint>
+            </default>
+            <calculate>
+                <label>Calculated Value</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>XPath expression</hint>
+            </calculate>
+            <alert>
+                <label>Error Message</label>
+                <hint>Message to display when the control data is incorrect or missing</hint>
+            </alert>
+        </dialog-validation-details>
     </resource>
     <resource xml:lang="fr">
         /Users/ebruchez/Documents/Orbeon/orbeon/src/resources/forms/orbeon/builder/form/resources.xml
@@ -350,5 +483,135 @@
                 <hint>Expression XPath booléenne</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-validation-details>
+            <dialog-title>Propriétés de validation</dialog-title>
+            <types>
+                <label>Types</label>
+            </types>
+            <builtin-type>
+                <label>Type de base</label>
+                <hint>Type de donnée de base</hint>
+
+                <choices>
+                    <choices>
+                        <label>Types courants</label>
+                        <type label="Chaîne de caractères" allow-empty="true">string</type>
+                        <type label="Nombre réel double précision">double</type>
+                        <type label="Nombre décimal">decimal</type>
+                        <type label="Nombre entier">integer</type>
+                        <type label="Date et heure">dateTime</type>
+                        <type label="Date">date</type>
+                        <type label="Heure">time</type>
+                        <type label="Booléen">boolean</type>
+                        <type label="URI">anyURI</type>
+                        <type label="Adresse email">email</type>
+                    </choices>
+                    <choices>
+                        <label>Types numériques</label>
+                        <type label="Nombre réel simple précision">float</type>
+                        <type label="Nombre réel double précision">double</type>
+                        <type label="Nombre décimal">decimal</type>
+                        <type label="Nombre entier">integer</type>
+
+                        <type label="Nombre entier positif">positiveInteger</type>
+                        <type label="Nombre entier non positif">nonPositiveInteger</type>
+                        <type label="Nombre entier négatif">negativeInteger</type>
+                        <type label="Nombre entier non négatif">nonNegativeInteger</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Types liés au temps</label>
+                        <type label="Date et heure">dateTime</type>
+                        <type label="Date">date</type>
+                        <type label="Heure">time</type>
+                        <type label="Durée">duration</type>
+                        <type label="Année et mois">gYearMonth</type>
+                        <type label="Mois et jour">gMonthDay</type>
+                        <type label="Année">gYear</type>
+                        <type label="Mois">gMonth</type>
+                        <type label="Jour">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>Types chaînes de caractères</label>
+                        <type label="Chaîne de caractères" allow-empty="true">string</type>
+                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                    </choices>
+                    <choices>
+                        <label>Autres types</label>
+                        <type label="Booléen">boolean</type>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Binaire encodé en Base64" allow-empty="true">base64Binary</type>
+                        <type label="Binaire encodé en hexadécimal" allow-empty="true">hexBinary</type>
+                        <type label="URI">anyURI</type>
+                        <type label="Nom XML qualifié">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Type de schéma</label>
+                <hint>Type provenant d'un schéma importé</hint>
+            </schema-type>
+            <required>
+                <label>Obligatoire</label>
+                <hint>Est-ce que la donnée est obligatoire</hint>
+                <item>
+                    <label>Oui</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>Non</label>
+                    <value>false</value>
+                </item>
+            </required>
+            <constraint>
+                <label>Contrainte</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </constraint>
+            <visibility>
+                <label>Visibilité</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </visibility>
+            <readonly>
+                <label>Lecture seule</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </readonly>
+            <default>
+                <label>Valeur initiale</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath</hint>
+            </default>
+            <calculate>
+                <label>Valeur calculée</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath</hint>
+            </calculate>
+            <alert>
+                <label>Message d'erreur</label>
+                <hint>Message à afficher lorsque la donnée est incorrecte ou manquante</hint>
+            </alert>
+        </dialog-validation-details>
     </resource>
 </resources>

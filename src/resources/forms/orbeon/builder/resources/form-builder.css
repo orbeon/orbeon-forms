@@ -147,8 +147,9 @@ a.fb-edit-help-trigger img {
 #fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
 
 #fb-edit-details-dialog,
-    #fb-edit-validation-dialog, #fb-section-details-dialog,
+    #fb-section-details-dialog,
     #fb-add-language-dialog { width: 20em }
+#fb-edit-validation-dialog { width: 30em }
 #fb-edit-details-dialog .xforms-input input { width: 98% }
 #fb-section-details-dialog .xforms-input input { width: 98% }
 

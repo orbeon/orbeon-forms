@@ -24,19 +24,23 @@
 
       id="fb-edit-validation-dialog" appearance="minimal" model="fb-validation-model" level="modal">
 
-    <xforms:label>Edit Validation Properties</xforms:label>
+    <xforms:label ref="$form-resources/dialog-validation-details/dialog-title"/>
+
+
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
     <xhtml:div>
         <xhtml:div class="fr-grid">
             <xhtml:div class="fr-grid-content">
 
                 <xforms:group appearance="xxforms:fieldset">
-                    <xforms:label>Types</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-validation-details/types/label"/>
+
+                    <!-- Built-in type -->
                     <xforms:select1 ref="builtin-type">
-                        <xforms:label>Built-in Type</xforms:label>
-                        <xforms:hint>Built-in data type</xforms:hint>
-                        <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                            <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
+                        <xforms:label ref="$form-resources/dialog-validation-details/builtin-type/label"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/builtin-type/hint"/>
+                        <xforms:itemset nodeset="$form-resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxforms:refresh-items="false">
+                            <xforms:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
                             <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
                         </xforms:itemset>
                         <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
@@ -46,14 +50,15 @@
                     <xforms:select1 ref="schema-type[$model/xs:schema]">
                         <xforms:label>
                             <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
-                            <xhtml:span>Schema Type</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/Schema Type/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:hint>Imported schema type</xforms:hint>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/types/hint"/>
                         <xforms:item>
-                            <xforms:label>[Select...]</xforms:label>
+                            <xforms:label ref="$form-resources/select/label"/>
                             <xforms:value/>
                         </xforms:item>
-                        <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                        <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                        <xforms:itemset nodeset="$model/xs:schema/xs:simpleType" xxforms:refresh-items="true">
                             <xforms:label ref="@name"/>
                             <xforms:value ref="@name"/>
                         </xforms:itemset>
@@ -61,16 +66,12 @@
                     </xforms:select1>
 
                     <xforms:select1 ref="required" appearance="full">
-                        <xforms:label>Required</xforms:label>
-                        <xforms:hint>Whether the data is required</xforms:hint>
-                        <xforms:item>
-                            <xforms:label>Yes</xforms:label>
-                            <xforms:value>true</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>No</xforms:label>
-                            <xforms:value>false</xforms:value>
-                        </xforms:item>
+                        <xforms:label ref="$form-resources/dialog-validation-details/required/label"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/required/hint"/>
+                        <xforms:itemset nodeset="$form-resources/dialog-validation-details/required//item" xxforms:refresh-items="false">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>   
                     </xforms:select1>
                 </xforms:group>
 
@@ -88,44 +89,46 @@
                     <xforms:input ref="constraint" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
-                            <xhtml:span>Constraint</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/constraint/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:alert>Incorrect XPath expression</xforms:alert>
-                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                        <xforms:alert ref="$form-resources/dialog-validation-details/constraint/alert"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/constraint/hint"/>
                     </xforms:input>
 
                     <xforms:input ref="relevant" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                            <xhtml:span>Visibility</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/visibility/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:alert>Incorrect XPath expression</xforms:alert>
-                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                        <xforms:alert ref="$form-resources/dialog-validation-details/visibility/alert"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/visibility/hint"/>
                     </xforms:input>
 
                     <xforms:input ref="readonly" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                            <xhtml:span>Read-Only</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/readonly/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:alert>Incorrect XPath expression</xforms:alert>
-                        <xforms:hint>Boolean XPath expression</xforms:hint>
+                        <xforms:alert ref="$form-resources/dialog-validation-details/readonly/alert"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/readonly/hint"/>
                     </xforms:input>
 
                     <xforms:input ref="default" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
-                            <xhtml:span>Initial Value</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/default/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:hint>XPath expression</xforms:hint>
+                        <xforms:alert ref="$form-resources/dialog-validation-details/default/alert"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/default/hint"/>
                     </xforms:input>
 
                     <xforms:input ref="calculate" incremental="true">
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
-                            <xhtml:span>Calculated Value</xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/calculate/label"/></xhtml:span>
                         </xforms:label>
-                        <xforms:hint>XPath expression</xforms:hint>
+                        <xforms:alert ref="$form-resources/dialog-validation-details/calculate/alert"/>
+                        <xforms:hint ref="$form-resources/dialog-validation-details/calculate/hint"/>
                     </xforms:input>
                 </xforms:group>
 
@@ -133,23 +136,22 @@
                 <xforms:textarea ref="alert" incremental="true">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
-                        <xhtml:span>Alert Message</xhtml:span>
+                        <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/alert/label"/></xhtml:span>
                     </xforms:label>
-                    <xforms:label>Alert Message</xforms:label>
-                    <xforms:hint>Message to display when the data is incorrect</xforms:hint>
+                    <xforms:hint ref="$form-resources/dialog-validation-details/alert/hint"/>
                 </xforms:textarea>
             </xhtml:div>
         </xhtml:div>
 
         <xhtml:div class="fr-dialog-buttons">
-                <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
-                <xforms:label>Apply</xforms:label>
+            <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
+                <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog"/>
             </xforms:trigger>
-            or
+            <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                <xforms:label>Cancel</xforms:label>
+                <xforms:label ref="$form-resources/cancel/label"/>
                 <!-- Close and cancel upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog">
                     <xxforms:context name="fb:save" select="false()"/>
@@ -303,83 +305,6 @@
             <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
-        <!-- TODO: i18n -->
-        <!-- TODO: more user-friendly labels for common types -->
-        <xforms:instance id="fb-validation-types-instance" xxforms:readonly="true">
-            <choices>
-                <choices>
-                    <label>Common Types</label>
-                    <type allow-empty="true">string</type>
-                    <type>float</type>
-                    <type>double</type>
-                    <type>decimal</type>
-                    <type>integer</type>
-                    <type>dateTime</type>
-                    <type>time</type>
-                    <type>date</type>
-                    <type>boolean</type>
-                    <type>anyURI</type>
-                    <type>email</type>
-                </choices>
-                <choices>
-                    <label>String Types</label>
-                    <type allow-empty="true">string</type>
-                    <type allow-empty="true">normalizedString</type>
-                    <type>token</type>
-                    <type>language</type>
-                    <type>Name</type>
-                    <type>NCName</type>
-                    <type>ID</type>
-                    <type>IDREF</type>
-                    <type>IDREFS</type>
-                    <type>ENTITY</type>
-                    <type>ENTITIES</type>
-                    <type>NMTOKEN</type>
-                    <type>NMTOKENS</type>
-                </choices>
-                <choices>
-                    <label>Number Types</label>
-                    <type>float</type>
-                    <type>double</type>
-                    <type>decimal</type>
-                    <type>integer</type>
-                    <type>long</type>
-                    <type>int</type>
-                    <type>short</type>
-                    <type>byte</type>
-                    <type>positiveInteger</type>
-                    <type>nonPositiveInteger</type>
-                    <type>negativeInteger</type>
-                    <type>nonNegativeInteger</type>
-                    <type>unsignedLong</type>
-                    <type>unsignedInt</type>
-                    <type>unsignedShort</type>
-                    <type>unsignedByte</type>
-                </choices>
-                <choices>
-                    <label>Time Types</label>
-                    <type>duration</type>
-                    <type>dateTime</type>
-                    <type>time</type>
-                    <type>date</type>
-                    <type>gYearMonth</type>
-                    <type>gYear</type>
-                    <type>gMonthDay</type>
-                    <type>gDay</type>
-                    <type>gMonth</type>
-                </choices>
-                <choices>
-                    <label>Other Types</label>
-                    <type>boolean</type>
-                    <!-- Not 100% sure if these two types allow empty content -->
-                    <type allow-empty="true">hexBinary</type>
-                    <type allow-empty="true">base64Binary</type>
-                    <type>anyURI</type>
-                    <type>QName</type>
-                    <type>NOTATION</type>
-                </choices>
-            </choices>
-        </xforms:instance>
     </xforms:model>
 
 </xxforms:dialog>

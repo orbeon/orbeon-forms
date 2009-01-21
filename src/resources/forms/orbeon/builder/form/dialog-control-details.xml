@@ -46,7 +46,7 @@
                 </xforms:input>
                 <xforms:select ref="classes" appearance="full">
                     <xforms:label ref="$form-resources/dialog-control-details/classes/label"/>
-                    <xforms:itemset nodeset="$form-resources/dialog-control-details/classes/item">
+                    <xforms:itemset nodeset="$form-resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

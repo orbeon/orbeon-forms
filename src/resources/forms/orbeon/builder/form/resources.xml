@@ -124,7 +124,6 @@
             <label>Edit</label>
         </edit>
         <!-- Dialogs -->
-        <!-- TODO: i18n whole Form Builder -->
         <apply>
             <label>Apply</label>
         </apply>
@@ -729,7 +728,6 @@
             <label>Editer</label>
         </edit>
         <!-- Dialogs -->
-        <!-- TODO: i18n whole Form Builder -->
         <apply>
             <label>Appliquer</label>
         </apply>

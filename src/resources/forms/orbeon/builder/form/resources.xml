@@ -512,6 +512,96 @@
                 <label>Test</label>
             </test>
         </dialog-database-services>
+        <dialog-actions>
+            <dialog-title>Actions Editor</dialog-title>
+            <service-name>
+                <label>Action Name</label>
+                <hint>Choose a unique name for this action</hint>
+            </service-name>
+            <event-type>
+                <label>React to</label>
+                <hint>Event (on a control or global) to react to</hint>
+                <!-- Just a value change -->
+                <item>
+                    <label>Value Change</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <item>
+                    <label>Value Change or Form Load</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>
+                <!-- Control activation -->
+                <item>
+                    <label>Activation</label>
+                    <value>DOMActivate</value>
+                </item>
+                <!-- Form load -->
+                <item>
+                    <label>Form Load</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-control>
+                <label>Control</label>
+            </event-control>
+            <service-to-call>
+                <label>Service to Call</label>
+                <hint>Service to call when the event happens</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Set Service Request Values</label>
+            </request-parameters>
+            <source-control>
+                <label>Source Control</label>
+            </source-control>
+            <destination-xpath>
+                <label>Destination XPath expression</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Set Database Service Parameters</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Parameter number</label>
+            </parameter-number>
+            <response-values>
+                <label>Set Response Control Values</label>
+            </response-values>
+            <destination-control>
+                <label>Destination Control</label>
+            </destination-control>
+            <source-xpath>
+                <label>Source XPath expression</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Set Response Selection Control Items</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Destination selection control</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Itemset</label>
+                <hint>XPath expressions to build a new itemset</hint>
+            </itemset>
+            <items>
+                <label>Items</label>
+                <hint>XPath expression returning one node for each item</hint>
+            </items>
+            <label>
+                <label>Label</label>
+                <hint>XPath expression relative to an item node</hint>
+            </label>
+            <value>
+                <label>Value</label>
+                <hint>XPath expression relative to an item node</hint>
+            </value>
+            <save>
+                <label>Save</label>
+            </save>
+            <test>
+                <label>Test</label>
+            </test>
+        </dialog-actions>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -1027,6 +1117,96 @@
                 <label>Tester</label>
             </test>
         </dialog-database-services>
+        <dialog-actions>
+            <dialog-title>Editeur d'actions</dialog-title>
+            <service-name>
+                <label>Nom de l'action</label>
+                <hint>Choisisez un nom d'action unique</hint>
+            </service-name>
+            <event-type>
+                <label>Réagir à</label>
+                <hint>Evénement (sur un contrôle ou global) auquel réagir</hint>
+                <!-- Just a value change -->
+                <item>
+                    <label>Changement de valeur</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <item>
+                    <label>Changement de valeur ou chargement du formulaire</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>
+                <!-- Control activation -->
+                <item>
+                    <label>Activation</label>
+                    <value>DOMActivate</value>
+                </item>
+                <!-- Form load -->
+                <item>
+                    <label>Chargement du formulaire</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-control>
+                <label>Contrôle</label>
+            </event-control>
+            <service-to-call>
+                <label>Service à appeler</label>
+                <hint>Service à appeler lorsque l'événement se produit</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Paramêtres de la requête au service</label>
+            </request-parameters>
+            <source-control>
+                <label>Contrôle source</label>
+            </source-control>
+            <destination-xpath>
+                <label>Expression XPath destination</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Paramêtres de la requête au service base de données</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Numéro de paramètre</label>
+            </parameter-number>
+            <response-values>
+                <label>Valeurs de contrôles provenant de la réponse</label>
+            </response-values>
+            <destination-control>
+                <label>Contrôle de destination</label>
+            </destination-control>
+            <source-xpath>
+                <label>Expression XPath source</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Valeurs de liste de choix provenant de la réponse</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Contrôle de sélection de destination</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Choix</label>
+                <hint>Expressions XPath pour construire une nouvelle liste de choix</hint>
+            </itemset>
+            <items>
+                <label>Noeuds</label>
+                <hint>Expression XPath retournant un noeud pour chaque choix</hint>
+            </items>
+            <label>
+                <label>Libellé</label>
+                <hint>Expression XPath relative à un noeud</hint>
+            </label>
+            <value>
+                <label>Valeur</label>
+                <hint>Expression XPath relative à un noeud</hint>
+            </value>
+            <save>
+                <label>Sauvegarder</label>
+            </save>
+            <test>
+                <label>Tester</label>
+            </test>
+        </dialog-actions>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

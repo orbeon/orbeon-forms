@@ -24,48 +24,32 @@
 
       id="fb-action-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
 
-    <xforms:label>Actions Editor</xforms:label>
+    <xforms:label ref="$form-resources/dialog-actions/dialog-title"/>
 
     <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:input ref="name" id="fb-binding-name-input" incremental="true">
-                <xforms:label>Action Name</xforms:label>
-                <xforms:hint>Choose a unique name for this action</xforms:hint>
+                <xforms:label ref="$form-resources/dialog-actions/service-name/label"/>
+                <xforms:hint ref="$form-resources/dialog-actions/service-name/hint"/>
             </xforms:input>
             <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
                 <xforms:select1 ref="xforms:action[1]/@ev:event">
-                    <xforms:label>React to</xforms:label>
-                    <xforms:hint>Event (on a control or global) to react to</xforms:hint>
+                    <xforms:label ref="$form-resources/dialog-actions/event-type/label"/>
+                    <xforms:hint ref="$form-resources/dialog-actions/event-type/hint"/>
                     <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
-                    <!-- Just a value change -->
-                    <xforms:item>
-                        <xforms:label>Value Change</xforms:label>
-                        <xforms:value>xforms-value-changed</xforms:value>
-                    </xforms:item>
-                    <!-- Value change AND the first time the control shows -->
-                    <xforms:item>
-                        <xforms:label>Value Change or Form Load</xforms:label>
-                        <xforms:value>xforms-value-changed xforms-enabled</xforms:value>
-                    </xforms:item>
-                    <!-- Control activation -->
-                    <xforms:item>
-                        <xforms:label>Activation</xforms:label>
-                        <xforms:value>DOMActivate</xforms:value>
-                    </xforms:item>
-                    <!-- Form load -->
-                    <xforms:item>
-                        <xforms:label>Form Load</xforms:label>
-                        <xforms:value>xforms-ready</xforms:value>
-                    </xforms:item>
+                    <xforms:itemset nodeset="$form-resources/dialog-actions/event-type/item">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
+                    </xforms:itemset>
                 </xforms:select1>
                 <xforms:select1 ref="xforms:action[1]/@ev:observer">
-                    <xforms:label>Control</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-actions/event-control/label"/>
                     <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
                     <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
@@ -75,10 +59,10 @@
                     </xforms:itemset>
                 </xforms:select1>
                 <xforms:select1 ref="xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
-                    <xforms:label>Service to Call</xforms:label>
-                    <xforms:hint>Service to call when the event happens</xforms:hint>
+                    <xforms:label ref="$form-resources/dialog-actions/service-to-call/label"/>
+                    <xforms:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                     <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
                     <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
@@ -89,15 +73,15 @@
                 </xforms:select1>
                 <!-- Set request values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
-                    <xforms:label>Set Service Request Values</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
                                     <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label>Source Control</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
                                         <xforms:item>
-                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
@@ -109,7 +93,7 @@
                                 </xhtml:td>
                                 <xhtml:td>
                                     <xforms:input ref="xxforms:variable[@name = 'path']/@select">
-                                        <xforms:label>Destination XPath Expression</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/destination-xpath/label"/>
                                     </xforms:input>
                                 </xhtml:td>
                             </xhtml:tr>
@@ -117,15 +101,15 @@
                     </fr:repeat>
                 </xforms:group>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
-                    <xforms:label>Set Database Service Parameters</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
                                     <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label>Source Control</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
                                         <xforms:item>
-                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
@@ -137,7 +121,7 @@
                                 </xhtml:td>
                                 <xhtml:td>
                                     <xforms:input ref="xxforms:variable[@name = 'parameter']/@select">
-                                        <xforms:label>Parameter Number</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/parameter-number/label"/>
                                     </xforms:input>
                                 </xhtml:td>
                             </xhtml:tr>
@@ -146,15 +130,15 @@
                 </xforms:group>
                 <!-- Set control values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done']">
-                    <xforms:label>Set Response Control Values</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-actions/response-values/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
                                     <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label>Destination Control</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/destination-control/label"/>
                                         <xforms:item>
-                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
@@ -165,7 +149,7 @@
                                 </xhtml:td>
                                 <xhtml:td>
                                     <xforms:input ref="xxforms:variable[@name = 'control-value']/@select">
-                                        <xforms:label>Source XPath Expression</xforms:label>
+                                        <xforms:label ref="$form-resources/dialog-actions/source-xpath/label"/>
                                     </xforms:input>
                                 </xhtml:td>
                             </xhtml:tr>
@@ -174,17 +158,17 @@
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($body//(xforms:select | xforms:select1))]">
-                    <xforms:label>Set Response Selection Control Items</xforms:label>
+                    <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
                                     <!-- Only list selection controls -->
                                     <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label>Destination Control</xforms:label>
-                                        <xforms:hint>Selection control</xforms:hint>
+                                        <xforms:label ref="$form-resources/dialog-actions/destination-selection-control/label"/>
+                                        <!--<xforms:hint ref="$form-resources/dialog-actions/destination-selection-control/hint"/>-->
                                         <xforms:item>
-                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="$body//(xforms:select | xforms:select1)[(@ref or @bind) and ends-with(@id, '-control')]">
@@ -197,20 +181,20 @@
                                 <xhtml:td>
                                     <!-- Only display this if a selection control is picked -->
                                     <xforms:group ref=".[xxforms:variable[@name = 'control-name']/@select != '']">
-                                        <xforms:label>Itemset</xforms:label>
-                                        <xforms:hint>XPath expressions to build a new itemset</xforms:hint>
+                                        <xforms:label ref="$form-resources/dialog-actions/itemset/label"/>
+                                        <xforms:hint ref="$form-resources/dialog-actions/itemset/hint"/>
                                         <xhtml:div class="fb-parameters">
                                             <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
-                                                <xforms:label>Items</xforms:label>
-                                                <xforms:hint>XPath expression returning all response item nodes</xforms:hint>
+                                                <xforms:label ref="$form-resources/dialog-actions/items/label"/>
+                                                <xforms:hint ref="$form-resources/dialog-actions/items/hint"/>
                                             </xforms:input>
                                             <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
-                                                <xforms:label>Label</xforms:label>
-                                                <xforms:hint>XPath expression relative to an item node</xforms:hint>
+                                                <xforms:label ref="$form-resources/dialog-actions/label/label"/>
+                                                <xforms:hint ref="$form-resources/dialog-actions/label/hint"/>
                                             </xforms:input>
                                             <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
-                                                <xforms:label>Value</xforms:label>
-                                                <xforms:hint>XPath expression relative to an item node</xforms:hint>
+                                                <xforms:label ref="$form-resources/dialog-actions/value/label"/>
+                                                <xforms:hint ref="$form-resources/dialog-actions/value/hint"/>
                                             </xforms:input>
                                         </xhtml:div>
                                     </xforms:group>
@@ -254,7 +238,7 @@
             <xforms:trigger ref="$instance/save-test-trigger[false()]">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
-                    <xhtml:span>Test</xhtml:span>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-actions/test/label"/></xhtml:span>
                 </xforms:label>
 
                 <!-- Test submission -->
@@ -267,7 +251,7 @@
 
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xhtml:span>Save</xhtml:span>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-actions/save/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
@@ -284,7 +268,10 @@
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
-                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-action-dialog"/>
             </xforms:trigger>

@@ -25,21 +25,22 @@
 
       id="fb-edit-help-dialog" appearance="minimal" model="fb-edit-help-model" level="modal">
 
-    <xforms:label>Edit Help</xforms:label>
+    <xforms:label ref="$form-resources/dialog-help/dialog-title"/>
+
     <xhtml:div>
         <xforms:group class="fb-hide-alert">
             <xforms:textarea ref="help-text" id="fb-edit-help-dialog-text">
-                <xforms:label>Help Message</xforms:label>
+                <xforms:label ref="$form-resources/dialog-help/help-message/label"/>
             </xforms:textarea>
             <xhtml:div class="fr-dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename">
-                    <xforms:label>Apply</xforms:label>
+                    <xforms:label ref="$form-resources/apply/label"/>
                     <!-- Close and save upon DOMActivate -->
                     <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog"/>
                 </xforms:trigger>
-                or
+                <xforms:output value="$form-resources/or/label"/>
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                    <xforms:label>Cancel</xforms:label>
+                    <xforms:label ref="$form-resources/cancel/label"/>
                     <!-- Close and cancel upon DOMActivate -->
                     <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog">
                         <xxforms:context name="fb:save" select="false()"/>

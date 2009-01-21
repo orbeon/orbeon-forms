@@ -314,6 +314,12 @@
         <dialog-confirmation>
             <dialog-title>Confirm</dialog-title>
         </dialog-confirmation>
+        <dialog-help>
+            <dialog-title>Edit Help</dialog-title>
+            <help-message>
+                <label>Help Message</label>
+            </help-message>
+        </dialog-help>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -629,6 +635,12 @@
         <dialog-confirmation>
             <dialog-title>Confirmation</dialog-title>
         </dialog-confirmation>
+        <dialog-help>
+            <dialog-title>Edition de l'aide</dialog-title>
+            <help-message>
+                <label>Message d'aide</label>
+            </help-message>
+        </dialog-help>
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante?</delete-section>
             <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante?</delete-grid>

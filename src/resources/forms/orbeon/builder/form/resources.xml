@@ -386,6 +386,18 @@
                 <label>PDF File</label>
             </upload-pdf>
         </dialog-upload-pdf>
+        <dialog-itemsets>
+            <dialog-title>Itemset Editor</dialog-title>
+            <resources-language>
+                <label>Resources Language</label>
+            </resources-language>
+            <label>
+                <label>Label</label>
+            </label>
+            <value>
+                <label>Value</label>
+            </value>
+        </dialog-itemsets>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -775,6 +787,18 @@
                 <label>Fichier PDF</label>
             </upload-pdf>
         </dialog-upload-pdf>
+        <dialog-itemsets>
+            <dialog-title>Editeur de listes de choix</dialog-title>
+            <resources-language>
+                <label>Langue des ressources</label>
+            </resources-language>
+            <label>
+                <label>Libellé</label>
+            </label>
+            <value>
+                <label>Valeur</label>
+            </value>
+        </dialog-itemsets>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

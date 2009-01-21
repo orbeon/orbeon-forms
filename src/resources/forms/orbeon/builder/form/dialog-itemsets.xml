@@ -24,13 +24,14 @@
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-itemset-editor-dialog" appearance="minimal" model="fb-itemset-model" level="modal">
-    <xforms:label>Itemset Editor</xforms:label>
+
+    <xforms:label ref="$form-resources/dialog-itemsets/dialog-title"/>
 
     <xhtml:div class="fb-dialog-body">
 
         <xforms:group class="fb-language-choice fb-hide-alert">
             <xforms:select1 appearance="minimal" ref="$itemset-lang">
-                <xforms:label class="xforms-disabled">Resources Language</xforms:label>
+                <xforms:label class="xforms-disabled" ref="$form-resources/dialog-itemsets/resources-language/label"/>
                 <xforms:itemset nodeset="$resources/resource">
                     <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
                     <xforms:value ref="@xml:lang"/>
@@ -44,7 +45,7 @@
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:input ref="label[@xml:lang = $itemset-lang]" id="fb-itemset-label-input">
-                                <xforms:label>Label</xforms:label>
+                                <xforms:label ref="$form-resources/dialog-itemsets/label/label"/>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
                                     <xforms:setfocus control="fb-itemset-label-input"/>
@@ -53,7 +54,7 @@
                         </xhtml:td>
                         <xhtml:td>
                             <xforms:input ref="value">
-                                <xforms:label>Value</xforms:label>
+                                <xforms:label ref="$form-resources/dialog-itemsets/value/label"/>
                                 <!-- Propose default value upon focus -->
                                 <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
                                     <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s') return lower-case($w), '-')"/>
@@ -71,13 +72,13 @@
         
         <xhtml:div class="fr-dialog-buttons">
             <xforms:trigger class="fr-inplace-rename">
-                <xforms:label>Apply</xforms:label>
+                <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog"/>
             </xforms:trigger>
-            or
+            <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                <xforms:label>Cancel</xforms:label>
+                <xforms:label ref="$form-resources/cancel/label"/>
                 <!-- Close and cancel upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog">
                     <xxforms:context name="fb:save" select="false()"/>

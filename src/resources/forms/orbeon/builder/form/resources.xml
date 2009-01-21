@@ -131,6 +131,9 @@
         <cancel>
             <label>Cancel</label>
         </cancel>
+        <close>
+            <label>Close</label>
+        </close>
         <delete>
             <label>Delete</label>
         </delete>
@@ -194,9 +197,9 @@
                     <choices>
                         <label>Common Types</label>
                         <type label="Any string" allow-empty="true">string</type>
-                        <type label="Double-precision floating-point number">double</type>
-                        <type label="Decimal number">decimal</type>
-                        <type label="Integer number">integer</type>
+                        <type label="Double-precision floating-point">double</type>
+                        <type label="Decimal">decimal</type>
+                        <type label="Integer">integer</type>
                         <type label="Date and time">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Time">time</type>
@@ -206,10 +209,10 @@
                     </choices>
                     <choices>
                         <label>Number Types</label>
-                        <type label="Simple-precision floating-point number">float</type>
-                        <type label="Double-precision floating-point number">double</type>
-                        <type label="Decimal number">decimal</type>
-                        <type label="Integer number">integer</type>
+                        <type label="Simple-precision floating-point">float</type>
+                        <type label="Double-precision floating-point">double</type>
+                        <type label="Decimal">decimal</type>
+                        <type label="Integer">integer</type>
 
                         <type label="Positive integer">positiveInteger</type>
                         <type label="Non-positive integer">nonPositiveInteger</type>
@@ -320,6 +323,15 @@
                 <label>Help Message</label>
             </help-message>
         </dialog-help>
+        <dialog-publish>
+            <dialog-title>Publish Form</dialog-title>
+            <publish>
+                <label>Publish</label>
+            </publish>
+            <publish-and-open>
+                <label>Publish and Open</label>
+            </publish-and-open>
+        </dialog-publish>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -332,6 +344,9 @@
             <delete-action>Are you sure you want to delete action</delete-action>
             <control-will-be-deleted> control will be deleted.</control-will-be-deleted>
             <controls-will-be-deleted> controls will be deleted.</controls-will-be-deleted>
+            <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
+            <publish-success>The form was published successfully.</publish-success>
+            <publish-error>There was an error during form publishing.</publish-error>
         </messages>
     </resource>
     <resource xml:lang="fr">
@@ -452,6 +467,9 @@
         <cancel>
             <label>Annuler</label>
         </cancel>
+        <close>
+            <label>Fermer</label>
+        </close>
         <delete>
             <label>Supprimer</label>
         </delete>
@@ -515,9 +533,9 @@
                     <choices>
                         <label>Types courants</label>
                         <type label="Chaîne de caractères" allow-empty="true">string</type>
-                        <type label="Nombre réel double précision">double</type>
-                        <type label="Nombre décimal">decimal</type>
-                        <type label="Nombre entier">integer</type>
+                        <type label="Réel double précision">double</type>
+                        <type label="Décimal">decimal</type>
+                        <type label="Entier">integer</type>
                         <type label="Date et heure">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Heure">time</type>
@@ -527,15 +545,15 @@
                     </choices>
                     <choices>
                         <label>Types numériques</label>
-                        <type label="Nombre réel simple précision">float</type>
-                        <type label="Nombre réel double précision">double</type>
-                        <type label="Nombre décimal">decimal</type>
-                        <type label="Nombre entier">integer</type>
+                        <type label="Réel simple précision">float</type>
+                        <type label="Réel double précision">double</type>
+                        <type label="Décimal">decimal</type>
+                        <type label="Entier">integer</type>
 
-                        <type label="Nombre entier positif">positiveInteger</type>
-                        <type label="Nombre entier non positif">nonPositiveInteger</type>
-                        <type label="Nombre entier négatif">negativeInteger</type>
-                        <type label="Nombre entier non négatif">nonNegativeInteger</type>
+                        <type label="Entier positif">positiveInteger</type>
+                        <type label="Entier non positif">nonPositiveInteger</type>
+                        <type label="Entier négatif">negativeInteger</type>
+                        <type label="Entier non négatif">nonNegativeInteger</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -641,17 +659,29 @@
                 <label>Message d'aide</label>
             </help-message>
         </dialog-help>
+        <dialog-publish>
+            <dialog-title>Publier le formulaire</dialog-title>
+            <publish>
+                <label>Publier</label>
+            </publish>
+            <publish-and-open>
+                <label>Publier et ouvrir</label>
+            </publish-and-open>
+        </dialog-publish>
         <messages>
-            <delete-section>Etes-vous sûr de vouloir supprimer la section courante?</delete-section>
-            <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante?</delete-grid>
-            <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante?</delete-column>
-            <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante?</delete-row>
-            <expand-cell>Etes-vous sûr de vouloir étendre la cellule courante? Un contrôle sera supprimé.</expand-cell>
+            <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
+            <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante ?</delete-grid>
+            <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante ?</delete-column>
+            <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante ?</delete-row>
+            <expand-cell>Etes-vous sûr de vouloir étendre la cellule courante ? Un contrôle sera supprimé.</expand-cell>
             <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
             <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
             <control-will-be-deleted> contrôle sera supprimé.</control-will-be-deleted>
             <controls-will-be-deleted> contrôles seront supprimés.</controls-will-be-deleted>
+            <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
+            <publish-success>Le formulaire a été publié avec succès.</publish-success>
+            <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
         </messages>
     </resource>
 </resources>

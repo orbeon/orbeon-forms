@@ -24,29 +24,26 @@
 
       id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
 
-    <xforms:label>XML Schema Upload</xforms:label>
+    <xforms:label ref="$form-resources/dialog-upload-schema/dialog-title"/>
+    
     <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
     <xhtml:div>
         <xforms:group>
 
             <!-- Schema information -->
-            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]"/>
-            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)"/>
-            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)"/>
+            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]" as="element()?"/>
+            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)" as="xs:boolean"/>
+            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)" as="xs:boolean"/>
 
             <xforms:group ref="$schema-element" class="fb-hide-alert">
-                <xforms:label class="fb-dialog-h2" value="if ($is-new-schema) then 'New Schema Information' else 'Existing Schema Information'"/>
+                <xforms:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
 
                 <xhtml:div class="fb-dialog-section">
                     <xforms:group ref=".[xs:simpleType]">
                         <!-- Schema types -->
                         <xforms:select1 ref="$instance/temp-type" appearance="compact">
-                            <xforms:label>Available Schema Types</xforms:label>
-                            <xforms:hint>This lists the simple types available in the uploaded schema</xforms:hint>
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>[Select...]</xforms:label>-->
-                                <!--<xforms:value/>-->
-                            <!--</xforms:item>-->
+                            <xforms:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
+                            <xforms:hint ref="$form-resources/dialog-upload-schema/schema-type/hint"/>
                             <xforms:itemset nodeset="$schema-element/xs:simpleType">
                                 <xforms:label ref="@name"/>
                                 <xforms:value ref="@name"/>
@@ -54,25 +51,27 @@
                         </xforms:select1>
                     </xforms:group>
                     <xforms:group ref=".[not(xs:simpleType)]">
-                        <xforms:label>Available Schema Types</xforms:label>
-                        Your schema does not seem to contain simple types. You won't be able to select types
-                        from this schema for validation.
+                        <xforms:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
+                        <!-- Display message when no simpletypes are available -->
+                        <xforms:output value="$form-resources/dialog-upload-schema/messages/no-simple-types"/>
                     </xforms:group>
                     <xforms:group ref=".[@targetNamespace]">
                         <xforms:output value="@targetNamespace">
-                            <xforms:label>Schema Namespace URI</xforms:label>
-                            <xforms:hint>This is the namespace URI of the uploaded schema</xforms:hint>
+                            <xforms:label ref="$form-resources/dialog-upload-schema/namespace-uri/label"/>
+                            <xforms:hint ref="$form-resources/dialog-upload-schema/namespace-uri/hint"/>
                         </xforms:output>
                     </xforms:group>
                 </xhtml:div>
 
             </xforms:group>
             <xforms:group class="fb-hide-alert">
-                <xforms:label class="fb-dialog-h2">Operations</xforms:label>
+                <xforms:label class="fb-dialog-h2" ref="$form-resources/dialog-upload-schema/operations/label"/>
 
                 <xhtml:div class="fb-dialog-section">
+
+                    <!-- Delete schema button -->
                     <xforms:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
-                        <xforms:label>Delete Existing XML Schema</xforms:label>
+                        <xforms:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
 
                         <xforms:action ev:event="DOMActivate">
                             <!-- Delete XML Schema -->
@@ -85,7 +84,7 @@
 
                     <!-- Upload a schema -->
                     <xforms:upload ref="$instance/schema-uri">
-                        <xforms:label value="if ($is-new-schema) then 'Change XML Schema' else if ($is-existing-schema) then 'Replace XML Schema' else 'Upload XML Schema'"/>
+                        <xforms:label value="$form-resources/dialog-upload-schema/(if ($is-new-schema) then change-schema else if ($is-existing-schema) then replace-schema else upload-schema)/label"/>
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
@@ -106,7 +105,7 @@
 
                                 <!-- Check for inclusions -->
                                 <xforms:action if="$schema-element/(xs:import | xs:include)">
-                                    <xforms:message>Your schema contains imports or includes. These will be disabled.</xforms:message>
+                                    <xforms:message><xforms:output value="$form-resources/dialog-upload-schema/messages/has-includes"/></xforms:message>
                                     <!-- Delete inclusions -->
                                     <xforms:delete nodeset="$schema-element/(xs:import | xs:include)"/>
                                 </xforms:action>
@@ -114,7 +113,7 @@
                             </xforms:action>
                             <xforms:action if="not($schema-element/self::xs:schema)">
                                 <!-- Oops, this is definitely not a schema -->
-                                <xforms:message>The uploaded file is not a valid schema.</xforms:message>
+                                <xforms:message><xforms:output value="$form-resources/dialog-upload-schema/messages/not-a-schema"/></xforms:message>
                                 <!-- Clear uploaded content -->
                                 <xforms:setvalue ref="schema-uri"/>
                                 <xforms:delete nodeset="$schema-element"/>
@@ -136,7 +135,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
             <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
-                <xforms:label>Apply</xforms:label>
+                <xforms:label ref="$form-resources/apply/label"/>
 
                 <xforms:action ev:event="DOMActivate">
                     <!-- Insert schema into the model -->
@@ -149,9 +148,9 @@
                 </xforms:action>
 
             </xforms:trigger>
-            or
+            <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                <xforms:label>Cancel</xforms:label>
+                <xforms:label ref="$form-resources/cancel/label"/>
             </xforms:trigger>
 
             <xforms:action ev:event="DOMActivate">

@@ -338,6 +338,39 @@
                 <label>Add the following language:</label>
             </new-language>
         </dialog-add-language>
+        <dialog-upload-schema>
+            <dialog-title>XML Schema Upload</dialog-title>
+            <schema-type>
+                <label>Available Schema Types</label>
+                <hint>This lists the simple types available in the uploaded schema</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>Schema Namespace URI</label>
+                <hint>This is the namespace URI of the uploaded schema</hint>
+            </namespace-uri>
+            <operations>
+                <label>Operations</label>
+            </operations>
+            <delete-schema>
+                <label>Delete Existing XML Schema</label>
+            </delete-schema>
+            <change-schema>
+                <label>Change XML Schema</label>
+            </change-schema>
+            <replace-schema>
+                <label>Replace XML Schema</label>
+            </replace-schema>
+            <upload-schema>
+                <label>Upload XML Schema</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>Your schema does not seem to contain simple types. You won't be able to select types from this schema for validation.</no-simple-types>
+                <has-includes>Your schema contains imports or includes. These will be disabled.</has-includes>
+                <not-a-schema>The uploaded file is not a valid schema.</not-a-schema>
+                <new-schema-information>New Schema Information</new-schema-information>
+                <existing-schema-information>Existing Schema Information</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -680,6 +713,39 @@
                 <label>Ajouter la langue suivante :</label>
             </new-language>
         </dialog-add-language>
+        <dialog-upload-schema>
+            <dialog-title>Insertion de schéma XML</dialog-title>
+            <schema-type>
+                <label>Types disponibles</label>
+                <hint>Liste les types simples disponibles dans le schéma</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>URI de l'espace de nom</label>
+                <hint>URI identifiant l'espace de nom du schéma</hint>
+            </namespace-uri>
+            <operations>
+                <label>Opérations</label>
+            </operations>
+            <delete-schema>
+                <label>Supprimer le schéma XML existant</label>
+            </delete-schema>
+            <change-schema>
+                <label>Changer le schéma XML existant</label>
+            </change-schema>
+            <replace-schema>
+                <label>Remplacer le schéma XML existant</label>
+            </replace-schema>
+            <upload-schema>
+                <label>Insérer un schéma XML</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>Votre schéma ne semble pas contenir de types simples. Vous ne pourrez pas sélectionner des types provenant de ce schéma pour la validation.</no-simple-types>
+                <has-includes>Votre schéma contient des imports ou inclusions. Ceux-ci seront supprimés.</has-includes>
+                <not-a-schema>Le fichier inséré n'est pas un schéma XML valide.</not-a-schema>
+                <new-schema-information>Information du nouveau schéma</new-schema-information>
+                <existing-schema-information>Information du schéma existant</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

@@ -371,6 +371,15 @@
                 <existing-schema-information>Existing Schema Information</existing-schema-information>
             </messages>
         </dialog-upload-schema>
+        <dialog-edit-source>
+            <dialog-title>Edit Source</dialog-title>
+            <source>
+                <alert>Please make sure the content is well-formed XML</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <dialog-title>View Source</dialog-title>
+        </dialog-view-source>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -746,6 +755,15 @@
                 <existing-schema-information>Information du schéma existant</existing-schema-information>
             </messages>
         </dialog-upload-schema>
+        <dialog-edit-source>
+            <dialog-title>Edition du code source</dialog-title>
+            <source>
+                <alert>Veuillez vous assûrer que le contenu soit du XML bien formé</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <dialog-title>Visualisation du code source</dialog-title>
+        </dialog-view-source>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

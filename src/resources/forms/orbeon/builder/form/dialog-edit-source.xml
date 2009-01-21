@@ -26,16 +26,17 @@
 
       id="fb-source-editor-dialog" level="modeless" close="true" draggable="true" class="fr-dialog" model="fb-source-editor-model">
 
-    <xforms:label>Edit Source</xforms:label>
+    <xforms:label ref="$form-resources/dialog-edit-source/dialog-title"/>
+
     <xhtml:div class="fb-xml-dialog-view">
         <xforms:textarea ref="source">
-            <xforms:alert>Please make sure the content is well-formed XML</xforms:alert>
+            <xforms:alert ref="$form-resources/dialog-edit-source/source/alert"/>
         </xforms:textarea>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span>
             <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
-                <xforms:label>Apply Changes</xforms:label>
+                <xforms:label ref="$form-resources/apply/label"/>
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Parse the XML and insert it -->
@@ -51,9 +52,9 @@
 
                 </xforms:action>
             </xforms:trigger>
-            or
+            <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                <xforms:label>Cancel</xforms:label>
+                <xforms:label ref="$form-resources/cancel/label"/>
             </xforms:trigger>
         </xhtml:span>
     </xhtml:div>

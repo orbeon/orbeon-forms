@@ -26,13 +26,17 @@
 
       id="fb-xml-dialog" level="modeless" close="true" draggable="true">
 
-    <xforms:label>View XML</xforms:label>
+    <xforms:label ref="$form-resources/dialog-view-source/dialog-title"/>
+
     <xhtml:div class="fb-xml-dialog-view">
         <xforms:output mediatype="text/html" value="$variables/xml-view"/>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:trigger>
-            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                <xforms:label ref="$form-resources/close/label"/>
+            </xforms:label>
             <!-- Hide dialog -->
             <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
         </xforms:trigger>

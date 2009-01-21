@@ -26,14 +26,15 @@
 
       id="fb-pdf-upload-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
-    <xforms:label>Upload PDF</xforms:label>
+    <xforms:label ref="$form-resources/dialog-upload-pdf/dialog-title"/>
+
     <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
     <xhtml:div>
         <xhtml:div class="fr-dialog-message">
 
             <!-- Upload a PDF file -->
             <xforms:upload bind="pdf-attachment-bind" class="fr-attachment">
-                <xforms:label>PDF File</xforms:label>
+                <xforms:label ref="$form-resources/dialog-upload-pdf/upload-pdf/label"/>
                 <xforms:filename ref="@filename"/>
                 <xforms:mediatype ref="@mediatype"/>
                 <xxforms:size ref="@size"/>
@@ -76,10 +77,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xforms:trigger xxforms:modal="true">
-                <xforms:label>
-                    <!--<xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
-                    <xhtml:span>Done</xhtml:span>
-                </xforms:label>
+                <xforms:label ref="$form-resources/apply/label"/>
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>

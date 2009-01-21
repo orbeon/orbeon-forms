@@ -380,6 +380,12 @@
         <dialog-view-source>
             <dialog-title>View Source</dialog-title>
         </dialog-view-source>
+        <dialog-upload-pdf>
+            <dialog-title>Upload PDF</dialog-title>
+            <upload-pdf>
+                <label>PDF File</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -398,7 +404,6 @@
         </messages>
     </resource>
     <resource xml:lang="fr">
-        /Users/ebruchez/Documents/Orbeon/orbeon/src/resources/forms/orbeon/builder/form/resources.xml
         <application-form-name>
             <label>Nom de l'application et du formulaire</label>
         </application-form-name>
@@ -764,6 +769,12 @@
         <dialog-view-source>
             <dialog-title>Visualisation du code source</dialog-title>
         </dialog-view-source>
+        <dialog-upload-pdf>
+            <dialog-title>Insertion de fichier PDF</dialog-title>
+            <upload-pdf>
+                <label>Fichier PDF</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

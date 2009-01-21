@@ -24,25 +24,25 @@
 
       id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-service-model">
 
-    <xforms:label>Service Editor</xforms:label>
+    <xforms:label ref="$form-resources/dialog-http-services/dialog-title"/>
 
     <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
                 <xforms:input ref="id" id="fb-service-name-input" incremental="true">
-                    <xforms:label>Service Name</xforms:label>
-                    <xforms:hint>Choose a unique name for this submission</xforms:hint>
+                    <xforms:label ref="$form-resources/dialog-http-services/service-name/label"/>
+                    <xforms:hint ref="$form-resources/dialog-http-services/service-name/hint"/>
                 </xforms:input>
 
                 <xforms:group ref="request" xxforms:internal="true">
                     <xforms:input ref="resource" incremental="true">
-                        <xforms:label>Resource URL</xforms:label>
-                        <xforms:hint>HTTP URI to which the submission is performed</xforms:hint>
+                        <xforms:label ref="$form-resources/dialog-http-services/resource/label"/>
+                        <xforms:hint ref="$form-resources/dialog-http-services/resource/hint"/>
                     </xforms:input>
 
                     <xforms:select1 ref="method">
-                        <xforms:label>Method</xforms:label>
+                        <xforms:label ref="$form-resources/dialog-http-services/method/label"/>
                         <xforms:item>
                             <xforms:label>GET</xforms:label>
                             <xforms:value>get</xforms:value>
@@ -62,7 +62,7 @@
                     </xforms:select1>
 
                     <xforms:select1 ref="serialization">
-                        <xforms:label>Serialization</xforms:label>
+                        <xforms:label ref="$form-resources/dialog-http-services/serialization/label"/>
                         <xforms:item>
                             <xforms:label>XML</xforms:label>
                             <xforms:value>application/xml</xforms:value>
@@ -74,35 +74,35 @@
                     </xforms:select1>
 
                     <xforms:input ref="is-soap">
-                        <xforms:label>SOAP Submission</xforms:label>
-                        <xforms:hint>Whether this is a SOAP submission</xforms:hint>
+                        <xforms:label ref="$form-resources/dialog-http-services/soap-submission/label"/>
+                        <xforms:hint ref="$form-resources/dialog-http-services/soap-submission/hint"/>
                     </xforms:input>
 
                     <xforms:group ref=".[is-soap = 'true']">
                         <xforms:input ref="soap-action" incremental="true">
-                            <xforms:label>SOAP Action</xforms:label>
-                            <xforms:hint>Optional SOAPAction header</xforms:hint>
+                            <xforms:label ref="$form-resources/dialog-http-services/soap-action/label"/>
+                            <xforms:hint ref="$form-resources/dialog-http-services/soap-action/hint"/>
                         </xforms:input>
                     </xforms:group>
 
                     <xforms:input ref="is-auth">
-                        <xforms:label>HTTP Authentication</xforms:label>
-                        <xforms:hint>Whether to use HTTP authentication</xforms:hint>
+                        <xforms:label ref="$form-resources/dialog-http-services/http-authentication/label"/>
+                        <xforms:hint ref="$form-resources/dialog-http-services/http-authentication/hint"/>
                     </xforms:input>
 
                     <xforms:group ref=".[is-auth = 'true']">
                         <xforms:input ref="username" incremental="true">
-                            <xforms:label>Username</xforms:label>
+                            <xforms:label ref="$form-resources/dialog-http-services/username/label"/>
                         </xforms:input>
 
                         <xforms:secret ref="password" incremental="true">
-                            <xforms:label>Password</xforms:label>
+                            <xforms:label ref="$form-resources/dialog-http-services/password/label"/>
                         </xforms:secret>
                     </xforms:group>
 
                     <xforms:textarea ref="body" incremental="true">
-                        <xforms:label>Request Body</xforms:label>
-                        <xforms:hint>XML data (can be a SOAP envelope)</xforms:hint>
+                        <xforms:label ref="$form-resources/dialog-http-services/request-body/label"/>
+                        <xforms:hint ref="$form-resources/dialog-http-services/request-body/hint"/>
                     </xforms:textarea>
                 </xforms:group>
 
@@ -112,49 +112,29 @@
                     </xforms:case>
                     <xforms:case id="fb-service-dialog-response">
                         <xforms:group class="fb-submission-response">
-                            <xforms:label>Response</xforms:label>
+                            <xforms:label ref="$form-resources/dialog-http-services/response/label"/>
 
                             <xhtml:div class="fb-service-dialog-{if (response/error-type = '') then 'success' else 'error'}">
                                 <xforms:group ref=".[response/error-type != '']">
-                                    <xforms:select1 ref="response/error-type" xxforms:readonly-appearance="static" >
-                                        <xforms:label>Error Type</xforms:label>
+                                    <xforms:select1 ref="response/error-type" xxforms:readonly-appearance="static">
+                                        <xforms:label ref="$form-resources/dialog-http-services/error-type/label"/>
                                         <xforms:item>
                                             <xforms:label/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>Submission in progress</xforms:label>
-                                            <xforms:value>submission-in-progress</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>No data</xforms:label>
-                                            <xforms:value>no-data</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>Validation error</xforms:label>
-                                            <xforms:value>validation-error</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>Resource error</xforms:label>
-                                            <xforms:value>resource-error</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>Target error</xforms:label>
-                                            <xforms:value>target-error</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>Internal error</xforms:label>
-                                            <xforms:value>xxforms-internal-error</xforms:value>
-                                        </xforms:item>
+                                        <xforms:itemset nodeset="$form-resources/dialog-http-services/error-type/item">
+                                            <xforms:label ref="label"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
                                     </xforms:select1>
                                 </xforms:group>
 
                                 <xforms:output value="response/resource-uri">
-                                    <xforms:label>Resource URI</xforms:label>
+                                    <xforms:label ref="$form-resources/dialog-http-services/resource-uri/label"/>
                                 </xforms:output>
 
                                 <xforms:output value="response/status-code">
-                                    <xforms:label>Status Code</xforms:label>
+                                    <xforms:label ref="$form-resources/dialog-http-services/status-code/label"/>
                                 </xforms:output>
 
                                 <!-- Not yet supported -->
@@ -163,7 +143,7 @@
                                 <!--</xforms:output>-->
 
                                 <xforms:group ref=".[response/headers/header]">
-                                    <xforms:label>Headers</xforms:label>
+                                    <xforms:label ref="$form-resources/dialog-http-services/headers/label"/>
                                     <fr:grid columns="1">
                                         <xhtml:tr>
                                             <xhtml:td>
@@ -173,12 +153,12 @@
                                                         <xhtml:tr>
                                                             <xhtml:td class="fb-nowrap">
                                                                 <xforms:output value="name">
-                                                                    <xforms:label>Name</xforms:label>
+                                                                    <xforms:label ref="$form-resources/dialog-http-services/header-name/label"/>
                                                                 </xforms:output>
                                                             </xhtml:td>
                                                             <xhtml:td>
                                                                 <xforms:output value="string-join(value, ', ')">
-                                                                    <xforms:label>Value(s)</xforms:label>
+                                                                    <xforms:label ref="$form-resources/dialog-http-services/header-value/label"/>
                                                                 </xforms:output>
                                                             </xhtml:td>
                                                         </xhtml:tr>
@@ -190,7 +170,7 @@
                                 </xforms:group>
 
                                 <xforms:textarea ref="response/body">
-                                    <xforms:label>Response Body</xforms:label>
+                                    <xforms:label ref="$form-resources/dialog-http-services/response-body/label"/>
                                 </xforms:textarea>
                             </xhtml:div>
                         </xforms:group>
@@ -204,8 +184,8 @@
             <!-- Test button -->
             <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Test</xhtml:span>
+                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-http-services/test/label"/></xhtml:span>
                 </xforms:label>
 
                 <!-- Test submission -->
@@ -245,8 +225,8 @@
             <!-- Save button -->
             <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Save</xhtml:span>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-http-services/save/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
@@ -300,7 +280,10 @@
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
-                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-service-dialog"/>
             </xforms:trigger>

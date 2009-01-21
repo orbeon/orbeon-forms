@@ -398,6 +398,99 @@
                 <label>Value</label>
             </value>
         </dialog-itemsets>
+        <dialog-http-services>
+            <dialog-title>HTTP Service Editor</dialog-title>
+            <service-name>
+                <label>Service Name</label>
+                <hint>Choose a unique name for this submission</hint>
+            </service-name>
+            <resource>
+                <label>Resource URL</label>
+                <hint>HTTP URL at which the service reside</hint>
+            </resource>
+            <method>
+                <label>Method</label>
+            </method>
+            <serialization>
+                <label>Serialization</label>
+            </serialization>
+            <soap-submission>
+                <label>SOAP Service</label>
+                <hint>Whether this is a SOAP service</hint>
+            </soap-submission>
+            <soap-action>
+                <label>Action SOAP</label>
+                <hint>Optional SOAPAction header</hint>
+            </soap-action>
+            <http-authentication>
+                <label>HTTP Authentication</label>
+                <hint>HTTP Authentication</hint>
+            </http-authentication>
+            <username>
+                <label>Username</label>
+            </username>
+            <password>
+                <label>Password</label>
+            </password>
+            <request-body>
+                <label>Request Body</label>
+                <hint>XML data (can be a SOAP envelope)</hint>
+            </request-body>
+            <response>
+                <label>Response</label>
+            </response>
+            <error-type>
+                <label>Error Type</label>
+                <item>
+                    <label>Submission in progress</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>No data</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Validation error</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Resource error</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Target error</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Internal error</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>Resource URL</label>
+            </resource-uri>
+            <status-code>
+                <label>Status Code</label>
+            </status-code>
+            <headers>
+                <label>Headers</label>
+            </headers>
+            <header-name>
+                <label>Name</label>
+            </header-name>
+            <header-value>
+                <label>Value(s)</label>
+            </header-value>
+            <response-body>
+                <label>Response Body</label>
+            </response-body>
+            <save>
+                <label>Save</label>
+            </save>
+            <test>
+                <label>Test</label>
+            </test>
+        </dialog-http-services>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -799,6 +892,99 @@
                 <label>Valeur</label>
             </value>
         </dialog-itemsets>
+        <dialog-http-services>
+            <dialog-title>Editeur de services HTTP</dialog-title>
+            <service-name>
+                <label>Nom du service</label>
+                <hint>Choisisez un nom de service unique</hint>
+            </service-name>
+            <resource>
+                <label>URL de la ressource</label>
+                <hint>URL HTTP auquel réside le service</hint>
+            </resource>
+            <method>
+                <label>Méthode</label>
+            </method>
+            <serialization>
+                <label>Sérialisation</label>
+            </serialization>
+            <soap-submission>
+                <label>Service SOAP</label>
+                <hint>Sélectionner si le service est un service SOAP</hint>
+            </soap-submission>
+            <soap-action>
+                <label>SOAP Action</label>
+                <hint>Header SOAPAction optionnel</hint>
+            </soap-action>
+            <http-authentication>
+                <label>Authentification HTTP</label>
+                <hint>Paramètres d'authentification HTTP</hint>
+            </http-authentication>
+            <username>
+                <label>Nom d'utilisateur</label>
+            </username>
+            <password>
+                <label>Mot de passe</label>
+            </password>
+            <request-body>
+                <label>Corps de la requête</label>
+                <hint>Document XML (peut être une enveloppe SOAP)</hint>
+            </request-body>
+            <response>
+                <label>Réponse</label>
+            </response>
+            <error-type>
+                <label>Type d'erreur</label>
+                <item>
+                    <label>Soumission en cours</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>Pas de données</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Erreur de validation</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Erreur de ressource</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Erreur de cible</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Error interne</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>URL de la ressource</label>
+            </resource-uri>
+            <status-code>
+                <label>Code de status</label>
+            </status-code>
+            <headers>
+                <label>Headers</label>
+            </headers>
+            <header-name>
+                <label>Nom</label>
+            </header-name>
+            <header-value>
+                <label>Valeur(s)</label>
+            </header-value>
+            <response-body>
+                <label>Corps de la réponse</label>
+            </response-body>
+            <save>
+                <label>Sauvegarder</label>
+            </save>
+            <test>
+                <label>Tester</label>
+            </test>
+        </dialog-http-services>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

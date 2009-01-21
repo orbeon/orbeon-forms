@@ -402,7 +402,7 @@
             <dialog-title>HTTP Service Editor</dialog-title>
             <service-name>
                 <label>Service Name</label>
-                <hint>Choose a unique name for this submission</hint>
+                <hint>Choose a unique name for this service</hint>
             </service-name>
             <resource>
                 <label>Resource URL</label>
@@ -491,6 +491,27 @@
                 <label>Test</label>
             </test>
         </dialog-http-services>
+        <dialog-database-services>
+            <dialog-title>Database Service Editor</dialog-title>
+            <service-name>
+                <label>Service Name</label>
+                <hint>Choose a unique name for this service</hint>
+            </service-name>
+            <datasource>
+                <label>Datasource</label>
+                <hint>JNDI datasource for this service</hint>
+            </datasource>
+            <query>
+                <label>SQL Query</label>
+                <hint>SQL query which can contain placeholders for parameters</hint>
+            </query>
+            <save>
+                <label>Save</label>
+            </save>
+            <test>
+                <label>Test</label>
+            </test>
+        </dialog-database-services>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -985,6 +1006,27 @@
                 <label>Tester</label>
             </test>
         </dialog-http-services>
+        <dialog-database-services>
+            <dialog-title>Editeur de services base de données</dialog-title>
+            <service-name>
+                <label>Nom du service</label>
+                <hint>Choisisez un nom de service unique</hint>
+            </service-name>
+            <datasource>
+                <label>Datasource</label>
+                <hint>Datasource JNDI pour ce service</hint>
+            </datasource>
+            <query>
+                <label>Requête SQL</label>
+                <hint>Requête SQL pouvant contenir des paramètres</hint>
+            </query>
+            <save>
+                <label>Sauvegarder</label>
+            </save>
+            <test>
+                <label>Tester</label>
+            </test>
+        </dialog-database-services>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>

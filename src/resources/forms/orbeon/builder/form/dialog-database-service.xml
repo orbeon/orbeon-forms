@@ -24,23 +24,23 @@
 
       id="fb-database-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-database-service-model">
 
-    <xforms:label>Database Service Editor</xforms:label>
+    <xforms:label ref="$form-resources/dialog-database-services/dialog-title"/>
 
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:input ref="name" id="fb-database-service-name-input" incremental="true">
-                <xforms:label>Service Name</xforms:label>
-                <xforms:hint>Choose a unique name for this submission</xforms:hint>
+                <xforms:label ref="$form-resources/dialog-database-services/service-name/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/service-name/hint"/>
             </xforms:input>
 
             <xforms:input ref="datasource" incremental="true">
-                <xforms:label>Datasource</xforms:label>
-                <xforms:hint>JNDI datasource for this service</xforms:hint>
+                <xforms:label ref="$form-resources/dialog-database-services/datasource/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/datasource/hint"/>
             </xforms:input>
 
             <xforms:textarea ref="query" incremental="true">
-                <xforms:label>SQL Query</xforms:label>
-                <xforms:hint>SQL query</xforms:hint>
+                <xforms:label ref="$form-resources/dialog-database-services/query/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/query/hint"/>
             </xforms:textarea>
         </xhtml:div>
     </xhtml:div>
@@ -50,8 +50,8 @@
             <!-- TODO: testing is disabled for now, implement in the future -->
             <xforms:trigger ref="save-test-trigger[false()]">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Test</xhtml:span>
+                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-database-services/test/label"/></xhtml:span>
                 </xforms:label>
 
                 <!-- Test submission -->
@@ -91,8 +91,8 @@
             <!-- Save button -->
             <xforms:trigger ref="save-test-trigger">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Publish" title="Publish"/>
-                    <xhtml:span>Save</xhtml:span>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-database-services/save/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate" xmlns:sql="http://orbeon.org/oxf/xml/sql">
@@ -132,7 +132,10 @@
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
-                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
             </xforms:trigger>

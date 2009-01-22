@@ -166,7 +166,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
 
         final String effectiveDialogId = dialogControl2.getEffectiveId();
 
-        final boolean previousVisible = (dialogControl1 != null) ? ((XXFormsDialogControl.XXFormsDialogControlLocal) dialogControl1.getInitialLocal()).isVisible() : false;
+        final boolean previousVisible = (dialogControl1 != null) ? dialogControl1.wasVisible() : false;
         // NOTE: We only compare on isVisible as we don't support just changing the neighbor for now
         if (dialogControl1 == null || previousVisible != dialogControl2.isVisible()) {
 

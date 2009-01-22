@@ -117,6 +117,13 @@ public class ControlTree implements Cloneable {
         return repeatIterationControl;
     }
 
+    public void createSubTree(PipelineContext pipelineContext, XFormsContainerControl containerControl) {
+
+        final XFormsControl control = (XFormsControl) containerControl;
+        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containerControl,
+                new CreateControlsListener(pipelineContext, this, control, false, true));
+    }
+
     /**
      * Index a single controls.
      *
@@ -464,7 +471,7 @@ public class ControlTree implements Cloneable {
             this.registerEvents = registerEvents;
         }
 
-        public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
+        public XFormsControl startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
 
             // Create XFormsControl with basic information
             final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
@@ -493,6 +500,18 @@ public class ControlTree implements Cloneable {
             if (control instanceof XFormsContainerControl) {
                 currentControlsContainer = control;
             }
+
+//            if (control instanceof XFormsComponentControl) {
+//                // Compute new id prefix for nested component
+//                final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
+//
+//                // Recurse into component tree
+//                final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
+//                XFormsControls.visitControlElementsHandleRepeat(pipelineContext, this, isOptimizeRelevance,
+//                        staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
+//            }
+
+            return control;
         }
 
         public void endVisitControl(Element controlElement, String effectiveControlId) {

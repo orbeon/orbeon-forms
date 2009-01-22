@@ -19,8 +19,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
@@ -47,6 +49,8 @@ public class XFormsControls {
     private XFormsContainer rootContainer;
     
     private Map constantItems;
+
+    private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
 
     public XFormsControls(XFormsContainingDocument containingDocument) {
 
@@ -404,6 +408,23 @@ public class XFormsControls {
                 XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)));
     }
 
+    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsContainerControl containerControl, XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+
+        final XFormsControl control = (XFormsControl) containerControl;
+        final XFormsContainingDocument containingDocument = control.getContainer().getContainingDocument();
+        final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
+
+        // Set binding context on the particular control
+        final XFormsContextStack contextStack = control.getContainer().getContextStack();
+        contextStack.setBinding(control);
+
+        // Start visiting children of the xforms:repeat element
+        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                containingDocument.getStaticState(), control.getContainer(), control.getControlElement(),
+                XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
+                XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
+    }
+
     private static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
                                                     boolean isOptimizeRelevance, XFormsStaticState staticState, XFormsContainer currentContainer,
                                                     Element containerElement, String idPrefix, String idPostfix) {
@@ -458,7 +479,7 @@ public class XFormsControls {
             } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
                 currentContextStack.pushBinding(pipelineContext, currentControlElement);
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
+                final XFormsControl newControl = controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
                 final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
                     // Recurse into grouping control and components if we don't optimize relevance, OR if we do
@@ -469,12 +490,20 @@ public class XFormsControls {
                     // this.
                     // && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))
 
-                    if (!isOptimizeRelevance
-                            || (!currentBindingContext.isNewBind()
-                                 || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
+                    if (TESTING_DIALOG_OPTIMIZATION && newControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
+                        // Visit dialog children only if dialog is visible
+                        if (((XXFormsDialogControl) newControl).isVisible()) {
+                            visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                    staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
+                        }
+                    } else {
+                        if (!isOptimizeRelevance
+                                || (!currentBindingContext.isNewBind()
+                                     || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
-                        visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                                staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
+                            visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                    staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
+                        }
                     }
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
@@ -501,7 +530,7 @@ public class XFormsControls {
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
                 controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
-                {
+                if (true) {// TODO: SHOULD MOVE THIS TO WITHIN COMPONENT CONTROL
                     // Compute new id prefix for nested component
                     final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
 
@@ -550,7 +579,7 @@ public class XFormsControls {
     }
 
     public static interface ControlElementVisitorListener {
-        public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId);
+        public XFormsControl startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId);
         public void endVisitControl(Element controlElement, String effectiveControlId);
         public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId);
         public void endRepeatIteration(int iteration);
@@ -605,47 +634,48 @@ public class XFormsControls {
 
         private Map newIterationsMap = new HashMap();
 
-        public void startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
+        public XFormsControl startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
             final XFormsControl control = (XFormsControl) effectiveIdsToControls.get(effectiveControlId);
 
             final XFormsContextStack.BindingContext oldBindingContext = control.getBindingContext();
             final XFormsContextStack.BindingContext newBindingContext = container.getContextStack().getCurrentBindingContext();
 
             // Handle special relevance events
-            {
-                if (control instanceof XFormsSingleNodeControl) {
-                    final NodeInfo boundNode1 = control.getBoundNode();
-                    final NodeInfo boundNode2 = newBindingContext.getSingleNode();
+            if (control instanceof XFormsSingleNodeControl) {
+                final NodeInfo boundNode1 = control.getBoundNode();
+                final NodeInfo boundNode2 = newBindingContext.getSingleNode();
 
-                    boolean found = false;
-                    int eventType = 0;
-                    if (boundNode1 != null && InstanceData.getInheritedRelevant(boundNode1) && boundNode2 == null) {
-                        // A control was bound to a node and relevant, but has become no longer bound to a node
-                        found = true;
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    } else if (boundNode1 == null && boundNode2 != null && InstanceData.getInheritedRelevant(boundNode2)) {
-                        // A control was not bound to a node, but has now become bound and relevant
-                        found = true;
-                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    } else if (boundNode1 != null && boundNode2 != null && !boundNode1.isSameNodeInfo(boundNode2)) {
-                        // The control is now bound to a different node
-                        // In this case, we schedule the control to dispatch all the events
+                boolean found = false;
+                int eventType = 0;
+                if (boundNode1 != null && InstanceData.getInheritedRelevant(boundNode1) && boundNode2 == null) {
+                    // A control was bound to a node and relevant, but has become no longer bound to a node
+                    found = true;
+                    eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                } else if (boundNode1 == null && boundNode2 != null && InstanceData.getInheritedRelevant(boundNode2)) {
+                    // A control was not bound to a node, but has now become bound and relevant
+                    found = true;
+                    eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                } else if (boundNode1 != null && boundNode2 != null && !boundNode1.isSameNodeInfo(boundNode2)) {
+                    // The control is now bound to a different node
+                    // In this case, we schedule the control to dispatch all the events
 
-                        // NOTE: This is not really proper according to the spec, but it does help applications to
-                        // force dispatching in such cases
-                        found = true;
-                        eventType = XFormsModel.EventSchedule.ALL;
-                    }
+                    // NOTE: This is not really proper according to the spec, but it does help applications to
+                    // force dispatching in such cases
+                    found = true;
+                    eventType = XFormsModel.EventSchedule.ALL;
+                }
 
-                    // Remember that we need to dispatch information about this control
-                    if (found) {
-                        eventsToDispatch.put(control.getEffectiveId(),
-                                new XFormsModel.EventSchedule(control.getEffectiveId(), eventType, control));
-                    }
+                // Remember that we need to dispatch information about this control
+                if (found) {
+                    eventsToDispatch.put(control.getEffectiveId(),
+                            new XFormsModel.EventSchedule(control.getEffectiveId(), eventType, control));
                 }
             }
 
             if (control instanceof XFormsRepeatControl) {
+                // Handle repeat
+                // TODO: handle this through inheritance
+
                 // Get old nodeset
                 final List oldRepeatNodeset = oldBindingContext.getNodeset();
 
@@ -663,7 +693,20 @@ public class XFormsControls {
                     final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl)i.next();
                     newIterationsMap.put(repeatIterationControl.getEffectiveId(), repeatIterationControl);
                 }
+            } else if (TESTING_DIALOG_OPTIMIZATION && control instanceof XXFormsDialogControl) {// TODO: TESTING DIALOG OPTIMIZATION
+                // Handle dialog
+                // TODO: handle this through inheritance
+
+                control.setBindingContext(newBindingContext);
+
+                final XXFormsDialogControl dialogControl = (XXFormsDialogControl) control;
+                final boolean isVisible = dialogControl.isVisible();
+                dialogControl.updateContent(pipelineContext, isVisible);
+
             } else {
+                // Handle all other controls
+                // TODO: handle other container controls
+
                 // Set new current binding for control element
                 control.setBindingContext(newBindingContext);
             }
@@ -671,6 +714,8 @@ public class XFormsControls {
             // Mark the control as dirty so it gets reevaluated
             // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
             control.markDirty();
+
+            return control;
         }
 
         public void endVisitControl(Element controlElement, String effectiveControlId) {

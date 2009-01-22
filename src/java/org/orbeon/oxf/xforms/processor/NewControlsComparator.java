@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 public class NewControlsComparator extends BaseControlsComparator {
-    
+
     public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
@@ -82,9 +82,9 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                     attributesImpl.clear();
 
-                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
                     if (xformsSingleNodeControl2 != null) {
 
+                        final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
                         if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)
                                 && !(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                                 && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {

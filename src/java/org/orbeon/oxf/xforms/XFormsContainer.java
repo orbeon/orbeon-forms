@@ -97,15 +97,15 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         return parentContainer;
     }
 
-    public void addChild(XFormsContainer container) {
+    private void addChild(XFormsContainer container) {
         if (childrenContainers == null)
             childrenContainers = new LinkedHashMap();
         childrenContainers.put(container.getId(), container);
     }
 
-    public Map getChildrenContainers() {
-        return childrenContainers;
-    }
+//    public Map getChildrenContainers() {
+//        return childrenContainers;
+//    }
 
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
@@ -428,9 +428,13 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         final String fullModelPrefix = XFormsUtils.getEffectiveIdPrefix(instance.getEffectiveModelId());
         final List parts = new ArrayList(Arrays.asList(XFormsUtils.getEffectiveIdPrefixParts(instance.getEffectiveModelId())));
         ((XFormsContainer) containingDocument).setInstance(fullModelPrefix, "", parts, instance, replaced);
+
+//        xxx this is called when restoring dynamic state
     }
 
     private void setInstance(String fullModelPrefix, String currentPrefix, List remainingParts, XFormsInstance instance, boolean replaced) {
+
+//        xxx this is called when restoring dynamic state
 
         if (fullModelPrefix.equals(fullPrefix)) {
             // The instance must be set within a model of this container
@@ -543,7 +547,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         return locationData;
     }
 
-    protected void setLocationData(LocationData locationData) {
+    public void setLocationData(LocationData locationData) {
         this.locationData = locationData;
     }
 

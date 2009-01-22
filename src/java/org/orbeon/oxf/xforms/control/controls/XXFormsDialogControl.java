@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.ControlTree;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -24,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -93,6 +96,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         return local.visible;
     }
 
+    public boolean wasVisible() {
+        final XXFormsDialogControlLocal local = ((XXFormsDialogControl.XXFormsDialogControlLocal) getInitialLocal());
+        return local.visible;
+    }
+
     public String getNeighborControlId() {
         final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
         return (local.neighborControlId != null) ? local.neighborControlId : defaultNeighborControlId;
@@ -150,5 +158,25 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
                 "true".equals(element.attributeValue("constrain")),
                 element.attributeValue("neighbor")));
+    }
+
+    public void updateContent(PipelineContext pipelineContext, boolean isVisible) {
+        final XFormsControls controls = containingDocument.getControls();
+        final ControlTree currentControlTree = controls.getCurrentControlTree();
+
+        final List children = getChildren();
+
+        if (isVisible) {
+            // Became visible: create children
+            if (children == null || children.size() == 0) {
+                currentControlTree.createSubTree(pipelineContext, this);
+            }
+        } else {
+            // Became invisible: remove children
+            if (children != null && children.size() > 0) {
+                currentControlTree.deindexSubtree(this, false, true);
+                this.setChildren(null);
+            }
+        }
     }
 }

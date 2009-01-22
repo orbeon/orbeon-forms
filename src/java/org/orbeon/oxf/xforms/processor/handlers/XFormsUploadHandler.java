@@ -37,7 +37,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
         // Control value
         final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
-        final String value = handlerContext.isTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
+        final String value = handlerContext.isTemplate() || uploadControl == null || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
 
         if (value.equals(""))
             classes.append(" xforms-upload-state-empty");

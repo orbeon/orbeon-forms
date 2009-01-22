@@ -2525,113 +2525,112 @@ ORBEON.xforms.Events = {
         var originalTarget = YAHOO.util.Event.getTarget(event);
         var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
 
-        if (target != null) {
-            if (ORBEON.util.Dom.hasClass(target, "xforms-output")) {
-                // Click on output
-                // Translate this into a focus event
+        if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-output")) {
+            // Click on output
+            // Translate this into a focus event
+            ORBEON.xforms.Events.focus(event);
+        } else if (target != null && (ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
+            // Click on trigger
+            YAHOO.util.Event.preventDefault(event);
+            if (ORBEON.util.Dom.hasClass(target, "xxforms-offline-save")) {
+                // This is a trigger take commits the data changed so far in Gears
+                ORBEON.xforms.Offline.storeEvents(ORBEON.xforms.Offline.memoryOfflineEvents);
+                ORBEON.xforms.Offline.memoryOfflineEvents = [];
+            }
+            if (ORBEON.util.Dom.hasClass(target, "xxforms-online")) {
+                // This is a trigger take takes the form back online
+                ORBEON.xforms.Offline.takeOnline();
+            }
+            if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
+                // If this is an anchor and we didn't get a chance to register the focus event,
+                // send the focus event here. This is useful for anchors (we don't listen on the
+                // focus event on those, and for buttons on Safari which does not dispatch the focus
+                // event for buttons.
                 ORBEON.xforms.Events.focus(event);
-            } else  if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
-                // Click on trigger
-                YAHOO.util.Event.preventDefault(event);
-                if (ORBEON.util.Dom.hasClass(target, "xxforms-offline-save")) {
-                    // This is a trigger take commits the data changed so far in Gears
-                    ORBEON.xforms.Offline.storeEvents(ORBEON.xforms.Offline.memoryOfflineEvents);
-                    ORBEON.xforms.Offline.memoryOfflineEvents = [];
-                }
-                if (ORBEON.util.Dom.hasClass(target, "xxforms-online")) {
-                    // This is a trigger take takes the form back online
-                    ORBEON.xforms.Offline.takeOnline();
-                }
-                if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
-                    // If this is an anchor and we didn't get a chance to register the focus event,
-                    // send the focus event here. This is useful for anchors (we don't listen on the
-                    // focus event on those, and for buttons on Safari which does not dispatch the focus
-                    // event for buttons.
-                    ORBEON.xforms.Events.focus(event);
-                    var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
-                    ORBEON.xforms.Server.fireEvents([event], false);
-
-                }
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
-                    || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
-                    || (ORBEON.util.Dom.hasClass(target, "xforms-input") && ORBEON.util.Dom.hasClass(target, "xforms-type-boolean"))) {
-                // Click on checkbox or radio button
-
-                // Update classes right away to give user visual feedback
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
+                var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
                 ORBEON.xforms.Server.fireEvents([event], false);
 
-            } else if (ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
-                // Click on calendar inside input field
-                if (ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar") {
-                    ORBEON.widgets.JSCalendar.click(event, target);
-                } else {
-                    ORBEON.widgets.YUICalendar.click(event, target);
-                }
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
-                // Click on remove icon in upload control
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false);
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
-                // Click on menu item
+            }
+        } else if (target != null &&
+                   (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
+                || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
+                || (ORBEON.util.Dom.hasClass(target, "xforms-input") && ORBEON.util.Dom.hasClass(target, "xforms-type-boolean")))) {
+            // Click on checkbox or radio button
 
-                // Find what is the position in the hiearchy of the item
-                var positions = [];
-                var currentParent = originalTarget;
-                while (true) {
-                    if (currentParent.tagName.toLowerCase() == "li") {
-                        // Get the position of this li, and add it to positions
-                        var liPosition = 0;
-                        while (true) {
-                            var previousSibling = currentParent.previousSibling;
-                            if (previousSibling == null) break;
-                            currentParent = previousSibling;
-                            if (currentParent.nodeType == ELEMENT_TYPE && currentParent.tagName.toLowerCase() == "li") liPosition++;
-                        }
-                        positions.push(liPosition);
-                    } else if (currentParent.tagName.toLowerCase() == "div" && ORBEON.util.Dom.hasClass(currentParent, "yuimenubar")) {
-                        // Got to the top of the tree
-                        break;
+            // Update classes right away to give user visual feedback
+            ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
+            var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.Server.fireEvents([event], false);
+
+        } else if (target != null && ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
+            // Click on calendar inside input field
+            if (ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar") {
+                ORBEON.widgets.JSCalendar.click(event, target);
+            } else {
+                ORBEON.widgets.YUICalendar.click(event, target);
+            }
+        } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
+            // Click on remove icon in upload control
+            var event = new ORBEON.xforms.Server.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.Server.fireEvents([event], false);
+        } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
+            // Click on menu item
+
+            // Find what is the position in the hiearchy of the item
+            var positions = [];
+            var currentParent = originalTarget;
+            while (true) {
+                if (currentParent.tagName.toLowerCase() == "li") {
+                    // Get the position of this li, and add it to positions
+                    var liPosition = 0;
+                    while (true) {
+                        var previousSibling = currentParent.previousSibling;
+                        if (previousSibling == null) break;
+                        currentParent = previousSibling;
+                        if (currentParent.nodeType == ELEMENT_TYPE && currentParent.tagName.toLowerCase() == "li") liPosition++;
                     }
-                    currentParent = currentParent.parentNode;
+                    positions.push(liPosition);
+                } else if (currentParent.tagName.toLowerCase() == "div" && ORBEON.util.Dom.hasClass(currentParent, "yuimenubar")) {
+                    // Got to the top of the tree
+                    break;
                 }
-                positions = positions.reverse();
+                currentParent = currentParent.parentNode;
+            }
+            positions = positions.reverse();
 
-                // Find value for this item
-                var currentLevel = ORBEON.xforms.Globals.menuItemsets[target.id];
-                var increment = 0;
-                for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
-                    var position = positions[positionIndex];
-                    currentLevel = currentLevel[position + increment];
-                    increment = 3;
-                }
+            // Find value for this item
+            var currentLevel = ORBEON.xforms.Globals.menuItemsets[target.id];
+            var increment = 0;
+            for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
+                var position = positions[positionIndex];
+                currentLevel = currentLevel[position + increment];
+                increment = 3;
+            }
 
-                // Send value change to server
-                var itemValue = currentLevel[1];
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, itemValue, "xxforms-value-change-with-focus-change");
+            // Send value change to server
+            var itemValue = currentLevel[1];
+            var event = new ORBEON.xforms.Server.Event(null, target.id, null, itemValue, "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.Server.fireEvents([event], false);
+            // Close the menu
+            ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
+        } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
+            // Help image
+
+            // Get label and control for this help message
+            var label = target.nextSibling;
+            while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
+            var control = ORBEON.util.Dom.getElementById(label.htmlFor);
+            var form = ORBEON.xforms.Controls.getForm(control);
+
+            if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {
+                // We are sending the xforms-help event to the server and the server will tell us what do to
+                var event = new ORBEON.xforms.Server.Event(null, control.id, null, null, "xforms-help");
                 ORBEON.xforms.Server.fireEvents([event], false);
-                // Close the menu
-                ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
-                // Help image
 
-                // Get label and control for this help message
-                var label = target.nextSibling;
-                while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
-                var control = ORBEON.util.Dom.getElementById(label.htmlFor);
-                var form = ORBEON.xforms.Controls.getForm(control);
-
-                if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {
-                    // We are sending the xforms-help event to the server and the server will tell us what do to
-                    var event = new ORBEON.xforms.Server.Event(null, control.id, null, null, "xforms-help");
-                    ORBEON.xforms.Server.fireEvents([event], false);
-
-                } else {
-                    // If the servers tells us there are no event handlers for xforms-help in the page,
-                    // we can avoid a round trip and show the help right away
-                    ORBEON.xforms.Controls.showHelp(control);
-                }
+            } else {
+                // If the servers tells us there are no event handlers for xforms-help in the page,
+                // we can avoid a round trip and show the help right away
+                ORBEON.xforms.Controls.showHelp(control);
             }
         } else {
             // Click on something that is not an XForms element, but which might still be in an repeat iteration,

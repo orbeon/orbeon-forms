@@ -36,6 +36,12 @@ public class OldControlsComparator extends BaseControlsComparator {
 
     public void diff(List state1, List state2) {
 
+        // Normalize
+        if (state1 != null && state1.size() == 0)
+            state1 = null;
+        if (state2 != null && state2.size() == 0)
+            state2 = null;
+
         // Trivial case
         if (state1 == null && state2 == null)
             return;

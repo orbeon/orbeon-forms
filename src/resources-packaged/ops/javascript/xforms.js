@@ -1894,12 +1894,25 @@ ORBEON.xforms.Controls = {
     autosizeTextarea: function(textarea) {
         var scrollHeight = textarea.scrollHeight;
         var clientHeight = textarea.clientHeight;
+
+        // In IE & Safari, scrollHeight is the length of vertical space text is taking in the textarea.
+        // In Firefox, it is the greater of text or textarea height. Here, we're interested in getting the height of text
+        // inside the text area (and not textarea height), we suppress textarea height to 0.
+        // So that scrollHeight will always return the vertical space text is taking in a text area. After  that we
+        // remove the height property, so that effect of setting of height (to 0) doesn't get proliferated elsewhere.
+        if (ORBEON.xforms.Globals.isFF3) {
+			textarea.style.height = 0;
+			scrollHeight = textarea.scrollHeight;
+            console.log(scrollHeight);
+            textarea.style.height = null;
+		}
+
         var rowHeight = clientHeight / textarea.rows;
         var linesAdded = 0;
 
         if (scrollHeight > clientHeight) {
             // Grow
-            while (scrollHeight > clientHeight) {
+            while (scrollHeight >= clientHeight) {
                 textarea.rows = textarea.rows + 1;
                 clientHeight = textarea.clientHeight;
                 linesAdded++;

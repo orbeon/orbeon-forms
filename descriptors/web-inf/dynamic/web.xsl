@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exslt="http://exslt.org/common"
     xmlns:xslt="http://xml.apache.org/xslt"
@@ -175,6 +176,8 @@
             <filter-mapping>
                 <filter-name>orbeon-xforms-filter</filter-name>
                 <url-pattern>/xforms-jsp/*</url-pattern>
+                <dispatcher>REQUEST</dispatcher>
+                <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
             <xsl:comment> Set listeners </xsl:comment>

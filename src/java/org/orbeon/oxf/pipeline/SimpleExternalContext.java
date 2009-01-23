@@ -422,7 +422,7 @@ public class SimpleExternalContext implements ExternalContext {
         return null;
     }
 
-    public ExternalContext.RequestDispatcher getRequestDispatcher(String path) {
+    public ExternalContext.RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return null;
     }
 }

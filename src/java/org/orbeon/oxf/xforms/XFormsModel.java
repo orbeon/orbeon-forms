@@ -511,7 +511,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                                                     new String[] { "URI", resolvedURI.toString() });
 
                                     connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext,
-                                            null, null, "get", resolvedURI.toString(), null, false, null, null);
+                                            null, null, "get", resolvedURI.toString(), false, null, null, null, false);
 
                                     instanceSourceURI = resolvedURI.toString();
                                     xxformsUsername = null;

@@ -853,7 +853,23 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getNamedDispatcher(name));
     }
 
-    public RequestDispatcher getRequestDispatcher(String path) {
-        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path));
+    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
+
+        if (isContextRelative) {
+            // Path is relative to the current context root
+            return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path));
+        } else {
+            // Path is relative to the server document root
+
+            final ServletContext otherServletContext = servletContext.getContext(path);
+            if (otherServletContext == null)
+                return null;
+
+            final String modifiedPath = NetUtils.removeFirstPathElement(path);
+            if (modifiedPath == null)
+                return null;
+
+            return new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath));
+        }
     }
 }

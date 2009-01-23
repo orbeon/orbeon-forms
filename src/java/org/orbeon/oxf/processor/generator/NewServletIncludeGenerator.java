@@ -93,7 +93,7 @@ public class NewServletIncludeGenerator extends ProcessorImpl {
             requestDispatcher = externalContext.getNamedDispatcher(config.getServletName());
             name += config.getServletName();
         } else if (config.getPath() != null) {
-            requestDispatcher = externalContext.getRequestDispatcher(config.getPath());
+            requestDispatcher = externalContext.getRequestDispatcher(config.getPath(), true);
             name += config.getPath();
         } else
             throw new OXFException("servlet-name or path must be present in config");

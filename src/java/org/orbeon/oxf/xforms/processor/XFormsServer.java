@@ -47,6 +47,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -245,6 +246,12 @@ public class XFormsServer extends ProcessorImpl {
                             public OutputStream getOutputStream() throws IOException {
                                 return outputStream;
                             }
+
+                            public PrintWriter getWriter() throws IOException {
+                                // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
+                                return new PrintWriter(outputStream);
+                            }
+
                             public void setContentType(String contentType) {
                                 try {
                                     // Assume that content type is always set, otherwise this won't work

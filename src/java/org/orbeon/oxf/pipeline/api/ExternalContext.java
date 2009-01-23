@@ -161,7 +161,17 @@ public interface ExternalContext extends WebAppExternalContext {
     public Object getNativeResponse();
     public Object getNativeSession(boolean flag);
 
-    public RequestDispatcher getRequestDispatcher(String path);
+    /**
+     * Return a request dispatcher usable to perform forwards and includes.
+     *
+     * NOTE: When isContextRelative is false, assume that the first path element points to the context. E.g. /foo/bar
+     * resolves to a context mounted on /foo, and /bar is the resource pointed to in that context.
+     *
+     * @param path                  path of the resource (must start with "/")
+     * @param isContextRelative     if true, path is relative to the current context root, otherwise to the document root
+     * @return                      RequestDispatcher or null if cannot be found
+     */
+    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative);
     public RequestDispatcher getNamedDispatcher(String name);
 
     public Request getRequest();

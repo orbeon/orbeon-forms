@@ -125,7 +125,7 @@ public class ServletContextExternalContext implements ExternalContext {
         return null;
     }
 
-    public RequestDispatcher getRequestDispatcher(String path) {
+    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return null;
     }
 

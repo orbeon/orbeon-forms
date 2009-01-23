@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -42,8 +43,13 @@ public class XFormsSubmissionUtils {
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      ExternalContext.Response response,
                                                                      XFormsModelSubmission xformsModelSubmission,
-                                                                     String httpMethod, final String action, String mediatype, boolean doReplace,
-                                                                     byte[] messageBody, String queryString) {
+                                                                     String httpMethod, final String action, boolean fURLNorewrite, String mediatype,
+                                                                     byte[] messageBody, String queryString,
+                                                                     boolean isReplaceAll) {
+
+        // Action must be an absolute path
+        if (!action.startsWith("/"))
+            throw new OXFException("Action does not start with a '/': " + action);
 
         final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
@@ -54,6 +60,7 @@ public class XFormsSubmissionUtils {
             // Create requestAdapter depending on method
             final ForwardExternalContextRequestWrapper requestAdapter;
             final String effectiveResourceURI;
+            final String rootAdjustedResourceURI;
             {
                 if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
                     // Simulate a POST or PUT
@@ -63,8 +70,12 @@ public class XFormsSubmissionUtils {
                         XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
                             new String[] { "body", new String(messageBody, "UTF-8") });
 
+                    rootAdjustedResourceURI = fURLNorewrite ? NetUtils.removeFirstPathElement(effectiveResourceURI) : effectiveResourceURI;
+                    if (rootAdjustedResourceURI == null)
+                        throw new OXFException("Action must start with a servlet context path: " + action);
+
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                            effectiveResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody);
+                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody);
                 } else {
                     // Simulate a GET or DELETE
                     {
@@ -78,16 +89,24 @@ public class XFormsSubmissionUtils {
                         }
                         effectiveResourceURI = updatedActionStringBuffer.toString();
                     }
+
+                    rootAdjustedResourceURI = fURLNorewrite ? NetUtils.removeFirstPathElement(effectiveResourceURI) : effectiveResourceURI;
+                    if (rootAdjustedResourceURI == null)
+                        throw new OXFException("Action must start with a servlet context path: " + action);
+
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                            effectiveResourceURI, httpMethod);
+                            rootAdjustedResourceURI, httpMethod);
                 }
             }
 
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
-                            new String[] { "effective resource URI (relative to servlet context)", effectiveResourceURI });
+                            new String[] {
+                                    "effective resource URI (original)", effectiveResourceURI,
+                                    "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
+                            });
 
-            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, !fURLNorewrite);
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 public void close() {
                     if (getResponseInputStream() != null) {
@@ -99,7 +118,7 @@ public class XFormsSubmissionUtils {
                     }
                 }
             };
-            if (doReplace) {
+            if (isReplaceAll) {
                 // "the event xforms-submit-done is dispatched"
                 if (xformsModelSubmission != null)
                     xformsModelSubmission.getContainer(containingDocument).dispatchEvent(pipelineContext,

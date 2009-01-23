@@ -710,14 +710,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         connectionResult.dontHandleResponse = true;
 
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
-                               && !fURLNorewrite
-                               && isAllowDeferredSubmission
-                               && headerNameValues == null
-                               && !isAsyncSubmission // for now we don't handle optimized async; could be optimized in the future
-                               && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
+                               && (isAllowDeferredSubmission || XFormsProperties.isAjaxPortlet(containingDocument))
+                               && headerNameValues == null  // for now, headers are not passed
+                               && !isAsyncSubmission        // for now, we don't handle optimized async; could be optimized in the future
+                               && ((request.getContainerType().equals("portlet") && !fURLNorewrite && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
                                         && XFormsProperties.isOptimizeLocalSubmission(containingDocument)
-                                        &&  isReplaceAll))) {
+                                        && isReplaceAll))) {
 
                         // This is an "optimized" submission, i.e. one that does not use an actual
                         // protocol handler to access the resource
@@ -743,8 +742,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                 containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
 
                         connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), actualRequestMediatype, isReplaceAll,
-                                messageBody, queryString);
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), fURLNorewrite, actualRequestMediatype,
+                                messageBody, queryString, isReplaceAll);
 
                         // This means we got a submission with replace="all"
                         if (connectionResult.dontHandleResponse)

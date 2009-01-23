@@ -41,7 +41,7 @@ public class PortletContextExternalContext extends PortletWebAppExternalContext 
         throw new UnsupportedOperationException();
     }
 
-    public RequestDispatcher getRequestDispatcher(String path) {
+    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         throw new UnsupportedOperationException();
     }
 

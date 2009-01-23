@@ -32,39 +32,11 @@ import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.io.*;
+import java.net.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -949,6 +921,22 @@ public class NetUtils {
             throw new OXFException("Invalid URL: " + action, e);
         }
         return resultURL;
+    }
+
+    /**
+     * Remove the first path element of a path. Return null if there is only one path element
+     *
+     * E.g. /foo/bar => /bar?a=b
+     *
+     * @param path  path to modify
+     * @return      modified path or null
+     */
+    public static String removeFirstPathElement(String path) {
+        final int secondSlashIndex = path.indexOf('/', 1);
+        if (secondSlashIndex == -1)
+            return null;
+
+        return path.substring(secondSlashIndex);
     }
 
     /**

@@ -775,7 +775,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getNamedDispatcher(name));
     }
 
-    public RequestDispatcher getRequestDispatcher(String path) {
+    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getRequestDispatcher(path));
     }
 

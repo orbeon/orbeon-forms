@@ -72,6 +72,18 @@
                 <xsl:template match="/">
                     <xsl:apply-templates select="$query/*"/>
                 </xsl:template>
+                <!-- Dynamically list of namespaces -->
+                <xsl:template match="namespaces">
+                    <!-- All namespaces on all query elements, which will contain duplicate namespaces -->
+                    <!-- Note: we need here to exclude the declaration for the XML namespace -->
+                    <xsl:variable name="namespaces" select="$instance/query/namespace::*[local-name() != 'xml']"/>
+                    <xsl:variable name="prefixes" as="xs:string*" select="distinct-values($namespaces/local-name())"/>
+                    <xsl:for-each select="$prefixes">
+                        <xsl:variable name="prefix" select="."/>
+                        <xsl:variable name="namespace" select="$namespaces[local-name() = $prefix][1]"/>
+                        <xsl:value-of select="concat('declare namespace ', $prefix, '=&quot;', $namespace, '&quot;;')"/>
+                    </xsl:for-each>
+                </xsl:template>
                 <!-- Dynamically build where clause -->
                 <xsl:template match="where">
                     <xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>

@@ -250,6 +250,17 @@
 
                         <xforms:setvalue ref="$query/@name" value="substring-before($bind/@id, '-bind')"/>
                         <xforms:setvalue ref="$query/@path" value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                        <xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>
+                        <xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>
+
+                        <!-- Copy namespace declarations from form to <query> element -->
+                        <!-- Note: Copying namespaces from the xforms:bind is tricky. We can't copy the namespaces nodes, as copying from
+                             a tiny tree to dom4j fails. If we copy the element, it doesn't copy nodes that are not used. So we go
+                             through serialization/parsing so all the namespaces are copied into the document. -->
+                        <xforms:insert context="$query" origin="saxon:parse(saxon:serialize($bind, 'xml'))"/>
+                        <xforms:insert context="$query" origin="$query/xforms:bind/namespace::*[local-name() != '']"/>
+                        <xforms:delete nodeset="$query/xforms:bind"/>
+
                         <xforms:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
                     </xforms:action>
                     <xforms:action if="$control/@ref">

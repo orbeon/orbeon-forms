@@ -77,6 +77,19 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return forwarding;
     }
 
+    /**
+     * Whether the control is disabled. Occurs whenL
+     *
+     * o control is not null and is non-relevant
+     * o control is null and is not in a repeat template
+     *
+     * @param xformsControl control to check or null if no concrete control available
+     * @return              whether the control is to be marked as disabled
+     */
+    protected boolean isDisabled(XFormsSingleNodeControl xformsControl) {
+        return xformsControl != null && !xformsControl.isRelevant() || xformsControl == null && !handlerContext.isTemplate();
+    }
+
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
         if (xformsControl != null && xformsControl.isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument)) {
             // @disabled="disabled"

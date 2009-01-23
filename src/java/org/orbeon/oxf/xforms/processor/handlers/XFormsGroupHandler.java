@@ -42,7 +42,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
     private String labelValue;
     private FastStringBuffer labelClasses;
 
-    private DeferredContentHandler savedOutput;
+    private DeferredContentHandler currentSavedOutput;
     private OutputInterceptor outputInterceptor;
 
     private static final String XHTML_PREFIX = "{" + XMLConstants.XHTML_NAMESPACE_URI + "}";
@@ -84,6 +84,8 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         }
 
         if (!isGroupInTable) {
+            // Group outside table
+
             // Gather information about label value and classes
 
             // Value
@@ -131,6 +133,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         final ElementHandlerController controller = handlerContext.getController();
 
         if (!isGroupInTable) {
+            // Group outside table
 
             final ContentHandler contentHandler = controller.getOutput();
 
@@ -165,17 +168,18 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveId));
             }
         } else {
+            // Group within table
 
             // Place interceptor on output
 
             // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
             // automatically handles ids and element names
+            currentSavedOutput = controller.getOutput();
             if (!handlerContext.isNoScript()) {
-                savedOutput = controller.getOutput();
-                outputInterceptor = new OutputInterceptor(savedOutput, groupElementQName, new OutputInterceptor.Listener() {
+                outputInterceptor = new OutputInterceptor(currentSavedOutput, groupElementQName, new OutputInterceptor.Listener() {
                     public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                         // Delimiter: begin group
-                        outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                        outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
                     }
                 });
@@ -184,6 +188,9 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
                 // Set control classes
                 outputInterceptor.setAddedClasses(classes);
+            } else if (isDisabled(xformsControl)) {
+                // Group not visible, set output to a black hole
+                handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());
             }
 
             // Don't support label, help, alert, or hint and other appearances, only the content!
@@ -198,21 +205,27 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
         final ElementHandlerController controller = handlerContext.getController();
         if (!isGroupInTable) {
+            // Group outside table
+
             // Close xhtml:span
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
             final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
             controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
         } else {
+            // Group within table
 
             if (!handlerContext.isNoScript()) {
                 // Restore output
-                controller.setOutput(savedOutput);
+                controller.setOutput(currentSavedOutput);
 
                 // Delimiter: end repeat
                 outputInterceptor.flushCharacters(true, true);
-                outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
+            } else if (isDisabled(xformsControl)) {
+                // Group not visible, restore output
+                handlerContext.getController().setOutput(currentSavedOutput);
             }
 
             // Don't support help, alert, or hint!

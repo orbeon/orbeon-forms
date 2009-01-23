@@ -122,12 +122,16 @@
                             <filter-mapping>
                                 <filter-name>orbeon-xforms-filter</filter-name>
                                 <url-pattern>/xforms-jsp/*</url-pattern>
+                                <dispatcher>REQUEST</dispatcher>
+                                <dispatcher>FORWARD</dispatcher>
                             </filter-mapping>
 
                             <comment> This is necessary so that XForms engine resources can be served appropriately </comment>
                             <filter-mapping>
                                 <filter-name>orbeon-xforms-filter</filter-name>
                                 <url-pattern>/orbeon/*</url-pattern>
+                                <dispatcher>REQUEST</dispatcher>
+                                <dispatcher>FORWARD</dispatcher>
                             </filter-mapping>
                         </xml-source>
                         <p>
@@ -164,6 +168,8 @@
                             <filter-mapping>
                                 <filter-name>orbeon-xforms-filter</filter-name>
                                 <url-pattern>/xforms-jsp/*</url-pattern>
+                                <dispatcher>REQUEST</dispatcher>
+                                <dispatcher>FORWARD</dispatcher>
                             </filter-mapping>
                         </xml-source>
                         <p>

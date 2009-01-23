@@ -133,6 +133,11 @@
                 <collapse-all>Collapse all</collapse-all>
                 <expand-all>Expand all</expand-all>
             </labels>
+            <view>
+                <explanation>
+                    This is a read-only view of your data.
+                </explanation>
+            </view>
         </detail>
         <import-export>
             <dialog-title>Save</dialog-title>
@@ -273,6 +278,11 @@
                 <collapse-all>Fermer sections</collapse-all>
                 <expand-all>Ouvrir sections</expand-all>
             </labels>
+            <view>
+                <explanation>
+                    Ceci est une vue en lecture seule de vos données. 
+                </explanation>
+            </view>
         </detail>
         <import-export>
             <dialog-title>[Save]</dialog-title>
@@ -413,6 +423,11 @@
                 <collapse-all>Cerrar Secciones</collapse-all>
                 <expand-all>Abrir Secciones</expand-all>
             </labels>
+            <view>
+                <explanation>
+                    [This is a read-only view of your data.]
+                </explanation>
+            </view>
         </detail>
         <import-export>
             <dialog-title>Guardar</dialog-title>

@@ -190,7 +190,9 @@
                             <xhtml:div class="yui-g fr-body">
 
                                 <!-- Optional message (mostly for view mode) -->
-                                <xsl:call-template name="fr-explanation"/>
+                                <xsl:if test="$is-show-explanation and $mode = ('view')">
+                                    <xsl:call-template name="fr-explanation"/>
+                                </xsl:if>
 
                                 <!-- Table of contents -->
                                 <xsl:call-template name="fr-toc"/>
@@ -226,7 +228,15 @@
                                         <xforms:output value="$fr-resources/summary/titles/help"/>
                                     </xhtml:h2>
                                     <xhtml:ul>
-                                        <xsl:apply-templates select="fr:body/*" mode="noscript-help"/>
+                                        <!--<xsl:variable name="help-section">-->
+                                            <xsl:apply-templates select="fr:body/*" mode="noscript-help"/>
+                                        <!--</xsl:variable>-->
+                                        <!--<xsl:message>-->
+                                            <!--xxxx-->
+                                            <!--<xsl:copy-of select="$help-section"/>-->
+                                            <!--xxxx-->
+                                        <!--</xsl:message>-->
+                                        <xsl:copy-of select="$help-section"/>
                                     </xhtml:ul>
                                 </xhtml:div>
                             </xsl:if>
@@ -510,12 +520,10 @@
 
     <!-- Explanation message -->
     <xsl:template name="fr-explanation">
-        <!-- TODO
         <xhtml:div class="fr-explanation">
-            xxx
+            <xforms:output value="$fr-resources/detail/view/explanation"/>
         </xhtml:div>
         <xhtml:div class="fr-separator">&#160;</xhtml:div>
-        -->
     </xsl:template>
 
     <!-- Table of contents UI -->

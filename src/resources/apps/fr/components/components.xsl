@@ -52,7 +52,7 @@
     <xsl:variable name="min-toc" select="(pipeline:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
     <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="is-noscript-table" select="not(not(pipeline:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table" select="not(not(pipeline:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
     <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
@@ -60,6 +60,7 @@
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="has-alfresco" select="pipeline:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="is-show-explanation" select="pipeline:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
         <xsl:copy>

@@ -940,6 +940,22 @@ public class NetUtils {
     }
 
     /**
+     * Return the first path element of a path. If there is only one path element, return the entire path.
+     *
+     * E.g. /foo/bar => /foo
+     *
+     * @param path  path to analyze
+     * @return      first path element
+     */
+    public static String getFirstPathElement(String path) {
+        final int secondSlashIndex = path.indexOf('/', 1);
+        if (secondSlashIndex == -1)
+            return path;
+
+        return path.substring(0, secondSlashIndex);
+    }
+
+    /**
      * Perform a connection to the given URL with the given parameters.
      *
      * This handles:

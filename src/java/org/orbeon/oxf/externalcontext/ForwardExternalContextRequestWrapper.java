@@ -29,6 +29,7 @@ import java.util.Map;
  */
 public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
+    private String contextPath;
     private String pathQuery;
     private String method;
     private String mediaType;
@@ -45,8 +46,9 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a POST or a PUT.
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String pathQuery, String method, String mediaType, byte[] messageBody) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody) {
         super(request);
+        this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
         this.mediaType = mediaType;
@@ -58,8 +60,9 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a GET.
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String pathQuery, String method) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method) {
         super(request);
+        this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
 
@@ -147,6 +150,11 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
     public String getCharacterEncoding() {
         return null;//TODO?
+    }
+
+    public String getContextPath() {
+        // Return the context path passed
+        return contextPath;
     }
 
     public String getRequestPath() {

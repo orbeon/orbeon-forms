@@ -62,6 +62,9 @@ public class XFormsSubmissionUtils {
             final String effectiveResourceURI;
             final String rootAdjustedResourceURI;
             {
+                // Context path is either the context path of the current request, or the context path implifed by the new URI
+                final String contextPath = fURLNorewrite ? NetUtils.getFirstPathElement(action) : externalContext.getRequest().getContextPath();
+
                 if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
                     // Simulate a POST or PUT
                     effectiveResourceURI = action;
@@ -74,7 +77,7 @@ public class XFormsSubmissionUtils {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
                             rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody);
                 } else {
                     // Simulate a GET or DELETE
@@ -94,7 +97,7 @@ public class XFormsSubmissionUtils {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
                             rootAdjustedResourceURI, httpMethod);
                 }
             }

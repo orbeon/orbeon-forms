@@ -43,7 +43,7 @@ public class XFormsSubmissionUtils {
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      ExternalContext.Response response,
                                                                      XFormsModelSubmission xformsModelSubmission,
-                                                                     String httpMethod, final String action, boolean fURLNorewrite, String mediatype,
+                                                                     String httpMethod, final String action, boolean isContextRelative, String mediatype,
                                                                      byte[] messageBody, String queryString,
                                                                      boolean isReplaceAll) {
 
@@ -62,8 +62,8 @@ public class XFormsSubmissionUtils {
             final String effectiveResourceURI;
             final String rootAdjustedResourceURI;
             {
-                // Context path is either the context path of the current request, or the context path implifed by the new URI
-                final String contextPath = fURLNorewrite ? NetUtils.getFirstPathElement(action) : externalContext.getRequest().getContextPath();
+                // Context path is either the context path of the current request, or the context path implied by the new URI
+                final String contextPath = isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(action);
 
                 if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
                     // Simulate a POST or PUT
@@ -73,7 +73,7 @@ public class XFormsSubmissionUtils {
                         XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
                             new String[] { "body", new String(messageBody, "UTF-8") });
 
-                    rootAdjustedResourceURI = fURLNorewrite ? NetUtils.removeFirstPathElement(effectiveResourceURI) : effectiveResourceURI;
+                    rootAdjustedResourceURI = isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
@@ -93,7 +93,7 @@ public class XFormsSubmissionUtils {
                         effectiveResourceURI = updatedActionStringBuffer.toString();
                     }
 
-                    rootAdjustedResourceURI = fURLNorewrite ? NetUtils.removeFirstPathElement(effectiveResourceURI) : effectiveResourceURI;
+                    rootAdjustedResourceURI = isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
@@ -109,7 +109,7 @@ public class XFormsSubmissionUtils {
                                     "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
                             });
 
-            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, !fURLNorewrite);
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, isContextRelative);
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 public void close() {
                     if (getResponseInputStream() != null) {

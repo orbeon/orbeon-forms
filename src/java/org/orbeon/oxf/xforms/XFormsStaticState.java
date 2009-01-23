@@ -88,6 +88,8 @@ public class XFormsStaticState {
     private Map nonDefaultProperties = new HashMap();   // Map<String, Object> of property name to property value (String, Integer, Boolean)
     private Map externalEventsMap;                      // Map<String, ""> of event names
 
+    private boolean isSeparateDeployment;
+    private String requestContextPath;
     private String baseURI;
     private String containerType;
     private String containerNamespace;
@@ -179,6 +181,8 @@ public class XFormsStaticState {
         // TODO: if staticStateDocument contains XHTML document, get controls and models from there
 
         // Extract top-level information
+        isSeparateDeployment = "separate".equals(staticStateElement.attributeValue("deployment"));
+        requestContextPath = staticStateElement.attributeValue("context-path");
         baseURI = staticStateElement.attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateElement.attributeValue("container-type");
         containerNamespace = staticStateElement.attributeValue("container-namespace");
@@ -608,6 +612,14 @@ public class XFormsStaticState {
 
     public Map getScripts() {
         return xxformsScripts;
+    }
+
+    public boolean isSeparateDeployment() {
+        return isSeparateDeployment;
+    }
+
+    public String getRequestContextPath() {
+        return requestContextPath;
     }
 
     public String getBaseURI() {

@@ -51,7 +51,7 @@ import java.util.*;
  *
  * Structure:
  *
- * <static-state xmlns:xxforms="..." xml:base="..." container-type="servlet" container-namespace="">
+ * <static-state xmlns:xxforms="..." xml:base="..." deployment="integrated" context-path="/orbeon" container-type="servlet" container-namespace="">
  *   <!-- E.g. AVT on xhtml:html -->
  *   <xxforms:attribute .../>
  *   <!-- E.g. xforms:output within xhtml:title -->
@@ -84,6 +84,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private final ExternalContext externalContext;
     private Stack xmlBaseStack = new Stack();
+    private boolean isSeparateDeployment;
+    private String requestContextPath;
 
     private boolean inXForms;       // whether we are in a model
     private int xformsLevel;
@@ -95,16 +97,31 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         this.externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
 
+        final ExternalContext.Request request = externalContext.getRequest();
+
+        // Remember if filter provided separate deployment information
+        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_DEPLOYMENT));
+
+        // Try to get request context path
+        {
+            // First try context path passed by the filter
+            requestContextPath = (String) request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH);
+
+            // Otherwise just use the request's context path
+            if (requestContextPath == null)
+                requestContextPath = request.getContextPath();
+        }
+
         // Create xml:base stack
         try {
             final String rootXMLBase;
             {
                 // It is possible to override the base URI by setting a request attribute. This is used by OPSXFormsFilter.
-                final String rendererBaseURI = (String) externalContext.getRequest().getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
+                final String rendererBaseURI = (String) request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
                 if (rendererBaseURI != null)
                     rootXMLBase = rendererBaseURI;
                 else
-                    rootXMLBase = externalContext.getRequest().getRequestPath();
+                    rootXMLBase = request.getRequestPath();
             }
             xmlBaseStack.push(new URI(null, null, rootXMLBase, null));
         } catch (URISyntaxException e) {
@@ -122,6 +139,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
             // Add xml:base attribute
             attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
+            // Add deployment attribute
+            attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, isSeparateDeployment ? "separate" : "integrated");
+            // Add context path attribute
+            attributesImpl.addAttribute(XMLConstants.XML_URI, "context-path", "context-path", ContentHandlerHelper.CDATA, requestContextPath);
             // Add container-type attribute
             attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
             // Add container-namespace attribute

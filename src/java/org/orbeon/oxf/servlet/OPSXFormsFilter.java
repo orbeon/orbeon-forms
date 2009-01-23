@@ -26,6 +26,8 @@ import java.util.*;
  */
 public class OPSXFormsFilter implements Filter {
 
+    public static final String OPS_XFORMS_RENDERER_DEPLOYMENT = "oxf.xforms.renderer.deployment";
+    public static final String OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH = "oxf.xforms.renderer.request.context-path";
     public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
     public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
     public static final String OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
@@ -73,19 +75,24 @@ public class OPSXFormsFilter implements Filter {
                 }
             }
 
+            // Set whether deployment is integrated or separate
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_DEPLOYMENT, (getOPSContext() == servletContext) ? "integrated" : "separate");
+
+            // Set servlet context for renderer
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH, httpRequest.getContextPath());
+
             // Override Orbeon Forms context so that rewriting works correctly
             if (opsContextPath != null)
                 httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
 
             // Tell whether there is a session
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, new Boolean(httpRequest.getSession(false) != null).toString());
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
 
             // Provide media type if available
             if (responseWrapper.getMediaType() != null)
                 httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
             // Set base URI
-//            final String absoluteBaseURI = httpRequest.getRequestURL().toString();
             httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
             // Forward to Orbeon Forms for rendering
@@ -96,11 +103,16 @@ public class OPSXFormsFilter implements Filter {
     public void destroy() {
     }
 
-    private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
+    private ServletContext getOPSContext() throws ServletException {
         final ServletContext opsContext = (opsContextPath != null) ? servletContext.getContext(opsContextPath) : servletContext;
         if (opsContext == null)
             throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
-        final RequestDispatcher dispatcher = opsContext.getRequestDispatcher(path);
+
+        return opsContext;
+    }
+
+    private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
+        final RequestDispatcher dispatcher = getOPSContext().getRequestDispatcher(path);
         if (dispatcher == null)
             throw new ServletException("Can't find Orbeon Forms request dispatcher.");
 

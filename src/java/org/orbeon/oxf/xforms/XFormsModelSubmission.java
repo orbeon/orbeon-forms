@@ -741,8 +741,30 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
 
+                        // NOTE: This code does custom rewriting of the path on the action, taking into account whether
+                        // the page was produced through a filter in separate deployment or not.
+                        final boolean isContextRelative;
+                        final String effectiveAction;
+                        if (!fURLNorewrite) {
+                            // Must rewrite
+                            if (!containingDocument.getStaticState().isSeparateDeployment()) {
+                                // We are not in separate deployment, so keep path relative to the current servlet context
+                                isContextRelative = true;
+                                effectiveAction = resolvedURI.toString();
+                            } else {
+                                // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
+                                final String contextPath = containingDocument.getStaticState().getRequestContextPath();
+                                isContextRelative = false;
+                                effectiveAction = contextPath + resolvedURI.toString();
+                            }
+                        } else {
+                            // Must not rewrite anyway, so mark path as not relative to the current context
+                            isContextRelative = false;
+                            effectiveAction = resolvedURI.toString();
+                        }
+
                         connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), fURLNorewrite, actualRequestMediatype,
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, effectiveAction, isContextRelative, actualRequestMediatype,
                                 messageBody, queryString, isReplaceAll);
 
                         // This means we got a submission with replace="all"

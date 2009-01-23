@@ -176,6 +176,7 @@
             <filter-mapping>
                 <filter-name>orbeon-xforms-filter</filter-name>
                 <url-pattern>/xforms-jsp/*</url-pattern>
+                <xsl:comment> Servlet 2.4 configuration allowing the filter to run upon forward in addition to request </xsl:comment>
                 <dispatcher>REQUEST</dispatcher>
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>

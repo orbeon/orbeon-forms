@@ -16,7 +16,7 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Form Runner properties -->
-    <property as="xs:anyURI"     name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookshelf.form"           value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.provinces.form"           value="/fr/service/resource"/>

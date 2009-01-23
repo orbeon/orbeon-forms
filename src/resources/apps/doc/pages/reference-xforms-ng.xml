@@ -2012,20 +2012,34 @@
                     reply so that errors can be handled as per XForms. However, this solution is less efficient.
                 </p>
                 <xml-source>
-                    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission" value="true"/>
+                    <property as="xs:boolean" name="oxf.xforms.oxf.xforms.local-submission-forward" value="true"/>
                 </xml-source>
                 <ul>
                     <li>
-                        If set to <code>true</code> (the default), Orbeon Forms optimizes "local" HTTP and HTTPS
-                        submissions, i.e. submissions performed to a URL controlled by Orbeon Forms itself, by directly
-                        submitting using the Java Servlet API instead of actually using the HTTP protocol for the
-                        submission.
+                        If set to <code>true</code> (the default), Orbeon Forms optimizes "local"
+                        (i.e. submissions performed to a URL controlled by Orbeon Forms itself)
+                        submissions with <code>replace="all"</code>, by
+                        using the Java Servlet API's forward capability instead of actually performing an HTTP request.
                     </li>
                     <li>
                         If set to <code>false</code>, Orbeon Forms always always uses the HTTP or HTTPS protocol, which
-                        is less efficient. In this case, it is possible to specify the <code>xxforms:post</code> method
-                        instead of the <code>post</code> method on the <code>xforms:submission</code> element to force
-                        an optimized local submission.
+                        is less efficient.
+                    </li>
+                </ul>
+                <xml-source>
+                    <property as="xs:boolean" name="oxf.xforms.oxf.xforms.local-submission-include" value="true"/>
+                </xml-source>
+                <ul>
+                    <li>
+                        If set to <code>true</code> (the default is <code>false</code>), Orbeon Forms optimizes "local"
+                        (i.e. submissions performed to a URL controlled by Orbeon Forms itself)
+                        submissions with <code>replace="instance"</code>, <code>replace="text"</code> or <code>replace="none"</code>,
+                        by directly
+                        using the Java Servlet API's include capability instead of actually performing an HTTP request.
+                    </li>
+                    <li>
+                        If set to <code>false</code>, Orbeon Forms always always uses the HTTP or HTTPS protocol, which
+                        is less efficient.
                     </li>
                 </ul>
             </section>

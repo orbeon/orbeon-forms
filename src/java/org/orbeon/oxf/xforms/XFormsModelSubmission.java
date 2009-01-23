@@ -711,26 +711,29 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && (isAllowDeferredSubmission || XFormsProperties.isAjaxPortlet(containingDocument))
-                               && headerNameValues == null  // for now, headers are not passed
+                               && headerNameValues == null  // for now, headers are not handled; could be optimized in the future
                                && !isAsyncSubmission        // for now, we don't handle optimized async; could be optimized in the future
                                && ((request.getContainerType().equals("portlet") && !fURLNorewrite && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
-                                        && XFormsProperties.isOptimizeLocalSubmission(containingDocument)
-                                        && isReplaceAll))) {
+                                        && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)
+                                        && isReplaceAll)
+                                    || (request.getContainerType().equals("servlet")
+                                        && XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument)
+                                        && !isReplaceAll))) {
 
                         // This is an "optimized" submission, i.e. one that does not use an actual
                         // protocol handler to access the resource
 
                         // NOTE: Optimizing with include() for servlets doesn't allow detecting
-                        // errors caused by the included resource, so we don't allow this for now.
+                        // errors caused by the included resource.
 
                         // NOTE: For portlets, paths are served directly by the portlet, NOT as
                         // resources.
 
+                        // f:url-norewrite="true" with an absolute path allows accessing other servlet contexts.
+
                         // Current limitations:
                         // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
-                        // o Servlets cannot access resources on the same server but not in the current application
-                        //   except by using absolute URLs
 
                         final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedActionOrResource);
 
@@ -1108,7 +1111,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
                 }
             } catch (Throwable e) {
-                if (isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmission(containingDocument)) {
+                if (isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
                     // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                     throw new XFormsSubmissionException(e, "Error while processing xforms:submission", "processing submission");
                 } else {

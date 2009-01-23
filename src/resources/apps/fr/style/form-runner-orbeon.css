@@ -155,8 +155,8 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 /* Colored border for invalid fields */
-.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited,
-    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty
+.xforms-invalid-visited .xforms-input-input,
+    textarea.xforms-invalid-visited
         { border-color: orange }
 
 /* Upload control information */

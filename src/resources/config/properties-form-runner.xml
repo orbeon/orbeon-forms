@@ -66,6 +66,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.send.pdf.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.send.alfresco.*.*"                            value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.detail.send.uri.*.*"                                 value="My-Confirmation-Page"/>
+    <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
 
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>

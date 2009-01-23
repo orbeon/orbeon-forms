@@ -228,9 +228,9 @@
                                         <xforms:output value="$fr-resources/summary/titles/help"/>
                                     </xhtml:h2>
                                     <xhtml:ul>
-                                        <!--<xsl:variable name="help-section">-->
+                                        <xsl:variable name="help-section">
                                             <xsl:apply-templates select="fr:body/*" mode="noscript-help"/>
-                                        <!--</xsl:variable>-->
+                                        </xsl:variable>
                                         <!--<xsl:message>-->
                                             <!--xxxx-->
                                             <!--<xsl:copy-of select="$help-section"/>-->

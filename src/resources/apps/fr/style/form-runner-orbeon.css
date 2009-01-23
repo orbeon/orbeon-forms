@@ -116,6 +116,13 @@ p, fieldset, table { margin-bottom: 1em }
     padding: 1em;
 }
 
+.fr-explanation .xforms-output {
+    border: 3px solid orange;
+    display: block;
+    font-style: italic;
+    padding: 1em;
+}
+
 .xforms-alert-active {
     font-weight: bold;
     font-size: smaller;

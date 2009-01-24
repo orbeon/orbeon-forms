@@ -222,23 +222,18 @@
                             </xhtml:div>
                             <!-- Noscript help section (shown only in edit mode) -->
                             <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
-                                <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                                <xhtml:div class="xforms-help-panel">
-                                    <xhtml:h2>
-                                        <xforms:output value="$fr-resources/summary/titles/help"/>
-                                    </xhtml:h2>
-                                    <xhtml:ul>
-                                        <xsl:variable name="help-section">
+                                <!-- Only display this section if there is at least one non-empty nested help text -->
+                                <xforms:group ref=".[normalize-space(string-join(({string-join((fr:body//(fr:section | xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
+                                    <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                    <xhtml:div class="xforms-help-panel">
+                                        <xhtml:h2>
+                                            <xforms:output value="$fr-resources/summary/titles/help"/>
+                                        </xhtml:h2>
+                                        <xhtml:ul>
                                             <xsl:apply-templates select="fr:body/*" mode="noscript-help"/>
-                                        </xsl:variable>
-                                        <!--<xsl:message>-->
-                                            <!--xxxx-->
-                                            <!--<xsl:copy-of select="$help-section"/>-->
-                                            <!--xxxx-->
-                                        <!--</xsl:message>-->
-                                        <xsl:copy-of select="$help-section"/>
-                                    </xhtml:ul>
-                                </xhtml:div>
+                                        </xhtml:ul>
+                                    </xhtml:div>
+                                </xforms:group>
                             </xsl:if>
                             <!-- Buttons and status section -->
                             <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
@@ -428,37 +423,50 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- Noscript control help entry -->
-    <xsl:template match="xforms:*[@id and xforms:help]" mode="noscript-help">
-        <xforms:group ref=".[normalize-space({xforms:help/@ref})]"><!-- handling xforms:help/@ref this way will work only if it is not dependent on the control's context (case of Form Builder) -->
+    <!-- Noscript section help entry -->
+    <xsl:template match="fr:section[@id]" mode="noscript-help">
+        <!-- Assumption: help referred to by xforms:help/@ref and XPath expression is independent on the control's context (case of Form Builder-generated forms) -->
+
+        <!-- Only display this <li> if there is at least one non-empty nested help text -->
+        <xforms:group ref=".[normalize-space(string-join(({string-join(((descendant-or-self::fr:section | .//xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
             <xhtml:li class="xforms-help-group">
-                <!-- So the control's help icon can link to here -->
-                <xhtml:a name="{@id}-help"/>
-                <!-- Label and help text -->
-                <xforms:output id="{@id}-help" value="':'" xxforms:order="label control help">
-                    <xsl:apply-templates select="xforms:label | xforms:help"/>
-                </xforms:output>
-                <!-- Link back to the control -->
-                <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+                <xxforms:variable name="section-has-help" select="normalize-space({xforms:help/@ref}) != ''" as="xs:boolean"/>
+                <!-- Case where current section has help -->
+                <xforms:group ref=".[$section-has-help]">
+                    <!-- Linked reachable from help icon -->
+                    <xhtml:a name="{@id}-help"/>
+                    <!-- Label and help text -->
+                    <xforms:output class="xforms-label" value="{xforms:label/@ref}"/>: <xforms:output value="{xforms:help/@ref}"/>
+                    <!-- Link back to control -->
+                    <xhtml:a href="#{@id}" class="fr-help-back"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+                </xforms:group>
+                <!-- Case where current section doesn't have help -->
+                <xforms:group ref=".[not($section-has-help)]">
+                    <!-- Label -->
+                    <xforms:output class="xforms-label" value="{xforms:label/@ref}"/>
+                </xforms:group>
+                <!-- Recurse into nested controls if there is at least one non-empty nested help text -->
+                <xforms:group ref=".[normalize-space(string-join(({string-join((.//(fr:section | xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
+                    <xhtml:ul>
+                        <xsl:apply-templates mode="#current"/>
+                    </xhtml:ul>
+                </xforms:group>
             </xhtml:li>
         </xforms:group>
     </xsl:template>
 
-    <!-- Noscript section help entry -->
-    <xsl:template match="fr:section[@id]" mode="noscript-help">
-        <xhtml:li class="xforms-help-group">
-            <xforms:group ref=".[normalize-space({xforms:help/@ref})]"><!-- handling xforms:help/@ref this way will work only if it is not dependent on the control's context (case of Form Builder) -->
+    <!-- Noscript control help entry -->
+    <xsl:template match="xforms:*[@id and xforms:help]" mode="noscript-help">
+        <xforms:group ref=".[normalize-space({xforms:help/@ref})]">
+            <xhtml:li class="xforms-help-group">
+                <!-- Linked reachable from help icon -->
                 <xhtml:a name="{@id}-help"/>
-                <xforms:output value="':'" xxforms:order="label control help">
-                    <xsl:apply-templates select="xforms:label | xforms:help"/>
-                </xforms:output>
-                <xhtml:a href="#{@id}"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
-            </xforms:group>
-            <!-- Recurse into nested controls -->
-            <xhtml:ul>
-                <xsl:apply-templates mode="#current"/>
-            </xhtml:ul>
-        </xhtml:li>
+                <!-- Label and help text -->
+                <xforms:output class="xforms-label" value="{xforms:label/@ref}"/>: <xforms:output value="{xforms:help/@ref}"/>
+                <!-- Link back to the control -->
+                <xhtml:a href="#{@id}" class="fr-help-back"><xforms:output value="$fr-resources/summary/labels/help-back"/></xhtml:a>
+            </xhtml:li>
+        </xforms:group>
     </xsl:template>
 
     <xsl:template match="node()" mode="noscript-help">
@@ -562,3 +570,5 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
+        

@@ -445,6 +445,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
             final String labelClasses = classes.toString();
 
+            final boolean isNoscript = handlerContext.isNoScript();
             if (isHelp) {
                 // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
                 // background images way too often.
@@ -452,7 +453,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-                if (handlerContext.isNoScript() && control != null) {
+                if (isNoscript && control != null) {
                     // Start <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
@@ -477,17 +478,21 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
 
-                if (handlerContext.isNoScript() && control != null) {
+                if (isNoscript && control != null) {
                     // End </a>
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
                 }
             }
 
-            // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
-            final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
-            if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
+            // Output label, except help in noscript mode since in that case help is displayed separately
+            if (!(isNoscript && isHelp)) {
+
+                // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
+                final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
+                if (newAttributes != null) {
+                    outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
+                }
             }
         }
     }

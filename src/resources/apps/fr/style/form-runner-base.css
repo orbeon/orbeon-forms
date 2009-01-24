@@ -137,7 +137,7 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-noscript .xforms-help-panel .xforms-help { display: inline }
 .xforms-noscript .xforms-help-panel .xforms-help-anchor { display: none }
 .xforms-noscript .xforms-help-panel .xforms-help-image { display: none }
-.xforms-noscript .xforms-help-panel a { margin-left: .5em }
+.xforms-noscript .fr-help-back { margin-left: .5em }
 
 /* ***** General Layout ********************************************************************************************* */
 

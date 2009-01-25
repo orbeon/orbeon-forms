@@ -552,7 +552,7 @@ ORBEON.util.DateTime = {
         } else {
             // Default: [h]:[m]:[s] [P]
             // US time
-            return jsDate.getHours() % 12 + ":"
+            return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
                     + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
@@ -903,13 +903,13 @@ ORBEON.util.Utils = {
         if (!ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel =
             new YAHOO.widget.Panel("wait", {
-                width:"60px",
-                fixedcenter:true,
-                close:false,
-                draggable:false,
-                zindex:4,
-                modal:true,
-                visible:true
+                width: "60px",
+                fixedcenter: true,
+                close: false,
+                draggable: false,
+                zindex: 4,
+                modal: true,
+                visible: true
             });
             ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + ORBEON.xforms.Globals.baseURL + '/ops/images/xforms/processing.gif"/>');
             ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
@@ -2532,6 +2532,15 @@ ORBEON.xforms.Events = {
         } else if (target != null && (ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
             // Click on trigger
             YAHOO.util.Event.preventDefault(event);
+            if (ORBEON.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
+                // If click on a modal trigger, we want to prevent any further interaction with the form until
+                // we get a response to this Ajax request from the server.
+                // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
+                // the progress panel is displayed.
+                target.blur();
+                // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
+                ORBEON.util.Utils.displayModalProgressPanel();
+            }
             if (ORBEON.util.Dom.hasClass(target, "xxforms-offline-save")) {
                 // This is a trigger take commits the data changed so far in Gears
                 ORBEON.xforms.Offline.storeEvents(ORBEON.xforms.Offline.memoryOfflineEvents);
@@ -3545,35 +3554,16 @@ ORBEON.xforms.Init = {
             }
         }
 
-        // Initialize special controls
-        if (!(window.opsXFormsControls === undefined)) {
-            var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
-            // Iterate over controls
-            for (var controlType in window.opsXFormsControls["controls"]) {
-                if (initFunctions[controlType]) {
-                    var controlAppearances = window.opsXFormsControls["controls"][controlType];
-                    // Iterate over appearance for current control
-                    for (var controlAppearance in controlAppearances) {
-                        var initFunction = initFunctions[controlType][controlAppearance];
-                        if (initFunction) {
-                            var controlIds = controlAppearances[controlAppearance];
-                            // Iterate over controls
-                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
-                                var control = ORBEON.util.Dom.getElementById(controlIds[controlIndex]);
-                                initFunction(control);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         // Initialize attributes on form
         for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
             var form = document.forms[formIndex];
-            // If this is an XForms form, procede with initialization
+            // If this is an XForms form, proceed with initialization
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
                 var formID = document.forms[formIndex].id;
+
+                // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
+                // interaction with the form before it is initialized
+                ORBEON.util.Dom.removeClass(form, "xforms-initially-hidden");
 
                 // Initialize loading and error indicator
                 ORBEON.xforms.Globals.formErrorPanel[formID] = null;
@@ -3721,6 +3711,29 @@ ORBEON.xforms.Init = {
                     } else {
                         var event = new ORBEON.xforms.Server.Event(form, null, null, null, "xxforms-all-events-required");
                         ORBEON.xforms.Server.fireEvents([event], false);
+                    }
+                }
+            }
+        }
+
+        // Initialize special controls
+        if (!(window.opsXFormsControls === undefined)) {
+            var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
+            // Iterate over controls
+            for (var controlType in window.opsXFormsControls["controls"]) {
+                if (initFunctions[controlType]) {
+                    var controlAppearances = window.opsXFormsControls["controls"][controlType];
+                    // Iterate over appearance for current control
+                    for (var controlAppearance in controlAppearances) {
+                        var initFunction = initFunctions[controlType][controlAppearance];
+                        if (initFunction) {
+                            var controlIds = controlAppearances[controlAppearance];
+                            // Iterate over controls
+                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
+                                var control = ORBEON.util.Dom.getElementById(controlIds[controlIndex]);
+                                initFunction(control);
+                            }
+                        }
                     }
                 }
             }
@@ -4264,13 +4277,11 @@ ORBEON.xforms.Server = {
                         progressMessage = null;
                     }
 
-                    // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
-                    var eventElement = ORBEON.util.Dom.getElementById(event.targetId);
-                    if (event.eventName == 'DOMActivate') {
-                        if (ORBEON.util.Dom.hasClass(eventElement, "xforms-trigger-appearance-modal"))
-                            ORBEON.util.Utils.displayModalProgressPanel();
-                        else if (ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
-                            sendInitialDynamicState = true; // Case of going offline
+                    // Case of going offline
+                    if (event.eventName == "DOMActivate") {
+                        var eventElement = ORBEON.util.Dom.getElementById(event.targetId);
+                        if (ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
+                            sendInitialDynamicState = true;
                     }
                 }
 

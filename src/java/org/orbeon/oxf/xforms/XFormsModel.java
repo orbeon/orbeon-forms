@@ -27,8 +27,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -497,21 +497,30 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     //                                    || (externalContext.getRequest().getContainerType().equals("servlet")
     //                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
 
-                                final boolean optimizeForPortlets = !NetUtils.urlHasProtocol(instanceResource)
-                                                            && externalContext.getRequest().getContainerType().equals("portlet");
+                                final ExternalContext.Request request = externalContext.getRequest();
+                                final boolean optimizeLocal =
+                                        !NetUtils.urlHasProtocol(instanceResource)
+                                                && (request.getContainerType().equals("portlet")
+                                                    || request.getContainerType().equals("servlet")
+                                                       && XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument));
 
                                 final ConnectionResult connectionResult;
-                                if (optimizeForPortlets) {
+                                if (optimizeLocal) {
                                     // Use optimized local mode
 
+                                    // URI with xml:base resolution
                                     final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResource);
+                                    // Whether or not to rewrite URLs
+                                    final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainerElement);
 
                                     if (XFormsServer.logger.isDebugEnabled())
                                         containingDocument.logDebug("model", "getting document from optimized URI",
-                                                    new String[] { "URI", resolvedURI.toString() });
+                                                    new String[] { "URI", resolvedURI.toString(), "norewrite", Boolean.toString(isNoRewrite) });
 
-                                    connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext,
-                                            null, null, "get", resolvedURI.toString(), false, null, null, null, false);
+                                    // Run submission
+                                    connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
+                                            null, "get", resolvedURI.toString(), isNoRewrite, null, null, null, false,
+                                            XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD);
 
                                     instanceSourceURI = resolvedURI.toString();
                                     xxformsUsername = null;

@@ -54,6 +54,7 @@ public class XFormsProperties {
     private static final String OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY = "optimize-local-submission";
     private static final String OPTIMIZE_LOCAL_SUBMISSION_FORWARD_PROPERTY = "local-submission-forward";
     private static final String OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
+    private static final String OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
@@ -179,6 +180,7 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_FORWARD_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
+            new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
@@ -394,6 +396,10 @@ public class XFormsProperties {
 
     public static boolean isOptimizeLocalSubmissionInclude(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY);
+    }
+
+    public static boolean isOptimizeLocalInstanceInclude(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY);
     }
 
     public static boolean isExceptionOnInvalidClientControlId(XFormsContainingDocument containingDocument) {

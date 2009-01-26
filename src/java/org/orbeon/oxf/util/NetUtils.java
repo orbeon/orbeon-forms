@@ -842,7 +842,7 @@ public class NetUtils {
      * @param request   incoming request
      * @return          true if Trident is identified
      */
-    public boolean isRenderingEngineTrident(ExternalContext.Request request) {
+    public static boolean isRenderingEngineTrident(ExternalContext.Request request) {
         final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
         if (userAgentHeader == null)
             return false;

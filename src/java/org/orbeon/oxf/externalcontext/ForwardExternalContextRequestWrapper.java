@@ -46,7 +46,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a POST or a PUT.
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] headerNames) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
@@ -54,22 +54,22 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         this.mediaType = mediaType;
         this.messageBody = messageBody;
 
-        initializeHeaders(request);
+        initializeHeaders(request, headerNames);
     }
 
     /**
      * This simulates a GET.
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] headerNames) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
 
-        initializeHeaders(request);
+        initializeHeaders(request, headerNames);
     }
 
-    private void initializeHeaders(ExternalContext.Request request) {
+    private void initializeHeaders(ExternalContext.Request request, String[] headerNames) {
         /**
          * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
          * we only pass 2 headers:
@@ -83,18 +83,19 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         {
             this.headerMap = new HashMap();
             final Map requestHeaderMap = request.getHeaderMap();
-            final Object cookie = requestHeaderMap.get("cookie");
-            if (cookie != null) headerMap.put("cookie", cookie);
-            final Object authorization = requestHeaderMap.get("authorization");
-            if (authorization != null) headerMap.put("authorization", authorization);
-        }
-        {
+
             this.headerValuesMap = new HashMap();
             Map requestHeaderValuesMap = request.getHeaderValuesMap();
-            final Object cookie = requestHeaderValuesMap.get("cookie");
-            if (cookie != null) headerValuesMap.put("cookie", cookie);
-            final Object authorization = requestHeaderValuesMap.get("authorization");
-            if (authorization != null) headerValuesMap.put("authorization", authorization);
+
+            for (int i = 0; i < headerNames.length; i++) {
+                final String currentHeaderName = headerNames[i];
+
+                final Object v1 = requestHeaderMap.get(currentHeaderName);
+                if (v1 != null) headerMap.put(currentHeaderName, v1);
+
+                final Object v2 = requestHeaderValuesMap.get(currentHeaderName);
+                if (v2 != null) headerValuesMap.put(currentHeaderName, v2);
+            }
         }
     }
 

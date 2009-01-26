@@ -37,15 +37,56 @@ import java.util.Map;
  */
 public class XFormsSubmissionUtils {
 
+    // TODO: harmonize with regular HTTP submission headers configuration (property)
+    public static String[] MINIMAL_HEADERS_TO_FORWARD = { "cookie", "authorization" };
+    public static String[] STANDARD_HEADERS_TO_FORWARD = { "cookie", "authorization", "user-agent"};
+
     /**
      * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
      */
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
-                                                                     ExternalContext.Response response,
-                                                                     XFormsModelSubmission xformsModelSubmission,
-                                                                     String httpMethod, final String action, boolean isContextRelative, String mediatype,
-                                                                     byte[] messageBody, String queryString,
-                                                                     boolean isReplaceAll) {
+                                                           XFormsContainingDocument containingDocument,
+                                                           XFormsModelSubmission xformsModelSubmission,
+                                                           String httpMethod, final String action, boolean fURLNorewrite, String mediatype,
+                                                           byte[] messageBody, String queryString,
+                                                           boolean isReplaceAll, String[] headerNames) {
+
+        // NOTE: This code does custom rewriting of the path on the action, taking into account whether
+        // the page was produced through a filter in separate deployment or not.
+        final boolean isContextRelative;
+        final String effectiveAction;
+        if (!fURLNorewrite) {
+            // Must rewrite
+            if (!containingDocument.getStaticState().isSeparateDeployment()) {
+                // We are not in separate deployment, so keep path relative to the current servlet context
+                isContextRelative = true;
+                effectiveAction = action;
+            } else {
+                // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
+                final String contextPath = containingDocument.getStaticState().getRequestContextPath();
+                isContextRelative = false;
+                effectiveAction = contextPath + action;
+            }
+        } else {
+            // Must not rewrite anyway, so mark path as not relative to the current context
+            isContextRelative = false;
+            effectiveAction = action;
+        }
+
+        return XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
+                                xformsModelSubmission, httpMethod, effectiveAction, isContextRelative, mediatype,
+                                messageBody, queryString, isReplaceAll, headerNames);
+    }
+
+    /**
+     * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
+     */
+    public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
+                                                           ExternalContext.Response response,
+                                                           XFormsModelSubmission xformsModelSubmission,
+                                                           String httpMethod, final String action, boolean isContextRelative, String mediatype,
+                                                           byte[] messageBody, String queryString,
+                                                           boolean isReplaceAll, String[] headerNames) {
 
         // Action must be an absolute path
         if (!action.startsWith("/"))
@@ -78,7 +119,7 @@ public class XFormsSubmissionUtils {
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
-                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody);
+                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames);
                 } else {
                     // Simulate a GET or DELETE
                     {
@@ -98,13 +139,15 @@ public class XFormsSubmissionUtils {
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
-                            rootAdjustedResourceURI, httpMethod);
+                            rootAdjustedResourceURI, httpMethod, headerNames);
                 }
             }
 
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
                             new String[] {
+                                    "method", httpMethod,
+                                    "mediatype", mediatype,
                                     "effective resource URI (original)", effectiveResourceURI,
                                     "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
                             });

@@ -735,6 +735,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // Current limitations:
                         // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
 
+                        // URI with xml:base resolution
                         final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedActionOrResource);
 
                         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
@@ -744,31 +745,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
 
-                        // NOTE: This code does custom rewriting of the path on the action, taking into account whether
-                        // the page was produced through a filter in separate deployment or not.
-                        final boolean isContextRelative;
-                        final String effectiveAction;
-                        if (!fURLNorewrite) {
-                            // Must rewrite
-                            if (!containingDocument.getStaticState().isSeparateDeployment()) {
-                                // We are not in separate deployment, so keep path relative to the current servlet context
-                                isContextRelative = true;
-                                effectiveAction = resolvedURI.toString();
-                            } else {
-                                // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
-                                final String contextPath = containingDocument.getStaticState().getRequestContextPath();
-                                isContextRelative = false;
-                                effectiveAction = contextPath + resolvedURI.toString();
-                            }
-                        } else {
-                            // Must not rewrite anyway, so mark path as not relative to the current context
-                            isContextRelative = false;
-                            effectiveAction = resolvedURI.toString();
-                        }
+                        // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
+                        // simulates a request from the browser! Useful in particular when the target URL renders XForms
+                        // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
+                        // element.
+                        final String[] headersToForward = isReplaceAll ? XFormsSubmissionUtils.STANDARD_HEADERS_TO_FORWARD : XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD;
+                        // TODO: Harmonize with HTTP submission handling of headers
 
-                        connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, effectiveAction, isContextRelative, actualRequestMediatype,
-                                messageBody, queryString, isReplaceAll);
+                        connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), fURLNorewrite, actualRequestMediatype,
+                                messageBody, queryString, isReplaceAll, headersToForward);
 
                         // This means we got a submission with replace="all"
                         if (connectionResult.dontHandleResponse)
@@ -823,14 +809,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             // Compute absolute submission URL
                             final URL submissionURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+
+                            // Gather remaining information to process the request
+                            final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+
+                            // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
+                            // simulates a request from the browser! Useful in particular when the target URL renders XForms
+                            // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
+                            // element.
+                            final String newForwardSubmissionHeaders = isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
+
                             // Open connection
                             if (isAsyncSubmission) {
-
-                                // Gather remaining information to process the request
-                                final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
                                 final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
                                 final Map headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
-                                            resolvedXXFormsUsername, headerNameValues, forwardSubmissionHeaders);
+                                            resolvedXXFormsUsername, headerNameValues, newForwardSubmissionHeaders);
 
                                 // Pack call into a Runnable
                                 final Runnable runnable = new Runnable() {
@@ -860,7 +853,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                 connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
                                         actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
-                                        headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                                        headerNameValues, newForwardSubmissionHeaders);
                             }
                         }
                     }

@@ -138,7 +138,7 @@ public class HandlerContext {
         if (!processedUserAgent) {
             final ExternalContext.Request request = externalContext.getRequest();
             isRenderingEngineIE6OrEarlier = NetUtils.isRenderingEngineIE6OrEarlier(request);
-            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : NetUtils.isRenderingEngineIE6OrEarlier(request);
+            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : NetUtils.isRenderingEngineTrident(request);
             processedUserAgent = true;
         }
     }

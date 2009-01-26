@@ -9,13 +9,14 @@
     <xsl:param name="build-root"/>
     <xsl:param name="version-number"/>
 
-    <xsl:output method="xml" indent="yes" xslt:indent-amount="4"
-        doctype-public="-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        doctype-system="http://java.sun.com/dtd/web-app_2_3.dtd"/>
+    <xsl:output method="xml" indent="yes" xslt:indent-amount="4"/>
 
     <xsl:template match="/">
-        <web-app>
-            <display-name>Orbeon Forms <xsl:value-of select="$version-number"/></display-name>
+        <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+            <display-name>Orbeon Forms
+                <xsl:value-of select="$version-number"/>
+            </display-name>
             <description>
                 Orbeon Forms is an open source forms solution that handles the complexity of forms typical of the
                 enterprise or government. It is delivered to standard web browsers (including Internet Explorer,
@@ -24,17 +25,17 @@
                 as-you-type validation, optional and repeated sections, always up-to-date error summaries, PDF output,
                 full internationalization, and controls like auto-completion, tabs, dialogs, trees and menus.
             </description>
-            <xsl:comment> Initialize main resource manager </xsl:comment>
+            <xsl:comment>Initialize main resource manager</xsl:comment>
             <context-param>
                 <param-name>oxf.resources.factory</param-name>
                 <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
             </context-param>
-            
+
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'filesystem resource manager'"/>
                 <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
-                    <xsl:comment> Filesystem resource managers </xsl:comment>
+                    <xsl:comment>Filesystem resource managers</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.1</param-name>
                         <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
@@ -43,7 +44,7 @@
                         <param-name>oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory</param-name>
                         <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
                     </context-param>
-                    <xsl:comment> Web application resource manager </xsl:comment>
+                    <xsl:comment>Web application resource manager</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.2</param-name>
                         <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
@@ -60,7 +61,7 @@
                         <param-name>oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory</param-name>
                         <param-value><xsl:value-of select="$build-root"/>/src/resources-packaged</param-value>
                     </context-param>
-                    <xsl:comment> Classloader resource manager </xsl:comment>
+                    <xsl:comment>Classloader resource manager</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.4</param-name>
                         <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
@@ -71,7 +72,7 @@
                 <xsl:with-param name="caption" select="'webapp resource manager'"/>
                 <xsl:with-param name="commented" select="$target = 'devel'"/>
                 <xsl:with-param name="content">
-                    <xsl:comment> Web application resource manager </xsl:comment>
+                    <xsl:comment>Web application resource manager</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.1</param-name>
                         <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
@@ -80,7 +81,7 @@
                         <param-name>oxf.resources.priority.1.oxf.resources.webapp.rootdir</param-name>
                         <param-value>/WEB-INF/resources</param-value>
                     </context-param>
-                    <xsl:comment> Classloader resource manager </xsl:comment>
+                    <xsl:comment>Classloader resource manager</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.2</param-name>
                         <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
@@ -88,7 +89,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:comment> OPS Class Loader </xsl:comment>
+            <xsl:comment>OPS Class Loader</xsl:comment>
             <context-param>
                 <param-name>oxf.classloader.enable</param-name>
                 <param-value>false</param-value>
@@ -98,19 +99,19 @@
                 <param-value>java. javax. org.apache.log4j. org.xml. org.w3c.</param-value>
             </context-param>
 
-            <xsl:comment> Set location of properties.xml (read by resource manager) </xsl:comment>
+            <xsl:comment>Set location of properties.xml (read by resource manager)</xsl:comment>
             <context-param>
                 <param-name>oxf.properties</param-name>
                 <param-value>oxf:/config/properties.xml</param-value>
             </context-param>
 
-            <xsl:comment> Determine whether logging initialization must take place </xsl:comment>
+            <xsl:comment>Determine whether logging initialization must take place</xsl:comment>
             <context-param>
-               <param-name>oxf.initialize-logging</param-name>
-               <param-value>true</param-value>
+                <param-name>oxf.initialize-logging</param-name>
+                <param-value>true</param-value>
             </context-param>
 
-            <xsl:comment> Set context listener processors </xsl:comment>
+            <xsl:comment>Set context listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'context listener processors'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -134,7 +135,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:comment> Set session listener processors </xsl:comment>
+            <xsl:comment>Set session listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'session listener processors'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -158,7 +159,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:comment> All JSP files under /xforms-jsp go through the XForms filter </xsl:comment>
+            <xsl:comment>All JSP files under /xforms-jsp go through the XForms filter</xsl:comment>
             <filter>
                 <filter-name>orbeon-xforms-filter</filter-name>
                 <filter-class>org.orbeon.oxf.servlet.OPSXFormsFilter</filter-class>
@@ -176,12 +177,12 @@
             <filter-mapping>
                 <filter-name>orbeon-xforms-filter</filter-name>
                 <url-pattern>/xforms-jsp/*</url-pattern>
-                <xsl:comment> Servlet 2.4 configuration allowing the filter to run upon forward in addition to request </xsl:comment>
+                <xsl:comment>Servlet 2.4 configuration allowing the filter to run upon forward in addition to request</xsl:comment>
                 <dispatcher>REQUEST</dispatcher>
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
-            <xsl:comment> Set listeners </xsl:comment>
+            <xsl:comment>Set listeners</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -224,11 +225,11 @@
             </servlet-mapping>
             -->
 
-            <xsl:comment> This is the main Orbeon Forms servlet </xsl:comment>
+            <xsl:comment>This is the main Orbeon Forms servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-main-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
-                <xsl:comment> Set main processor </xsl:comment>
+                <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
@@ -237,7 +238,7 @@
                     <param-name>oxf.main-processor.input.controller</param-name>
                     <param-value>oxf:/page-flow.xml</param-value>
                 </init-param>
-                <xsl:comment> Set error processor </xsl:comment>
+                <xsl:comment>Set error processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.error-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
@@ -246,12 +247,12 @@
                     <param-name>oxf.error-processor.input.controller</param-name>
                     <param-value>oxf:/config/error-page-flow.xml</param-value>
                 </init-param>
-                <xsl:comment> Set supported methods </xsl:comment>
+                <xsl:comment>Set supported methods</xsl:comment>
                 <init-param>
                     <param-name>oxf.http.accept-methods</param-name>
                     <param-value>get,post,head,put,delete</param-value>
                 </init-param>
-                <xsl:comment> Set servlet initialization and destruction listeners </xsl:comment>
+                <xsl:comment>Set servlet initialization and destruction listeners</xsl:comment>
                 <xsl:call-template name="comment">
                     <xsl:with-param name="caption" select="'servlet listener processors'"/>
                     <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -277,11 +278,11 @@
                 <load-on-startup>1</load-on-startup>
             </servlet>
 
-            <xsl:comment> This is the XForms Server servlet </xsl:comment>
+            <xsl:comment>This is the XForms Server servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-xforms-server-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
-                <xsl:comment> Set main processor </xsl:comment>
+                <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -290,7 +291,7 @@
                     <param-name>oxf.main-processor.input.config</param-name>
                     <param-value>oxf:/ops/xforms/xforms-server.xpl</param-value>
                 </init-param>
-                <xsl:comment> Set error processor </xsl:comment>
+                <xsl:comment>Set error processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.error-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -302,11 +303,11 @@
                 <load-on-startup>1</load-on-startup>
             </servlet>
 
-            <xsl:comment> This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR </xsl:comment>
+            <xsl:comment>This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-renderer-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
-                <xsl:comment> Set main processor </xsl:comment>
+                <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -315,7 +316,7 @@
                     <param-name>oxf.main-processor.input.config</param-name>
                     <param-value>oxf:/ops/xforms/xforms-renderer.xpl</param-value>
                 </init-param>
-                <xsl:comment> Set error processor </xsl:comment>
+                <xsl:comment>Set error processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.error-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -344,7 +345,7 @@
                     <param-name>basedir</param-name>
                     <param-value>WEB-INF/</param-value>
                 </init-param>
-                 <init-param>
+                <init-param>
                     <param-name>configuration</param-name>
                     <param-value>exist-conf.xml</param-value>
                 </init-param>
@@ -405,7 +406,7 @@
             </servlet-mapping>
 
             <servlet-mapping>
-            <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                <servlet-name>exist-xmlrpc-servlet</servlet-name>
                 <url-pattern>/exist/xmlrpc</url-pattern>
             </servlet-mapping>
 

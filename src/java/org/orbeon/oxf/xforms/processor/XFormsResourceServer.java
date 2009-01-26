@@ -66,9 +66,9 @@ public class XFormsResourceServer extends ProcessorImpl {
                     
                     // TODO: for Safari, try forcing application/octet-stream
                     // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
-//                    if (resource.getContentType() != null)
-//                        response.setContentType(resource.getContentType());
-//                    else
+                    if (resource.getContentType() != null)
+                        response.setContentType(resource.getContentType());
+                    else
                         response.setContentType("application/octet-stream");
 
                     // File name visible by the user

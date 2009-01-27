@@ -62,6 +62,7 @@
     <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.local-submission-forward"             value="true"/>
     <property as="xs:boolean" name="oxf.xforms.local-submission-include"             value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.local-instance-include"               value="false"/>
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"           value="Authorization"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>

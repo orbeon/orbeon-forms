@@ -163,6 +163,10 @@
                     <label>Email Recipient</label>
                     <value>fr-email-recipient</value>
                 </item>
+                <item>
+                    <label>Show in Email Subject</label>
+                    <value>fr-email-subject</value>
+                </item>
             </classes>
         </dialog-control-details>
         <dialog-section-details>
@@ -766,6 +770,10 @@
                 <item>
                     <label>Destinataire email</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Utiliser comme sujet d'email</label>
+                    <value>fr-email-subject</value>
                 </item>
             </classes>
         </dialog-control-details>

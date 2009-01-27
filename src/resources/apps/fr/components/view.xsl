@@ -37,7 +37,7 @@
                     <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
                         <!-- Go to content link in noscript mode -->
                         <xsl:if test="$is-noscript">
-                            <xhtml:div class="fr-noscript-choice" style="float: left">
+                            <xhtml:div class="fr-goto-content">
                                 <!-- Group to scope variables -->
                                 <xforms:group appearance="xxforms:internal" model="fr-error-summary-model">
                                     <!-- Link to form content or to errors if any -->
@@ -49,7 +49,7 @@
                         </xsl:if>
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
-                            <xhtml:div class="fr-noscript-choice" style="float: left">
+                            <xhtml:div class="fr-noscript-choice">
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:group ref=".[not(property('xxforms:noscript'))]">
                                         <xforms:trigger appearance="minimal">

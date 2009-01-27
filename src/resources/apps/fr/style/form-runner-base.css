@@ -153,10 +153,13 @@ button.xforms-trigger img { margin-right: 10px }
 }
 
 /* Language and mode selectors */
-.fr-language-choice, .fr-noscript-choice { margin-right: 1em; margin-top: .2em; text-align: right }
-.fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
+.fr-goto-content, .fr-language-choice, .fr-noscript-choice { margin-right: 1em; margin-top: .2em; text-align: right }
+.fr-goto-content, .fr-noscript-choice { float: left }
+.fr-language-choice { float: right }
+.fr-goto-content .xforms-trigger-appearance-xxforms-minimal,
+    .fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
     .fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
-.fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
+.fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
 
 /* Metadata */
 .fr-metadata { display: block }
@@ -446,5 +449,9 @@ button.xforms-trigger img { margin-right: 10px }
     .fr-status-icons { display: none }
     .fr-bottom { display: none }
     .fr-section-container .fr-section-open-close { display: none }
+    /* Remove button */
+    .xforms-upload-remove { display: none }
+    /* Remove background attachment image */
+    .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
     noscript { display: none }
 }

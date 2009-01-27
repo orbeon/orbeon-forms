@@ -87,18 +87,30 @@
                 <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
 
                 <!-- Find fr-email-recipient controls and binds -->
-
-                <xsl:variable name="controls" as="element()*"
+                <xsl:variable name="recipient-controls" as="element()*"
                               select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-email-recipient']"/>
-                <xsl:variable name="binds" as="element(xforms:bind)*"
-                              select="for $control in $controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+                <xsl:variable name="recipient-binds" as="element(xforms:bind)*"
+                              select="for $control in $recipient-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
-                <xsl:variable name="paths" as="xs:string*"
-                              select="for $bind in $binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                <xsl:variable name="recipient-paths" as="xs:string*"
+                              select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
 
                 <!-- Extract email addresses from form if any -->
                 <xsl:variable name="email-addresses" as="xs:string*"
-                              select="for $path in $paths return $data/saxon:evaluate($path)"/>
+                              select="for $path in $recipient-paths return $data/saxon:evaluate($path)"/>
+
+                <!-- Find fr-email-recipient controls and binds -->
+                <xsl:variable name="subject-controls" as="element()*"
+                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-email-subject']"/>
+                <xsl:variable name="subject-binds" as="element(xforms:bind)*"
+                              select="for $control in $subject-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+
+                <xsl:variable name="subject-paths" as="xs:string*"
+                              select="for $bind in $subject-binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+
+                <!-- Extract values from form if any -->
+                <xsl:variable name="subject-values" as="xs:string*"
+                              select="for $path in $subject-paths return $data/saxon:evaluate($path)"/>
 
                 <!-- SMTP outgoing server settings -->
                 <smtp-host>
@@ -132,10 +144,20 @@
                         <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
                     </email>
                 </to>
-                <!-- Message details -->
+                <!-- Subject -->
                 <subject>
-                    <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
+                    <xsl:choose>
+                        <xsl:when test="count($subject-values) > 0">
+                            <!-- Append subject values to static subject, comma-separated -->
+                            <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, string-join($subject-values, ', '))"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- Just put static subject -->
+                            <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </subject>
+                <!-- Body -->
                 <body content-type="multipart/related">
                     <part name="text" content-type="text/plain">
                         <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>

@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
@@ -35,11 +34,11 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
-import java.io.IOException;
+import java.util.Map;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -369,9 +368,10 @@ public class XFormsToXHTML extends ProcessorImpl {
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
 
             // Send redirect
-            final String absoluteURL = URLRewriter.rewriteURL(externalContext.getRequest(), load.getResource(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-            containingDocument.logDebug("XForms initialization", "handling response for xforms:load", new String[] { "url", absoluteURL });
-            externalContext.getResponse().sendRedirect(absoluteURL, null, false, false);
+            final String redirectResource = load.getResource();
+            containingDocument.logDebug("XForms initialization", "handling redirect response for xforms:load", new String[] { "url", redirectResource });
+            // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+            externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 
             // Still send out a null document to signal that no further processing must take place
             XMLUtils.streamNullDocument(contentHandler);

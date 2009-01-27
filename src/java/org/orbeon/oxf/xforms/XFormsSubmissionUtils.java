@@ -47,7 +47,7 @@ public class XFormsSubmissionUtils {
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                            XFormsContainingDocument containingDocument,
                                                            XFormsModelSubmission xformsModelSubmission,
-                                                           String httpMethod, final String action, boolean fURLNorewrite, String mediatype,
+                                                           String httpMethod, final String action, boolean isNorewrite, String mediatype,
                                                            byte[] messageBody, String queryString,
                                                            boolean isReplaceAll, String[] headerNames) {
 
@@ -55,7 +55,7 @@ public class XFormsSubmissionUtils {
         // the page was produced through a filter in separate deployment or not.
         final boolean isContextRelative;
         final String effectiveAction;
-        if (!fURLNorewrite) {
+        if (!isNorewrite) {
             // Must rewrite
             if (!containingDocument.getStaticState().isSeparateDeployment()) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
@@ -461,7 +461,7 @@ class ResponseAdapter implements ExternalContext.Response {
         this.status = sc;
     }
 
-    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
     }
 
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {

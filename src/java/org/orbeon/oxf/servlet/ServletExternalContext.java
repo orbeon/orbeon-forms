@@ -498,25 +498,26 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             nativeResponse.addHeader(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
             // Create URL
             if (isServerSide) {
                 // Server-side redirect: do a forward
-                javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(pathInfo);
+                final javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(pathInfo);
+                // TODO: handle isNoRewrite like in XFormsSubmissionUtils.openOptimizedConnection(): absolute path can then be used to redirect to other servlet context
                 try {
                     // Destroy the pipeline context before doing the forward. Nothing significant
                     // should be allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, pathInfo, parameters);
+                    final ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, pathInfo, parameters);
                     requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
                 }
             } else {
                 // Client-side redirect: send the redirect to the client
-                String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
-                if (redirectURLString.startsWith("/") && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
+                final String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
+                if (!isNoRewrite && redirectURLString.startsWith("/") && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
                     nativeResponse.sendRedirect(request.getContextPath() + redirectURLString);
                 else
                     nativeResponse.sendRedirect(redirectURLString);

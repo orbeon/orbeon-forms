@@ -163,7 +163,7 @@ class ServletIncludeResponseWrapper extends ResponseWrapper {
         // NOTE: Should do something?
     }
 
-    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
     }
 
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {

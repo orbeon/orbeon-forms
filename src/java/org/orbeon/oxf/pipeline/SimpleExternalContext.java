@@ -231,7 +231,7 @@ public class SimpleExternalContext implements ExternalContext {
             headers.put(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
         }
 
         public void setContentLength(int len) {

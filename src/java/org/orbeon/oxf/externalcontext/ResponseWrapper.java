@@ -85,8 +85,8 @@ public class ResponseWrapper implements ExternalContext.Response {
         _response.sendError(len);
     }
 
-    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
-        _response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal);
+    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
+        _response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal, false);
     }
 
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {

@@ -1214,7 +1214,7 @@ public class XFormsContainingDocument extends XFormsContainer {
                     pathInfo = resource;
                     parameters = null;
                 }
-                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false);
+                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false, false);
             } catch (IOException e) {
                 throw new ValidationException(e, getLocationData());
             }

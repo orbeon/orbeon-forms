@@ -65,7 +65,7 @@ public class RedirectProcessor extends ProcessorImpl {
             // Send the redirect
             ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             ExternalContext.Response response = externalContext.getResponse();
-            response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal);
+            response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal, false);
         } catch (Exception e) {
             throw new OXFException(e);
         }

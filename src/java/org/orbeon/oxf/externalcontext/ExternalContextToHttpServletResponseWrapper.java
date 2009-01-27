@@ -119,7 +119,7 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
             pathInfo = path;
             parameters = null;
         }
-        response.sendRedirect(pathInfo, parameters, false, false);
+        response.sendRedirect(pathInfo, parameters, false, false, false);
     }
 
     public void setDateHeader(String clazz, long l) {

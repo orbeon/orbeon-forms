@@ -27,7 +27,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
@@ -46,8 +45,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -479,9 +478,10 @@ public class XFormsServer extends ProcessorImpl {
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
 
             // Send redirect
-            final String absoluteURL = URLRewriter.rewriteURL(externalContext.getRequest(), load.getResource(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-            containingDocument.logDebug("XForms server", "handling noscript response for xforms:load", new String[] { "url", absoluteURL });
-            externalContext.getResponse().sendRedirect(absoluteURL, null, false, false);
+            final String redirectResource = load.getResource();
+            containingDocument.logDebug("XForms server", "handling noscript redirect response for xforms:load", new String[] { "url", redirectResource });
+            // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+            externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 
             // Still send out a null document to signal that no further processing must take place
             XMLUtils.streamNullDocument(contentHandler);

@@ -177,6 +177,11 @@
                 <xforms:setvalue ref="instance('fr-roles-instance')/authorized"
                              value="exists(instance('fr-permissions')/app[@name = '*'])
                                         or exists(instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)])"/>
+
+                <!-- Issue a redirect if the user is not authorized -->
+                <xforms:load if="not(instance('fr-roles-instance')/authorized = 'true')"
+                             resource="/fr/unauthorized"/>
+
             </xforms:action>
 
         </xforms:action>

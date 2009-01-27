@@ -35,6 +35,18 @@
                        class="{if ($mode = ('view', 'pdf', 'email')) then ' fr-print-mode' else ''}">
                 <xhtml:div class="fr-header">
                     <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
+                        <!-- Go to content link in noscript mode -->
+                        <xsl:if test="$is-noscript">
+                            <xhtml:div class="fr-noscript-choice" style="float: left">
+                                <!-- Group to scope variables -->
+                                <xforms:group appearance="xxforms:internal" model="fr-error-summary-model">
+                                    <!-- Link to form content or to errors if any -->
+                                    <xhtml:a href="#{{if (count($visible-errors) > 0) then 'fr-errors' else 'fr-form'}}">
+                                        <xforms:output value="$fr-resources/summary/labels/goto-content"/>
+                                    </xhtml:a>
+                                </xforms:group>
+                            </xhtml:div>
+                        </xsl:if>
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
                             <xhtml:div class="fr-noscript-choice" style="float: left">
@@ -206,11 +218,13 @@
 
                                 <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
                                 <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
-                                        <!-- Main form content -->
-                                        <xsl:apply-templates select="fr:body/node()">
-                                            <!-- Dialogs are handled later -->
-                                            <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
-                                        </xsl:apply-templates>
+                                    <!-- Anchor for navigation -->
+                                    <xhtml:a name="fr-form"/>
+                                    <!-- Main form content -->
+                                    <xsl:apply-templates select="fr:body/node()">
+                                        <!-- Dialogs are handled later -->
+                                        <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
+                                    </xsl:apply-templates>
                                 </xforms:group>
 
                                 <!-- Error summary (if at bottom) -->
@@ -487,6 +501,8 @@
 
             <xforms:group class="fr-error-summary-body">
                 <xforms:output class="fr-error-title" value="$fr-resources/errors/summary-title"/>
+                <!-- Anchor for navigation -->
+                <xhtml:a name="fr-errors"/>
                 <xhtml:ol class="fr-error-list">
                     <xforms:repeat nodeset="$visible-errors">
                         <xhtml:li>
@@ -520,6 +536,7 @@
                     </xforms:repeat>
                 </xhtml:ol>
             </xforms:group>
+
             <xsl:if test="$position = 'top'">
                 <xhtml:div class="fr-separator">&#160;</xhtml:div>
             </xsl:if>

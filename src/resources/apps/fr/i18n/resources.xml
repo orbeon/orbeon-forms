@@ -79,6 +79,7 @@
                 <refresh>Refresh</refresh>
                 <close-box>[close]</close-box>
                 <help-back>Back</help-back>
+                <goto-content>Go to Content</goto-content>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -224,6 +225,7 @@
                 <refresh>Raffraîchir</refresh>
                 <close-box>[fermer]</close-box>
                 <help-back>Retour</help-back>
+                <goto-content>Aller au contenu</goto-content>
             </labels>
             <formats>
                 <date>Le [D] [Mn] [Y]</date>
@@ -369,6 +371,7 @@
                 <refresh>Actualizar</refresh>
                 <close-box>Cerrrar</close-box>
                 <help-back>Atrás</help-back>
+                <goto-content>[Go to Content]</goto-content>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>

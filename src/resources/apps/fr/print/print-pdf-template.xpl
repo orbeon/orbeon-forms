@@ -133,6 +133,7 @@
                 <xsl:variable name="resources-instance" select="$xhtml/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-resources']/resources" as="element(resources)"/>
                 <xsl:variable name="current-resources" select="$resources-instance/resource[@xml:lang = $request-language]" as="element(resource)"/>
 
+                <!-- TODO: resources.xml should go through fr-resources.xpl so that overrides work -->
                 <xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>
                 <xsl:variable name="fr-current-resources" select="($fr-resources/resource[@xml:lang = $request-language], $fr-resources/resource[1])[1]" as="element(resource)"/>
 

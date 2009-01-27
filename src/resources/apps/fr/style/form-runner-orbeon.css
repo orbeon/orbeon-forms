@@ -162,8 +162,9 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 /* Colored border for invalid fields */
-.xforms-invalid-visited .xforms-input-input,
-    textarea.xforms-invalid-visited
+/* NOTE: style required-empty as well to show user which are the required fields */
+.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited,
+    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty
         { border-color: orange }
 
 /* Upload control information */

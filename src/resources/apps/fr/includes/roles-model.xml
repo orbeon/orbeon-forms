@@ -167,13 +167,14 @@
 
             <!--
                 Remember whether the page is authorized or not. Usually a container protection by path will be in
-                place.
+                place, but we double-check here.
              -->
             <xforms:setvalue if="not($has-roles)" ref="instance('fr-roles-instance')/authorized">true</xforms:setvalue>
             <xforms:action if="$has-roles">
                 <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
                 <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
 
+                <!-- TODO: This logic should be a reusable function -->
                 <xforms:setvalue ref="instance('fr-roles-instance')/authorized"
                              value="exists(instance('fr-permissions')/app[@name = '*'])
                                         or exists(instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)])"/>

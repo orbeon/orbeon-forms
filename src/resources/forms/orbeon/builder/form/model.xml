@@ -29,6 +29,35 @@
 
     <xforms:action ev:event="xforms-model-construct-done">
 
+        <!-- Check permissions if there are roles -->
+        <xxforms:variable name="has-roles" select="not(xxforms:instance('fr-roles-instance')/has-roles = 'false')" as="xs:boolean"/>
+        <xforms:action if="$has-roles">
+            <!-- Make sure binds to app and form name are evaluated -->
+            <xforms:rebuild/>
+            <xforms:recalculate/>
+
+            <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
+                <!-- New form: set default value for app and form if needed -->
+                <!-- NOTE: we use xxforms:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
+                <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')" ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
+            </xforms:action>
+            <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
+                <!-- E.g. we are reading an existing doc: IF there are roles and roles don't match THEN send redirection -->
+                <xxforms:variable name="app" select="xxforms:bind('application-name-bind')" as="xs:string"/>
+                <xxforms:variable name="form" select="xxforms:bind('form-name-bind')" as="xs:string"/>
+                <!-- See similar logic in FR -->
+                <xforms:load if="not(exists(xxforms:instance('fr-permissions')/app[@name = '*'])
+                                    or exists(xxforms:instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)]))"
+                             resource="/fr/unauthorized"/>
+                <!--<xforms:message level="xxforms:log-debug">-->
+                    <!--xxx-->
+                    <!--<xforms:output value="$app"/>-->
+                    <!--xxx-->
+                    <!--<xforms:output value="$form"/>-->
+                <!--</xforms:message>-->
+            </xforms:action>
+        </xforms:action>
+
         <!-- Handle user agent -->
 
         <xxforms:variable name="user-agent" select="xxforms:get-request-header('user-agent')"/>
@@ -50,9 +79,6 @@
         <!-- Load components -->
         <xforms:send submission="fb-load-components"/>
 
-        <!-- Set default value for app and form if needed -->
-        <!-- NOTE: we use xxforms:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
-        <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')" ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
     </xforms:action>
 
     <!-- Variable pointing to the current language -->
@@ -134,6 +160,8 @@
     <!-- All form resources -->
     <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
                      xxforms:readonly="true" xxforms:shared="application"/>
+    <!--<xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"-->
+                     <!--xxforms:readonly="false"/>-->
 
     <!-- Instance containing the current language -->
     <xforms:instance id="fb-language-instance">

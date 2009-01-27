@@ -651,7 +651,7 @@
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->
-    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusIn">
+    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusIn DOMActivate xforms-value-changed">
         <xforms:toggle case="fr-message-none"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>

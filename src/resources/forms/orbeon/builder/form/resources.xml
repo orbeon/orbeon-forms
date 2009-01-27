@@ -113,6 +113,78 @@
         <reload-components>
             <label>Reload Components</label>
         </reload-components>
+        <enter-label>
+            <label>click to enter a label</label>
+        </enter-label>
+        <enter-hint>
+            <label>click to enter an optional hint</label>
+        </enter-hint>
+        <enter-text>
+            <label>click to enter text</label>
+        </enter-text>
+        <click-cell>
+            <label>click to select this cell</label>
+        </click-cell>
+        <insert-control>
+            <label>use the toolbar to insert a control</label>
+        </insert-control>
+        <edit-items>
+            <label>Edit Items</label>
+        </edit-items>
+        <expand-icon>
+            <label>Expand</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Shrink</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Delete Control</label>
+        </delete-control-icon>
+        <delete-grid-icon>
+            <label>Delete Grid</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Delete Section</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Delete Row</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Delete Column</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Insert Column to the Left</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Insert Column to the Right</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Insert Row Above</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Insert Row Below</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Section Details</label>
+        </section-details-icon>
+        <move-up-icon>
+            <label>Move Up</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Move Down</label>
+        </move-down-icon>
+        <control-details-icon>
+            <label>Control Details</label>
+        </control-details-icon>
+        <validation-settings-icon>
+            <label>Validation Settings</label>
+        </validation-settings-icon>
+        <switch-appearance-icon>
+            <label>Switch Appearance</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Edit Help</label>
+        </help-icon>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -721,6 +793,78 @@
         <reload-components>
             <label>Recharger les composants</label>
         </reload-components>
+        <enter-label>
+            <label>cliquez pour entrer un libellé</label>
+        </enter-label>
+        <enter-hint>
+            <label>cliquez pour entrer une suggestion optionnelle</label>
+        </enter-hint>
+        <enter-text>
+            <label>cliquez pour entrer un texte</label>
+        </enter-text>
+        <click-cell>
+            <label>cliquez pour sélectionner cette cellule</label>
+        </click-cell>
+        <insert-control>
+            <label>utilisez la boîte à outils pour insérer un contrôle</label>
+        </insert-control>
+        <edit-items>
+            <label>Editer la liste</label>
+        </edit-items>
+        <expand-icon>
+            <label>Etendre</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Rétrécir</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Supprimer le contrôle</label>
+        </delete-control-icon>
+         <delete-grid-icon>
+            <label>Supprimer la grille</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Supprimer la section</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Supprimer la rangée</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Supprimer la colonne</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Insérer colonne à gauche</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Insérer colonne à droite</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Insérer rangée dessus</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Insérer rangée dessous</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Détails de la section</label>
+        </section-details-icon>
+        <move-up-icon>
+            <label>Déplacer vers le haut</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Déplacer vers le bas</label>
+        </move-down-icon>
+        <control-details-icon>
+            <label>Détails du contrôle</label>
+        </control-details-icon>
+        <validation-settings-icon>
+            <label>Réglage de la validation</label>
+        </validation-settings-icon>
+        <switch-appearance-icon>
+            <label>Changer l'apparence</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Editer l'aide</label>
+        </help-icon>
         <!-- Common -->
         <add>
             <label>Ajouter</label>

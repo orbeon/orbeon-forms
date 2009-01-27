@@ -37,7 +37,7 @@
         <!-- Expand cell down -->
         <xforms:group ref=".[exists($td/../following-sibling::xhtml:tr[xs:integer(if ($td/@rowspan) then $td/@rowspan else 1)])]">
             <xforms:trigger appearance="minimal" id="fb-expand-cell-down-trigger" ref=".[$readwrite-grid]">
-                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_down.png" alt="Expand" title="Expand"/></xforms:label>
+                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_down.png" alt="{$form-resources/expand-icon/label}" title="{$form-resources/expand-icon/label}"/></xforms:label>
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Prepare span grid -->
@@ -91,7 +91,7 @@
         <!-- Shrink -->
         <xforms:group ref=".[$td/@rowspan and $td/@rowspan > 1]">
             <xforms:trigger appearance="minimal" id="fb-shrink-cell-down-trigger" ref=".[$readwrite-grid]">
-                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_up.png" alt="Shrink" title="Shrink"/></xforms:label>
+                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_up.png" alt="{$form-resources/shrink-icon/label}" title="{$form-resources/shrink-icon/label}"/></xforms:label>
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Prepare span grid -->
@@ -115,7 +115,7 @@
         <!-- Delete control -->
         <xforms:group ref=".[$control]">
             <xforms:trigger appearance="minimal" ref=".[$readwrite-grid]">
-                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Control" title="Delete Control"/></xforms:label>
+                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-control-icon/label}" title="{$form-resources/delete-control-icon/label}"/></xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <!-- Delete control -->
                     <xforms:dispatch name="fb-delete-control" target="fr-form-model">
@@ -129,7 +129,7 @@
     <xforms:group ref=".[$readwrite-grid and $control]" class="fb-grid-control-icons">
         <!-- Edit details for any control -->
         <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-            <xforms:label><xhtml:img alt="Control Details" title="Control Details" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
+            <xforms:label><xhtml:img alt="{$form-resources/control-details-icon/label}" title="{$form-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
                     <xxforms:context name="control-name" select="$control-name"/>
@@ -140,7 +140,7 @@
 
         <!-- Edit validation for any control -->
         <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
-            <xforms:label><xhtml:img class="fb-control-alert" alt="Validation Settings" title="Validation Settings" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
+            <xforms:label><xhtml:img class="fb-control-alert" alt="{$form-resources/validation-settings-icon/label}" title="{$form-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="$current-control-name" value="$control-name"/>
                 <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>
@@ -151,7 +151,7 @@
         <xforms:group ref=".[xforms:select1 | xforms:select]">
             <xforms:trigger appearance="minimal">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/update.gif" alt="Switch Appearance" title="Switch Appearance"/>
+                    <xhtml:img src="/apps/fr/style/update.gif" alt="{$form-resources/switch-appearance-icon/label}" title="{$form-resources/switch-appearance-icon/label}"/>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
 
@@ -212,10 +212,10 @@
         <xforms:group ref=".[not($control)]">
             <span class="fb-empty-cell">
                 <span class="fb-click-message">
-                    click to select this cell
+                    <xforms:output value="$form-resources/click-cell/label"/>
                 </span>
                 <span class="fb-use-toolbar-message">
-                    use the toolbar to insert a control
+                    <xforms:output value="$form-resources/insert-control/label"/>
                 </span>
             </span>
         </xforms:group>
@@ -223,7 +223,7 @@
 
             <!-- Edit help for any control -->
             <xforms:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger" ref=".[$readwrite-grid]">
-                <xforms:label><xhtml:img alt="Help" title="Help" src="/ops/images/xforms/help.png"/></xforms:label>
+                <xforms:label><xhtml:img alt="{$form-resources/help-icon/label}" title="{$form-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-control-help-trigger">
                         <xxforms:context name="fb:node" select="$resource-holder/help"/>
@@ -242,7 +242,7 @@
                     <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
                                   appearance="fr:in-place" class="fb-control-label">
                         <xforms:label class="fb-xforms-disabled"/>
-                        <xforms:hint>click to enter a label</xforms:hint>
+                        <xforms:hint ref="$form-resources/enter-label/label"/>
                     </xforms:input>
                 </xforms:group>
             </xhtml:span>
@@ -264,9 +264,9 @@
                     <xforms:select1 appearance="minimal" ref="$instance-holder">
                         <xforms:label class="fb-xforms-disabled"/>
                         <xforms:item>
-                            <xforms:label>[Choose...]</xforms:label>
-                            <xforms:value/>
-                        </xforms:item>
+                        <xforms:label ref="$form-resources/select/label"/>
+                        <xforms:value/>
+                    </xforms:item>
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -313,7 +313,7 @@
                     <!-- In-place text -->
                     <xforms:input id="fb-xforms-output-text-input" ref="$instance-holder" appearance="fr:in-place" incremental="false">
                         <xforms:label class="fb-xforms-disabled"/>
-                        <xforms:hint>click to enter text</xforms:hint>
+                        <xforms:hint ref="$form-resources/enter-text/label"/>
                     </xforms:input>
                 </xforms:group>
                 <xforms:group ref="xforms:trigger">
@@ -362,8 +362,8 @@
                 <!-- Button to show items editor if needed -->
                 <xforms:trigger ref="*[xforms:itemset and $readwrite-grid]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                        <xhtml:span>Edit Items</xhtml:span>
+                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
+                        <xhtml:span><xforms:output value="$form-resources/edit-items/label"/></xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-items-trigger">
@@ -382,7 +382,7 @@
                     <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
                                   appearance="fr:in-place" class="fb-control-hint">
                         <xforms:label class="fb-xforms-disabled"/>
-                        <xforms:hint>click to enter an optional hint</xforms:hint>
+                        <xforms:hint ref="$form-resources/enter-hint/label"/>
                     </xforms:input>
                 </xforms:group>
             </xhtml:span>

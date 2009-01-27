@@ -259,7 +259,7 @@
                                         <xforms:hint ref="$form-resources/section-name/hint"/>
                                         <fr:buttons>
                                             <xforms:trigger appearance="minimal">
-                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-section-icon/label}" title="{$form-resources/delete-section-icon/label}"/></xforms:label>
                                                 <!-- Show confirmation dialog -->
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-confirmation-dialog">
                                                     <xxforms:context name="fr:message"
@@ -272,14 +272,14 @@
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="minimal" id="fb-edit-section-details-trigger">
-                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Section Details" title="Section Details"/></xforms:label>
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{$form-resources/section-details-icon/label}" title="{$form-resources/section-details-icon/label}"/></xforms:label>
                                                 <!-- Show section details dialog -->
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-edit-section-details-trigger">
                                                     <xxforms:context name="fr:section-name" select="$section-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="minimal" ref=".[$top-level-block/preceding-sibling::fr:*]">
-                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="Move Up" title="Move Up"/></xforms:label>
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{$form-resources/move-up-icon/label}" title="{$form-resources/move-up-icon/label}"/></xforms:label>
                                                 <!-- Move section up -->
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="$top-level-block/preceding-sibling::fr:*[1]" position="before" origin="$top-level-block"/>
@@ -288,7 +288,7 @@
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="minimal" ref=".[$top-level-block/following-sibling::fr:*]">
-                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="Move Down" title="Move Down"/></xforms:label>
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{$form-resources/move-down-icon/label}" title="{$form-resources/move-down-icon/label}"/></xforms:label>
                                                 <!-- Move section down -->
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="$top-level-block/following-sibling::fr:*[1]" position="after" origin="$top-level-block"/>
@@ -298,7 +298,7 @@
                                             </xforms:trigger>
                                             <!-- Edit help for section -->
                                             <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
-                                                <xforms:label><xhtml:img alt="Help" title="Help" src="/ops/images/xforms/help.png"/></xforms:label>
+                                                <xforms:label><xhtml:img alt="{$form-resources/help-icon/label}" title="{$form-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-section-help-trigger">
                                                         <xxforms:context name="fb:node" select="$section-resource/help"/>
@@ -345,7 +345,7 @@
                                                                     <xhtml:td class="fb-grid-top-left-td">
                                                                         <xforms:trigger appearance="minimal" id="fb-delete-grid-trigger" ref=".[$readwrite-grid]">
                                                                             <xforms:label>
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Grid" title="Delete Grid"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-grid-icon/label}" title="{$form-resources/delete-grid-icon/label}"/></xforms:label>
                                                                             </xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
 
@@ -389,7 +389,7 @@
                                                                             <!-- Insert column to the left -->
                                                                             <xhtml:div class="fb-insert-left">
                                                                                 <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) lt 4]" id="fb-insert-column-left-trigger">
-                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="Insert Column to the Left" title="Insert Column to the Left"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{$form-resources/insert-column-left-icon/label}" title="{$form-resources/insert-column-left-icon/label}"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <!-- Increment number of columns -->
                                                                                         <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -414,7 +414,7 @@
                                                                             <!-- Insert column to the right -->
                                                                             <xhtml:div class="fb-insert-right">
                                                                                 <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) lt 4]" id="fb-insert-column-right-trigger">
-                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="Insert Column to the Right" title="Insert Column to the Right"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{$form-resources/insert-column-right-icon/label}" title="{$form-resources/insert-column-right-icon/label}"/></xforms:label>
                                                                                     <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                         <!-- Increment number of columns -->
                                                                                         <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -438,7 +438,7 @@
                                                                             </xhtml:div>
                                                                             <!-- Delete column -->
                                                                             <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) gt 1]" id="fb-delete-column-trigger">
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Column" title="Delete Column"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-column-icon/label}" title="{$form-resources/delete-column-icon/label}"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
 
                                                                                     <!-- Prepare span grid -->
@@ -502,7 +502,7 @@
                                                                                 <!-- Insert row above -->
                                                                                 <xhtml:div>
                                                                                     <xforms:trigger appearance="minimal" id="fb-insert-row-above-trigger" ref=".[$readwrite-grid]">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{$form-resources/insert-row-above-icon/label}" title="{$form-resources/insert-row-above-icon/label}"/></xforms:label>
                                                                                         <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                             <xforms:action ev:event="DOMActivate">
 
@@ -540,7 +540,7 @@
                                                                                 </xhtml:div>
                                                                                 <!-- Delete row -->
                                                                                 <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and count($grid/xhtml:tr) gt 1]" id="fb-delete-row-trigger">
-                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Row" title="Delete Row"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-row-icon/label}" title="{$form-resources/delete-row-icon/label}"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
 
                                                                                         <xxforms:variable name="count" select="count($tr/xhtml:td[*])"/>
@@ -600,7 +600,7 @@
                                                                                 <!-- Insert row below -->
                                                                                 <xhtml:div>
                                                                                     <xforms:trigger appearance="minimal" id="fb-insert-row-below-trigger" ref=".[$readwrite-grid]">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{$form-resources/insert-row-below-icon/label}" title="{$form-resources/insert-row-below-icon/label}"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
                                                                                             <!-- Prepare span grid -->

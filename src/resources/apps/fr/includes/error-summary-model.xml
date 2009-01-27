@@ -45,7 +45,7 @@
 
     <!-- Instance containing visited controls -->
     <xforms:instance id="fr-visited-instance">
-        <controls xmlns=""/>
+        <controls all="false" xmlns=""/>
     </xforms:instance>
 
     <!-- Template for visited controls information -->
@@ -128,6 +128,13 @@
     <!-- Only count errors for controls that have been visited -->
     <xxforms:variable name="visible-errors" select="
         for $e in xxforms:instance('fr-errors-instance')/error
-        return if (exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes])) then $e else () " as="element(error)*"/>
+        return if (instance('fr-visited-instance')/@all = 'true'
+                    or exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes]))
+               then $e else () " as="element(error)*"/>
+
+    <!-- Mark all controls as visited when certain buttons are activated -->
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button">
+        <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
+    </xforms:action>
 
 </xforms:model>

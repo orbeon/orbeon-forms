@@ -27,7 +27,7 @@
 
     <xsl:template match="fr:refresh-button">
         <!-- Display a "refresh" button only in noscript mode -->
-        <xforms:trigger ref=".[property('xxforms:noscript')]">
+        <xforms:trigger ref=".[property('xxforms:noscript')]" id="fr-refresh-button">
             <xforms:label>
                 <xhtml:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt=""/>
                 <xforms:output value="$fr-resources/summary/labels/refresh"/>
@@ -42,7 +42,7 @@
         <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just closes the window. -->
 
         <!-- Display a "close" button as it's clearer for users -->
-        <xforms:trigger>
+        <xforms:trigger id="fr-back-button">
             <xforms:label>
                 <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/close"/>
@@ -76,7 +76,7 @@
     </xsl:template>
 
     <xsl:template match="fr:clear-button">
-        <xforms:trigger>
+        <xforms:trigger id="fr-clear-button">
             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
             </xforms:label>
@@ -95,7 +95,7 @@
     </xsl:template>
 
     <xsl:template match="fr:print-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/submit">
+        <xforms:trigger ref="instance('fr-triggers-instance')/submit" id="fr-print-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
@@ -107,7 +107,7 @@
     </xsl:template>
 
     <xsl:template match="fr:pdf-button">
-        <xforms:trigger model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit">
+        <xforms:trigger model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit" id="fr-pdf-button">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>

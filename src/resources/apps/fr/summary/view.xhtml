@@ -166,7 +166,7 @@
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
                 <xforms:bind nodeset="$app-query" readonly="false()"
                              calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
-                <!-- Ajust value for form if there is an app constraint and a form constraint -->
+                <!-- Adjust value for form if there is an app constraint and a form constraint -->
                 <xforms:bind nodeset="$form-query" readonly="false()"
                              calculate="(for $a in xxforms:instance('fr-permissions')/app[@name = $app-query]
                                              return for $current in . return if ($a/form[@name = ($current, '*')]) then .

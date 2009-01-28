@@ -78,7 +78,7 @@
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
                         <xforms:trigger appearance="minimal">
                             <xforms:label><xhtml:img src="../apps/xforms-upload/images/add.gif"/></xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
+                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" nodeset="file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
@@ -86,7 +86,7 @@
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Add One</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
+                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" nodeset="file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>

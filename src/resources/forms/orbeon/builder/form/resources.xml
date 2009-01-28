@@ -692,6 +692,8 @@
             <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
             <publish-success>The form was published successfully.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
+            <new-metadata>Before editing your new form, please provide an application name and a form name:</new-metadata>
+            <edit-metadata>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata>
         </messages>
     </resource>
     <resource xml:lang="fr">
@@ -1372,6 +1374,8 @@
             <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
             <publish-success>Le formulaire a été publié avec succès.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
+            <new-metadata>Avant d'éditer votre nouveau formulaire, veuillez fournir un nom d'application et un nom de formulaire:</new-metadata>
+            <edit-metadata>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata>
         </messages>
     </resource>
 </resources>

@@ -244,7 +244,9 @@ a.fb-edit-help-trigger img {
 /* ***** XXX ******************************************************************************************************** */
 
 #fb-metadata-group .fr-grid { margin: 0 }
-#fb-metadata-group td { width: 50% } 
+#fb-metadata-group td { width: 50% }
+
+.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger { display: inline }
 
 /* Try some WYSIWYG appearance */
 .fb-title-control, .fb-description-control { text-align: right }

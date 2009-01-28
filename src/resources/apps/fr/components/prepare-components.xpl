@@ -24,6 +24,8 @@
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
+    <!-- TODO: this should be part of FB not FR -> move there at some point -->
+
     <!-- XBL document -->
     <!--<p:param type="output" name="data"/>-->
 
@@ -54,37 +56,7 @@
         <p:output name="data" id="template-xbl"/>
     </p:processor>
 
-    <!-- Get request information -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/parameters/parameter[name = 'fr-unroll']</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <p:choose href="#request">
-        <p:when test="//parameter/value = 'true'">
-            <!-- Unroll the form (theme, inclusions, NO components) for runtime use -->
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="../unroll-form.xpl"/>
-                <p:input name="instance" href="#parameters"/>
-                <p:input name="data" href="#template-xbl"/>
-                <!-- Don't pass components, obviously! -->
-                <p:input name="components"><components/></p:input>
-                <p:output name="data" id="unrolled-template-xbl"/>
-            </p:processor>
-        </p:when>
-        <p:otherwise>
-            <p:processor name="oxf:identity">
-                <p:input name="data" href="#template-xbl"/>
-                <p:output name="data" id="unrolled-template-xbl"/>
-            </p:processor>
-        </p:otherwise>
-    </p:choose>
-
-    <!-- Read standard components -->
+    <!-- Read custom components -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
             <config xsl:version="2.0">
@@ -98,33 +70,22 @@
                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
             </config>
         </p:input>
-        <p:output name="data" id="standard-xbl"/>
+        <p:output name="data" id="custom-xbl"/>
     </p:processor>
 
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#unrolled-template-xbl"/>
-        <p:input name="request" href="#request"/>
-        <p:input name="parameters" href="#parameters"/>
-        <p:input name="standard-xbl" href="#standard-xbl"/>
+        <p:input name="data" href="#template-xbl"/>
+        <p:input name="custom-xbl" href="#custom-xbl"/>
         <p:input name="config">
             <!-- Return an aggregate so that each xbl:xbl can have its own metadata -->
             <components xsl:version="2.0">
-                <xsl:choose>
-                    <xsl:when test="doc('input:request')//parameter/value = 'true'">
-                        <xbl:xbl>
-                            <!-- Only copy bindings with templates because there may be some bindings for xforms:* controls
-                                 which are used only for their metadata by Form Builder -->
-                            <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl/xbl:binding[xbl:template]"/>
-                        </xbl:xbl>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- Copy all bindings for design time -->
-                        <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <!-- Standard controls -->
+                <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl"/>
+                <!-- Section components -->
                 <xsl:copy-of select="/xbl:xbl"/>
-                <xsl:copy-of select="doc('input:standard-xbl')/xbl:xbl"/>
+                <!-- Custom components -->
+                <xsl:copy-of select="doc('input:custom-xbl')/xbl:xbl"/>
             </components>
         </p:input>
         <!--<p:output name="data" ref="data"/>-->

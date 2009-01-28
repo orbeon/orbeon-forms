@@ -81,6 +81,14 @@
 
     </xforms:action>
 
+    <xforms:action ev:event="xforms-ready">
+        <!-- Show editor case if mode is not new -->
+        <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
+            <xforms:toggle case="fb-editor-open-case"/>
+            <xforms:toggle case="fb-metadata-view-case"/>
+        </xforms:action>
+    </xforms:action>
+
     <!-- Variable pointing to the current language -->
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
 
@@ -624,7 +632,7 @@
     <xforms:submission id="fb-load-components" serialization="none"
                        method="get" resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/components/orbeon/library"
                        replace="instance" instance="fb-components-instance"
-                       xxforms:readonly="true" xxforms:shared="application"/>
+                       xxforms:readonly="true" xxforms:shared="document"/>
 
     <xforms:instance id="fb-components-instance">
         <!-- This contains the components available for the currently edited form -->
@@ -703,5 +711,32 @@
             <xforms:alert ref="$fr-resources/detail/labels/alert"/>
         </xforms:input>
     </xforms:instance>
+
+    <!-- Instance for metadata editor -->
+    <xforms:instance id="fb-metadata-instance" >
+        <metadata>
+            <application-name/>
+            <form-name/>
+            <cancel-trigger/>
+            <next-trigger/>
+            <entered/>
+        </metadata>
+    </xforms:instance>
+
+    <!-- Enable/disable trigger -->
+    <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/next-trigger">disabled</xforms:setvalue>
+    <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/next-trigger">enabled</xforms:setvalue>
+
+    <xforms:bind nodeset="instance('fb-metadata-instance')">
+        <!-- App/form name -->
+        <xforms:bind nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
+        <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
+        <!-- In new mode, default is that metadata hasn't yet been entered. In other modes, metadata has been already entered. -->
+        <xforms:bind nodeset="entered" xxforms:initial="if (xxforms:instance('fr-parameters-instance')/mode = 'new') then 'false' else 'true'"/>
+        <!-- Triggers -->
+        <xforms:bind nodeset="cancel-trigger" relevant="../entered = 'true'"/>
+        <xforms:bind nodeset="next-trigger" readonly=". = 'disabled'"/>
+    </xforms:bind>
+
 
 </xforms:model>

@@ -527,7 +527,7 @@
                                 <!--<xforms:output value="@label" class="fr-error-label"/>-->
                             <!--</xhtml:a>-->
                             <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
-                                <xforms:output value="concat(' (row ', @indexes, ')')"/>
+                                <xforms:output value="concat(' (', @indexes, ')')"/>
                             </xforms:group>
                             <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
                                 - <xforms:output value="@alert"/>

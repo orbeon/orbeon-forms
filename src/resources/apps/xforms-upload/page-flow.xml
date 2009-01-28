@@ -17,8 +17,6 @@
 
     <page id="main" path-info="/xforms-upload/" model="main-model.xpl" view="view.xhtml"/>
 
-    <page id="background-upload" path-info="/xforms-upload/background" view="do-background-upload.xpl"/>
-
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

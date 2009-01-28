@@ -464,11 +464,10 @@
                     documentation. The documentation will be added soon.
                 </p>
             </section>
-            <section added="2008-05-30">
+            <section added="2008-05-30" updated="2009-01-28">
                 <title>I can't save my form, what's wrong?</title>
                 <p>
-                    Make sure you have entered: Form Title, Application Name, and Form name (in the Metadata section).
-                    We will streamline this to make it clearer.
+                    Make sure you have entered a Form Title and that all your sections have titles.
                 </p>
             </section>
             <section added="2008-06-05">

@@ -394,7 +394,7 @@
                 <xforms:group class="fr-summary-search">
 
                     <!-- Free-text search -->
-                    <xforms:input ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
+                    <xforms:input ref="instance('fr-search-instance')/query" class="fr-search-input">
                         <xforms:label ref="$fr-resources/summary/labels/free-search"/>
                     </xforms:input>
 
@@ -421,7 +421,7 @@
                                     <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
                                     <!-- Use an input if app name is a wildcard -->
                                     <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                                    <xforms:input ref=".[$is-input]" incremental="true" >
+                                    <xforms:input ref=".[$is-input]">
                                         <xforms:label>
                                             <xforms:output value="$label"/>
                                         </xforms:label>
@@ -452,7 +452,7 @@
                                     <xxforms:variable name="current-app" select="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
                                     <!-- Use an input if app name or form name is a wildcard -->
                                     <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
-                                    <xforms:input ref=".[$is-input]" incremental="true" >
+                                    <xforms:input ref=".[$is-input]">
                                         <xforms:label>
                                             <xforms:output value="$label"/>
                                         </xforms:label>
@@ -483,13 +483,13 @@
                                     <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                     <!-- input -->
-                                    <xforms:input ref=".[@control = 'input']" incremental="true" >
+                                    <xforms:input ref=".[@control = 'input']">
                                         <xforms:label>
                                             <xforms:output value="$label"/>
                                         </xforms:label>
                                     </xforms:input>
                                     <!-- textarea -->
-                                    <xforms:input ref=".[@control = 'textarea']" incremental="true" >
+                                    <xforms:input ref=".[@control = 'textarea']">
                                         <xforms:label>
                                             <xforms:output value="$label"/>
                                         </xforms:label>
@@ -616,7 +616,7 @@
                                                     <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
 
                                                     <!-- input -->
-                                                    <xforms:group ref=".[$query/@control = 'input']">
+                                                    <xforms:group ref=".[$query/@control = ('input', 'output')]">
                                                         <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
                                                         <xforms:output value="
                                                             if ($type = 'date') then

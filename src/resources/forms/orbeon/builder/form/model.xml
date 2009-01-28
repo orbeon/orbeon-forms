@@ -729,8 +729,8 @@
 
     <xforms:bind nodeset="instance('fb-metadata-instance')">
         <!-- App/form name -->
-        <xforms:bind nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
-        <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
+        <xforms:bind nodeset="application-name" required="true()" type="xs:NCName"/>
+        <xforms:bind nodeset="form-name" required="true()" type="xs:NCName"/>
         <!-- In new mode, default is that metadata hasn't yet been entered. In other modes, metadata has been already entered. -->
         <xforms:bind nodeset="entered" xxforms:initial="if (xxforms:instance('fr-parameters-instance')/mode = 'new') then 'false' else 'true'"/>
         <!-- Triggers -->

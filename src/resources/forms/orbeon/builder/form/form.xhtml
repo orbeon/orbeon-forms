@@ -128,6 +128,10 @@
                                         <xforms:trigger>
                                             <xforms:label ref="$form-resources/edit/label"/>
                                             <xforms:action ev:event="DOMActivate">
+                                                <!-- Copy data to editor instance -->
+                                                <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="xxforms:bind('application-name-bind')"/>
+                                                <xforms:setvalue ref="instance('fb-metadata-instance')/form-name" value="xxforms:bind('form-name-bind')"/>
+
                                                 <xforms:toggle case="fb-editor-closed-case"/>
                                                 <xforms:toggle case="fb-metadata-edit-case"/>
                                             </xforms:action>
@@ -147,6 +151,7 @@
                         <!-- Edit form metadata -->
                         <xforms:group ref="instance('fb-metadata-instance')" class="fb-metadata-edit-group">
                             <xhtml:p>
+                                <!-- Display message to user -->
                                 <xforms:output value="if (not(entered = 'true'))
                                                       then $form-resources/messages/new-metadata
                                                       else $form-resources/messages/edit-metadata"/>
@@ -159,7 +164,7 @@
                                         <!-- Use an input if app name is a wildcard -->
                                         <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xforms:group ref=".[$is-input]">
-                                            <xforms:input ref="application-name" class="fr-summary fr-search" incremental="true">
+                                            <xforms:input ref="application-name">
                                                 <xforms:label ref="$form-resources/application-name/label"/>
                                                 <!--<xforms:hint ref="$form-resources/application-name/hint"/>-->
                                                 <xforms:alert ref="$form-resources/application-name/alert"/>
@@ -178,7 +183,7 @@
                                     </fr:td>
                                     <fr:td>
                                         <!-- Form name -->
-                                        <xforms:input ref="form-name" class="fr-summary fr-search" incremental="true">
+                                        <xforms:input ref="form-name">
                                             <xforms:label ref="$form-resources/form-name/label"/>
                                             <!--<xforms:hint ref="$form-resources/form-name/hint"/>-->
                                             <xforms:alert ref="$form-resources/form-name/alert"/>
@@ -188,8 +193,12 @@
                                         <xforms:trigger ref="cancel-trigger">
                                             <xforms:label value="$form-resources/cancel/label"/>
                                             <xforms:action ev:event="DOMActivate">
+                                                <!-- Show main form -->
                                                 <xforms:toggle case="fb-editor-open-case"/>
                                                 <xforms:toggle case="fb-metadata-view-case"/>
+                                                <!-- HACK: Store valid values so we don't see error message -->
+                                                <xforms:setvalue ref="instance('fb-metadata-instance')/application-name">dummy</xforms:setvalue>
+                                                <xforms:setvalue ref="instance('fb-metadata-instance')/form-name">dummy</xforms:setvalue>
                                             </xforms:action>
                                         </xforms:trigger>
                                         <xforms:trigger ref="next-trigger">

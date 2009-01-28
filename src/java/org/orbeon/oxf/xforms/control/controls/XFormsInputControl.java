@@ -131,8 +131,9 @@ public class XFormsInputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
-        super.storeExternalValue(pipelineContext, convertFromExternalValue(pipelineContext, value), type);
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+        // Store after converting
+        super.storeExternalValue(pipelineContext, convertFromExternalValue(pipelineContext, value), type, filesElement);
     }
 
     private String convertFromExternalValue(PipelineContext pipelineContext, String externalValue) {

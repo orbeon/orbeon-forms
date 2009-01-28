@@ -46,8 +46,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * @param pipelineContext   current pipeline context
      * @param value             list of tokens from the UI
      * @param type              should probably be null
+     * @param filesElement
      */
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
 
         final String controlValue = getValue(pipelineContext);
 
@@ -122,7 +123,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         // "newValue" is created so as to ensure that if a value is NOT in the itemset AND we are a closed selection
         // then we do NOT store the value in instance.
         // NOTE: At the moment we don't support open selection here anyway
-        super.storeExternalValue(pipelineContext, newValue, type);
+        super.storeExternalValue(pipelineContext, newValue, type, filesElement);
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {

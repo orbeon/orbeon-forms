@@ -94,9 +94,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * Notify the control that its value has changed due to external user interaction. The value passed is a value as
      * understood by the UI layer.
      *
-     * @param value     the new external value
+     * @param value             the new external value
+     * @param filesElement      special filesElement construct for controls that need it
      */
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
         // Set value into the instance
 
         final NodeInfo boundNode = getBoundNode();

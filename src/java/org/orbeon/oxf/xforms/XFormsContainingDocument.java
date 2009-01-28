@@ -973,7 +973,8 @@ public class XFormsContainingDocument extends XFormsContainer {
                 {
                     // Store value into instance data through the control
                     final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
-                    valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
+                    // NOTE: filesElement is only used by the upload control at the moment
+                    valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null, filesElement);
                 }
 
                 {

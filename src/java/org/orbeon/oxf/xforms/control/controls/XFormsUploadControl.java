@@ -27,12 +27,14 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 
 /**
  * Represents an xforms:upload control.
@@ -63,20 +65,90 @@ public class XFormsUploadControl extends XFormsValueControl {
         fileInfo.markDirty();
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+    /**
+     * Handle a construct of the form:
+     *
+     *   <xxforms:files>
+     *     <parameter>
+     *       <name>xforms-element-27</name>
+     *       <filename>my-filename.jpg</filename>
+     *       <content-type>image/jpeg</content-type>
+     *       <content-length>33204</content-length>
+     *       <value xmlns:request="http://orbeon.org/oxf/xml/request-private" xsi:type="xs:anyURI">file:/temp/upload_432dfead_11f1a983612__8000_00000107.tmp</value>
+     *     </parameter>
+     *     <parameter>
+     *       ...
+     *     </parameter>
+     *   </xxforms:files>
+     *
+     * @param pipelineContext       current pipeline context
+     * @param containingDocument    containing document
+     * @param filesElement          xxforms:files element
+     * @param forControl            control to handle, null for all controls specified
+     * @param handleTemporaryFiles  whether to set listners for file deletion
+     */
+    public static void handleFileElement(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element filesElement, XFormsUploadControl forControl, boolean handleTemporaryFiles) {
+        for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
+            final Element parameterElement = (Element) i.next();
+            final String name = parameterElement.element("name").getTextTrim();
 
-        // Set value and handle temporary files
-        setExternalValue(pipelineContext, value, type, true);
+            final XFormsUploadControl uploadControl = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(name);
 
-        // If the value is being cleared, also clear the metadata
-        if (value.equals("")) {
-            setFilename(pipelineContext, "");
-            setMediatype(pipelineContext, "");
-            setSize(pipelineContext, "");
+            // In case of xforms:repeat, the name of the template will not match an existing control
+            // In addition, only set value on forControl control if specified
+            if (uploadControl == null || forControl != null && forControl != uploadControl)
+                continue;
+
+            final Element valueElement = parameterElement.element("value");
+            final String value = valueElement.getTextTrim();
+
+            final String filename;
+            {
+                final Element filenameElement = parameterElement.element("filename");
+                filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
+            }
+            final String mediatype;
+            {
+                final Element mediatypeElement = parameterElement.element("content-type");
+                mediatype = (mediatypeElement != null) ? mediatypeElement.getTextTrim() : "";
+            }
+            final String size = parameterElement.element("content-length").getTextTrim();
+
+            if (size.equals("0") && filename.equals("")) {
+                // No file was selected in the UI
+            } else {
+                // A file was selected in the UI (note that the file may be empty)
+                final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
+
+                // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
+                uploadControl.setExternalValue(pipelineContext, value, paramValueType, handleTemporaryFiles);
+
+                // Handle filename, mediatype and size if necessary
+                uploadControl.setFilename(pipelineContext, filename);
+                uploadControl.setMediatype(pipelineContext, mediatype);
+                uploadControl.setSize(pipelineContext, size);
+            }
         }
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+        if (XFormsProperties.isNoscript(containingDocument) && filesElement != null) {
+            // Must handle file elements
+            XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, this, true);// seems reasonable to set handleTemporaryFiles = true
+        } else {
+            // Set value and handle temporary files
+            setExternalValue(pipelineContext, value, type, true);
+
+            // If the value is being cleared, also clear the metadata
+            if (value.equals("")) {
+                setFilename(pipelineContext, "");
+                setMediatype(pipelineContext, "");
+                setSize(pipelineContext, "");
+            }
+        }
+    }
+
+    private void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles) {
 
         final String oldValue = getValue(pipelineContext);
 
@@ -147,7 +219,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             }
 
             // Call the super method
-            super.storeExternalValue(pipelineContext, newValue, type);
+            super.storeExternalValue(pipelineContext, newValue, type, null);
         } catch (Exception e) {
             throw new ValidationException(e, getLocationData());
         }

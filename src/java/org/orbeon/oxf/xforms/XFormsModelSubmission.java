@@ -485,47 +485,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Handle uploaded files if any
                     final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
-                        for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
-                            final Element parameterElement = (Element) i.next();
-                            final String name = parameterElement.element("name").getTextTrim();
-
-                            final XFormsUploadControl uploadControl
-                                        = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(name);
-
-                            // In case of xforms:repeat, the name of the template will not match an existing control
-                            if (uploadControl == null)
-                                continue;
-
-                            final Element valueElement = parameterElement.element("value");
-                            final String value = valueElement.getTextTrim();
-
-                            final String filename;
-                            {
-                                final Element filenameElement = parameterElement.element("filename");
-                                filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
-                            }
-                            final String mediatype;
-                            {
-                                final Element mediatypeElement = parameterElement.element("content-type");
-                                mediatype = (mediatypeElement != null) ? mediatypeElement.getTextTrim() : "";
-                            }
-                            final String size = parameterElement.element("content-length").getTextTrim();
-
-                            if (size.equals("0") && filename.equals("")) {
-                                // No file was selected in the UI
-                            } else {
-                                // A file was selected in the UI (note that the file may be empty)
-                                final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
-
-                                // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-                                uploadControl.setExternalValue(pipelineContext, value, paramValueType, !isReplaceAll);
-
-                                // Handle filename, mediatype and size if necessary
-                                uploadControl.setFilename(pipelineContext, filename);
-                                uploadControl.setMediatype(pipelineContext, mediatype);
-                                uploadControl.setSize(pipelineContext, size);
-                            }
-                        }
+                        // Handle all file elements
+                        XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, null, !isReplaceAll);
                     }
 
                     // Create document to submit

@@ -131,6 +131,8 @@
                                                 <!-- Copy data to editor instance -->
                                                 <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="xxforms:bind('application-name-bind')"/>
                                                 <xforms:setvalue ref="instance('fb-metadata-instance')/form-name" value="xxforms:bind('form-name-bind')"/>
+                                                <!-- Tell that we allow the cancel button -->
+                                                <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
 
                                                 <xforms:toggle case="fb-editor-closed-case"/>
                                                 <xforms:toggle case="fb-metadata-edit-case"/>
@@ -152,7 +154,7 @@
                         <xforms:group ref="instance('fb-metadata-instance')" class="fb-metadata-edit-group">
                             <xhtml:p>
                                 <!-- Display message to user -->
-                                <xforms:output value="if (not(entered = 'true'))
+                                <xforms:output value="if (not(allow-cancel = 'true'))
                                                       then $form-resources/messages/new-metadata
                                                       else $form-resources/messages/edit-metadata"/>
                             </xhtml:p>
@@ -207,8 +209,6 @@
                                                 <!-- Copy data to main instance -->
                                                 <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="instance('fb-metadata-instance')/application-name"/>
                                                 <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
-                                                <!-- Remember that data has been entered (so that next time a cancel button can be used, for example) -->
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/entered">true</xforms:setvalue>
                                                 <!-- Refresh components -->
                                                 <xforms:send submission="fb-load-components"/>
                                                 <!-- Show main form -->
@@ -847,7 +847,7 @@
                 <fr:clear-button/>
 
                 <!-- Test form -->
-                <xforms:trigger model="fr-form-model" ref="instance('fb-variables')/test-trigger">
+                <xforms:trigger id="fb-test-button" model="fr-form-model" ref="instance('fb-variables')/test-trigger">
                     <xforms:label>
                         <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>

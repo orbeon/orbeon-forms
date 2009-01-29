@@ -91,6 +91,7 @@
     <property as="xs:string"  name="oxf.xforms.datepicker"                           value="yui"/>  <!-- jcalendar or yui -->
     <property as="xs:string"  name="oxf.xforms.htmleditor"                           value="yui"/>  <!-- fck or yui -->
 
+    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                 value="10"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"     value="500"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request" value="2000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"         value="500"/>

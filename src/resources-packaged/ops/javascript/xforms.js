@@ -3180,7 +3180,7 @@ ORBEON.widgets.YUICalendar = function() {
                     // With IE it turns out we can get to this point with inputField == null in some cases
                     if (inputField != null)
                         inputField.focus();
-                }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
             } else {
                 closeCalendar();
             }

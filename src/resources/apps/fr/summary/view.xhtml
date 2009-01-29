@@ -226,12 +226,14 @@
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
 
+                <xxforms:variable name="summary-elements" as="element()*"
+                                  select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+
                 <!-- Extract fields which must appear in the summary -->
-                <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
-                    origin="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+                <xforms:insert context="instance('fr-configuration-instance')" nodeset="*" origin="$summary-elements"/>
 
                 <!-- Create elements holding structured search data -->
-                <xforms:action xxforms:iterate="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]">
+                <xforms:action xxforms:iterate="$summary-elements">
                     <xxforms:variable name="control" select="."/>
 
                     <!-- Insert empty template -->
@@ -250,8 +252,8 @@
 
                         <xforms:setvalue ref="$query/@name" value="substring-before($bind/@id, '-bind')"/>
                         <xforms:setvalue ref="$query/@path" value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
-                        <xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>
-                        <xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>
+                        <!--<xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>-->
+                        <!--<xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>-->
 
                         <!-- Copy namespace declarations from form to <query> element -->
                         <!-- Note: Copying namespaces from the xforms:bind is tricky. We can't copy the namespaces nodes, as copying from
@@ -555,7 +557,7 @@
                                         <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
                                     </xforms:group>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
+                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
                                         <th>
                                             <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
                                             <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
@@ -614,11 +616,18 @@
                                                     <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
 
                                                     <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
+                                                    <xxforms:variable name="control" select="$query/@control" as="xs:string"/>
+                                                    <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
 
-                                                    <!-- input -->
-                                                    <xforms:group ref=".[$query/@control = ('input', 'output')]">
-                                                        <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
-                                                        <xforms:output value="
+                                                    <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
+                                                    <xforms:output value="
+                                                        if ($control = 'textarea') then
+                                                            if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
+                                                        else if ($control = 'select') then
+                                                            string-join(for $v in tokenize(., '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                        else if ($control = 'select1') then
+                                                            for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
+                                                        else
                                                             if ($type = 'date') then
                                                                 (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else .)
                                                             else if ($type = 'time') then
@@ -639,23 +648,6 @@
                                                                     else .
                                                                 )
                                                             else ."/>
-                                                    </xforms:group>
-
-                                                    <!-- textarea -->
-                                                    <xforms:group ref=".[$query/@control = 'textarea']">
-                                                        <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
-                                                    </xforms:group>
-
-                                                    <!-- select -->
-                                                    <xforms:group ref=".[$query/@control = 'select']">
-                                                        <xforms:output model="fr-persistence-model"
-                                                                       value="string-join(for $v in tokenize(context(), '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')"/>
-                                                    </xforms:group>
-
-                                                    <!-- select1 -->
-                                                    <xforms:group ref=".[$query/@control = 'select1']">
-                                                        <xforms:output model="fr-persistence-model" value="$form-resources/*[local-name() = $query/@name]/item[value = context()]/label"/>
-                                                    </xforms:group>
                                                 </td>
                                             </xforms:repeat>
                                         </xforms:group>
@@ -663,7 +655,7 @@
                                 </xforms:repeat>
                                 <xforms:group ref=".[not(document)]">
                                     <tr>
-                                        <td colspan="{3 + count(instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary'])}">
+                                        <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary'])}">
                                             <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                         </td>
                                     </tr>

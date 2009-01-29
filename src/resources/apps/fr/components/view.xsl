@@ -587,5 +587,3 @@
     </xsl:template>
 
 </xsl:stylesheet>
-
-        

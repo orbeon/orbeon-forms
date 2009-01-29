@@ -76,8 +76,10 @@
         <!-- Set current language based on first resources available in loaded form -->
         <xforms:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
 
-        <!-- Load components -->
-        <xforms:send submission="fb-load-components"/>
+        <!-- Load components right away if mode is not new -->
+        <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
+            <xforms:send submission="fb-load-components"/>
+        </xforms:action>
 
     </xforms:action>
 
@@ -627,10 +629,8 @@
                        method="post" replace="none" resource="test:"/>
 
     <!-- Submission to load the components library -->
-    <!-- TODO: should load components based on app config? -->
-    <!-- TODO: don't use hardcoded orbeon/library, but what should be used? -->
     <xforms:submission id="fb-load-components" serialization="none"
-                       method="get" resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/components/orbeon/library"
+                       method="get" resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/components/{xxforms:bind('application-name-bind')}/{xxforms:bind('form-name-bind')}"
                        replace="instance" instance="fb-components-instance"
                        xxforms:readonly="true" xxforms:shared="document"/>
 

@@ -209,6 +209,8 @@
                                                 <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
                                                 <!-- Remember that data has been entered (so that next time a cancel button can be used, for example) -->
                                                 <xforms:setvalue ref="instance('fb-metadata-instance')/entered">true</xforms:setvalue>
+                                                <!-- Refresh components -->
+                                                <xforms:send submission="fb-load-components"/>
                                                 <!-- Show main form -->
                                                 <xforms:toggle case="fb-editor-open-case"/>
                                                 <xforms:toggle case="fb-metadata-view-case"/>

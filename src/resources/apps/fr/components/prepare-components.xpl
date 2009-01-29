@@ -26,12 +26,39 @@
 
     <!-- TODO: this should be part of FB not FR -> move there at some point -->
 
-    <!-- XBL document -->
-    <!--<p:param type="output" name="data"/>-->
+    <!-- Extract page detail (app, form, document, and mode) from URL -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/request-path</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+    <p:processor name="oxf:perl5-matcher">
+        <p:input name="config"><config>/fr/service/components/([^/]+)/([^/]+)</config></p:input>
+        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
+        <p:output name="data" id="matcher-groups"/>
+    </p:processor>
 
-    <!-- TODO: for now use orbeon/library, but must be configurable -->
-    <p:processor name="oxf:identity">
-        <p:input name="data">
+    <!-- Put app, form, and mode in format understood by read-form.xpl -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#matcher-groups"/>
+        <p:input name="config">
+            <request xsl:version="2.0">
+                <app><xsl:value-of select="/result/group[1]"/></app>
+                <form>library</form>
+                <document/>
+                <mode/>
+            </request>
+        </p:input>
+        <p:output name="data" id="parameters" debug="xxxxx"/>
+    </p:processor>
+
+    <!-- Read template form for global orbeon library -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../detail/read-form.xpl"/>
+        <p:input name="instance">
             <request>
                 <app>orbeon</app>
                 <form>library</form>
@@ -39,21 +66,26 @@
                 <mode/>
             </request>
         </p:input>
-        <p:output name="data" id="parameters"/>
+        <p:output name="data" id="global-template-form"/>
     </p:processor>
 
-    <!-- Read template form -->
+    <!-- Read template form for application library -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../detail/read-form.xpl"/>
         <p:input name="instance" href="#parameters"/>
-        <p:output name="data" id="template-form"/>
+        <p:output name="data" id="custom-template-form"/>
     </p:processor>
 
-    <!-- Convert template to XBL -->
+    <!-- Convert templates to XBL -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#template-form"/>
+        <p:input name="data" href="#global-template-form"/>
         <p:input name="config" href="form-to-xbl.xsl"/>
-        <p:output name="data" id="template-xbl"/>
+        <p:output name="data" id="global-template-xbl"/>
+    </p:processor>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#custom-template-form"/>
+        <p:input name="config" href="form-to-xbl.xsl"/>
+        <p:output name="data" id="custom-template-xbl"/>
     </p:processor>
 
     <!-- Read custom components -->
@@ -75,15 +107,18 @@
 
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#template-xbl"/>
+        <p:input name="data" href="#global-template-xbl"/>
+        <p:input name="custom-template-xbl" href="#custom-template-xbl"/>
         <p:input name="custom-xbl" href="#custom-xbl"/>
         <p:input name="config">
             <!-- Return an aggregate so that each xbl:xbl can have its own metadata -->
             <components xsl:version="2.0">
                 <!-- Standard controls -->
                 <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl"/>
-                <!-- Section components -->
+                <!-- Global section components -->
                 <xsl:copy-of select="/xbl:xbl"/>
+                <!-- Custom section components -->
+                <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
                 <!-- Custom components -->
                 <xsl:copy-of select="doc('input:custom-xbl')/xbl:xbl"/>
             </components>

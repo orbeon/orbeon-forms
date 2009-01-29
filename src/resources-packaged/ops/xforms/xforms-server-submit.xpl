@@ -69,23 +69,34 @@
         <!-- Noscript mode response -->
         <p:otherwise>
             <!-- Create XForms Server request -->
-            <p:processor name="oxf:xslt">
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <xxforms:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
                         </xxforms:dynamic-state>
-                        <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
+                        <!-- Handle files -->
+                        <xsl:variable name="files" select="/*/parameters/parameter[filename and normalize-space(value)]"/>
                         <xsl:if test="$files">
                             <xxforms:files>
                                 <xsl:copy-of select="$files"/>
                             </xxforms:files>
                         </xsl:if>
                         <xxforms:action>
+                            <!-- Create events for uploaded files if any -->
+                            <xsl:if test="$files">
+                                <xsl:for-each select="$files">
+                                    <!-- Generate value change events -->
+                                    <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="{name}">
+                                        <xsl:value-of select="normalize-space(value)"/>
+                                    </xxforms:event>
+                                </xsl:for-each>
+                            </xsl:if>
+
                             <!-- Create list of events based on parameters -->
                             <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or filename)]">
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->
@@ -126,6 +137,7 @@
                                 </xxforms:event>
                             </xsl:for-each>
                         </xxforms:action>
+                        <!-- There shouldn't be any server events, but process them if there are any (future use) -->
                         <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
                         <xsl:if test="$server-events != ''">
                             <xxforms:server-events>

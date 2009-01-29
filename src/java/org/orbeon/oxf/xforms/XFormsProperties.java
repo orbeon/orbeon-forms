@@ -66,19 +66,19 @@ public class XFormsProperties {
 
     private static final String SKIP_SCHEMA_VALIDATION_PROPERTY = "skip-schema-validation";
 
-//    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
-    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.";
+    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
     private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
-    private static final String DATE_FORMAT_PROPERTY = "format.date";
-    private static final String DATETIME_FORMAT_PROPERTY = "format.dateTime";
-    private static final String TIME_FORMAT_PROPERTY = "format.time";
-    private static final String DECIMAL_FORMAT_PROPERTY = "format.decimal";
-    private static final String INTEGER_FORMAT_PROPERTY = "format.integer";
-    private static final String FLOAT_FORMAT_PROPERTY = "format.float";
-    private static final String DOUBLE_FORMAT_PROPERTY = "format.double";
 
-    private static final String DATE_FORMAT_INPUT_PROPERTY = "format.input.date";
-    private static final String TIME_FORMAT_INPUT_PROPERTY = "format.input.time";
+    private static final String DATE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "date";
+    private static final String DATETIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "dateTime";
+    private static final String TIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "time";
+    private static final String DECIMAL_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "decimal";
+    private static final String INTEGER_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "integer";
+    private static final String FLOAT_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "float";
+    private static final String DOUBLE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "double";
+
+    private static final String DATE_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "date";
+    private static final String TIME_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "time";
 
     private static final String DATEPICKER_PROPERTY = "datepicker";
     private static final String XHTML_EDITOR_PROPERTY = "htmleditor";

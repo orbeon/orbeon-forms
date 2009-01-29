@@ -101,7 +101,7 @@
             </messages>
             <labels>
                 <save-document>Save</save-document>
-                <publish>Publish</publish>
+                <publish>Publish...</publish>
                 <test>Test</test>
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
@@ -247,7 +247,7 @@
             </messages>
             <labels>
                 <save-document>Sauvegarder</save-document>
-                <publish>Publier</publish>
+                <publish>Publier...</publish>
                 <test>Tester</test>
                 <save-locally>Sauvegarde Locale</save-locally>
                 <save-offline>Sauvegarde Or-ligne</save-offline>
@@ -393,7 +393,7 @@
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
-                <publish>Publicar</publish>
+                <publish>Publicar...</publish>
                 <test>Probar</test>
                 <save-locally>Guardar en su computador</save-locally>
                 <save-offline>Guardar Sin conexión</save-offline>

@@ -92,7 +92,6 @@
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
             <config xsl:version="2.0">
-
                 <!-- Create URI based on properties -->
                 <xsl:variable name="resource" select="pipeline:property(string-join(('oxf.fb.components.uri', /*/app, /*/form), '.'))" as="xs:string"/>
                 <url>

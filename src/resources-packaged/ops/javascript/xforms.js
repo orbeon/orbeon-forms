@@ -1903,7 +1903,6 @@ ORBEON.xforms.Controls = {
         if (ORBEON.xforms.Globals.isFF3) {
 			textarea.style.height = 0;
 			scrollHeight = textarea.scrollHeight;
-            console.log(scrollHeight);
             textarea.style.height = null;
 		}
 

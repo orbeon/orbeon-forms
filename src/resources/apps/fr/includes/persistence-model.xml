@@ -177,13 +177,17 @@
     <!-- Respond to save button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">save</xforms:setvalue>
-        <xforms:dispatch name="fr-save-action" target="fr-persistence-model"/>
+        <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
+            <xxforms:context name="fr:check-data-valid" select="true()"/>
+        </xforms:dispatch>
     </xforms:action>
 
     <!-- Respond to submit button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-submit-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">submit</xforms:setvalue>
-        <xforms:dispatch name="fr-save-action" target="fr-persistence-model"/>
+        <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
+            <xxforms:context name="fr:check-data-valid" select="true()"/>
+        </xforms:dispatch>
     </xforms:action>
 
     <!-- Respond to workflow preview button activation -->
@@ -201,24 +205,34 @@
     <!-- Respond to send button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-workflow-send-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">send</xforms:setvalue>
-        <xforms:dispatch name="fr-save-action" target="fr-persistence-model"/>
+        <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
+            <xxforms:context name="fr:check-data-valid" select="true()"/>
+        </xforms:dispatch>
     </xforms:action>
 
     <xforms:action ev:event="fr-save-action">
+        <!-- fr:check-data-valid   xs:boolean   * true if the data needs to be valid to perform this action (generally the
+                                                  case this is called in response to users' actions such as click on a
+                                                  Save button).
+                                                * false if this action should be performed even if the data is invalid
+                                                  (e.g. when doing an auto-save).
+        -->
+        <xxforms:variable name="check-data-valid" select="event('fr:check-data-valid')"/>
+
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="$document != ''">
 
             <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
                  is invalid and 2) submission dosn't check validity anymore -->
-            <xxforms:variable name="is-data-valid" select="xxforms:valid(xxforms:instance('fr-form-instance'), true())" as="xs:boolean"/>
+            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:valid(xxforms:instance('fr-form-instance'), true())" as="xs:boolean"/>
 
-            <xforms:action if="not($is-data-valid)">
+            <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->
                 <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                                  value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
                 <xforms:toggle case="fr-message-validation-error"/>
             </xforms:action>
-            <xforms:action if="$is-data-valid">
+            <xforms:action if="$continue-with-save">
                 <!-- Data valid: proceed with saving attachments and data -->
 
                 <!-- Handle attachments -->

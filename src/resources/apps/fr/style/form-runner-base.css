@@ -443,6 +443,8 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* This is also used for PDF generation */
 @media print {
+    /* Don't hide as there is no script running */
+    form.xforms-initially-hidden { display: block }
     .fr-header { display: none }
     .fr-top { display: none }
     .fr-buttons-block { display: none }

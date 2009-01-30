@@ -24,10 +24,7 @@ import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
@@ -78,7 +75,11 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         config.setResourceId(rootElement.attributeValue("resource-id"));
 
         config.setQuery(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(configDocument, "/*/text() | /*/*")));
-        config.setNamespaceContext(Dom4jUtils.getNamespaceContext(configDocument.getRootElement()));
+
+        final Map namespaceContext = Dom4jUtils.getNamespaceContext(configDocument.getRootElement());
+        // Not sure why 1) xml needs to be in there and 2) why eXist balks on it, but we remove it here for eXist
+        namespaceContext.remove(XMLConstants.XML_PREFIX);
+        config.setNamespaceContext(namespaceContext);
 
         return config;
     }

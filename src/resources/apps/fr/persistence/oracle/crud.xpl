@@ -91,40 +91,40 @@
                 <p:input name="data" href="#request-description"/>
                 <p:input name="config">
                     <sql:config xsl:version="2.0">
-                        <sql:connection>
-                            <sql:datasource>
-                                <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                            </sql:datasource>
+                        <sql-out>
+                            <sql:connection>
+                                <sql:datasource>
+                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                </sql:datasource>
 
-                            <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
-                            <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
-                            <xsl:variable name="table-name" as="xs:string" select="concat(
-                                if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
-                                if ($is-attachment) then '_attach' else '')"/>
+                                <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
+                                <xsl:variable name="table-name" as="xs:string" select="concat(
+                                    if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
+                                    if ($is-attachment) then '_attach' else '')"/>
 
-                            <sql:execute>
-                                <sql:query>
-                                    select
-                                        last_modified,
-                                        <xsl:if test="not($is-attachment)">t.xml.getClobVal() xml</xsl:if>
-                                        <xsl:if test="$is-attachment">file_content</xsl:if>
-                                    from <xsl:value-of select="$table-name"/> t
-                                        where app = <sql:param type="xs:string" select="/request/app"/>
-                                        and form = <sql:param type="xs:string" select="/request/form"/>
-                                        <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
-                                        <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
-                                        and last_modified = (
-                                            select max(last_modified) from <xsl:value-of select="$table-name"/>
+                                <sql:execute>
+                                    <sql:query>
+                                        select
+                                            last_modified,
+                                            <xsl:if test="not($is-attachment)">t.xml.getClobVal() xml</xsl:if>
+                                            <xsl:if test="$is-attachment">file_content</xsl:if>
+                                        from <xsl:value-of select="$table-name"/> t
                                             where app = <sql:param type="xs:string" select="/request/app"/>
                                             and form = <sql:param type="xs:string" select="/request/form"/>
                                             <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
                                             <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
-                                        )
-                                        <!-- This will prevent request for document that have been deleted to return a delete doc -->
-                                        and deleted = 'N'
-                                </sql:query>
-                                <sql:result-set>
-                                    <sql-out>
+                                            and last_modified = (
+                                                select max(last_modified) from <xsl:value-of select="$table-name"/>
+                                                where app = <sql:param type="xs:string" select="/request/app"/>
+                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                            )
+                                            <!-- This will prevent request for document that have been deleted to return a delete doc -->
+                                            and deleted = 'N'
+                                    </sql:query>
+                                    <sql:result-set>
                                         <sql:row-iterator>
                                             <last-modified>
                                                 <sql:get-column-value column="last_modified" type="xs:dateTime"/>
@@ -140,10 +140,10 @@
                                                 </xsl:choose>
                                             </data>
                                         </sql:row-iterator>
-                                    </sql-out>
-                                </sql:result-set>
-                            </sql:execute>
-                        </sql:connection>
+                                    </sql:result-set>
+                                </sql:execute>
+                            </sql:connection>
+                        </sql-out>
                     </sql:config>
                 </p:input>
                 <p:output name="data" id="sql-config"/>
@@ -155,8 +155,9 @@
                 <p:output name="data" id="sql-out"/>
             </p:processor>
 
-            <p:choose href="#request-description">
-                <p:when test="ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml')">
+            <p:choose href="aggregate('root', #request-description, #sql-out)">
+                <!-- Test whether we got data as well as the extension type before trying to parse as XML -->
+                <p:when test="/*/sql-out/data and (ends-with(/*/request/filename, '.xml') or ends-with(/*/request/filename, '.xhtml'))">
                     <!-- Convert and serialize to XML -->
                     <p:processor name="oxf:xml-converter">
                         <p:input name="config">

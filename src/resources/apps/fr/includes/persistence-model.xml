@@ -435,7 +435,7 @@
             <error/>
             <!-- Whether an error was received -->
             <is-error>false</is-error>
-            <!-- Whether the last action that triggered the a fr-create-update-submission is a "submit" or a "save" -->
+            <!-- Whether the last action that triggered the fr-create-update-submission is a "submit" or a "save" -->
             <submit-or-save-or-send/>
             <!-- Flag to override data-safe -->
             <data-safe-override/>

@@ -4995,6 +4995,12 @@ ORBEON.xforms.Server = {
                                                 newDocumentElement.setAttribute("id", controlId);
                                                 newDocumentElement.className = documentElementClasses.join(" ") + " xforms-static";
                                                 parentElement.replaceChild(newDocumentElement, documentElement);
+
+                                                // Because we replaced a control element, make sure to update the cache
+                                                var cachedElement = ORBEON.xforms.Globals.idToElement[controlId];
+                                                if (cachedElement != null)
+                                                    ORBEON.xforms.Globals.idToElement[controlId] = newDocumentElement;
+
                                                 // Remove alert
                                                 var alertElement = ORBEON.xforms.Controls._getControlLabel(newDocumentElement, "xforms-alert");
                                                 if (alertElement != null)

@@ -41,7 +41,8 @@
             </p>
             <p>
                 <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of January 2009. The
-                latest officially stable release of Orbeon Forms is 3.6.</b>
+                latest officially stable release of Orbeon Forms is 3.6. Also make sure to check for any beta or final
+                version on the <a href="http://www.orbeon.com/forms/download">downloads page</a>.</b>
             </p>
         </section>
         <a name="changes-37"/>
@@ -568,8 +569,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of August 2008. The
-                    latest stable release of Orbeon Forms is 3.6.</b>
+                    <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of January 2009.</b>
                 </p>
                 <p>
                     Orbeon Forms 3.7 addresses the following bugs and features:
@@ -846,12 +846,6 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309149&amp;group_id=168&amp;atid=350207">
                             #309149: Cookie forwarding may behave incorrectly in submissions
-                        </a>
-                    </li>
-                    <li>
-
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311719&amp;group_id=168&amp;atid=350207">
-                            #311719: Regression: Alert doesn't update properly within repeat
                         </a>
                     </li>
                     <li>

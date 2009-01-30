@@ -955,7 +955,8 @@ public class XFormsModelBinds {
                     final String attributePrefix = attributeQName.getNamespacePrefix();
                     final String attributeURI = attributeQName.getNamespaceURI();
                     if (attributePrefix != null && attributePrefix.length() > 0
-                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI) || attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI))) {
+                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI) || attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)
+                                     || attributePrefix.startsWith("xml"))) {
                         // Any QName-but-not-NCName which is not in the xforms or xxforms namespace
                         if (customMips == null)
                             customMips = new HashMap();

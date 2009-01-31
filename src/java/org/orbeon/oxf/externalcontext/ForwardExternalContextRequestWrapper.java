@@ -154,7 +154,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     }
 
     public String getContextPath() {
-        // Return the context path passed
+        // Return the context path passed to this wrapper
         return contextPath;
     }
 
@@ -176,14 +176,16 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
         return requestPath;
     }
-//
-//    public String getRequestURI() {
-//        return getRequestPath();// FIXME
-//    }
-//
-//    public String getRequestURL() {
-//        return getRequestPath();// FIXME
-//    }
+
+    public String getRequestURI() {
+        // Must return the path including the context
+        final String contextPath = getContextPath();
+        return "/".equals(contextPath) ? getRequestPath() : getContextPath() + getRequestPath();
+    }
+
+    public String getRequestURL() {
+        return getRequestPath();// FIXME
+    }
 
     public Map getHeaderMap() {
         return headerMap;

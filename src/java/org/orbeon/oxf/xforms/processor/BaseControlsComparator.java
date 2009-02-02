@@ -33,6 +33,8 @@ import java.util.Map;
 
 public abstract class BaseControlsComparator implements ControlsComparator {
 
+    public static final boolean DEFAULT_RELEVANCE_FOR_NEW_ITERATION = true;
+
     protected PipelineContext pipelineContext;
     protected ContentHandlerHelper ch;
     protected XFormsContainingDocument containingDocument;

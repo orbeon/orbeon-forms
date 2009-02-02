@@ -76,9 +76,9 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                         attributesImpl.clear();
 
-                        // Whether it is necessary to output information about this control
+                        // Whether it is necessary to output information about this control because the control was previously non-existing
                         // TODO: distinction between new iteration AND control just becoming relevant
-                        final boolean isNewRepeatIteration = xformsSingleNodeControl1 == null;
+                        final boolean isNewlyVisibleSubtree = xformsSingleNodeControl1 == null;
 
                         // Whether it is necessary to output information about this control
                         boolean doOutputElement = false;
@@ -94,14 +94,14 @@ public class OldControlsComparator extends BaseControlsComparator {
                             attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
 
                             // Model item properties
-                            if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
+                            if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isReadonly()
                                     || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isReadonly() != xformsSingleNodeControl2.isReadonly()) {
                                 attributesImpl.addAttribute("", XFormsConstants.READONLY_ATTRIBUTE_NAME,
                                         XFormsConstants.READONLY_ATTRIBUTE_NAME,
                                         ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isReadonly()));
                                 doOutputElement = true;
                             }
-                            if (isNewRepeatIteration && xformsSingleNodeControl2.isRequired()
+                            if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRequired()
                                     || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRequired() != xformsSingleNodeControl2.isRequired()) {
                                 attributesImpl.addAttribute("", XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
                                         XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
@@ -111,9 +111,7 @@ public class OldControlsComparator extends BaseControlsComparator {
 
 
                             // Default for relevance
-                            final boolean relevantDefault = isNewRepeatIteration;
-
-                            if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() != relevantDefault
+                            if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRelevant() != DEFAULT_RELEVANCE_FOR_NEW_ITERATION
                                     //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
                                     || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
                                 attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
@@ -121,7 +119,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                         ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
                                 doOutputElement = true;
                             }
-                            if (isNewRepeatIteration && !xformsSingleNodeControl2.isValid()
+                            if (isNewlyVisibleSubtree && !xformsSingleNodeControl2.isValid()
                                     || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isValid() != xformsSingleNodeControl2.isValid()) {
                                 attributesImpl.addAttribute("", XFormsConstants.VALID_ATTRIBUTE_NAME,
                                         XFormsConstants.VALID_ATTRIBUTE_NAME,
@@ -132,62 +130,62 @@ public class OldControlsComparator extends BaseControlsComparator {
                             // Type attribute
                             {
 
-                                final String typeValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getType();
+                                final String typeValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getType();
                                 final String typeValue2 = xformsSingleNodeControl2.getType();
 
-                                if (isNewRepeatIteration || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
+                                if (isNewlyVisibleSubtree || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
                                     final String attributeValue = typeValue2 != null ? typeValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                 }
                             }
 
                             // Label, help, hint, alert, etc.
                             {
-                                final String labelValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
+                                final String labelValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
                                 final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
 
                                 if (!XFormsUtils.compareStrings(labelValue1, labelValue2)) {
                                     final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
                                     final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                 }
                             }
 
                             {
-                                final String helpValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
+                                final String helpValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
                                 final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
                                 if (!XFormsUtils.compareStrings(helpValue1, helpValue2)) {
                                     final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
                                     final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                 }
                             }
 
                             {
-                                final String hintValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHint(pipelineContext);
+                                final String hintValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getHint(pipelineContext);
                                 final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
 
                                 if (!XFormsUtils.compareStrings(hintValue1, hintValue2)) {
                                     final String escapedHintValue2 = xformsSingleNodeControl2.getEscapedHint(pipelineContext);
                                     final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                 }
                             }
 
                             {
-                                final String alertValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
+                                final String alertValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
                                 final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
 
                                 if (!XFormsUtils.compareStrings(alertValue1, alertValue2)) {
                                     final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
                                     final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                 }
                             }
 
                             // Output control-specific attributes
-                            doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewRepeatIteration);
+                            doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewlyVisibleSubtree);
 
                             // Get current value if possible for this control
                             // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
@@ -211,7 +209,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                     final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                     value = (tempValue == null) ? "" : tempValue;
                                 }
-                                if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                                if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                     ch.text(value);
                                     ch.endElement();
@@ -233,13 +231,13 @@ public class OldControlsComparator extends BaseControlsComparator {
                             {
                                 // HTML element id
                                 final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
                             }
 
                             {
                                 // Attribute name
                                 final String name2 = attributeControlInfo2.getNameAttribute();
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2, isNewRepeatIteration, false);
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
                             }
 
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
@@ -251,7 +249,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
-                            if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
                                 ch.text(value);
                                 ch.endElement();
@@ -268,7 +266,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             {
                                 // HTML element id
                                 final String effectiveFor2 = txtControlInfo2.getEffectiveForAttribute();
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
                             }
 
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
@@ -280,7 +278,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
-                            if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
                                 ch.text(value);
                                 ch.endElement();
@@ -291,7 +289,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             // Use the effective id of the parent repeat
                             attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
 
-                            if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
+                            if (isNewlyVisibleSubtree && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
                                     //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
                                     || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {//TODO: not sure why the above alternative fails tests. Which is more correct?
                                 attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,

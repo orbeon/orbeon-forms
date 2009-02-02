@@ -92,8 +92,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                             // But we force a change for controls whose values changed in the request
                             // Also, we don't output anything for triggers in static readonly mode
 
-                            // Whether it is necessary to output information about this control
-                            final boolean isNewRepeatIteration = xformsSingleNodeControl1 == null;
+                            // Whether it is necessary to output information about this control because the control was previously non-existing
+                            final boolean isNewlyVisibleSubtree = xformsSingleNodeControl1 == null;
 
                             // Whether it is necessary to output information about this control
                             boolean doOutputElement = false;
@@ -105,28 +105,29 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, leadingControl.getEffectiveId());
 
                                 // Model item properties
-                                if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
+                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isReadonly()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isReadonly() != xformsSingleNodeControl2.isReadonly()) {
                                     attributesImpl.addAttribute("", XFormsConstants.READONLY_ATTRIBUTE_NAME,
                                             XFormsConstants.READONLY_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isReadonly()));
                                     doOutputElement = true;
                                 }
-                                if (isNewRepeatIteration && xformsSingleNodeControl2.isRequired()
+                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRequired()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRequired() != xformsSingleNodeControl2.isRequired()) {
                                     attributesImpl.addAttribute("", XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
                                             XFormsConstants.REQUIRED_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRequired()));
                                     doOutputElement = true;
                                 }
-                                if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() // NOTE: we output if we ARE relevant as the default is non-relevant
+
+                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRelevant() != DEFAULT_RELEVANCE_FOR_NEW_ITERATION
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
                                     attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
                                     doOutputElement = true;
                                 }
-                                if (isNewRepeatIteration && !xformsSingleNodeControl2.isValid()
+                                if (isNewlyVisibleSubtree && !xformsSingleNodeControl2.isValid()
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isValid() != xformsSingleNodeControl2.isValid()) {
                                     attributesImpl.addAttribute("", XFormsConstants.VALID_ATTRIBUTE_NAME,
                                             XFormsConstants.VALID_ATTRIBUTE_NAME,
@@ -135,68 +136,68 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 }
 
                                 // Notify the client that this control must be static readonly in case it just appeared
-                                if (isNewRepeatIteration && xformsSingleNodeControl2.isStaticReadonly() && xformsSingleNodeControl2.isRelevant())
+                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isStaticReadonly() && xformsSingleNodeControl2.isRelevant())
                                     attributesImpl.addAttribute("", "static", "static", ContentHandlerHelper.CDATA, "true");
 
                                 // Type attribute
                                 final boolean isOutputControlWithValueAttribute = xformsSingleNodeControl2 instanceof XFormsOutputControl && ((XFormsOutputControl) xformsSingleNodeControl2).getValueAttribute() != null;
                                 if (!isOutputControlWithValueAttribute) {
 
-                                    final String typeValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getType();
+                                    final String typeValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getType();
                                     final String typeValue2 = xformsSingleNodeControl2.getType();
 
                                     if (!((typeValue1 == null && typeValue2 == null) || (typeValue1 != null && typeValue2 != null && typeValue1.equals(typeValue2)))) {
                                         final String attributeValue = typeValue2 != null ? typeValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 // Label, help, hint, alert, etc.
                                 {
-                                    final String labelValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
+                                    final String labelValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
                                     final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
 
                                     if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
                                         final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
                                         final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 {
-                                    final String helpValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
+                                    final String helpValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
                                     final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
                                     if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
                                 final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
                                 final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 {
-                                    final String hintValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHint(pipelineContext);
+                                    final String hintValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getHint(pipelineContext);
                                     final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
 
                                     if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
                                         final String attributeValue = hintValue2 != null ? hintValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 {
-                                    final String alertValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
+                                    final String alertValue1 = isNewlyVisibleSubtree ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
                                     final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
 
                                     if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
                                         final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
                                         final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 // Output control-specific attributes
-                                doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewRepeatIteration);
+                                doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewlyVisibleSubtree);
 
                                 // Get current value if possible for this control
                                 // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
@@ -207,14 +208,6 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                     final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
 
-                                    // Check if a "display-value" attribute must be added
-//                                    if (!isOutputControlWithValueAttribute) {
-//                                        final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-//                                        if (displayValue != null) {
-//                                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-//                                        }
-//                                    }
-
                                     // Create element with text value
                                     final String value;
                                     {
@@ -222,7 +215,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                         final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
                                         value = (tempValue == null) ? "" : tempValue;
                                     }
-                                    if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(value))) {
+                                    if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                         ch.text(value);
                                         ch.endElement();
@@ -238,7 +231,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
 
                                 // Repeat iteration only handles relevance
-                                if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
+                                if (isNewlyVisibleSubtree && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
                                     attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             XFormsConstants.RELEVANT_ATTRIBUTE_NAME,

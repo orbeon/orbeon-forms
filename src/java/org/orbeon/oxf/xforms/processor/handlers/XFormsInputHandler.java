@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsItemUtils;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -78,8 +77,10 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
             final boolean isMany = true;
             final List items = new ArrayList(2);
-            final boolean isEncryptItemValues = XFormsProperties.isEncryptItemValues(containingDocument);
-            items.add(new XFormsItemUtils.Item(isEncryptItemValues, Collections.EMPTY_LIST, "", "true", 1));
+            // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
+            // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
+            // the encrypted value of "true". So we do not encrypt values.
+            items.add(new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "true", 1));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));

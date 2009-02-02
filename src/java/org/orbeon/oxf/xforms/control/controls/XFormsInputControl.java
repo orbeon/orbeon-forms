@@ -107,18 +107,11 @@ public class XFormsInputControl extends XFormsValueControl {
             if (typeName.equals("boolean")) {
                 // xs:boolean
 
-                if (internalValue != null && !internalValue.equals("true")) {
-                    // This so we don't send "false" to the client but ""
-                    updatedValue = "";
-                } else {
-                    if (XFormsProperties.isEncryptItemValues(containingDocument)) {
-                        // Encrypt outgoing value if needed
-                        updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
-                    } else {
-                        // For open selection, values sent to client are the internal values
-                        updatedValue = internalValue;
-                    }
-                }
+                // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
+                // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
+                // the encrypted value of "true". So we do not encrypt values.
+
+                updatedValue = Boolean.toString("true".equals(internalValue));
             } else {
                 // Other types
                 updatedValue = internalValue;
@@ -133,18 +126,18 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
         // Store after converting
-        super.storeExternalValue(pipelineContext, convertFromExternalValue(pipelineContext, value), type, filesElement);
+        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type, filesElement);
     }
 
-    private String convertFromExternalValue(PipelineContext pipelineContext, String externalValue) {
+    private String convertFromExternalValue(String externalValue) {
         final String typeName = getBuiltinTypeName();
         if (typeName != null) {
             if (typeName.equals("boolean")) {
                 // Boolean input
 
-                // Decrypt incoming value if needed. With open selection, values are sent to the client.
-                if (XFormsProperties.isEncryptItemValues(containingDocument))
-                    externalValue = XFormsItemUtils.decryptValue(pipelineContext, externalValue);
+                // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
+                // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
+                // the encrypted value of "true". So we do not encrypt values.
 
                 // Anything but "true" is "false"
                 if (!externalValue.equals("true"))

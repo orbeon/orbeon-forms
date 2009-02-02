@@ -33,17 +33,13 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Base class for all XHTML and XForms element handlers.
  */
 public abstract class XFormsBaseHandler extends ElementHandler {
-
-    // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
-    // cannot be used; those should probably be in the XHTML namespace
-    private static final String[] XHTML_ATTRIBUTES_TO_COPY = { "style", "onchange" };
 
     private boolean repeating;
     private boolean forwarding;
@@ -169,7 +165,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue(pipelineContext));
     }
 
-    protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
+    protected static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
         // Handle "tabindex"
         {
             // This is the standard XForms attribute
@@ -193,24 +189,20 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 destAttributes.addAttribute("", "accesskey", "accesskey", ContentHandlerHelper.CDATA, value);
         }
     }
-
     protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String id) {
+        return getAttributes(reusableAttributes, elementAttributes, classes, id);
+    }
+
+    protected static AttributesImpl getAttributes(AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String id) {
         reusableAttributes.clear();
 
         // Copy "id"
         if (id != null) {
             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, id);
         }
-        // Copy common attributes
-        for (int i = 0; i < XHTML_ATTRIBUTES_TO_COPY.length; i++) {
-            final String name = XHTML_ATTRIBUTES_TO_COPY[i];
-            final String value = elementAttributes.getValue(name);
-            if (value != null)
-                reusableAttributes.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
-        }
         // Create "class" attribute if necessary
         {
-            final FastStringBuffer sb = new FastStringBuffer(100);
+            final FastStringBuffer sb = new FastStringBuffer(50);
             // User-defined classes go first
             {
                 final String value = elementAttributes.getValue("class");

@@ -200,6 +200,17 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
 
+            // Templates
+            {
+                final String spanQName = XMLUtils.buildQName(htmlPrefix, "span");
+                final String TEMPLATE_ID = "$xforms-effective-id$";
+
+                // xforms:select[@appearance = 'full'], xforms:select1[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
+                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, htmlPrefix, spanQName,
+                        containingDocument, reusableAttributes, attributes,
+                        "xforms-select-full-template", TEMPLATE_ID, TEMPLATE_ID, true, "$xforms-item-type$");
+            }
+
         } else {
             // Noscript mode
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{

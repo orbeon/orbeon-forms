@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -25,6 +26,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -168,7 +170,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         int itemIndex = 0;
                         for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
                             final XFormsItemUtils.Item item = (XFormsItemUtils.Item) i.next();
-                            handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, xformsControl, staticId, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                            handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes, xhtmlPrefix, spanQName, containingDocument, xformsControl, staticId, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
                         }
                     }
 
@@ -178,17 +180,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 // Try to produce the template only when needed
                 if (!handlerContext.isNoScript()) {// don't generate templates in noscript mode as they won't be used
                     final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(getPrefixedId());
+                    // TODO: Use global select full template(s)
                     if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {// only generate if there are non-static items
-                        reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
-
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                        handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, null, staticId, effectiveId, isMany, fullItemType,
-                                new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
-                                        "$xforms-template-label$", "$xforms-template-value$", 1),
-                                        "$xforms-item-index$", true);
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                        outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, xhtmlPrefix, spanQName,
+                                containingDocument, reusableAttributes, attributes, "xforms-select-template-" + effectiveId,
+                                staticId, effectiveId, isMany, fullItemType);
                     }
                 }
             } else {
@@ -452,6 +448,24 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
+    public static void outputItemFullTemplate(PipelineContext pipelineContext, HandlerContext handlerContext,
+                                              ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
+                                              XFormsContainingDocument containingDocument,
+                                              AttributesImpl reusableAttributes, Attributes attributes, String templateId,
+                                              String staticId, String effectiveId, boolean isMany, String fullItemType) throws SAXException {
+        reusableAttributes.clear();
+        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, templateId);
+        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-template");
+
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+        handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes,
+                xhtmlPrefix, spanQName, containingDocument, null, staticId, effectiveId, isMany, fullItemType,
+                new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
+                        "$xforms-template-label$", "$xforms-template-value$", 1),
+                        "$xforms-item-index$", true);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+    }
+
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, List items, boolean many, ContentHandler contentHandler) throws SAXException {
         if (xformsControl != null && !handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierachical information
@@ -462,8 +476,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    private void handleItemFull(ContentHandler contentHandler, Attributes attributes, String xhtmlPrefix, String spanQName,
-                                XFormsValueControl xformsControl, String id, String effectiveId, boolean isMany, String type, XFormsItemUtils.Item item, String itemIndex, boolean isFirst) throws SAXException {
+    public static void handleItemFull(PipelineContext pipelineContext, HandlerContext handlerContext, ContentHandler contentHandler,
+                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
+                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl, String id,
+                                       String effectiveId, boolean isMany, String type,
+                                       XFormsItemUtils.Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
@@ -479,7 +496,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
 
         // xhtml:span enclosing input and label
-        final AttributesImpl spanAttributes = getAttributes(new AttributesImpl(), isSelected ? "xforms-selected" : "xforms-deselected", null);
+        final AttributesImpl spanAttributes = getAttributes(reusableAttributes, new AttributesImpl(), isSelected ? "xforms-selected" : "xforms-deselected", null);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
         {

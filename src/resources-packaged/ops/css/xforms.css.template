@@ -183,6 +183,7 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
     background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
 }
 
+/* For backward compatibility, new code uses xforms-template */
 .xforms-select-template {
     display: none;
 }
@@ -192,7 +193,7 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
 }
 
 /* Try to give more precedence to this rule as top-level template elements may have other display: properties */
-html body .xforms-form .xforms-repeat-template {
+html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-template {
     display: none;
 }
 

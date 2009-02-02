@@ -160,21 +160,21 @@
 					<p>The application server reads the
                     <code>WEB-INF/web.xml</code> file, which:</p>
 					<ul>
-						<li>Declares a Servlet named <code>ops-main-servlet</code>
+						<li>Declares a Servlet named <code>orbeon-main-servlet</code>
                         implemented by the class <code>org.orbeon.oxf.servlet.OPSServlet</code> (loaded from
                         <code>lib/orbeon.jar</code>)</li>
-						<li>Defines <code>ops-main-servlet</code> as the default Servlet
+						<li>Defines <code>orbeon-main-servlet</code> as the default Servlet
                         (i.e. the Servlet handling all the requests).</li>
 					</ul>
 					<xml-source>
 <web-app>
     <servlet>
-        <servlet-name>ops-main-servlet</servlet-name>
+        <servlet-name>orbeon-main-servlet</servlet-name>
         <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
         <comment>Initialization parameters here (see below)</comment>
     </servlet>
     <servlet-mapping>
-        <servlet-name>ops-main-servlet</servlet-name>
+        <servlet-name>orbeon-main-servlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 </web-app>
@@ -202,6 +202,7 @@
 						<li>
                             <p>
                                 The location of <code>properties.xml</code>, by default <code>oxf:/config/properties.xml</code>.
+                                See <a href="reference-properties">Configuration Properties</a> for more details.
                             </p>
                         </li>
                         <li>
@@ -283,7 +284,7 @@
                 </p>
                 <xml-source>
                     <servlet>
-                        <servlet-name>ops-main-servlet</servlet-name>
+                        <servlet-name>orbeon-main-servlet</servlet-name>
                         <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
                         <comment> Set main processor </comment>
                         <init-param>
@@ -321,7 +322,7 @@
                 </p>
                 <xml-source>
                     <servlet>
-                        <servlet-name>ops-main-servlet</servlet-name>
+                        <servlet-name>orbeon-main-servlet</servlet-name>
                         <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
                         <comment> ... </comment>
                         <comment> Set error processor </comment>

@@ -177,16 +177,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName);
                 }
 
-                // Try to produce the template only when needed
-                if (!handlerContext.isNoScript()) {// don't generate templates in noscript mode as they won't be used
-                    final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(getPrefixedId());
-                    // TODO: Use global select full template(s)
-                    if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {// only generate if there are non-static items
-                        outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, xhtmlPrefix, spanQName,
-                                containingDocument, reusableAttributes, attributes, "xforms-select-template-" + effectiveId,
-                                staticId, effectiveId, isMany, fullItemType);
-                    }
-                }
+                // NOTE: Templates for full items are output globally in XHTMLBodyHandler
+
             } else {
 
                 if (isOpenSelection) {

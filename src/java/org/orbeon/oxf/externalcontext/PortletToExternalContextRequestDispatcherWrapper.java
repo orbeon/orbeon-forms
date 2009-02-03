@@ -48,4 +48,9 @@ public class PortletToExternalContextRequestDispatcherWrapper implements Externa
 //            throw new OXFException(e);
 //        }
     }
+
+    public boolean isDefaultContext() {
+        // TODO
+        return false;
+    }
 }

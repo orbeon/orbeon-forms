@@ -851,14 +851,16 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getNamedDispatcher(name));
+        final ServletContext slashServletContext = servletContext.getContext("/");
+        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getNamedDispatcher(name), slashServletContext == servletContext);
     }
 
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
 
         if (isContextRelative) {
             // Path is relative to the current context root
-            return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path));
+            final ServletContext slashServletContext = servletContext.getContext("/");
+            return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path), slashServletContext == servletContext);
         } else {
             // Path is relative to the server document root
 
@@ -866,11 +868,23 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             if (otherServletContext == null)
                 return null;
 
-            final String modifiedPath = NetUtils.removeFirstPathElement(path);
-            if (modifiedPath == null)
-                return null;
+            final ServletContext slashServletContext = servletContext.getContext("/");
 
-            return new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath));
+            final String modifiedPath;
+            final boolean isDefaultContext;
+            if (slashServletContext != otherServletContext) {
+                // Remove first path element
+                modifiedPath = NetUtils.removeFirstPathElement(path);
+                if (modifiedPath == null)
+                    return null;
+                isDefaultContext = false;
+            } else {
+                // No need to remove first path element because the servlet context is ""
+                modifiedPath = path;
+                isDefaultContext = true;
+            }
+
+            return new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath), isDefaultContext);
         }
     }
 }

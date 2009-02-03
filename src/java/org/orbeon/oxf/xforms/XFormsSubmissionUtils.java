@@ -94,18 +94,23 @@ public class XFormsSubmissionUtils {
 
         final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
+
+            // Get dispatcher
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, isContextRelative);
+            final boolean isDefaultContext = requestDispatcher.isDefaultContext();
+
             // Case of empty body
             if (messageBody == null)
                 messageBody = new byte[0];
+
+            // Destination context path is the context path of the current request, or the context path implied by the new URI
+            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(action);
 
             // Create requestAdapter depending on method
             final ForwardExternalContextRequestWrapper requestAdapter;
             final String effectiveResourceURI;
             final String rootAdjustedResourceURI;
             {
-                // Context path is either the context path of the current request, or the context path implied by the new URI
-                final String contextPath = isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(action);
-
                 if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
                     // Simulate a POST or PUT
                     effectiveResourceURI = action;
@@ -114,11 +119,11 @@ public class XFormsSubmissionUtils {
                         XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
                             new String[] { "body", new String(messageBody, "UTF-8") });
 
-                    rootAdjustedResourceURI = isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames);
                 } else {
                     // Simulate a GET or DELETE
@@ -134,11 +139,11 @@ public class XFormsSubmissionUtils {
                         effectiveResourceURI = updatedActionStringBuffer.toString();
                     }
 
-                    rootAdjustedResourceURI = isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), contextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, headerNames);
                 }
             }
@@ -148,11 +153,11 @@ public class XFormsSubmissionUtils {
                             new String[] {
                                     "method", httpMethod,
                                     "mediatype", mediatype,
+                                    "context path", destinationContextPath,
                                     "effective resource URI (original)", effectiveResourceURI,
                                     "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
                             });
 
-            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, isContextRelative);
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 public void close() {
                     if (getResponseInputStream() != null) {

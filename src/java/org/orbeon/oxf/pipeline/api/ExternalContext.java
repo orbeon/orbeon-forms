@@ -155,6 +155,7 @@ public interface ExternalContext extends WebAppExternalContext {
     public interface RequestDispatcher {
         public abstract void forward(Request request, Response response) throws IOException;
         public void include(Request request, Response response) throws IOException;
+        public boolean isDefaultContext();
     }
 
     public Object getNativeRequest();

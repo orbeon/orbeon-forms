@@ -89,7 +89,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:comment>OPS Class Loader</xsl:comment>
+            <xsl:comment>Orbeon Class Loader</xsl:comment>
             <context-param>
                 <param-name>oxf.classloader.enable</param-name>
                 <param-value>false</param-value>

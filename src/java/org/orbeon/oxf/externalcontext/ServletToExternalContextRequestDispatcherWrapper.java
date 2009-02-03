@@ -25,9 +25,11 @@ import java.io.IOException;
 public class ServletToExternalContextRequestDispatcherWrapper implements ExternalContext.RequestDispatcher {
 
     private javax.servlet.RequestDispatcher dispatcher;
+    private boolean isDefaultContext;
 
-    public ServletToExternalContextRequestDispatcherWrapper(javax.servlet.RequestDispatcher dispatcher) {
+    public ServletToExternalContextRequestDispatcherWrapper(javax.servlet.RequestDispatcher dispatcher, boolean isDefaultContext) {
         this.dispatcher = dispatcher;
+        this.isDefaultContext = isDefaultContext;
     }
 
     public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
@@ -44,5 +46,9 @@ public class ServletToExternalContextRequestDispatcherWrapper implements Externa
         } catch (ServletException e) {
             throw new OXFException(e);
         }
+    }
+
+    public boolean isDefaultContext() {
+        return isDefaultContext;
     }
 }

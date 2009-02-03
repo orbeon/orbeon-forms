@@ -59,23 +59,48 @@
     <!-- Copy resources of the selected language, using the first language declared if the no matching language is found -->
     <xforms:action ev:event="fr-update-language">
 
-        <!-- Use language provided as a request parameter if it exists -->
+        <!-- 1. Explicit: Use language provided as a request parameter if it exists -->
         <xforms:action if="$lang = ''">
             <xforms:setvalue ref="$lang" value="xxforms:get-request-parameter('fr-language')"/>
-            <xforms:message if="$lang != ''" level="xxforms:log-debug">Setting language from request: <xforms:output value="$lang"/></xforms:message>
+            <xforms:message if="$lang != ''" level="xxforms:log-debug">Getting language preference from request: <xforms:output value="$lang"/></xforms:message>
         </xforms:action>
-        <!-- Else use language from session if it exists -->
+        <!-- 2. Implicit: Else use language from session if it exists -->
         <xforms:action if="$lang = ''">
             <xforms:setvalue ref="$lang" value="xxforms:get-session-attribute('fr-language')"/>
-            <xforms:message if="$lang != ''" level="xxforms:log-debug">Setting language from session: <xforms:output value="$lang"/></xforms:message>
+            <xforms:message if="$lang != ''" level="xxforms:log-debug">Getting language preference from session: <xforms:output value="$lang"/></xforms:message>
         </xforms:action>
-        <!-- Else use default language in resources if no language was found or if language found does not exist in resources -->
-        <xforms:action if="$lang = '' or not(xs:string($lang) = xxforms:instance('fr-form-resources')/resource/@xml:lang)">
-            <!-- Get default language from properties -->
-            <xxforms:variable name="default-language" select="instance('fr-default-language-instance')" as="xs:string"/>
-            <!-- Try first to get default language, or just take first language if default doesn't exist -->
-            <xforms:setvalue ref="$lang" value="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $default-language], resource[1])[1]/@xml:lang"/>
-            <xforms:message level="xxforms:log-debug">Setting language using default: <xforms:output value="$lang"/></xforms:message>
+        <!-- 3. Default: Else use language from property if it exists -->
+        <xforms:action if="$lang = ''">
+            <xforms:setvalue ref="$lang" value="instance('fr-default-language-instance')"/>
+            <xforms:message if="$lang != ''" level="xxforms:log-debug">Getting language preference from property: <xforms:output value="$lang"/></xforms:message>
+        </xforms:action>
+
+        <xxforms:variable name="form-resources" select="xxforms:instance('fr-form-resources')" as="element()?"/>
+        <xforms:action if="exists($form-resources/resource)">
+            <xforms:message level="xxforms:log-debug">Form has resources</xforms:message>
+            <!-- Form has resources -->
+            <xxforms:variable name="missing-resource" select="$lang = '' or not(xs:string($lang) = $form-resources/resource/@xml:lang)" as="xs:boolean"/>
+            <xforms:action if="$missing-resource">
+                <!-- Try first to get default language, or just take first language if default doesn't exist -->
+                <xforms:setvalue ref="$lang" value="$form-resources/(resource[@xml:lang = $lang], resource[1])[1]/@xml:lang"/>
+                <xforms:message level="xxforms:log-debug">Overriding language preference using form resources: <xforms:output value="$lang"/></xforms:message>
+            </xforms:action>
+            <xforms:action if="not($missing-resource)">
+                <xforms:message level="xxforms:log-debug">Using language preference: <xforms:output value="$lang"/></xforms:message>
+            </xforms:action>
+        </xforms:action>
+        <xforms:action if="not(exists($form-resources/resource))">
+            <!-- Form doesn't have resources -->
+            <xforms:message level="xxforms:log-debug">Form doesn't have resources</xforms:message>
+            <xxforms:variable name="missing-resource" select="$lang = '' or not(xs:string($lang) = instance('fr-fr-resources')/resource/@xml:lang)" as="xs:boolean"/>
+            <xforms:action if="$missing-resource">
+                <!-- Try first to get default language, or just take first language if default doesn't exist -->
+                <xforms:setvalue ref="$lang" value="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]/@xml:lang"/>
+                <xforms:message level="xxforms:log-debug">Overriding language preference using Form Runner resources: <xforms:output value="$lang"/></xforms:message>
+            </xforms:action>
+            <xforms:action if="not($missing-resource)">
+                <xforms:message level="xxforms:log-debug">Using language preference: <xforms:output value="$lang"/></xforms:message>
+            </xforms:action>
         </xforms:action>
 
         <!-- Update resources -->
@@ -95,15 +120,12 @@
 
     <!-- Initialize default language -->
     <xforms:action ev:event="xforms-model-construct-done">
+        <!-- Set default language from property (used above, as well as for UI to show default language first) -->
         <xforms:setvalue ref="instance('fr-default-language-instance')"
                          value="xxforms:property(string-join(('oxf.fr.default-language', xxforms:instance('fr-parameters-instance')/app, xxforms:instance('fr-parameters-instance')/form), '.'))"/>
         <xforms:message level="xxforms:log-debug">Getting default language: <xforms:output value="instance('fr-default-language-instance')"/></xforms:message>
+        <!-- Load all FR resources -->
         <xforms:send submission="fr-get-fr-resources"/>
-    </xforms:action>
-
-    <!-- Initialize language and resources if there are any resources at all -->
-    <!-- NOTE: The Form Runner summary, for example, loads resources dynamically, and triggers fr-update-language itself -->
-    <xforms:action ev:event="xforms-model-construct-done" if="exists(xxforms:instance('fr-form-resources')/resource)">
         <!-- Get initial resources for current language (will also save current language into the session) -->
         <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
     </xforms:action>

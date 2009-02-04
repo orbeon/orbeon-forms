@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
-import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
+import org.orbeon.oxf.portlet.portal.PortletContainerProcessor;
+import org.orbeon.oxf.portlet.portal.PortletIncludeGenerator;
 import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.converter.*;

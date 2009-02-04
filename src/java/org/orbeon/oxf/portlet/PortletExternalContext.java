@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.webapp.ProcessorService;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.portlet.*;
 import java.io.*;

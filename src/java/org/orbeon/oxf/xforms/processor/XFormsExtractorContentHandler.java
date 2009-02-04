@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.servlet.OPSXFormsFilter;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.*;
@@ -100,12 +100,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final ExternalContext.Request request = externalContext.getRequest();
 
         // Remember if filter provided separate deployment information
-        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_DEPLOYMENT));
+        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_DEPLOYMENT));
 
         // Try to get request context path
         {
             // First try context path passed by the filter
-            requestContextPath = (String) request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH);
+            requestContextPath = (String) request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH);
 
             // Otherwise just use the request's context path
             if (requestContextPath == null)
@@ -117,7 +117,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             final String rootXMLBase;
             {
                 // It is possible to override the base URI by setting a request attribute. This is used by OPSXFormsFilter.
-                final String rendererBaseURI = (String) request.getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
+                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
                 if (rendererBaseURI != null)
                     rootXMLBase = rendererBaseURI;
                 else

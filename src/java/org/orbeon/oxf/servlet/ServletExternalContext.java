@@ -85,7 +85,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getContextPath() {
             if (contextPath == null) {
-                final String overriddenServletContext = (String) nativeRequest.getAttribute(OPSXFormsFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
+                final String overriddenServletContext = (String) nativeRequest.getAttribute(OrbeonXFormsFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
                 if (overriddenServletContext != null) {
                     // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
                     contextPath = overriddenServletContext; // use overridden context
@@ -826,7 +826,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             // Force creation if whoever forwarded to us did have a session
             // This is to work around a Tomcat issue whereby a session is newly created in the original servlet, but
             // somehow we can't know about it when the request is forwarded to us.
-            if (!create && "true".equals(getRequest().getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME)))
+            if (!create && "true".equals(getRequest().getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME)))
                 create = true;
 
             final HttpSession nativeSession = nativeRequest.getSession(create);

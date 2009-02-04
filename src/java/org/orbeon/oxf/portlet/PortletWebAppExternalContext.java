@@ -4,10 +4,10 @@ import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 
 import javax.portlet.PortletContext;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * Portlet-specific implementation of WebAppExternalContext.

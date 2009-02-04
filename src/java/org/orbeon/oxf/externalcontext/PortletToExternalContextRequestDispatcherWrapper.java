@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.portlet.OPSPortletDelegate;
+import org.orbeon.oxf.portlet.OrbeonPortletDelegate;
 
 import javax.portlet.PortletRequestDispatcher;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class PortletToExternalContextRequestDispatcherWrapper implements Externa
     public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
         // It is not possible to forward with the Portlet API, so we have to do something that is
         // proprietary to the OPS Portlet.
-        OPSPortletDelegate.forward(request, response);
+        OrbeonPortletDelegate.forward(request, response);
     }
 
     public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
@@ -40,7 +40,7 @@ public class PortletToExternalContextRequestDispatcherWrapper implements Externa
         // Furthermore, it is not allowed to intercept the response by providing your own
         // RenderResponse wrapper. This means that we just do local includes directly through our
         // portlet.
-        OPSPortletDelegate.include(request, response);
+        OrbeonPortletDelegate.include(request, response);
         
 //        try {
 //            _dispatcher.include(new ExternalContextToPortletRenderRequestWrapper(request), new ExternalContextToPortletRenderResponseWrapper(response));

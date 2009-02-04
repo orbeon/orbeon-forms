@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.servlet.OPSXFormsFilter;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
@@ -102,7 +102,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final String xformsSubmissionPath;
         {
             final String requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
-            final boolean isForwarded = OPSXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
+            final boolean isForwarded = OrbeonXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
             if (isForwarded) {
                 // This is the case where the request was forwarded to us (separate deployment)
                 xformsSubmissionPath = "/xforms-server-submit";// TODO: read property!
@@ -111,6 +111,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                 xformsSubmissionPath = requestPath;
             }
         }
+
+        // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
+        // TODO: must send startPrefixMapping()/endPrefixMapping()?
+        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
 
         // Create xhtml:form element
         final boolean hasUpload = staticState.hasControlByName("upload");
@@ -195,10 +199,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // Help panel
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/help-panel.xml" });
-
-            // Noscript panel
-            // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
 
             // Templates
             {

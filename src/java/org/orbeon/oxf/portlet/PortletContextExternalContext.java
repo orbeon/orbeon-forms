@@ -14,10 +14,9 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 
 import javax.portlet.PortletContext;
-
-import org.orbeon.oxf.servlet.ServletExternalContext;
 
 /**
  *

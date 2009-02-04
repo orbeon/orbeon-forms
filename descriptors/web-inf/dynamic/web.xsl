@@ -162,7 +162,7 @@
             <xsl:comment>All JSP files under /xforms-jsp go through the XForms filter</xsl:comment>
             <filter>
                 <filter-name>orbeon-xforms-filter</filter-name>
-                <filter-class>org.orbeon.oxf.servlet.OPSXFormsFilter</filter-class>
+                <filter-class>org.orbeon.oxf.servlet.OrbeonXFormsFilter</filter-class>
                 <xsl:call-template name="comment">
                     <xsl:with-param name="caption" select="'separate WAR deployment'"/>
                     <xsl:with-param name="commented" select="true()"/>
@@ -228,7 +228,7 @@
             <xsl:comment>This is the main Orbeon Forms servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-main-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -281,7 +281,7 @@
             <xsl:comment>This is the XForms Server servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-xforms-server-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -306,7 +306,7 @@
             <xsl:comment>This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-renderer-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>

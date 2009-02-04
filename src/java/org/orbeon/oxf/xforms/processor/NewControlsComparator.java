@@ -36,6 +36,10 @@ public class NewControlsComparator extends BaseControlsComparator {
     }
 
     public void diff(List state1, List state2) {
+        diff(state1, state2, false);
+    }
+
+    public void diff(List state1, List state2, boolean isWithinNewRepeatIteration) {
 
         // Normalize
         if (state1 != null && state1.size() == 0)
@@ -119,8 +123,11 @@ public class NewControlsComparator extends BaseControlsComparator {
                                             ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRequired()));
                                     doOutputElement = true;
                                 }
-
-                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRelevant() != DEFAULT_RELEVANCE_FOR_NEW_ITERATION
+                                // TRICKY:
+                                //
+                                // * Non-concrete control and within a new iteration, default for relevance is true
+                                // * Non-concrete control and NOT within a new iteration, default for relevance is false (xforms-disabled class present)
+                                if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isRelevant() != isWithinNewRepeatIteration
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
                                     attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
                                             XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
@@ -311,7 +318,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                             }
 
                             // Diff children
-                            diff(children1, children2);
+                            diff(children1, children2, isWithinNewRepeatIteration);
                         } else if (size2 > size1) {
                             // Size has grown
 
@@ -319,10 +326,10 @@ public class NewControlsComparator extends BaseControlsComparator {
                             outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
 
                             // Diff the common subset
-                            diff(children1, children2.subList(0, size1));
+                            diff(children1, children2.subList(0, size1), isWithinNewRepeatIteration);
 
                             // Issue new values for new iterations
-                            diff(null, children2.subList(size1, size2));
+                            diff(null, children2.subList(size1, size2), true);
 
                         } else if (size2 < size1) {
                             // Size has shrunk
@@ -330,11 +337,11 @@ public class NewControlsComparator extends BaseControlsComparator {
                             outputDeleteRepeatTemplate(ch, leadingControl, size1 - size2);
 
                             // Diff the remaining subset
-                            diff(children1.subList(0, size2), children2);
+                            diff(children1.subList(0, size2), children2, isWithinNewRepeatIteration);
                         }
                     } else {
                         // Other grouping controls
-                        diff(children1, children2);
+                        diff(children1, children2, isWithinNewRepeatIteration);
                     }
                 }
             }

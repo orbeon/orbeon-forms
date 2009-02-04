@@ -182,14 +182,16 @@
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
-            <xsl:comment>Set listeners</xsl:comment>
+            <xsl:comment>Set context listener</xsl:comment>
+            <listener>
+                <listener-class>org.orbeon.oxf.webapp.OPSServletContextListenerDelegate</listener-class>
+            </listener>
+
+            <xsl:comment>Set optional session listener</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
-                    <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OPSServletContextListenerDelegate</listener-class>
-                    </listener>
                     <listener>
                         <listener-class>org.orbeon.oxf.webapp.OPSSessionListenerDelegate</listener-class>
                     </listener>

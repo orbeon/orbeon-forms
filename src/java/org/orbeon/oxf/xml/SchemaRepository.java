@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.portlet.portal.PortletContainerProcessor;
-import org.orbeon.oxf.portlet.portal.PortletIncludeGenerator;
 import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.converter.*;
@@ -105,8 +103,6 @@ public class SchemaRepository {
         SCHEMAS.put(SchedulerProcessor.SCHEDULER_CONFIG_NAMESPACE_URI, "schemas/scheduler-config.rng");
         SCHEMAS.put(ServletIncludeGenerator.SERVLET_INCLUDE_NAMESPACE_URI, "schemas/servlet-include-config.rng");
         // Portlet schemas
-        SCHEMAS.put(PortletIncludeGenerator.PORTLET_INCLUDE_NAMESPACE_URI, "schemas/portlet-include-config.rng");
-        SCHEMAS.put(PortletContainerProcessor.PORTLET_CONTAINER_NAMESPACE_URI, "schemas/portlet-container-config.rng");
         SCHEMAS.put(PortletPreferencesSerializer.PORTLET_PREFERENCES_SERIALIZER_DATA_NAMESPACE_URI,
                 PORTLET_PROCESSORS_SCHEMA_PATH + "portlet-preferences-serializer-data.rng");
 

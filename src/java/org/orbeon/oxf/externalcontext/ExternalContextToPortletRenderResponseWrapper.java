@@ -14,13 +14,19 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.w3c.dom.Element;
+import org.w3c.dom.DOMException;
 
 import javax.portlet.RenderResponse;
 import javax.portlet.PortletURL;
+import javax.portlet.ResourceURL;
+import javax.portlet.CacheControl;
+import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.Collection;
 
 /**
  * Wrap an ExternalContext.Request into a RenderResponse.
@@ -55,11 +61,11 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public void flushBuffer() throws IOException {
-        //TODO
+        // TODO
     }
 
     public int getBufferSize() {
-        return 0;//TODO
+        return 0;// TODO
     }
 
     public String getCharacterEncoding() {
@@ -104,11 +110,11 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public void resetBuffer() {
-        //TODO
+        // TODO
     }
 
     public void setBufferSize(int i) {
-        //TODO
+        // TODO
     }
 
     public void setContentType(String clazz) {
@@ -121,7 +127,7 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public void addProperty(String clazz, String clazz1) {
-        //TODO
+        // TODO
     }
 
     public String encodeURL(String clazz) {
@@ -132,6 +138,39 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public void setProperty(String clazz, String clazz1) {
-        //TODO
+        // TODO
+    }
+
+    // JSR-268 methods
+
+    public ResourceURL createResourceURL() {
+        if (nativeResponse != null)
+            return nativeResponse.createResourceURL();
+        else
+            return null;
+    }
+
+    public CacheControl getCacheControl() {
+        if (nativeResponse != null)
+            return nativeResponse.getCacheControl();
+        else
+            return null;
+    }
+
+    public void setNextPossiblePortletModes(Collection collection) {
+        // TODO
+    }
+
+    public void addProperty(Cookie cookie) {
+        // TODO
+    }
+
+    public void addProperty(String s, Element element) {
+        // TODO
+    }
+
+    public Element createElement(String s) throws DOMException {
+        // TODO
+        return null;
     }
 }

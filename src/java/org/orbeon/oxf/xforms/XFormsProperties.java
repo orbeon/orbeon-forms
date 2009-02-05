@@ -83,6 +83,9 @@ public class XFormsProperties {
     private static final String DATEPICKER_PROPERTY = "datepicker";
     private static final String XHTML_EDITOR_PROPERTY = "htmleditor";
 
+    private static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
+    private static final String CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
+
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
     public static final String FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
@@ -224,7 +227,9 @@ public class XFormsProperties {
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
             new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true),
-            new PropertyDefinition(XHTML_EDITOR_PROPERTY, "yui", true)
+            new PropertyDefinition(XHTML_EDITOR_PROPERTY, "yui", true),
+            new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),
+            new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true)
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;

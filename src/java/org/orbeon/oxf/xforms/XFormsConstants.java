@@ -262,6 +262,8 @@ public class XFormsConstants {
     public static final String XFORMS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "anyURI");
     public static final String XFORMS_BASE64BINARY_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "base64Binary");
 
+    public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
 

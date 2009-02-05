@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import javax.portlet.*;
+import javax.servlet.http.Cookie;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -205,5 +206,31 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
 
     public void setAttribute(String clazz, Object o) {
         request.getAttributesMap().put(clazz, o);
+    }
+
+    // JSR-268 methods
+    public String getETag() {
+        // TODO
+        return null;
+    }
+
+    public String getWindowID() {
+        // TODO
+        return null;
+    }
+
+    public Cookie[] getCookies() {
+        // TODO
+        return new Cookie[0];
+    }
+
+    public Map /*<String, String[]>*/ getPrivateParameterMap() {
+        // TODO
+        return null;
+    }
+
+    public Map /*<String, String[]>*/ getPublicParameterMap() {
+        // TODO
+        return null;
     }
 }

@@ -581,14 +581,6 @@
     </processor>
 
     <!-- Portlet processors -->
-    <processor name="oxf:portlet-include">
-        <class name="org.orbeon.oxf.portlet.processor.PortletIncludeGenerator"/>
-    </processor>
-
-    <processor name="oxf:portlet-container">
-        <class name="org.orbeon.oxf.portlet.processor.PortletContainerProcessor"/>
-    </processor>
-
     <processor name="oxf:portlet-preferences-generator">
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
     </processor>

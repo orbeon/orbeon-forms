@@ -46,10 +46,10 @@ public class WSRPUtils {
     public static final String URL_TYPE_RENDER_STRING = "render";
     public static final String URL_TYPE_RESOURCE_STRING = "resource";
 
-    private static final int BASE_TAG_LENGTH = BASE_TAG.length();
-    private static final int START_TAG_LENGTH = START_TAG.length();
-    private static final int END_TAG_LENGTH = END_TAG.length();
-    private static final int PREFIX_TAG_LENGTH = PREFIX_TAG.length();
+    protected static final int BASE_TAG_LENGTH = BASE_TAG.length();
+    protected static final int START_TAG_LENGTH = START_TAG.length();
+    protected static final int END_TAG_LENGTH = END_TAG.length();
+    protected static final int PREFIX_TAG_LENGTH = PREFIX_TAG.length();
 
     public static String encodePortletURL(int urlType, String navigationalState, String mode, String windowState, String fragmentId, boolean secure) {
         StringBuffer sb = new StringBuffer(START_TAG);
@@ -61,6 +61,8 @@ public class WSRPUtils {
             urlTypeString = URL_TYPE_BLOCKING_ACTION_STRING;
         else if (urlType == URL_TYPE_RENDER)
             urlTypeString = URL_TYPE_RENDER_STRING;
+        else if (urlType == URL_TYPE_RESOURCE)
+            urlTypeString = URL_TYPE_RESOURCE_STRING;
         else
             throw new IllegalArgumentException();
 

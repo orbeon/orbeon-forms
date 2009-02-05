@@ -954,8 +954,11 @@ public class XFormsModelBinds {
                     final QName attributeQName = attribute.getQName();
                     final String attributePrefix = attributeQName.getNamespacePrefix();
                     final String attributeURI = attributeQName.getNamespaceURI();
+                    // NOTE: Also allow for xxforms:events-mode extension MIP
                     if (attributePrefix != null && attributePrefix.length() > 0
-                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI) || attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)
+                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI)
+                                     || (attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)
+                                            && !attributeQName.getName().equals(XFormsConstants.XXFORMS_EVENT_MODE_QNAME.getName()))
                                      || attributePrefix.startsWith("xml"))) {
                         // Any QName-but-not-NCName which is not in the xforms or xxforms namespace
                         if (customMips == null)

@@ -201,8 +201,17 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
         final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
+
+        // TODO: how else can we handle components?
+        // NOTE: Here we have an issue identifying which elements must have content preserved. For example, an element
+        // to which an XBL binding is applied should be preserved, because XBL template processing take place during
+        // static state analysis. In XFormsDocumentAnnotatorContentHandler, we detect XBL bindings. Should we do the
+        // same here again? Et is wasteful to do it twice. Possibly, XFDACH could pass this information here since
+        // it already does all the work to detect content preservation. E.g. custom attribute.
+
 //        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
-        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
+        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri); // see NOTE above
+        final boolean isExtension = isXFormsOrExtension && !isXForms && !isXXForms && !isEXForms && !isXBL; // see NOTE above
 
         // Handle xml:base
         if (!inXForms) {
@@ -270,7 +279,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null // labels, etc. may contain XHTML
                     || "instance".equals(localname)) && isXForms // XForms instances
                     || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri) // XML schemas
-                    || "xbl".equals(localname) && isXBL) {// preserve everything under xbl:xbl so that templates may be processed by static state
+                    || "xbl".equals(localname) && isXBL // preserve everything under xbl:xbl so that templates may be processed by static state
+                    || isExtension) {
                 inPreserve = true;
                 preserveLevel = level;
             }

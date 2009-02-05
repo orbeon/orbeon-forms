@@ -4054,7 +4054,7 @@ ORBEON.xforms.Init = {
                 visible: false,
                 constraintoviewport: true,
                 iframe: true,
-                underlay: "shadow"
+                underlay: "none"
             });
             // Close the dialog when users click on document
             YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
@@ -4066,8 +4066,8 @@ ORBEON.xforms.Init = {
                 visible: false,
                 draggable: isDraggable,
                 fixedcenter: false,
-                constraintoviewport: true,
-                underlay: "shadow"
+                constraintoviewport: false,
+                underlay: "none"
             });
 			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);//SAN
             // Register listener for when the dialog is closed by a click on the "x"

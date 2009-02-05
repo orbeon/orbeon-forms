@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Element;
 
 import java.util.*;
 
@@ -62,7 +63,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         contentHandler.startElement(uri, localname, qName, attributes);
 
         final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
-        final String prefix = XMLUtils.prefixFromQName(qName); // current prefix for XHTML
+        final String xhtmlPrefix = XMLUtils.prefixFromQName(qName); // current prefix for XHTML
 
         // Gather information about appearances of controls which use Script
         // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
@@ -118,29 +119,54 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
         // Stylesheets
         final AttributesImpl attributesImpl = new AttributesImpl();
-        if (isCombineResources) {
-            final String combinedResourceName = combinedResourcesPrefix + ".css";
+        {
+            // Main CSS resources
+            if (isCombineResources) {
+                final String combinedResourceName = combinedResourcesPrefix + ".css";
 
-            attributesImpl.clear();
-            final String[] attributesList = new String[] { "rel", "stylesheet", "href", combinedResourceName, "type", "text/css", "media", "all" };
-            ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
-
-            if (isCacheCombinedResources) {
-                // Attempt to cache combined resources
-                // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
-                final List resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
-                final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
-            }
-        } else {
-            for (Iterator i = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
-                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                // Only include stylesheet if needed
                 attributesImpl.clear();
-                final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css", "media", "all"  };
+                final String[] attributesList = new String[] { "rel", "stylesheet", "href", combinedResourceName, "type", "text/css", "media", "all" };
                 ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
+                helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
+
+                if (isCacheCombinedResources) {
+                    // Attempt to cache combined resources
+                    // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
+                    final List resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
+                    final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
+                    XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
+                }
+            } else {
+                for (Iterator i = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
+                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                    // Only include stylesheet if needed
+                    attributesImpl.clear();
+                    final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css", "media", "all"  };
+                    ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                    helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
+                }
+            }
+
+            // XBL resources
+            final List xblStyles = containingDocument.getStaticState().getXBLStyles();
+            if (xblStyles != null) {
+                for (Iterator i = xblStyles.iterator(); i.hasNext();) {
+                    final Element styleElement = (Element) i.next();
+                    attributesImpl.clear();
+                    if (styleElement.attributeValue("src") != null) {
+                        // xhtml:link
+                        final String[] attributesList = new String[] { "rel", "stylesheet", "href", styleElement.attributeValue("src"), "type", "text/css", "media", styleElement.attributeValue("media") };
+                        ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                        helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
+                    } else {
+                        // xhtml:style
+                        final String[] attributesList = new String[] { "rel", "stylesheet", "type", "text/css", "media", styleElement.attributeValue("media") };
+                        ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "style", attributesImpl);
+                        helper.text(styleElement.getText());
+                        helper.endElement();
+                    }
+                }
             }
         }
 
@@ -148,13 +174,14 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         // TODO: Have option to put this at the bottom of the page. See theme-plain.xsl and http://developer.yahoo.com/performance/rules.html#js_bottom -->
         if (!handlerContext.isNoScript() && !XFormsProperties.isReadonly(containingDocument)) {
 
+            // Main JavaScript resources
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
 
                 attributesImpl.clear();
                 final String[] attributesList = new String[] { "type", "text/javascript", "src", combinedResourceName };
                 ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
+                helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
 
                 if (isCacheCombinedResources) {
                     // Attempt to cache combined resources
@@ -172,10 +199,31 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                     attributesImpl.clear();
                     final String[] attributesList =  new String[] { "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal) };
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                    helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
+                    helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                 }
             }
 
+            // XBL scripts
+            final List xblScripts = containingDocument.getStaticState().getXBLScripts();
+            if (xblScripts != null) {
+                for (Iterator i = xblScripts.iterator(); i.hasNext();) {
+                    final Element scriptElement = (Element) i.next();
+                    attributesImpl.clear();
+                    if (scriptElement.attributeValue("src") != null) {
+                        // xhtml:script with @src
+                        final String[] attributesList = new String[] { "type", "text/javascript", "src", scriptElement.attributeValue("src") };
+                        ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                        helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
+                    } else {
+                        // xhtml:script without @src
+                        final String[] attributesList = new String[] { "type", "text/javascript" };
+                        ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
+                        helper.text(scriptElement.getText());
+                        helper.endElement();
+                    }
+                }
+            }
 
             // Configuration properties
             {
@@ -246,7 +294,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                             if (sb == null) {
                                 // First property found
-                                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                                     "type", "text/javascript"});
                                 sb = new FastStringBuffer("var opsXFormsProperties = {");
                             } else {
@@ -282,7 +330,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             final Map scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
             if (scriptsToDeclare != null || focusElementId != null) {
-                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
 
                 if (scriptsToDeclare != null) {
@@ -330,7 +378,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
             // Store information about "special" controls that need JavaScript initialization
             {
-                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                         "type", "text/javascript"});
 
                 // Produce JSON output

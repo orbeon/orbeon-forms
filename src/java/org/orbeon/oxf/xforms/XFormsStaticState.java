@@ -117,10 +117,12 @@ public class XFormsStaticState {
     private Map alertsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
 
     // Components
-    private Map componentsFactories;        // Map<QName, Factory> of QNames to component factory
-    private Map componentBindings;          // Map<QName, Element> of QNames to bindings
-    private Map fullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
-    private Map compactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
+    private Map xblComponentsFactories;        // Map<QName, Factory> of QNames to component factory
+    private Map xblComponentBindings;          // Map<QName, Element> of QNames to bindings
+    private Map xblFullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
+    private Map xblCompactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
+    private List xblScripts;                   // List<Element xblScriptElements>
+    private List xblStyles;                    // List<Element xblStyleElements>
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -422,17 +424,17 @@ public class XFormsStaticState {
         {
             final Document staticStateDocument = staticStateElement.getDocument();
             final DocumentWrapper documentInfo = new DocumentWrapper(staticStateDocument, null, xpathConfiguration);
-            extractScripts(pipelineContext, documentInfo, "");
+            extractXFormsScripts(pipelineContext, documentInfo, "");
         }
 
         // Extract components
         {
             final List xblElements = staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME);
             if (xblElements.size() > 0) {
-                componentsFactories = new HashMap();
-                componentBindings = new HashMap();
-                fullShadowTrees = new HashMap();
-                compactShadowTrees = new HashMap();
+                xblComponentsFactories = new HashMap();
+                xblComponentBindings = new HashMap();
+                xblFullShadowTrees = new HashMap();
+                xblCompactShadowTrees = new HashMap();
 
                 int xblCount = 0;
                 int xblBindingCount = 0;
@@ -440,6 +442,14 @@ public class XFormsStaticState {
                     final Element currentXBLElement = (Element) i.next();
                     // Copy the element because we may need it in staticStateDocument for encoding
                     final Document currentXBLDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentXBLElement);
+
+                    // Extract xbl:xbl/xbl:script
+                    // TODO: should do this differently, in order to include only the scripts and resources actually used
+                    final List scriptElements = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_SCRIPT_QNAME);
+                    if (scriptElements != null && scriptElements.size() > 0) {
+                        xblScripts = new ArrayList();
+                        xblScripts.addAll(scriptElements);
+                    }
 
                     // Find bindings
                     for (Iterator j = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_BINDING_QNAME).iterator(); j.hasNext(); xblBindingCount++) {
@@ -453,14 +463,31 @@ public class XFormsStaticState {
                                     = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'), false);
 
                             // Create and remember factory for this QName
-                            componentsFactories.put(currentQNameMatch,
+                            xblComponentsFactories.put(currentQNameMatch,
                                 new XFormsControlFactory.Factory() {
                                     public XFormsControl createXFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
                                         return new XFormsComponentControl(container, parent, element, name, effectiveId);
                                     }
                                 });
 
-                            componentBindings.put(currentQNameMatch, currentBindingElement);
+                            xblComponentBindings.put(currentQNameMatch, currentBindingElement);
+
+                            // Extract xbl:binding/xbl:resources/xbl:style
+                            // TODO: should do this differently, in order to include only the scripts and resources actually used
+                            final List resourcesElements = currentBindingElement.elements(XFormsConstants.XBL_RESOURCES_QNAME);
+                            if (resourcesElements != null) {
+                                for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
+                                    final Element currentResourcesElement = (Element) k.next();
+                                    final List styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
+                                    if (styleElements != null && styleElements.size() > 0) {
+                                        if (xblStyles == null) {
+                                            xblStyles = new ArrayList(styleElements);
+                                        } else {
+                                            xblStyles.addAll(styleElements);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -471,7 +498,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractScripts(PipelineContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+    private void extractXFormsScripts(PipelineContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
         final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
                     "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
@@ -790,7 +817,7 @@ public class XFormsStaticState {
      * Return whether this document has at leat one component in use.
      */
     public boolean hasComponentsInUse() {
-        return componentBindings != null && componentBindings.size() > 0;
+        return xblComponentBindings != null && xblComponentBindings.size() > 0;
     }
 
     /**
@@ -799,7 +826,7 @@ public class XFormsStaticState {
      * @return Map<QName, Element> of QNames to bindings, or null
      */
     public Map getComponentBindings() {
-        return componentBindings;
+        return xblComponentBindings;
     }
 
     /**
@@ -809,7 +836,7 @@ public class XFormsStaticState {
      * @return      true iif there is a binding
      */
     public boolean isComponent(QName qName) {
-        return componentBindings != null && componentBindings.get(qName) != null;
+        return xblComponentBindings != null && xblComponentBindings.get(qName) != null;
     }
 
     /**
@@ -819,7 +846,7 @@ public class XFormsStaticState {
      * @return      control factory, or null
      */
     public XFormsControlFactory.Factory getComponentFactory(QName qName) {
-        return (componentsFactories == null) ? null : (XFormsControlFactory.Factory) componentsFactories.get(qName);
+        return (xblComponentsFactories == null) ? null : (XFormsControlFactory.Factory) xblComponentsFactories.get(qName);
     }
 
     /**
@@ -829,7 +856,7 @@ public class XFormsStaticState {
      * @return                      full expanded shadow tree, or null
      */
     public Element getFullShadowTree(String controlPrefixedId) {
-        return (fullShadowTrees == null) ? null : ((Document) fullShadowTrees.get(controlPrefixedId)).getRootElement();
+        return (xblFullShadowTrees == null) ? null : ((Document) xblFullShadowTrees.get(controlPrefixedId)).getRootElement();
     }
 
     /**
@@ -839,7 +866,21 @@ public class XFormsStaticState {
      * @return                      compact expanded shadow tree, or null
      */
     public Element getCompactShadowTree(String controlPrefixedId) {
-        return (compactShadowTrees == null) ? null : ((Document) compactShadowTrees.get(controlPrefixedId)).getRootElement();
+        return (xblCompactShadowTrees == null) ? null : ((Document) xblCompactShadowTrees.get(controlPrefixedId)).getRootElement();
+    }
+
+    /**
+     * Return a List of xbl:style elements.
+     */
+    public List getXBLStyles() {
+        return xblStyles;
+    }
+
+    /**
+     * Return a List of xbl:script elements.
+     */
+    public List getXBLScripts() {
+        return xblScripts;
     }
 
     /**
@@ -949,8 +990,8 @@ public class XFormsStaticState {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                if (componentBindings != null) {
-                    final Element bindingElement = (Element) componentBindings.get(controlElement.getQName());
+                if (xblComponentBindings != null) {
+                    final Element bindingElement = (Element) xblComponentBindings.get(controlElement.getQName());
                     if (bindingElement != null) {
                         // A custom component is bound to this element
 
@@ -974,18 +1015,21 @@ public class XFormsStaticState {
                             XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
 
                             // Remember full shadow tree for this prefixed id
-                            fullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
+                            xblFullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
 
                             // Generate compact shadow tree for this static id
                             final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument, controlElement);
-                            compactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
+                            xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                             // Find new prefix
                             final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
-                            // Extract scripts within this shadow tree
+                            // Extract XForms scripts within this shadow tree
                             final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
-                            extractScripts(pipelineContext, compactShadowTreeWrapper, newPrefix);
+                            extractXFormsScripts(pipelineContext, compactShadowTreeWrapper, newPrefix);
+
+                            // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
+                            // TODO: should do this here, in order to include only the scripts and resources actually used
 
                             // NOTE: Say we don't want to exclude gathering event handlers within nested models
                             analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer, false);
@@ -1316,7 +1360,7 @@ public class XFormsStaticState {
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 handleControlsStatic(controlElementVisitorListener, currentControlElement);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
-            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName) || componentBindings != null && componentBindings.get(currentControlElement.getQName()) != null) {
+            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName) || xblComponentBindings != null && xblComponentBindings.get(currentControlElement.getQName()) != null) {
                 // Handle core control or component
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);

@@ -111,6 +111,9 @@ public class XFormsConstants {
     public static final Namespace XBL_NAMESPACE = new Namespace(XBL_PREFIX, XBL_NAMESPACE_URI);
     public static final QName XBL_XBL_QNAME = new QName("xbl", XBL_NAMESPACE);
     public static final QName XBL_BINDING_QNAME = new QName("binding", XBL_NAMESPACE);
+    public static final QName XBL_SCRIPT_QNAME = new QName("script", XBL_NAMESPACE);
+    public static final QName XBL_RESOURCES_QNAME = new QName("resources", XBL_NAMESPACE);
+    public static final QName XBL_STYLE_QNAME = new QName("style", XBL_NAMESPACE);
     public static final QName XBL_TEMPLATE_QNAME = new QName("template", XBL_NAMESPACE);
     public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
     public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);

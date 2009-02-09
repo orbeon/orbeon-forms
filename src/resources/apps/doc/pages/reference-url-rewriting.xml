@@ -262,8 +262,8 @@
                 </table>
                 <p>
                     Note that since portlets do not have the concept of path, URL paths are encoded as a special
-                    portlet parameter named <code>oxf.path</code>. Relative paths are resolved against the current path
-                    stored in <code>oxf.path</code>. The following table illustrates action URL and render URL
+                    portlet parameter named <code>orbeon.path</code>. Relative paths are resolved against the current path
+                    stored in <code>orbeon.path</code>. The following table illustrates action URL and render URL
                     rewriting:
                 </p>
                 <table>
@@ -275,7 +275,7 @@
                         <td><code>/example1/page1?name1=value1&amp;name2=value2</code></td>
                         <td>
                             <ul>
-                                <li><code>oxf.path=/example1/page1</code></li>
+                                <li><code>orbeon.path=/example1/page1</code></li>
                                 <li><code>name1=value1</code></li>
                                 <li><code>name2=value2</code></li>
                             </ul>
@@ -292,13 +292,13 @@
                     </tr>
                     <tr>
                         <td>
-                            Assuming the current value of <code>oxf.path</code> is <code>/example1/page1</code>:
+                            Assuming the current value of <code>orbeon.path</code> is <code>/example1/page1</code>:
                             <br/><br/>
                             <code>../example2/page2?name1=value1&amp;name2=value2</code>
                         </td>
                         <td>
                             <ul>
-                                <li><code>oxf.path=/example2/page2</code></li>
+                                <li><code>orbeon.path=/example2/page2</code></li>
                                 <li><code>name1=value1</code></li>
                                 <li><code>name2=value2</code></li>
                             </ul>
@@ -323,14 +323,14 @@
                     </tr>
                     <tr>
                         <td>
-                            Assuming the current value of <code>oxf.path</code> is <code>/example1/page1</code>:
+                            Assuming the current value of <code>orbeon.path</code> is <code>/example1/page1</code>:
                             <br/><br/>
                             <code>my/image.gif?scale=100</code>
                         </td>
                         <td>
                             <code>/ops/example1/my/image.gif?scale=100</code>
                             <p>
-                                Note that using resource URLs relative to <code>oxf.path</code> does not necessarily
+                                Note that using resource URLs relative to <code>orbeon.path</code> does not necessarily
                                 make sense unless you define your hierarchy of resources carefully.
                             </p>
                         </td>

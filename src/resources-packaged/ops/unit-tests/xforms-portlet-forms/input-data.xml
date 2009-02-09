@@ -428,7 +428,7 @@
 
                             <div xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xforms="http://www.w3.org/2002/xforms">
 
-                                <form id="p1_form_1" action="/oxf/?$portlet$x1.target=a&amp;$portlet$x1.mode=view&amp;$portlet$x1.state=normal&amp;$portlet$p1.oxf.path=/tutorial-hello3" method="post" portlet:is-portlet-form="true" portlet:form-portlet-id="1">
+                                <form id="p1_form_1" action="/oxf/?$portlet$x1.target=a&amp;$portlet$x1.mode=view&amp;$portlet$x1.state=normal&amp;$portlet$p1.orbeon.path=/tutorial-hello3" method="post" portlet:is-portlet-form="true" portlet:form-portlet-id="1">
 
                                     <input type="hidden" id="p1_action_1" name="" value=""/>
 

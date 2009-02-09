@@ -36,7 +36,7 @@ import java.util.*;
  */
 public class PortletExternalContext extends PortletWebAppExternalContext implements ExternalContext {
 
-    public static final String PATH_PARAMETER_NAME = "oxf.path";
+    public static final String PATH_PARAMETER_NAME = "orbeon.path";
     private static final String OPS_CONTEXT_NAMESPACE_KEY = "org.orbeon.ops.portlet.namespace";
 
     private class Request implements ExternalContext.Request {

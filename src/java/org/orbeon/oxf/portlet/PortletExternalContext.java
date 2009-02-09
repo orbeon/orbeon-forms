@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -457,7 +457,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public String rewriteResourceURL(String urlString, int rewriteMode) {
             // NOTE: We could encode the URL a la WSRP, but for resources, we can always produce an URL here, so we
             // just do so!
-            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
+            return URLRewriterUtils.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
         public String getNamespacePrefix() {

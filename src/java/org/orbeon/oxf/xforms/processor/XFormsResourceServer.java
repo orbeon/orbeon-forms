@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
@@ -154,7 +154,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             // If conditional get and date ok, send not modified
 
             // Set Last-Modified, required for caching and conditional get
-            if (URLRewriter.isResourcesVersioned()) {
+            if (URLRewriterUtils.isResourcesVersioned()) {
 
                 // Set old last modified date so that Expires header is set as far in the future as possible
                 // NOTE: the setCaching() implementation will specially handle values <= 0 as being not cacheable
@@ -291,9 +291,9 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             // Create matcher that matches all paths in case resources are versioned
             final List matchAllPathMatcher;
-            if (URLRewriter.isResourcesVersioned()) {
+            if (URLRewriterUtils.isResourcesVersioned()) {
                 matchAllPathMatcher = new ArrayList(1);
-                matchAllPathMatcher.add(new URLRewriter.PathMatcher("/*", null, null, true));
+                matchAllPathMatcher.add(new URLRewriterUtils.PathMatcher("/*", null, null, true));
             } else {
                 matchAllPathMatcher = null;
             }
@@ -355,7 +355,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         try {
                             final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim()).normalize();// normalize to remove "..", etc.
 
-                            final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(),
+                            final String rewrittenURI = URLRewriterUtils.rewriteResourceURL(externalContext.getRequest(),
                                     externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);
 
                             outputWriter.write("url(" + rewrittenURI + ")");

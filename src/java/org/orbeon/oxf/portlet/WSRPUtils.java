@@ -101,35 +101,6 @@ public class WSRPUtils {
         return sb.toString();
     }
 
-    public static String encodeResourceURL(String url, boolean requiresRewrite) {
-        StringBuffer sb = new StringBuffer(START_TAG);
-        sb.append(URL_TYPE_PARAM);
-        sb.append('=');
-
-        sb.append(URL_TYPE_RESOURCE_STRING);
-
-        // Encode URL
-        if (url != null) {
-            try {
-                sb.append('&');
-                sb.append(URL_PARAM);
-                sb.append('=');
-                sb.append(URLEncoder.encode(url, "utf-8"));
-
-                sb.append('&');
-                sb.append(REQUIRES_REWRITE_PARAM);
-                sb.append('=');
-                sb.append(new Boolean(requiresRewrite).toString());
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e);
-            }
-        }
-
-        sb.append(END_TAG);
-
-        return sb.toString();
-    }
-
     public static String encodeNamespacePrefix() {
         return PREFIX_TAG;
     }
@@ -254,7 +225,7 @@ public class WSRPUtils {
                 // Write resulting encoded PortletURL
                 return portletURL.toString();
             }
-        } catch (PortletException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }

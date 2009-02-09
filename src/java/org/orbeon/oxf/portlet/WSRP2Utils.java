@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.portlet.*;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class WSRP2Utils extends WSRPUtils {
      *
      * It is possible to escape by using the string wsrp_rewritewsrp_rewrite.
      */
-    public static void write(MimeResponse response, String s) throws IOException {
+    public static void write(MimeResponse response, String s, boolean encodeForXML) throws IOException {
         int stringLength = s.length();
         int currentIndex = 0;
         int index;
@@ -64,7 +65,8 @@ public class WSRP2Utils extends WSRPUtils {
 
                 currentIndex = endIndex + END_TAG_LENGTH;
 
-                writer.write(decodePortletURL(encodedURL, response));
+                final String decodedPortletURL = decodePortletURL(encodedURL, response);
+                writer.write(encodeForXML ? XMLUtils.escapeXMLMinimal(decodedPortletURL) : decodedPortletURL);
 
             } else if (index < stringLength - BASE_TAG_LENGTH && s.charAt(index + BASE_TAG_LENGTH) == '_') {
                 // Namespace encoding
@@ -108,13 +110,15 @@ public class WSRP2Utils extends WSRPUtils {
                 final PortletURL portletURL = (PortletURL) baseURL;
                 final String[] portletModeValues = (String[]) wsrpParameters.get(MODE_PARAM);
                 if (portletModeValues != null) {
-                    portletURL.setPortletMode(new PortletMode(portletModeValues[0]));
+                    final String portletMode = portletModeValues[0].startsWith("amp;") ? portletModeValues[0].substring(4) : portletModeValues[0];
+                    portletURL.setPortletMode(new PortletMode(portletMode));
                 }
 
                 // Get window state
                 final String[] windowStateValues = (String[]) wsrpParameters.get(WINDOW_STATE_PARAM);
                 if (windowStateValues != null) {
-                    portletURL.setWindowState(new WindowState(windowStateValues[0]));
+                    final String windowState = windowStateValues[0].startsWith("amp;") ? windowStateValues[0].substring(4) : windowStateValues[0];
+                    portletURL.setWindowState(new WindowState(windowState));
                 }
             } else {
                 // NOP
@@ -124,14 +128,15 @@ public class WSRP2Utils extends WSRPUtils {
             // Get navigational state
             final String[] navigationalStateValues = (String[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM);
             if (navigationalStateValues != null) {
-                String decodedNavigationalState = null;
+                final String decodedNavigationalState;
                 try {
-                    decodedNavigationalState = URLDecoder.decode(navigationalStateValues[0], "utf-8");
+                    final String navigationalState = navigationalStateValues[0].startsWith("amp;") ? navigationalStateValues[0].substring(4) : navigationalStateValues[0];
+                    decodedNavigationalState = URLDecoder.decode(navigationalState, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen
                     throw new OXFException(e);
                 }
-                Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
+                final Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
                 baseURL.setParameters(navigationParameters);
             }
 

@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.PortletExternalContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.RootFilter;
@@ -224,7 +224,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
-                final String newRes = URLRewriter.rewriteResourceURL(request, response, res, pathMatchers);
+                final String newRes = URLRewriterUtils.rewriteResourceURL(request, response, res, pathMatchers);
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
@@ -254,23 +254,23 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
+                    final String newAttribute = URLRewriterUtils.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
                     // We don't rewrite these attributes if there is a codebase
                     if (classidAttribute != null) {
-                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, classidAttribute, pathMatchers);
+                        final String newAttribute = URLRewriterUtils.rewriteResourceURL(request, response, classidAttribute, pathMatchers);
                         final int idx = newAtts.getIndex("", "classid");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (dataAttribute != null) {
-                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, dataAttribute, pathMatchers);
+                        final String newAttribute = URLRewriterUtils.rewriteResourceURL(request, response, dataAttribute, pathMatchers);
                         final int idx = newAtts.getIndex("", "data");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (usemapAttribute != null) {
-                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, usemapAttribute, pathMatchers);
+                        final String newAttribute = URLRewriterUtils.rewriteResourceURL(request, response, usemapAttribute, pathMatchers);
                         final int idx = newAtts.getIndex("", "usemap");
                         newAtts.setValue(idx, newAttribute);
                     }
@@ -280,7 +280,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = st.nextToken().trim();
-                            final String newArchive = URLRewriter.rewriteResourceURL(request, response, currentArchive, pathMatchers);
+                            final String newArchive = URLRewriterUtils.rewriteResourceURL(request, response, currentArchive, pathMatchers);
                             if (!first) {
                                 sb.append(' ');
                                 first = false;
@@ -317,7 +317,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
+                    final String newAttribute = URLRewriterUtils.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
@@ -328,7 +328,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = st.nextToken().trim();
-                            final String newArchive = URLRewriter.rewriteResourceURL(request, response, currentArchive, pathMatchers);
+                            final String newArchive = URLRewriterUtils.rewriteResourceURL(request, response, currentArchive, pathMatchers);
                             if (!first) {
                                 sb.append(' ');
                                 first = false;
@@ -397,7 +397,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 } else if ("action".equals(urlType)) {
                     newHref = response.rewriteActionURL(href, portletMode, windowState);
                 } else if ("resource".equals(urlType)) {
-                    newHref = URLRewriter.rewriteResourceURL(request, response, href, pathMatchers);
+                    newHref = URLRewriterUtils.rewriteResourceURL(request, response, href, pathMatchers);
                 } else {
                     newHref = null;
                 }
@@ -670,7 +670,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     } else if ("render".equals(typ)) {
                         newURL = response.rewriteRenderURL(url);
                     } else {
-                        newURL = URLRewriter.rewriteResourceURL(request, response, url, pathMatchers);
+                        newURL = URLRewriterUtils.rewriteResourceURL(request, response, url, pathMatchers);
                     }
                     final char[] chs = newURL.toCharArray();
                     contentHandler.characters(chs, 0, chs.length);
@@ -715,6 +715,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     if (ret != null) break done;
 
                     ret = handleApplet(ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+
+                    // Not valid in HTML, but useful for e.g. Dojo contentPane
+                    ret = handleEltWithResource("div", HREF_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;
                 }
                 ret = this;
@@ -848,10 +852,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Get PFC resource rewriting information if needed
-                final List pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+                final boolean isPortlet = externalContext instanceof PortletExternalContext;
+                final List pathMatchers;
+                if (isPortlet) {
+                    // Don't handle resource versioning
+                    pathMatchers = null;
+                } else {
+                    pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+                }
 
                 // Do the conversion
-                final boolean isPortlet = externalContext instanceof PortletExternalContext;
                 final RootFilter initialState = new RootFilter(null, contentHandler, pathMatchers);
                 final State aftRt = new RewriteState(initialState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI, pathMatchers);
                 initialState.setNextState(aftRt);

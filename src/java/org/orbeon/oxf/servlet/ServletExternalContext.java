@@ -21,9 +21,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ExternalContextToHttpServletResponseWrapper;
-import org.orbeon.oxf.externalcontext.ForwardHttpServletRequestWrapper;
-import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -32,7 +30,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
@@ -59,6 +57,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
     public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
+    private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
     private static final String DEFAULT_FORM_CHARSET = Properties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
 
     private class Request implements ExternalContext.Request {
@@ -464,7 +463,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    private class Response implements ExternalContext.Response {
+    private abstract class Response implements ExternalContext.Response {
+
+        private org.orbeon.oxf.externalcontext.URLRewriter urlRewriter;
+
+        protected Response(org.orbeon.oxf.externalcontext.URLRewriter urlRewriter) {
+            this.urlRewriter = urlRewriter;
+        }
+
         public OutputStream getOutputStream() throws IOException {
             return nativeResponse.getOutputStream();
         }
@@ -609,30 +615,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return NetUtils.checkIfModifiedSince(nativeRequest, lastModified);
         }
 
-        public String rewriteActionURL(String urlString) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
-        public String rewriteRenderURL(String urlString) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
-        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
-        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
-        public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, generateAbsoluteURL ? REWRITE_MODE_ABSOLUTE : REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
-        public String rewriteResourceURL(String urlString, int rewriteMode) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
-        }
-
         public String getNamespacePrefix() {
             return "";
         }
@@ -647,6 +629,42 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public Object getNativeResponse() {
             return ServletExternalContext.this.getNativeResponse();
+        }
+
+        public String rewriteActionURL(String urlString) {
+            return urlRewriter.rewriteActionURL(urlString);
+        }
+
+        public String rewriteRenderURL(String urlString) {
+            return urlRewriter.rewriteRenderURL(urlString);
+        }
+
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return urlRewriter.rewriteActionURL(urlString, portletMode, windowState);
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return urlRewriter.rewriteRenderURL(urlString, portletMode, windowState);
+        }
+
+        public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
+            return rewriteResourceURL(urlString, generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        }
+
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            return urlRewriter.rewriteResourceURL(urlString, rewriteMode);
+        }
+    }
+
+    private class ResponseServletRewrite extends Response {
+        public ResponseServletRewrite(Request request) {
+            super(new ServletURLRewriter(request));
+        }
+    }
+
+    private class ResponsePortlet2Rewrite extends Response {
+        public ResponsePortlet2Rewrite(Request request) {
+            super(new Portlet2URLRewriter(request));
         }
     }
 
@@ -816,8 +834,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     public ExternalContext.Response getResponse() {
-        if (response == null)
-            response = new Response();
+        if (response == null) {
+            response = "portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ? new ResponsePortlet2Rewrite(request) : (Response) new ResponseServletRewrite(request);
+        }
         return response;
     }
 

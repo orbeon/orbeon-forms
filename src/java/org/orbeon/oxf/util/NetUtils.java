@@ -48,14 +48,9 @@ public class NetUtils {
     // Resources are served by the XForms server. It is not ideal to refer to XForms-related functionality from here.
     public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
 
-    /**
-     * @see #decodeQueryString(CharSequence, boolean)
-     */
     private static final Pattern PATTERN_NO_AMP;
-    /**
-     * @see #decodeQueryString(CharSequence, boolean)
-     */
     private static final Pattern PATTERN_AMP;
+//    private static final Pattern PATTERN_AMP_AMP;
 
     public static final String DEFAULT_URL_ENCODING = "utf-8";
 
@@ -85,8 +80,8 @@ public class NetUtils {
         final String notEqNorAmpChar = "[^=&]";
         final String token = notEqNorAmpChar+ "+";
         PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&|(?<!&)\\z)" );
-        PATTERN_AMP 
-            = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
+        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
+//        PATTERN_AMP_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;amp;|&|(?<!&amp;amp;|&)\\z)" );
     }
 
     public static long getDateHeader(String stringValue) throws ParseException {
@@ -335,41 +330,37 @@ public class NetUtils {
     }
 
     /**
-     * @param qry a query string of the form n1=v1&n2=v2&... to decode.  May be null.
-     * @param accptAmp true if both &amp; and '&' should be accepted as delimiters and false if only & 
-     *              should be considered as a delimiter.
+     * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
+     * @param acceptAmp -> "&amp;" if true, "&" if false
+     *
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
-    public static java.util.Map decodeQueryString
-    ( final CharSequence qry, final boolean accptAmp ) {
+    public static Map decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
 
-        final java.util.Map ret = new java.util.TreeMap();
-
-        if ( qry != null ) {
-
-            final Matcher m = accptAmp ? PATTERN_AMP.matcher( qry ) : PATTERN_NO_AMP.matcher( qry );
+        final Map ret = new TreeMap();
+        if (queryString != null) {
+            final Matcher m = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
             int mtchEnd = 0;
-            while ( m.find() )
-            {
+            while (m.find()) {
                 mtchEnd = m.end();
                 try {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
                     // denoted ( with parens ) in the expression.  Hence we start with group 1.
-                    String nam = m.group( 1 );
-                    nam = URLDecoder.decode( nam, NetUtils.DEFAULT_URL_ENCODING );
+                    String nam = m.group(1);
+                    nam = URLDecoder.decode(nam, NetUtils.DEFAULT_URL_ENCODING);
 
-                    String val = m.group( 2 );
-                    val= URLDecoder.decode( val, NetUtils.DEFAULT_URL_ENCODING );
+                    String val = m.group(2);
+                    val = URLDecoder.decode(val, NetUtils.DEFAULT_URL_ENCODING);
 
-                    NetUtils.addValueToStringArrayMap( ret, nam, val );
-                } catch ( final java.io.UnsupportedEncodingException e ) {
+                    NetUtils.addValueToStringArrayMap(ret, nam, val);
+                } catch (final java.io.UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
-                    throw new OXFException( e );
+                    throw new OXFException(e);
                 }
             }
-            if ( qry.length() != mtchEnd ) {
+            if (queryString.length() != mtchEnd) {
                 // There was garbage at the end of the query.
-                throw new OXFException( "Malformed URL: " + qry );
+                throw new OXFException("Malformed URL: " + queryString);
             }
         }
         return ret;

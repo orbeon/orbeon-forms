@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
@@ -104,7 +104,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final boolean globalIsVersioned; {
                     final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_ATTRIBUTE);
                     // NOTE: We use a global property, not an oxf:page-flow scoped one
-                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue() : URLRewriter.isResourcesVersioned();
+                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue() : URLRewriterUtils.isResourcesVersioned();
                 }
                 final String epilogueURL;
                 final Element epilogueElement;
@@ -260,7 +260,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             // Remember this FilesInfo if needed
                             if (currentFileIsVersioned) {
-                                versionedFilesInfo.add(new URLRewriter.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
+                                versionedFilesInfo.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
                             }
 
                             // Can we just add this condition to the previous "when" statement?

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.collections.map.CompositeMap;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -105,7 +105,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
         // Create prefix for combined resources if needed
         final boolean isMinimal = XFormsProperties.isMinimalResources(containingDocument);
-        final boolean isVersionedResources = URLRewriter.isResourcesVersioned();
+        final boolean isVersionedResources = URLRewriterUtils.isResourcesVersioned();
         final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, javaScriptControlsAppearancesMap, isMinimal, isVersionedResources);
 
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
@@ -242,7 +242,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Produce JavaScript paths for use on the client
                         {
-                            final boolean isVersionResources = URLRewriter.isResourcesVersioned();
+                            final boolean isVersionResources = URLRewriterUtils.isResourcesVersioned();
                             // FCKeditor path
                             {
                                 final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY);
@@ -263,10 +263,10 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         // Application version
                         {
                             if (isVersionedResources) {
-                                final String applicationVersion = URLRewriter.getApplicationResourceVersion();
+                                final String applicationVersion = URLRewriterUtils.getApplicationResourceVersion();
                                 if (applicationVersion != null) {
                                     // This is not an XForms property but we want to expose it on the client 
-                                    dynamicProperties.put(URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY, applicationVersion);
+                                    dynamicProperties.put(URLRewriterUtils.RESOURCES_VERSION_NUMBER_PROPERTY, applicationVersion);
                                 }
                             }
                         }
@@ -290,7 +290,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         final Object propertyValue = currentEntry.getValue();
 
                         final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
-                        if (propertyDefinition != null && propertyDefinition.isPropagateToClient() || URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY.equals(propertyName)) {
+                        if (propertyDefinition != null && propertyDefinition.isPropagateToClient() || URLRewriterUtils.RESOURCES_VERSION_NUMBER_PROPERTY.equals(propertyName)) {
 
                             if (sb == null) {
                                 // First property found

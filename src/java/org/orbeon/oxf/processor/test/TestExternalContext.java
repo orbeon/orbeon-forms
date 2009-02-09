@@ -11,7 +11,7 @@ import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -393,7 +393,7 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public String rewriteResourceURL(String urlString, int rewriteMode) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
+            return URLRewriterUtils.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
         public void sendError(int len) throws IOException {

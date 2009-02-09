@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.pipeline;
 
-import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.io.*;
 
@@ -85,7 +85,7 @@ public class CommandLineExternalContext extends SimpleExternalContext {
         }
 
         public String rewriteResourceURL(String urlString, int rewriteMode) {
-            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
+            return URLRewriterUtils.rewriteURL(getRequest(), urlString, rewriteMode);
         }
     }
 }

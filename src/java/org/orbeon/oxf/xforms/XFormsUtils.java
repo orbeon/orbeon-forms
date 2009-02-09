@@ -815,7 +815,9 @@ public class XFormsUtils {
         // runs in a servlet when processing these events!
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            externalURL = URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString,
+            // TODO: check this: must probably use response rewriting methods
+//            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString);
+            externalURL = URLRewriterUtils.rewriteURL(externalContext.getRequest(), resolvedURIString,
                 generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else {
             // XForms page was loaded from a portlet
@@ -849,7 +851,7 @@ public class XFormsUtils {
         final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        return URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString, rewriteMode);
+        return externalContext.getResponse().rewriteResourceURL(resolvedURIString, rewriteMode);
     }
 
     /**

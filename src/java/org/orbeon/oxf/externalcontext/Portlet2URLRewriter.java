@@ -54,7 +54,7 @@ public class Portlet2URLRewriter implements URLRewriter {
 
         // TEMP HACK to avoid multiple rewrites
         // TODO: Find out where it happens. Check XFOutputControl with image mediatype for example.
-        if (urlString.contains("wsrp_rewrite"))
+        if (urlString.indexOf("wsrp_rewrite") != -1)
             return urlString;
 
         try {

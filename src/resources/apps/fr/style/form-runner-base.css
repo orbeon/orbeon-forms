@@ -147,6 +147,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-container { *width: 100% }/* For IE6: otherwise the container can be narrower than the containing doc */
 .fr-separator { clear: both }
 .fr-body { padding: 0 }
+.fr-bottom { clear: both }
 
 #fr-form-group {
     display: block;

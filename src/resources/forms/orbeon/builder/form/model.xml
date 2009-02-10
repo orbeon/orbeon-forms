@@ -737,8 +737,9 @@
 
     <xforms:bind nodeset="instance('fb-metadata-instance')">
         <!-- App/form name -->
-        <xforms:bind nodeset="application-name" required="true()" type="xs:NCName"/>
-        <xforms:bind nodeset="form-name" required="true()" type="xs:NCName"/>
+        <!-- NOTE: check normalize-space() = . because type validation seems to allow leading and trailing spaces -->
+        <xforms:bind nodeset="application-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
+        <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->
         <xforms:bind nodeset="cancel-trigger" relevant="../allow-cancel = 'true'"/>
         <xforms:bind nodeset="next-trigger" readonly=". = 'disabled'"/>

@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
@@ -78,10 +79,10 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                 for (final Iterator i = headers.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     sb.append("<header><name>");
-                    sb.append((String) currentEntry.getKey());
+                    sb.append(XMLUtils.escapeXMLMinimal((String) currentEntry.getKey()));
                     sb.append("</name>");
                     sb.append("<value>");
-                    sb.append((String) currentEntry.getValue());
+                    sb.append(XMLUtils.escapeXMLMinimal((String) currentEntry.getValue()));
                     sb.append("</value>");
 //                    for (Iterator j = ((List) currentEntry.getValue()).iterator(); j.hasNext();) {
 //                        sb.append("<value>");

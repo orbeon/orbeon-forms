@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -157,7 +158,7 @@ public class XFormsModelBinds {
             // Handle default values
             iterateBinds(pipelineContext, new BindRunner() {
                 public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
-                    handleXXFormsDefaultBinds(pipelineContext, bind, nodeset, position);
+                    handleXXFormsDefaultBind(pipelineContext, bind, nodeset, position);
                 }
             });
             // This will be false from now on as we have done our first handling of calculate binds
@@ -169,7 +170,7 @@ public class XFormsModelBinds {
         // to evaluate "calculate" binds before the other binds.
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
-                handleCalculateBinds(pipelineContext, bind, nodeset, position);
+                handleCalculateBind(pipelineContext, bind, nodeset, position);
             }
         });
 
@@ -205,7 +206,7 @@ public class XFormsModelBinds {
 
             iterateBinds(pipelineContext, new BindRunner() {
                 public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
-                    handleComputedExpressionBinds(pipelineContext, bind, nodeset, position);
+                    handleComputedExpressionBind(pipelineContext, bind, nodeset, position);
                 }
             });
         }
@@ -552,7 +553,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleXXFormsDefaultBinds(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleXXFormsDefaultBind(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
 
         // Handle xxforms:default MIP
         if (bind.getXXFormsDefault() != null) {
@@ -570,13 +571,15 @@ public class XFormsModelBinds {
                 XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, model, currentNodeInfo, stringResult, null, true);
 
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
             }
         }
     }
 
-    private void handleCalculateBinds(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleCalculateBind(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
         // Handle calculate MIP
         if (bind.getCalculate() != null) {
             // Compute calculated value
@@ -593,8 +596,10 @@ public class XFormsModelBinds {
                 XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, model, currentNodeInfo, stringResult, null, true);
 
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
             }
         }
     }
@@ -622,7 +627,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleComputedExpressionBinds(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleComputedExpressionBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
         final Map currentVariables = getVariables(currentNodeInfo);
@@ -637,22 +642,26 @@ public class XFormsModelBinds {
                 // Update node with MIP value
                 InstanceData.setRequired(currentNodeInfo, required);
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms required bind",
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms required bind",
                         bind.getBindElement(), new String[] { "expression", bind.getRequired() }));
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
             }
         }
 
         // Handle relevant MIP
         if (bind.getRelevant() != null) {
-                // Evaluate "relevant" XPath expression on this node
-                try {
-                    final boolean relevant = evaluateBooleanExpression1(pipelineContext, bind, bind.getRelevant(), nodeset, position, currentVariables);
-                    // Mark node
-                    InstanceData.setRelevant(currentNodeInfo, relevant);
-                } catch (Exception e) {
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
-                            bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
-                }
+            // Evaluate "relevant" XPath expression on this node
+            try {
+                final boolean relevant = evaluateBooleanExpression1(pipelineContext, bind, bind.getRelevant(), nodeset, position, currentVariables);
+                // Mark node
+                InstanceData.setRelevant(currentNodeInfo, relevant);
+            } catch (Exception e) {
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
+                        bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+            }
         }
 
         // Handle readonly MIP
@@ -665,8 +674,11 @@ public class XFormsModelBinds {
                 // Mark node
                 InstanceData.setReadonly(currentNodeInfo, readonly);
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms readonly bind",
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms readonly bind",
                         bind.getBindElement(), new String[] { "expression", bind.getReadonly() }));
+
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
             }
         } else if (bind.getCalculate() != null) {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
@@ -689,8 +701,10 @@ public class XFormsModelBinds {
 
                     InstanceData.setCustom(currentNodeInfo, key, stringResult);
                 } catch (Exception e) {
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
+                    final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
                             bind.getBindElement(), new String[] { "name", key, "expression", expression }));
+
+                    model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
                 }
             }
         }
@@ -743,6 +757,8 @@ public class XFormsModelBinds {
                     }
                 } catch (Exception e) {
                     throw ValidationException.wrapException(e, bind.getLocationData());
+
+                    // TODO: xxx check what XForms event must be dispatched
                 }
 
                 {
@@ -758,6 +774,8 @@ public class XFormsModelBinds {
                             if (typeNamespaceURI == null)
                                 throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
                                         bind.getLocationData());
+
+                            // TODO: xxx check what XForms event must be dispatched
 
                             typeLocalname = typeQName.substring(prefixPosition + 1);
                         } else {
@@ -807,6 +825,8 @@ public class XFormsModelBinds {
                         final int requiredTypeFingerprint = StandardNames.getFingerprint(newTypeNamespaceURI, typeLocalname);
                         if (requiredTypeFingerprint == -1) {
                             throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
+
+                            // TODO: xxx check what XForms event must be dispatched
                         }
 
                         // Try to perform casting
@@ -841,6 +861,8 @@ public class XFormsModelBinds {
 
                         } else {
                             throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
+
+                            // TODO: xxx check what XForms event must be dispatched
                         }
 
                     } else if (model.getSchemaValidator() != null && model.getSchemaValidator().hasSchema()) {
@@ -857,6 +879,8 @@ public class XFormsModelBinds {
                         }
                     } else {
                         throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
+
+                        // TODO: xxx check what XForms event must be dispatched
                     }
 
                     // Set type on node
@@ -908,8 +932,10 @@ public class XFormsModelBinds {
                 isValid &= valid;
                 InstanceData.updateValueValid(currentNodeInfo, valid, bind.getId());
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
                         bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
+
+                model.getContainer().dispatchEvent(pipelineContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
             }
         }
 

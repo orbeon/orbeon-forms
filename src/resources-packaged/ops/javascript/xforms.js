@@ -4230,7 +4230,7 @@ ORBEON.xforms.Server = {
                     if (event.isActivating == null) {
                         if (event.targetId != null) {
                             var target = ORBEON.util.Dom.getElementById(event.targetId);
-                            event.isActivating = ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-deferred");
+                            event.isActivating = ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default");
                             if (event.isActivating) {
                                 foundActivatingEvent = true;
                                 break;

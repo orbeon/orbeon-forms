@@ -998,8 +998,16 @@ public class XFormsModelBinds {
             // Compute nodeset for this bind
             contextStack.pushBinding(pipelineContext, bindElement);
             {
-                this.nodeset = contextStack.getCurrentNodeset();
-                final int nodesetSize = nodeset.size();
+                // NOTE: This should probably go into XFormsContextStack
+                if (bindElement.attribute("nodeset") != null) {
+                    // Case where a @nodeset attribute is present
+                    this.nodeset = contextStack.getCurrentNodeset();
+                } else {
+                    // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)
+                    final Item contextItem = contextStack.getContextItem();
+                    this.nodeset = (contextItem == null) ? Collections.EMPTY_LIST : Collections.singletonList(contextItem);
+                }
+                final int nodesetSize = this.nodeset.size();
 
                 // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
                 // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind

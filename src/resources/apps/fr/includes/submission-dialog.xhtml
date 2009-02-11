@@ -32,48 +32,50 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xforms:repeat nodeset="instance('fr-submission-buttons-instance')/*">
-                <!-- Clear button -->
-                <xforms:trigger ref=".[local-name() = 'clear']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch name="fr-clear" target="fr-persistence-model"/>
-                        <xxforms:hide dialog="fr-submission-result-dialog"/>
-                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
-                    </xforms:action>
-                </xforms:trigger>
-                <!-- Keep button -->
-                <xforms:trigger ref=".[local-name() = 'keep']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xxforms:hide dialog="fr-submission-result-dialog"/>
-                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
-                    </xforms:action>
-                </xforms:trigger>
-                <!-- Go button -->
-                <xforms:trigger ref=".[local-name() = 'go']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
-                        <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
-                    </xforms:action>
-                </xforms:trigger>
-                <!-- Close window button -->
-                <xforms:trigger ref=".[local-name() = 'close-window']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
-                    </xforms:label>
-                    <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
-                </xforms:trigger>
+                <xhtml:span>
+                    <!-- Clear button -->
+                    <xforms:trigger ref=".[local-name() = 'clear']">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch name="fr-clear" target="fr-persistence-model"/>
+                            <xxforms:hide dialog="fr-submission-result-dialog"/>
+                            <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <!-- Keep button -->
+                    <xforms:trigger ref=".[local-name() = 'keep']">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xxforms:hide dialog="fr-submission-result-dialog"/>
+                            <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <!-- Go button -->
+                    <xforms:trigger ref=".[local-name() = 'go']">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
+                            <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <!-- Close window button -->
+                    <xforms:trigger ref=".[local-name() = 'close-window']">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
+                        </xforms:label>
+                        <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
+                    </xforms:trigger>
+                </xhtml:span>
             </xforms:repeat>
         </xforms:group>
     </xhtml:div>
@@ -97,7 +99,7 @@
             <xxforms:variable name="submit-buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s')"/>
             <!-- Add dummy element in front, so none of the buttons is the current button, which otherwise would change its style -->
             <xforms:insert context="instance('fr-submission-buttons-instance')"
-                           origin="(xxforms:element('dummy'), for $b in $submit-buttons return xxforms:element($b))"/>
+                           origin="(for $b in $submit-buttons return xxforms:element($b))"/>
         </xforms:action>
 
         <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>

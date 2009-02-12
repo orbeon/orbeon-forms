@@ -328,8 +328,26 @@ public class XMLUtils {
         }
     }
 
+    /**
+     * Parse a string into SAX events. If the string is empty or only contains white space, output an empty document.
+     *
+     * @param xml               XML string
+     * @param systemId          system id of the document, or null
+     * @param contentHandler    SAX content handler to output to
+     * @param validating        whether validation must be performed
+     * @param handleXInclude    whether XInclude must be performed
+     */
     public static void stringToSAX(String xml, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
-        readerToSAX(new StringReader(xml), systemId, contentHandler, validating, handleXInclude);
+        if (xml.trim().equals("")) {
+            try {
+                contentHandler.startDocument();
+                contentHandler.endDocument();
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
+        } else {
+            readerToSAX(new StringReader(xml), systemId, contentHandler, validating, handleXInclude);
+        }
     }
 
     public static void inputStreamToSAX(InputStream inputStream, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {

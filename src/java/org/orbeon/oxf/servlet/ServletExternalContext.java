@@ -267,7 +267,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getRequestURL() {
-            return nativeRequest.getRequestURL().toString();
+            // NOTE: If this is included from a portlet, we may not have a request URL
+            final StringBuffer requestUrl = nativeRequest.getRequestURL();
+            // TODO: check if we should return null or "" or sth else
+            return (requestUrl != null) ? requestUrl.toString() : null;
         }
 
         public String getServletPath() {

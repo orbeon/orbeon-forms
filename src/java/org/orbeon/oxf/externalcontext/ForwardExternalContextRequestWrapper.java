@@ -187,7 +187,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         // Get absolute URL w/o query string e.g. http://foo.com/a/b/c
         final String incomingRequestURL = super.getRequestURL();
         // Resolving request URI against incoming absolute URL, e.g. /d/e/f -> http://foo.com/d/e/f
-        return NetUtils.resolveURI(getRequestPath(), incomingRequestURL);
+        return NetUtils.resolveURI(getRequestURI(), incomingRequestURL);
     }
 
     public Map getHeaderMap() {

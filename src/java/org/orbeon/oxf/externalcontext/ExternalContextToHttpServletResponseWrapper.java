@@ -119,6 +119,7 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
             pathInfo = path;
             parameters = null;
         }
+        // TODO: it was suggested to pass false, false, true
         response.sendRedirect(pathInfo, parameters, false, false, false);
     }
 

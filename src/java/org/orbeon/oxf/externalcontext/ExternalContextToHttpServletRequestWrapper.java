@@ -39,9 +39,8 @@ import java.text.SimpleDateFormat;
  * o request attributes
  * o request headers
  *
- * Often, an
- * HttpServletRequestWrapper is used to forward within the same application, and in this case developers have good
- * control over all the aspects of the application.
+ * Often, an HttpServletRequestWrapper is used to forward within the same application, and in this case developers have
+ * good control over all the aspects of the application.
  *
  * Here, we need to make it look to the recipient that the request is as close as possible as a new incoming HTTP
  * request. The difficulty is to decide what to delegate to the servlet container, and what to get from the incoming

@@ -3281,7 +3281,8 @@ ORBEON.widgets.RTE = function() {
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
             yuiRTE.on("afterRender", function() {
-                var yuiDivBeforeTextArea = ORBEON.util.Dom.getChildElementByIndex(control.parentNode, 0);
+                var rteContainer = control.parentNode;
+                rteContainer.className += " " + control.className;  
             });
             yuiRTE.render();
         },

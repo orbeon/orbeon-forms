@@ -34,7 +34,7 @@ public class ServletToExternalContextRequestDispatcherWrapper implements Externa
 
     public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
         try {
-            dispatcher.forward(new ExternalContextToHttpServletRequestWrapper(request), new ExternalContextToHttpServletResponseWrapper(response));
+            dispatcher.forward(new ExternalContextToHttpServletRequestWrapper(request, true), new ExternalContextToHttpServletResponseWrapper(response));
         } catch (ServletException e) {
             throw new OXFException(e);
         }
@@ -42,7 +42,7 @@ public class ServletToExternalContextRequestDispatcherWrapper implements Externa
 
     public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
         try {
-            dispatcher.include(new ExternalContextToHttpServletRequestWrapper(request), new ExternalContextToHttpServletResponseWrapper(response));
+            dispatcher.include(new ExternalContextToHttpServletRequestWrapper(request, false), new ExternalContextToHttpServletResponseWrapper(response));
         } catch (ServletException e) {
             throw new OXFException(e);
         }

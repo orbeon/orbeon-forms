@@ -49,35 +49,89 @@ import java.text.SimpleDateFormat;
 public class ExternalContextToHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private ExternalContext.Request request;
+    private boolean isForward;
 
     private ServletInputStream servletInputStream;
 
-    public ExternalContextToHttpServletRequestWrapper(ExternalContext.Request request) {
+    public ExternalContextToHttpServletRequestWrapper(ExternalContext.Request request, boolean isForward) {
         super((HttpServletRequest) request.getNativeRequest());
         this.request = request;
+        this.isForward = isForward;
     }
 
-    /* SUPPORTED: request method */
+    /*
+     * SUPPORTED: request method
+     *
+     * An obvious one: we want the recipient to see a GET or a POST, for example.
+     */
 
     public String getMethod() {
         return request.getMethod();
     }
 
-    /* SUPPORTED: request path and query string */
+    /*
+     * SPECIAL: derived path information
+     *
+     * Upon forward, Tomcat in particular constructs contextPath, pathInfo, servletPath, and requestURI based on the
+     * path of the resource to which the request is forwarded. So we don't need to rebuild them.
+     *
+     * It makes sense that the servlet container fixes them up, otherwise there would be no need for the properties
+     * listed in SRV.8.3.1 and SRV.8.4.2.
+     *
+     * HOWEVER, this is NOT the case for includes. Tomcat does not have the same code for includes, and the spec does
+     * not mention path adjustments for includes.
+     *
+     * NOTE: We handle the query string separately.
+     */
+
+    public String getContextPath() {
+        if (isForward)
+            return super.getContextPath();
+        else
+            return request.getContextPath();
+    }
+
+    public String getPathInfo() {
+        if (isForward)
+            return super.getPathInfo();
+        else
+            return request.getPathInfo();
+    }
+
+    public String getServletPath() {
+        if (isForward)
+            return super.getServletPath();
+        else
+            return request.getServletPath();
+    }
+
+    public String getRequestURI() {
+        if (isForward)
+            return super.getRequestURI();
+        else
+            return request.getRequestURI();
+    }
+
+    /*
+     * SUPPORTED: request path and query string
+     *
+     * Paths are automatically computed by container (see below), except maybe for getRequestURL().
+     */
+
+    public StringBuffer getRequestURL() {
+        // NOTE: By default, super will likely return the original request URL. Here we simulate a new one.
+
+        // Get absolute URL w/o query string e.g. http://foo.com/a/b/c
+        final StringBuffer incomingRequestURL = super.getRequestURL();
+        // Resolving request URI against incoming absolute URL, e.g. /d/e/f -> http://foo.com/d/e/f
+        return new StringBuffer(NetUtils.resolveURI(getRequestURI(), incomingRequestURL.toString()));
+    }
+
+    /* SUPPORTED: query string and request parameters */
 
     public String getQueryString() {
         return NetUtils.encodeQueryString(request.getParameterMap());
     }
-
-    public String getRequestURI() {
-        return request.getRequestURI();
-    }
-
-    public StringBuffer getRequestURL() {
-        return new StringBuffer(request.getRequestURL());
-    }
-
-    /* SUPPORTED: request parameters */
 
     public String getParameter(String clazz) {
         final String[] values = getParameterValues(clazz);
@@ -200,19 +254,6 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     /*
      * DELEGATED: other path information
      */
-
-    public String getPathInfo() {
-        return super.getPathInfo();
-    }
-
-    public String getServletPath() {
-        // NOTE: we assume that this is properly handled by
-        return super.getServletPath();
-    }
-
-    public String getContextPath() {
-        return super.getContextPath();
-    }
 
     public String getRealPath(String path) {
         return super.getRealPath(path);

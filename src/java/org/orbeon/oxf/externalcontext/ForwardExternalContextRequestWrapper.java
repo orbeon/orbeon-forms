@@ -99,6 +99,33 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         }
     }
 
+    /* SUPPORTED: methods called by ExternalContextToHttpServletRequestWrapper */
+
+    public String getMethod() {
+        return method.toUpperCase();
+    }
+
+    public Map getParameterMap() {
+        if (queryParameters == null) {
+            queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
+        }
+
+        return queryParameters;
+    }
+
+    public String getQueryString() {
+        if (queryString == null) {
+            final int mark = pathQuery.indexOf('?');
+            queryString = (mark == -1) ? null : pathQuery.substring(mark + 1);
+        }
+
+        return queryString;
+    }
+
+    public String getCharacterEncoding() {
+        return null;//TODO?
+    }
+
     public int getContentLength() {
         return (messageBody == null) ? 0 : messageBody.length;
     }
@@ -115,17 +142,30 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return inputStream;
     }
 
-    public String getMethod() {
-        return method.toUpperCase();
+    public Reader getReader() throws IOException {
+        return null;//TODO?
     }
 
-    public Map getParameterMap() {
-        if (queryParameters == null) {
-            queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
-        }
-
-        return queryParameters;
+    public Map getAttributesMap() {
+        // Just return super since we do not override attributes here
+        return super.getAttributesMap();
     }
+
+    public Map getHeaderMap() {
+        return headerMap;
+    }
+
+    public Map getHeaderValuesMap() {
+        return headerValuesMap;
+    }
+
+    /*
+     * NOTE: All the path methods are handled by the request dispatcher implementation in the servlet container upon
+     * forward, but upon include we must provide them.
+     *
+     * NOTE: Checked 2009-02-12 that none of the methods below are called when forwarding through
+     * spring/JSP/filter/Orbeon in Tomcat 5.5.27. HOWEVER they are called when including.
+     */
 
     public String getPathInfo() {
         if (path == null) {
@@ -136,21 +176,8 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return path;
     }
 
-    public String getQueryString() {
-        if (queryString == null) {
-            final int mark = pathQuery.indexOf('?');
-            queryString = (mark == -1) ? null : pathQuery.substring(mark + 1);
-        }
-
-        return queryString;
-    }
-
     public String getServletPath() {
         return "";
-    }
-
-    public String getCharacterEncoding() {
-        return null;//TODO?
     }
 
     public String getContextPath() {
@@ -183,26 +210,11 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return "/".equals(contextPath) ? getRequestPath() : getContextPath() + getRequestPath();
     }
 
+    // Probably not needed because computed by ExternalContextToHttpServletRequestWrapper. 
     public String getRequestURL() {
         // Get absolute URL w/o query string e.g. http://foo.com/a/b/c
         final String incomingRequestURL = super.getRequestURL();
         // Resolving request URI against incoming absolute URL, e.g. /d/e/f -> http://foo.com/d/e/f
         return NetUtils.resolveURI(getRequestURI(), incomingRequestURL);
-    }
-
-    public Map getHeaderMap() {
-        return headerMap;
-    }
-
-    public Map getHeaderValuesMap() {
-        return headerValuesMap;
-    }
-
-    public String getPathTranslated() {
-        return null;
-    }
-
-    public Reader getReader() throws IOException {
-        return null;//TODO?
     }
 }

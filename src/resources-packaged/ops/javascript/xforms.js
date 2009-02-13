@@ -4216,28 +4216,60 @@ ORBEON.xforms.Server = {
             var foundActivatingEvent = false;
             if (ORBEON.util.Utils.getProperty(CLIENT_EVENTS_MODE_PROPERTY) == "deferred") {
 
+                // Element with class xxforms-events-mode-default which is the parent of a target
+                var parentWithDefaultClass = null;
+                // Set to true when we find a target which is not under and element with the default class
+                var foundTargetWithNoParentWithDefaultClass = false;
+
                 // Look for events that we need to send to the server when deferred mode is enabled
-                for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
+                eventLoop: for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
 
                     var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
 
                     // DOMActivate is considered to be an "activating" event
                     if (event.eventName == "DOMActivate") {
                         foundActivatingEvent = true;
-                        break;
+                        break eventLoop;
                     }
 
                     // Check if we find a class on the target that tells us this is an activating event
-                    if (event.isActivating == null) {
-                        if (event.targetId != null) {
-                            var target = ORBEON.util.Dom.getElementById(event.targetId);
-                            event.isActivating = ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default");
-                            if (event.isActivating) {
-                                foundActivatingEvent = true;
+                    if (event.targetId != null) {
+                        var target = ORBEON.util.Dom.getElementById(event.targetId);
+                        if (ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default")) {
+                            foundActivatingEvent = true;
+                            break eventLoop;
+                        }
+
+                        // Look for parent with the default class
+                        var parent = target.parentNode;
+                        var foundParentWithDefaultClass = false;
+                        while (parent != null) {
+                            // Found a parent with the default class
+                            if (parent.nodeType == ELEMENT_TYPE && ORBEON.util.Dom.hasClass(parent, "xxforms-events-mode-default")) {
+                                foundParentWithDefaultClass = true;
+                                if (foundTargetWithNoParentWithDefaultClass) {
+                                    // And there is another target which is outside of a parent with a default class
+                                    foundActivatingEvent = true;
+                                    break eventLoop;
+                                }
+                                if (parentWithDefaultClass == null) {
+                                    parentWithDefaultClass = parent;
+                                } else if (parentWithDefaultClass != parent) {
+                                    // And there is another target which is under another parent with a default class
+                                    foundActivatingEvent = true;
+                                    break eventLoop;
+                                }
                                 break;
                             }
-                        } else {
-                            event.isActivating = false;
+                            parent = parent.parentNode;
+                        }
+                        // Record the fact  
+                        if (! foundParentWithDefaultClass) {
+                            foundTargetWithNoParentWithDefaultClass = true;
+                            if (parentWithDefaultClass != null) {
+                                foundActivatingEvent = true;
+                                break eventLoop;
+                            }
                         }
                     }
                 }

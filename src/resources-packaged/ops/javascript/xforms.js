@@ -1775,10 +1775,12 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
-            // XForms radio buttons
+            // XForms radio buttons or checkboxes
             for (var spanIndex = 0; spanIndex < control.childNodes.length; spanIndex++) {
-                var span = control.childNodes[spanIndex];
-                var input = span.firstChild;
+                var span1 = control.childNodes[spanIndex];
+                // NOTE: Two levels of spans
+                var span2 = span1.firstChild;
+                var input = span2.firstChild;
                 setReadonlyOnFormElement(input, isReadonly);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {

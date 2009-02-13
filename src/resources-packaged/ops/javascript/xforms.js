@@ -4237,40 +4237,47 @@ ORBEON.xforms.Server = {
                     // Check if we find a class on the target that tells us this is an activating event
                     if (event.targetId != null) {
                         var target = ORBEON.util.Dom.getElementById(event.targetId);
-                        if (ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default")) {
+                        if (target == null) {
+                            // Target is not on the client. For most use cases, assume event should be dispatched right away.
                             foundActivatingEvent = true;
                             break eventLoop;
-                        }
-
-                        // Look for parent with the default class
-                        var parent = target.parentNode;
-                        var foundParentWithDefaultClass = false;
-                        while (parent != null) {
-                            // Found a parent with the default class
-                            if (parent.nodeType == ELEMENT_TYPE && ORBEON.util.Dom.hasClass(parent, "xxforms-events-mode-default")) {
-                                foundParentWithDefaultClass = true;
-                                if (foundTargetWithNoParentWithDefaultClass) {
-                                    // And there is another target which is outside of a parent with a default class
-                                    foundActivatingEvent = true;
-                                    break eventLoop;
-                                }
-                                if (parentWithDefaultClass == null) {
-                                    parentWithDefaultClass = parent;
-                                } else if (parentWithDefaultClass != parent) {
-                                    // And there is another target which is under another parent with a default class
-                                    foundActivatingEvent = true;
-                                    break eventLoop;
-                                }
-                                break;
-                            }
-                            parent = parent.parentNode;
-                        }
-                        // Record the fact  
-                        if (! foundParentWithDefaultClass) {
-                            foundTargetWithNoParentWithDefaultClass = true;
-                            if (parentWithDefaultClass != null) {
+                        } else {
+                            // Target is on the client
+                            if (ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default")) {
                                 foundActivatingEvent = true;
                                 break eventLoop;
+                            }
+
+                            // Look for parent with the default class
+                            var parent = target.parentNode;
+                            var foundParentWithDefaultClass = false;
+                            while (parent != null) {
+                                // Found a parent with the default class
+                                if (parent.nodeType == ELEMENT_TYPE && ORBEON.util.Dom.hasClass(parent, "xxforms-events-mode-default")) {
+                                    foundParentWithDefaultClass = true;
+                                    if (foundTargetWithNoParentWithDefaultClass) {
+                                        // And there is another target which is outside of a parent with a default class
+                                        foundActivatingEvent = true;
+                                        break eventLoop;
+                                    }
+                                    if (parentWithDefaultClass == null) {
+                                        parentWithDefaultClass = parent;
+                                    } else if (parentWithDefaultClass != parent) {
+                                        // And there is another target which is under another parent with a default class
+                                        foundActivatingEvent = true;
+                                        break eventLoop;
+                                    }
+                                    break;
+                                }
+                                parent = parent.parentNode;
+                            }
+                            // Record the fact
+                            if (! foundParentWithDefaultClass) {
+                                foundTargetWithNoParentWithDefaultClass = true;
+                                if (parentWithDefaultClass != null) {
+                                    foundActivatingEvent = true;
+                                    break eventLoop;
+                                }
                             }
                         }
                     }

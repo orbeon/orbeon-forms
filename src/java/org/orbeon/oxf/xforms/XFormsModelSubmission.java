@@ -670,26 +670,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         connectionResult = new ConnectionResult(resultURL);
                         connectionResult.dontHandleResponse = true;
 
-                    } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
-                               && (isAllowDeferredSubmission || XFormsProperties.isAjaxPortlet(containingDocument))
-                               && headerNameValues == null  // for now, headers are not handled; could be optimized in the future
-                               && !isAsyncSubmission        // for now, we don't handle optimized async; could be optimized in the future
-                               && ((request.getContainerType().equals("portlet") && !fURLNorewrite && !"resource".equals(urlType))
-                                    || (request.getContainerType().equals("servlet")
-                                        && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)
-                                        && isReplaceAll)
-                                    || (request.getContainerType().equals("servlet")
-                                        && XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument)
-                                        && !isReplaceAll))) {
+                    } else if (isAllowOptimizedSubmission(isReplaceAll, isNoscript, urlType, request, isAsyncSubmission, headerNameValues)) {
 
-                        // This is an "optimized" submission, i.e. one that does not use an actual
-                        // protocol handler to access the resource
+                        // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
+                        // access the resource, but instead uses servlet forward/include for servlets, or a local
+                        // mechanism for portlets.
 
-                        // NOTE: Optimizing with include() for servlets doesn't allow detecting
-                        // errors caused by the included resource.
+                        // NOTE: Optimizing with include() for servlets doesn't allow detecting errors caused by the
+                        // included resource. [As of 2009-02-13, not sure if this is the case.]
 
-                        // NOTE: For portlets, paths are served directly by the portlet, NOT as
-                        // resources.
+                        // NOTE: For portlets, paths are served directly by the portlet, NOT as resources.
 
                         // f:url-norewrite="true" with an absolute path allows accessing other servlet contexts.
 
@@ -1096,6 +1086,104 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
+    }
+
+    /**
+     * Check whether optimized submission is allowed, depending on a series of conditions.
+     *
+     * Log a lot of stuff for development, as it is not always obvious why we pick an optimized vs. regular submission.
+     */
+    private boolean isAllowOptimizedSubmission(boolean replaceAll, boolean isNoscript, String urlType,
+                                              ExternalContext.Request request, boolean asyncSubmission, Map headerNameValues) {
+
+        final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+        if (isDebugEnabled) {
+            containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
+                new String[] { "resource", resolvedActionOrResource, "noscript", Boolean.toString(isNoscript),
+                    "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
+                    "headers", (headerNameValues != null) ? headerNameValues.toString() : null,
+                    "is asynchronous", Boolean.toString(asyncSubmission),
+                    "container type", request.getContainerType(), "norewrite", Boolean.toString(fURLNorewrite),
+                    "url type", urlType,
+                    "local-submission-forward", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)),
+                    "local-submission-include", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument))
+                });
+        }
+
+        // Absolute URL is not optimized
+        if (NetUtils.urlHasProtocol(resolvedActionOrResource)) {
+            if (isDebugEnabled)
+                containingDocument.logDebug("submission", "skipping optimized submission",
+                        new String[] { "reason", "resource URL has protocol", "resource", resolvedActionOrResource });
+            return false;
+        }
+
+        // TODO: why is this condition here?
+        if (isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument)) {
+            if (isDebugEnabled)
+                containingDocument.logDebug("submission", "skipping optimized submission",
+                        new String[] { "reason", "noscript mode enabled and not in ajax portlet mode" });
+            return false;
+        }
+
+        // For now, headers are not handled; could be optimized in the future
+        if (headerNameValues != null) {
+            if (isDebugEnabled)
+                containingDocument.logDebug("submission", "skipping optimized submission",
+                        new String[] { "reason", "passing headers is not supported yet" });
+            return false;
+        }
+
+        // For now, we don't handle optimized async; could be optimized in the future
+        if (asyncSubmission) {
+            if (isDebugEnabled)
+                containingDocument.logDebug("submission", "skipping optimized submission",
+                        new String[] { "reason", "asynchronous mode is not supported yet" });
+            return false;
+        }
+
+        if (request.getContainerType().equals("portlet")) {
+            // Portlet
+
+            if (fURLNorewrite) {
+                if (isDebugEnabled)
+                    containingDocument.logDebug("submission", "skipping optimized submission",
+                            new String[] { "reason", "norewrite is specified" });
+                return false;
+            }
+
+            // NOTE: we could optimize for resource URLs:
+            // o JSR-268 local resource handling, can access porlet resources the same way as with render/action
+            // o In include mode, Servlet resources can be accessed using request dispatcher to servlet
+
+            if ("resource".equals(urlType)) {
+                if (isDebugEnabled)
+                    containingDocument.logDebug("submission", "skipping optimized submission",
+                            new String[] { "reason", "resource URL type is specified" });
+                return false;
+            }
+        } else if (replaceAll) {
+            // Servlet, replace all
+            if (!XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
+                if (isDebugEnabled)
+                    containingDocument.logDebug("submission", "skipping optimized submission",
+                            new String[] { "reason", "forward submissions are disallowed in properties" });
+                return false;
+            }
+        } else {
+            // Servlet, other
+            if (!XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument)) {
+                if (isDebugEnabled)
+                    containingDocument.logDebug("submission", "skipping optimized submission",
+                            new String[] { "reason", "include submissions are disallowed in properties" });
+                return false;
+            }
+        }
+
+        if (isDebugEnabled)
+            containingDocument.logDebug("submission", "enabling optimized submission");
+
+        return true;
     }
 
     /**

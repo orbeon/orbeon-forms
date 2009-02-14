@@ -68,6 +68,14 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, newAttributes);
 
+                // Output extension attributes
+                // NOTE: textarea doesn't support maxlength natively, but this can be implemented natively
+                if (isConcreteControl) {
+                    final String maxlength = textareaControl.getMaxlength(pipelineContext);
+                    if (maxlength != null)
+                        reusableAttributes.addAttribute("", "maxlength", "maxlength", ContentHandlerHelper.CDATA, maxlength);
+                }
+
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);

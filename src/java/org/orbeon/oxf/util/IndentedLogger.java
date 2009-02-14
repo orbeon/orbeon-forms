@@ -129,7 +129,7 @@ public class IndentedLogger {
                     final String paramName = parameters[i];
                     final String paramValue = parameters[i + 1];
 
-                    if (paramValue != null) {
+                    if (paramName != null && paramValue != null) {
                         if (!first)
                             sb.append(", ");
 

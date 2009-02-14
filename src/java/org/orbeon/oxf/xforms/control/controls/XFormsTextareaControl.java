@@ -33,7 +33,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
 
     private boolean isMaxlengthEvaluated;
 
-    // NOTE: textarea doesn't support maxlength natively, but this can be implemented natively
+    // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented natively
     private String maxlength;
 
     public XFormsTextareaControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {

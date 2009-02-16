@@ -237,19 +237,22 @@
               <include name="**/*.xsd"/>
               <!-- These classes go into their own JAR -->
               <exclude name="org/orbeon/oxf/servlet/OPSXFormsFilter*.class"/>
+              <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
               <include name="config/*-processors.xml"/>
               <include name="*.xml"/>
           </fileset>
-          <zipfileset dir="descriptors/jar" prefix="META-INF" >
-            <exclude name='*.MF' />
-          </zipfileset>
+          <!-- WHY DO WE NEED THIS? WE DON'T WANT ANYBODY TO TOUCH OUR XERCES, RIGHT? -->
+          <!--<zipfileset dir="descriptors/jar" prefix="META-INF" >-->
+            <!--<exclude name='*.MF' />-->
+          <!--</zipfileset>-->
         </jar>
 
         <jar destfile="${xforms-filter.jar.file}" compress="false">
           <fileset dir="${build.classes.dir}">
               <include name="org/orbeon/oxf/servlet/OPSXFormsFilter*.class"/>
+              <include name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
           </fileset>
         </jar>
 

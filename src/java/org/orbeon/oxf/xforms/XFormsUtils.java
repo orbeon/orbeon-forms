@@ -1442,7 +1442,7 @@ public class XFormsUtils {
     }
 
     public static String escapeJavaScript(String value) {
-        return org.apache.commons.lang.StringUtils.replace(org.apache.commons.lang.StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\"");
+        return StringUtils.replace(StringUtils.replace(StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\""), "\n", "\\n");
     }
 
     /**

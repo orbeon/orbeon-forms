@@ -329,7 +329,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             // User-defined scripts (with xxforms:script)
             final Map scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
-            if (scriptsToDeclare != null || focusElementId != null) {
+            final List messagesToRun = containingDocument.getMessagesToRun();
+            if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null) {
                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
 
@@ -344,7 +345,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 final List scriptsToRun = containingDocument.getScriptsToRun();
 
-                if (focusElementId != null || (scriptsToRun != null)) {
+                if (focusElementId != null || scriptsToRun != null || messagesToRun != null) {
                     final FastStringBuffer sb = new FastStringBuffer("\nfunction xformsPageLoadedServer() { ");
 
                     // Initial setfocus if present
@@ -365,6 +366,19 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                             sb.append("\",\"");
                             sb.append(script.getEventObserverId());
                             sb.append("\");");
+                        }
+                    }
+
+                    // Initial xforms:message to run if present
+                    if (messagesToRun != null) {
+                        for (Iterator i = messagesToRun.iterator(); i.hasNext();) {
+                            final XFormsContainingDocument.Message message = (XFormsContainingDocument.Message) i.next();
+                            if ("modal".equals(message.getLevel())) {
+                                // TODO: should not call directly alert() but a client-side method
+                                sb.append("alert(\"");
+                                sb.append(XFormsUtils.escapeJavaScript(message.getMessage()));
+                                sb.append("\");");
+                            }
                         }
                     }
 

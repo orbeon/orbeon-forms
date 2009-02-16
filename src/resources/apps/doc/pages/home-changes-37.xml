@@ -2442,6 +2442,46 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     should try to use or switch to the YUI when possible.
                 </p>
             </section>
+            <section>
+                <title>Deprecation and removal of Java classes</title>
+                <p>
+                    The following classes, usually referenced from <code>web.xml</code> and <code>portlet.xml</code>,
+                    are still available but deprecated:
+                </p>
+                <ul>
+                    <li>
+                        <code>OPSServlet</code> and <code>OPSServletDelegate</code>: use <code>OrbeonServlet</code> and
+                        <code>OrbeonServletDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSPortlet</code> and <code>OPSPortletDelegate</code>: use <code>OrbeonPortlet</code> and
+                        <code>OrbeonPortletDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSXFormsFilter</code> and <code>OPSServletFilterDelegate</code>: use
+                        <code>OrbeonXFormsFilter</code> and <code>OrbeonServletFilterDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSServletFilter</code> and <code>OPSServletFilterDelegate</code>: use
+                        <code>OrbeonServletFilter</code> and <code>ServletFilterDelegate</code> instead.
+                    </li>
+                </ul>
+                <p>
+                    The following classes have been deprecated for a long time and are now removed:
+                </p>
+                <ul>
+                    <li>
+                        <code>ProcessorServlet</code>: use <code>OrbeonServlet</code> instead.
+                    </li>
+                    <li>
+                        <code>ProcessorFilter</code>: use <code>OrbeonServletFilter</code> instead.
+                    </li>
+                    <li>
+                        <code>ProcessorServletContextListener</code>: use <code>OrbeonServletContextListener</code>
+                        instead.
+                    </li>
+                </ul>
+            </section>
         </section>
     </body>
 </document>

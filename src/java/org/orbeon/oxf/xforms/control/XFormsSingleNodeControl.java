@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
 
@@ -148,10 +150,30 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
                 this.readonly = false;
                 this.required = false;
-                this.relevant = (currentItem instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentItem) : false; // inherit relevance anyway
                 this.valid = true;// by default, a control is not invalid
                 this.type = null;
                 this.customMips = null;
+
+                final XFormsControl parent = getParent();
+                if (parent instanceof XFormsSingleNodeControl) {
+                    // Inherit relevance based on outer control
+                    this.relevant = ((XFormsSingleNodeControl) parent).isRelevant();
+                } else if (parent instanceof XFormsRepeatControl) {
+                    // Must not happen because a repeat iteration is always bound to a node
+                    throw new OXFException("Unexpected parent control class: " + parent.getClass().getName());
+                } else if (parent instanceof XFormsNoSingleNodeContainerControl) {
+                    // Includes dialog, case, and component
+                    // TODO: those must have special relevance handling
+                    this.relevant = true;
+                } else if (parent == null) {
+                    // This means we are at the top-level, therefore we are relevant
+                    this.relevant = true;
+                } else {
+                    // Must not happen
+                    throw new OXFException("Unexpected parent control class: " + parent.getClass().getName());
+                }
+
+                //this.relevant = (currentItem instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentItem) : false; // inherit relevance anyway
             }
             mipsRead = true;
         }

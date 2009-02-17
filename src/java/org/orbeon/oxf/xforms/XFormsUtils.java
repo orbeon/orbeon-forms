@@ -762,6 +762,10 @@ public class XFormsUtils {
     }
 
     public static String retrieveSrcValue(String src) throws IOException {
+
+        // Handle HHRI
+        src = encodeHRRI(src, true);
+
         final URL url = URLFactory.createURL(src);
 
         // Load file into buffer
@@ -837,7 +841,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Resolve a resource URL includng xml:base resolution.
+     * Resolve a resource URL including xml:base resolution.
      *
      * @param pipelineContext       current PipelineContext
      * @param element               element used to start resolution (if null, no resolution takes place)
@@ -848,10 +852,9 @@ public class XFormsUtils {
     public static String resolveResourceURL(PipelineContext pipelineContext, Element element, String url, int rewriteMode) {
 
         final URI resolvedURI = resolveXMLBase(element, url);
-        final String resolvedURIString = resolvedURI.toString();
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        return externalContext.getResponse().rewriteResourceURL(resolvedURIString, rewriteMode);
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        return externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
     }
 
     /**

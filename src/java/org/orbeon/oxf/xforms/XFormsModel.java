@@ -406,8 +406,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                         final long xxformsTimeToLive = XFormsInstance.getTimeToLive(instanceContainerElement);
 
                         // Skip processing in case somebody has already set this particular instance
-                        if (instances.get(instancePosition) != null)
+                        if (instances.get(instancePosition) != null) {
                             continue;
+                        }
 
                         // Get instance from static state if possible
                         if (staticStateInstancesMap != null) {
@@ -446,221 +447,73 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                         }
 
                         // Did not get the instance from static state
-                        final Object instanceDocument;// Document or DocumentInfo
-                        final String instanceSourceURI;
-                        final String xxformsUsername;
-                        final String xxformsPassword;
                         final String xxformsValidation = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
-                        containingDocument.startHandleOperation("model", "loading instance (including handling returned body)",
+                        containingDocument.startHandleOperation("model", "loading instance",
                                 new String[] { "instance id", instanceContainerElement.attributeValue("id") });
                         {
-                            final String instanceResource;
-                            {
-                                final String srcAttribute = instanceContainerElement.attributeValue("src");
-                                final String resourceAttribute = instanceContainerElement.attributeValue("resource");
-                                if (srcAttribute != null)
-                                    instanceResource = XFormsUtils.encodeHRRI(srcAttribute, true);
-                                else if (resourceAttribute != null)
-                                    instanceResource = XFormsUtils.encodeHRRI(resourceAttribute, true);
-                                else
-                                    instanceResource = null;
-                            }
-                            if (instanceResource == null) {
-                                // Inline instance
+                            // Get instance resource URI, can be from @src or @resource
+                            //final String instanceResource = getOriginalInstanceResourceURI(instanceContainerElement);
+
+                            final String srcAttribute = instanceContainerElement.attributeValue("src");
+                            final String resourceAttribute = instanceContainerElement.attributeValue("resource");
+                            final List children = instanceContainerElement.elements();
+                            if (srcAttribute != null) {
+                                // "If the src attribute is given, then it takes precedence over inline content and the
+                                // resource attribute, and the XML data for the instance is obtained from the link."
+
+                                if (srcAttribute.trim().equals("")) {
+                                    // Got a blank src attribute, just dispatch xforms-link-exception
+                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
+                                    final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, extendedLocationData);
+                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
+                                    break;
+                                }
+
+                                // Load instance
+                                loadExternalInstance(pipelineContext, instanceContainerElement, instanceId, srcAttribute, locationData, isReadonlyHint, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
+                            } else if (children != null && children.size() >= 1) {
+                                // "If the src attribute is omitted, then the data for the instance is obtained from
+                                // inline content if it is given or the resource attribute otherwise. If both the
+                                // resource attribute and inline content are provided, the inline content takes
+                                // precedence."
+
                                 final String xxformsExcludeResultPrefixes = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
-                                final List children = instanceContainerElement.elements();
-                                if (children == null || children.size() != 1) {
-                                    // TODO: dispatch xforms-link-exception
-                                    final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element",
-                                            new ExtendedLocationData(locationData, "processing inline XForms instance", instanceContainerElement));
+
+                                if (children.size() > 1) {
+                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
+                                    final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
                                     container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                     break;
                                 }
-                                // Extract document
-                                instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
-                                instanceSourceURI = null;
-                                xxformsUsername = null;
-                                xxformsPassword = null;
-                            } else if (!instanceResource.trim().equals("")) {
+                                try {
+                                    // Extract document
+                                    final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
-                                // External instance
-                                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
-                                // NOTE: Optimizing with include() for servlets doesn't allow detecting errors caused by
-                                // the included resource, so we don't allow this for now. Furthermore, we are forced to
-                                // "optimize" for portlet access.
-
-    //                            final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
-    //                               && (externalContext.getRequest().getContainerType().equals("portlet")
-    //                                    || (externalContext.getRequest().getContainerType().equals("servlet")
-    //                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
-
-                                final ExternalContext.Request request = externalContext.getRequest();
-                                final boolean optimizeLocal =
-                                        !NetUtils.urlHasProtocol(instanceResource)
-                                                && (request.getContainerType().equals("portlet")
-                                                    || request.getContainerType().equals("servlet")
-                                                       && XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument));
-
-                                final ConnectionResult connectionResult;
-                                if (optimizeLocal) {
-                                    // Use optimized local mode
-
-                                    // URI with xml:base resolution
-                                    final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResource);
-                                    // Whether or not to rewrite URLs
-                                    final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainerElement);
-
-                                    if (XFormsServer.logger.isDebugEnabled())
-                                        containingDocument.logDebug("model", "getting document from optimized URI",
-                                                    new String[] { "URI", resolvedURI.toString(), "norewrite", Boolean.toString(isNoRewrite) });
-
-                                    // Run submission
-                                    connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
-                                            null, "get", resolvedURI.toString(), isNoRewrite, null, null, null, false,
-                                            XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD);
-
-                                    instanceSourceURI = resolvedURI.toString();
-                                    xxformsUsername = null;
-                                    xxformsPassword = null;
-
-                                    try {
-                                        try {
-                                            // Handle connection errors
-                                            if (connectionResult.statusCode != 200) {
-                                                throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.statusCode);
-                                            }
-
-                                            // TODO: Handle validating and handleXInclude!
-
-                                            // Read result as XML
-                                            if (!isReadonlyHint) {
-                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
-                                            } else {
-                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
-                                            }
-                                        } catch (Exception e) {
-                                            final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external XForms instance (optimized)", instanceContainerElement);
-                                            dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, instanceResource, e, instanceContainerElement, extendedLocationData);
-                                            break;
-                                        }
-                                    } finally {
-                                        // Clean-up
-                                        if (connectionResult != null)
-                                            connectionResult.close();
-                                    }
-
-                                } else {
-                                    // Connect using external protocol
-
-                                    // Extension: username and password
-                                    // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
-                                    // instances that haven't been loaded yet.
-                                    xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
-                                    xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
-
-                                    final URL absoluteResolvedURL;
-                                    final String absoluteResolvedURLString;
-                                    {
-                                        final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource,
-                                                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-                                        final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resolvedURL);
-                                        if (inputName != null) {
-                                            // URL is input:*, keep it as is
-                                            absoluteResolvedURL = null;
-                                            absoluteResolvedURLString = resolvedURL;
-                                        } else {
-                                            // URL is regular URL, make sure it is absolute
-                                            absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, null, externalContext);
-                                            absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
-                                        }
-                                    }
-
-                                    // Get instance from shared cache if possible
-                                    if (isApplicationSharedHint) {
-                                        final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelEffectiveId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
-                                        setInstance(sharedXFormsInstance, false);
-                                        
-                                        containingDocument.endHandleOperation();
-                                        continue;
-                                    }
-
-                                    if (containingDocument.getURIResolver() == null || isApplicationSharedHint) {
-                                        // Connect directly if there is no resolver or if the instance is globally shared
-
-                                        if (XFormsServer.logger.isDebugEnabled())
-                                            containingDocument.logDebug("model", "getting document from URI",
-                                                    new String[] { "URI", absoluteResolvedURLString });
-
-                                        connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
-                                                "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
-                                                XFormsProperties.getForwardSubmissionHeaders(containingDocument));
-
-                                        try {
-                                            try {
-                                                // Handle connection errors
-                                                if (connectionResult.statusCode != 200) {
-                                                    throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.statusCode);
-                                                }
-
-                                                // TODO: Handle validating and XInclude!
-
-                                                // Read result as XML
-                                                if (!isReadonlyHint) {
-                                                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
-                                                } else {
-                                                    instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
-                                                }
-                                            } catch (Exception e) {
-                                                final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (no resolver)", instanceContainerElement);
-                                                dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, instanceResource, e, instanceContainerElement, extendedLocationData);
-                                                break;
-                                            }
-                                        } finally {
-                                            // Clean-up
-                                            if (connectionResult != null)
-                                                connectionResult.close();
-                                        }
-
-                                    } else {
-                                        // Optimized case that uses the provided resolver
-                                        if (XFormsServer.logger.isDebugEnabled())
-                                            containingDocument.logDebug("model", "getting document from resolver",
-                                                    new String[] { "URI", absoluteResolvedURLString });
-
-                                        try {
-                                            // TODO: Handle validating and handleXInclude!
-
-                                            if (!isReadonlyHint) {
-                                                instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteResolvedURLString, xxformsUsername, xxformsPassword,
-                                                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
-                                            } else {
-                                                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(absoluteResolvedURLString, xxformsUsername, xxformsPassword,
-                                                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
-                                            }
-                                        } catch (Exception e) {
-                                            final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (resolver)", instanceContainerElement);
-                                            dispatchXFormsLinkExceptionEvent(pipelineContext, new ConnectionResult(absoluteResolvedURLString), instanceResource, e, instanceContainerElement, extendedLocationData);
-                                            break;
-                                        }
-                                    }
-
-                                    instanceSourceURI = absoluteResolvedURLString;
+                                    // Set instance and associated information if everything went well
+                                    setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, null, null, null, false, -1, xxformsValidation);
+                                } catch (Exception e) {
+                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
+                                    final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
+                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
+                                    break;
                                 }
+                            } else if (resourceAttribute != null) {
+                                // "the data for the instance is obtained from inline content if it is given or the
+                                // resource attribute otherwise"
+
+                                // Load instance
+                                loadExternalInstance(pipelineContext, instanceContainerElement, instanceId, resourceAttribute, locationData, isReadonlyHint, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                             } else {
-                                // Got a blank src attribute, just dispatch xforms-link-exception
+                                // Everything missing
                                 final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
-                                final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, extendedLocationData);
-                                container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, instanceResource, instanceContainerElement, throwable));
+                                final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceId, extendedLocationData);
+                                container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, "", instanceContainerElement, throwable));
                                 break;
                             }
                         }
                         containingDocument.endHandleOperation();
-
-                        // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                     }
                 }
             }
@@ -777,22 +630,185 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         }
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
-        // NOP
+    private void loadExternalInstance(PipelineContext pipelineContext, Element instanceContainerElement, String instanceId, String instanceResource, LocationData locationData, boolean readonlyHint, boolean applicationSharedHint, long xxformsTimeToLive, String xxformsValidation) {
+        // External instance
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+        // Perform HHRI encoding
+        final String instanceResourceHHRI = XFormsUtils.encodeHRRI(instanceResource, true);
+
+        // Resolve to absolute resource path
+        final String resourceAbsolutePathOrAbsoluteURL
+                = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResourceHHRI,
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+
+        try {
+            if (applicationSharedHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) != null) {
+                // Instance can be shared
+                // NOTE: We don't allow sharing for input:* URLs because this is very likely NOT to make sense
+
+                // TODO: This doesn't handle optimized submissions!
+
+                // Make sure URL is absolute to make it unique
+                final String absoluteResolvedURLString; {
+                    final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
+                    absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
+                }
+
+                final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelEffectiveId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
+                setInstance(sharedXFormsInstance, false);
+            } else {
+                // Instance cannot be shared
+
+                // NOTE: Optimizing with include() for servlets has limitations, in particular
+                // the proper split between servlet path and path info is not done.
+                final ExternalContext.Request request = externalContext.getRequest();
+                final boolean optimizeLocal =
+                        !NetUtils.urlHasProtocol(resourceAbsolutePathOrAbsoluteURL)
+                                && (request.getContainerType().equals("portlet")
+                                    || request.getContainerType().equals("servlet")
+                                       && XFormsProperties.isOptimizeLocalInstanceInclude(containingDocument));
+
+                if (optimizeLocal) {
+                    // Use URL resolved against current context
+                    final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResourceHHRI);
+                    loadInstanceOptimized(pipelineContext, externalContext, instanceContainerElement, instanceId, resolvedURI.toString(), readonlyHint, xxformsValidation);
+                } else {
+                    // Use full resolved resource URL
+                    // o absolute URL, e.g. http://example.org/instance.xml
+                    // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
+                    loadInstance(externalContext, instanceContainerElement, instanceId, resourceAbsolutePathOrAbsoluteURL, readonlyHint, xxformsValidation);
+                }
+            }
+        } catch (Exception e) {
+            final ValidationException validationException
+                = ValidationException.wrapException(e, new ExtendedLocationData(locationData, "reading external instance", instanceContainerElement));
+            container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, resourceAbsolutePathOrAbsoluteURL, instanceContainerElement, validationException));
+        }
     }
 
-    private void dispatchXFormsLinkExceptionEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, String srcAttribute, Exception e, Element instanceContainerElement, LocationData locationData) {
-        final Throwable throwable;
-        if (connectionResult != null && connectionResult.resourceURI != null) {
-            final ValidationException validationException
-                = ValidationException.wrapException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
-                    "reading external instance", instanceContainerElement));
-            validationException.addLocationData(locationData);
-            throwable = validationException;
-        } else {
-            throwable = ValidationException.wrapException(e, locationData);
+    private void loadInstance(ExternalContext externalContext, Element instanceContainerElement,
+                                          String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
+
+        // Connect using external protocol
+
+        final URL absoluteResolvedURL;
+        final String absoluteResolvedURLString;
+        {
+
+            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL);
+            if (inputName != null) {
+                // URL is input:*, keep it as is
+                absoluteResolvedURL = null;
+                absoluteResolvedURLString = resourceAbsolutePathOrAbsoluteURL;
+            } else {
+                // URL is regular URL, make sure it is absolute
+                absoluteResolvedURL = NetUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
+                absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
+            }
         }
-        container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
+
+        // Extension: username and password
+        // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
+        // instances that haven't been loaded yet.
+        final String xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+        final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+
+        final Object instanceDocument;// Document or DocumentInfo
+        if (containingDocument.getURIResolver() == null) {
+            // Connect directly if there is no resolver or if the instance is globally shared
+
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("model", "getting document from URI",
+                        new String[] { "URI", absoluteResolvedURLString });
+
+            final ConnectionResult connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
+                    "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
+                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+
+            try {
+                // Handle connection errors
+                if (connectionResult.statusCode != 200) {
+                    throw new OXFException("Got invalid return code while loading instance: " + absoluteResolvedURLString + ", " + connectionResult.statusCode);
+                }
+
+                // TODO: Handle validating and XInclude!
+
+                // Read result as XML
+                if (!isReadonlyHint) {
+                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                } else {
+                    instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                }
+            } finally {
+                // Clean-up
+                if (connectionResult != null)
+                    connectionResult.close();
+            }
+
+        } else {
+            // Optimized case that uses the provided resolver
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("model", "getting document from resolver",
+                        new String[] { "URI", absoluteResolvedURLString });
+
+            // TODO: Handle validating and handleXInclude!
+
+            if (!isReadonlyHint) {
+                instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteResolvedURLString, xxformsUsername, xxformsPassword,
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+            } else {
+                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(absoluteResolvedURLString, xxformsUsername, xxformsPassword,
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+            }
+        }
+
+        // Set instance and associated information if everything went well
+        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, absoluteResolvedURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation);
+    }
+
+    private void loadInstanceOptimized(PipelineContext pipelineContext, ExternalContext externalContext, Element instanceContainerElement,
+                                          String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
+
+        // Whether or not to rewrite URLs
+        final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainerElement);
+
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("model", "getting document from optimized URI",
+                        new String[] { "URI", resourceAbsolutePathOrAbsoluteURL, "norewrite", Boolean.toString(isNoRewrite) });
+
+        // Run submission
+        final ConnectionResult connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
+                null, "get", resourceAbsolutePathOrAbsoluteURL, isNoRewrite, null, null, null, false,
+                XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD);
+
+        final Object instanceDocument;// Document or DocumentInfo
+        try {
+            // Handle connection errors
+            if (connectionResult.statusCode != 200) {
+                throw new OXFException("Got invalid return code while loading instance: " + resourceAbsolutePathOrAbsoluteURL + ", " + connectionResult.statusCode);
+            }
+
+            // TODO: Handle validating and handleXInclude!
+
+            // Read result as XML
+            if (!isReadonlyHint) {
+                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+            } else {
+                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+            }
+        } finally {
+            // Clean-up
+            if (connectionResult != null)
+                connectionResult.close();
+        }
+
+        // Set instance and associated information if everything went well
+        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation);
+    }
+
+    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
+        // NOP
     }
 
     public static class EventSchedule {
@@ -1453,12 +1469,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
 
     public void endOutermostActionHandler(PipelineContext pipelineContext) {
 
-        // TODO: This is not 100% in line with the "correct" interpretation of the deferred updates, as deferred
-        // behavior is triggered at the level of outermost action handlers, not outermost event dispatches.
-
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
-        deferredActionContext = null;
+        // NOTE: We used to clear this, but this caused events to be dispatched in a different order
+        // So we are now leaving the flag as is, and waiting until they clear themselves. Leaving commented
+        // line below for now in case this causes issues.
+        //deferredActionContext = null;
         if (currentDeferredActionContext != null) {
             if (currentDeferredActionContext.rebuild) {
                 containingDocument.startOutermostActionHandler();

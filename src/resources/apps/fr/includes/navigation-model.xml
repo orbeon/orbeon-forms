@@ -34,22 +34,22 @@
 
     <xforms:submission id="fr-edit-switch-script-summary-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
-        method="get" serialization="none" replace="all" validate="false"/>
+        method="get" serialization="none" replace="all" validate="false" relevant="false"/>
 
     <xforms:submission id="fr-edit-switch-script-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"/>
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <xforms:submission id="fr-print-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <xforms:submission id="fr-pdf-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 
     <!-- Go back to the Form Runner summary page -->

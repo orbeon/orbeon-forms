@@ -14,7 +14,7 @@
 -->
 <xhtml:script type="text/javascript" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <![CDATA[
-    function unload_handler(){
+    function unload_handler() {
         try{
             if (!ORBEON.xforms.Document.isReloading() && ORBEON.xforms.Document.getValue('fr-data-safe-input') != 'true'){
               return "You may lose some unsaved changes.";

@@ -397,19 +397,16 @@
                                                     <xxforms:variable name="current-qname" select="resolve-QName(name(), .)" as="QName()"/>
                                                     <!-- Whether this is a component -->
                                                     <xxforms:variable name="is-component" select="$current-qname = $components-qnames" as="xs:boolean"/>
-                                                    <!-- Component template if this is a component -->
+                                                    <!-- Component template if this is a component (take first one) -->
                                                     <xxforms:variable name="component-template" as="element(xbl:template)?"
                                                                       select="if ($is-component)
-                                                                              then $component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))]/xbl:template
+                                                                              then ($component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))]/xbl:template)[1]
                                                                               else ()"/>
-
-                                                    <!--xxx <xforms:output value="$is-component"/> xxx-->
 
                                                     <xhtml:div class="fb-section-content{if ($is-component) then ' fb-section-component' else ''}">
                                                         <!-- Grid or component within top-level section -->
                                                         <xforms:group ref=".[$current-qname = xs:QName('fr:grid') or $is-component]">
                                                             <!-- Find grid to display -->
-                                                            <!-- TODO: read-only grid if from XBL -->
 
                                                             <xxforms:variable name="readwrite-grid" select="not($is-component)" as="xs:boolean"/>
                                                             <xxforms:variable name="grid" as="element(fb:grid)"

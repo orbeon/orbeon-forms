@@ -28,9 +28,15 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
+    <!-- Namespace URI e.g. http://orbeon.org/oxf/xml/form-builder/component/APP/FORM -->
+    <xsl:variable name="component-namespace" as="xs:string"
+                  select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
+
     <xsl:template match="/">
 
         <xbl:xbl>
+            <!-- Create namespace declaration for resolution of CSS selector -->
+            <xsl:namespace name="component" select="$component-namespace"/>
 
             <!-- Add Form Builder metadata -->
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -73,7 +79,7 @@
 
         <!-- Create binding for the section/grid as a component -->
         <!-- TODO: Is using class fr-section-component the best way? -->
-        <xbl:binding id="{$component-id}-component" element="fr|{$component-id}" class="fr-section-component">
+        <xbl:binding id="{$component-id}-component" element="component|{$component-id}" class="fr-section-component">
 
             <!-- Orbeon Form Builder Component Metadata -->
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -103,11 +109,11 @@
                 <!-- Control template -->
                 <template>
                     <!-- NOTE: Element doesn't have LHHA elements for now -->
-                    <xsl:element name="fr:{$component-id}"/>
+                    <xsl:element name="component:{$component-id}" namespace="{$component-namespace}"/>
                 </template>
             </metadata>
 
-            <!-- XLB template -->
+            <!-- XBL template -->
             <xbl:template>
 
                 <xforms:model id="{$component-id}-model">

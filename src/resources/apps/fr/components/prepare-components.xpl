@@ -52,13 +52,11 @@
                 <mode/>
             </request>
         </p:input>
-        <p:output name="data" id="parameters" debug="xxxxx"/>
+        <p:output name="data" id="parameters"/>
     </p:processor>
 
-    <!-- Read template form for global orbeon library -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../detail/read-form.xpl"/>
-        <p:input name="instance">
+    <p:processor name="oxf:identity">
+        <p:input name="data">
             <request>
                 <app>orbeon</app>
                 <form>library</form>
@@ -66,6 +64,13 @@
                 <mode/>
             </request>
         </p:input>
+        <p:output name="data" id="global-parameters"/>
+    </p:processor>
+
+    <!-- Read template form for global orbeon library -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../detail/read-form.xpl"/>
+        <p:input name="instance" href="#global-parameters"/>
         <p:output name="data" id="global-template-form"/>
     </p:processor>
 
@@ -78,13 +83,15 @@
 
     <!-- Convert templates to XBL -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#global-template-form"/>
         <p:input name="config" href="form-to-xbl.xsl"/>
+        <p:input name="data" href="#global-template-form"/>
+        <p:input name="parameters" href="#global-parameters"/>
         <p:output name="data" id="global-template-xbl"/>
     </p:processor>
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#custom-template-form"/>
         <p:input name="config" href="form-to-xbl.xsl"/>
+        <p:input name="data" href="#custom-template-form"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:output name="data" id="custom-template-xbl"/>
     </p:processor>
 

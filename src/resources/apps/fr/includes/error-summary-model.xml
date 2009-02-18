@@ -133,7 +133,7 @@
                then $e else () " as="element(error)*"/>
 
     <!-- Mark all controls as visited when certain buttons are activated -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button">
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button">
         <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
     </xforms:action>
 

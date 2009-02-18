@@ -113,13 +113,15 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         }
 
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
-        // TODO: must send startPrefixMapping()/endPrefixMapping()?
-        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
+        if (!handlerContext.isNoScript()) {
+            // TODO: must send startPrefixMapping()/endPrefixMapping()?
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
+        }
 
         // Create xhtml:form element
         final boolean hasUpload = staticState.hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
-                // Add id so that things work in portals
+                // Add id so that things work in portals    
                 "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
                 // Regular classes
                 "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden"),

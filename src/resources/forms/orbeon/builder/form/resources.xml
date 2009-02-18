@@ -31,7 +31,7 @@
         <title>
             <label>Form Title</label>
             <hint>click to enter the form title</hint>
-            <alert>The form title is required</alert>
+            <alert>The form title is required in all languages</alert>
         </title>
         <description>
             <label>Form Description</label>
@@ -44,7 +44,7 @@
         <!-- Sections -->
         <section-name>
             <hint>click to enter a section title</hint>
-            <alert>The section title is required</alert>
+            <alert>The section title is required in all languages</alert>
         </section-name>
         <!-- Toolbox -->
         <cut>
@@ -713,7 +713,7 @@
         <title>
             <label>Titre du formulaire</label>
             <hint>titre du formulaire</hint>
-            <alert>Le titre de formulaire est requis</alert>
+            <alert>Le titre de formulaire est requis dans toutes les langues</alert>
         </title>
         <description>
             <label>Description du formulaire</label>
@@ -726,7 +726,7 @@
         <!-- Sections -->
         <section-name>
             <hint>cliquer pour entrer un titre de section</hint>
-            <alert>Le title de section est requis</alert>
+            <alert>Le title de section est requis dans toutes les langues</alert>
         </section-name>
         <!-- Toolbox -->
         <cut>

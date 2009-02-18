@@ -5143,61 +5143,65 @@ ORBEON.xforms.Server = {
                                             var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean"
                                             var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string"
 
-                                            // Clean-up document element by removing type classes
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-time");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-boolean");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-incremental");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-input-appearance-minimal");
+                                            var isRecognizedType = isDateType || isTimeType || isDateTimeType || isBooleanType || isStringType;
+                                            if (isRecognizedType) { // just ignore if we don't know the type
 
-                                            // Remove content of span
-                                            while (documentElement.childNodes.length != 0)
-                                                documentElement.removeChild(documentElement.childNodes[0]);
+                                                // Clean-up document element by removing type classes
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-time");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-boolean");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-incremental");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-input-appearance-minimal");
 
-                                            function createInput(typeClassName, inputIndex) {
-                                                var input = document.createElement("input");
-                                                input.setAttribute("type", "text");
-                                                input.className = "xforms-input-input " + typeClassName;
-                                                input.name = controlId + "$xforms-input-" + inputIndex;
-                                                input.id = input.name;
-                                                documentElement.appendChild(input);
-                                            }
+                                                // Remove content of span
+                                                while (documentElement.childNodes.length != 0)
+                                                    documentElement.removeChild(documentElement.childNodes[0]);
 
-                                            if (isStringType) {
-                                                createInput("xforms-type-string", 1);
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
-                                            } else if (isDateType) {
-                                                createInput("xforms-type-date", 1);
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            } else if (isTimeType) {
-                                                createInput("xforms-type-time", 1);
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
-                                            } else if (isDateTimeType) {
-                                                createInput("xforms-type-date", 1);
-                                                createInput("xforms-type-time", 2);
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
-                                            } else if (isBooleanType) {
+                                                function createInput(typeClassName, inputIndex) {
+                                                    var input = document.createElement("input");
+                                                    input.setAttribute("type", "text");
+                                                    input.className = "xforms-input-input " + typeClassName;
+                                                    input.name = controlId + "$xforms-input-" + inputIndex;
+                                                    input.id = input.name;
+                                                    documentElement.appendChild(input);
+                                                }
 
-                                                // Make copy of the template
-                                                var template = ORBEON.util.Dom.getElementById("xforms-select-full-template");
-                                                template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
-                                                var templateClone = template.cloneNode(true);
-                                                // This is also the template used for <xforms:select appearance="full"> and <xforms:select1 appearance="full">,
-                                                // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
-                                                // so there is no item label.
-                                                xformsStringReplace(templateClone, "$xforms-template-label$", "");
-                                                xformsStringReplace(templateClone, "$xforms-template-value$", "true");
-                                                xformsStringReplace(templateClone, "$xforms-item-index$", "0");
-                                                xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
-                                                documentElement.appendChild(templateClone);
+                                                if (isStringType) {
+                                                    createInput("xforms-type-string", 1);
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
+                                                } else if (isDateType) {
+                                                    createInput("xforms-type-date", 1);
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                } else if (isTimeType) {
+                                                    createInput("xforms-type-time", 1);
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
+                                                } else if (isDateTimeType) {
+                                                    createInput("xforms-type-date", 1);
+                                                    createInput("xforms-type-time", 2);
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
+                                                } else if (isBooleanType) {
 
-                                                // Update classes
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
+                                                    // Make copy of the template
+                                                    var template = ORBEON.util.Dom.getElementById("xforms-select-full-template");
+                                                    template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
+                                                    var templateClone = template.cloneNode(true);
+                                                    // This is also the template used for <xforms:select appearance="full"> and <xforms:select1 appearance="full">,
+                                                    // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
+                                                    // so there is no item label.
+                                                    xformsStringReplace(templateClone, "$xforms-template-label$", "");
+                                                    xformsStringReplace(templateClone, "$xforms-template-value$", "true");
+                                                    xformsStringReplace(templateClone, "$xforms-item-index$", "0");
+                                                    xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                    documentElement.appendChild(templateClone);
+
+                                                    // Update classes
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
+                                                }
                                             }
                                         }
 

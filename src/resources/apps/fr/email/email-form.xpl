@@ -64,6 +64,62 @@
         <p:output name="data" id="fr-resources"/>
     </p:processor>
 
+    <!-- Obtain attachment information -->
+
+    <!-- Provide attachments information -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="xhtml" href="#xhtml-fr-xforms"/>
+        <p:input name="parameters" href="#parameters"/>
+        <p:input name="config">
+            <attachments xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+                <xsl:variable name="data" select="/*" as="element()"/>
+                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
+
+                <!-- App and form -->
+                <xsl:variable name="app" select="doc('input:parameters')/*/app" as="xs:string"/>
+                <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
+
+                <xsl:variable name="data-collection" select="pipeline:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.'))" as="xs:string"/>
+
+                <!--  NOTE: code below partially duplicated in persistence-model.xml but in XForms! -->
+                <xsl:variable name="attachment-controls" as="element()*"
+                              select="$xhtml/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, ' ') = 'fr-attachment']"/>
+
+                <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
+                <xsl:variable name="attachment-binds" as="element(xforms:bind)*"
+                              select="$xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                        or @id = $attachment-controls/@bind]"/>
+
+                <!-- Iterate over attachment controls while there is no submission error -->
+                <xsl:for-each select="(1 to count($attachment-binds))">
+
+                        <xsl:variable name="bind" as="element(xforms:bind)"
+                                      select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                                or @id = $attachment-controls/@bind])[number(current())]"/>
+
+                        <xsl:variable name="binds" select="$bind/ancestor-or-self::xforms:bind" as="element(xforms:bind)+"/>
+                        <xsl:variable name="expression" select="string-join($binds/@nodeset, '/')" as="xs:string"/>
+
+                        <xsl:variable name="holders" select="$data/saxon:evaluate($expression)"/>
+
+                        <xsl:for-each select="$holders[normalize-space() != '']">
+                            <xsl:variable name="uri" select="normalize-space()" as="xs:string"/>
+                            <attachment filename="{@filename}" mediatype="{@mediatype}">
+                                <!-- URL may be absolute or already point to persistence layer -->
+                                <!-- TODO: Should this use oxf.fr.appserver.uri in case there is no protocol specified? -->
+                                <xsl:value-of select="pipeline:rewriteResourceURI($uri, true())"/>
+                            </attachment>
+                        </xsl:for-each>
+
+                </xsl:for-each>
+            </attachments>
+        </p:input>
+        <p:output name="data" id="attachments"/>
+    </p:processor>
+
+
     <!-- Build email message -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#instance"/>
@@ -71,6 +127,7 @@
         <p:input name="request" href="#request"/>
         <p:input name="parameters" href="#parameters"/>
         <p:input name="fr-resources" href="#fr-resources"/>
+        <p:input name="attachments" href="#attachments"/>
         <p:input name="config">
             <message xsl:version="2.0">
 
@@ -78,6 +135,7 @@
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
                 <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
                 <xsl:variable name="fr-resources" select="doc('input:fr-resources')/*" as="element(resources)"/>
+                <xsl:variable name="attachments" select="doc('input:attachments')/*" as="element(attachments)"/>
 
                 <!-- Language requested -->
                 <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
@@ -157,17 +215,24 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </subject>
-                <!-- Body -->
+                <!-- Multipart body -->
                 <body content-type="multipart/related">
+                    <!-- Email body -->
                     <part name="text" content-type="text/plain">
                         <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
                     </part>
+                    <!-- XML attachment if needed -->
                     <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
                         <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                     </xsl:if>
+                    <!-- PDF attachment if needed -->
                     <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
                         <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                     </xsl:if>
+                    <!-- Other attachments if needed -->
+                    <xsl:for-each select="$attachments/attachment">
+                        <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="inline; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
+                    </xsl:for-each>
                 </body>
             </message>
         </p:input>
@@ -195,14 +260,49 @@
         <p:output name="data" id="form-xml"/>
     </p:processor>
 
-    <!-- Send the email -->
-    <p:processor name="oxf:email">
-        <!-- The instance contains the email message -->
-        <p:input name="data" href="#message"/>
-        <!-- The attachment contains the XML document -->
+    <!-- Connect attachments and send email -->
+    <p:processor name="oxf:pipeline">
+        <!-- Inputs to forward -->
+        <p:input name="message" href="#message"/>
         <p:input name="form-xml" href="#form-xml"/>
-        <!-- The attachment contains the pdf document -->
         <p:input name="form-pdf" href="#form-pdf"/>
+        <!-- Dynamically generate pipeline to dereference attachments and send email -->
+        <p:input name="config" href="#attachments" transform="oxf:unsafe-xslt">
+            <p:config xsl:version="2.0">
+                <!-- Forwarded inputs -->
+                <p:param type="input" name="message"/>
+                <p:param type="input" name="form-xml"/>
+                <p:param type="input" name="form-pdf"/>
+                <!-- Iterate over attachments -->
+                <xsl:for-each select="/*/attachment">
+                    <xsl:variable name="uri" select="." as="xs:string"/>
+                    <!-- Create one URL generator per attachment -->
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url><xsl:value-of select="$uri"/></url>
+                                <!-- Forward the same headers that the XForms engine forwards -->
+                                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="attachment-{position()}"/>
+                    </p:processor>
+                </xsl:for-each>
+                <!-- Send the email -->
+                <p:processor name="oxf:email">
+                    <!-- The instance contains the email message -->
+                    <p:input name="data" href="#message"/>
+                    <!-- The attachment contains the XML document -->
+                    <p:input name="form-xml" href="#form-xml"/>
+                    <!-- The attachment contains the pdf document -->
+                    <p:input name="form-pdf" href="#form-pdf"/>
+                    <!-- Create one extra input per attachment -->
+                    <xsl:for-each select="/*/attachment">
+                        <p:input name="attachment-{position()}" href="#attachment-{position()}"/>
+                    </xsl:for-each>
+                </p:processor>
+            </p:config>
+        </p:input>
     </p:processor>
 
     <!-- If something goes wrong, an exception will be thrown before we get here -->

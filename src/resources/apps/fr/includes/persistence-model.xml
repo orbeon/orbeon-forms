@@ -229,7 +229,7 @@
         <xforms:action if="$document != ''">
 
             <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
-                 is invalid and 2) submission dosn't check validity anymore -->
+                 is invalid and 2) submission doesn't check validity anymore -->
             <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:valid(xxforms:instance('fr-form-instance'), true())" as="xs:boolean"/>
 
             <xforms:action if="not($continue-with-save)">
@@ -242,11 +242,11 @@
                 <!-- Data valid: proceed with saving attachments and data -->
 
                 <!-- Handle attachments -->
-                <xxforms:variable name="attachment-controls"
+                <xxforms:variable name="attachment-controls" as="element()*"
                                   select="instance('fr-source-form-instance')/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, ' ') = 'fr-attachment']"/>
 
                 <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
-                <xxforms:variable name="attachment-binds"
+                <xxforms:variable name="attachment-binds" as="element(xforms:bind)*"
                                   select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
                                             or @id = $attachment-controls/@bind]"/>
 
@@ -263,8 +263,9 @@
                 <xforms:action xxforms:iterate="(1 to count($attachment-binds))">
 
                     <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
-                        <xxforms:variable name="bind" select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
-                                            or @id = $attachment-controls/@bind])[number(context())]"/>
+                        <xxforms:variable name="bind" as="element(xforms:bind)"
+                                          select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                                    or @id = $attachment-controls/@bind])[number(context())]"/>
 
                         <!--
                             Argh: why does the sequence below suddenly does not contain nodes in document order? This
@@ -284,8 +285,8 @@
                               http://forge.objectweb.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
 
                         -->
-                        <xxforms:variable name="binds" select="$bind/ancestor-or-self::xforms:bind"/>
-                        <xxforms:variable name="expression" select="string-join($binds/@nodeset, '/')"/>
+                        <xxforms:variable name="binds" select="$bind/ancestor-or-self::xforms:bind" as="element(xforms:bind)+"/>
+                        <xxforms:variable name="expression" select="string-join($binds/@nodeset, '/')" as="xs:string"/>
 
                         <!--<xforms:message level="xxforms:log-debug">-->
                             <!--xxx <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
@@ -296,18 +297,18 @@
                         <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
 
                         <xforms:action xxforms:iterate="$holders">
-                            <xxforms:variable name="holder" select="."/>
+                            <xxforms:variable name="holder" select="." as="node()"/>
                             <!-- Found attachment URI location -->
-                            <xxforms:variable name="uri" select="normalize-space($holder)"/>
+                            <xxforms:variable name="uri" select="normalize-space($holder)" as="xs:string"/>
                             <xforms:action if="$uri != '' and starts-with($uri, 'file:')">
                                 <!-- There is a URI to process -->
 
-                                <xxforms:variable name="upload-extension" select="normalize-space(tokenize($holder/@filename, '\.')[last()])"/>
-                                <xxforms:variable name="upload-has-extension" select="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''"/>
-                                <xxforms:variable name="new-id" select="digest(string(random(true)), 'MD5', 'hex')"/>
+                                <xxforms:variable name="upload-extension" select="normalize-space(tokenize($holder/@filename, '\.')[last()])" as="xs:string"/>
+                                <xxforms:variable name="upload-has-extension" select="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''" as="xs:string"/>
+                                <xxforms:variable name="new-id" select="digest(string(random(true)), 'MD5', 'hex')" as="xs:string"/>
                                 <xxforms:variable name="new-filename" select="string-join(($new-id,
-                                                                                            if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')"/>
-                                <xxforms:variable name="resource"
+                                                                                            if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')" as="xs:string"/>
+                                <xxforms:variable name="resource" as="xs:string"
                                                   select="concat(instance('fr-uris-instance')/data-collection, '/crud/',
                                                             $app, '/', $form, '/data/',
                                                             $document, '/', $new-filename)"/>

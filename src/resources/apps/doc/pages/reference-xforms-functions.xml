@@ -437,7 +437,7 @@
                         </p>
                         <xml-source show-namespaces="false">
                             <comment> Store the value of the element to which the first-name control is bound </comment>
-                            <xforms:setvalue ref="my-value" origin="xxforms:binding('first-name')"/>
+                            <xforms:setvalue ref="my-value" value="xxforms:binding('first-name')"/>
                         </xml-source>
                     </li>
                     <li>
@@ -451,7 +451,7 @@
                         </p>
                         <xml-source show-namespaces="false">
                             <comment> Remember the User-Agent header </comment>
-                            <xforms:setvalue ref="user-agent" select="xxforms:get-request-header('User-Agent')"/>
+                            <xforms:setvalue ref="user-agent" value="xxforms:get-request-header('User-Agent')"/>
                         </xml-source>
                         <note>
                             <p>
@@ -472,7 +472,7 @@
                         </p>
                         <xml-source show-namespaces="false">
                             <comment> Remember the "columns" parameter </comment>
-                            <xforms:setvalue ref="columns" select="xxforms:get-request-parameter('columns')"/>
+                            <xforms:setvalue ref="columns" value="xxforms:get-request-parameter('columns')"/>
                         </xml-source>
                         <note>
                             <p>

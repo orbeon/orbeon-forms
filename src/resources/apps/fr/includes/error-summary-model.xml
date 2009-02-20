@@ -59,8 +59,9 @@
     </xforms:instance>
 
     <!-- Keep track of whether the form is valid or invalid -->
-    <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fr-form-instance" ref="instance('fr-form-valid-instance')">false</xforms:setvalue>
-    <xforms:setvalue ev:event="xxforms-valid" ev:observer="fr-form-instance" ref="instance('fr-form-valid-instance')">true</xforms:setvalue>
+    <!-- NOTE: We don't use the events above anymore because XBL components may have invalid local instances, which is not
+         reflected by xxforms-invalid. So we use the error count instead. -->
+    <xforms:bind nodeset="instance('fr-form-valid-instance')" calculate="count(instance('fr-errors-instance')/error) = 0"/>
 
     <!-- Handle "control visited" events on #fr-form-group -->
     <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->

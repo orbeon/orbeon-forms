@@ -230,7 +230,9 @@
 
             <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
                  is invalid and 2) submission doesn't check validity anymore -->
-            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:valid(xxforms:instance('fr-form-instance'), true())" as="xs:boolean"/>
+            <!-- NOTE: We use instance('fr-form-valid-instance') and not xxforms:valid() because the instance validity may
+                 not be reflected with the use of XBL components. -->
+            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:instance('fr-form-valid-instance') = 'true'" as="xs:boolean"/>
 
             <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->

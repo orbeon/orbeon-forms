@@ -6915,9 +6915,28 @@ function xformsDisplayLoading(progressMessage) {
 // Run xformsPageLoaded when the browser has finished loading the page
 // In case this script is loaded twice, we still want to run the initialization only once
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
-    ORBEON.xforms.Globals.pageLoadedRegistered = true;
-    // If the browser does not provide a console object, create one which delegates log() to xformsLog()
-    YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
-    ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
-    ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
+
+    // See if we the form is inside a <div class="dijitContentPane">. If it is, this means that the form has been
+    // included into the <div> by Dojo. When that happens, using YAHOO.util.Event.onDOMReady() works with IE but not
+    // Firefox. So the user is responsible from calling ORBEON.xforms.Init.document() (see the Wiki:
+    // http://tinyurl.com/cufx4f). But because YAHOO.util.Event.onDOMReady() does work on IE, that causes
+    // ORBEON.xforms.Init.document() to be called twice which causes problems. So here we look for a
+    // <div class="dijitContentPane"> and if we can find one, we don't call YAHOO.util.Event.onDOMReady().
+    var foundDojoContentPane = false;
+    for (var i = 0; i < document.forms.length; i++) {
+        var form = document.forms[i];
+        if (form.className.indexOf("xforms-form") != -1) {
+            console.log("Found form");
+            if (form.parentNode.className == "dijitContentPane") {
+                foundDojoContentPane = true;
+            }
+        }
+    }
+
+    if (!foundDojoContentPane) {
+        ORBEON.xforms.Globals.pageLoadedRegistered = true;
+        YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
+        ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
+        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
+    }
 }

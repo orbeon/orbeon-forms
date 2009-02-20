@@ -215,6 +215,7 @@ public class XFormsFeatures {
             },
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
+            // Selector is so far only used offline
             new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
@@ -299,13 +300,6 @@ public class XFormsFeatures {
                     return isAutocompleteInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "autocomplete"; }
-            },
-            // Selector is so far only used offline
-            new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
-                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return XFormsProperties.isOfflineMode(containingDocument);
-                }
-                public String getFeatureName() { return "offline"; }
             },
             // ajaxxslt (to compute XPath expressions on the client-side when offline)
             new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util-min.js") {

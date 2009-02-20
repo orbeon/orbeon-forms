@@ -53,16 +53,23 @@ public class XFormsActionInterpreter {
         this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(container);
 
-        // Set context on top-level action
+        // Set XPath context based on lexical location
         final String eventContainerEffectiveId;
         if (eventObserver.getId().equals(ancestorObserverStaticId)) {
-            // We have access to the effective context
+            // Observer is parent of action, so we have easily access to the effective context
             eventContainerEffectiveId = eventObserver.getEffectiveId();
         } else {
-            // We don't really know, and this won't work for handlers nested within repeats but will work for outer
-            // controls and, models, instances and submissions
-            // TODO: once XFormsContainer supports nested control tree, use resolveObjectById() to obtain effective id 
-            eventContainerEffectiveId = ancestorObserverStaticId;
+            // Observer is not parent of action, try to find effective id of parent
+
+            // Get source id to resolve against if we are within a nested container
+            final String fullPrefix = container instanceof XFormsContainingDocument ? null : container.getFullPrefix();
+
+            // Try to find effective parent object
+            final Object o = container.resolveObjectById(fullPrefix, ancestorObserverStaticId);
+            eventContainerEffectiveId = (o != null) ? ((XFormsEventObserver) o).getEffectiveId() : ancestorObserverStaticId;
+
+            // TODO: The logic above is not quite right at the moment because the parent might be in a repeat.
+            // Should work for outer controls, models, instances and submissions
         }
 
         setActionBindingContext(pipelineContext, containingDocument, actionElement, eventContainerEffectiveId);

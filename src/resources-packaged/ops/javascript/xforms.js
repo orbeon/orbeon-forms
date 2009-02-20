@@ -959,6 +959,37 @@ ORBEON.util.Utils = {
 };
 
 /**
+ * Utility function to make testing with YUI Test easier.
+ */
+ORBEON.util.Test = {
+    /**
+     * Tests that rely on instances having a certain value should start by callng this utility function
+     */
+    executeWithInitialInstance: function(testCase, testFunction) {
+        ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
+            ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
+        }, function() {
+            testFunction.call(testCase);
+        });
+    },
+
+    executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
+
+        function ajaxReceived() {
+            testCase.resume(function() {
+                ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(ajaxReceived);
+                afterAjaxResponseFunction.call(testCase);
+            });
+        }
+
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(ajaxReceived, testCase, true);
+        causingAjaxRequestFunction.call(testCase);
+        testCase.wait();
+    }
+};
+
+
+/**
  * This object contains function designed to be called from JavaScript code
  * embedded in forms.
  */

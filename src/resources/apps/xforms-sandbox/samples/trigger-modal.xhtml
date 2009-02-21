@@ -23,16 +23,54 @@
         <xhtml:title>XForms Modal Trigger</xhtml:title>
         <xforms:model id="main-model">
             <xforms:instance id="instance">
-                <instance/>
+                <instance>0</instance>
             </xforms:instance>
-            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds"
-                replace="instance"/>
+            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
         </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+                testDoubleClick: function() {
+                    var control = document.getElementById("modal-trigger");
+                    var countControl = document.getElementById("click-count");
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        YAHOO.util.UserAction.click(control);
+                        YAHOO.util.UserAction.click(control);
+                    }, function() {
+                        var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
+                        YAHOO.util.Assert.areEqual(1, count);
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            YAHOO.util.UserAction.click(control);
+                            YAHOO.util.UserAction.click(control);
+                        }, function() {
+                            var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
+                            YAHOO.util.Assert.areEqual(2, count);
+                        });
+                    });
+                }
+            }));
+            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                new YAHOO.tool.TestLogger();
+                YAHOO.tool.TestRunner.run();
+            });
+        </xhtml:script>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger xxforms:modal="true">
-            <xforms:label>Do long operation</xforms:label>
-            <xforms:send ev:event="DOMActivate" submission="sleep-5-seconds"/>
-        </xforms:trigger>
+        <xhtml:p>
+            <xforms:output ref="." id="click-count">
+                <xforms:label>Number of clicks: </xforms:label>
+            </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger id="modal-trigger" xxforms:modal="true">
+                <xforms:label>Do long operation</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="." value="number(.) + 1"/>
+                    <xforms:send submission="sleep-5-seconds"/>
+                </xforms:action>
+            </xforms:trigger>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

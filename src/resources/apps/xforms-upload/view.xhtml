@@ -51,14 +51,17 @@
             <!-- Background submission -->
             <xforms:submission id="background-submission" method="post" replace="none" resource="test:"/>
             <!-- Main submission which uploads the files -->
-            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/text"
+            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/test"
                                replace="all" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }
             .xforms-upload-info { background: white; display: block; padding: 2px; width: 99%; margin: 1px }
             .upload-table .xforms-alert { display: none }
+            .upload-table td { vertical-align: top } 
             .upload-table { background-color: #fce5b6 }
+            .xforms-mediatype-image img { max-width: 100px; max-height: 100px; vertical-align: middle; margin:0 0.5em 0.5em; }
+            .xforms-output-appearance-xxforms-download { display: block }
         </style>
     </head>
     <body>
@@ -88,6 +91,9 @@
                         </xforms:trigger>
                     </xforms:group>
                 </td>
+                <th>
+                    <xforms:group ref=".[(for $m in file/@mediatype return starts-with($m, 'image/')) = true()]">Image</xforms:group>
+                </th>
             </tr>
             <xforms:repeat nodeset="file" id="file-repeat">
                 <tr>
@@ -103,18 +109,25 @@
                         </xforms:group>
                     </td>
                     <td>
+                        <!-- Upload field -->
                         <xforms:upload ref="." xxforms:size="60">
                             <xforms:filename ref="@filename"/>
                             <xforms:mediatype ref="@mediatype"/>
                             <xxforms:size ref="@size"/>
                             <xforms:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file got selected!</xforms:setvalue>
                         </xforms:upload>
+                        <!-- Download link -->
+                        <xforms:output ref="." appearance="xxforms:download">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xforms:label>Download</xforms:label>
+                        </xforms:output>
                     </td>
                     <td>
-                        <!--<xforms:group ref=".[normalize-space() != '' and starts-with(@mediatype, 'image/')]">-->
-                            <!--Image!-->
-                            <!--<xforms:output value=""/>-->
-                        <!--</xforms:group>-->
+                        <!-- Show image if mediatype is of an imate -->
+                        <xforms:group ref=".[normalize-space() != '' and starts-with(@mediatype, 'image/')]">
+                            <xforms:output mediatype="image/*" value="."/>
+                        </xforms:group>
                     </td>
                 </tr>
             </xforms:repeat>

@@ -926,6 +926,9 @@ ORBEON.util.Utils = {
     hideModalProgressPanel: function() {
         if (ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel.hide();
+            // We set it to null when hidding so we have an easy way of knowing of the panel is visible or not.
+            // See: http://www.nabble.com/Is-Panel-visible--td22139417.html
+            ORBEON.xforms.Globals.modalProgressPanel = null;
         }
     },
 
@@ -2596,15 +2599,6 @@ ORBEON.xforms.Events = {
         } else if (target != null && (ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
             // Click on trigger
             YAHOO.util.Event.preventDefault(event);
-            if (ORBEON.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
-                // If click on a modal trigger, we want to prevent any further interaction with the form until
-                // we get a response to this Ajax request from the server.
-                // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
-                // the progress panel is displayed.
-                target.blur();
-                // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
-                ORBEON.util.Utils.displayModalProgressPanel();
-            }
             if (ORBEON.util.Dom.hasClass(target, "xxforms-offline-save")) {
                 // This is a trigger take commits the data changed so far in Gears
                 ORBEON.xforms.Offline.storeEvents(ORBEON.xforms.Offline.memoryOfflineEvents);
@@ -2622,7 +2616,15 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Events.focus(event);
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
                 ORBEON.xforms.Server.fireEvents([event], false);
-
+            }
+            if (ORBEON.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
+                // If click on a modal trigger, we want to prevent any further interaction with the form until
+                // we get a response to this Ajax request from the server.
+                // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
+                // the progress panel is displayed.
+                target.blur();
+                // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
+                ORBEON.util.Utils.displayModalProgressPanel();
             }
         } else if (target != null &&
                    (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
@@ -4204,38 +4206,41 @@ ORBEON.xforms.Server = {
                 );
             }
         } else {
-            // Store the time of the first event to be sent in the queue
-            var currentTime = new Date().getTime();
-            if (ORBEON.xforms.Globals.eventQueue.length == 0)
-                ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
+            // Only proceed handling this event if the progress panel is not displayed
+            if (ORBEON.xforms.Globals.modalProgressPanel == null) {
+                // Store the time of the first event to be sent in the queue
+                var currentTime = new Date().getTime();
+                if (ORBEON.xforms.Globals.eventQueue.length == 0)
+                    ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
 
-            // Store events to fire
-            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-                ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
-            }
+                // Store events to fire
+                for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+                    ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
+                }
 
-            // Fire them with a delay to give us a change to aggregate events together
-            ORBEON.xforms.Globals.executeEventFunctionQueued++;
-            if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                                 ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
-                // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
-                // if there are no other executeNextRequest() that have been added to the queue after this
-                // request.
-                window.setTimeout(
-                    function() { ORBEON.xforms.Server.executeNextRequest(false); },
-                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
-                );
-            } else {
-                // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
-                // to be sent to the server, even if there are other executeNextRequest() queued.
-                // The small delay is here so we don't send multiple requests to the server when the
-                // browser gives us a sequence of events (e.g. focus out, change, focus in).
-                window.setTimeout(
-                    function() { ORBEON.xforms.Server.executeNextRequest(true); },
-                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
-                );
+                // Fire them with a delay to give us a change to aggregate events together
+                ORBEON.xforms.Globals.executeEventFunctionQueued++;
+                if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
+                                     ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
+                    // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
+                    // if there are no other executeNextRequest() that have been added to the queue after this
+                    // request.
+                    window.setTimeout(
+                        function() { ORBEON.xforms.Server.executeNextRequest(false); },
+                        ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
+                    );
+                } else {
+                    // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
+                    // to be sent to the server, even if there are other executeNextRequest() queued.
+                    // The small delay is here so we don't send multiple requests to the server when the
+                    // browser gives us a sequence of events (e.g. focus out, change, focus in).
+                    window.setTimeout(
+                        function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                        ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                    );
+                }
+                ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
             }
-            ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
         }
     },
 

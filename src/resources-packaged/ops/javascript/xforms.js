@@ -984,7 +984,9 @@ ORBEON.util.Test = {
 
         ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(ajaxReceived, testCase, true);
         causingAjaxRequestFunction.call(testCase);
-        testCase.wait();
+        // Takes a threshold after which YUI Test considers that the test has failed. The default is 10 s.
+        // We set it to 20 s for tests that call a 5 s delay service multiple times.
+        testCase.wait(20000);
     }
 };
 

@@ -24,16 +24,18 @@
             <xforms:instance id="files-instance">
                 <!-- Start with placeholders for three files -->
                 <files xmlns="">
-                    <file filename="" mediatype="" size=""/>
-                    <file filename="" mediatype="" size=""/>
-                    <file filename="" mediatype="" size=""/>
+                    <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
+                    <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
+                    <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                 </files>
             </xforms:instance>
             <xforms:instance id="selected">
                 <selected>No file selected.</selected>
             </xforms:instance>
             <xforms:instance id="file-template">
-                <file xmlns="" filename="" mediatype="" size=""/>
+                <!-- Using xs:anyURI will cause the XForms engine to store a reference to
+                     a URI instead of inlining the content of the file -->
+                <file xmlns="" xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
             </xforms:instance>
             <xforms:instance id="control-instance">
                 <control xmlns="">
@@ -46,15 +48,11 @@
                 <xforms:bind nodeset="add-upload-trigger" readonly="false()"/>
                 <xforms:bind nodeset="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
             </xforms:bind>
-            <xforms:bind nodeset="instance('files-instance')">
-                <!-- Using xs:anyURI will cause the XForms engine to store a reference to
-                 a URI instead of inlining the content of the file -->
-                <xforms:bind nodeset="file" type="xs:anyURI"/>
-            </xforms:bind>
-            <!-- Main submission which uploads the files -->
-            <!--<xforms:submission id="all-submission" method="post" replace="all" action="/xforms-upload/"/>-->
             <!-- Background submission -->
             <xforms:submission id="background-submission" method="post" replace="none" resource="test:"/>
+            <!-- Main submission which uploads the files -->
+            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/text"
+                               replace="all" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }
@@ -127,6 +125,10 @@
         <p>
             <xforms:submit ref="instance('control-instance')/simple-upload-trigger" submission="background-submission">
                 <xforms:label>Upload Selected Files</xforms:label>
+            </xforms:submit>
+
+            <xforms:submit ref="instance('control-instance')/simple-upload-trigger" submission="all-submission">
+                <xforms:label>Send Selected Files</xforms:label>
             </xforms:submit>
         </p>
 

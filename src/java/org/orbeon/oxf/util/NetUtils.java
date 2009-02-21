@@ -13,18 +13,20 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -333,7 +335,7 @@ public class NetUtils {
      * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
      * @param acceptAmp -> "&amp;" if true, "&" if false
      *
-     * @return a Map of String[] indexed by name, an empty Map if the query string was null
+     * @return a Map of Object[] indexed by name, an empty Map if the query string was null
      */
     public static Map decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
 
@@ -352,7 +354,7 @@ public class NetUtils {
                     String val = m.group(2);
                     val = URLDecoder.decode(val, NetUtils.DEFAULT_URL_ENCODING);
 
-                    NetUtils.addValueToStringArrayMap(ret, nam, val);
+                    NetUtils.addValueToObjectArrayMap(ret, nam, val);
                 } catch (final java.io.UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
                     throw new OXFException(e);
@@ -376,24 +378,27 @@ public class NetUtils {
     }
 
     /**
-     * Encode a query string. The input Map contains names indexing String[].
+     * Encode a query string. The input Map contains names indexing Object[].
      */
     public static String encodeQueryString(Map parameters) {
-        StringBuffer sb = new StringBuffer();
+        final FastStringBuffer sb = new FastStringBuffer(100);
         boolean first = true;
         try {
             for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-                String name = (String) i.next();
-                String[] values = (String[]) parameters.get(name);
+                final String name = (String) i.next();
+                final Object[] values = (Object[]) parameters.get(name);
                 for (int j = 0; j < values.length; j++) {
-                    if (!first)
-                        sb.append('&');
+                    final Object currentValue = values[j];
+                    if (currentValue instanceof String) {
+                        if (!first)
+                            sb.append('&');
 
-                    sb.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
-                    sb.append('=');
-                    sb.append(URLEncoder.encode(values[j], NetUtils.DEFAULT_URL_ENCODING));
+                        sb.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
+                        sb.append('=');
+                        sb.append(URLEncoder.encode((String) currentValue, NetUtils.DEFAULT_URL_ENCODING));
 
-                    first = false;
+                        first = false;
+                    }
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -403,12 +408,12 @@ public class NetUtils {
         return sb.toString();
     }
 
-    public static void addValueToStringArrayMap(Map map, String name, String value) {
-        String[] currentValue = (String[]) map.get(name);
+    public static void addValueToObjectArrayMap(Map map, String name, Object value) {
+        final Object[] currentValue = (Object[]) map.get(name);
         if (currentValue == null) {
-            map.put(name, new String[]{value});
+            map.put(name, new Object[] { value });
         } else {
-            String[] newValue = new String[currentValue.length + 1];
+            final Object[] newValue = new Object[currentValue.length + 1];
             System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
             newValue[currentValue.length] = value;
             map.put(name, newValue);
@@ -416,15 +421,17 @@ public class NetUtils {
     }
 
     public static void addValuesToStringArrayMap(Map map, String name, String[] values) {
-        String[] currentValues = (String[]) map.get(name);
+        final Object[] currentValues = (Object[]) map.get(name);
+        final Object[] newValues;
         if (currentValues == null) {
-            map.put(name, values);
+            newValues = new Object[values.length];
+            System.arraycopy(values, 0, newValues, 0, values.length);
         } else {
-            String[] newValues = new String[currentValues.length + values.length];
+            newValues = new Object[currentValues.length + values.length];
             System.arraycopy(currentValues, 0, newValues, 0, currentValues.length);
             System.arraycopy(values, 0, newValues, currentValues.length, values.length);
-            map.put(name, newValues);
         }
+        map.put(name, newValues);
     }
 
     /**
@@ -463,18 +470,21 @@ public class NetUtils {
      * Combine a path info and a parameters map to form a path info with a query string.
      */
     public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
-        StringBuffer redirectURL = new StringBuffer(pathInfo);
+        final FastStringBuffer redirectURL = new FastStringBuffer(pathInfo);
         if (parameters != null) {
             boolean first = true;
             for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-                String name = (String) i.next();
-                String[] values = (String[]) parameters.get(name);
+                final String name = (String) i.next();
+                final Object[] values = (Object[]) parameters.get(name);
                 for (int j = 0; j < values.length; j++) {
-                    redirectURL.append(first ? "?" : "&");
-                    redirectURL.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
-                    redirectURL.append("=");
-                    redirectURL.append(URLEncoder.encode(values[j], NetUtils.DEFAULT_URL_ENCODING));
-                    first = false;
+                    final Object currentValue = values[j];
+                    if (currentValue instanceof String) {
+                        redirectURL.append(first ? "?" : "&");
+                        redirectURL.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
+                        redirectURL.append("=");
+                        redirectURL.append(URLEncoder.encode((String) currentValue, NetUtils.DEFAULT_URL_ENCODING));
+                        first = false;
+                    }
                 }
             }
         }
@@ -617,12 +627,47 @@ public class NetUtils {
     }
 
     /**
+     * Convert a URI to a FileItem.
+     *
+     * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
+     * when no longer used.
+     */
+    public static FileItem anyURIToFileItem(PipelineContext pipelineContext, String uri, int scope) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new URI(uri).toURL().openStream();
+
+            // Get FileItem
+            return prepareFileItemFromInputStream(pipelineContext, inputStream, scope);
+
+        } catch (Exception e) {
+            throw new OXFException(e);
+        } finally {
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        }
+    }
+
+    /**
      * Convert an InputStream to an xs:anyURI.
      *
      * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
      * when no longer used.
      */
     public static String inputStreamToAnyURI(PipelineContext pipelineContext, InputStream inputStream, int scope) {
+        // Get FileItem
+        final FileItem fileItem = prepareFileItemFromInputStream(pipelineContext, inputStream, scope);
+
+        // Return a file URL
+        final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
+        return storeLocation.toURI().toString();
+    }
+
+    private static FileItem prepareFileItemFromInputStream(PipelineContext pipelineContext, InputStream inputStream, int scope) {
         // Get FileItem
         final FileItem fileItem = prepareFileItem(pipelineContext, scope);
         // Write to file
@@ -648,8 +693,8 @@ public class NetUtils {
         } catch (IOException e) {
             throw new OXFException(e);
         }
-        // Return a file URL
-        return storeLocation.toURI().toString();
+
+        return fileItem;
     }
 
     /**
@@ -834,11 +879,11 @@ public class NetUtils {
      * @return          true if Trident is identified
      */
     public static boolean isRenderingEngineTrident(ExternalContext.Request request) {
-        final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
+        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
         if (userAgentHeader == null)
             return false;
 
-        final String userAgent = ((String[]) userAgentHeader)[0].toLowerCase();
+        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
 
         final String lowerCaseUserAgent = userAgent.toLowerCase();
         return lowerCaseUserAgent.indexOf("msie") != -1 && lowerCaseUserAgent.indexOf("opera") == -1;
@@ -851,11 +896,11 @@ public class NetUtils {
      * @return          true if IE 6 or earlier is identified
      */
     public static boolean isRenderingEngineIE6OrEarlier(ExternalContext.Request request) {
-        final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
+        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
         if (userAgentHeader == null)
             return false;
 
-        final String userAgent = ((String[]) userAgentHeader)[0].toLowerCase();
+        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
 
         final int msieIndex = userAgent.indexOf("msie");
         final boolean isIE = msieIndex != -1 && userAgent.indexOf("opera") == -1;
@@ -1259,6 +1304,7 @@ public class NetUtils {
                     if (indentedLogger.isDebugEnabled())
                         logRequestBody(indentedLogger, contentType, messageBody);
                     // Set request body on connection
+                    
                     httpURLConnection.setRequestBody(messageBody);
                 }
 
@@ -1362,6 +1408,134 @@ public class NetUtils {
         // Rewrite new URI to absolute path without the context
         return externalContext.getResponse().rewriteResourceURL(DYNAMIC_RESOURCES_PATH + digest,
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+    }
+
+    /**
+     * Utility method to decode a multipart/fomr-data stream and return a Map of parameters of type Object[], each of
+     * which can be a String or FileData.
+     */
+    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
+
+        final Map uploadParameterMap = new HashMap();
+        try {
+            // Setup commons upload
+
+            // Read properties
+            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
+            int maxSize = RequestGenerator.getMaxSizeProperty();
+            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
+
+            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory());
+
+            final ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory) {
+                protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
+                    if (isFormField) {
+                        // Handle externalized values
+                        final String externalizeFormValuesPrefix = org.orbeon.oxf.properties.Properties.instance().getPropertySet().getString(ServletExternalContext.EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
+                        final String fieldName = getFieldName(headers);
+                        if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
+                            // In this case, we do as if the value content is an uploaded file so that it can be externalized
+                            return super.createItem(headers, false);
+                        } else {
+                            // Just create the FileItem using the default way
+                            return super.createItem(headers, isFormField);
+                        }
+                    } else {
+                        // Just create the FileItem using the default way
+                        return super.createItem(headers, isFormField);
+                    }
+                }
+            };
+            upload.setHeaderEncoding(headerEncoding);
+            upload.setSizeMax(maxSize);
+
+            // Add a listener to destroy file items when the pipeline context is destroyed
+            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+                public void contextDestroyed(boolean success) {
+                    if (uploadParameterMap != null) {
+                        for (Iterator i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
+                            final String name = (String) i.next();
+                            final Object values[] = (Object[]) uploadParameterMap.get(name);
+                            for (int j = 0; j < values.length; j++) {
+                                final Object currentValue = values[j];
+                                if (currentValue instanceof FileItem) {
+                                    final FileItem fileItem = (FileItem) currentValue;
+                                    fileItem.delete();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Wrap and implement just the required methods for the upload code
+            final InputStream inputStream;
+            try {
+                inputStream = request.getInputStream();
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+
+            final RequestContext requestContext = new RequestContext() {
+
+                public int getContentLength() {
+                    return request.getContentLength();
+                }
+
+                public InputStream getInputStream() {
+                    // NOTE: The upload code does not actually check that it doesn't read more than the content-length
+                    // sent by the client! Maybe here would be a good place to put an interceptor and make sure we
+                    // don't read too much.
+                    return new InputStream() {
+                        public int read() throws IOException {
+                            return inputStream.read();
+                        }
+                    };
+                }
+
+                public String getContentType() {
+                    return request.getContentType();
+                }
+
+                public String getCharacterEncoding() {
+                    return request.getCharacterEncoding();
+                }
+            };
+
+            // Parse the request and add file information
+            try {
+                for (Iterator i = upload.parseRequest(requestContext).iterator(); i.hasNext();) {
+                    final FileItem fileItem = (FileItem) i.next();
+                    // Add value to existing values if any
+                    if (fileItem.isFormField()) {
+                        // Simple form field
+                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: FORM_ENCODING getString() should use an encoding
+                    } else {
+                        // File
+                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
+                    }
+                }
+            } catch (FileUploadBase.SizeLimitExceededException e) {
+                // Should we do something smart so we can use the Presentation
+                // Server error page anyway? Right now, this is going to fail
+                // miserably with an error.
+                throw e;
+            } finally {
+                // Close the input stream; if we don't nobody does, and if this stream is
+                // associated with a temporary file, that file may resist deletion
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+            }
+
+            return uploadParameterMap;
+        } catch (FileUploadException e) {
+            throw new OXFException(e);
+        }
     }
 
     public static class DynamicResource {

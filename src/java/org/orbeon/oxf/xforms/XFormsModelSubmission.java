@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -304,23 +305,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 //
                 // o we only check for replace="instance|none" and if serialization must take place
 
-                boolean hasBoundRelevantUploadControl = false;
+                final boolean hasBoundRelevantUploadControl;
                 if (currentInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
-                    final XFormsControls xformsControls = containingDocument.getControls();
-                    final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
-                    if (uploadControls != null) {
-                        for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
-                            final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
-                            if (currentControl.isRelevant()) {
-                                final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
-                                if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
-                                    // Found one relevant upload control bound to the instance we are submitting
-                                    hasBoundRelevantUploadControl = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    hasBoundRelevantUploadControl = XFormsUtils.hasBoundRelevantUploadControls(containingDocument, currentInstance);
+                } else {
+                    hasBoundRelevantUploadControl = false;
                 }
 
                 // Evaluate early AVTs
@@ -521,7 +510,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Serialize
-                final byte[] messageBody;
+                final byte[] messageBody;// TODO: provide option for body to be a stream
                 final String queryString;
                 final String defaultMediatypeForSerialization;
                 if (serialize) {
@@ -569,11 +558,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // TODO
                         throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
                     } else if (requestedSerialization.equals("multipart/form-data")) {
-                        // TODO
+                        // Build multipart/form-data body
 
-//                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
+                        // Create and set body
+                        final MultipartRequestEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData(pipelineContext, containingDocument, documentToSubmit);
 
-                        throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
+                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        multipartFormData.writeRequest(os);
+
+                        messageBody = os.toByteArray();
+                        queryString = null;
+
+                        // The mediatype also contains the boundary
+                        defaultMediatypeForSerialization = multipartFormData.getContentType();
+
                     } else if (requestedSerialization.equals("application/octet-stream")) {
                         // Binary serialization
                         final String nodeType = InstanceData.getType(documentToSubmit.getRootElement());

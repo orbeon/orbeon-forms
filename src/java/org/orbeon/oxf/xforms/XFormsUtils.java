@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.*;
@@ -566,6 +567,59 @@ public class XFormsUtils {
             throw new OXFException("Invalid variable type: " + object.getClass());
         }
         return valueRepresentation;
+    }
+
+    /**
+     * Returns whether there are relevant upload controls bound to any node of the given instance.
+     *
+     * @param containingDocument    current XFormsContainingDocument
+     * @param currentInstance       instance to check
+     * @return                      true iif there are relevant upload controls bound
+     */
+    public static boolean hasBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
+        final XFormsControls xformsControls = containingDocument.getControls();
+        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
+        if (uploadControls != null) {
+            for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
+                final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
+                if (currentControl.isRelevant()) {
+                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
+                    if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                        // Found one relevant upload control bound to the instance we are submitting
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns the first relevant upload controls bound the given node if any.
+     *
+     * @param containingDocument    current XFormsContainingDocument
+     * @param node                  node to check
+     * @return                      first bound relevant XFormsUploadControl, null if not found
+     */
+    public static XFormsUploadControl getFirstBoundRelevantUploadControl(XFormsContainingDocument containingDocument, Node node) {
+        final XFormsControls xformsControls = containingDocument.getControls();
+        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
+        if (uploadControls != null) {
+            for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
+                final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
+                if (currentControl.isRelevant()) {
+                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
+                    if (controlBoundNodeInfo instanceof NodeWrapper) {
+                        final Node controlBoundNode = getNodeFromNodeInfo(controlBoundNodeInfo, "");
+                        if (node == controlBoundNode) {
+                            // Found one relevant upload control bound to the given node
+                            return currentControl;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {

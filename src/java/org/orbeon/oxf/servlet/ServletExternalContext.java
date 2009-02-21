@@ -13,23 +13,15 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.RequestContext;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 
@@ -150,7 +142,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                         throw new OXFException("Cannot call getParameterMap() after getInputStream() when a form was posted with multipart/form-data");
 
                     // Decode the multipart data
-                    parameterMap = getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
+                    parameterMap = NetUtils.getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
 
                     // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
                     getParameterMapMultipartFormDataCalled = true;
@@ -336,133 +328,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     inputStreamCharset = requestCharacterEncoding;
                 }
             }
-        }
-    }
-
-    /**
-     * Utility method to decode a multipart/fomr-data stream and return a Map of parameters of type
-     * String[] or FileData.
-     *
-     * NOTE: This is used also by PortletExternalContext. Should probably remove this dependency
-     * at some point.
-     */
-    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
-
-        final Map uploadParameterMap = new HashMap();
-        try {
-            // Setup commons upload
-
-            // Read properties
-            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-            int maxSize = RequestGenerator.getMaxSizeProperty();
-            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
-
-            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory());
-
-            final ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory) {
-                protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
-                    if (isFormField) {
-                        // Handle externalized values
-                        final String externalizeFormValuesPrefix = org.orbeon.oxf.properties.Properties.instance().getPropertySet().getString(EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
-                        final String fieldName = getFieldName(headers);
-                        if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
-                            // In this case, we do as if the value content is an uploaded file so that it can be externalized
-                            return super.createItem(headers, false);
-                        } else {
-                            // Just create the FileItem using the default way
-                            return super.createItem(headers, isFormField);
-                        }
-                    } else {
-                        // Just create the FileItem using the default way
-                        return super.createItem(headers, isFormField);
-                    }
-                }
-            };
-            upload.setHeaderEncoding(headerEncoding);
-            upload.setSizeMax(maxSize);
-
-            // Add a listener to destroy file items when the pipeline context is destroyed
-            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-                public void contextDestroyed(boolean success) {
-                    if (uploadParameterMap != null) {
-                        for (Iterator i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
-                            String name = (String) i.next();
-                            Object value = uploadParameterMap.get(name);
-                            if (value instanceof FileItem) {
-                                FileItem fileItem = (FileItem) value;
-                                fileItem.delete();
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Wrap and implement just the required methods for the upload code
-            final InputStream inputStream;
-            try {
-                inputStream = request.getInputStream();
-            } catch (IOException e) {
-                throw new OXFException(e);
-            }
-
-            final RequestContext requestContext = new RequestContext() {
-
-                public int getContentLength() {
-                    return request.getContentLength();
-                }
-
-                public InputStream getInputStream() {
-                    // NOTE: The upload code does not actually check that it doesn't read more than the content-length
-                    // sent by the client! Maybe here would be a good place to put an interceptor and make sure we
-                    // don't read too much.
-                    return new InputStream() {
-                        public int read() throws IOException {
-                            return inputStream.read();
-                        }
-                    };
-                }
-
-                public String getContentType() {
-                    return request.getContentType();
-                }
-
-                public String getCharacterEncoding() {
-                    return request.getCharacterEncoding();
-                }
-            };
-
-            // Parse the request and add file information
-            try {
-                for (Iterator i = upload.parseRequest(requestContext).iterator(); i.hasNext();) {
-                    FileItem fileItem = (FileItem) i.next();
-                    if (fileItem.isFormField()) {
-                        // Simple form filled: add value to existing values, if any
-                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: FORM_ENCODING getString() should use an encoding
-                    } else {
-                        // It is a file, store the FileItem object
-                        uploadParameterMap.put(fileItem.getFieldName(), fileItem);
-                    }
-                }
-            } catch (FileUploadBase.SizeLimitExceededException e) {
-                // Should we do something smart so we can use the Presentation
-                // Server error page anyway? Right now, this is going to fail
-                // miserably with an error.
-                throw e;
-            } finally {
-                // Close the input stream; if we don't nobody does, and if this stream is
-                // associated with a temporary file, that file may resist deletion
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            }
-
-            return uploadParameterMap;
-        } catch (FileUploadException e) {
-            throw new OXFException(e);
         }
     }
 

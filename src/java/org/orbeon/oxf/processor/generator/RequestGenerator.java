@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -31,11 +31,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -47,8 +43,14 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Request generator works like this:
@@ -100,6 +102,7 @@ public class RequestGenerator extends ProcessorImpl {
 
     private static final String FILE_ITEM_ELEMENT = "request:file-item";
     private static final String PARAMETER_NAME_ATTRIBUTE = "parameter-name";
+    private static final String PARAMETER_POSITION_ATTRIBUTE = "parameter-position";
 
 //    private static final Map prefixes = new HashMap();
 //
@@ -118,7 +121,7 @@ public class RequestGenerator extends ProcessorImpl {
                 try {
                     final State state = (State) getFilledOutState(pipelineContext);
                     // Transform the resulting document into SAX
-                    Transformer identity = TransformerUtils.getIdentityTransformer();
+                    final Transformer identity = TransformerUtils.getIdentityTransformer();
                     identity.transform(new DocumentSource(state.requestDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
                         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                             try {
@@ -127,10 +130,11 @@ public class RequestGenerator extends ProcessorImpl {
                                     if (FILE_ITEM_ELEMENT.equals(qName)) {
                                         // Marker for file item
 
-                                        String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
-                                        FileItem fileItem = (FileItem) getRequest(pipelineContext).getParameterMap().get(parameterName);
+                                        final String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
+                                        final int parameterPosition = Integer.parseInt(attributes.getValue(PARAMETER_POSITION_ATTRIBUTE));
+                                        final FileItem fileItem = (FileItem) ((Object[]) getRequest(pipelineContext).getParameterMap().get(parameterName))[parameterPosition];
 
-                                        AttributesImpl newAttributes = new AttributesImpl();
+                                        final AttributesImpl newAttributes = new AttributesImpl();
                                         super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                         super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                         newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
@@ -151,7 +155,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     // we didn't need to read it multiple times, we could avoid
                                     // saving the stream, but practically, it can happen, and it is
                                     // convenient.
-                                    Context context = getContext(pipelineContext);
+                                    final Context context = getContext(pipelineContext);
                                     if (context.bodyFileItem != null || getRequest(pipelineContext).getInputStream() != null) {
                                         if (context.bodyFileItem == null) {
                                             final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
@@ -160,13 +164,13 @@ public class RequestGenerator extends ProcessorImpl {
                                                     fileItem.delete();
                                                 }
                                             });
-                                            OutputStream outputStream = fileItem.getOutputStream();
+                                            final OutputStream outputStream = fileItem.getOutputStream();
                                             NetUtils.copyStream(getRequest(pipelineContext).getInputStream(), outputStream);
                                             outputStream.close();
                                             context.bodyFileItem = fileItem;
                                         }
                                         // Serialize the stream into the body element
-                                        AttributesImpl newAttributes = new AttributesImpl();
+                                        final AttributesImpl newAttributes = new AttributesImpl();
                                         super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                         super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                         newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
@@ -441,18 +445,20 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     /**
-     * Add parameters to the request element. The parameters are also all stored in the pipeline
-     * context if they are not already present. The parameter map supports the regular String[], but
-     * also FileItem objects.
+     * Add parameters to the request element. The parameters are also all stored in the pipeline context if they are not
+     * already present. The parameter map supports Object[], which can contain String but also FileItem objects.
      */
     protected void addParameters(PipelineContext pipelineContext, Element requestElement, final ExternalContext.Request request) {
         // Obtain parameters from external context
         Map parametersMap = request.getParameterMap();
         // Check if there is at least one file upload and set this information in the pipeline context
         for (Iterator i = parametersMap.values().iterator(); i.hasNext();) {
-            if (i.next() instanceof FileItem) {
-                getContext(pipelineContext).hasUpload = true;
-                break;
+            final Object[] values = (Object[]) i.next();
+            for (int j = 0; j < values.length; j++) {
+                if (values[j] instanceof FileItem) {
+                    getContext(pipelineContext).hasUpload = true;
+                    break;
+                }
             }
         }
         // Add parameters elements
@@ -464,41 +470,43 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     protected void addElements(Element requestElement, Map map, String name1, String name2) {
-        Element parametersElement = requestElement.addElement(name1);
+        final Element parametersElement = requestElement.addElement(name1);
         for (Iterator i = map.keySet().iterator(); i.hasNext();) {
-            Element parameterElement = parametersElement.addElement(name2);
+            final Element parameterElement = parametersElement.addElement(name2);
             // Always create the name element
-            String name = (String) i.next();
+            final String name = (String) i.next();
             parameterElement.addElement("name").addText(name);
 
-            Object value = map.get(name);
-            if (value instanceof String[]) {
-                // Simple parameter
-                String[] values = (String[]) value;
-                for (int j = 0; j < values.length; j++) {
-                    parameterElement.addElement("value").addText(values[j]);
-                }
-            } else if (value instanceof FileItem) {
-                // Retrieve the FileItem (only for parameters)
-                FileItem fileItem = (FileItem) value;
+            final Object[] values = (Object[]) map.get(name);
+            for (int j = 0; j < values.length; j++) {
+                final Object value = values[j];
 
-                // Set meta-information element
-                if (fileItem.getName() != null)
-                    parameterElement.addElement("filename").addText(fileItem.getName());
-                if (fileItem.getContentType() != null)
-                    parameterElement.addElement("content-type").addText(fileItem.getContentType());
-                parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
+                if (value instanceof String) {
+                    // Simple String parameter
+                    parameterElement.addElement("value").addText((String) value);
+                } else if (value instanceof FileItem) {
+                    // Retrieve the FileItem (only for parameters)
+                    final FileItem fileItem = (FileItem) value;
 
-                if (!isFileItemEmpty(fileItem)) {
-                    // Create private placeholder element with parameter name as attribute
-                    Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
-                    fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
+                    // Set meta-information element
+                    if (fileItem.getName() != null)
+                        parameterElement.addElement("filename").addText(fileItem.getName());
+                    if (fileItem.getContentType() != null)
+                        parameterElement.addElement("content-type").addText(fileItem.getContentType());
+                    parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
+
+                    if (!isFileItemEmpty(fileItem)) {
+                        // Create private placeholder element with parameter name as attribute
+                        final Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
+                        fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
+                        fileItemElement.addAttribute(PARAMETER_POSITION_ATTRIBUTE, Integer.toString(j));
+                    } else {
+                        // Just generate an empty "value" element
+                        parameterElement.addElement("value");
+                    }
                 } else {
-                    // Just generate an empty "value" element
-                    parameterElement.addElement("value");
+                    throw new OXFException("Invalid value type.");
                 }
-            } else {
-                throw new OXFException("Invalid value type.");
             }
         }
     }

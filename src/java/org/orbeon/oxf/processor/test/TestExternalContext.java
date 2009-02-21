@@ -206,7 +206,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         Element valueElement = (Element) j.next();
                         String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        NetUtils.addValueToStringArrayMap(map, name, value);
+                        NetUtils.addValueToObjectArrayMap(map, name, value);
                     }
                 }
                 headerValuesMap = Collections.unmodifiableMap(map);
@@ -237,7 +237,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         Element valueElement = (Element) j.next();
                         String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        NetUtils.addValueToStringArrayMap(map, name, value);
+                        NetUtils.addValueToObjectArrayMap(map, name, value);
                     }
                 }
                 parameterMap = Collections.unmodifiableMap(map);

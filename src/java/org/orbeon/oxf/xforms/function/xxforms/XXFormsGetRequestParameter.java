@@ -48,19 +48,20 @@ public class XXFormsGetRequestParameter extends XFormsFunction {
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             final ExternalContext externalContext = staticContext.getExternalContext();
 
-            final Object parameterValues = externalContext.getRequest().getParameterMap().get(parameterName);
-
-            if (parameterValues instanceof String[]) {
-                final String[] stringValues = (String[]) parameterValues;
-                final List result = new ArrayList(stringValues.length);
-                for (int i = 0; i < stringValues.length; i++) {
-                    result.add(new StringValue(stringValues[i]));
+            final Object[] parameterValues = (Object[]) externalContext.getRequest().getParameterMap().get(parameterName);
+            if (parameterValues != null) {
+                final List result = new ArrayList(parameterValues.length);
+                for (int j = 0; j < parameterValues.length; j++) {
+                    final Object currentValue = parameterValues[j];
+                    if (currentValue instanceof String) {
+                        result.add(new StringValue((CharSequence) currentValue));
+                    }
                 }
 
-                return new ListIterator(result);
+                return result.size() <= 0 ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(result);
+            } else {
+                return EmptyIterator.getInstance();
             }
-
-            return EmptyIterator.getInstance();
         } else {
             throw new OXFException("xxforms:get-request-parameter() can only be called during XForms initialization.");
         }

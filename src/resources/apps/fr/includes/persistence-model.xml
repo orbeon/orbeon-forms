@@ -503,8 +503,10 @@
         <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../submit)"/>
     </xforms:bind>
 
-    <!-- HACK: recalc this model when instance validity changes, so that the triggers instance in particular is kept up to date -->
+    <!-- HACK: recalculate this model when instance validity changes, so that the triggers instance in particular is kept up to date -->
     <xforms:recalculate ev:event="xxforms-invalid xxforms-valid" ev:observer="fr-form-instance"/>
+    <!-- HACK: recalculate this model when there is a change in the instance in the persistence model which stores the validity -->
+    <xforms:recalculate ev:event="xforms-delete xforms-insert" ev:observer="fr-errors-instance"/>
 
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">

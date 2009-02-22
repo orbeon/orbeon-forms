@@ -611,13 +611,13 @@ ORBEON.util.DateTime = {
      */
     _timeParsePatterns: [
         // Now
-        {   re: /^now/i,
+        {   re: /^now$/i,
             handler: function() {
                 return new Date();
             }
         },
         // p.m.
-        {   re: /(\d{1,2}):(\d{1,2}):(\d{1,2})(?:p| p)/,
+        {   re: /$(\d{1,2}):(\d{1,2}):(\d{1,2})(?:p| p)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -629,7 +629,7 @@ ORBEON.util.DateTime = {
             }
         },
         // p.m., no seconds
-        {   re: /(\d{1,2}):(\d{1,2})(?:p| p)/,
+        {   re: /^(\d{1,2}):(\d{1,2})(?:p| p)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -641,7 +641,7 @@ ORBEON.util.DateTime = {
             }
         },
         // p.m., hour only
-        {   re: /(\d{1,2})(?:p| p)/,
+        {   re: /^(\d{1,2})(?:p| p)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -653,7 +653,7 @@ ORBEON.util.DateTime = {
             }
         },
         // hh:mm:ss
-        {   re: /(\d{1,2}):(\d{1,2}):(\d{1,2})/,
+        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2})$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
@@ -663,7 +663,7 @@ ORBEON.util.DateTime = {
             }
         },
         // hh:mm
-        {   re: /(\d{1,2}):(\d{1,2})/,
+        {   re: /^(\d{1,2}):(\d{1,2})$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
@@ -673,7 +673,7 @@ ORBEON.util.DateTime = {
             }
         },
         // hhmmss
-        {   re: /(\d{1,6})/,
+        {   re: /^(\d{1,6})$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = bits[1].substring(0,2);
@@ -808,7 +808,7 @@ ORBEON.util.DateTime = {
             }
         },
         // yyyy-mm-dd (ISO style)
-        {   re: /(\d{2,4})-(\d{1,2})-(\d{1,2})/,
+        {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(parseInt(bits[1]));

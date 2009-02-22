@@ -2284,7 +2284,6 @@ ORBEON.xforms.Events = {
                     // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
                     // DOMFocusOut, but it is hard to detect correctly
                     events.push(new ORBEON.xforms.Server.Event(null, currentFocusControlElement.id, null, null, "DOMFocusOut"));
-                    ORBEON.xforms.Server.fireEvents(events, false);
                 }
 
                 // Handle DOMFocusIn

@@ -31,6 +31,7 @@
         <menu-item label="Installing" href="intro-install"/>
         <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>
         <menu-item label="Frequently Asked Questions" href="home-faq"/>
+        <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="XForms">

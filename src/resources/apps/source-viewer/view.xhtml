@@ -31,32 +31,6 @@
             .xforms-trigger-appearance-minimal img { margin-right: 0.5em; vertical-align: middle }
             .xforms-label { font-weight: bold; margin-right: .5em }
         </style>
-        <script language="Javascript" type="text/javascript">
-            window.onload = sourceInit;
-            window.onresize = sourceResize;
-
-            function sourceInit() {
-                sourceResize();
-            }
-
-            function sourceResize() {
-                var divElement = document.getElementById('source-file-output');
-                divElement.style.height = (document.body.clientHeight - findTopPosition(divElement) - 18) + "px";
-            }
-
-            function findTopPosition(element) {
-                var curtop = 0;
-                if (element.offsetParent) {
-                    while (element.offsetParent) {
-                        curtop += element.offsetTop
-                        element = element.offsetParent;
-                    }
-                } else if (element.y) {
-                    curtop += element.y;
-                }
-                return curtop;
-            }
-        </script>
         <xforms:model id="main-model">
 
             <!-- Load applications list and files list -->
@@ -220,7 +194,7 @@
                             <xforms:repeat nodeset="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">
-                                        <!--<xforms:output ref="@name"/>-->
+                                        <xforms:output ref="@name"/>
                                         <xforms:trigger ref="@path" appearance="minimal">
                                             <xforms:label ref="."/>
                                         </xforms:trigger>
@@ -238,7 +212,7 @@
                     <table style="width: 100%">
                         <tr>
                             <td style="padding: 0">
-                                <div class="ops-source" id="source-file-output">
+                                <div class="ops-source">
                                     <xforms:output ref="instance('source-response-instance')" mediatype="text/html"/>
                                 </div>
                             </td>

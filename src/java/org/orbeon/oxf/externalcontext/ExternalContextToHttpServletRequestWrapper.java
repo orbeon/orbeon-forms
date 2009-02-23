@@ -146,8 +146,9 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
         return Collections.enumeration(request.getParameterMap().keySet());
     }
 
-    public String[] getParameterValues(String clazz) {
-        return (String[]) request.getParameterMap().get(clazz);
+    public String[] getParameterValues(String name) {
+        // Convert as parameters MAY contain FileItem values
+        return NetUtils.objectArrayToStringArray((Object[]) request.getParameterMap().get(name)); 
     }
 
     /* SUPPORTED: request body */

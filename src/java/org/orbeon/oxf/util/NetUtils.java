@@ -73,6 +73,7 @@ public class NetUtils {
     public static final String DEFAULT_HTTP_TEXT_READING_ENCODING = "iso-8859-1";
     // Default RFC 3023 default charset for txt/xml mediatype
     public static final String DEFAULT_TEXT_XML_READING_ENCODING = "us-ascii";
+    public static final String APPLICATION_SOAP_XML = "application/soap+xml";
 
     static {
         // Set timezone to GMT as required for HTTP headers
@@ -329,6 +330,33 @@ public class NetUtils {
         String[] stringValues = new String[values.size()];
         values.toArray(stringValues);
         return stringValues;
+    }
+
+    /**
+     * Convert an Object array into a String array, removing non-string values.
+     */
+    public static String[] objectArrayToStringArray(Object[] values) {
+
+        if (values == null)
+            return null;
+
+        final String[] result = new String[values.length];
+        int size = 0;
+        for (int i = 0; i < values.length; i++) {
+            final Object currentValue = values[i];
+            if (currentValue instanceof String) {
+                result[size++] = (String) currentValue;
+            }
+        }
+        if (size == values.length) {
+            // Optimistic approach worked
+            return result;
+        } else {
+            // Optimistic approach failed
+            final String[] newResult = new String[size];
+            System.arraycopy(result, 0, newResult, 0, size);
+            return newResult;
+        }
     }
 
     /**
@@ -1229,7 +1257,7 @@ public class NetUtils {
                 }
                 final String contentTypeMediaType = getContentTypeMediaType(contentType);
                 if (hasRequestBody) {
-                    if (httpMethod.equals("POST") && "application/soap+xml".equals(contentTypeMediaType)) {
+                    if (httpMethod.equals("POST") && APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
                         // SOAP POST
 
                         indentedLogger.logDebug("connection", "found SOAP POST");
@@ -1265,12 +1293,12 @@ public class NetUtils {
                         urlConnection.setRequestProperty("Content-Type", (contentType != null) ? contentType : "application/xml");
                     }
                 } else {
-                    if (httpMethod.equals("GET") && "application/soap+xml".equals(contentTypeMediaType)) {
+                    if (httpMethod.equals("GET") && APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
                         // SOAP GET
                         indentedLogger.logDebug("connection", "found SOAP GET");
 
                         final Map parameters = getContentTypeParameters(contentType);
-                        final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
+                        final FastStringBuffer sb = new FastStringBuffer(APPLICATION_SOAP_XML);
 
                         // Extract charset parameter if present
                         if (parameters != null) {

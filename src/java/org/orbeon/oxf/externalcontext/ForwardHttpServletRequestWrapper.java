@@ -51,8 +51,9 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
         return Collections.enumeration(parameters.keySet());
     }
 
-    public String[] getParameterValues(String s) {
-        return (String[]) parameters.get(s);
+    public String[] getParameterValues(String name) {
+        // Convert as parameters MAY contain FileItem values
+        return NetUtils.objectArrayToStringArray((Object[]) parameters.get(name));
     }
 
     public String getParameter(String s) {

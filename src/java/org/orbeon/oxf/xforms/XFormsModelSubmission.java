@@ -315,6 +315,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Evaluate early AVTs
                 final String resolvedMethod;
                 final String actualHttpMethod;
+                final String resolvedMediatype;
 
                 final boolean resolvedValidate;
                 final boolean resolvedRelevant;
@@ -326,6 +327,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Get actual method based on the method attribute
                     actualHttpMethod = getActualHttpMethod(resolvedMethod);
 
+                    // Get mediatype
+                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+
                     // Resolve validate and relevant AVTs
                     final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
                     resolvedValidate = !"false".equals(resolvedValidateString);
@@ -336,6 +340,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                         && isReplaceAll
+                        && !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML) // can't let SOAP requests be handled by the browser
                         && avtXXFormsUsername == null // can't optimize if there are authentication credentials
                         && avtXXFormsTarget == null;  // can't optimize if there is a target
 
@@ -399,7 +404,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Evaluate late AVTs
                 final String resolvedSerialization;
-                final String resolvedMediatype;
                 final String resolvedMode;
                 final String resolvedVersion;
                 final String resolvedEncoding;
@@ -424,7 +428,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
                     resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
-                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
                     resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
                     resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
                     resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);

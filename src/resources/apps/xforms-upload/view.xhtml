@@ -50,9 +50,10 @@
             </xforms:bind>
             <!-- Background submission -->
             <xforms:submission id="background-submission" method="post" replace="none" resource="test:"/>
-            <!-- Main submission which uploads the files -->
-            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/test"
-                               replace="all" xxforms:target="_blank" xxforms:show-progress="false"/>
+            <!-- Main submission which uploads the files
+                 This would be nice but is blocked by Firefox: xxforms:target="_blank" xxforms:show-progress="false"
+            -->
+            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/test" replace="all"/>
         </xforms:model>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }

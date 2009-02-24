@@ -162,18 +162,17 @@ public class WSRPUtils {
 
         // Check URL type and create URL
         try {
-            String[] urlTypeValues = (String[]) wsrpParameters.get(URL_TYPE_PARAM);
-            if (urlTypeValues == null)
+            final String urlTypeValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(URL_TYPE_PARAM));
+            if (urlTypeValue == null)
                 throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
-            String urlTypeValue = urlTypeValues[0];
 
             if (urlTypeValue.equals(URL_TYPE_RESOURCE_STRING)) {
                 // Case of a resource
-                String[] urlValues = (String[]) wsrpParameters.get(URL_PARAM);
-                if (urlValues != null) {
+                final String urlValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(URL_PARAM));
+                if (urlValue != null) {
                     String url = null;
                     try {
-                        url = response.encodeURL(URLDecoder.decode(urlValues[0], "utf-8"));
+                        url = response.encodeURL(URLDecoder.decode(urlValue, "utf-8"));
                     } catch (UnsupportedEncodingException e) {
                         // Should not happen
                         throw new OXFException(e);
@@ -194,23 +193,23 @@ public class WSRPUtils {
                     throw new OXFException("Invalid URL type for WSRP encoded URL: " + encodedURL);
 
                 // Get portlet mode
-                String[] portletModeValues = (String[]) wsrpParameters.get(MODE_PARAM);
-                if (portletModeValues != null) {
-                    portletURL.setPortletMode(new PortletMode(portletModeValues[0]));
+                final String portletModeValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(MODE_PARAM));
+                if (portletModeValue != null) {
+                    portletURL.setPortletMode(new PortletMode(portletModeValue));
                 }
 
                 // Get window state
-                String[] windowStateValues = (String[]) wsrpParameters.get(WINDOW_STATE_PARAM);
-                if (windowStateValues != null) {
-                    portletURL.setWindowState(new WindowState(windowStateValues[0]));
+                final String windowStateValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(WINDOW_STATE_PARAM));
+                if (windowStateValue != null) {
+                    portletURL.setWindowState(new WindowState(windowStateValue));
                 }
 
                 // Get navigational state
-                String[] navigationalStateValues = (String[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM);
-                if (navigationalStateValues != null) {
+                final String navigationalStateValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM));
+                if (navigationalStateValue != null) {
                     String decodedNavigationalState = null;
                     try {
-                        decodedNavigationalState = URLDecoder.decode(navigationalStateValues[0], "utf-8");
+                        decodedNavigationalState = URLDecoder.decode(navigationalStateValue, "utf-8");
                     } catch (UnsupportedEncodingException e) {
                         // Should not happen
                         throw new OXFException(e);

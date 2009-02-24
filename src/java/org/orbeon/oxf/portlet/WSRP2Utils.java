@@ -88,10 +88,9 @@ public class WSRP2Utils extends WSRPUtils {
 
         // Check URL type and create URL
         try {
-            final String[] urlTypeValues = (String[]) wsrpParameters.get(URL_TYPE_PARAM);
-            if (urlTypeValues == null)
+            final String urlTypeValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(URL_TYPE_PARAM));
+            if (urlTypeValue == null)
                 throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
-            final String urlTypeValue = urlTypeValues[0];
 
             // Case of a render or action request
             // Create a BaseURL
@@ -108,16 +107,16 @@ public class WSRP2Utils extends WSRPUtils {
             if (baseURL instanceof PortletURL) {
                 // Get portlet mode
                 final PortletURL portletURL = (PortletURL) baseURL;
-                final String[] portletModeValues = (String[]) wsrpParameters.get(MODE_PARAM);
-                if (portletModeValues != null) {
-                    final String portletMode = portletModeValues[0].startsWith("amp;") ? portletModeValues[0].substring(4) : portletModeValues[0];
+                final String portletModeValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(MODE_PARAM));
+                if (portletModeValue != null) {
+                    final String portletMode = portletModeValue.startsWith("amp;") ? portletModeValue.substring(4) : portletModeValue;
                     portletURL.setPortletMode(new PortletMode(portletMode));
                 }
 
                 // Get window state
-                final String[] windowStateValues = (String[]) wsrpParameters.get(WINDOW_STATE_PARAM);
-                if (windowStateValues != null) {
-                    final String windowState = windowStateValues[0].startsWith("amp;") ? windowStateValues[0].substring(4) : windowStateValues[0];
+                final String windowStateValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(WINDOW_STATE_PARAM));
+                if (windowStateValue != null) {
+                    final String windowState = windowStateValue.startsWith("amp;") ? windowStateValue.substring(4) : windowStateValue;
                     portletURL.setWindowState(new WindowState(windowState));
                 }
             } else {
@@ -126,11 +125,11 @@ public class WSRP2Utils extends WSRPUtils {
             }
 
             // Get navigational state
-            final String[] navigationalStateValues = (String[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM);
-            if (navigationalStateValues != null) {
+            final String navigationalStateValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM));
+            if (navigationalStateValue != null) {
                 final String decodedNavigationalState;
                 try {
-                    final String navigationalState = navigationalStateValues[0].startsWith("amp;") ? navigationalStateValues[0].substring(4) : navigationalStateValues[0];
+                    final String navigationalState = navigationalStateValue.startsWith("amp;") ? navigationalStateValue.substring(4) : navigationalStateValue;
                     decodedNavigationalState = URLDecoder.decode(navigationalState, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen

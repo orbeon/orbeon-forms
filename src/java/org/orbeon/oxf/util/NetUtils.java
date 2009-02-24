@@ -360,6 +360,16 @@ public class NetUtils {
     }
 
     /**
+     * Return the value of the first object in the array as a String.
+     */
+    public static String getStringFromObjectArray(Object[] values) {
+        if (values == null || values.length == 0 || !(values[0] instanceof String))
+            return null;
+        else
+            return (String) values[0];
+    }
+
+    /**
      * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
      * @param acceptAmp -> "&amp;" if true, "&" if false
      *

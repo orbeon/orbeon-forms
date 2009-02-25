@@ -394,7 +394,7 @@ public class XFormsSubmissionUtils {
                             if (InstanceData.getValid(element) && value.trim().length() > 0) {
                                 // Value is valid as per xs:anyURI
                                 final DiskFileItem fileItem = (DiskFileItem) NetUtils.anyURIToFileItem(pipelineContext, value, NetUtils.REQUEST_SCOPE);
-                                addFilePart(element, fileItem, pipelineContext, containingDocument, params);
+                                addFilePart(element, fileItem, params);
                             } else {
                                 // Value is invalid as per xs:anyURI
                                 // Just use the value as is (could also ignore it)
@@ -408,7 +408,7 @@ public class XFormsSubmissionUtils {
                                 // Value is valid as per xs:base64Binary
                                 final String localURI = NetUtils.base64BinaryToAnyURI(pipelineContext, value, NetUtils.REQUEST_SCOPE);
                                 final DiskFileItem fileItem = (DiskFileItem) NetUtils.anyURIToFileItem(pipelineContext, localURI, NetUtils.REQUEST_SCOPE);
-                                addFilePart(element, fileItem, pipelineContext, containingDocument, params);
+                                addFilePart(element, fileItem, params);
                             } else {
                                 // Value is invalid as per xs:base64Binary
                                 // Just use the value as is (could also ignore it)
@@ -429,15 +429,21 @@ public class XFormsSubmissionUtils {
         return new MultipartRequestEntity(partsArray, new HttpMethodParams());
     }
 
-    private static void addFilePart(Element element, DiskFileItem fileItem, PipelineContext pipelineContext, XFormsContainingDocument containingDocument, List params) {
+    private static void addFilePart(Element element, DiskFileItem fileItem, List params) {
         try {
             // Gather mediatype and filename if known
-            // TODO: no control is found because the control is actually bound to a node of the original instance, not the pruned instance
-            final XFormsUploadControl control = XFormsUtils.getFirstBoundRelevantUploadControl(containingDocument, element);
-            final String mediatype = control != null ? control.getMediatype() : null;
-            final String filename = control != null ? control.getFileName(pipelineContext) : null;
+            // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
+            // removed during the next recalculate.
+            final String mediatype = InstanceData.getCustom(element, "xxforms-mediatype");
+            final String filename = InstanceData.getCustom(element, "xxforms-filename");
 
-            params.add(new FilePart(element.getName(), new FilePartSource(filename, fileItem.getStoreLocation()), mediatype, null));
+            // TODO: if filename == null, then name of fileItem is used, which is probably not what we want
+            final FilePart filePart = new FilePart(element.getName(), new FilePartSource(filename, fileItem.getStoreLocation()), mediatype, null);
+            if (mediatype == null || !mediatype.startsWith("text/")) {
+                // Stupid Apache implementation sets a charset for all mediatypes, not only text types, even if we pass null above 
+                filePart.setCharSet(null);
+            }
+            params.add(filePart);
         } catch (FileNotFoundException e) {
             throw new OXFException(e);
         }

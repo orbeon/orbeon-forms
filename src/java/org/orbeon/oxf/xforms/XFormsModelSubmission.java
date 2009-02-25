@@ -472,6 +472,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 /* ************************************* Serialization ************************************* */
 
+                // Get serialization requested from @method and @serialization attributes
+                final String requestedSerialization = getRequestedSerialization(resolvedSerialization, resolvedMethod);
+
                 final Document documentToSubmit;
                 if (serialize) {
                     // Handle uploaded files if any
@@ -481,6 +484,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, null, !isReplaceAll);
                     }
 
+                    // Check if a submission requires file upload information
+                    if (requestedSerialization.startsWith("multipart/")) {
+                        // Annotate before re-rooting/pruning
+                        XFormsUtils.annotateBoundRelevantUploadControls(pipelineContext, containingDocument, currentInstance);
+                    }
+
                     // Create document to submit
                     documentToSubmit = createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
 
@@ -488,9 +497,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Don't recreate document
                     documentToSubmit = null;
                 }
-
-                // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(resolvedSerialization, resolvedMethod);
 
                 final String overriddenSerializedData;
                 if (serialize && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document

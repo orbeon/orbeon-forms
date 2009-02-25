@@ -120,6 +120,13 @@ public class InstanceData {
                 : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name));
     }
 
+    public static String getCustom(Node node, String name) {
+        final InstanceData existingInstanceData = getLocalInstanceData(node, false);
+        return (String) ((existingInstanceData == null)
+                ? DEFAULT_CUSTOM
+                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name));
+    }
+
     public static void setRelevant(NodeInfo nodeInfo, boolean relevant) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
         if (existingInstanceData == null) {

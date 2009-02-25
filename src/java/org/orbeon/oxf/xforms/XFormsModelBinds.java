@@ -958,7 +958,7 @@ public class XFormsModelBinds {
         private List nodeset;       // actual nodeset for this bind
 
         private List childrenIterations; // List<BindIteration>
-        private Map customMips;          // Map<String name, String expression>
+        private Map customMips;          // Map<String name, String expression> where: foo:bar="true()" => "foo-bar" -> "true()"
 
         public Bind(PipelineContext pipelineContext, Element bindElement, boolean isSingleNodeContext) {
             this.bindElement = bindElement;

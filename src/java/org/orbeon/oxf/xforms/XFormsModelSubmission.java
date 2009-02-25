@@ -340,7 +340,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                         && isReplaceAll
-                        && !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML) // can't let SOAP requests be handled by the browser
+                        && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                         && avtXXFormsUsername == null // can't optimize if there are authentication credentials
                         && avtXXFormsTarget == null;  // can't optimize if there is a target
 

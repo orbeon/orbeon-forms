@@ -199,14 +199,14 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getHeaderValuesMap() {
             if (headerValuesMap == null) {
-                Map map = new HashMap();
+                final Map map = new HashMap();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
-                    Element e = (Element) i.next();
-                    String name = XPathUtils.selectStringValueNormalize(e, "name");
+                    final Element e = (Element) i.next();
+                    final String name = XPathUtils.selectStringValueNormalize(e, "name");
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
-                        Element valueElement = (Element) j.next();
-                        String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        NetUtils.addValueToObjectArrayMap(map, name, value);
+                        final Element valueElement = (Element) j.next();
+                        final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
+                        NetUtils.addValueToStringArrayMap(map, name, value);
                     }
                 }
                 headerValuesMap = Collections.unmodifiableMap(map);
@@ -230,13 +230,13 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getParameterMap() {
             if (parameterMap == null) {
-                Map map = new HashMap();
+                final Map map = new HashMap();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
-                    Element e = (Element) i.next();
-                    String name = XPathUtils.selectStringValueNormalize(e, "name");
+                    final Element e = (Element) i.next();
+                    final String name = XPathUtils.selectStringValueNormalize(e, "name");
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
-                        Element valueElement = (Element) j.next();
-                        String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
+                        final Element valueElement = (Element) j.next();
+                        final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
                         NetUtils.addValueToObjectArrayMap(map, name, value);
                     }
                 }

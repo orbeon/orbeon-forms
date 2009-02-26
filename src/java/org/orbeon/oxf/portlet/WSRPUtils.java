@@ -207,14 +207,14 @@ public class WSRPUtils {
                 // Get navigational state
                 final String navigationalStateValue = NetUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM));
                 if (navigationalStateValue != null) {
-                    String decodedNavigationalState = null;
+                    final String decodedNavigationalState;
                     try {
                         decodedNavigationalState = URLDecoder.decode(navigationalStateValue, "utf-8");
                     } catch (UnsupportedEncodingException e) {
                         // Should not happen
                         throw new OXFException(e);
                     }
-                    Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
+                    final Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
                     portletURL.setParameters(navigationParameters);
                 }
 

@@ -373,37 +373,34 @@ public class NetUtils {
      * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
      * @param acceptAmp -> "&amp;" if true, "&" if false
      *
-     * @return a Map of Object[] indexed by name, an empty Map if the query string was null
+     * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
     public static Map decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
 
-        final Map ret = new TreeMap();
+        final Map result = new TreeMap();
         if (queryString != null) {
-            final Matcher m = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
-            int mtchEnd = 0;
-            while (m.find()) {
-                mtchEnd = m.end();
+            final Matcher matcher = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
+            int matcherEnd = 0;
+            while (matcher.find()) {
+                matcherEnd = matcher.end();
                 try {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
                     // denoted ( with parens ) in the expression.  Hence we start with group 1.
-                    String nam = m.group(1);
-                    nam = URLDecoder.decode(nam, NetUtils.DEFAULT_URL_ENCODING);
+                    final String name = URLDecoder.decode(matcher.group(1), NetUtils.DEFAULT_URL_ENCODING);
+                    final String value = URLDecoder.decode(matcher.group(2), NetUtils.DEFAULT_URL_ENCODING);
 
-                    String val = m.group(2);
-                    val = URLDecoder.decode(val, NetUtils.DEFAULT_URL_ENCODING);
-
-                    NetUtils.addValueToObjectArrayMap(ret, nam, val);
-                } catch (final java.io.UnsupportedEncodingException e) {
+                    NetUtils.addValueToStringArrayMap(result, name, value);
+                } catch (UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
                     throw new OXFException(e);
                 }
             }
-            if (queryString.length() != mtchEnd) {
+            if (queryString.length() != matcherEnd) {
                 // There was garbage at the end of the query.
                 throw new OXFException("Malformed URL: " + queryString);
             }
         }
-        return ret;
+        return result;
     }
 
     /**
@@ -458,18 +455,16 @@ public class NetUtils {
         }
     }
 
-    public static void addValuesToStringArrayMap(Map map, String name, String[] values) {
-        final Object[] currentValues = (Object[]) map.get(name);
-        final Object[] newValues;
-        if (currentValues == null) {
-            newValues = new Object[values.length];
-            System.arraycopy(values, 0, newValues, 0, values.length);
+    public static void addValueToStringArrayMap(Map map, String name, String value) {
+        final String[] currentValue = (String[]) map.get(name);
+        if (currentValue == null) {
+            map.put(name, new String[] { value });
         } else {
-            newValues = new Object[currentValues.length + values.length];
-            System.arraycopy(currentValues, 0, newValues, 0, currentValues.length);
-            System.arraycopy(values, 0, newValues, currentValues.length, values.length);
+            final String[] newValue = new String[currentValue.length + 1];
+            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
+            newValue[currentValue.length] = value;
+            map.put(name, newValue);
         }
-        map.put(name, newValues);
     }
 
     /**

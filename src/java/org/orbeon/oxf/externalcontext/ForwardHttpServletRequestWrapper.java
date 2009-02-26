@@ -35,6 +35,8 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
 
     /**
      * This simulates a GET.
+     *
+     * @param parameters        Map<String name, String[] values>
      */
     public ForwardHttpServletRequestWrapper(HttpServletRequest httpServletRequest, String pathInfo, Map parameters) {
         super(httpServletRequest);

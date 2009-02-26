@@ -6962,8 +6962,14 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     for (var i = 0; i < document.forms.length; i++) {
         var form = document.forms[i];
         if (form.className.indexOf("xforms-form") != -1) {
-            if (form.parentNode.className == "dijitContentPane") {
-                foundDojoContentPane = true;
+            // Found Orbeon Forms <form> element
+            var currentElement = form.parentNode;
+            while (currentElement != null) {
+                if (currentElement.className == "dijitContentPane") {
+                    foundDojoContentPane = true;
+                    break;
+                }
+                currentElement = currentElement.parentNode;
             }
         }
     }

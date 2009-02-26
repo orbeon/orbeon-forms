@@ -5018,10 +5018,9 @@ ORBEON.xforms.Server = {
                                             if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
                                                 // IE does not support setting the content of a select with innerHTML
                                                 // So we have to generate the whole select, and use outerHTML
-                                                documentElement.innerHTML = "";
-                                                documentElement.outerHTML =
-                                                documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf("</SELECT>"))
-                                                        + sb.join("") + "</select>";
+                                                YAHOO.util.Event.removeListener(documentElement, "change");
+                                                var selectOpeningTag = documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf(">") + 1);
+                                                documentElement.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
                                                 documentElement = ORBEON.util.Dom.getElementByIdNoCache(controlId);
                                                 // Must now update the cache

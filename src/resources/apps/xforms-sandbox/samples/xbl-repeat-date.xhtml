@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+    Copyright (C) 2009 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,6 +22,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
+        <xhtml:title>XBL Components within Repeat</xhtml:title>
         <xforms:model id="main-model">
             <xforms:instance id="main-instance">
                 <instance xmlns="">
@@ -31,8 +32,10 @@
             </xforms:instance>
             <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
         </xforms:model>
+
+        <!--
         <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
-            <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date">
+            <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date-local">
 
                 <xbl:resources>
                     <xbl:style>
@@ -40,7 +43,6 @@
                     </xbl:style>
                 </xbl:resources>
                 <xbl:template>
-                    <!-- Local model -->
                     <xforms:model id="date-model">
                         <xforms:instance id="date-instance">
                             <date>
@@ -48,13 +50,11 @@
                             </date>
                         </xforms:instance>
                     </xforms:model>
-                    <!-- Local controls -->
                     <xforms:group xbl:attr="ref bind">
                         <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
                         <xxforms:variable name="result" select="." as="node()?"/>
 
-                        <!-- React to update to bound node -->
                         <xforms:group ref="$result" appearance="xxforms:internal">
                             <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:integer">
                                 <xforms:setvalue model="date-model" ref="year" value="$result"/>
@@ -63,7 +63,6 @@
 
                         <xforms:group model="date-model" class="fr-component-group">
                             <xforms:select1 ref="year" xxforms:refresh-items="false">
-                                <!--<xforms:label>Year</xforms:label>-->
                                 <xforms:item>
                                     <xforms:label>Year</xforms:label>
                                     <xforms:value/>
@@ -82,9 +81,7 @@
                                 </xforms:item>
                             </xforms:select1>
 
-                            <!-- React to update to local values -->
                             <xforms:action ev:event="xforms-value-changed">
-                                <!-- Only proceed if all parts are integers -->
                                 <xforms:action if="year castable as xs:integer">
                                     <xforms:setvalue ref="$result" value="context()/year"/>
                                 </xforms:action>
@@ -95,9 +92,8 @@
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-        <xhtml:style type="text/css">
-            .xforms-group-appearance-xxforms-fieldset { padding: .5em }
-        </xhtml:style>
+        -->
+        <xi:include href="oxf:/forms/orbeon/builder/form/custom-controls.xbl" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
 

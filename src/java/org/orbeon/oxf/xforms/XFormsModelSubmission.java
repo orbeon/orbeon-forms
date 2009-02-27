@@ -214,9 +214,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     public String getEffectiveId() {
-        // Submission effective id has the same prefix as effective id of the model
-        final String prefix = XFormsUtils.getEffectiveIdPrefix(model.getEffectiveId());
-        return prefix + getId();
+        return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), getId());
     }
 
     public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
@@ -270,8 +268,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Get current node for xforms:submission and instance containing the node to submit
                 final NodeInfo boundNodeInfo;
                 final XFormsInstance currentInstance;
-                // Create context (should we simply reuse that of the model?)
-                final XFormsContextStack contextStack = new XFormsContextStack(model);
+                // Get and reset context stack
+                final XFormsContextStack contextStack = model.getContextStack();
+                contextStack.resetBindingContext(pipelineContext);
+
                 final XFormsFunction.Context functionContext;
                 {
                     contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
@@ -850,6 +850,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                     NetUtils.copyStream(connectionResult.getResponseInputStream(), outputStream);
 
                                     // End document and close
+                                    outputStream.flush();
                                     outputStream.close();
 
                                     // TODO: [#306918] RFE: Must be able to do replace="all" during initialization.

@@ -69,11 +69,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
 
     // Container
     private XFormsContainer container;
+    private XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
 
     // Containing document
     private XFormsContainingDocument containingDocument;
 
-    public XFormsModel(String prefixedId, Document modelDocument) {
+    public XFormsModel(XFormsContainer container, String prefixedId, Document modelDocument) {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
@@ -100,14 +101,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                 }
             }
         }
-    }
 
-    public void setContainer(XFormsContainer container) {
-
+        // Set container
         this.container = container;
         this.containingDocument = container.getContainingDocument();
-
-        final Element modelElement = modelDocument.getRootElement();
 
         // Get <xforms:submission> elements (may be missing)
         {
@@ -125,6 +122,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         // Create binds object
         binds = XFormsModelBinds.create(this);
         mustBindValidate = binds != null;
+
+        // Create context stack
+        this.contextStack = new XFormsContextStack(this);
+    }
+
+    public void updateEffectiveId(String effectiveId) {
+        this.modelEffectiveId = effectiveId;
+
+        // Update effective ids of all nested instances
+        if (instances != null) {
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                // NOTE: we pass the new model id, not the instance id
+                currentInstance.updateModelEffectiveId(effectiveId);
+            }
+        }
+    }
+
+    public XFormsContextStack getContextStack() {
+        return contextStack;
     }
 
     public XFormsContainer getContainer() {
@@ -230,8 +247,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     /**
      * Return the XFormsInstance with given id, null if not found.
      */
-    public XFormsInstance getInstance(String instanceId) {
-        return (instancesMap == null) ? null : (XFormsInstance) (instancesMap.get(instanceId));
+    public XFormsInstance getInstance(String instanceStaticId) {
+        return (instancesMap == null) ? null : (XFormsInstance) (instancesMap.get(instanceStaticId));
     }
 
     /**
@@ -350,11 +367,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     }
 
     /**
-     * Initialize the state of the model when the model object was just recreated.
+     * Restore the state of the model when the model object was just recreated.
      */
-    public void initializeState(PipelineContext pipelineContext ) {
+    public void restoreState(PipelineContext pipelineContext ) {
         // Ensure schemas are loaded
         loadSchemasIfNeeded(pipelineContext);
+
+        // Restore instances
+        restoreInstances(pipelineContext);
 
         // Refresh binds
         doRebuild(pipelineContext);
@@ -363,6 +383,82 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         doRevalidate(pipelineContext);
 
         synchronizeInstanceDataEventState();
+    }
+
+    /**
+     * Restore all the instances serialized as children of the given container element.
+     *
+     * @param pipelineContext   current PipelineContext containing attribute with serialized instances
+     */
+    private void restoreInstances(PipelineContext pipelineContext) {
+
+        // Find serialized instances from context
+        final Element instancesElement = (Element) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE);
+
+        // Get instances from dynamic state first
+        if (instancesElement != null) {
+            for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
+                final Element currentInstanceElement = (Element) i.next();
+
+                // Check that the instance belongs to this model
+                final String currentModelEffectiveId = currentInstanceElement.attributeValue("model-id");
+                if (modelEffectiveId.equals(currentModelEffectiveId)) {
+
+                    // Create and set instance document on current model
+                    final XFormsInstance newInstance = new XFormsInstance(currentInstanceElement);
+
+                    if (newInstance.getDocumentInfo() == null) {
+                        // Instance is not initialized yet
+
+                        // This means that the instance was application shared
+                        if (!newInstance.isApplicationShared())
+                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
+
+                        final SharedXFormsInstance sharedInstance
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getEffectiveId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
+
+                        setInstance(sharedInstance, false);
+                    } else {
+                        // Instance is initialized, just use it
+                        setInstance(newInstance, newInstance.isReplaced());
+                    }
+
+                    containingDocument.logDebug("restore", "restoring instance from dynamic state", new String[] { "model effective id", modelEffectiveId, "instance static id", newInstance.getId() });
+                }
+            }
+        }
+
+        // Then get instances from static state if necessary
+        final Map staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
+        if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
+            for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
+                final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+
+                // Check that the instance belongs to this model
+                if (modelEffectiveId.equals(currentInstance.getEffectiveModelId())) {
+                    if (getInstance(currentInstance.getId()) == null) {
+                        // Instance was not set from dynamic state
+
+                        if (currentInstance.getDocumentInfo() == null) {
+                            // Instance is not initialized yet
+
+                            // This means that the instance was application shared
+                            if (!currentInstance.isApplicationShared())
+                                throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
+
+                            final SharedXFormsInstance sharedInstance
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getEffectiveId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
+                            setInstance(sharedInstance, false);
+                        } else {
+                            // Instance is initialized, just use it
+                            setInstance(currentInstance, false);
+                        }
+
+                        containingDocument.logDebug("restore", "restoring instance from static state", new String[] { "model effective id", modelEffectiveId, "instance static id", currentInstance.getId() });
+                    }
+                }
+            }
+        }
     }
 
     public void performDefaultAction(final PipelineContext pipelineContext, XFormsEvent event) {

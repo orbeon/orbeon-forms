@@ -227,7 +227,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 contextStack.popBinding();
             }
             contextStack.pushBinding(pipelineContext, getControlElement());
-            setBindingContext(contextStack.getCurrentBindingContext());
+            setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
 
             newRepeatNodeset = getBindingContext().getNodeset();
         }
@@ -280,13 +280,17 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // Node has moved or is removed
 
                     final boolean isRemoved = currentNewIndex == -1;
+                    final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
+                    if (isRemoved) {
+                        if (isDebugEnabled)
+                            containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
 
-                    if (isRemoved && isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
+                        // Indicate to iteration that it is being removed
+                        removedIteration.iterationRemoved(pipelineContext);
                     }
 
                     // Deindex old iteration
-                    currentControlTree.deindexSubtree((XFormsContainerControl) oldChildren.get(i), true, isRemoved);
+                    currentControlTree.deindexSubtree(removedIteration, true, isRemoved);
                 }
             }
 
@@ -466,24 +470,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             result[index] = indexOfNodeInfo(nodeset2, currentNodeInfo);
         }
         return result;
-    }
-
-    private boolean compareNodesets(List nodeset1, List nodeset2) {
-
-        // Can't be the same if the size has changed
-        if (nodeset1.size() != nodeset2.size())
-            return false;
-
-        final Iterator j = nodeset2.iterator();
-        for (Iterator i = nodeset1.iterator(); i.hasNext(); ) {
-            final NodeInfo currentNodeInfo1 = (NodeInfo) i.next();
-            final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
-
-            // Found a difference
-            if (!currentNodeInfo1.isSameNodeInfo(currentNodeInfo2))
-                return false;
-        }
-        return true;
     }
 
     public Map serializeLocal() {

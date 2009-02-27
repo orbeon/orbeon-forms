@@ -39,7 +39,7 @@ public class XFormsResetAction extends XFormsAction {
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
 
-        final Object modelObject = container.getModelByEffectiveId(modelId);// xxx fix cast not needed
+        final Object modelObject = container.findModelByStaticId(modelId);// TODO: FIXME do like other model-related actions
         if (modelObject instanceof XFormsModel) {
             final XFormsModel model = (XFormsModel) modelObject;
             container.dispatchEvent(pipelineContext, new XFormsResetEvent(model));

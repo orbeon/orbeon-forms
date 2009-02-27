@@ -39,7 +39,7 @@ public class XFormsRevalidateAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? container.getModelByEffectiveId(modelId) : actionInterpreter.getContextStack().getCurrentModel();// xxx fix not effective
+        final XFormsModel model = (modelId != null) ? container.findModelByStaticId(modelId) : actionInterpreter.getContextStack().getCurrentModel();
 
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());

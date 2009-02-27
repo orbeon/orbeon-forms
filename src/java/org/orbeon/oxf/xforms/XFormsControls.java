@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
@@ -529,36 +526,13 @@ public class XFormsControls {
                 // Handle components
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
-                if (true) {// TODO: SHOULD MOVE THIS TO WITHIN COMPONENT CONTROL
-                    // Compute new id prefix for nested component
-                    final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
+                final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
 
-                    // Get container
-                    XFormsContainer newContainer = currentContainer.getChildById(staticControlId);
-                    if (newContainer == null) {
-                        // Container does not exist yet, create one
-                        newContainer = currentContainer.createChildContainer(staticControlId, effectiveControlId, newIdPrefix);
-                        newContainer.addAllModels();// NOTE: there may or may not be nested models
-                        newContainer.initializeModels(pipelineContext);
-                    } else {
-                        // Container exists
-                        // o controls are rebuilt
-                        // o containers have been restored from the dynamic state
-                    }
+                // Recurse into the shadow component tree
+                final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
+                visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                        staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 
-                    // Make sure there is location data
-                    newContainer.setLocationData(XFormsUtils.getNodeLocationData(currentControlElement));
-
-                    // In all cases, reset the binding context as this is used for recursing in the tree below
-                    newContainer.setBindingContext(currentContextStack.getCurrentBindingContext());
-                    newContainer.getContextStack().resetBindingContext(pipelineContext);
-
-                    // Recurse into component tree
-                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
-                    visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                            staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
-                }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
 
             } else {
@@ -683,7 +657,7 @@ public class XFormsControls {
                 final List newRepeatNodeset = newBindingContext.getNodeset();
 
                 // Set new current binding for control element
-                control.setBindingContext(newBindingContext);
+                control.setBindingContext(pipelineContext, newBindingContext);
 
                 // Update iterations
                 final List newIterations = ((XFormsRepeatControl) control).updateIterations(pipelineContext, oldRepeatNodeset, newRepeatNodeset, null);
@@ -697,7 +671,7 @@ public class XFormsControls {
                 // Handle dialog
                 // TODO: handle this through inheritance
 
-                control.setBindingContext(newBindingContext);
+                control.setBindingContext(pipelineContext, newBindingContext);
 
                 final XXFormsDialogControl dialogControl = (XXFormsDialogControl) control;
                 final boolean isVisible = dialogControl.isVisible();
@@ -708,7 +682,7 @@ public class XFormsControls {
                 // TODO: handle other container controls
 
                 // Set new current binding for control element
-                control.setBindingContext(newBindingContext);
+                control.setBindingContext(pipelineContext, newBindingContext);
             }
 
             // Mark the control as dirty so it gets reevaluated

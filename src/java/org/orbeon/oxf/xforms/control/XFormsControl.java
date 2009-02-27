@@ -126,6 +126,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return containingDocument.getControls().getContextStack();
     }
 
+    public void iterationRemoved(PipelineContext pipelineContext) {
+        // NOP, can be overridden
+    }
+
     public String getId() {
         return id;
     }
@@ -396,7 +400,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
 
         // Keep binding context
         this.bindingContext = bindingContext;
@@ -690,5 +694,30 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public void resetLocal() {
         initialLocal = currentLocal;
+    }
+
+    /**
+     * Compare two nodesets.
+     *
+     * @param nodeset1  List<NodeInfo> first nodeset
+     * @param nodeset2  List<NodeInfo> second nodeset
+     * @return  true iif the nodesets point to the same nodes
+     */
+    protected boolean compareNodesets(List nodeset1, List nodeset2) {
+
+        // Can't be the same if the size has changed
+        if (nodeset1.size() != nodeset2.size())
+            return false;
+
+        final Iterator j = nodeset2.iterator();
+        for (Iterator i = nodeset1.iterator(); i.hasNext(); ) {
+            final NodeInfo currentNodeInfo1 = (NodeInfo) i.next();
+            final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
+
+            // Found a difference
+            if (!currentNodeInfo1.isSameNodeInfo(currentNodeInfo2))
+                return false;
+        }
+        return true;
     }
 }

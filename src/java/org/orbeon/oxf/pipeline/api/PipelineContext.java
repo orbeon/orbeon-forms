@@ -72,7 +72,6 @@ public class PipelineContext {
     public static final String JNDI_CONTEXT = "context"; // used by Delegation processor and related
     public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context"; // used by SQLProcessor and related
     public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
-    public static final String STRUTS_REQUEST = "struts-request"; // used by StrutsActionFormGenerator (obsolete)
 
     /**
      * ContextListener interface to listen on PipelineContext events.

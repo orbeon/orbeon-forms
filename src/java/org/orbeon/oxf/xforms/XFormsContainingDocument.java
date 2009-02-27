@@ -666,7 +666,7 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
     /**
-     * Return the list of messages to send to the client, null if none.
+     * Return the list of loads to send to the client, null if none.
      */
     public List getLoadsToRun() {
         return loadsToRun;
@@ -1351,21 +1351,25 @@ public class XFormsContainingDocument extends XFormsContainer {
     }
 
 
+    /**
+     * Restore the document's dynamic state given a serialized version of the dynamic state.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param encodedDynamicState   serialized dynamic state
+     */
     private void restoreDynamicState(PipelineContext pipelineContext, String encodedDynamicState) {
 
         // Get dynamic state document
         final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
 
+        // Store instances state in PipelineContext for use down the line
+        final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
+        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE, instancesElement);
+
         // Create XForms controls and models
         createControlsAndModels(pipelineContext);
-
-        // Extract and restore instances
-        {
-            final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
-            restoreInstances(pipelineContext, instancesElement);
-        }
-
-        // Restore models state
+        
+        // Restore top-level models state, including instances
         restoreModelsState(pipelineContext);
 
         // Restore controls state
@@ -1374,6 +1378,19 @@ public class XFormsContainingDocument extends XFormsContainer {
             xformsControls.deserializeControls(dynamicStateDocument.getRootElement());
             xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
         }
+
+        // Indicate that instance restoration process is over
+        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE, null);
+    }
+
+    /**
+     * Whether the containing document is in a phase of restoring the dynamic state.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @return                  true iif restore is in process
+     */
+    public boolean isRestoringDynamicState(PipelineContext pipelineContext) {
+        return pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE) != null;
     }
 
     /**
@@ -1463,5 +1480,9 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public XFormsEvent getCurrentEvent() {
         return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
+    }
+          
+    public List getEventHandlers(XFormsContainer container) {
+        return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 }

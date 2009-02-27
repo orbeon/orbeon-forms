@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
@@ -20,12 +21,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
-import org.apache.commons.collections.map.LinkedMap;
 
 import java.util.*;
 
@@ -43,12 +44,15 @@ import java.util.*;
  */
 public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 
-    // Static id of the control using this container, e.g. my-foo-bar
-    private final String staticId;
-    // Effective id of the control using this container, e.g. my-stuff$my-foo-bar.2
-    private final String effectiveId;
-    // "" for the root container, "my-stuff$my-foo-bar$", etc.
-    private final String fullPrefix;
+    // PipelineContext attribute used during instance restoration
+    protected static final String XFORMS_DYNAMIC_STATE_RESTORE = "xforms-dynamic-state-instances";
+
+    // Static id of the control containing this container, e.g. my-foo-bar
+    private String staticId;
+    // Effective id of the control containing this container, e.g. my-stuff$my-foo-bar.1-2
+    private String effectiveId;
+    // Prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
+    private String fullPrefix;
 
     private LocationData locationData;
 
@@ -60,10 +64,24 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
     private XFormsContextStack.BindingContext bindingContext; 
 
     private XFormsContainingDocument containingDocument;
-    private final XFormsContextStack contextStack;
+    private final XFormsContextStack contextStack;  // for controls under this container
 
     private List models = new ArrayList();  // List<XFormsModel>
     private Map modelsMap = new HashMap();  // Map<String, XFormsModel> of effective model id to model
+
+    /**
+     * Create a new container child of the control with id effectiveId.
+     *
+     * @param effectiveId   effective id of the containing control
+     * @return              new XFormsContainer
+     */
+    public XFormsContainer createChildContainer(String effectiveId) {
+        return new XFormsContainer(effectiveId, this);
+    }
+
+    protected XFormsContainer(String effectiveId, XFormsContainer parentContainer) {
+        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentContainer);
+    }
 
     protected XFormsContainer(String staticId, String effectiveId, String fullPrefix, XFormsContainer parentContainer) {
         this.staticId = staticId;
@@ -89,6 +107,63 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         this.contextStack = new XFormsContextStack(this);
     }
 
+    /**
+     * Update the effective id when repeat iterations change.
+     *
+     * @param effectiveId   effective id of the containing control
+     */
+    public void updateEffectiveId(String effectiveId) {
+
+        // Remove from parent before updating id
+        if (parentContainer != null) {
+            parentContainer.removeChild(this);
+        }
+
+        // Update all ids
+        this.staticId = XFormsUtils.getStaticIdFromId(effectiveId);
+        this.effectiveId = effectiveId;
+        this.fullPrefix = XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR;
+
+        // Add back to parent after updating id
+        if (parentContainer != null) {
+            // TODO: document order may not be kept anymore
+            parentContainer.addChild(this);
+        }
+
+        // Clear map
+        modelsMap.clear();
+
+        // Update effective ids of all nested models
+        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) iterator.next();
+
+            // E.g. foo$bar$my-model.1-2 => foo$bar$my-model.1-3
+            final String newModelEffectiveId = XFormsUtils.getEffectiveIdNoSuffix(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
+            currentModel.updateEffectiveId(newModelEffectiveId);
+
+            // Put in map
+            modelsMap.put(currentModel.getEffectiveId(), currentModel);
+        }
+    }
+
+    /**
+     * Remove container and destroy models when a repeat iteration is removed.
+     *
+     * @param pipelineContext   current PipelineContext
+     */
+    public void destroy(PipelineContext pipelineContext) {
+        // Tell parent about it
+        if (parentContainer != null) {
+            parentContainer.removeChild(this);
+        }
+
+        // Dispatch destruction event to all models
+        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) iterator.next();
+            dispatchEvent(pipelineContext, new XFormsModelDestructEvent(currentModel));
+        }
+    }
+
     public String getFullPrefix() {
         return fullPrefix;
     }
@@ -100,12 +175,19 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
     private void addChild(XFormsContainer container) {
         if (childrenContainers == null)
             childrenContainers = new LinkedHashMap();
-        childrenContainers.put(container.getId(), container);
+        childrenContainers.put(container.getEffectiveId(), container);
     }
 
-//    public Map getChildrenContainers() {
-//        return childrenContainers;
-//    }
+    private void removeChild(XFormsContainer container) {
+
+        final String effectiveId = container.getEffectiveId();
+        final Object containerForEffectiveId = childrenContainers.get(effectiveId);
+
+        // Only remove if the object matches, in case another object with same effective id was added in the meanwhile.
+        // Possible with repeat iteration updates.
+        if (containerForEffectiveId == container)
+            childrenContainers.remove(effectiveId);
+    }
 
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
@@ -124,35 +206,35 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         return contextStack;
     }
 
-    public XFormsContainer getChildById(String staticId) {
+    public XFormsContainer getChildByEffectiveId(String staticId) {
         return (XFormsContainer) ((childrenContainers != null) ? childrenContainers.get(staticId) : null);
-    }
-
-    public XFormsContainer createChildContainer(String staticId, String effectiveId, String prefix) {
-        return new XFormsContainer(staticId, effectiveId, prefix, this);
     }
 
     /**
      * Create and index models corresponding to this container's scope.
      */
     public void addAllModels() {
+        // Iterate through all models and finds the one that apply to this container
         for (Iterator i = containingDocument.getStaticState().getModelDocuments().entrySet().iterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
-            final String prefixedId = (String) currentEntry.getKey();
+            final String modelPrefixedId = (String) currentEntry.getKey();
             final Document modelDocument = (Document) currentEntry.getValue();
 
-            final String currentPrefix = XFormsUtils.getEffectiveIdPrefix(prefixedId);
-            if (fullPrefix.equals(currentPrefix)) {
-                final XFormsModel model = new XFormsModel(prefixedId, modelDocument);
-                model.setContainer(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument (really? should explain why)
+            final String modelPrefix = XFormsUtils.getEffectiveIdPrefix(modelPrefixedId);
+            if (fullPrefix.equals(modelPrefix)) {
+                // This model belongs to this container
 
-                // Add model
-                addModel(model);
+                // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
+                // my-model => foo$bar$my-model.1-2
+                final String modelEffectiveId = modelPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
+
+                // Create and add model
+                addModel(new XFormsModel(this, modelEffectiveId, modelDocument));
             }
         }
     }
 
-    protected void initializeModels(PipelineContext pipelineContext) {
+    public void initializeModels(PipelineContext pipelineContext) {
 
         // 4.2 Initialization Events
 
@@ -187,16 +269,18 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
     }
 
     /**
-     * Return model with the specified id, null if not found. If the id is the empty string, return
-     * the default model, i.e. the first model.
+     * Return model within this container, with the specified static id, null if not found. If the id is the empty
+     * string, return the default model, i.e. the first model.
      */
-    public XFormsModel getModelByEffectiveId(String modelEffectiveId) {
-        return (XFormsModel) ("".equals(modelEffectiveId) ? getDefaultModel() : modelsMap.get(modelEffectiveId));
+    public XFormsModel findModelByStaticId(String modelStaticId) {
+        return (XFormsModel) ("".equals(modelStaticId)
+                ? getDefaultModel()
+                : modelsMap.get(fullPrefix + modelStaticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)));
     }
 
     protected void addModel(XFormsModel model) {// move to private once legacy caller is gone
         this.models.add(model);
-        if (model.getEffectiveId() != null)
+        if (model.getEffectiveId() != null)// TODO: how can this be null?
             this.modelsMap.put(model.getEffectiveId(), model);
     }
 
@@ -328,6 +412,12 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         return null;
     }
 
+    /**
+     * Serialize all the instances of this container and children containers.
+     *
+     * @param instancesElement  container element
+     */
+    // TODO: xxx move to XFormsModel
     protected void serializeInstances(Element instancesElement) {
 
         // Serialize this container's model's
@@ -360,118 +450,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    protected void restoreInstances(PipelineContext pipelineContext, Element instancesElement) {
-        // Get instances from dynamic state first
-        if (instancesElement != null) {
-            for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
-                final Element instanceElement = (Element) i.next();
-
-                // Create and set instance document on current model
-                final XFormsInstance newInstance = new XFormsInstance(instanceElement);
-
-                if (newInstance.getDocumentInfo() == null) {
-                    // Instance is not initialized yet
-
-                    // This means that the instance was application shared
-                    if (!newInstance.isApplicationShared())
-                        throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
-
-                    final SharedXFormsInstance sharedInstance
-                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getEffectiveId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
-
-                    setInstance(sharedInstance, false);
-                } else {
-                    // Instance is initialized, just use it
-                    setInstance(newInstance, newInstance.isReplaced());
-                }
-
-                // Log instance if needed
-                newInstance.logIfNeeded(containingDocument, "restoring instance from dynamic state");
-            }
-        }
-
-        // Then get instances from static state if necessary
-        final Map staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
-        if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
-            for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
-
-                if (findInstance(currentInstance.getEffectiveId()) == null) {
-                    // Instance was not set from dynamic state
-
-                    if (currentInstance.getDocumentInfo() == null) {
-                        // Instance is not initialized yet
-
-                        // This means that the instance was application shared
-                        if (!currentInstance.isApplicationShared())
-                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
-
-                        final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getEffectiveId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
-                        setInstance(sharedInstance, false);
-                    } else {
-                        // Instance is initialized, just use it
-                        setInstance(currentInstance, false);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Set an instance by creating nested containers if needed.
-     *
-     * @param instance  instance to set
-     * @param replaced  whether the instance was replaced
-     */
-    private void setInstance(XFormsInstance instance, boolean replaced) {
-        final String fullModelPrefix = XFormsUtils.getEffectiveIdPrefix(instance.getEffectiveModelId());
-        final List parts = new ArrayList(Arrays.asList(XFormsUtils.getEffectiveIdPrefixParts(instance.getEffectiveModelId())));
-        ((XFormsContainer) containingDocument).setInstance(fullModelPrefix, "", parts, instance, replaced);
-
-//        xxx this is called when restoring dynamic state
-    }
-
-    private void setInstance(String fullModelPrefix, String currentPrefix, List remainingParts, XFormsInstance instance, boolean replaced) {
-
-//        xxx this is called when restoring dynamic state
-
-        if (fullModelPrefix.equals(fullPrefix)) {
-            // The instance must be set within a model of this container
-            final XFormsModel model = (XFormsModel) modelsMap.get(instance.getEffectiveModelId()); // model must exist as addAllModels() must have been called
-            model.setInstance(instance, replaced);
-        } else {
-            // The instance must be set within a child container
-            if (remainingParts.size() == 0)
-                throw new ValidationException("Cannot set instance: " + instance.getEffectiveId(), getLocationData());
-
-            final String currentPart = (String) remainingParts.get(0);
-            // Make sure there is a child container
-            XFormsContainer childContainer = getChildById(currentPart);
-            if (childContainer == null) {
-                // Create container
-                childContainer = createChildContainer(currentPart, currentPrefix + currentPart, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR);
-                childContainer.addAllModels();
-            }
-
-            // Recurse into container
-            remainingParts.remove(0);
-            childContainer.setInstance(fullModelPrefix, currentPrefix + currentPart + XFormsConstants.COMPONENT_SEPARATOR, remainingParts, instance, replaced);
-        }
-    }
-
-    protected void restoreModelsState(PipelineContext pipelineContext) {
-        // Handle this container
+    public void restoreModelsState(PipelineContext pipelineContext) {
+        // Handle this container only
         for (Iterator iterator = models.iterator(); iterator.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) iterator.next();
-            currentModel.initializeState(pipelineContext);
-        }
-        // Recurse into children containers
-        if (childrenContainers != null) {
-            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
-                final XFormsContainer currentContainer = (XFormsContainer) i.next();
-                currentContainer.restoreModelsState(pipelineContext);
-            }
+            currentModel.restoreState(pipelineContext);
         }
     }
 
@@ -601,9 +584,10 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                         // Add container except if it is a repeat, as we use repeat iterations instead
                         eventObservers.add(eventObserver);
 
-                        if (eventObserver instanceof XFormsContainer || eventObserver instanceof XFormsComponentControl) {
+                        if (eventObserver instanceof XFormsContainer && !(eventObserver instanceof XFormsContainingDocument)
+                                || eventObserver instanceof XFormsComponentControl) {
                             if (originalEvent instanceof XFormsUIEvent) {
-                                // UI events need to be regargetted
+                                // UI events need to be retargetted
                                 boundaries.add(eventObserver);
                                 eventsForBoundaries.put(eventObserver.getEffectiveId(), null);
                             } else {

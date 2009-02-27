@@ -368,7 +368,6 @@ public class XFormsStaticState {
             final List modelsElements = staticStateElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
             modelDocuments.clear();
 
-            // Get all models
             // FIXME: we don't get a System ID here. Is there a simple solution?
             int modelsCount = 0;
             for (Iterator i = modelsElements.iterator(); i.hasNext(); modelsCount++) {

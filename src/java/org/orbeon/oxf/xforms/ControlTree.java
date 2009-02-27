@@ -104,7 +104,7 @@ public class ControlTree implements Cloneable {
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getContainer(), repeatControl, iterationIndex);
-        repeatIterationControl.setBindingContext(bindingContext);
+        repeatIterationControl.setBindingContext(pipelineContext, bindingContext);
 
         // Index this control
         // NOTE: Must do after setting the context, so that relevance can be properly determined
@@ -140,11 +140,11 @@ public class ControlTree implements Cloneable {
         // Remember by control type (for certain controls we know we need)
         if (control instanceof XFormsUploadControl || control instanceof XFormsRepeatControl) {
             if (controlTypes == null)
-                controlTypes = new HashMap();
+                controlTypes = new HashMap();// no need for order here
 
             Map controlsMap = (Map) controlTypes.get(control.getName());
             if (controlsMap == null) {
-                controlsMap = new LinkedHashMap();
+                controlsMap = new LinkedHashMap(); // need for order here!
                 controlTypes.put(control.getName(), controlsMap);
             }
 
@@ -400,9 +400,13 @@ public class ControlTree implements Cloneable {
             // Start from source control
             XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceEffectiveId);
             // Go down parents until component is found
-            while (!(componentControl instanceof XFormsComponentControl)) {
+            while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
                 componentControl =  componentControl.getParent();
             }
+
+            // Can't keep going if the source control or one of its ancestors is not found
+            if (componentControl == null)
+                return null;
 
             // Search from the root of the component
             return findEffectiveControlId(sourceEffectiveId, targetId, ((XFormsComponentControl) componentControl).getChildren());
@@ -452,6 +456,13 @@ public class ControlTree implements Cloneable {
         return null;
     }
 
+    /**
+     * Listener used to create a tree of control from scratch. Used:
+     *
+     * o the first time controls are created
+     * o for new repeat iterations
+     * o for new non-relevant parts of a tree (under development as of 2009-02-24)
+     */
     public static class CreateControlsListener implements XFormsControls.ControlElementVisitorListener {
 
         private XFormsControl currentControlsContainer;
@@ -487,7 +498,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            control.setBindingContext(currentBindingContext);
+            control.setBindingContext(pipelineContext, currentBindingContext);
 
             // Index this control
             // NOTE: Must do after setting the context, so that relevance can be properly determined
@@ -535,7 +546,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            repeatIterationControl.setBindingContext(currentBindingContext);
+            repeatIterationControl.setBindingContext(pipelineContext, currentBindingContext);
 
             // Index this control
             // NOTE: Must do after setting the context, so that relevance can be properly determined

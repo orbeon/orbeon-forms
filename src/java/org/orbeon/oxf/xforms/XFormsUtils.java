@@ -1440,7 +1440,7 @@ public class XFormsUtils {
                 };
                 contextStack.pushBinding(pipelineContext, element);
                 {
-                    outputControl.setBindingContext(contextStack.getCurrentBindingContext());
+                    outputControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
                     outputControl.evaluateIfNeeded(pipelineContext);
                 }
                 contextStack.popBinding();
@@ -1491,7 +1491,7 @@ public class XFormsUtils {
 
                             contextStack.pushBinding(pipelineContext, element);
                             {
-                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext());
+                                attributeControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
                                 attributeControl.evaluateIfNeeded(pipelineContext);
                             }
                             contextStack.popBinding();
@@ -1590,7 +1590,9 @@ public class XFormsUtils {
     }
 
     /**
-     * Return an effective id without its suffix, e.g. "foo$bar$my-input" or "my-textarea".
+     * Return an effective id without its suffix, e.g.:
+     *
+     * o foo$bar$my-input.1-2 => foo$bar$my-input
      *
      * @param effectiveId   effective id to check
      * @return              effective id without its suffix, null if effectiveId was null
@@ -1602,6 +1604,27 @@ public class XFormsUtils {
         final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
         if (suffixIndex != -1) {
             return effectiveId.substring(0, suffixIndex);
+        } else {
+            return effectiveId;
+        }
+    }
+
+    /**
+     * Return an effective id without its prefix, e.g.:
+     *
+     * o foo$bar$my-input => my-input
+     * o foo$bar$my-input.1-2 => my-input.1-2
+     *
+     * @param effectiveId   effective id to check
+     * @return              effective id without its prefix, null if effectiveId was null
+     */
+    public static String getEffectiveIdNoPrefix(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int prefixIndex = effectiveId.lastIndexOf(XFormsConstants.COMPONENT_SEPARATOR);
+        if (prefixIndex != -1) {
+            return effectiveId.substring(prefixIndex + 1);
         } else {
             return effectiveId;
         }
@@ -1635,10 +1658,10 @@ public class XFormsUtils {
     public static String getIterationEffectiveId(String repeatEffectiveId, int iterationIndex) {
         final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(repeatEffectiveId);
         if (parentSuffix.equals("")) {
-            // E.g. foobar -> foobar.3
+            // E.g. foobar => foobar.3
             return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iterationIndex;
         } else {
-            // E.g. foobar.3-7 -> foobar.3-7-2
+            // E.g. foobar.3-7 => foobar.3-7-2
             return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
         }
     }
@@ -1683,5 +1706,17 @@ public class XFormsUtils {
             suffix = (suffixIndex == -1) ? "" : baseEffectiveId.substring(suffixIndex);
         }
         return prefix + staticId + suffix;
+    }
+
+    /**
+     * Return the static id associated with the given id, removing suffix and prefix if present.
+     *
+     *  foo$bar.1-2 => bar
+     *
+     * @param anyId id to check
+     * @return      static id, or null if anyId was null
+     */
+    public static String getStaticIdFromId(String anyId) {
+        return getEffectiveIdNoSuffix(getEffectiveIdNoPrefix(anyId));
     }
 }

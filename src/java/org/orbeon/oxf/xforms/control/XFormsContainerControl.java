@@ -16,11 +16,37 @@ package org.orbeon.oxf.xforms.control;
 import java.util.List;
 
 /**
- * Marker interface for all container controls.
+ * Interface for all container controls.
  */
 public interface XFormsContainerControl {
+    /**
+     * Add a child control.
+     *
+     * @param XFormsControl control
+     */
     public void addChild(XFormsControl XFormsControl);
+
+    /**
+     * Get all the direct children controls.
+     *
+     * @return  List<XFormsControl>
+     */
     public List getChildren();
+
+    /**
+     * Number of direct children control.
+     *
+     * @return  number
+     */
     public int getSize();
+
+    /**
+     * Notify container control that all its children have been added.
+     */
     public void childrenAdded();
+
+    /**
+     * Update this container control's effective id, e.g. after a change of repeat iteration.
+     */
+    public void updateEffectiveId();
 }

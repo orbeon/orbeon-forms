@@ -60,7 +60,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private DocumentInfo documentInfo;
 
     private String instanceId;
-    private String effectiveModelId;
+    private String modelEffectiveId;
 
     private String sourceURI;
 
@@ -93,7 +93,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public XFormsInstance(Element containerElement) {
 
         this.instanceId = containerElement.attributeValue("id");
-        this.effectiveModelId = containerElement.attributeValue("model-id");
+        this.modelEffectiveId = containerElement.attributeValue("model-id");
 
         this.sourceURI = containerElement.attributeValue("source-uri");
 
@@ -143,18 +143,18 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String effectiveModelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String modelEffectiveId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(effectiveModelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(modelEffectiveId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String effectiveModelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String modelEffectiveId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
 
         if (applicationShared && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
 
         this.instanceId = instanceId;
-        this.effectiveModelId = effectiveModelId;
+        this.modelEffectiveId = modelEffectiveId;
 
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
         this.applicationShared = applicationShared;
@@ -167,6 +167,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.validation = validation;
 
         this.documentInfo = instanceDocumentInfo;
+    }
+
+    public void updateModelEffectiveId(String modelEffectiveId) {
+        this.modelEffectiveId = modelEffectiveId;
     }
 
     /**
@@ -188,7 +192,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             instanceElement.addAttribute("ttl", Long.toString(timeToLive));
 
         instanceElement.addAttribute("id", instanceId);
-        instanceElement.addAttribute("model-id", effectiveModelId);
+        instanceElement.addAttribute("model-id", modelEffectiveId);
         if (sourceURI != null)
             instanceElement.addAttribute("source-uri", sourceURI);
         if (username != null)
@@ -223,7 +227,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @return XFormsModel          XFormsModel containing this instance
      */
     public XFormsModel getModel(XFormsContainingDocument containingDocument) {
-        return (XFormsModel) containingDocument.getObjectByEffectiveId(effectiveModelId);
+        return (XFormsModel) containingDocument.getObjectByEffectiveId(modelEffectiveId);
     }
 
     /**
@@ -243,9 +247,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public String getEffectiveId() {
-        // Instance effective id has the same prefix as effective id of the model
-        final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveModelId);
-        return prefix + getId();
+        return XFormsUtils.getRelatedEffectiveId(modelEffectiveId, getId());
     }
 
     public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
@@ -253,7 +255,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public String getEffectiveModelId() {
-        return effectiveModelId;
+        return modelEffectiveId;
     }
 
     public boolean isReadOnly() {
@@ -590,7 +592,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(effectiveModelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(modelEffectiveId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
     }
 
     public static String getInstanceId(Element xformsInstanceElement) {

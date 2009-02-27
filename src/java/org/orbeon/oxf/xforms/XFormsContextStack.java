@@ -260,7 +260,7 @@ public class XFormsContextStack {
             final XFormsModel newModel;
             final boolean isNewModel;
             if (modelId != null) {
-                newModel = (XFormsModel) container.getModelByEffectiveId(container.getFullPrefix() + modelId);
+                newModel = (XFormsModel) container.findModelByStaticId(modelId);
                 // TODO: dispatch xforms-binding-exception
                 if (newModel == null)
                     throw new ValidationException("Invalid model id: " + modelId, locationData);
@@ -338,13 +338,13 @@ public class XFormsContextStack {
                 } else if (isNewModel && context == null) {
                     // Only the model has changed
 
-                    final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
+                    final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel);
                     if (modelBindingContext != null) {
                         newNodeset = modelBindingContext.getNodeset();
                         newPosition = modelBindingContext.getPosition();
                         isPushModelVariables = false;
                     } else {
-                        newNodeset = getCurrentNodeset(newModel.getEffectiveId());
+                        newNodeset = getCurrentNodeset(newModel);
                         newPosition = 1;
                         // Variables for this model are not yet on the stack
                         isPushModelVariables = true;
@@ -463,15 +463,13 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the current node-set binding for the given model id.
+     * Get the current node-set binding for the given model.
      */
-    public BindingContext getCurrentBindingContextForModel(String effectiveModelId) {
+    public BindingContext getCurrentBindingContextForModel(XFormsModel model) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-            final String currentModelId = currentBindingContext.getModel().getEffectiveId();
-            if ((currentModelId == null && effectiveModelId == null) || (effectiveModelId != null && effectiveModelId.equals(currentModelId)))
+            if (model == currentBindingContext.getModel())
                 return currentBindingContext;
         }
 
@@ -479,18 +477,18 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the current node-set binding for the given effective model id.
+     * Get the current node-set binding for the given model.
      */
-    public List getCurrentNodeset(String effectiveModelId) {
+    public List getCurrentNodeset(XFormsModel model) {
 
-        final BindingContext bindingContext = getCurrentBindingContextForModel(effectiveModelId);
+        final BindingContext bindingContext = getCurrentBindingContextForModel(model);
 
         // If a context exists, return its node-set
         if (bindingContext != null)
             return bindingContext.getNodeset();
 
         // If there is no default instance, return an empty node-set
-        final XFormsInstance defaultInstance = container.getModelByEffectiveId(effectiveModelId).getDefaultInstance();
+        final XFormsInstance defaultInstance = model.getDefaultInstance();
         if (defaultInstance == null)
             return Collections.EMPTY_LIST;
 
@@ -498,7 +496,6 @@ public class XFormsContextStack {
         try {
             return Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
         } catch (Exception e) {
-            defaultInstance.getInstanceRootElementInfo();
             throw new OXFException(e);
         }
     }

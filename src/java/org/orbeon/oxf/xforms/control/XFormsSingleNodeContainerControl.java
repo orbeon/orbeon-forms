@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,5 +82,15 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
 
     public void childrenAdded() {
         // For subclasses
+    }
+
+    public void iterationRemoved(PipelineContext pipelineContext) {
+        final List children = getChildren();
+        if (children != null && children.size() > 0) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final XFormsControl currentControl = (XFormsControl) i.next();
+                currentControl.iterationRemoved(pipelineContext);
+            }
+        }
     }
 }

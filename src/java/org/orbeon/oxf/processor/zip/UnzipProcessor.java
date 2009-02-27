@@ -8,6 +8,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
+import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.ContentHandler;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -52,12 +54,16 @@ public class UnzipProcessor extends ProcessorImpl {
                         ZipEntry zipEntry = (ZipEntry) entries.nextElement();
                         // Get file name
                         String fileName = zipEntry.getName();
+                        long fileSize = zipEntry.getSize();
+                        String fileTime = ISODateUtils.XS_DATE_TIME.format(new Date(zipEntry.getTime()));
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
                         String uri = NetUtils.inputStreamToAnyURI(context, entryInputStream, NetUtils.REQUEST_SCOPE);
                         // <file name="filename.ext">uri</file>
                         AttributesImpl fileAttributes = new AttributesImpl();
                         fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);
+                        fileAttributes.addAttribute("", "size", "size", "CDATA", Long.toString(fileSize));
+                        fileAttributes.addAttribute("", "dateTime", "dateTime", "CDATA", fileTime);
                         contentHandler.startElement("", "file", "file", fileAttributes);
                         contentHandler.characters(uri.toCharArray(), 0, uri.length());
                         // </file>

@@ -35,7 +35,7 @@
         <xforms:trigger>
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                <xforms:label ref="$form-resources/close/label"/>
+                <xforms:output value="$form-resources/close/label"/>
             </xforms:label>
             <!-- Hide dialog -->
             <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>

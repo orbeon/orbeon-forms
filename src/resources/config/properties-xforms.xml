@@ -64,8 +64,8 @@
     <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                   value="xmldb:exist:///"/>
     <property as="xs:string"  name="oxf.xforms.store.application.collection"            value="/db/orbeon/xforms/cache/"/>
     <property as="xs:boolean" name="oxf.xforms.cache.document"                          value="true"/>
-    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="10"/>
-    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="40"/>
+    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
+    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
 
     <!-- Other XForms options -->
     <property as="xs:string"  name="oxf.xforms.order"                                   value="label control help alert hint"/>
@@ -91,7 +91,7 @@
     <property as="xs:string"  name="oxf.xforms.datepicker"                              value="yui"/>  <!-- jcalendar or yui -->
     <property as="xs:string"  name="oxf.xforms.htmleditor"                              value="yui"/>  <!-- fck or yui -->
 
-    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                    value="10"/>
+    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                    value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"        value="500"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"  value="2000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"            value="500"/>

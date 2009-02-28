@@ -22,7 +22,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
-        <xhtml:title>XBL Components within Repeat</xhtml:title>
+        <xhtml:title>XBL Components in Repeat</xhtml:title>
         <xforms:model id="main-model">
             <xforms:instance id="main-instance">
                 <instance xmlns="">
@@ -30,72 +30,31 @@
                     <date/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
+            <xforms:bind nodeset="date[1]" xxforms:default="current-date()"/>
+            <xforms:bind nodeset="date[2]" xxforms:default="current-date() - xs:dayTimeDuration('P1D')"/>
+            <xforms:bind nodeset="date" type="xforms:date"/>
         </xforms:model>
-
-        <!--
-        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
-            <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date-local">
-
-                <xbl:resources>
-                    <xbl:style>
-                        .xbl-fr-dropdown-date .fr-component-group select.xforms-select1-appearance-minimal { width: auto }
-                    </xbl:style>
-                </xbl:resources>
-                <xbl:template>
-                    <xforms:model id="date-model">
-                        <xforms:instance id="date-instance">
-                            <date>
-                                <year/>
-                            </date>
-                        </xforms:instance>
-                    </xforms:model>
-                    <xforms:group xbl:attr="ref bind">
-                        <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
-
-                        <xxforms:variable name="result" select="." as="node()?"/>
-
-                        <xforms:group ref="$result" appearance="xxforms:internal">
-                            <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:integer">
-                                <xforms:setvalue model="date-model" ref="year" value="$result"/>
-                            </xforms:action>
-                        </xforms:group>
-
-                        <xforms:group model="date-model" class="fr-component-group">
-                            <xforms:select1 ref="year" xxforms:refresh-items="false">
-                                <xforms:item>
-                                    <xforms:label>Year</xforms:label>
-                                    <xforms:value/>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>2009</xforms:label>
-                                    <xforms:value>2009</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>2008</xforms:label>
-                                    <xforms:value>2008</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>2007</xforms:label>
-                                    <xforms:value>2007</xforms:value>
-                                </xforms:item>
-                            </xforms:select1>
-
-                            <xforms:action ev:event="xforms-value-changed">
-                                <xforms:action if="year castable as xs:integer">
-                                    <xforms:setvalue ref="$result" value="context()/year"/>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:group>
-
-                    </xforms:group>
-                </xbl:template>
-            </xbl:binding>
-        </xbl:xbl>
-        -->
         <xi:include href="oxf:/forms/orbeon/builder/form/custom-controls.xbl" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
+
+        <xhtml:p>
+            This example shows how you can use XBL to build reusable custom controls. Here we use a date made of
+            separate dropdowns. The first date is today's date, the second one yesterday's date. You can add and remove
+            dates with the buttons.
+        </xhtml:p>
+
+        <xforms:trigger>
+            <xforms:label>Add</xforms:label>
+            <xforms:insert ev:event="DOMActivate" context="." nodeset="date" at="index('date-repeat')" origin="xxforms:element('date')"/>
+        </xforms:trigger>
+
+        <xforms:trigger>
+            <xforms:label>Remove</xforms:label>
+            <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+        </xforms:trigger>
+
+        <xhtml:hr/>
 
         <xforms:repeat nodeset="date" id="date-repeat">
             <fr:dropdown-date ref="." id="fr-dropdown-date">
@@ -103,16 +62,6 @@
             </fr:dropdown-date>
             <xhtml:hr/>
         </xforms:repeat>
-
-        <xforms:trigger>
-            <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
-        </xforms:trigger>
-
-        <xforms:trigger>
-            <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
-        </xforms:trigger>
 
         <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 

@@ -23,9 +23,12 @@
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!--
         TODO:
@@ -3055,6 +3058,334 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="XBL Component in Repeat: Events Upon New Iteration" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client" xxforms:encrypt-item-values="false">
+                                    <xforms:instance id="main-instance">
+                                        <instance xmlns="">
+                                            <date>2009-01-02</date>
+                                            <date>2008-02-01</date>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
+
+                                    <!-- TEST: Action to take on xforms-ready -->
+                                    <xforms:action ev:event="xforms-ready">
+                                        <!-- Tricky: add second refresh because first refresh causes a series of values set into nested components -->
+                                        <xforms:refresh/>
+                                        <xforms:refresh/>
+                                        <xforms:delete nodeset="instance('events')/*"/>
+                                        <xforms:dispatch name="DOMActivate" target="add-row-trigger"/>
+                                    </xforms:action>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+
+                                <xbl:xbl>
+                                    <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date">
+                                        <xbl:template>
+                                            <!-- Local model -->
+                                            <xforms:model id="date-model">
+                                                <xforms:instance id="date-instance">
+                                                    <date>
+                                                        <year/>
+                                                        <month/>
+                                                        <day/>
+                                                    </date>
+                                                </xforms:instance>
+
+                                                <xforms:instance id="years-itemset">
+                                                    <years/>
+                                                </xforms:instance>
+
+                                                <xforms:instance id="months-itemset">
+                                                    <months/>
+                                                </xforms:instance>
+
+                                                <xforms:instance id="days-itemset">
+                                                    <days/>
+                                                </xforms:instance>
+
+                                                <!-- Initialize itemsets upon initialization -->
+                                                <xforms:action ev:event="xforms-model-construct-done">
+                                                    <xforms:action xxforms:iterate="(2007 to 2009)">
+                                                        <xxforms:variable name="year" select="." as="xs:string"/>
+                                                        <xforms:insert context="instance('years-itemset')" origin="xxforms:element('year', $year)"/>
+                                                    </xforms:action>
+                                                    <xforms:action xxforms:iterate="(1 to 3)">
+                                                        <xxforms:variable name="month" select="." as="xs:string"/>
+                                                        <xforms:insert context="instance('months-itemset')" nodeset="*" origin="xxforms:element('month', $month)"/>
+                                                    </xforms:action>
+                                                    <xforms:action xxforms:iterate="(1 to 3)">
+                                                        <xxforms:variable name="day" select="." as="xs:string"/>
+                                                        <xforms:insert context="instance('days-itemset')" nodeset="*" origin="xxforms:element('day', $day)"/>
+                                                    </xforms:action>
+                                                </xforms:action>
+                                            </xforms:model>
+                                            <!-- Local controls -->
+                                            <xforms:group xbl:attr="ref bind" id="component-group">
+                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                                                <xxforms:variable name="result" select="." as="node()?"/>
+
+                                                <!-- React to update to bound node -->
+                                                <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                                                    <!-- Only set local values if the bound node is an xs:date -->
+                                                    <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:date">
+                                                        <xforms:setvalue model="date-model" ref="year" value="year-from-date($result)"/>
+                                                        <xforms:setvalue model="date-model" ref="month" value="month-from-date($result)"/>
+                                                        <xforms:setvalue model="date-model" ref="day" value="day-from-date($result)"/>
+                                                    </xforms:action>
+                                                </xforms:group>
+
+                                                <xforms:group model="date-model" id="component-controls-group">
+                                                    <xforms:select1 ref="year" xxforms:refresh-items="false" id="year-select">
+                                                        <xforms:item>
+                                                            <xforms:label>Year</xforms:label>
+                                                            <xforms:value/>
+                                                        </xforms:item>
+                                                        <xforms:itemset nodeset="instance('years-itemset')/year">
+                                                            <xforms:label ref="."/>
+                                                            <xforms:value ref="."/>
+                                                        </xforms:itemset>
+                                                    </xforms:select1>
+                                                    <xforms:select1 ref="month" xxforms:refresh-items="false" id="month-select">
+                                                        <xforms:item>
+                                                            <xforms:label>Month</xforms:label>
+                                                            <xforms:value/>
+                                                        </xforms:item>
+                                                        <xforms:itemset nodeset="instance('months-itemset')/month">
+                                                            <xforms:label ref="."/>
+                                                            <xforms:value ref="."/>
+                                                        </xforms:itemset>
+                                                    </xforms:select1>
+                                                    <xforms:select1 ref="day" xxforms:refresh-items="true" id="day-select">
+                                                        <xforms:item>
+                                                            <xforms:label>Day</xforms:label>
+                                                            <xforms:value/>
+                                                        </xforms:item>
+                                                        <xforms:itemset nodeset="instance('days-itemset')/day">
+                                                            <xforms:label ref="."/>
+                                                            <xforms:value ref="."/>
+                                                        </xforms:itemset>
+                                                    </xforms:select1>
+
+                                                    <!-- React to update to local values -->
+                                                    <xforms:action ev:event="xforms-value-changed">
+                                                        <!-- Only proceed if all parts are integers -->
+                                                        <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
+                                                            <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
+                                                            <!-- Only set value if the result is castable as a date -->
+                                                            <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                                                        </xforms:action>
+                                                    </xforms:action>
+                                                </xforms:group>
+
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group>
+                                    <!-- TEST: Event listener -->
+                                    <xforms:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                                    <xforms:repeat nodeset="date" id="date-repeat">
+                                        <fr:dropdown-date ref="." id="fr-dropdown-date">
+                                            <xforms:label>Date: </xforms:label>
+                                        </fr:dropdown-date>
+                                        <xhtml:hr/>
+                                    </xforms:repeat>
+
+                                    <xforms:trigger id="add-row-trigger">
+                                        <xforms:label>Add</xforms:label>
+                                        <xforms:insert ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+                                    </xforms:trigger>
+
+                                    <xforms:trigger>
+                                        <xforms:label>Remove</xforms:label>
+                                        <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+                                    </xforms:trigger>
+                                </xforms:group>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <instance>
+                                    <date>2009-01-02</date>
+                                    <date>2008-02-01</date>
+                                    <date>2008-02-01</date>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="main-model">
+                                <events>
+                                    <event type="xforms-enabled" target="year-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="day-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="month-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="component-result-group" indexes="2"/>
+                                    <event type="xforms-enabled" target="component-group" indexes="2"/>
+                                    <event type="xforms-enabled" target="date-repeat" indexes="2"/>
+                                    <event type="xforms-value-changed" target="year-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="year-select" indexes="2"/>
+                                    <event type="xforms-value-changed" target="month-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="month-select" indexes="2"/>
+                                    <event type="xforms-value-changed" target="day-select" indexes="2"/>
+                                    <event type="xforms-enabled" target="day-select" indexes="2"/>
+                                </events>
+                            </instance>
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·1">
+                                <date>
+                                    <year>2009</year>
+                                    <month>1</month>
+                                    <day>2</day>
+                                </date>
+                            </instance>
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·1">
+                                <years>
+                                    <year>2009</year>
+                                    <year>2008</year>
+                                    <year>2007</year>
+                                </years>
+                            </instance>
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·1">
+                                <months>
+                                    <month>1</month>
+                                    <month>2</month>
+                                    <month>3</month>
+                                </months>
+                            </instance>
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·1">
+                                <days>
+                                    <day>1</day>
+                                    <day>2</day>
+                                    <day>3</day>
+                                </days>
+                            </instance>
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·2">
+                                <date>
+                                    <year>2008</year>
+                                    <month>2</month>
+                                    <day>1</day>
+                                </date>
+                            </instance>
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·2">
+                                <years>
+                                    <year>2009</year>
+                                    <year>2008</year>
+                                    <year>2007</year>
+                                </years>
+                            </instance>
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·2">
+                                <months>
+                                    <month>1</month>
+                                    <month>2</month>
+                                    <month>3</month>
+                                </months>
+                            </instance>
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·2">
+                                <days>
+                                    <day>1</day>
+                                    <day>2</day>
+                                    <day>3</day>
+                                </days>
+                            </instance>
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·3">
+                                <date>
+                                    <year>2008</year>
+                                    <month>2</month>
+                                    <day>1</day>
+                                </date>
+                            </instance>
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·3">
+                                <years>
+                                    <year>2009</year>
+                                    <year>2008</year>
+                                    <year>2007</year>
+                                </years>
+                            </instance>
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·3">
+                                <months>
+                                    <month>1</month>
+                                    <month>2</month>
+                                    <month>3</month>
+                                </months>
+                            </instance>
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·3">
+                                <days>
+                                    <day>1</day>
+                                    <day>2</day>
+                                    <day>3</day>
+                                </days>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="date-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="date-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="fr-dropdown-date$component-group·1" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-select·1">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$component-group·2" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-select·2">2008</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-select·2">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-select·2">1</xxf:control>
+                        <xxf:control id="fr-dropdown-date$component-group·3" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-select·3">2008</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
+                        <xxf:control id="add-row-trigger" label="Add"/>
+                        <xxf:control id="xforms-element-17" label="Remove"/>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-select·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-select·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-select·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-select·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                    </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
         </output>

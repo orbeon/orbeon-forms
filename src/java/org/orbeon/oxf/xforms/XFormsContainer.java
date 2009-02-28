@@ -33,14 +33,17 @@ import java.util.*;
 /**
  * Represent a container of models and controls.
  *
- * This is used at the top-level (XFormsContainingDocument) and by component instances.
+ * Notes:
  *
- * For now there is no nested component tree. There is a single components tree in XFormsControls.
+ * o This is used at the top-level (XFormsContainingDocument) and by component instances.
+ * o For now there is no nested component tree. There is a single components tree in XFormsControls.
+ * o We are not 100% happy with this, because models should be allowed within any container, not only components.
  *
- * In the future:
+ * In the future, we should see how we can refactor this to handle flexible model placement. Also, there is a double
+ * purpose for this class, which we should correct:
  *
- * o We may use this for nested repeat iterations as well.
- * o We may build nested component trees.
+ * o as a container for models
+ * o as a boundary for components
  */
 public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
 

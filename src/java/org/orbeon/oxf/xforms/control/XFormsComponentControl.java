@@ -21,6 +21,11 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 
 /**
  * Control that represents a custom components.
+ *
+ * A component control contains a nested container, which handles:
+ *
+ * o models nested within component (which we are not 100% happy with as models should be allowed in other places)
+ * o event dispatching
  */
 public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 

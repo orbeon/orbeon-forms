@@ -308,6 +308,205 @@
                 </xml-source>
             </section>
         </section>
+        <a name="local-submissions"/>
+        <section>
+            <title>Local Submissions</title>
+            <a name="local-submissions-rationale"/>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    XForms pages can make heavy use of services through the use of <code>&lt;xforms:submission></code>.
+                    A service is primarily identified by a URL.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Sometimes a service is remote (on a machine other than the machine on which Orbeon Forms is
+                            installed), in which case the URL is necessarily an absolute URL starting with
+                            <code>http://</code> or <code>https://</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            But often services are implemented within Orbeon Forms itself, not only on the same server
+                            but within the same web application. In the case of such local submission, Orbeon Forms
+                            provides a special optimized mode which has the following benefits:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    No actual HTTP connection is initiated, so performance is likely to be better.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    There is no need to deal with absolute URLs such as
+                                    <code>http://localhost:8080</code>, especially when proxies or firewalls are in
+                                    place.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                    For more information, see also the <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties#TOC-Submission">Configuration
+                    Properties</a> related to submissions.
+                </p>
+            </section>
+            <a name="local-submissions-enabling"/>
+            <section>
+                <title>Enabling Local Submissions</title>
+                <p>
+                    Orbeon Forms performs a local submission if:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The URL specified is not a absolute, i.e. does not start with <code>http://</code> or
+                            <code>https://</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            No HTTP headers are explicitly passed using <code>&lt;xforms:header></code>. (This
+                            restriction may be lifted in the future.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The submission is not asynchronous. (This restriction may be lifted in the future.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            In a servlet environment:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    The submission has <code>replace="all"</code> (which is the default if no
+                                    <code>replace</code> attribute is specified) and the
+                                    <code>oxf.xforms.oxf.xforms.local-submission-forward</code> property is set to
+                                    <code>true</code> (which is the default).
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    The submission has <code>replace="instance"</code>, <code>replace="text"</code> or
+                                    <code>replace="none"</code> and the
+                                    <code>oxf.xforms.oxf.xforms.local-submission-include</code> property is set to
+                                    <code>true</code> (the default is <code>false</code>).
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            In a portlet environment:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    The <code>f:url-norewrite</code> attribute is not set to <code>true</code>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    The <code>f:url-type</code> attribute is not set to <code>resource</code>.
+                                </p>
+                            </li>
+                        </ul>
+                        <note>
+                            The portlet logic above is likely to be revised in the future. Also note that in the case of
+                            optimzied submissions within portlets, requests are made directly to the Orbeon Forms
+                            portlet and do not use servlet forward/include.
+                        </note>
+                    </li>
+                </ul>
+            </section>
+            <a name="local-submissions-context"/>
+            <section>
+                <title>Context Resolution</title>
+                <p>
+                    In a servlet environment, paths are resolved as follows:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            If <code>f:url-norewrite</code> is not set to <code>true</code>, the resource is resolved
+                            against the current servlet context.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            If <code>f:url-norewrite</code> is set to <code>true</code>, the resource is resolved
+                            against the servlet container root. This allows accessing other web applications within the
+                            same servlet container.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="local-submissions-includes"/>
+            <section>
+                <title>Limitations of Includes</title>
+                <p>
+                    With <code>replace="instance"</code>, <code>replace="text"</code> or <code>replace="none"</code>,
+                    optimized submission are implemented using the servlet container's include mechanism, which does not
+                    automatically build path information for the included resource.
+                </p>
+                <p>
+                    In this case, Orbeon Forms is therefore unable to provide proper "servlet path" and "path info"
+                    information. Orbeon Forms handles this situation in the following way:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            A blank (<code>""</code>) "servlet path" is provided.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The "path info" contains the entire path provided, instead of the path following the servlet
+                            path.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                   This may cause some application which rely on the "servlet path" information to behave incorrectly.
+                   For example, consider the eXist REST servlet:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            It is mounted as <code>/exist/rest</code> within Orbeon Forms.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            eXist (quite properly) expects any path following <code>/exist/rest</code> to be a path
+                            into the database, e.g. <code>/exist/rest/db/orbeon</code> produces a path called
+                            <code>/db/orbeon</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            If Orbeon Forms calls the eXist REST servlet with a blank servlet path and a path info
+                            containing <code>/exist/rest/db/orbeon</code>, eXist obviously obtains an incorrect database
+                            path.
+                        </p>
+                    </li>
+                </ul>
+                <warning>
+                   In short you must be careful when using local includes. The good news is that if you are using
+                   servlets which do not depend on path information as explained above, or if you have control over the
+                   implementation of the services you are calling, then you can most likely work around this limitation.
+                </warning>
+                <p>
+                   Local forwards are not subject to that limitation.
+                </p>
+            </section>
+        </section>
         <a name="xforms-resources"/>
         <section>
             <title>JavaScript and CSS Resources</title>

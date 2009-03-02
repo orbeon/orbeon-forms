@@ -704,6 +704,17 @@
                         </p>
                     </li>
                     <li>
+                        <a name="xxforms-event"/>
+                        <p>
+                            <code>xxforms:event($attribute-name as xs:string) as item()*</code>
+                        </p>
+                        <p>
+                            <code>xxforms:event()</code> works like the XForms 1.1 <code>event()</code> function, except
+                            that when using XBL components, <code>xxforms:event()</code> returns event information from
+                            the original event instead of the retargetted event.
+                        </p>
+                    </li>
+                    <li>
                         <a name="xxforms-repeat-current"/>
                         <p>
                             <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>

@@ -3641,13 +3641,13 @@ ORBEON.xforms.Init = {
                     var formChild = form.childNodes[formChildIndex];
                     if (formChild.className == "xforms-loading-loading") {
                         formChild.style.display = "block";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild);
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false });
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].render(document.body);
                         ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
                             YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
                             YAHOO.util.Dom.getY(formChild)
                         ];
                         formChild.style.right = "auto";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
                         xformsLoadingCount++;
                     } else if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
 
@@ -6693,7 +6693,7 @@ function xformsDisplayIndicator(state, progressMessage) {
                 if (formLoadingLoadingOverlay != null) {
                     ORBEON.util.Dom.setStringValue(formLoadingLoadingOverlay.element,
                         progressMessage == null ? DEFAULT_LOADING_TEXT : progressMessage);
-                    formLoadingLoadingOverlay.cfg.setProperty("visible", true);
+                    formLoadingLoadingOverlay.show();
                     ORBEON.xforms.Controls.updateLoadingPosition(formID);
                 }
                 if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)

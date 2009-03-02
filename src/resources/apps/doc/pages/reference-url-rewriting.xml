@@ -136,7 +136,7 @@
                 </note>
                 <note>
                     Rewriting also occurs on some XForms elements. In that case, rewriting is handled by the XForms
-                    engine. For details, refer to <a href="reference-xforms-ng#xforms-urls">URLs in XForms</a> in the
+                    engine. For details, refer to <a href="reference-xforms-guide#xforms-urls">URLs in XForms</a> in the
                     XForms documentation.
                 </note>
             </section>

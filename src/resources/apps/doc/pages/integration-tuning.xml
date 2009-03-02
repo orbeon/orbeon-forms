@@ -381,7 +381,7 @@
                 <title>Enable minimal resources</title>
                 <p>
                     Make sure that minimal JavaScript and CSS resources are enabled, as they will load faster in the
-                    user's web browser. See the <a href="reference-xforms-2#xforms-minimal-resources">XForms
+                    user's web browser. See the <a href="reference-xforms-extensions#xforms-minimal-resources">XForms
                     reference</a> for details. Also enable gzip compression in addition.
                 </p>
             </section>
@@ -391,7 +391,7 @@
                 <p>
                     Make sure that combined JavaScript and CSS resources are enabled, as they will load faster in the
                     user's web browser when the resources are not yet in browser cache. See the <a
-                    href="reference-xforms-2#xforms-combined-resources">XForms reference</a> for details. Also enable
+                    href="reference-xforms-extensions#xforms-combined-resources">XForms reference</a> for details. Also enable
                     combined resources caching and gzip compression in addition.
                 </p>
             </section>
@@ -400,7 +400,7 @@
                 <title>Enable versioned resources</title>
                 <p>
                     Configure versioned resources, to maximize client-side caching of CSS, JavaScript, and other
-                    resources. See the <a href="reference-xforms-2#versioned-resources">XForms reference</a> for
+                    resources. See the <a href="reference-xforms-extensions#versioned-resources">XForms reference</a> for
                     details.
                 </p>
             </section>
@@ -412,7 +412,7 @@
                     as read-only, and can also optionally be shared between pages and even applications. Such instances
                     take less memory and are more efficient to build. However they cannot hold data that changes over
                     time and they cannot use XForms Model Item Properties (MIPs). See the <a
-                    href="reference-xforms-2#xxforms-readonly">XForms reference</a> for details.
+                    href="reference-xforms-extensions#xxforms-readonly">XForms reference</a> for details.
                 </p>
             </section>
             <a name="xforms-selection-controls"/>
@@ -420,7 +420,7 @@
                 <title>Consider not refreshing sets of items on selection controls</title>
                 <p>
                     The <code>xxforms:refresh-items</code> attribute on selection controls allows for performance
-                    improvements in certain cases. See <a href="reference-xforms-2#xxforms-refresh-items">Controlling
+                    improvements in certain cases. See <a href="reference-xforms-extensions#xxforms-refresh-items">Controlling
                     Item Sets Refreshes with xxforms:refresh-items</a>.
                 </p>
             </section>
@@ -430,7 +430,7 @@
                 <p>
                     The state of the XForms engine can be either stored on the server, or sent to the client and
                     exchanged with the server with each request. By default, the XForms state is stored on the server.
-                    Make sure this is enabled. See the <a href="reference-xforms-2#xforms-state-handling">XForms
+                    Make sure this is enabled. See the <a href="reference-xforms-extensions#xforms-state-handling">XForms
                     reference</a> for the benefits and drawbacks of each option and for details on how to configure
                     state handling.
                 </p>
@@ -439,7 +439,7 @@
             <section>
                 <title>Use <code>xforms:instance</code> to load dynamic instances</title>
                 <p>
-                    There are <a href="reference-xforms-ng#xforms-instance-initialization-pfc">several ways</a> of
+                    There are <a href="reference-xforms-guide#xforms-instance-initialization-pfc">several ways</a> of
                     initializating XForms instances. For instances whose content is generated dynamically, try to use
                     the <code>src</code> attribute of the <code>xforms:instance</code> instead of
                     <code>xi:include</code> or XSLT. Alternatively, you can use a submission upon receiving
@@ -453,7 +453,7 @@
                     If you have initialization tasks to perform upon page initialization, try using
                     <code>xforms-model-construct-done</code> instead of <code>xforms-ready</code>. This will cause less
                     updates to controls and may yield better performance. See also the <a
-                    href="reference-xforms-ng#xforms-initialization">XForms reference</a> for details.
+                    href="reference-xforms-guide#xforms-initialization">XForms reference</a> for details.
                 </p>
             </section>
             <a name="xforms-cache"/>

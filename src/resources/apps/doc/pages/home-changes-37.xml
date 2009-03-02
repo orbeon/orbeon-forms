@@ -111,12 +111,12 @@
                             <li>
                                 <p>
                                     <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
-                                    <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a> feature. This allows
+                                    <a href="reference-xforms-extensions#session-heartbeat">Session Heartbeat</a> feature. This allows
                                     sessions associated with live pages in a user's browser to stay active, therefore
                                     preventing situations where the user gets back to a form and gets session expiration errors.
                                 </p>
                                 <p>
-                                    See also <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a>.
+                                    See also <a href="reference-xforms-extensions#session-heartbeat">Session Heartbeat</a>.
                                 </p>
                                 <p>
                                     This feature is kindly sponsored by Teleflex.
@@ -129,7 +129,7 @@
                                     page loading times as well as server load.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#versioned-resources">Versioned Resources</a> for the full
+                                    See <a href="reference-xforms-extensions#versioned-resources">Versioned Resources</a> for the full
                                     documentation.
                                 </p>
                                 <p>
@@ -175,7 +175,7 @@
                                     that saves a document.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#modal-trigger">Modal Trigger Behavior</a> for documentation.
+                                    See <a href="reference-xforms-extensions#modal-trigger">Modal Trigger Behavior</a> for documentation.
                                 </p>
                                 <p>
                                     This feature is kindly sponsored by Teleflex.
@@ -207,55 +207,55 @@
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#output-mediatype">Media Type for
+                                    <a href="reference-xforms-extensions#output-mediatype">Media Type for
                                     <code>&lt;xforms:output></code></a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#insert-origin-attribute"><code>origin</code> Attribute
+                                    <a href="reference-xforms-extensions#insert-origin-attribute"><code>origin</code> Attribute
                                     on <code>&lt;xforms:insert></code> Action</a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#insert-context-attribute"><code>context</code>
+                                    <a href="reference-xforms-extensions#insert-context-attribute"><code>context</code>
                                     Attribute on <code>&lt;xforms:insert></code> Action</a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#validate-relevant-attributes"><code>validate</code> and
+                                    <a href="reference-xforms-extensions#validate-relevant-attributes"><code>validate</code> and
                                     <code>relevant</code> Attributes on <code>&lt;xforms:submission></code></a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#serialization-attribute"><code>serialization</code>
+                                    <a href="reference-xforms-extensions#serialization-attribute"><code>serialization</code>
                                     Attribute on <code>&lt;xforms:submission></code></a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#asynchronous-submissions">Preliminary Support for
+                                    <a href="reference-xforms-extensions#asynchronous-submissions">Preliminary Support for
                                     Asynchronous Handling of <code>&lt;xforms:submission></code></a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <a href="reference-xforms-2#dispatch-delay">Preliminary Support for delay Attribute
+                                    <a href="reference-xforms-extensions#dispatch-delay">Preliminary Support for delay Attribute
                                     on <code>&lt;xforms:dispatch></code> Action</a>.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    New <a href="reference-xforms-2#xforms11-types">XForms 1.1 Types</a>, in particular the very useful
+                                    New <a href="reference-xforms-extensions#xforms11-types">XForms 1.1 Types</a>, in particular the very useful
                                     <code>xforms:email</code> type.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    New <a href="reference-xforms-2#xforms11-functions">XForms 1.1 Functions</a>.
+                                    New <a href="reference-xforms-extensions#xforms11-functions">XForms 1.1 Functions</a>.
                                 </p>
                             </li>
                         </ul>
@@ -301,7 +301,7 @@
                                     <code>ev:target</code> attribute has been added as well.
                                 </p>
                                 <p>
-                                    See also <a href="reference-xforms-ng#events-observer-target">Using the
+                                    See also <a href="reference-xforms-guide#events-observer-target">Using the
                                     <code>ev:observer</code> and <code>ev:target</code> Attributes</a>.
                                 </p>
                             </li>
@@ -364,12 +364,12 @@
                             <li>
                                 <p>
                                     <b>Attribute Value Templates (AVTs) on XHTML elements.</b> AVTs were already supported on <a
-                                    href="reference-xforms-2#avts-xforms">some XForms elements</a>. You can now use AVTs on
+                                    href="reference-xforms-extensions#avts-xforms">some XForms elements</a>. You can now use AVTs on
                                     XHTML elements as well. This allows you to use XForms to influence aspects of XHTML such as
                                     <code>class</code>, <code>style</code> or <code>colspan</code> attributes.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
+                                    See <a href="reference-xforms-extensions#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
                                 </p>
                                 <p>
                                     This feature is kindly sponsored by Teleflex.
@@ -400,7 +400,7 @@
                                     elements.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#variables">Variables</a> for documentation.
+                                    See <a href="reference-xforms-extensions#variables">Variables</a> for documentation.
                                 </p>
                             </li>
                             <li>
@@ -413,7 +413,7 @@
                                     support this way.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#context-attribute">Generalized <code>context</code>
+                                    See <a href="reference-xforms-extensions#context-attribute">Generalized <code>context</code>
                                     attribute</a> for the documentation.
                                 </p>
                             </li>
@@ -424,7 +424,7 @@
                                     to XML Events 1, which is planned for XML Events 2.
                                 </p>
                                 <p>
-                                    See also <a href="reference-xforms-2#events-multiple">Multiple Event Names,
+                                    See also <a href="reference-xforms-extensions#events-multiple">Multiple Event Names,
                                     Observers and Targets on Event Handlers</a>.
                                 </p>
                             </li>
@@ -434,7 +434,7 @@
                                     additions make it much easier to iterate over nodes within actions.
                                 </p>
                                 <p>
-                                    See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
+                                    See <a href="reference-xforms-extensions#exforms-iterate">Iteration of XForms Actions over
                                     Sequences</a> for documentation and a complete example.
                                 </p>
                             </li>
@@ -470,7 +470,7 @@
                                     </xforms:submission>
                                 </xml-source>
                                 <p>
-                                    See also <a href="reference-xforms-ng#xforms-message">Displaying Messages with the
+                                    See also <a href="reference-xforms-guide#xforms-message">Displaying Messages with the
                                     <code>xforms:message</code> Action</a>.
                                 </p>
                             </li>

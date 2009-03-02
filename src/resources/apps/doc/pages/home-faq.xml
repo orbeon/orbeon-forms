@@ -517,7 +517,7 @@
                     <li>Not tied to a particular platform or language such as Java or .NET</li>
                 </ul>
                 <p>
-                    See also the Orbeon Forms <a href="reference-xforms-ng#introduction">XForms Introduction</a>
+                    See also the Orbeon Forms <a href="reference-xforms-guide#introduction">XForms Introduction</a>
                     section.
                 </p>
             </section>
@@ -671,7 +671,7 @@
             <section added="2006-09-18">
                 <title>How do I migrate from XForms Classic to XForms NG?</title>
                 <p>
-                    Please visit <a href="reference-xforms-2#xforms-classic-migration">Migrating from XForms Classic
+                    Please visit <a href="reference-xforms-extensions#xforms-classic-migration">Migrating from XForms Classic
                     to XForms NG</a>.
                 </p>
             </section>
@@ -690,7 +690,7 @@
             <section>
                 <title>How can I perform a file upload?</title>
                 <p>
-                    Check the <a href="reference-xforms-ng#xforms-upload">XForms upload control</a> and the <a
+                    Check the <a href="reference-xforms-guide#xforms-upload">XForms upload control</a> and the <a
                     href="/xforms-upload/">XForms upload example</a>
                 </p>
             </section>
@@ -701,7 +701,7 @@
                     This happens because Orbeon Forms uses XPath 2.0 expressions instead of XPath 1.0 expressions as
                     mandated by XForms 1.0 and XForms 1.1. This allows much greater flexibility in the expressions you
                     can use in Orbeon Forms (and once you have tasted XPath 2.0, you can't go back to XPath 1.0!). For
-                    more information, see <a href="reference-xforms-ng#xforms-xpath-20">Note About XPath 2.0
+                    more information, see <a href="reference-xforms-guide#xforms-xpath-20">Note About XPath 2.0
                     Expressions</a>.
                 </p>
             </section>

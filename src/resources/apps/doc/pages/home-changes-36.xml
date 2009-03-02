@@ -78,7 +78,7 @@
                         </xml-source>
                         <p>
                             For more information about configuration, see <a
-                            href="reference-xforms-2#xforms-state-handling">State Handling</a>.
+                            href="reference-xforms-extensions#xforms-state-handling">State Handling</a>.
                         </p>
                     </li>
                     <li>
@@ -208,7 +208,7 @@
                         <p>
                             The help panel appears when the user selects a help icon. It stays open until closed by the
                             user, and can be moved around the page. See the <a
-                            href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for more
+                            href="reference-xforms-guide#xforms-label-alert-help-hint">XForms Reference</a> for more
                             information.
                         </p>
                     </li>
@@ -220,7 +220,7 @@
                         <img src="../apps/doc/images/reference-xforms-hint.png" alt="XForms Hints"/>
                         <p>
                             Hints appear when you mouse over a field, and disappear after a while. See the <a
-                            href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for more
+                            href="reference-xforms-guide#xforms-label-alert-help-hint">XForms Reference</a> for more
                             information.
                         </p>
                     </li>
@@ -366,7 +366,7 @@
                             <b>Support for optimization hint on selection controls.</b> The new
                             <code>xxforms:refresh-items</code> attribute on selection controls allows for performance
                             improvements in certain cases. See <a
-                            href="reference-xforms-2#xxforms-refresh-items">Controlling Item Sets Refreshes with
+                            href="reference-xforms-extensions#xxforms-refresh-items">Controlling Item Sets Refreshes with
                             xxforms:refresh-items</a>.
                         </p>
                         <p>
@@ -1341,7 +1341,7 @@
                         </xml-source>
                         <p>
                             For more information about configuration, see <a
-                            href="reference-xforms-2#xforms-state-handling">State Handling</a>.
+                            href="reference-xforms-extensions#xforms-state-handling">State Handling</a>.
                         </p>
                     </li>
                     <li>

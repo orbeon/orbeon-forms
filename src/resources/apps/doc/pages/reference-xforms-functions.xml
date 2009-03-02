@@ -30,19 +30,9 @@
         <section>
             <title>Introduction</title>
             <p>
-                This part of the XForms reference documentation focuses on extension XPath functions.
+                This part of the XForms reference documentation focuses on extension XPath functions supported by the
+                XForms engine.
             </p>
-            <p>
-                Please be sure to visit:
-            </p>
-            <ul>
-                <li>
-                    <a href="reference-xforms-ng">XForms Reference: Standard Features</a>
-                </li>
-                <li>
-                    <a href="reference-xforms-2">XForms Reference: Extensions</a>
-                </li>
-            </ul>
         </section>
         <a name="xforms-functions"/>
         <section>

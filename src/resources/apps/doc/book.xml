@@ -120,7 +120,7 @@
         <menu-item label="Web Services" href="integration-webservices"/>
         <menu-item label="Packaging and Deployment" href="integration-packaging"/>
         <menu-item label="Performance and Tuning" href="integration-tuning"/>
-        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>
+        <menu-item label="Portlets (JSR-168/268)" href="http://wiki.orbeon.com/forms/doc/developer-guide/deployment-portlet"/>
         <menu-item label="EJB Support" href="integration-ejb"/>
     </menu>
 </book>

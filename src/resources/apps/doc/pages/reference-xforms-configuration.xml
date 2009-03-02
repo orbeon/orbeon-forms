@@ -446,6 +446,16 @@
                         </p>
                     </li>
                 </ul>
+                <p>
+                    Say your application is under context <code>/orbeon</code>, and you have a second web application
+                    under context <code>/foo</code>:
+                </p>
+                <xml-source xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                    <comment> This submission calls /orbeon/bar </comment>
+                    <xforms:submission replace="all" method="post" resource="/bar"/>
+                    <comment> This submission calls /foo/bar </comment>
+                    <xforms:submission replace="all" method="post" resource="/foo/bar" f:url-norewrite="true"/>
+                </xml-source>
             </section>
             <a name="local-submissions-includes"/>
             <section>

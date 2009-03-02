@@ -39,8 +39,7 @@
             <menu-item label="Extensions" href="reference-xforms-2"/>
             <menu-item label="XPath Functions" href="reference-xforms-functions"/>
             <menu-item label="XForms for Java Apps" href="reference-xforms-java"/>
-            <!--<menu-item label="XForms Compliance" href="reference-xforms-compliance"/>-->
-            <!--<menu-item label="XForms Test Suite" href="reference-xforms-test-suite"/>-->
+            <menu-item label="XForms 1.1 Compliance" href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-compliance-matrix"/>
         </menu>
         <menu label="Page Flow">
             <menu-item label="Page Flow Controller" href="reference-page-flow"/>

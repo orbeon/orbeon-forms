@@ -27,14 +27,13 @@
             <section added="2006-01-10" updated="2006-11-06">
                 <title>What is Orbeon Forms?</title>
                 <p>
-                    Orbeon Forms (formerly Orbeon PresentationServer (OPS)) is an open source forms solution that
-                    handles the complexity of forms typical of the enterprise or government. It is delivered to standard
-                    web browsers (including Internet Explorer, Firefox, Safari and Opera) thanks to XForms and Ajax
-                    technology, with no need for client-side software or plugins. Orbeon Forms allows you to build fully
-                    interactive forms with features that include as-you-type validation, optional and repeated sections,
-                    always up-to-date error summaries, PDF output, full internationalization, and controls like
-                    auto-completion, tabs, dialogs, trees and menus. Orbeon Forms already supports parts of the XForms
-                    1.1 specification.
+                    Orbeon Forms is an open source forms solution that handles the complexity of forms typical of the
+                    enterprise or government. It is delivered to standard web browsers (including Internet Explorer,
+                    Firefox, Safari and Opera) thanks to XForms and Ajax technology, with no need for client-side
+                    software or plugins. Orbeon Forms allows you to build fully interactive forms with features that
+                    include as-you-type validation, optional and repeated sections, always up-to-date error summaries,
+                    PDF output, full internationalization, and controls like auto-completion, tabs, dialogs, trees and
+                    menus. Orbeon Forms already supports most of the XForms 1.1 specification.
                 </p>
                 <p>
                     Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to
@@ -493,11 +492,11 @@
                 </p>
                 <p>
                     XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
-                    March 2006 and a third edition published in October 2007. As of December 2007, the Forms Working
-                    Group at W3C has published XForms 1.1 as a Candidate Recommendation. XForms 1.1 should therefore
-                    be an actual recommendation in 2008. The Forms Working Group is already embarking on XForms 1.2 or
-                    XForms 2.0! Please visit <a href="http://www.w3.org/MarkUp/Forms/">The Forms Working Group</a> for
-                    more information about XForms right from W3C.
+                    March 2006 and a third edition published in October 2007. As of March 2009, the Forms Working Group
+                    at W3C has published XForms 1.1 as a Candidate Recommendation. XForms 1.1 should therefore be an
+                    actual recommendation in 2009. The Forms Working Group is already embarking on XForms 1.2 or XForms
+                    2.0! Please visit <a href="http://www.w3.org/MarkUp/Forms/">The Forms Working Group</a> for more
+                    information about XForms right from W3C.
                 </p>
                 <p>
                     XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms
@@ -527,10 +526,11 @@
                 <title>How much of the XForms specification does Orbeon Forms support?</title>
                 <p>
                     The Orbeon Forms implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms
-                    1.1 Candidate Recommendation</a> (29 November 2007). The XForms NG engine in Orbeon Forms 3.6 is
-                    close to supporting all of the XForms 1.0 specification, and several XForms 1.1 features as well.
-                    For more detailed information on what features are supported in the latest version of Orbeon Forms,
-                    see the <a href="reference-xforms-compliance">XForms Compliance</a> section of the documentation.
+                    1.1 Candidate Recommendation</a>. The XForms NG engine in Orbeon Forms 3.7 is
+                    close to supporting all of the XForms 1.1 specification. For more detailed information on what
+                    features are supported in the latest version of Orbeon Forms, see the
+                    <a href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-compliance-matrix">XForms Compliance</a>
+                    section of the documentation.
                 </p>
                 <p>
                     Orbeon Forms also supports extensions such as new widgets (autocomplete, tree, menu, dialog,
@@ -627,14 +627,12 @@
                 <p>
                     Up to version 2.8, Orbeon Forms featured a pure server-side XForms engine with limited XForms
                     functionality. With version 3.0, Orbeon Forms features a much enhanced XForms engine, with support
-                    for almost the entire XForms specification, with the intent to completely support XForms 1.0 and
-                    XForms 1.1 in the future. The older XForms engine has been informally dubbed "XForms Classic", and
-                    the new XForms engine "XForms NG".
+                    for almost the entire XForms 1.1 specification. The older XForms engine was informally dubbed
+                    "XForms Classic", and the new XForms engine "XForms NG".
                 </p>
                 <p>
-                    For backward compatibility reasons, the XForms Classic engine is still present in Orbeon Forms 3.6.
-                    We plan over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well,
-                    therefore making XForms Classic obsolete in Orbeon Forms.
+                    Support for the XForms Classic engine was entirely removed in Orbeon Forms 3.7, since XForms NG now
+                    supports a "Noscript" mode allowing JavaScript-free support as well.
                 </p>
             </section>
             <a name="xforms-classic-or-ng"/>
@@ -642,11 +640,14 @@
                 <title>How do I know which XForms engine I am using?</title>
                 <p>
                     If you are using Orbeon Forms 2.8 or earlier, you are using XForms Classic. If you are using Orbeon
-                    Forms 3.0 or later, then you may be using XForms Classic or XForms NG, but there is an easy way to
-                    tell: if a <code>&lt;page></code> entry in your page flow features an <code>xforms</code>
-                    attribute, then and only then that page is using XForms Classic. Otherwise, if the page view
-                    contains at least one XForms model under its <code>xhtml:head</code> element, then it is using
-                    XForms NG.
+                    Forms 3.7 or later, you are using XForms NG.
+                </p>
+                <p>
+                    If you are using Orbeon Forms 3.0 or later, then you may be using XForms Classic or XForms NG, but
+                    there is an easy way to tell: if a <code>&lt;page></code> entry in your page flow features an
+                    <code>xforms</code> attribute, then and only then that page is using XForms Classic. Otherwise, if
+                    the page view contains at least one XForms model under its <code>xhtml:head</code> element, then it
+                    is using XForms NG.
                 </p>
             </section>
             <a name="xforms-classic-deprecation"/>

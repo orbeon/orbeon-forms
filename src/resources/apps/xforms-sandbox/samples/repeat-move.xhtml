@@ -1,0 +1,66 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Repeat with Move Buttons</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <oranges>
+                    <orange>Persian orange</orange>
+                    <orange>Navel orange</orange>
+                    <orange>Valencia orange</orange>
+                    <orange>Blood orange</orange>
+                </oranges>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:table>
+            <xforms:repeat nodeset="orange">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:input ref=".">
+                            <xforms:label>Orange type:</xforms:label>
+                        </xforms:input>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:trigger ref=".[preceding-sibling::*]">
+                            <xforms:label>Up</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert origin="context()" nodeset="preceding-sibling::*[1]" position="before"/>
+                                <xforms:delete nodeset="."/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:trigger ref=".[following-sibling::*]">
+                            <xforms:label>Down</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert origin="context()" nodeset="following-sibling::*[1]"/>
+                                <xforms:delete nodeset="."/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+        </xhtml:table>
+    </xhtml:body>
+</xhtml:html>

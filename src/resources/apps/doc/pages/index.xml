@@ -71,7 +71,7 @@
                 </li>
                 <li>
                     <p>
-                        The <a href="reference-xforms-guide">XForms Reference</a>.
+                        The <a href="reference-xforms-guide">XForms Guide</a>.
                     </p>
                 </li>
                 <li>
@@ -90,40 +90,5 @@
                 href="home-faq#mailing-list">mailing-list</a>.
             </p>
         </section>
-        <!--<section>-->
-            <!--<title>Purpose of the User Guide</title>-->
-            <!--<p>-->
-                <!--The purpose of this guide is to get you acquainted with the main components of Orbeon Forms:-->
-            <!--</p>-->
-            <!--<ul>-->
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--<a href="reference-xforms-guide"><b>XForms.</b></a> XForms is the W3C standard for creating-->
-                        <!--complex web forms.-->
-                    <!--</p>-->
-                <!--</li>-->
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--<a href="reference-page-flow"><b>The Page Flow Controller (PFC).</b></a> The PFC is the heart-->
-                        <!--of your Orbeon Forms application. It defines your application's pages and how you navigate-->
-                        <!--between them.-->
-                    <!--</p>-->
-                <!--</li>-->
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--<a href="reference-xpl-pipelines"><b>The XML Pipeline Definition Language (XPL).</b></a> XPL-->
-                        <!--allows you to implement lightweight processes that handle XML data, without writing a single-->
-                        <!--line of Java or other scripting language.-->
-                    <!--</p>-->
-                <!--</li>-->
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--<b>Orbeon Forms's built-in XML components.</b> The built-in Orbeon Forms XML components provide-->
-                        <!--services such as accessing databases, performing data transformations, calling web services, and-->
-                        <!--more. If you need more, you can write your own XML components.-->
-                    <!--</p>-->
-                <!--</li>-->
-            <!--</ul>-->
-        <!--</section>-->
     </body>
 </document>

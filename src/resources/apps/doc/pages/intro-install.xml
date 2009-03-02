@@ -529,6 +529,18 @@
                 </li>
             </ol>
         </section>
+        <a name="oc4j"/>
+        <section>
+            <title>Installing Orbeon Forms on Oracle Application Server and OC4J</title>
+            <p>
+                To run Orbeon Forms on Oracle Application Server or OC4J, edit
+                <code>$ORACLE_HOME/j2ee/home/application-deployments/orbeon/orbeon/orion-web.xml</code> and uncomment
+                the following line:
+            </p>
+            <xml-source>
+                <web-app-class-loader search-local-classes-first="true" include-war-manifest-class-path="true"/>
+            </xml-source>
+        </section>
         <a name="security"/>
         <section>
             <title>Security</title>

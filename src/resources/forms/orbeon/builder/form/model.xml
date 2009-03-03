@@ -39,7 +39,10 @@
             <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
                 <!-- New form: set default value for app and form if needed -->
                 <!-- NOTE: we use xxforms:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
-                <xforms:setvalue context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')" ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
+                <xforms:action context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')">
+                    <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
+                    <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="context()/@name"/>
+                </xforms:action>
             </xforms:action>
             <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
                 <!-- E.g. we are reading an existing doc: IF there are roles and roles don't match THEN send redirection -->

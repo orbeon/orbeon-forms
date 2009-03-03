@@ -364,7 +364,7 @@
     </xforms:instance>
 
     <!-- Submission to create/update the XML form -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here -->
+    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
          enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
          code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
@@ -378,7 +378,7 @@
     </xforms:submission>
 
     <!-- Submission to create/update an attachment -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here -->
+    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')" xxforms:ensure-uploads="false"
@@ -388,7 +388,7 @@
     </xforms:submission>
 
     <!-- Submission to preview the XML form -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here -->
+    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <xforms:submission id="fr-workflow-review-submission"
             validate="true" relevant="false" method="post"
             ref="xxforms:instance('fr-form-instance')" xxforms:ensure-uploads="false"
@@ -595,21 +595,34 @@
 
     </xforms:action>
 
-    <!-- Send to confirmation page -->
+    <!-- Send to final confirmation page -->
+    <!--
+        NOTE: Use xxforms:ensure-uploads="false" here because we now all uploads have been processed at this point.
+    -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.'))}"
-        method="post" ref="instance('fr-workflow-confirmation-instance')" replace="all"/>
+        method="post" ref="instance('fr-workflow-confirmation-instance')" replace="all" xxforms:ensure-uploads="false"/>
 
     <!-- Call email service -->
+    <!--
+        NOTE: Use xxforms:ensure-uploads="false" here because 1) when this is called, uploads have already been
+        processed because this reacts to a create/save submission and 2) not doing so will cause a failure when we call
+        the final submission/load.
+    -->
     <xforms:submission id="fr-email-service-submission"
         resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/email/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="none" xxforms:ensure-uploads="false"/>
 
     <!-- Call PDF service -->
+    <!--
+        NOTE: Use xxforms:ensure-uploads="false" here because 1) when this is called, uploads have already been
+        processed because this reacts to a create/save submission and 2) not doing so will cause a failure when we call
+        the final submission/load.
+    -->
     <xforms:submission id="fr-pdf-service-submission"
         resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/pdf/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')"
-        replace="instance" instance="fr-workflow-confirmation-instance"/>
+        replace="instance" instance="fr-workflow-confirmation-instance" xxforms:ensure-uploads="false"/>
 
     <xforms:instance id="fr-workflow-confirmation-instance">
         <uri/>

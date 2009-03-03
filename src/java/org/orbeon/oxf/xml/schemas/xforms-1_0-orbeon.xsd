@@ -411,7 +411,6 @@
     <xsd:element name="mediatype">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
         </xsd:complexType>
     </xsd:element>
@@ -577,6 +576,8 @@
         <xsd:complexType>
             <xsd:sequence minOccurs="0">
                 <xsd:element ref="xforms:label"/>
+                <xsd:element ref="xforms:mediatype"/>
+                <xsd:element ref="xforms:filename"/>
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>

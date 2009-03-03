@@ -85,7 +85,9 @@ public class EmailProcessor extends ProcessorImpl {
     public static final String EMAIL_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/email";
 
     private static final String DEFAULT_MULTIPART = "mixed";
-    private static final String DEFAULT_TEXT_ENCODING = "utf-8";
+
+    // Use utf-8 as most email clients support it. This allows us not to have to pick an inferior encoding.
+    private static final String DEFAULT_CHARACTER_ENCODING = "utf-8";
 
     public EmailProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, EMAIL_CONFIG_NAMESPACE_URI));
@@ -93,16 +95,16 @@ public class EmailProcessor extends ProcessorImpl {
 
     public void start(PipelineContext pipelineContext) {
         try {
-            Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
-            Element messageElement = dataDocument.getRootElement();
+            final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+            final Element messageElement = dataDocument.getRootElement();
 
             // Get system id (will likely be null if document is generated dynamically)
-            LocationData locationData = (LocationData) messageElement.getData();
-            String dataInputSystemId = locationData.getSystemID();
+            final LocationData locationData = (LocationData) messageElement.getData();
+            final String dataInputSystemId = locationData.getSystemID();
 
             // Set SMTP host
-            Properties properties = new Properties();
-            String testSmtpHostProperty = getPropertySet().getString(EMAIL_TEST_SMTP_HOST);
+            final Properties properties = new Properties();
+            final String testSmtpHostProperty = getPropertySet().getString(EMAIL_TEST_SMTP_HOST);
 
             if (testSmtpHostProperty != null) {
                 // Test SMTP Host from properties overrides the local configuration
@@ -126,10 +128,10 @@ public class EmailProcessor extends ProcessorImpl {
             }
 
             // Get credentials
-            Element credentials = messageElement.element("credentials");
+            final Element credentials = messageElement.element("credentials");
 
             // Create session variable, but don't assign it
-            Session session = null;
+            final Session session;
 
             // Check if credentials are supplied
             if(credentials != null && !credentials.equals("")) {
@@ -138,14 +140,14 @@ public class EmailProcessor extends ProcessorImpl {
             	// Set the auth property to true
             	properties.setProperty("mail.smtp.auth", "true");
 
-            	String username = credentials.element("username").getStringValue();
-            	String password = credentials.element("password").getStringValue();
+            	final String username = credentials.element("username").getStringValue();
+            	final String password = credentials.element("password").getStringValue();
 
             	if(logger.isInfoEnabled())
                     logger.info("Username: " + username);
 
             	// Create an authenticator
-            	Authenticator auth = new SMTPAuthenticator(username,password);
+            	final Authenticator auth = new SMTPAuthenticator(username,password);
 
             	// Create session with auth
             	session = Session.getInstance(properties,auth);
@@ -156,7 +158,7 @@ public class EmailProcessor extends ProcessorImpl {
             }
 
             // Create message
-            Message message = new MimeMessage(session);
+            final Message message = new MimeMessage(session);
 
             // Set From
             message.addFrom(createAddresses(messageElement.element("from")));
@@ -198,15 +200,19 @@ public class EmailProcessor extends ProcessorImpl {
                 final String headerName = headerElement.element("name").getTextTrim();
                 final String headerValue = headerElement.element("value").getTextTrim();
 
-                message.addHeader(headerName, headerValue);
+                // NOTE: Use encodeText() in case there are non-ASCII characters
+                message.addHeader(headerName, MimeUtility.encodeText(headerValue, DEFAULT_CHARACTER_ENCODING, null));
             }
 
-            // Set subject
-            message.setSubject(messageElement.element("subject").getStringValue());
-
+            // Set the email subject
+            // The JavaMail spec is badly written and is not clear about whether this needs to be done here. But it
+            // seems to use the platform's default charset, which we don't want to deal with. So we preemptively encode.
+            // The result is pure ASCII so that setSubject() will not attempt to re-encode it.
+            message.setSubject(MimeUtility.encodeText(messageElement.element("subject").getStringValue(), DEFAULT_CHARACTER_ENCODING, null));
+            
             // Handle body
-            Element textElement = messageElement.element("text");
-            Element bodyElement = messageElement.element("body");
+            final Element textElement = messageElement.element("text");
+            final Element bodyElement = messageElement.element("body");
 
             if (textElement != null) {
                 // Old deprecated mechanism (simple text body)
@@ -219,7 +225,7 @@ public class EmailProcessor extends ProcessorImpl {
             }
 
             // Send message
-            Transport transport = session.getTransport("smtp");
+            final Transport transport = session.getTransport("smtp");
             Transport.send(message);
             transport.close();
         } catch (Exception e) {
@@ -230,31 +236,32 @@ public class EmailProcessor extends ProcessorImpl {
     private void handleBody(PipelineContext pipelineContext, String dataInputSystemId, Part parentPart, Element bodyElement) throws Exception {
 
         // Find out if there are embedded parts
-        Iterator parts = bodyElement.elementIterator("part");
+        final Iterator parts = bodyElement.elementIterator("part");
         String multipart;
         if (bodyElement.getName().equals("body")) {
             multipart = bodyElement.attributeValue("mime-multipart");
             if (multipart != null && !parts.hasNext())
                 throw new OXFException("mime-multipart attribute on body element requires part children elements");
-            String contentTypeFromAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
-            if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
-                contentTypeFromAttribute.substring("multipart/".length());// TODO: This is doing nothing!
+            // TODO: Check following lines, which were doing nothing!
+//            final String contentTypeFromAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
+//            if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
+//                contentTypeFromAttribute.substring("multipart/".length());
             if (parts.hasNext() && multipart == null)
                 multipart = DEFAULT_MULTIPART;
         } else {
-            String contentTypeAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
+            final String contentTypeAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
             multipart = (contentTypeAttribute != null && contentTypeAttribute.startsWith("multipart/")) ? contentTypeAttribute.substring("multipart/".length()) : null;
         }
 
         if (multipart != null) {
             // Multipart content is requested
-            MimeMultipart mimeMultipart = new MimeMultipart(multipart);
+            final MimeMultipart mimeMultipart = new MimeMultipart(multipart);
 
             // Iterate through parts
-            for (final Iterator i = parts; i.hasNext();) {
-                Element partElement = (Element) i.next();
+            while (parts.hasNext()) {
+                final Element partElement = (Element) parts.next();
 
-                MimeBodyPart mimeBodyPart = new MimeBodyPart();
+                final MimeBodyPart mimeBodyPart = new MimeBodyPart();
                 handleBody(pipelineContext, dataInputSystemId, mimeBodyPart, partElement);
                 mimeMultipart.addBodyPart(mimeBodyPart);
             }
@@ -273,8 +280,8 @@ public class EmailProcessor extends ProcessorImpl {
         final String contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
         final String charset;
         {
-            String c = NetUtils.getContentTypeCharset(contentTypeAttribute);
-            charset = (c != null) ? c : DEFAULT_TEXT_ENCODING;
+            final String c = NetUtils.getContentTypeCharset(contentTypeAttribute);
+            charset = (c != null) ? c : DEFAULT_CHARACTER_ENCODING;
         }
         final String contentTypeWithCharset = contentType + "; charset=" + charset;
         final String src = partOrBodyElement.attributeValue("src");

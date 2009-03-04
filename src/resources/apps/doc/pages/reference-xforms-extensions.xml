@@ -1162,7 +1162,7 @@
                     </li>
                 </ul>
                 <p>
-                    AVTs are currently supported only within certain attributes:
+                    AVTs are currently supported on the following attributes:
                 </p>
                 <ul>
                     <li>
@@ -1312,12 +1312,19 @@
                     </li>
                     <li>
                         <p>
-                            <code>&lt;xxforms:input></code> attributes:
+                            All controls:
                         </p>
                         <ul>
                             <li>
                                 <code>style</code>: equivalent to the HTML <code>style</code> attribute
                             </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xxforms:input></code> attributes:
+                        </p>
+                        <ul>
                             <li>
                                 <code>xxforms:size</code>: equivalent to the HTML <code>size</code> attribute
                             </li>
@@ -1334,9 +1341,6 @@
                             <code>&lt;xxforms:textarea></code> attributes:
                         </p>
                         <ul>
-                            <li>
-                                <code>style</code>: equivalent to the HTML <code>style</code> attribute
-                            </li>
                             <li>
                                 <code>xxforms:cols</code>: equivalent to the HTML <code>cols</code> attribute
                             </li>

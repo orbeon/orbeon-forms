@@ -650,14 +650,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         final QName[] extensionAttributes = getExtensionAttributes();
         if (extensionAttributes != null) {
-            return addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes);
+            // By default, diff only attributes in the xxforms:* namespace
+            return addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
         } else {
             return false;
         }
     }
 
-    private boolean addAttributesDiffs(XFormsControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration,
-                                         QName[] attributeQNames) {
+    private boolean addAttributesDiffs(XFormsControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
 
         final XFormsControl control1 = (XFormsControl) other;
         final XFormsControl control2 = this;
@@ -666,6 +666,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         for (int i = 0; i < attributeQNames.length; i++) {
             final QName avtAttributeQName = attributeQNames[i];
+
+            // Skip if namespace URI is excluded
+            if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
+                continue;
 
             final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
             final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
@@ -686,6 +690,46 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else {
             attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
             return true;
+        }
+    }
+
+    public void addAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration, String namespaceURI) {
+        final QName[] extensionAttributes = getExtensionAttributes();
+        if (extensionAttributes != null) {
+            final XFormsControl control1 = (XFormsControl) originalControl;
+            final XFormsControl control2 = this;
+
+            for (int i = 0; i < extensionAttributes.length; i++) {
+                final QName avtAttributeQName = extensionAttributes[i];
+
+                // Skip if namespace URI is excluded
+                if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
+                    continue;
+
+                final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
+                final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
+
+                if (!XFormsUtils.compareStrings(value1, value2)) {
+                    final String attributeValue = value2 != null ? value2 : "";
+
+                    final AttributesImpl attributesImpl = new AttributesImpl();
+                    // Control id
+                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+
+                    // The client does not store an HTML representation of the xxforms:attribute control, so we
+                    // have to output these attributes.
+
+                    // HTML element id
+                    addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId(), isNewRepeatIteration, false);
+
+                    // Attribute name
+                    addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName(), isNewRepeatIteration, false);
+
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
+                    ch.text(attributeValue);
+                    ch.endElement();
+                }
+            }
         }
     }
 

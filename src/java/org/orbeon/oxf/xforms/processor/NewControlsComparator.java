@@ -232,6 +232,10 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     if (doOutputElement)
                                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                 }
+
+                                // Output extension attributes in no namespace
+                                // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
+                                xformsSingleNodeControl2.addAttributesDiffs(xformsSingleNodeControl1, ch, isNewlyVisibleSubtree, "");
                             } else {
 
                                 // Use the effective id of the parent repeat

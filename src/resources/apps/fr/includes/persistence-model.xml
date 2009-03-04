@@ -680,9 +680,10 @@
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-value-changed">
 
-        <!-- Mark status as dirty if data changes in fr-form-instance instance only -->
-        <xforms:setvalue if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')"
-                         ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+        <!-- Mark status as dirty if data changes -->
+        <!-- NOTE: We used to check on event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance'), but this
+             doesn't work with nested XBL components which handle their own local data. So now just rely on observers. -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
 
         <!-- HACK: Force a recalculate as value changed in the form may inpact binds in this form -->
         <xforms:recalculate/>
@@ -696,8 +697,10 @@
     </xforms:action>
 
     <!-- Perform background submission upon xforms-select for xforms:upload -->
+    <!-- NOTE: We used to check on event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance'), but this
+         doesn't work with nested XBL components which handle their own local data. So now just rely on observers. -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group fr-dialogs-group" ev:event="xforms-select"
-            if="for $b in xxforms:event('xxforms:binding') return $b/root()/* is xxforms:instance('fr-form-instance') and $b/(@filename and @mediatype and @size)">
+            if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>
 

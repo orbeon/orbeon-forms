@@ -718,12 +718,18 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Add all non-null values of extension attributes to the given list of attributes.
      *
      * @param attributesImpl    attributes to add to
+     * @param namespaceURI      restriction on namespace URI, or null if all attributes
      */
-    public void addExtensionAttributes(AttributesImpl attributesImpl) {
+    public void addExtensionAttributes(AttributesImpl attributesImpl, String namespaceURI) {
         if (extensionAttributesValues != null) {
             for (Iterator i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final QName currentName = (QName) currentEntry.getKey();
+
+                // Skip if namespace URI is excluded
+                if (namespaceURI != null && !namespaceURI.equals(currentName.getNamespaceURI()))
+                    continue;
+
                 final String currentValue = (String) currentEntry.getValue();
 
                 if (currentValue != null) {

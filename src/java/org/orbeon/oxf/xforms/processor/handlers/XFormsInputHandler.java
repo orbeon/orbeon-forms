@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -70,6 +71,11 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, inputControl);
             handleMIPClasses(classes, getPrefixedId(), inputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (isConcreteControl) {
+                // Output extension attributes in no namespace
+                inputControl.addExtensionAttributes(reusableAttributes, "");
+            }
         }
 
         if (isBoolean) {
@@ -110,7 +116,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // Regular read-write mode
 
                         // Main input field
-
                         {
                             final String inputId = effectiveId + "$xforms-input-1";// do as if this was in a component, noscript has to handle that
 
@@ -132,8 +137,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                     inputClasses.append(firstType);
                                 }
 
-                                // Output extension attributes
-                                inputControl.addExtensionAttributes(reusableAttributes);
+                                // Output xxforms:* extension attributes
+                                inputControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                                 
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");

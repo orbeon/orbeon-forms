@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -49,6 +50,11 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             handleMIPClasses(classes, getPrefixedId(), textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);
+
+            if (isConcreteControl) {
+                // Output extension attributes in no namespace
+                textareaControl.addExtensionAttributes(reusableAttributes, "");
+            }
         }
 
         // Create xhtml:textarea
@@ -61,9 +67,10 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, newAttributes);
 
-                // Output extension attributes
+                // Output all extension attributes
                 if (isConcreteControl) {
-                    textareaControl.addExtensionAttributes(reusableAttributes);
+                    // Output xxforms:* extension attributes
+                    textareaControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);

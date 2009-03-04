@@ -104,11 +104,9 @@ public class XFormsSetindexAction extends XFormsAction {
             //currentModel.getBinds().rebuild(pipelineContext);
 
             final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-            if (deferredActionContext != null) {
-                deferredActionContext.recalculate = true;
-                deferredActionContext.revalidate = true;
-                deferredActionContext.refresh = true;
-            }
+            deferredActionContext.recalculate = true;
+            deferredActionContext.revalidate = true;
+            deferredActionContext.refresh = true;
         }
     }
 }

@@ -127,15 +127,13 @@ public class XFormsSetvalueAction extends XFormsAction {
 
                 final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
                 if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
-                    final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
 
                     // "XForms Actions that change only the value of an instance node results in setting the flags for
                     // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-                    if (deferredActionContext != null) {
-                        deferredActionContext.recalculate = true;
-                        deferredActionContext.revalidate = true;
-                        deferredActionContext.refresh = true;
-                    }
+                    final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
+                    deferredActionContext.recalculate = true;
+                    deferredActionContext.revalidate = true;
+                    deferredActionContext.refresh = true;
                 }
             }
 

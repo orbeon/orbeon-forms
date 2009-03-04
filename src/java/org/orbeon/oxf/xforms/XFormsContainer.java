@@ -257,10 +257,7 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
                 final XFormsModel currentModel = (XFormsModel) j.next();
 
                 // Make sure there is at least one refresh
-                final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-                if (deferredActionContext != null) {
-                    deferredActionContext.refresh = true;
-                }
+                currentModel.getDeferredActionContext().refresh = true;
 
                 dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
             }

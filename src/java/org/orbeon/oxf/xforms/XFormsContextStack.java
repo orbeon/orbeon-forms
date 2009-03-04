@@ -391,6 +391,18 @@ public class XFormsContextStack {
 
             // Push new context
             final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
+
+//        DEBUG
+//            {
+//                if (newNodeset != null && newNodeset.size() > 0) {
+//                    final Item item = (Item) newNodeset.get(0);
+//
+//                    if (item instanceof NodeInfo && containingDocument.getInstanceForNode((NodeInfo) item) == null) {
+//                        System.out.println("Dangling node: " + ((NodeInfo) item).getDisplayName());
+//                    }
+//                }
+//            }
+
             contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, hasOverriddenContext, contextItem));
 
             // Add new model variables if needed

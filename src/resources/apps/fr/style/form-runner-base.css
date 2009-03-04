@@ -453,9 +453,11 @@ button.xforms-trigger img { margin-right: 10px }
     .fr-status-icons { display: none }
     .fr-bottom { display: none }
     .fr-section-container .fr-section-open-close { display: none }
-    /* Remove button */
+    /* Upload remove button */
     .xforms-upload-remove { display: none }
     /* Remove background attachment image */
     .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
+    /* Don't show download link */
+    .xforms-output-appearance-xxforms-download { display: none } 
     noscript { display: none }
 }

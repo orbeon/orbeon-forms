@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsItemUtils;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -51,6 +48,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private boolean isCompact;
     private boolean isTree;
     private boolean isMenu;
+
+    private static final XFormsItemUtils.Item EMPTY_TOP_LEVEL_ITEM = new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "", 1);
 
     public XFormsSelect1Handler() {
         super(false);
@@ -133,6 +132,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (xformsControl != null) {
+                // Output extension attributes in no namespace
+                xformsControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -224,7 +228,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
 
                                 final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                                handleItemCompact(contentHandler, optionQName, xformsControl, isMany, new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "", 1));
+                                handleItemCompact(contentHandler, optionQName, xformsControl, isMany, EMPTY_TOP_LEVEL_ITEM);
                                 if (items != null) {
                                     for (Iterator i = items.iterator(); i.hasNext();) {
                                         final XFormsItemUtils.Item item = (XFormsItemUtils.Item) i.next();
@@ -369,6 +373,15 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
                     if (items != null) {
+
+// Work in progress for in-bounds/out-of-bounds
+//                        if (!((XFormsSelect1Control) xformsControl).isInBounds(items)) {
+//                            // Control is out of bounds so add first item with out of bound value to handle this
+//                            handleItemCompact(contentHandler, optionQName, xformsControl, isMany,
+//                                    new XFormsItemUtils.Item(XFormsProperties.isEncryptItemValues(containingDocument),
+//                                            Collections.EMPTY_LIST, "", xformsControl.getValue(pipelineContext), 1));
+//                        }
+
                         XFormsItemUtils.visitItemsTree(contentHandler, items, handlerContext.getLocationData(), new XFormsItemUtils.TreeListener() {
 
                             private int optgroupCount = 0;

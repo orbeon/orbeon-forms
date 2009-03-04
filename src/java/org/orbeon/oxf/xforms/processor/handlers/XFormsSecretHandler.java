@@ -49,6 +49,11 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
             handleMIPClasses(classes, getPrefixedId(), secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
+
+            if (secretControl != null) {
+                // Output extension attributes in no namespace
+                secretControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         // Create xhtml:input

@@ -59,6 +59,11 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), uploadControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (uploadControl != null) {
+                // Output extension attributes in no namespace
+                uploadControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

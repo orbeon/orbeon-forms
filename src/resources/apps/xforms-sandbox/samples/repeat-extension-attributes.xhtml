@@ -63,7 +63,7 @@
             <xforms:label>Add</xforms:label>
             <xforms:insert ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat')"/>
         </xforms:trigger>
-        <xforms:trigger>
+        <xforms:trigger style="{instance('attributes')/style}">
             <xforms:label>Remove</xforms:label>
             <xforms:delete ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat')"/>
         </xforms:trigger>

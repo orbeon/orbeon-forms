@@ -106,6 +106,11 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
             containingDocument.getStaticState().appendClasses(classes, getPrefixedId());
             addCustomClasses(classes, triggerControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (isConcreteControl) {
+                // Output extension attributes in no namespace
+                triggerControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         // Handle accessibility attributes

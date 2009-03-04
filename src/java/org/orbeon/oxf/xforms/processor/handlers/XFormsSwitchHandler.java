@@ -39,6 +39,11 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
                 final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
                 handleMIPClasses(classes, getPrefixedId(), xformsControl);
                 newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+                if (xformsControl != null) {
+                    // Output extension attributes in no namespace
+                    xformsControl.addExtensionAttributes(newAttributes, "");
+                }
             }
 
             // Start xhtml:span

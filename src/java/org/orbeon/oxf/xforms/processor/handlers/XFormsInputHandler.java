@@ -74,7 +74,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
             if (isConcreteControl) {
                 // Output extension attributes in no namespace
-                inputControl.addExtensionAttributes(reusableAttributes, "");
+                inputControl.addExtensionAttributes(newAttributes, "");
             }
         }
 

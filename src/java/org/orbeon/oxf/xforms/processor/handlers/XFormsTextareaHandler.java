@@ -53,7 +53,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
             if (isConcreteControl) {
                 // Output extension attributes in no namespace
-                textareaControl.addExtensionAttributes(reusableAttributes, "");
+                textareaControl.addExtensionAttributes(newAttributes, "");
             }
         }
 

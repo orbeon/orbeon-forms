@@ -222,7 +222,7 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                             // Output extension attributes in no namespace
                             // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
-                            xformsSingleNodeControl2.addAttributesDiffs(xformsSingleNodeControl1, ch, isNewlyVisibleSubtree, "");
+                            xformsSingleNodeControl2.addAttributesDiffs(xformsSingleNodeControl1, ch, isNewlyVisibleSubtree);
 
                         } else if (isAttributeControl) {
                             // Attribute control

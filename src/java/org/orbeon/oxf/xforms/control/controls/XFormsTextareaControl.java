@@ -30,12 +30,10 @@ public class XFormsTextareaControl extends XFormsValueControl {
     private static final String AUTOSIZE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
 
     // List of attributes to handle as AVTs
-    private static final QName[] AVT_ATTRIBUTES = {
+    private static final QName[] EXTENSION_ATTRIBUTES = {
             XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
             XFormsConstants.XXFORMS_COLS_QNAME,
-            XFormsConstants.XXFORMS_ROWS_QNAME,
-            XFormsConstants.STYLE_QNAME,
-            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler
+            XFormsConstants.XXFORMS_ROWS_QNAME
     };
 
     public XFormsTextareaControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
@@ -43,7 +41,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
     }
 
     protected QName[] getExtensionAttributes() {
-        return AVT_ATTRIBUTES;
+        return EXTENSION_ATTRIBUTES;
     }
 
     public boolean hasJavaScriptInitialization() {

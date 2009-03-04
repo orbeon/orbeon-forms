@@ -69,6 +69,11 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
             final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, outputControl);
             handleMIPClasses(classes, getPrefixedId(), outputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (isConcreteControl) {
+                // Output extension attributes in no namespace
+                outputControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         if (XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(getAppearance(attributes))) {

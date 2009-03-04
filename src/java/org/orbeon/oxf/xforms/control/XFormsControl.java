@@ -44,6 +44,12 @@ import java.util.*;
  */
 public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, Cloneable {
 
+    // List of standard extension attributes
+    private static final QName[] EXTENSION_ATTRIBUTES = {
+            XFormsConstants.STYLE_QNAME,
+            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler
+    };
+
     private XFormsContainer container;
     protected XFormsContainingDocument containingDocument;
 
@@ -446,7 +452,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
             evaluate(pipelineContext);
 
-            // Evaluate extension attributes if any
+            // Evaluate standard extension attributes
+            evaluateExtensionAttributes(pipelineContext, EXTENSION_ATTRIBUTES);
+            // Evaluate custom extension attributes
             final QName[] extensionAttributes = getExtensionAttributes();
             if (extensionAttributes != null) {
                 evaluateExtensionAttributes(pipelineContext, extensionAttributes);
@@ -693,18 +701,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public void addAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration, String namespaceURI) {
-        final QName[] extensionAttributes = getExtensionAttributes();
+    public void addAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
+        final QName[] extensionAttributes = EXTENSION_ATTRIBUTES;
         if (extensionAttributes != null) {
             final XFormsControl control1 = (XFormsControl) originalControl;
             final XFormsControl control2 = this;
 
             for (int i = 0; i < extensionAttributes.length; i++) {
                 final QName avtAttributeQName = extensionAttributes[i];
-
-                // Skip if namespace URI is excluded
-                if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
-                    continue;
 
                 final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
                 final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
@@ -741,16 +745,29 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                  value of the AVT or null if cannot be computed
      */
     protected String evaluateAvt(PipelineContext pipelineContext, String avt) {
-        final XFormsContextStack contextStack = getContextStack();
-        contextStack.setBinding(this);
-        if (getBoundNode() == null) {
-            // TODO: in the future we should be able to try evaluating anyway
-            return null;
+
+
+        if (avt.indexOf('{') == -1) {
+            // Not an AVT
+
+            return avt;
         } else {
-            final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
-            return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(),
-                        bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                        contextStack.getFunctionContext(), prefixToURIMap, getLocationData(), avt);
+            // Possible AVT
+
+            final XFormsContextStack contextStack = getContextStack();
+            contextStack.setBinding(this);
+    
+            // NOTE: the control may or may not be bound, so don't use getBoundNode()
+            final List contextNodeset = bindingContext.getNodeset();
+            if (contextNodeset.size() == 0) {
+                // TODO: in the future we should be able to try evaluating anyway
+                return null;
+            } else {
+                final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
+                return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNodeset,
+                            bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                            contextStack.getFunctionContext(), prefixToURIMap, getLocationData(), avt);
+            }
         }
     }
 

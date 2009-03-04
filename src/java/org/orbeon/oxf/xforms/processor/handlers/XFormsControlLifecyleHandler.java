@@ -105,7 +105,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
                 // Add extension attributes in no namespace if possible
                 if (xformsControl != null) {
-                    xformsControl.addExtensionAttributes(reusableAttributes, "");
+                    xformsControl.addExtensionAttributes(newAttributes, "");
                 }
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);

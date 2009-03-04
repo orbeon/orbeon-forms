@@ -42,12 +42,10 @@ import java.util.Map;
 public class XFormsInputControl extends XFormsValueControl {
 
     // List of attributes to handle as AVTs
-    private static final QName[] AVT_ATTRIBUTES = {
+    private static final QName[] EXTENSION_ATTRIBUTES = {
             XFormsConstants.XXFORMS_SIZE_QNAME,
             XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
-            XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME,
-            XFormsConstants.STYLE_QNAME,
-            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler 
+            XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME 
     };
 
     public XFormsInputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
@@ -55,7 +53,7 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     protected QName[] getExtensionAttributes() {
-        return AVT_ATTRIBUTES;
+        return EXTENSION_ATTRIBUTES;
     }
 
     protected void evaluate(PipelineContext pipelineContext) {

@@ -49,6 +49,11 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             addCustomClasses(classes, xformsControl);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+            if (xformsControl != null) {
+                // Output extension attributes in no namespace
+                xformsControl.addExtensionAttributes(newAttributes, "");
+            }
         }
 
         // Create xhtml:div

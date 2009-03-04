@@ -1316,13 +1316,36 @@
                         </p>
                         <ul>
                             <li>
-                                <code>xxforms:size</code>
+                                <code>style</code>: equivalent to the HTML <code>style</code> attribute
                             </li>
                             <li>
-                                <code>xxforms:maxlength</code>
+                                <code>xxforms:size</code>: equivalent to the HTML <code>size</code> attribute
                             </li>
                             <li>
-                                <code>xxforms:autocomplete</code>
+                                <code>xxforms:maxlength</code>: equivalent to the HTML <code>maxlength</code> attribute
+                            </li>
+                            <li>
+                                <code>xxforms:autocomplete</code>: equivalent to the HTML <code>autocomplete</code> attribute
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xxforms:textarea></code> attributes:
+                        </p>
+                        <ul>
+                            <li>
+                                <code>style</code>: equivalent to the HTML <code>style</code> attribute
+                            </li>
+                            <li>
+                                <code>xxforms:cols</code>: equivalent to the HTML <code>cols</code> attribute
+                            </li>
+                            <li>
+                                <code>xxforms:rows</code>: equivalent to the HTML <code>rows</code> attribute
+                            </li>
+                            <li>
+                                <code>xxforms:maxlength</code>: equivalent to the HTML 5 <code>rows</code> attribute
+                                (NOTE: this HTML 5 attribute is not supported by most browsers as of March 2009)
                             </li>
                         </ul>
                     </li>

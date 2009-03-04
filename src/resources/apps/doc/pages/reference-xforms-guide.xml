@@ -727,17 +727,6 @@
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:input ref="text"/>
                                 </xml-source>
-                                <p>
-                                    <code>xforms:input</code> supports the following extension attributes:
-                                </p>
-                                <ul>
-                                    <li><code>xxforms:size</code>: equivalent to the HTML <code>size</code> attribute</li>
-                                    <li><code>xxforms:maxlength</code>: equivalent to the HTML <code>maxlength</code> attribute</li>
-                                    <li><code>xxforms:autocomplete</code>: equivalent to the HTML <code>autocomplete</code> attribute</li>
-                                </ul>
-                                <p>
-                                    NOTE: These are attribute value templates, so the values can be computed dynamically.
-                                </p>
                             </td>
                             <td>
                                 <a href="/xforms-controls/">XForms Controls</a>
@@ -768,13 +757,6 @@
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:textarea ref="textarea"/>
                                 </xml-source>
-                                <p>
-                                    <code>xforms:textarea</code> supports the following extension attributes:
-                                </p>
-                                <ul>
-                                    <li><code>xxforms:rows</code>: equivalent to the HTML <code>rows</code> attribute</li>
-                                    <li><code>xxforms:cols</code>: equivalent to the HTML <code>cols</code> attribute</li>
-                                </ul>
                             </td>
                             <td>
                                 <a href="/xforms-controls/">XForms Controls</a>

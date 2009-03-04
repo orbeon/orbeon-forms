@@ -31,8 +31,11 @@ public class XFormsTextareaControl extends XFormsValueControl {
 
     // List of attributes to handle as AVTs
     private static final QName[] AVT_ATTRIBUTES = {
-            XFormsConstants.XXFORMS_MAXLENGTH_QNAME, XFormsConstants.XXFORMS_COLS_QNAME, XFormsConstants.XXFORMS_ROWS_QNAME,
-            XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME
+            XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
+            XFormsConstants.XXFORMS_COLS_QNAME,
+            XFormsConstants.XXFORMS_ROWS_QNAME,
+            XFormsConstants.STYLE_QNAME,
+            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler
     };
 
     public XFormsTextareaControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {

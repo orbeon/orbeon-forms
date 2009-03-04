@@ -43,9 +43,11 @@ public class XFormsInputControl extends XFormsValueControl {
 
     // List of attributes to handle as AVTs
     private static final QName[] AVT_ATTRIBUTES = {
-            XFormsConstants.XXFORMS_SIZE_QNAME, XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
+            XFormsConstants.XXFORMS_SIZE_QNAME,
+            XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
             XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME,
-            XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME
+            XFormsConstants.STYLE_QNAME,
+            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler 
     };
 
     public XFormsInputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {

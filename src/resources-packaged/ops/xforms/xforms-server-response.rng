@@ -57,6 +57,13 @@
                                         <optional>
                                             <attribute name="help"/>
                                         </optional>
+                                        <!-- Optional attributes for all controls -->
+                                        <optional>
+                                            <attribute name="style"/>
+                                        </optional>
+                                        <optional>
+                                            <attribute name="class"/>
+                                        </optional>
                                         <choice>
                                             <!-- Optional attributes for xforms:output -->
                                             <group>
@@ -110,6 +117,30 @@
                                                             <value>on</value>
                                                             <value>off</value>
                                                         </choice>
+                                                    </attribute>
+                                                </optional>
+                                            </group>
+                                            <!-- Optional attributes for xforms:textarea -->
+                                            <group>
+                                                <optional>
+                                                    <attribute name="maxlength">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="cols">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="rows">
+                                                        <optional>
+                                                            <data type="nonNegativeInteger"/>
+                                                        </optional>
                                                     </attribute>
                                                 </optional>
                                             </group>

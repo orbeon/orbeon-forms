@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
@@ -30,9 +29,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * Handle xforms:textarea.
  */
 public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
-
-    // TODO: make these AVTs like in xforms:input
-    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "rows", "cols" };
 
     public XFormsTextareaHandler() {
         super(false);
@@ -62,18 +58,12 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
-                // Copy special attributes in xxforms namespace
-                copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
-
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, newAttributes);
 
                 // Output extension attributes
-                // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented natively
                 if (isConcreteControl) {
-                    final String maxlength = textareaControl.getMaxlength(pipelineContext);
-                    if (maxlength != null)
-                        reusableAttributes.addAttribute("", "maxlength", "maxlength", ContentHandlerHelper.CDATA, maxlength);
+                    textareaControl.addExtensionAttributes(reusableAttributes);
                 }
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);

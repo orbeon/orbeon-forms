@@ -118,11 +118,11 @@ public class XFormsConstants {
     public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
     public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);
 
+    // XBL extensions
     public static final String XXBL_PREFIX = "xxbl";
     public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
     public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
     public static final QName XXBL_ATTR_QNAME = new QName("attr", XXBL_NAMESPACE);
-
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 
@@ -138,16 +138,13 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
 
-    public static final String XFORMS_FILENAME_NAME = "filename";
-    public static final QName XFORMS_FILENAME_QNAME = new QName(XFORMS_FILENAME_NAME, XFORMS_NAMESPACE);
-    public static final String XFORMS_MEDIATYPE_NAME = "mediatype";
-    public static final QName XFORMS_MEDIATYPE_QNAME = new QName(XFORMS_MEDIATYPE_NAME, XFORMS_NAMESPACE);
-    public static final String XXFORMS_SIZE_NAME = "size";
-    public static final QName XXFORMS_SIZE_QNAME = new QName(XXFORMS_SIZE_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_MAXLENGTH_NAME = "maxlength";
-    public static final QName XXFORMS_MAXLENGTH_QNAME = new QName(XXFORMS_MAXLENGTH_NAME, XXFORMS_NAMESPACE);
-    public static final String XXFORMS_AUTOCOMPLETE_NAME = "autocomplete";
-    public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName(XXFORMS_AUTOCOMPLETE_NAME, XXFORMS_NAMESPACE);
+    public static final QName XFORMS_FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
+    public static final QName XFORMS_MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
+    public static final QName XXFORMS_SIZE_QNAME = new QName("size", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_MAXLENGTH_QNAME = new QName("maxlength", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_COLS_QNAME = new QName("cols", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_ROWS_QNAME = new QName("rows", XXFORMS_NAMESPACE);
 
     public static final String VALID_ATTRIBUTE_NAME = "valid";
     public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";
@@ -253,6 +250,9 @@ public class XFormsConstants {
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
+
+    public static final QName CLASS_QNAME = new QName("class", Namespace.NO_NAMESPACE);
+    public static final QName STYLE_QNAME = new QName("style", Namespace.NO_NAMESPACE);
 
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");
     public static final String XFORMS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "integer");

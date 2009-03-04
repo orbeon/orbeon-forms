@@ -133,17 +133,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                 }
 
                                 // Output extension attributes
-                                final String size = inputControl.getSize(pipelineContext);
-                                if (size != null)
-                                    reusableAttributes.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, size);
-
-                                final String maxlength = inputControl.getMaxlength(pipelineContext);
-                                if (maxlength != null)
-                                    reusableAttributes.addAttribute("", "maxlength", "maxlength", ContentHandlerHelper.CDATA, maxlength);
+                                inputControl.addExtensionAttributes(reusableAttributes);
                                 
-                                final String autocomplete = inputControl.getAutocomplete(pipelineContext);
-                                if (autocomplete != null)
-                                    reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, autocomplete);
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }

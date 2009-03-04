@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -25,9 +26,9 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -36,10 +37,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms control.
@@ -68,6 +66,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private NodeInfo boundNode;
 
     private boolean isEvaluated;
+
+    // Optional extension attributes supported by the control
+    private Map extensionAttributesValues;
 
     private String label;
     private boolean isLabelEvaluated;
@@ -394,6 +395,18 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!XFormsUtils.compareStrings(getAlert(pipelineContext), other.getAlert(pipelineContext)))
             return false;
 
+        // Compare values of extension attributes if any
+        if (extensionAttributesValues != null) {
+            for (Iterator i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final QName currentName = (QName) currentEntry.getKey();
+                final String currentValue = (String) currentEntry.getValue();
+
+                if (!XFormsUtils.compareStrings(currentValue, other.getExtensionAttributeValue(currentName)))
+                    return false;
+            }
+        }
+
         return true;
     }
 
@@ -432,6 +445,29 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isEvaluated) {
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
             evaluate(pipelineContext);
+
+            // Evaluate extension attributes if any
+            final QName[] extensionAttributes = getExtensionAttributes();
+            if (extensionAttributes != null) {
+                evaluateExtensionAttributes(pipelineContext, extensionAttributes);
+            }
+        }
+    }
+
+    private void evaluateExtensionAttributes(PipelineContext pipelineContext, QName[] attributeQNames) {
+        final Element controlElement = getControlElement();
+        for (int i = 0; i < attributeQNames.length; i++) {
+            final QName avtAttributeQName = attributeQNames[i];
+            final String attributeValue = controlElement.attributeValue(avtAttributeQName);
+
+            if (attributeValue != null) {
+                final String resolvedValue = evaluateAvt(pipelineContext, attributeValue);
+
+                if (extensionAttributesValues == null)
+                    extensionAttributesValues = new HashMap();
+
+                extensionAttributesValues.put(avtAttributeQName, resolvedValue);
+            }
         }
     }
 
@@ -441,6 +477,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         isHelpEvaluated = false;
         isHintEvaluated = false;
         isAlertEvaluated = false;
+        if (extensionAttributesValues != null)
+            extensionAttributesValues.clear();
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
@@ -448,6 +486,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         getHint(pipelineContext);
         getHelp(pipelineContext);
         getAlert(pipelineContext);
+    }
+
+    /**
+     * Return an optional static list of extension attribute QNames provided by the control. If present these
+     * attributes are evaluated as AVTs and copied over to the outer control element.
+     */
+    protected QName[] getExtensionAttributes() {
+        return null;
     }
 
     public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
@@ -599,8 +645,39 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
      * @return                      true if any attribute was added, false otherwise
      */
-    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
-        return false;
+    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl,
+                                      AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+
+        final QName[] extensionAttributes = getExtensionAttributes();
+        if (extensionAttributes != null) {
+            return addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean addAttributesDiffs(XFormsControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration,
+                                         QName[] attributeQNames) {
+
+        final XFormsControl control1 = (XFormsControl) other;
+        final XFormsControl control2 = this;
+
+        boolean added = false;
+
+        for (int i = 0; i < attributeQNames.length; i++) {
+            final QName avtAttributeQName = attributeQNames[i];
+
+            final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
+            final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
+
+            if (!XFormsUtils.compareStrings(value1, value2)) {
+                final String attributeValue = value2 != null ? value2 : "";
+                // NOTE: For now we use the local name; may want to use a full name?
+                added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName(), attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+
+        return added;
     }
 
     protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
@@ -609,6 +686,51 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else {
             attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
             return true;
+        }
+    }
+
+    /**
+     * Evaluate an attribute of the control as an AVT.
+     *
+     * @param pipelineContext   current pipeline contextStack
+     * @param avt               value of the attribute
+     * @return                  value of the AVT or null if cannot be computed
+     */
+    protected String evaluateAvt(PipelineContext pipelineContext, String avt) {
+        final XFormsContextStack contextStack = getContextStack();
+        contextStack.setBinding(this);
+        if (getBoundNode() == null) {
+            // TODO: in the future we should be able to try evaluating anyway
+            return null;
+        } else {
+            final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
+            return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(),
+                        bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        contextStack.getFunctionContext(), prefixToURIMap, getLocationData(), avt);
+        }
+    }
+
+    protected String getExtensionAttributeValue(QName attributeName) {
+        return (extensionAttributesValues == null) ? null : (String) extensionAttributesValues.get(attributeName);
+    }
+
+    /**
+     * Add all non-null values of extension attributes to the given list of attributes.
+     *
+     * @param attributesImpl    attributes to add to
+     */
+    public void addExtensionAttributes(AttributesImpl attributesImpl) {
+        if (extensionAttributesValues != null) {
+            for (Iterator i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final QName currentName = (QName) currentEntry.getKey();
+                final String currentValue = (String) currentEntry.getValue();
+
+                if (currentValue != null) {
+                    final String localName = currentName.getName();
+                    attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, currentValue);
+                }
+            }
         }
     }
 
@@ -650,7 +772,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (this.currentLocal != null) {
             // There is some local data
             if (this.currentLocal != this.initialLocal) {
-                // The trees don't keep wastefull references
+                // The trees don't keep wasteful references
                 cloned.currentLocal = cloned.initialLocal;
                 this.initialLocal = this.currentLocal;
             } else {
@@ -658,6 +780,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 // NOTE: We could implement a copy-on-write flag here
                 cloned.initialLocal = cloned.currentLocal = (XFormsControlLocal) this.currentLocal.clone();
             }
+        }
+
+        // Handle extension attributes if any
+        if (extensionAttributesValues != null) {
+            cloned.extensionAttributesValues = new HashMap(this.extensionAttributesValues);
         }
 
         return cloned;

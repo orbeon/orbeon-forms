@@ -419,7 +419,7 @@
                         </ul>
                         <note>
                             The portlet logic above is likely to be revised in the future. Also note that in the case of
-                            optimzied submissions within portlets, requests are made directly to the Orbeon Forms
+                            optimized submissions within portlets, requests are made directly to the Orbeon Forms
                             portlet and do not use servlet forward/include.
                         </note>
                     </li>

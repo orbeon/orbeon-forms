@@ -1442,11 +1442,30 @@
                     </td>
                 </tr>
                 <tr>
+                    <th><code>model</code></th>
+                    <td>Optional</td>
+                    <td>
+                        Id of the model used for the evaluation of the <code>select</code> attribute. This works like
+                        the standard XForms <code>model</code> attribute.
+                    </td>
+                </tr>
+                <tr>
+                    <th><code>context</code></th>
+                    <td>Optional</td>
+                    <td>
+                        Overridden evaluation context for the evaluation of the <code>select</code> attribute. If a
+                        <code>model</code> attribute is present, the model is resolved first, and then
+                        <code>context</code> is evaluated. This works like the standard XForms <code>context</code>
+                        attribute.
+                    </td>
+                </tr>
+                <tr>
                     <th><code>select</code></th>
                     <td>Optional</td>
                     <td>
                         XPath 2.0 expression determining the value of the variable. If the attribute is omitted, the
-                        text content of the <code>&lt;exforms:variable></code> is used as the value.
+                        text content of the <code>&lt;xxforms:variable></code> or <code>&lt;exforms:variable></code>
+                        element is used as the value.
                     </td>
                 </tr>
             </table>

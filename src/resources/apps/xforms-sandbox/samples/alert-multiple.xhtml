@@ -1,0 +1,95 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Alert</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <age/>
+                    <height/>
+                </instance>
+            </xforms:instance>
+
+            <xforms:bind nodeset="age" id="must-be-present" required="true()"/>
+            <xforms:bind nodeset="age" id="must-be-integer" constraint=". castable as xs:integer"/>
+            <xforms:bind nodeset="age" id="must-be-positive" constraint="if (. castable as xs:integer) then . >= 0 else true()"/>
+            <xforms:bind nodeset="age" id="must-be-lower" constraint="if (. castable as xs:integer) then 150 >= . else true()"/>
+
+            <xforms:bind nodeset="height" id="h-must-be-present" required="true()"/>
+            <xforms:bind nodeset="height" id="h-must-be-integer" constraint=". castable as xs:integer"/>
+
+        </xforms:model>
+        <xhtml:style type="text/css">
+            <!-- Have the text of the alert displayed -->
+            .xforms-alert-active {
+                background-image: none;/* override xforms.css */
+                color: red;
+                font-size: inherit;/* override xforms.css */
+                width: auto;/*width: 100%;*/
+            }
+            .xforms-label { padding-right: 1em; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            Possible errors are:
+        </xhtml:p>
+        <xhtml:ol>
+            <xhtml:li>Age missing</xhtml:li>
+            <xhtml:li>Age must be an integer</xhtml:li>
+            <xhtml:li>Age must be positive</xhtml:li>
+            <xhtml:li>Age must be lower or equal to 150</xhtml:li>
+        </xhtml:ol>
+
+        <xhtml:ul>
+            <xforms:repeat nodeset="instance('instance')/*">
+                <xxforms:variable name="invalid-binds" select="xxforms:invalid-binds(.)"/>
+                <xforms:repeat nodeset="for $bind-id in $invalid-binds return xxforms:element('bind-id', $bind-id)">
+                    <xhtml:li>
+                        <xforms:output value="if ($invalid-binds = 'must-be-present') then 'Age missing'
+                            else if ($invalid-binds = 'must-be-integer') then 'Age must be an integer'
+                            else if ($invalid-binds = 'must-be-positive') then 'Age must be positive'
+                            else if ($invalid-binds = 'must-be-lower') then 'Age must be lower or equal to 150'
+                            else if ($invalid-binds = 'h-must-be-present') then 'Height must be present'
+                            else if ($invalid-binds = 'h-must-be-integer') then 'Height must be an integer'
+                            else ()"/>
+                    </xhtml:li>
+                </xforms:repeat>
+            </xforms:repeat>
+        </xhtml:ul>
+        <xhtml:p>
+            <xforms:input ref="age" incremental="true" id="age">
+                <xforms:label>Age</xforms:label>
+                <!--<xforms:alert>-->
+                    <!--<xforms:output value="if ($invalid-binds = 'must-be-present') then 'Age missing'-->
+                        <!--else if ($invalid-binds = 'must-be-integer') then 'Age must be an integer'-->
+                        <!--else if ($invalid-binds = 'must-be-positive') then 'Age must be positive'-->
+                        <!--else if ($invalid-binds = 'must-be-lower') then 'Age must be lower or equal to 150'-->
+                        <!--else ()"/>-->
+                <!--</xforms:alert>-->
+            </xforms:input>
+            <xforms:input ref="height" incremental="true" id="height">
+                <xforms:label>Height</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

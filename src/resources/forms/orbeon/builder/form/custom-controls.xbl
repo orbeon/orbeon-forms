@@ -446,7 +446,7 @@
             </xforms:model>
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
-                <xhtml:style>
+                <xhtml:style  type="text/css">
                     .xbl-fr-us-currency-thousands .fr-component-group input { width: 6em }
                 </xhtml:style>
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
@@ -476,5 +476,103 @@
         </xbl:template>
     </xbl:binding>
 
+    <xbl:binding id="fr-date-picker" element="fr|date-picker">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Date picker</display-name>
+            <display-name lang="fr">Selection de date</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
+            </icon>
+            <datatype>xforms:date</datatype>
+            <template>
+                <fr:date-picker>
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref=""/>
+               </fr:date-picker>
+            </template>
+        </metadata>
+        <xbl:template>
+            <xforms:group xbl:attr="ref bind"><xbl:content includes="xforms|label,xforms|help,xforms|hint"/><xforms:output ref="."/>
+                <xforms:input ref="." appearance="minimal"/>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <!--
+        Component to show a map, using Google Maps
+     -->
+    <xbl:binding id="fr-map" element="fr|map">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Map</display-name>
+            <display-name lang="fr">Carte</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
+            </icon>
+            <datatype>xforms:String</datatype>
+            <template>
+                 <fr:map>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </fr:map>
+            </template>
+        </metadata>
+
+        <xbl:template>
+            <!-- Local model -->
+            <xforms:model id="map-model">
+                <xforms:instance id="map-instance">
+                    <value/>
+                </xforms:instance>
+                <xforms:bind nodeset="." constraint="substring-after(., '$') castable as xs:decimal"/>
+            </xforms:model>
+            <!-- Local controls -->
+            <xforms:group xbl:attr="ref bind">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+
+                <xxforms:variable name="result" select="." as="node()?"/>
+
+                <!-- React to update to bound node -->
+                <!--<xforms:group ref="$result" appearance="xxforms:internal">-->
+                    <!--<xforms:action ev:event="xforms-value-changed xforms-enabled">-->
+                        <!--<xforms:setvalue model="map-model" ref="." value="if ($result castable as xs:decimal) then format-number($result, '$ #.000') else $result"/>-->
+                    <!--</xforms:action>-->
+                <!--</xforms:group>-->
+
+                <xforms:group model="map-model" class="fr-component-group">
+
+                    <xxforms:variable name="width" xbl:attr="xbl:text=width"/>
+                    <xxforms:variable name="height" xbl:attr="xbl:text=height"/>
+                    <xhtml:div id="map" style="width:{$width}px;height:{$height}px"></xhtml:div>
+
+                    <xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA29DoCyTBBHWCx75dFud5rxT4lftsSa3SaZIzQGxOmBuGKTUk8hQ4hiDXmoFdYblBeyWah68wn_JosQ" type="text/javascript"/>
+                    <xhtml:script type="text/javascript">
+                        xformsPageLoadedServer = function() {
+                            if (GBrowserIsCompatible()) {
+                                var map = new GMap2(document.getElementById("xforms-element-4$map"));
+                                map.setCenter(new GLatLng(37.4419, -122.1419), 13);
+                            }
+                        };
+                    </xhtml:script>
+
+                    <!-- React to update to local values -->
+                    <!--<xforms:action ev:event="xforms-value-changed">-->
+                        <!--<xxforms:variable name="currency-normalized" select="normalize-space(.)" as="xs:string"/>-->
+                        <!--<xxforms:variable name="currency-no-dollar" select="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized" as="xs:string"/>-->
+                        <!--<xforms:setvalue ref="$result" value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>-->
+                    <!--</xforms:action>-->
+                </xforms:group>
+
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
 
 </xbl:xbl>

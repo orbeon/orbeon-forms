@@ -23,7 +23,10 @@
         <xhtml:title>XForms Modal Trigger</xhtml:title>
         <xforms:model id="main-model">
             <xforms:instance id="instance">
-                <instance>0</instance>
+                <instance>
+                    <input/>
+                    <count>0</count>
+                </instance>
             </xforms:instance>
             <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
         </xforms:model>
@@ -59,15 +62,20 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:output ref="." id="click-count">
+            <xforms:output ref="count" id="click-count">
                 <xforms:label>Number of clicks: </xforms:label>
             </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="input" id="input">
+                <xforms:label>Input: </xforms:label>
+            </xforms:input>
         </xhtml:p>
         <xhtml:p>
             <xforms:trigger id="modal-trigger" xxforms:modal="true">
                 <xforms:label>Do long operation</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="." value="number(.) + 1"/>
+                    <xforms:setvalue ref="count" value="number(.) + 1"/>
                     <xforms:send submission="sleep-5-seconds"/>
                 </xforms:action>
             </xforms:trigger>

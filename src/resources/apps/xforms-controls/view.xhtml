@@ -21,6 +21,8 @@
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+	xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     lang="en">
 
     <xhtml:head>
@@ -82,7 +84,7 @@
                                       then current-date() + xdt:dayTimeDuration('P1D') >= xs:date(.)
                                       else false()"
                                       readonly="false()"
-                                      xxforms:default="adjust-date-to-timezone(current-date(), ())"/>
+                                      xxforms:default="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P2D'), ())"/>
                 <xforms:bind nodeset="time" type="xs:time" xxforms:default="current-time()" readonly="false()"/>
                 <xforms:bind nodeset="date-time" type="xs:dateTime" xxforms:default="current-dateTime()" readonly="false()"/>
                 <!--<xforms:bind nodeset="time" type="xs:time"/>-->
@@ -104,6 +106,8 @@
             <xforms:submission ref="instance('instance')" id="country-name-updated" validate="false"
                 method="post" action="services/countries" replace="instance" instance="countries-names-instance"/>
         </xforms:model>
+        <!-- Include custom Form Runner components -->
+        <xi:include href="oxf:/forms/orbeon/builder/form/custom-controls.xbl" xxi:omit-xml-base="true"/>
         <xhtml:style type="text/css">
             .input input { width: 20em; }
             .password { width: 20em; }
@@ -142,11 +146,11 @@
                 </xhtml:p>
                 <xhtml:p>
                     <xforms:input ref="date" navindex="4" class="datafield">
-                        <xforms:label class="fixed-width">Date:</xforms:label>
+                        <xforms:label class="fixed-width">Date field:</xforms:label>
                         <xforms:help>
-                                   <div>
+                            <div>
                                 <p>
-                                           This field must contain:
+                                    This field must contain:
                                 </p>
                                 <ul>
                                     <li>a valid date</li>
@@ -157,6 +161,22 @@
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
+                    <fr:date-picker ref="date" id="data-picker">
+                        <xforms:label class="fixed-width">Date picker:</xforms:label>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
+					</fr:date-picker>
+                </xhtml:p>
+                <xhtml:p>
                     <xforms:output ref="date" xxforms:format=".">
                         <xforms:label class="fixed-width">Date (native XML):</xforms:label>
                         <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
@@ -165,7 +185,7 @@
                 <xhtml:p>
                     <xforms:output ref="date" xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), '[FNn], le [D] [MNn] [Y]', 'fr', (), ()) else ()">
                         <xforms:label class="fixed-width">Date (in French):</xforms:label>
-                    <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
+                        <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>

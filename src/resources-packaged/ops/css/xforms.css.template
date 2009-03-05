@@ -140,6 +140,13 @@
     overflow: hidden;
 }
 
+/* Highlight of invalid input/textarea */
+/*
+.xforms-invalid .xforms-input-input, textarea.xforms-invalid,
+    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty
+        { border-color: orange }
+*/
+
 /* Default size for YUI RTE (seems to work!) */
 textarea.xforms-mediatype-text-html { width: 550px; height: 300px }
 
@@ -245,33 +252,33 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
  * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
  */
 
-    .xforms-case-selected {
-        visibility: visible;
-        position: static;
-    }
+.xforms-case-selected {
+    visibility: visible;
+    position: static;
+}
 
-    .xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
-        visibility: hidden;
-        position: absolute;
-    }
+.xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
+    visibility: hidden;
+    position: absolute;
+}
 
-    .xforms-case-begin-end {
-        display: none;
-    }
+.xforms-case-begin-end {
+    display: none;
+}
 
-    body #xforms-form .xforms-case-deselected tr td {
-        border: none;
-    }
+body #xforms-form .xforms-case-deselected tr td {
+    border: none;
+}
 
-    tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
-            th.xforms-case-deselected, .xforms-case-deselected th.xforms-case-selected,
-            td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selected {
-        display: none;
-    }
+tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
+        th.xforms-case-deselected, .xforms-case-deselected th.xforms-case-selected,
+        td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selected {
+    display: none;
+}
 
-    .xforms-case-deselected-subsequent {
-        display: none;
-    }
+.xforms-case-deselected-subsequent {
+    display: none;
+}
 
 
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
@@ -279,6 +286,7 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
 .xforms-upload-mediatype { padding-left: .5em; font-style: italic; }
 .xforms-upload-size { padding-left: .5em; }
 .xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
+.xforms-readonly .xforms-upload-remove { display: none }
 
 .xforms-dialog-appearance-minimal { visibility:hidden; border: 1px outset #eef; }
 .xforms-dialog-appearance-minimal .bd1 { border: 0; padding: 5px; background-color: #dde; margin: 0; }

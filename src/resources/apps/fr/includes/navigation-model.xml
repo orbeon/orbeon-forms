@@ -41,16 +41,18 @@
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
+    <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <xforms:submission id="fr-print-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
-        xxforms:target="_blank" xxforms:show-progress="false"/>
+        xxforms:show-progress="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
+    <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <xforms:submission id="fr-pdf-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}/?fr-language={xxforms:instance('fr-language-instance')}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
-        xxforms:target="_blank" xxforms:show-progress="false"/>
+        xxforms:show-progress="false"/>
 
     <!-- Go back to the Form Runner summary page -->
     <xforms:action ev:event="fr-goto-summary">

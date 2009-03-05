@@ -335,6 +335,10 @@
             </xforms:instance>
 
         </xforms:model>
+        <style type="text/css">
+            <!-- To prevent the first grid to become too tall -->
+            #image-output-control.xforms-mediatype-image { max-height: 200px }
+        </style>
     </head>
     <body>
         <fr:view>
@@ -363,7 +367,7 @@
                                 </xforms:input>
                             </fr:td>
                             <fr:td rowspan="3">
-                                <xforms:upload id="image-control" bind="image-bind" class="fr-attachment">
+                                <xforms:upload id="image-upload-control" bind="image-bind" class="fr-attachment">
                                     <xforms:label ref="$form-resources/image/label"/>
                                     <xforms:hint ref="$form-resources/image/hint"/>
                                     <xforms:help ref="$form-resources/image/help"/>
@@ -372,7 +376,7 @@
                                     <xforms:mediatype ref="@mediatype"/>
                                     <xxforms:size ref="@size"/>
                                 </xforms:upload>
-                                <xforms:output ref="image" mediatype="image/*"/>
+                                <xforms:output id="image-output-control" ref="image" mediatype="image/*"/>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>
@@ -425,7 +429,7 @@
                         <fr:tr>
                             <fr:td>
                                 <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
-                                    <xforms:label>Note</xforms:label>
+                                    <!--<xforms:label>Note</xforms:label>-->
                                     <fr:body>
                                         <fr:tr>
                                             <fr:td>

@@ -117,10 +117,10 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 .fr-explanation .xforms-output {
-    border: 3px solid orange;
     display: block;
     font-style: italic;
     padding: 1em;
+    background-color: #f8f8f8
 }
 
 .xforms-alert-active {

@@ -252,7 +252,7 @@
                 <save-locally>Sauvegarde Locale</save-locally>
                 <save-offline>Sauvegarde Or-ligne</save-offline>
                 <submit-document>Envoyer</submit-document>
-                <workflow-review>Revue</workflow-review>
+                <workflow-review>Valider</workflow-review>
                 <workflow-send>Envoyer</workflow-send>
                 <workflow-edit>Editer</workflow-edit>
                 <return>Retour</return>

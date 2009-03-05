@@ -105,11 +105,12 @@ public class XFormsContextStack {
         }
 
         // Add model variables for default model
-        if (xformsModel != null)
-            addVariables(pipelineContext, getCurrentBindingContext(), xformsModel);
+        if (xformsModel != null) {
+            addVariables(pipelineContext, xformsModel);
+        }
     }
 
-    private void addVariables(PipelineContext pipelineContext, BindingContext bindingContext, XFormsModel xformsModel) {
+    private void addVariables(PipelineContext pipelineContext, XFormsModel xformsModel) {
         int variablesCount = 0;
         // TODO: Check dirty flag to prevent needless re-evaluation
         for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); variablesCount++) {
@@ -118,7 +119,13 @@ public class XFormsContextStack {
             // All variables in the model are in scope for the nested binds and actions.
             // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
             final Variable variable = new Variable(containingDocument, this, currentVariableElement);
-            bindingContext.addVariable(variable.getVariableName(), variable.getVariableValue(pipelineContext, false));
+
+            // NOTE: We used to call bindingContext.addVariable() to add variables to the current binding context, but
+            // this could cause an issue because getVariableValue() can itself search for variables, and cause variables
+            // on the same bindingContext object to be cached down the line, therefore preventing further variables
+            // values to be added! The method below takes one more element on the stack, but it is safer.
+            pushVariable(currentVariableElement,variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+
         }
 
         if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
@@ -411,8 +418,8 @@ public class XFormsContextStack {
                 // variables in scope. We have to set them to the newly pushed BindingContext.
                 getCurrentBindingContext().setVariableInfo(variableInfo);
             } else if (isPushModelVariables) {
-                // In this case, the model just changed and so we gathered the variables in scope for this model.
-                addVariables(pipelineContext, getCurrentBindingContext(), newModel);
+                // In this case, the model just changed and so we gather the variables in scope for the new model
+                addVariables(pipelineContext, newModel);
             }
 //        } catch (Throwable e) {
             // TODO: handle dispatch of xforms-binding-exception

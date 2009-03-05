@@ -112,6 +112,9 @@
     background-position: right center;
     background-repeat: no-repeat;
 }
+
+.xforms-type-date img { vertical-align: middle; padding-left: .2em; }
+
 .xforms-input input.xforms-type-time {
     width: 8em;
     padding-right: 16px;

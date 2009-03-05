@@ -480,6 +480,7 @@
         <triggers xmlns="">
             <save/>
             <submit/>
+            <publish/>
             <workflow-review/>
             <workflow-edit/>
             <workflow-send/>
@@ -495,9 +496,16 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">
+        <!-- Condition for disabling Save button -->
         <xforms:bind nodeset="save" readonly="not(property('xxforms:noscript'))
             and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>
+        <!-- Condition for disabling Submit button -->
         <xforms:bind nodeset="submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <!-- Condition for disabling Publish button -->
+        <xforms:bind nodeset="publish" readonly="not(property('xxforms:noscript'))
+            and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-form-valid-instance') = 'false'"/>
+
+        <!-- Conditions for disabling workflow buttons -->
         <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
         <xforms:bind nodeset="workflow-edit" readonly="exforms:readonly(../submit)"/>
         <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../submit)"/>

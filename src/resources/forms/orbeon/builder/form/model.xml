@@ -279,8 +279,6 @@
             <new-language/>
             <new-language-trigger/>
 
-            <test-trigger/>
-            <publish-trigger/>
             <controls-triggers/>
             <sections-triggers/>
             <grids-triggers/>
@@ -290,11 +288,6 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fb-variables')">
-        <!-- Test is button is enabled when the instance is valid -->
-        <xforms:bind nodeset="test-trigger" readonly="xxforms:instance('fr-form-valid-instance') = 'false'"/>
-        <!-- Publish button is enabled when the data is clean AND the instance is valid -->
-        <xforms:bind nodeset="publish-trigger"
-                     readonly="not(xxforms:instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-form-valid-instance') = 'false'"/>
         <!-- When are toolbar controls triggers enabled -->
         <xforms:bind nodeset="controls-triggers"
                      readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]

@@ -58,6 +58,9 @@
         <valid xmlns="">true</valid>
     </xforms:instance>
 
+    <!-- Utility bind for triggers -->
+    <xforms:bind nodeset="instance('fr-form-valid-instance')" readonly="not(property('xxforms:noscript')) and . = 'false'"/>
+
     <!-- Handle "control visited" events on #fr-form-group -->
     <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
     <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->

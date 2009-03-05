@@ -220,6 +220,11 @@
                                     <fr:td/>
                                 </fr:tr>
                             </fr:grid>
+
+                            <!-- Stop value change propagation so changes in this section of the form don't cause data
+                                 to become dirty in fr-peristence-model -->
+                            <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
+
                         </xforms:group>
                     </xforms:case>
                     <xforms:case id="fb-editor-open-case">
@@ -844,7 +849,7 @@
                 <fr:clear-button/>
 
                 <!-- Test form -->
-                <xforms:trigger id="fb-test-button" model="fr-form-model" ref="instance('fb-variables')/test-trigger">
+                <xforms:trigger id="fb-test-button" model="fr-error-summary-model" ref="instance('fr-form-valid-instance')">
                     <xforms:label>
                         <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
@@ -853,7 +858,7 @@
                 </xforms:trigger>
 
                 <!-- Publish form -->
-                <xforms:trigger id="fb-publish-button" model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
+                <xforms:trigger id="fb-publish-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/world.png" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/publish"/></xhtml:span>

@@ -740,77 +740,67 @@
 
                 <!-- Custom buttons for the summary page -->
                 <xhtml:div class="fr-buttons fr-summary-buttons">
+
                     <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                        <!-- New button -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/new">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
-                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
-                        </xforms:trigger>
-                        <!-- Edit button -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit"/>
-                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-edit"/>
-                        </xforms:trigger>
-                        <!-- Print button (if not Form Builder) -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[not($is-form-builder)]">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/report.gif" alt="Print"/>
-                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-view"/>
-                        </xforms:trigger>
-                        <!-- PDF button (if not Form Builder) -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[not($is-form-builder)]">
-                            <xforms:label>
-                                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt="Print PDF"/>
-                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
-                        </xforms:trigger>
-                        <!-- Take offline -->
-                        <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'false') then . else ()">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/take-offline.gif" alt="Take offline"/>
-                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-offline"/>
-                        </xforms:trigger>
-                        <!-- Take online -->
-                        <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'true') then . else ()">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/take-online.gif" alt="Take online"/>
-                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-online"/>
-                        </xforms:trigger>
-                        <!-- Test button (if Form Builder) -->
-                        <!-- TODO -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[$is-form-builder]">
-                            <xforms:label>
-                                <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
-                                <xhtml:span>Test</xhtml:span>
-                            </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-test"/>
-                        </xforms:trigger>
-                        <!-- Delete button -->
-                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/delete">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
-                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
-                                    <xxforms:context name="document-id" select="instance('fr-summary-instance')/document[index('documents-repeat')]/@name"/>
-                                </xforms:dispatch>
-                                <xforms:send submission="search-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
+                        <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s')"/>
+                        <xforms:repeat nodeset="for $button in $buttons return xxforms:element('button', $button)">
+                            <xhtml:span>
+                                <!-- New button -->
+                                <xforms:trigger ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
+                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
+                                </xforms:trigger>
+                                <!-- Edit button -->
+                                <xforms:trigger ref="if (. = 'edit') then instance('fr-summary-triggers-instance')/edit else ()">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit"/>
+                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-edit"/>
+                                </xforms:trigger>
+                                <!-- Print button (if not Form Builder) -->
+                                <xforms:trigger ref="if (. = 'print') then instance('fr-summary-triggers-instance')/edit[not($is-form-builder)] else ()">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/report.gif" alt="Print"/>
+                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-view"/>
+                                </xforms:trigger>
+                                <!-- PDF button (if not Form Builder) -->
+                                <xforms:trigger ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/edit[not($is-form-builder)] else ()">
+                                    <xforms:label>
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt="Print PDF"/>
+                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
+                                </xforms:trigger>
+                                <!-- Test button (if Form Builder) -->
+                                <!-- TODO -->
+                                <xforms:trigger ref="if (. = 'test') then instance('fr-summary-triggers-instance')/edit[$is-form-builder] else ()">
+                                    <xforms:label>
+                                        <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
+                                        <xhtml:span>Test</xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-test"/>
+                                </xforms:trigger>
+                                <!-- Delete button -->
+                                <xforms:trigger ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
+                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
+                                            <xxforms:context name="document-id" select="instance('fr-summary-instance')/document[index('documents-repeat')]/@name"/>
+                                        </xforms:dispatch>
+                                        <xforms:send submission="search-submission"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </xhtml:span>
+                        </xforms:repeat>
                     </xforms:group>
 
                     <!-- TODO
@@ -820,6 +810,20 @@
                             <xforms:output ref="$fr-resources/summary/labels/view-xml"/>
                         </xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="fr-summary-xml"/>
+                    </xforms:trigger>
+                    <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'false') then . else ()">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/take-offline.gif" alt="Take offline"/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-offline"/>
+                    </xforms:trigger>
+                    <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'true') then . else ()">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/take-online.gif" alt="Take online"/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-online"/>
                     </xforms:trigger>
                     -->
                 </xhtml:div>

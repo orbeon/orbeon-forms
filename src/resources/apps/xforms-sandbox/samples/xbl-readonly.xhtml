@@ -1,0 +1,122 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL Component Inheriting Readonly</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="main-instance">
+                <values xmlns="">
+                    <value1/>
+                    <value2/>
+                </values>
+            </xforms:instance>
+            <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+        </xforms:model>
+        <xbl:xbl>
+            <xbl:binding id="fr-super-control-binding" element="fr|super-control">
+                <xbl:template>
+                    <xforms:model id="super-control-model">
+                        <xforms:instance id="super-control-instance">
+                            <value/>
+                        </xforms:instance>
+
+                        <!-- NOTE: This doesn't work properly because the binds are not re-evaluated when just the outer readonly MIP changes -->
+                        <xxforms:variable name="ctx" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                        <xforms:bind nodeset="." readonly="exforms:readonly($ctx)"/>
+
+                        <xforms:action ev:event="xforms-model-construct-done">
+
+                            <xforms:message xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                                Result from xxforms:component-context(): <xforms:output value="string-join(for $i in $ctx return name($i), ' - ')"/>
+                            </xforms:message>
+
+                        </xforms:action>
+                    </xforms:model>
+
+                    <xforms:group xbl:attr="ref bind" id="component-group">
+                        <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                        <xxforms:variable name="result" select="." as="node()?"/>
+
+                        <!-- React to update to bound node -->
+                        <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                            <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                                <xforms:setvalue model="super-control-model" ref="." value="$result"/>
+                            </xforms:action>
+                        </xforms:group>
+
+                        <!-- Local controls -->
+                        <xforms:group model="super-control-model" id="component-controls-group">
+                            
+                            <xforms:input ref="."/>
+
+                            <!-- React to update to local controls -->
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="$result" value="context()"/>
+                            </xforms:action>
+                        </xforms:group>
+
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:p>
+            This example shows how you can use XBL to propagate the readonly property to a local control value. When
+            changing value 2 to to "42", the two "Value 1" fields should become read-only.
+        </xhtml:p>
+        <xhtml:p>
+            NOTE: This doesn't work properly yet!
+        </xhtml:p>
+
+        <xhtml:hr/>
+
+        <fr:super-control ref="value1" id="fr-super-control-1">
+            <xforms:label>Internal value 1: </xforms:label>
+        </fr:super-control>
+
+        <xhtml:hr/>
+
+        <fr:super-control ref="value2" id="fr-super-control-2">
+            <xforms:label>Internal value 2: </xforms:label>
+        </fr:super-control>
+
+        <xhtml:hr/>
+
+        <xforms:input ref="value1">
+            <xforms:label>External value 1: </xforms:label>
+        </xforms:input>
+
+        <xhtml:hr/>
+
+        <xforms:input ref="value2">
+            <xforms:label>External value 2: </xforms:label>
+        </xforms:input>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

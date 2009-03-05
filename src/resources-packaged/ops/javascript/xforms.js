@@ -297,7 +297,7 @@ ORBEON.util.Dom = {
      * 2) This performs caching of element ids, so when the same element is requested many times in a row we'll be
      *    able to respond just by looking at the cache, instead of calling document.getElementById. This has a
      *    significant impact in particular when copying many repeat items on Firefox.
-     * 
+     *
      * NOTE: At the moment we do not remove element from this cache, e.g. when repeat iterations are removed. This mean
      * that getElementById() may return elements that are no longer in the main document.
      */
@@ -526,7 +526,7 @@ ORBEON.util.String = {
 
 /**
  * Utility functions dealing with dates and times.
- * 
+ *
  * Credits - This is based and inspired by:
  *     Simon Willison's Magic date parser (http://simon.incutio.com/archive/2003/10/06/betterDateInput)
  *     Stoyan Stefanov's Magic time parsing (http://www.phpied.com/javascript-time-input/)
@@ -1257,7 +1257,14 @@ ORBEON.xforms.Controls = {
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(inputValue);
             return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISOTime(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-            var inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+			var inputValue;
+			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+				inputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
+			}
+			else {
+				inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+			}
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputValue);
             return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISODate(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
@@ -1385,6 +1392,20 @@ ORBEON.xforms.Controls = {
             // Update classes on control
             ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
 
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
+            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
+            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
+            var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
+			} else {
+                var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                inputField.value = displayDate;
+			}
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
@@ -1410,16 +1431,8 @@ ORBEON.xforms.Controls = {
                     }
                 }
             }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
-            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
-            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
-            // Only update value if different from the one we have. This handle the case where the fields contain invalid 
+            // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
             // to separate into 2 values.
             if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
@@ -2374,7 +2387,7 @@ ORBEON.xforms.Events = {
                             }
                         }
                     }
-                } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-time") || ORBEON.util.Dom.hasClass(target, "xforms-type-date") || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
+                } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-time") || (ORBEON.util.Dom.hasClass(target, "xforms-type-date") && !ORBEON.util.Dom.hasClass(target, "xforms-input-appearance-minimal")) || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
 
                     // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value
 
@@ -2588,6 +2601,7 @@ ORBEON.xforms.Events = {
     },
 
     click: function(event) {
+        ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
         var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
 
@@ -3001,7 +3015,8 @@ ORBEON.xforms.Events = {
     },
 
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
-    ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed")
+    ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
+    clickEvent: new YAHOO.util.CustomEvent("clickEvent")
 };
 
 ORBEON.widgets.Base = function() {
@@ -3034,23 +3049,20 @@ ORBEON.widgets.JSCalendar = function() {
     function update(calendar) {
         if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
             // Change value in field from ISO to display value
-            var inputField = calendar.params.inputField;
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
-            inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
-            var element = inputField.parentNode;
+            var element;
+			if(! YAHOO.lang.isNull(calendar.params.inputField)) {
+                var inputField = calendar.params.inputField;
+                var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
+                inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+                element = inputField.parentNode;
+			} else {
+                var imageField = calendar.params.imageField;
+				imageField.alt = ORBEON.util.DateTime.jsDateToformatDisplayDate(calendar.date);
+                element = imageField.parentNode;
+			}
             var event = new ORBEON.xforms.Server.Event(null, element.id, null, ORBEON.xforms.Controls.getCurrentValue(element), "xxforms-value-change-with-focus-change");
             ORBEON.xforms.Server.fireEvents([event], false);
         }
-    }
-
-    /**
-     * Restore last value actualy selected by user in the input field, which at this point could
-     * contain a value the user just browsed to, without selecting it.
-     */
-    function close(calendar) {
-        var inputField = calendar.params.inputField;
-        var element = inputField.parentNode;
-        calendar.hide();
     }
 
     return {
@@ -3064,20 +3076,31 @@ ORBEON.widgets.JSCalendar = function() {
 
         click: function(event, target) {
             // Initialize calendar when needed
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
+            var firstChildElement = ORBEON.util.Dom.getChildElementByIndex(target, 0);
 
             // Setup calendar library
-            Calendar.setup({
-                inputField     :    inputField.id,
+            var calendarParameters = {
+                imageField : firstChildElement,
                 ifFormat       :    "%m/%d/%Y",
                 showsTime      :    false,
                 button         :    target.id,
                 singleClick    :    true,
                 step           :    1,
                 onUpdate       :    update,
-                onClose        :    close,
                 electric       :    false
-            });
+            };
+            if (ORBEON.util.Dom.hasClass(firstChildElement, "xforms-input-appearance-minimal")) {
+                // Store the reference to the image so we can then update the alt on the image when the user selects a date
+                calendarParameters["imageField"] = firstChildElement;
+                // Set initial date
+                var dateFromAlt = ORBEON.util.Dom.getAttribute(firstChildElement, "alt");
+                calendarParameters["date"] = dateFromAlt;
+            } else {
+                // Calendar uses input field to get the date from/to
+                calendarParameters["inputField"] = firstChildElement;
+            }
+            Calendar.setup(calendarParameters);
+
             // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
             var jsCalendarOnclick = target.onclick;
             target.onclick = null;
@@ -3114,30 +3137,26 @@ ORBEON.widgets.YUICalendar = function() {
         }
     };
 
+    /**
+     * State shared amongst all calendars
+     */
+
     // Set when the calendar is ceated the first time
     var yuiCalendar = null;
     var calendarDiv = null;
-
     // Set when the calendar is opened for a given control
     var control = null;
     var inputField = null;
-
-    // When calendar is in use, is the mouse in the calendar area
+    // When calendar is in use, if the mouse in the calendar area
     var mouseOverCalendar = false;
 
-    function hideCal() {
-        if (!over_cal) {
-            YAHOO.util.Dom.setStyle('cal1Container', 'display', 'none');
-        }
-    }
+    /**
+     * Private listeners
+     */
 
-    function mouseover() {
-        mouseOverCalendar = true;
-    }
-
-    function mouseout() {
-        mouseOverCalendar = false;
-    }
+    // Keep track of whether the mouse pointer is inside or outside the calendar area
+    function mouseover() { mouseOverCalendar = true;  }
+    function mouseout() { mouseOverCalendar = false; }
 
     // After the calendar is rendered, setup listeners on mouseover/mouseout
     function setupListeners() {
@@ -3149,6 +3168,8 @@ ORBEON.widgets.YUICalendar = function() {
     function dateSelected() {
         var jsDate = yuiCalendar.getSelectedDates()[0];
         inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+		if(ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal"))
+			inputField.alt = inputField.value;
         var event = new ORBEON.xforms.Server.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
         ORBEON.xforms.Server.fireEvents([event], false);
         closeCalendar();
@@ -3156,10 +3177,25 @@ ORBEON.widgets.YUICalendar = function() {
 
     // Hide calendar div and do some cleanup of private variables
     function closeCalendar() {
+        // Reset state
         control = null;
         inputField = null;
         mouseOverCalendar = false;
+        // Hide calendar
         YAHOO.util.Dom.setStyle(calendarDiv, "display", "none");
+        // Unsubscribe to global click
+        ORBEON.xforms.Events.clickEvent.unsubscribe(clickAnywhere);
+    }
+
+    // Listener on a click anywhere on the page, so we can close the calendar when we get a click on the background
+    function clickAnywhere(type, arguments) {
+        var event = arguments[0];
+        var originalTarget = YAHOO.util.Event.getTarget(event);
+        // Check if click was inside the date picker div
+        var calendarContainer = YAHOO.util.Dom.getAncestorByClassName(originalTarget, "yui-calcontainer");
+        // Close calendar if click was outside
+        if (YAHOO.lang.isNull(calendarContainer))
+            closeCalendar();
     }
 
     return {
@@ -3209,6 +3245,8 @@ ORBEON.widgets.YUICalendar = function() {
             var resources = RESOURCES[lang];
             for (var key in resources)
                 yuiCalendar.cfg.setProperty(key, resources[key]);
+            // Listen on clicks on the page, so we can close the dialog
+            ORBEON.xforms.Events.clickEvent.subscribe(clickAnywhere)
 
             // Set date
             control = target;
@@ -3224,8 +3262,6 @@ ORBEON.widgets.YUICalendar = function() {
                 yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
                 yuiCalendar.cfg.setProperty("pagedate", date, false);
             }
-            // This doesn't work, see above where we set the z-index on orbeon-calendar-div
-//            yuiCalendar.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
             yuiCalendar.cfg.applyConfig();
 
             // Show calendar
@@ -3318,7 +3354,7 @@ ORBEON.widgets.RTE = function() {
             // Transform text area into RTE on the page
             yuiRTE.on("afterRender", function() {
                 var rteContainer = control.parentNode;
-                rteContainer.className += " " + control.className;  
+                rteContainer.className += " " + control.className;
             });
             yuiRTE.render();
         },
@@ -3540,7 +3576,7 @@ ORBEON.xforms.Init = {
             formClientState: {},                 // Store for information we want to keep when the page is reloaded
             modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
             topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
-                ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered 
+                ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
         };
 
         // Initialize DOM methods based on browser
@@ -5043,7 +5079,7 @@ ORBEON.xforms.Server = {
                                             //     </span>
 
                                             // Get template
-                                            var template = ORBEON.util.Dom.hasClass(documentElement, "xforms-select") 
+                                            var template = ORBEON.util.Dom.hasClass(documentElement, "xforms-select")
                                                     ? ORBEON.util.Dom.getElementById("xforms-select-full-template")
                                                     : ORBEON.util.Dom.getElementById("xforms-select1-full-template");
                                             template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
@@ -5114,7 +5150,7 @@ ORBEON.xforms.Server = {
 
                                         // Save new value sent by server (upload controls don't carry their value the same way as other controls)
                                         var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
-                                        if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) 
+                                        if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload"))
                                             ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
 
                                         // Handle migration of control from non-static to static if needed
@@ -5277,7 +5313,7 @@ ORBEON.xforms.Server = {
                                             // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed
                                             // by handling this on the server-side with custom MIPS.
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") && relevant == null) {
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-visited"); 
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-visited");
                                                 if (ORBEON.util.Dom.hasClass(documentElement, "xforms-invalid"))
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-invalid-visited");
                                             }

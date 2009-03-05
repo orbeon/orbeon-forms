@@ -32,7 +32,7 @@
                 <!-- Do nothing -->
             </xforms:action>
 
-            <xforms:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/null" replace="instance">
+            <xforms:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/identity" replace="instance">
                 <xforms:action ev:event="xforms-submit-error">
                     <!-- Go back offline, as if the submission had failed -->
                     <xxforms:offline/>

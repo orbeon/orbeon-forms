@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -46,20 +46,24 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         final boolean isConcreteControl = inputControl != null;
 
         final String controlTypeName = (inputControl != null) ? inputControl.getBuiltinTypeName() : null;
-
+        final String appearance = inputControl.getAppearance();
 
         final boolean isDateTime;
+        final boolean isDateMinimal;
         final boolean isBoolean;
         if (!handlerContext.isTemplate()) {
             if (isConcreteControl) {
                 isDateTime = "dateTime".equals(controlTypeName);
+                isDateMinimal = "date".equals(controlTypeName) && "minimal".equals(appearance) ;
                 isBoolean = "boolean".equals(controlTypeName);
             } else {
                 isDateTime = false;
+                isDateMinimal = false;
                 isBoolean = false;
             }
         } else {
             isDateTime = false;
+            isDateMinimal = false;
             isBoolean = false;
         }
 
@@ -106,6 +110,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
+
             if (!handlerContext.isNewXHTMLLayout())
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
@@ -121,25 +126,31 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
-                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                            if(!isDateMinimal)
+                            	reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             // Use effective id for name of first field
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
-
                             final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
+                            final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
                             if (isConcreteControl) {
                                 // Output value only for concrete control
-                                final String inputValue = inputControl.getFirstValueUseFormat(pipelineContext);
-                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
+                            	if(!isDateMinimal) {
+                                    reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, formattedValue);
+                            	}
 
                                 final String firstType = inputControl.getFirstValueType();
                                 if (firstType != null) {
                                     inputClasses.append(" xforms-type-");
                                     inputClasses.append(firstType);
                                 }
+                                if(appearance != null) {
+                                	inputClasses.append(" xforms-input-appearance-");
+                                	inputClasses.append(appearance);
+                                }
 
                                 // Output xxforms:* extension attributes
                                 inputControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                
+
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }
@@ -150,9 +161,18 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             // Handle accessibility attributes
                             handleAccessibilityAttributes(attributes, reusableAttributes);
-
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                            if(isDateMinimal) {
+                            	final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                            	reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
+                            	reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
+                            	reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, formattedValue);
+                            	contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
+	                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+                            }
+                            else {
+	                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+	                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                            }
                         }
 
                         // Add second field for dateTime's time part
@@ -163,7 +183,9 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
-                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                            reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
+                            reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
+                            reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");
                             // TODO: Is this an appropriate name? Noscript must be able to find this
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
 

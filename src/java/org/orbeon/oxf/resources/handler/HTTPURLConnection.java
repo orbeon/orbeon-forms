@@ -164,22 +164,25 @@ public class HTTPURLConnection extends URLConnection {
             if (method == null)
                 method = new GetMethod(url.toString());
 
-            // Set headers
+            // Set all headers
+            // NOTE: Do headers first so we can benefit from method.removeRequestHeader () and method.getRequestHeader() later
             for (Iterator i = requestProperties.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String currentHeaderName = (String) currentEntry.getKey();
-                // NOTE: don't forward the authorization header if the username is blank
-                if (!"authorization".equals(currentHeaderName) || (userinfo == null && username == null)) {
-                    final String[] currentHeaderValues = (String[]) currentEntry.getValue();
-                    for (int j = 0; j < currentHeaderValues.length; j++) {
-                        final String currentHeaderValue = currentHeaderValues[j];
-                        method.addRequestHeader(currentHeaderName, currentHeaderValue);
-                    }
+                final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+
+                for (int j = 0; j < currentHeaderValues.length; j++) {
+                    final String currentHeaderValue = currentHeaderValues[j];
+                    method.addRequestHeader(currentHeaderName, currentHeaderValue);
                 }
             }
 
+            // If there is some user authentication specified so remove Authorization header if present
+            if (userinfo != null || username != null) {
+                method.removeRequestHeader("Authorization");// header names are case-insensitive for comparison
+            }
+
             // Create request entity with body
-            // NOTE: Do headers first so we can benefit from method.getRequestHeader() below
             if (requestBody != null && method instanceof EntityEnclosingMethod) {
                 final Header contentTypeHeader = method.getRequestHeader("Content-Type");// header names are case-insensitive for comparison
                 if (contentTypeHeader == null)

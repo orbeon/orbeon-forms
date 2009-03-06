@@ -20,7 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -45,8 +46,10 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
     /**
      * This simulates a POST or a PUT.
+     *
+     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] headerNames) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] headerNames, Map headerNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
@@ -54,22 +57,24 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         this.mediaType = mediaType;
         this.messageBody = messageBody;
 
-        initializeHeaders(request, headerNames);
+        initializeHeaders(request, headerNames, headerNameValues);
     }
 
     /**
      * This simulates a GET.
+     *
+     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] headerNames) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] headerNames, Map headerNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
 
-        initializeHeaders(request, headerNames);
+        initializeHeaders(request, headerNames, headerNameValues);
     }
 
-    private void initializeHeaders(ExternalContext.Request request, String[] headerNames) {
+    private void initializeHeaders(ExternalContext.Request request, String[] headerNames, Map headerNameValues) {
         /**
          * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
          * we only pass 2 headers:
@@ -81,20 +86,35 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
          * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
          */
         {
-            this.headerMap = new HashMap();
+            this.headerMap = new LinkedHashMap();
+            this.headerValuesMap = new LinkedHashMap();
+
             final Map requestHeaderMap = request.getHeaderMap();
+            final Map requestHeaderValuesMap = request.getHeaderValuesMap();
 
-            this.headerValuesMap = new HashMap();
-            Map requestHeaderValuesMap = request.getHeaderValuesMap();
-
+            // Handle headers to forward
             for (int i = 0; i < headerNames.length; i++) {
                 final String currentHeaderName = headerNames[i];
 
                 final Object v1 = requestHeaderMap.get(currentHeaderName);
-                if (v1 != null) headerMap.put(currentHeaderName, v1);
+                if (v1 != null)
+                    headerMap.put(currentHeaderName, v1);
 
                 final Object v2 = requestHeaderValuesMap.get(currentHeaderName);
-                if (v2 != null) headerValuesMap.put(currentHeaderName, v2);
+                if (v2 != null)
+                    headerMap.put(currentHeaderName, v2);
+            }
+
+            // Handle custom headers. Those override existing headers if any.
+            if (headerNameValues != null) {
+                for (Iterator i = headerNameValues.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String currentHeaderName = (String) currentEntry.getKey();
+                    final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+
+                    headerMap.put(currentHeaderName, currentHeaderValues[0]);
+                    headerValuesMap.put(currentHeaderName, currentHeaderValues);
+                }
             }
         }
     }
@@ -135,8 +155,9 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     }
 
     public InputStream getInputStream() throws IOException {
-        if (inputStream == null && messageBody != null) {
-            inputStream = new ByteArrayInputStream(messageBody);
+        if (inputStream == null) {
+            // NOTE: Provide an empty stream if there is no body because calle might assume InputStream is non-null
+            inputStream = new ByteArrayInputStream((messageBody != null) ? messageBody : new byte[] {});
         }
 
         return inputStream;

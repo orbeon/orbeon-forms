@@ -3391,5 +3391,130 @@
         </output>
     </test>
 
+    <test description="XBL component with local model variables" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:exforms="http://www.exforms.org/exf/1-0">
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                        <values xmlns="">
+                                            <value1>foo-value</value1>
+                                            <value2>bar-value</value2>
+                                        </values>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+                                </xforms:model>
+                                <xbl:xbl>
+                                    <xbl:binding id="fr-super-control-binding" element="fr|super-control">
+                                        <xbl:template>
+                                            <xforms:model id="super-control-model">
+                                                <xforms:instance id="super-control-instance">
+                                                    <instance xmlns="">
+                                                        <value/>
+                                                        <name/>
+                                                    </instance>
+                                                </xforms:instance>
+                                                <!-- TEST: The variable below must be found and not cause an error -->
+                                                <xxforms:variable name="ctx" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                                                <xforms:bind nodeset="value" readonly="exforms:readonly($ctx)"/>
+                                                <!-- TEST: The variable must point to the outer element -->
+                                                <xforms:bind nodeset="name" calculate="name($ctx[1])"/>
+                                            </xforms:model>
+
+                                            <xforms:group xbl:attr="ref bind" id="component-group">
+                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                                                <xxforms:variable name="result" select="." as="node()?"/>
+
+                                                <!-- React to update to bound node -->
+                                                <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                                                    <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                                                        <xforms:setvalue model="super-control-model" ref="value" value="$result"/>
+                                                    </xforms:action>
+                                                </xforms:group>
+
+                                                <!-- Local controls -->
+                                                <xforms:group model="super-control-model" id="component-controls-group">
+
+                                                    <xforms:input ref="value"/>
+
+                                                    <!-- React to update to local controls -->
+                                                    <xforms:action ev:event="xforms-value-changed">
+                                                        <xforms:setvalue ref="$result" value="context()/value"/>
+                                                    </xforms:action>
+                                                </xforms:group>
+
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <fr:super-control ref="value1" id="fr-super-control-1">
+                                    <xforms:label>Internal value 1: </xforms:label>
+                                </fr:super-control>
+                                <fr:super-control ref="value2" id="fr-super-control-2">
+                                    <xforms:label>Internal value 2: </xforms:label>
+                                </fr:super-control>
+                                <xforms:input ref="value1" id="input-1">
+                                    <xforms:label>External value 1: </xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="value2" id="input-2">
+                                    <xforms:label>External value 2: </xforms:label>
+                                </xforms:input>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <values>
+                                    <value1>foo-value</value1>
+                                    <value2>bar-value</value2>
+                                </values>
+                            </instance>
+                            <instance id="super-control-instance" model-id="fr-super-control-1$super-control-model">
+                                <instance>
+                                    <value>foo-value</value>
+                                    <name>value1</name>
+                                </instance>
+                            </instance>
+                            <instance id="super-control-instance" model-id="fr-super-control-2$super-control-model">
+                                <instance>
+                                    <value>bar-value</value>
+                                    <name>value2</name>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="fr-super-control-1$component-group" label="Internal value 1: "/>
+                        <xxf:control id="fr-super-control-1$xforms-element-13">foo-value</xxf:control>
+                        <xxf:control id="fr-super-control-2$component-group" label="Internal value 2: "/>
+                        <xxf:control id="fr-super-control-2$xforms-element-13">bar-value</xxf:control>
+                        <xxf:control id="input-1" label="External value 1: ">foo-value</xxf:control>
+                        <xxf:control id="input-2" label="External value 2: ">bar-value</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

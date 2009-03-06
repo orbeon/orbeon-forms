@@ -46,7 +46,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         final boolean isConcreteControl = inputControl != null;
 
         final String controlTypeName = (inputControl != null) ? inputControl.getBuiltinTypeName() : null;
-        final String appearance = inputControl.getAppearance();
+        final String appearance = inputControl == null ? null : inputControl.getAppearance();
 
         final boolean isDateTime;
         final boolean isDateMinimal;

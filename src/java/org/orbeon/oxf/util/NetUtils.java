@@ -1214,7 +1214,7 @@ public class NetUtils {
                     if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                         // Only forward Authorization header if there is no username provided
                         indentedLogger.logDebug("connection", "forwarding header",
-                            new String[] { "name", currentHeaderName, "value", Arrays.toString(currentIncomingHeaderValues) });
+                            new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValues.toString() });
                         NetUtils.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
                     } else {
                         // Just log this information

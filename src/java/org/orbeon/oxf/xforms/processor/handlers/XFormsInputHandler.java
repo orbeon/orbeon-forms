@@ -126,26 +126,30 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
-                            if(!isDateMinimal)
-                            	reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                            if (!isDateMinimal)
+                                reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             // Use effective id for name of first field
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
                             final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
-                            final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
                             if (isConcreteControl) {
                                 // Output value only for concrete control
-                            	if(!isDateMinimal) {
+                                final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
+                                if (!isDateMinimal) {
+                                    // Regular case, value goes to input control
                                     reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, formattedValue);
-                            	}
+                                } else {
+                                    // "Minimal date", value goes to @alt attribute on image
+                                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, formattedValue);
+                                }
 
                                 final String firstType = inputControl.getFirstValueType();
                                 if (firstType != null) {
                                     inputClasses.append(" xforms-type-");
                                     inputClasses.append(firstType);
                                 }
-                                if(appearance != null) {
-                                	inputClasses.append(" xforms-input-appearance-");
-                                	inputClasses.append(appearance);
+                                if (appearance != null) {
+                                    inputClasses.append(" xforms-input-appearance-");
+                                    inputClasses.append(appearance);
                                 }
 
                                 // Output xxforms:* extension attributes
@@ -161,17 +165,16 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             // Handle accessibility attributes
                             handleAccessibilityAttributes(attributes, reusableAttributes);
-                            if(isDateMinimal) {
-                            	final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                            	reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
-                            	reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
-                            	reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, formattedValue);
-                            	contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
-	                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-                            }
-                            else {
-	                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-	                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                            if (isDateMinimal) {
+                                final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                                reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
+                                reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
+
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+                            } else {
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
                             }
                         }
 

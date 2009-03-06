@@ -40,6 +40,9 @@
             <xxforms:variable name="form-query" select="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xxforms:variable name="initial-app-value" select="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
 
+            <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
+            <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
+
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Store resources from configuration instance -->
@@ -393,346 +396,350 @@
             <xforms:label>Orbeon Form Runner</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
-                <xforms:group class="fr-summary-search">
+                <xforms:group appearance="xxforms:internal">
+                    <!-- Stop value change propagation so changes in this section of the form don't cause data
+                         to become dirty in fr-peristence-model -->
+                    <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
 
-                    <!-- Free-text search -->
-                    <xforms:input ref="instance('fr-search-instance')/query" class="fr-search-input">
-                        <xforms:label ref="$fr-resources/summary/labels/free-search"/>
-                    </xforms:input>
+                    <xforms:group class="fr-summary-search">
 
-                    <!-- Send search -->
-                    <xforms:trigger id="fr-search-trigger">
-                        <xforms:label>
-                            <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt="Search" title="Search"/>
-                            <xhtml:span>Search</xhtml:span>
-                        </xforms:label>
-                    </xforms:trigger>
+                        <!-- Free-text search -->
+                        <xforms:input ref="instance('fr-search-instance')/query" class="fr-search-input">
+                            <xforms:label ref="$fr-resources/summary/labels/free-search"/>
+                        </xforms:input>
 
-                    <xforms:group ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
+                        <!-- Send search -->
+                        <xforms:trigger id="fr-search-trigger">
+                            <xforms:label>
+                                <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt="Search" title="Search"/>
+                                <xhtml:span>Search</xhtml:span>
+                            </xforms:label>
+                        </xforms:trigger>
 
-                        <p>
-                        - or -
-                        </p>
+                        <xforms:group ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
 
-                        <!-- Special form builder search: use input or select1 for app/form name -->
-                        <xforms:group ref=".[$is-form-builder and $has-roles]" class="fr-summary-search-items">
-                            <div class="fr-summary-search-item">
-                                <!-- Application -->
-                                <xforms:group ref="$app-query">
-                                    <xxforms:variable name="control-name" select="@name" as="xs:string"/>
-                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
-                                    <!-- Use an input if app name is a wildcard -->
-                                    <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                                    <xforms:input ref=".[$is-input]">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <xforms:select1 ref=".[not($is-input)]">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                        <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
-                                            <xforms:label ref="@name"/>
-                                            <xforms:value ref="@name"/>
-                                        </xforms:itemset>
+                            <p>
+                            - or -
+                            </p>
 
-                                        <xforms:action ev:event="xforms-value-changed">
-                                            <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
-                                            <xforms:setvalue ref="$form-query"/>
-                                            <!-- Update search results when selection changes (recalculate is done automatically as well) -->
-                                            <xforms:send submission="search-submission"/>
-                                        </xforms:action>
-                                    </xforms:select1>
-                                </xforms:group>
-                            </div>
-                            <div class="fr-summary-search-item">
-                                <!-- Form -->
-                                <xforms:group ref="$form-query">
-                                    <xxforms:variable name="control-name" select="@name" as="xs:string"/>
-                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
-                                    <xxforms:variable name="current-app" select="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
-                                    <!-- Use an input if app name or form name is a wildcard -->
-                                    <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
-                                    <xforms:input ref=".[$is-input]">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <xforms:select1 ref=".[not($is-input)]">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                        <xforms:itemset nodeset="$current-app/form">
-                                            <xforms:label ref="@name"/>
-                                            <xforms:value ref="@name"/>
-                                        </xforms:itemset>
+                            <!-- Special form builder search: use input or select1 for app/form name -->
+                            <xforms:group ref=".[$is-form-builder and $has-roles]" class="fr-summary-search-items">
+                                <div class="fr-summary-search-item">
+                                    <!-- Application -->
+                                    <xforms:group ref="$app-query">
+                                        <xxforms:variable name="control-name" select="@name" as="xs:string"/>
+                                        <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                        <!-- Use an input if app name is a wildcard -->
+                                        <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                        <xforms:input ref=".[$is-input]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <xforms:select1 ref=".[not($is-input)]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                            <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
+                                                <xforms:label ref="@name"/>
+                                                <xforms:value ref="@name"/>
+                                            </xforms:itemset>
 
-                                        <!-- Update search results when selection changes -->
-                                        <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
-                                    </xforms:select1>
-                                </xforms:group>
-                            </div>
+                                            <xforms:action ev:event="xforms-value-changed">
+                                                <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
+                                                <xforms:setvalue ref="$form-query"/>
+                                                <!-- Update search results when selection changes (recalculate is done automatically as well) -->
+                                                <xforms:send submission="search-submission"/>
+                                            </xforms:action>
+                                        </xforms:select1>
+                                    </xforms:group>
+                                </div>
+                                <div class="fr-summary-search-item">
+                                    <!-- Form -->
+                                    <xforms:group ref="$form-query">
+                                        <xxforms:variable name="control-name" select="@name" as="xs:string"/>
+                                        <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                        <xxforms:variable name="current-app" select="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
+                                        <!-- Use an input if app name or form name is a wildcard -->
+                                        <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                        <xforms:input ref=".[$is-input]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <xforms:select1 ref=".[not($is-input)]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                            <xforms:itemset nodeset="$current-app/form">
+                                                <xforms:label ref="@name"/>
+                                                <xforms:value ref="@name"/>
+                                            </xforms:itemset>
+
+                                            <!-- Update search results when selection changes -->
+                                            <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+                                        </xforms:select1>
+                                    </xforms:group>
+                                </div>
+                            </xforms:group>
+
+                            <!-- Structured search over query terms that have search-field set to 'true' -->
+                            <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
+                                <xxforms:variable name="control-name" select="@name"/>
+                                <div class="fr-summary-search-item">
+                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
+
+                                    <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
+                                        <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
+
+                                        <!-- input -->
+                                        <xforms:input ref=".[@control = 'input']">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <!-- textarea -->
+                                        <xforms:input ref=".[@control = 'textarea']">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <!-- select1 -->
+                                        <xforms:select1 ref=".[@control = 'select1']">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                            <xforms:item>
+                                                <xforms:label ref="$fr-resources/summary/labels/any"/>
+                                                <xforms:value/>
+                                            </xforms:item>
+                                            <xforms:itemset model="fr-persistence-model"
+                                                            nodeset="$form-resources/*[local-name() = $control-name]/item"
+                                                            xxforms:refresh-items="false">
+                                                <xforms:label ref="label"/>
+                                                <xforms:value ref="value"/>
+                                            </xforms:itemset>
+                                        </xforms:select1>
+                                    </xforms:group>
+                                </div>
+                            </xforms:repeat>
                         </xforms:group>
 
-                        <!-- Structured search over query terms that have search-field set to 'true' -->
-                        <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
-                            <xxforms:variable name="control-name" select="@name"/>
-                            <div class="fr-summary-search-item">
-                                <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
+                        <!-- Search also when user presses "enter" in a field -->
+                        <xforms:send ev:event="DOMActivate" submission="search-submission"/>
 
-                                <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
-                                    <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
-
-                                    <!-- input -->
-                                    <xforms:input ref=".[@control = 'input']">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <!-- textarea -->
-                                    <xforms:input ref=".[@control = 'textarea']">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <!-- select1 -->
-                                    <xforms:select1 ref=".[@control = 'select1']">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                        <xforms:item>
-                                            <xforms:label ref="$fr-resources/summary/labels/any"/>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset model="fr-persistence-model"
-                                                        nodeset="$form-resources/*[local-name() = $control-name]/item"
-                                                        xxforms:refresh-items="false">
-                                            <xforms:label ref="label"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xforms:group>
-                            </div>
-                        </xforms:repeat>
+                        <div class="fr-clear"/>
                     </xforms:group>
 
-                    <!-- Search also when user presses "enter" in a field -->
-                    <xforms:send ev:event="DOMActivate" submission="search-submission"/>
+                    <xforms:group ref="instance('fr-summary-instance')">
 
-                    <div class="fr-clear"/>
-                </xforms:group>
+                        <xforms:group ref=".[document]">
+                            <!-- Display welcome message -->
+                            <xforms:output mediatype="text/html"
+                                           value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
+                                           class="fr-summary-welcome-message"/>
+                        </xforms:group>
 
-                <xforms:group ref="instance('fr-summary-instance')">
-
-                    <xforms:group ref=".[document]">
-                        <!-- Display welcome message -->
-                        <xforms:output mediatype="text/html"
-                                       value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
-                                       class="fr-summary-welcome-message"/>
-                    </xforms:group>
-
-                    <xforms:group ref="instance('fr-paging-instance')[search-total != total]" class="fr-summary-search-count">
-                        <xforms:output value="$fr-resources/summary/titles/search-1"/>
-                        <xforms:output value="instance('fr-paging-instance')/search-total"/>
-                        <xforms:output value="$fr-resources/summary/titles/of"/>
-                        <xforms:output value="instance('fr-paging-instance')/total"/>
-                        <xforms:output value="$fr-resources/summary/titles/search-2"/>
-                    </xforms:group>
-
-                    <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
-                    <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
-                    <xxforms:variable name="show-created" select="xxforms:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
-                    <xxforms:variable name="show-last-modified" select="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
-
-                    <div class="fr-summary-table-div">
-                        <table class="fr-summary-table">
-                            <thead>
-                                <tr>
-                                    <th class="fr-summary-repeat-column-number"><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
-                                    <xforms:group ref="if ($show-created) then . else ()">
-                                        <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
-                                    </xforms:group>
-                                    <xforms:group ref="if ($show-last-modified) then . else ()">
-                                        <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
-                                    </xforms:group>
-                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
-                                        <th>
-                                            <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
-                                            <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
-                                            <!-- control to make data accessible to JavaScript -->
-                                            <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
-                                            <!-- Output showing as the header of the column -->
-                                            <xforms:output value="if (exists($resource)) then $resource/label else concat('[', $resourceId, ']')"/>
-
-                                        </th>
-                                    </xforms:repeat>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <xforms:repeat nodeset="document" id="documents-repeat">
-                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
-
-                                    <tr>
-                                        <!--<td>-->
-                                            <!--<xforms:select appearance="full" ref="instance('fr-selection-instance')">-->
-                                                <!--<xforms:item>-->
-                                                    <!--<xforms:label/>-->
-                                                    <!--<xforms:value value="concat('v', $position)"/>-->
-                                                <!--</xforms:item>-->
-                                            <!--</xforms:select>-->
-                                        <!--</td>-->
-                                        <xforms:group appearance="xxforms:internal">
-                                            <!-- Upon focus on the row, edit document -->
-                                            <!--<xforms:dispatch ev:event="DOMFocusIn" target="fr-form-model" name="fr-summary-edit"/>-->
-
-                                            <td class="fr-summary-repeat-column-number">
-                                                <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
-                                                <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
-                                                <!-- Expose to JavaScript name of this form -->
-                                                <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
-
-                                                <!-- Just output the number -->
-                                                <xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
-                                                <!-- Trigger to select the row in noscript mode -->
-                                                <xforms:trigger ref=".[property('xxforms:noscript')]">
-                                                    <xforms:label value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
-                                                </xforms:trigger>
-                                            </td>
-                                            <xforms:group ref="if ($show-created) then @created else ()">
-                                                <td>
-                                                    <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                </td>
-                                            </xforms:group>
-                                            <xforms:group ref="if ($show-last-modified) then @last-modified else ()">
-                                                <td>
-                                                    <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                </td>
-                                            </xforms:group>
-                                            <xforms:repeat nodeset="details/detail" id="document-details-repeat">
-                                                <td>
-                                                    <!-- control to make data accessible to JavaScript -->
-                                                    <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
-
-                                                    <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
-                                                    <xxforms:variable name="control" select="$query/@control" as="xs:string"/>
-                                                    <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
-
-                                                    <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
-                                                    <xforms:output value="
-                                                        if ($control = 'textarea') then
-                                                            if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
-                                                        else if ($control = 'select') then
-                                                            string-join(for $v in tokenize(., '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
-                                                        else if ($control = 'select1') then
-                                                            for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
-                                                        else
-                                                            if ($type = 'date') then
-                                                                (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                            else if ($type = 'time') then
-                                                                (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                            else if ($type = 'dateTime') then
-                                                                (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                            else if ($type = 'dayTimeDuration') then
-                                                                (
-                                                                    if (. castable as xs:dayTimeDuration) then
-                                                                        string-join(
-                                                                            (
-                                                                                if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
-                                                                                if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
-                                                                                if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
-                                                                                if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
-                                                                             ), ' '
-                                                                        )
-                                                                    else .
-                                                                )
-                                                            else ."/>
-                                                </td>
-                                            </xforms:repeat>
-                                        </xforms:group>
-                                    </tr>
-                                </xforms:repeat>
-                                <xforms:group ref=".[not(document)]">
-                                    <tr>
-                                        <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary'])}">
-                                            <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
-                                        </td>
-                                    </tr>
-                                </xforms:group>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!--<p>-->
-                        <!--<xforms:output value="$fr-resources/summary/titles/selected"/>:-->
-                        <!--<xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>-->
-                        <!--<xforms:output value="$fr-resources/summary/titles/of"/>-->
-                        <!--<xforms:output value="instance('fr-paging-instance')/total"/>-->
-                    <!--</p>-->
-
-                    <div class="fr-paging-buttons">
-                        <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
-                                <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/first"/></xhtml:span>-->
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-                                <xforms:setindex repeat="documents-repeat" index="1"/>
-                                <xforms:send submission="search-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
-
-                        <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
-                                <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>-->
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
-                                <xforms:setindex repeat="documents-repeat" index="1"/>
-                                <xforms:send submission="search-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
-
-                        <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
-                            <!-- Some results -->
-                            <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
-                            <xforms:output value="$fr-resources/summary/titles/to"/>
-                            <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
-                            <xforms:output value="$fr-resources/summary/titles/of"/>
+                        <xforms:group ref="instance('fr-paging-instance')[search-total != total]" class="fr-summary-search-count">
+                            <xforms:output value="$fr-resources/summary/titles/search-1"/>
                             <xforms:output value="instance('fr-paging-instance')/search-total"/>
+                            <xforms:output value="$fr-resources/summary/titles/of"/>
+                            <xforms:output value="instance('fr-paging-instance')/total"/>
+                            <xforms:output value="$fr-resources/summary/titles/search-2"/>
                         </xforms:group>
-                        <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
-                            <!-- No results -->
-                        </xforms:group>
 
-                        <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
-                            <xforms:label>
-                                <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
-                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
-                                <xforms:setindex repeat="documents-repeat" index="1"/>
-                                <xforms:send submission="search-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
+                        <xxforms:variable name="show-created" select="xxforms:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
+                        <xxforms:variable name="show-last-modified" select="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
-                        <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
-                            <xforms:label>
-                                <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->
-                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
-                                <xforms:setindex repeat="documents-repeat" index="1"/>
-                                <xforms:send submission="search-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </div>
+                        <div class="fr-summary-table-div">
+                            <table class="fr-summary-table">
+                                <thead>
+                                    <tr>
+                                        <th class="fr-summary-repeat-column-number"><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
+                                        <xforms:group ref="if ($show-created) then . else ()">
+                                            <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
+                                        </xforms:group>
+                                        <xforms:group ref="if ($show-last-modified) then . else ()">
+                                            <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
+                                        </xforms:group>
+                                        <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                        <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
+                                            <th>
+                                                <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
+                                                <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
+                                                <!-- control to make data accessible to JavaScript -->
+                                                <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
+                                                <!-- Output showing as the header of the column -->
+                                                <xforms:output value="if (exists($resource)) then $resource/label else concat('[', $resourceId, ']')"/>
 
+                                            </th>
+                                        </xforms:repeat>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <xforms:repeat nodeset="document" id="documents-repeat">
+                                        <xxforms:variable name="position" select="position()" as="xs:integer"/>
+
+                                        <tr>
+                                            <!--<td>-->
+                                                <!--<xforms:select appearance="full" ref="instance('fr-selection-instance')">-->
+                                                    <!--<xforms:item>-->
+                                                        <!--<xforms:label/>-->
+                                                        <!--<xforms:value value="concat('v', $position)"/>-->
+                                                    <!--</xforms:item>-->
+                                                <!--</xforms:select>-->
+                                            <!--</td>-->
+                                            <xforms:group appearance="xxforms:internal">
+                                                <!-- Upon focus on the row, edit document -->
+                                                <!--<xforms:dispatch ev:event="DOMFocusIn" target="fr-form-model" name="fr-summary-edit"/>-->
+
+                                                <td class="fr-summary-repeat-column-number">
+                                                    <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
+                                                    <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
+                                                    <!-- Expose to JavaScript name of this form -->
+                                                    <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
+
+                                                    <!-- Just output the number -->
+                                                    <xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                                    <!-- Trigger to select the row in noscript mode -->
+                                                    <xforms:trigger ref=".[property('xxforms:noscript')]">
+                                                        <xforms:label value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                                    </xforms:trigger>
+                                                </td>
+                                                <xforms:group ref="if ($show-created) then @created else ()">
+                                                    <td>
+                                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                    </td>
+                                                </xforms:group>
+                                                <xforms:group ref="if ($show-last-modified) then @last-modified else ()">
+                                                    <td>
+                                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                    </td>
+                                                </xforms:group>
+                                                <xforms:repeat nodeset="details/detail" id="document-details-repeat">
+                                                    <td>
+                                                        <!-- control to make data accessible to JavaScript -->
+                                                        <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
+
+                                                        <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
+                                                        <xxforms:variable name="control" select="$query/@control" as="xs:string"/>
+                                                        <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
+
+                                                        <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
+                                                        <xforms:output value="
+                                                            if ($control = 'textarea') then
+                                                                if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
+                                                            else if ($control = 'select') then
+                                                                string-join(for $v in tokenize(., '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                            else if ($control = 'select1') then
+                                                                for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
+                                                            else
+                                                                if ($type = 'date') then
+                                                                    (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                else if ($type = 'time') then
+                                                                    (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                else if ($type = 'dateTime') then
+                                                                    (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                else if ($type = 'dayTimeDuration') then
+                                                                    (
+                                                                        if (. castable as xs:dayTimeDuration) then
+                                                                            string-join(
+                                                                                (
+                                                                                    if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
+                                                                                    if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
+                                                                                    if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
+                                                                                    if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
+                                                                                 ), ' '
+                                                                            )
+                                                                        else .
+                                                                    )
+                                                                else ."/>
+                                                    </td>
+                                                </xforms:repeat>
+                                            </xforms:group>
+                                        </tr>
+                                    </xforms:repeat>
+                                    <xforms:group ref=".[not(document)]">
+                                        <tr>
+                                            <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary'])}">
+                                                <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                                            </td>
+                                        </tr>
+                                    </xforms:group>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--<p>-->
+                            <!--<xforms:output value="$fr-resources/summary/titles/selected"/>:-->
+                            <!--<xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>-->
+                            <!--<xforms:output value="$fr-resources/summary/titles/of"/>-->
+                            <!--<xforms:output value="instance('fr-paging-instance')/total"/>-->
+                        <!--</p>-->
+
+                        <div class="fr-paging-buttons">
+                            <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
+                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/first"/></xhtml:span>-->
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                    <xforms:setindex repeat="documents-repeat" index="1"/>
+                                    <xforms:send submission="search-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+
+                            <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
+                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>-->
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
+                                    <xforms:setindex repeat="documents-repeat" index="1"/>
+                                    <xforms:send submission="search-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+
+                            <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                                <!-- Some results -->
+                                <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
+                                <xforms:output value="$fr-resources/summary/titles/to"/>
+                                <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
+                                <xforms:output value="$fr-resources/summary/titles/of"/>
+                                <xforms:output value="instance('fr-paging-instance')/search-total"/>
+                            </xforms:group>
+                            <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                                <!-- No results -->
+                            </xforms:group>
+
+                            <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                                <xforms:label>
+                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
+                                    <xforms:setindex repeat="documents-repeat" index="1"/>
+                                    <xforms:send submission="search-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+
+                            <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                                <xforms:label>
+                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
+                                    <xforms:setindex repeat="documents-repeat" index="1"/>
+                                    <xforms:send submission="search-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </div>
+
+                    </xforms:group>
                 </xforms:group>
 
             </fr:body>

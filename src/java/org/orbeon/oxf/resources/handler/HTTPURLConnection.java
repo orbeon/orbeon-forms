@@ -33,6 +33,7 @@ import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.util.NetUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class HTTPURLConnection extends URLConnection {
 
@@ -72,7 +74,7 @@ public class HTTPURLConnection extends URLConnection {
     private HttpMethodBase method;
     private int responseCode;
     private byte[] requestBody;
-    private HashMap requestProperties = new HashMap();
+    private Map requestProperties = new LinkedHashMap();    // LinkedHashMap<String lowercaseHeaderName, String[] headerValues>
     private HashMap responseHeaders;
 
     private String username;
@@ -161,17 +163,31 @@ public class HTTPURLConnection extends URLConnection {
             // If method has not been set, use GET
             if (method == null)
                 method = new GetMethod(url.toString());
+
+            // Set headers
+            for (Iterator i = requestProperties.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String currentHeaderName = (String) currentEntry.getKey();
+                // NOTE: don't forward the authorization header if the username is blank
+                if (!"authorization".equals(currentHeaderName) || (userinfo == null && username == null)) {
+                    final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+                    for (int j = 0; j < currentHeaderValues.length; j++) {
+                        final String currentHeaderValue = currentHeaderValues[j];
+                        method.addRequestHeader(currentHeaderName, currentHeaderValue);
+                    }
+                }
+            }
+
             // Create request entity with body
+            // NOTE: Do headers first so we can benefit from method.getRequestHeader() below
             if (requestBody != null && method instanceof EntityEnclosingMethod) {
-                HandlerRequestEntity requestEntity = new HandlerRequestEntity(requestBody, getRequestProperty("content-type"));
+                final Header contentTypeHeader = method.getRequestHeader("Content-Type");// header names are case-insensitive for comparison
+                if (contentTypeHeader == null)
+                    throw new ProtocolException("Can't set request entity: Content-Type header is missing");
+                final HandlerRequestEntity requestEntity = new HandlerRequestEntity(requestBody, contentTypeHeader.getValue());
                 ((EntityEnclosingMethod) method).setRequestEntity(requestEntity);
             }
-            // Set headers
-            for (Iterator keyIteratory = requestProperties.keySet().iterator(); keyIteratory.hasNext();) {
-                String key = (String) keyIteratory.next();
-                if (!"authorization".equalsIgnoreCase(key) || (userinfo == null && username == null))// note that we don't forward the header if username is ""
-                    method.setRequestHeader(key, (String) requestProperties.get(key));
-            }
+
             // Handle authentication challenge
             method.setDoAuthentication(true);
 
@@ -221,11 +237,22 @@ public class HTTPURLConnection extends URLConnection {
 
     public void setRequestProperty(String key, String value) {
         super.setRequestProperty(key, value);
-        requestProperties.put(key, value);
+        requestProperties.put(key, new String[] { value });
+    }
+
+    public void addRequestProperty(String key, String value) {
+        super.addRequestProperty(key, value);
+        NetUtils.addValueToStringArrayMap(requestProperties, key, value);
     }
 
     public String getRequestProperty(String key) {
-        return (String) requestProperties.get(key);
+        // Not sure what should be returned so return the first value if any. But likely nobody is calling this method.
+        final String[] values = (String[]) requestProperties.get(key);
+        return (values == null) ? null : values[0];
+    }
+
+    public Map getRequestProperties() {
+        return super.getRequestProperties();
     }
 
     public int getResponseCode() {

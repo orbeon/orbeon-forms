@@ -858,6 +858,7 @@ public class XFormsContextStack {
 
         public void setVariables(List /* <VariableInfo> */ variableInfo) {
             this.variables = variableInfo;
+            this.inScopeVariablesMap = null;
         }
 
         public List /* <VariableInfo> */ getVariables() {

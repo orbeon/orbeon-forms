@@ -69,7 +69,7 @@ public class XFormsContextStack {
      */
     public void resetBindingContext(PipelineContext pipelineContext) {
         if (parentBindingContext == null) {
-            // Reset to default model 
+            // Reset to default model
             resetBindingContext(pipelineContext, container.getDefaultModel());
         } else {
             // Clear existing stack
@@ -106,31 +106,52 @@ public class XFormsContextStack {
 
         // Add model variables for default model
         if (xformsModel != null) {
-            addVariables(pipelineContext, xformsModel);
+            addModelVariables(pipelineContext, xformsModel);
         }
     }
 
-    private void addVariables(PipelineContext pipelineContext, XFormsModel xformsModel) {
-        int variablesCount = 0;
+    private void addModelVariables(PipelineContext pipelineContext, XFormsModel xformsModel) {
         // TODO: Check dirty flag to prevent needless re-evaluation
-        for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); variablesCount++) {
+
+        List /* <VariableInfo> */ variableInfos = null;
+        for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); ) {
             final Element currentVariableElement = (Element) i.next();
 
             // All variables in the model are in scope for the nested binds and actions.
             // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
             final Variable variable = new Variable(containingDocument, this, currentVariableElement);
 
-            // NOTE: We used to call bindingContext.addVariable() to add variables to the current binding context, but
-            // this could cause an issue because getVariableValue() can itself search for variables, and cause variables
-            // on the same bindingContext object to be cached down the line, therefore preventing further variables
-            // values to be added! The method below takes one more element on the stack, but it is safer.
-            pushVariable(currentVariableElement,variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+            // NOTE: We used to simply add variables to the current bindingContext, but this could cause issues
+            // because getVariableValue() can itself use variables declared previously. This would work at first, but
+            // because BindingContext caches variables in scope, after a first request for in-scope variables, further
+            // variables values could not be added. The method below temporarily adds more elements on the stack but it
+            // is safer.
+            pushVariable(currentVariableElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
+            // Add VariableInfo created during above pushVariable(). There must be only one!
+            if (variableInfos == null)
+                variableInfos = new ArrayList();
+
+            variableInfos.addAll(getCurrentBindingContext().getVariables());
         }
 
-        if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "evaluated variables",
-                    new String[] { "count", Integer.toString(variablesCount) });
+        if (variableInfos != null) {
+            // Some variables added
+
+            final int variableCount = variableInfos.size();
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                containingDocument.logDebug("model", "evaluated variables",
+                        new String[] { "count", Integer.toString(variableCount) });
+            }
+
+            // Remove extra bindings added
+            for (int i = 0; i < variableCount; i++) {
+                popBinding();
+            }
+
+            getCurrentBindingContext().setVariables(variableInfos);
+        }
     }
 
     /**
@@ -306,13 +327,13 @@ public class XFormsContextStack {
                         pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
                         hasOverriddenContext = true;
                         contextItem = getCurrentSingleNode();
-                        variableInfo = getCurrentBindingContext().getVariableInfo();
+                        variableInfo = getCurrentBindingContext().getVariables();
                     } else if (isNewModel) {
                         // Push model only
                         pushBinding(pipelineContext, null, null, null, modelId, null, null, bindingElementNamespaceContext);
                         hasOverriddenContext = false;
                         contextItem = currentBindingContext.getSingleItem();
-                        variableInfo = getCurrentBindingContext().getVariableInfo();
+                        variableInfo = getCurrentBindingContext().getVariables();
                     } else {
                         hasOverriddenContext = false;
                         contextItem = currentBindingContext.getSingleItem();
@@ -416,10 +437,10 @@ public class XFormsContextStack {
             if (variableInfo != null) {
                 // In this case, we did a temporary context push with the new model, and we already gathered the new
                 // variables in scope. We have to set them to the newly pushed BindingContext.
-                getCurrentBindingContext().setVariableInfo(variableInfo);
+                getCurrentBindingContext().setVariables(variableInfo);
             } else if (isPushModelVariables) {
                 // In this case, the model just changed and so we gather the variables in scope for the new model
-                addVariables(pipelineContext, newModel);
+                addModelVariables(pipelineContext, newModel);
             }
 //        } catch (Throwable e) {
             // TODO: handle dispatch of xforms-binding-exception
@@ -738,9 +759,9 @@ public class XFormsContextStack {
         private boolean hasOverriddenContext;
         private Item contextItem;
 
-        private List variableInfo;
+        private List /* <VariableInfo> */ variables;
 
-        private Map variablesMap; // cached varaiable map
+        private Map inScopeVariablesMap; // cached variable map
 
         public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String elementId, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
             this.parent = parent;
@@ -767,8 +788,8 @@ public class XFormsContextStack {
 
         public BindingContext(BindingContext parent, Element controlElement, LocationData locationData, String variableName, ValueRepresentation variableValue) {
             this(parent, parent.getModel(), parent.getNodeset(), parent.getPosition(), parent.getElementId(), false, controlElement, locationData, false, parent.getContextItem());
-            variableInfo = new ArrayList();
-            variableInfo.add(new VariableInfo(variableName, variableValue));
+            variables = new ArrayList();
+            variables.add(new VariableInfo(variableName, variableValue));
         }
 
         public BindingContext getParent() {
@@ -835,18 +856,12 @@ public class XFormsContextStack {
             return (Item) nodeset.get(position - 1);
         }
 
-        public void addVariable(String variableName, ValueRepresentation variableValue) {
-            if (variableInfo == null)
-                variableInfo = new ArrayList();
-            variableInfo.add(new VariableInfo(variableName, variableValue));
+        public void setVariables(List /* <VariableInfo> */ variableInfo) {
+            this.variables = variableInfo;
         }
 
-        public void setVariableInfo(List variableInfo) {
-            this.variableInfo = variableInfo;
-        }
-
-        public List getVariableInfo() {
-            return variableInfo;
+        public List /* <VariableInfo> */ getVariables() {
+            return variables;
         }
 
         /**
@@ -860,12 +875,12 @@ public class XFormsContextStack {
 
         public Map getInScopeVariables(boolean useCache) {
             // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
-            if (variablesMap == null || !useCache) {
+            if (inScopeVariablesMap == null || !useCache) {
                 final Map tempVariablesMap = new HashMap();
 
                 BindingContext currentBindingContext = this;
                 do {
-                    final List currentInfo = currentBindingContext.variableInfo;
+                    final List currentInfo = currentBindingContext.variables;
                     if (currentInfo != null) {
                         for (Iterator i = currentInfo.iterator(); i.hasNext();) {
                             final VariableInfo variableInfo = (VariableInfo) i.next();
@@ -883,9 +898,9 @@ public class XFormsContextStack {
                 if (!useCache)
                     return tempVariablesMap;
 
-                variablesMap = tempVariablesMap;
+                inScopeVariablesMap = tempVariablesMap;
             }
-            return variablesMap;
+            return inScopeVariablesMap;
         }
 
         private static class VariableInfo {

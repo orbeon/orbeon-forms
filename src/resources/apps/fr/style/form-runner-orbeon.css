@@ -101,7 +101,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-container {
     background-color: white;
-    border: 1px solid #cccccc;
+    /*border: 1px solid #cccccc;*/
 }
 
 .fr-separator {

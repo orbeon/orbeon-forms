@@ -376,7 +376,9 @@
                                     <xforms:mediatype ref="@mediatype"/>
                                     <xxforms:size ref="@size"/>
                                 </xforms:upload>
-                                <xforms:output id="image-output-control" ref="image" mediatype="image/*"/>
+                                <!-- Orbeon Form Builder Component Metadata -->
+                                <xforms:output id="image-output-control" ref="image" mediatype="image/*"
+                                               value="for $v in . return if (starts-with($v, 'file:')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)"/>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>

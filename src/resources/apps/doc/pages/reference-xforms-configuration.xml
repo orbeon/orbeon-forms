@@ -369,12 +369,6 @@
                     </li>
                     <li>
                         <p>
-                            No HTTP headers are explicitly passed using <code>&lt;xforms:header></code>. (This
-                            restriction may be lifted in the future.)
-                        </p>
-                    </li>
-                    <li>
-                        <p>
                             The submission is not asynchronous. (This restriction may be lifted in the future.)
                         </p>
                     </li>

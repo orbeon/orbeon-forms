@@ -467,6 +467,18 @@ public class NetUtils {
         }
     }
 
+    public static void addValuesToStringArrayMap(Map map, String name, String[] values) {
+        final String[] currentValue = (String[]) map.get(name);
+        if (currentValue == null) {
+            map.put(name, values);
+        } else {
+            final String[] newValues = new String[currentValue.length + values.length];
+            System.arraycopy(currentValue, 0, newValues, 0, currentValue.length);
+            System.arraycopy(values, 0, newValues, currentValue.length, values.length);
+            map.put(name, newValues);
+        }
+    }
+
     /**
      * Canonicalize a string of the form "a/b/../../c/./d/". The string may start and end with a
      * "/". Occurrences of "..." or other similar patterns are ignored. Also, contiguous "/" are
@@ -1054,11 +1066,15 @@ public class NetUtils {
      * o a list of headers names and values to set
      * o authentication information including username
      * o a list of headers to forward
+     *
+     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
+     *
+     * @return LinkedHashMap<String headerName, String[] headerValues>
      */
     public static Map getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
                                     Map headerNameValues, String headersToForward) {
         // Resulting header names and values to set
-        final LinkedHashMap headersMap = new LinkedHashMap();
+        final LinkedHashMap /* <String headerName, String[] headerValues> */ headersMap = new LinkedHashMap();
 
         // Get header forwarding information
         final Map headersToForwardMap = getHeadersToForward(headersToForward);
@@ -1068,9 +1084,9 @@ public class NetUtils {
             for (Iterator i = headerNameValues.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String currentHeaderName = (String) currentEntry.getKey();
-                final String currentHeaderValue = (String) currentEntry.getValue();
+                final String[] currentHeaderValues = (String[]) currentEntry.getValue();
                 // Set header
-                headersMap.put(currentHeaderName, currentHeaderValue);
+                headersMap.put(currentHeaderName, currentHeaderValues);
                 // Remove from list of headers to forward below
                 if (headersToForwardMap != null)
                     headersToForwardMap.remove(currentHeaderName.toLowerCase());
@@ -1078,7 +1094,6 @@ public class NetUtils {
         }
 
         // Forward cookies for session handling
-        final Map requestHeadersMap = externalContext.getRequest().getHeaderMap();
         boolean sessionCookieSet = false;
         if (username == null) {
 
@@ -1122,7 +1137,7 @@ public class NetUtils {
                         // One or more cookies were set
                         final String cookieString = sb.toString();
                         indentedLogger.logDebug("connection", "forwarding cookies", new String[] { "cookie", cookieString });
-                        headersMap.put("Cookie", cookieString);
+                        NetUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
 
 //                            CookieTools.getCookieHeaderValue(cookie, sb);
                     }
@@ -1137,7 +1152,7 @@ public class NetUtils {
                 if (session != null) {
 
                     // This will work with Tomcat, but may not work with other app servers
-                    headersMap.put("Cookie", "JSESSIONID=" + session.getId());
+                    NetUtils.addValueToStringArrayMap(headersMap, "Cookie", "JSESSIONID=" + session.getId());
 
                     if (indentedLogger.isDebugEnabled()) {
 
@@ -1184,21 +1199,23 @@ public class NetUtils {
         // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ JSESSIONID
         if (headersToForwardMap != null) {
 
+            final Map requestHeaderValuesMap = externalContext.getRequest().getHeaderValuesMap();
+
             for (Iterator i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String currentHeaderName = (String) currentEntry.getValue();
                 final String currentHeaderNameLowercase = (String) currentEntry.getKey();
 
                 // Get incoming header value (Map contains values in lowercase!)
-                final String currentIncomingHeaderValue = (String) requestHeadersMap.get(currentHeaderNameLowercase);
+                final String[] currentIncomingHeaderValues = (String[]) requestHeaderValuesMap.get(currentHeaderNameLowercase);
                 // Forward header if present
-                if (currentIncomingHeaderValue != null) {
+                if (currentIncomingHeaderValues != null) {
                     final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
                     if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                         // Only forward Authorization header if there is no username provided
                         indentedLogger.logDebug("connection", "forwarding header",
-                            new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
-                        headersMap.put(currentHeaderName, currentIncomingHeaderValue);
+                            new String[] { "name", currentHeaderName, "value", Arrays.toString(currentIncomingHeaderValues) });
+                        NetUtils.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
                     } else {
                         // Just log this information
                         indentedLogger.logDebug("connection",
@@ -1211,6 +1228,18 @@ public class NetUtils {
         return headersMap;
     }
 
+    /**
+     *
+     * @param indentedLogger
+     * @param httpMethod
+     * @param connectionURL
+     * @param username
+     * @param password
+     * @param contentType
+     * @param messageBody
+     * @param headersMap        LinkedHashMap<String headerName, String[] headerValues>
+     * @return
+     */
     public static ConnectionResult openConnection(IndentedLogger indentedLogger,
                                                    String httpMethod, final URL connectionURL, String username, String password,
                                                    String contentType, byte[] messageBody, Map headersMap) {
@@ -1325,9 +1354,14 @@ public class NetUtils {
                     for (Iterator i = headersMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         final String currentHeaderName = (String) currentEntry.getKey();
-                        final String currentHeaderValue = (String) currentEntry.getValue();
-                        // Set header
-                        urlConnection.setRequestProperty(currentHeaderName, currentHeaderValue);
+                        final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+                        if (currentHeaderValues != null) {
+                            // Add all header values as "request properties"
+                            for (int j = 0; j < currentHeaderValues.length; j++) {
+                                final String currentHeaderValue = currentHeaderValues[j];
+                                urlConnection.addRequestProperty(currentHeaderName, currentHeaderValue);
+                            }
+                        }
                     }
                 }
 

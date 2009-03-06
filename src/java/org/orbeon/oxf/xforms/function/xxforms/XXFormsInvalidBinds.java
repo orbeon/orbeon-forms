@@ -22,8 +22,8 @@ import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * xxforms:invalid-binds()
@@ -49,7 +49,7 @@ public class XXFormsInvalidBinds extends XFormsFunction {
             return EmptyIterator.getInstance();
 
         final String[] invalidBindIds = StringUtils.split(invalidBindIdsString, ' ');
-        final ArrayList result = new ArrayList(invalidBindIds.length);
+        final List result = new ArrayList(invalidBindIds.length);
         for (int i = 0; i < invalidBindIds.length; i++)
             result.add(new StringValue(invalidBindIds[i]));
         return new ListIterator(result);

@@ -25,7 +25,8 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * xxforms:get-request-header($header-name as xs:string) as xs:string*
@@ -47,13 +48,17 @@ public class XXFormsGetRequestHeader extends XFormsFunction {
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             final ExternalContext externalContext = staticContext.getExternalContext();
 
-            // TODO: getHeaderMap() returns a single header, but should really return all occurrences
-            final String headerValue = (String) externalContext.getRequest().getHeaderMap().get(headerName.toLowerCase());
+            // Get all header values
+            final String[] headerValues = (String[]) externalContext.getRequest().getHeaderValuesMap().get(headerName.toLowerCase());
 
-            if (headerValue != null)
-                return new ListIterator(Collections.singletonList(new StringValue(headerValue)));
-            else
+            if (headerValues != null && headerValues.length > 0) {
+                final List result = new ArrayList(headerValues.length);
+                for (int i = 0; i < headerValues.length; i++)
+                    result.add(new StringValue(headerValues[i]));
+                return new ListIterator(result);
+            } else {
                 return EmptyIterator.getInstance();
+            }
         } else {
             throw new OXFException("xxforms:get-request-header() can only be called during XForms initialization.");
         }

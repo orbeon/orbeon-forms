@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -56,7 +55,7 @@ public class XFormsSubmissionUtils {
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String action, boolean isNorewrite, String mediatype,
                                                            byte[] messageBody, String queryString,
-                                                           boolean isReplaceAll, String[] headerNames) {
+                                                           boolean isReplaceAll, String[] headerNames, Map headerNameValues) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
         // the page was produced through a filter in separate deployment or not.
@@ -82,7 +81,7 @@ public class XFormsSubmissionUtils {
 
         return XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
                                 xformsModelSubmission, httpMethod, effectiveAction, isContextRelative, mediatype,
-                                messageBody, queryString, isReplaceAll, headerNames);
+                                messageBody, queryString, isReplaceAll, headerNames, headerNameValues);
     }
 
     /**
@@ -93,7 +92,7 @@ public class XFormsSubmissionUtils {
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String action, boolean isContextRelative, String mediatype,
                                                            byte[] messageBody, String queryString,
-                                                           boolean isReplaceAll, String[] headerNames) {
+                                                           boolean isReplaceAll, String[] headerNames, Map headerNameValues) {
 
         // Action must be an absolute path
         if (!action.startsWith("/"))
@@ -131,7 +130,7 @@ public class XFormsSubmissionUtils {
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
-                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames);
+                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, headerNameValues);
                 } else {
                     // Simulate a GET or DELETE
                     {
@@ -151,7 +150,7 @@ public class XFormsSubmissionUtils {
                         throw new OXFException("Action must start with a servlet context path: " + action);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
-                            rootAdjustedResourceURI, httpMethod, headerNames);
+                            rootAdjustedResourceURI, httpMethod, headerNames, headerNameValues);
                 }
             }
 
@@ -368,8 +367,7 @@ public class XFormsSubmissionUtils {
      * @return                  MultipartRequestEntity
      * @throws IOException
      */
-    public static MultipartRequestEntity createMultipartFormData(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
-                                                                 final Document document) throws IOException {
+    public static MultipartRequestEntity createMultipartFormData(final PipelineContext pipelineContext, final Document document) throws IOException {
 
         final List params = new ArrayList();
 

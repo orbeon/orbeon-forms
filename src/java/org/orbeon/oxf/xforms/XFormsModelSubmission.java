@@ -570,7 +570,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // Build multipart/form-data body
 
                         // Create and set body
-                        final MultipartRequestEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData(pipelineContext, containingDocument, documentToSubmit);
+                        final MultipartRequestEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData(pipelineContext, documentToSubmit);
 
                         final ByteArrayOutputStream os = new ByteArrayOutputStream();
                         multipartFormData.writeRequest(os);
@@ -642,7 +642,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean isAsyncSubmission = isReplaceNone && "asynchronous".equals(resolvedMode);// for now we only support this with replace="none"
 
                 // Evaluate headers if any
-                final Map headerNameValues = evaluateHeaders(pipelineContext, contextStack);
+                final Map /* LinkedHashMap<String headerName, String[] headerValues> */ customHeaderNameValues = evaluateHeaders(pipelineContext, contextStack);
 
                 // Result information
                 ConnectionResult connectionResult = null;
@@ -677,7 +677,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         connectionResult = new ConnectionResult(resultURL);
                         connectionResult.dontHandleResponse = true;
 
-                    } else if (isAllowOptimizedSubmission(isReplaceAll, isNoscript, urlType, request, isAsyncSubmission, headerNameValues)) {
+                    } else if (isAllowOptimizedSubmission(isReplaceAll, isNoscript, urlType, request, isAsyncSubmission)) {
 
                         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
                         // access the resource, but instead uses servlet forward/include for servlets, or a local
@@ -712,7 +712,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                         connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
                                 isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), fURLNorewrite, actualRequestMediatype,
-                                messageBody, queryString, isReplaceAll, headersToForward);
+                                messageBody, queryString, isReplaceAll, headersToForward, customHeaderNameValues);
 
                         // This means we got a submission with replace="all"
                         if (connectionResult.dontHandleResponse)
@@ -781,7 +781,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             if (isAsyncSubmission) {
                                 final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
                                 final Map headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
-                                            resolvedXXFormsUsername, headerNameValues, newForwardSubmissionHeaders);
+                                            resolvedXXFormsUsername, customHeaderNameValues, newForwardSubmissionHeaders);
 
                                 // Pack call into a Runnable
                                 final Runnable runnable = new Runnable() {
@@ -811,7 +811,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                 connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
                                         actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
-                                        headerNameValues, newForwardSubmissionHeaders);
+                                        customHeaderNameValues, newForwardSubmissionHeaders);
                             }
                         }
                     }
@@ -1102,14 +1102,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      * Log a lot of stuff for development, as it is not always obvious why we pick an optimized vs. regular submission.
      */
     private boolean isAllowOptimizedSubmission(boolean replaceAll, boolean isNoscript, String urlType,
-                                              ExternalContext.Request request, boolean asyncSubmission, Map headerNameValues) {
+                                              ExternalContext.Request request, boolean asyncSubmission) {
 
         final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
         if (isDebugEnabled) {
             containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
                 new String[] { "resource", resolvedActionOrResource, "noscript", Boolean.toString(isNoscript),
                     "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
-                    "headers", (headerNameValues != null) ? headerNameValues.toString() : null,
                     "is asynchronous", Boolean.toString(asyncSubmission),
                     "container type", request.getContainerType(), "norewrite", Boolean.toString(fURLNorewrite),
                     "url type", urlType,
@@ -1131,14 +1130,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (isDebugEnabled)
                 containingDocument.logDebug("submission", "skipping optimized submission",
                         new String[] { "reason", "noscript mode enabled and not in ajax portlet mode" });
-            return false;
-        }
-
-        // For now, headers are not handled; could be optimized in the future
-        if (headerNameValues != null) {
-            if (isDebugEnabled)
-                containingDocument.logDebug("submission", "skipping optimized submission",
-                        new String[] { "reason", "passing headers is not supported yet" });
             return false;
         }
 
@@ -1199,13 +1190,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      *
      * @param pipelineContext   pipeline context
      * @param contextStack      context stack set to enclosing <xforms:submission>
-     * @return                  LinkedHashMap<String headerName, String headerValue>, or null if no header elements
+     * @return                  LinkedHashMap<String headerName, String[] headerValues>, or null if no header elements
      */
     private Map evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
-        Map headerNameValues;
         final List headerElements = submissionElement.elements("header");
         if (headerElements.size() > 0) {
-            headerNameValues = new LinkedHashMap();
+            final Map headerNameValues = new LinkedHashMap();
 
             // Iterate over all <xforms:header> elements
             for (Iterator i = headerElements.iterator(); i.hasNext();) {
@@ -1231,10 +1221,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
                 contextStack.popBinding();
             }
+
+            return headerNameValues;
         } else {
-            headerNameValues = null;
+            return null;
         }
-        return headerNameValues;
     }
 
     /**
@@ -1242,7 +1233,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      *
      * @param pipelineContext       pipeline context
      * @param contextStack          context stack set to <xforms:header> (or element iteration)
-     * @param headerNameValues      LinkedHashMap<String headerName, String headerValue> to update
+     * @param headerNameValues      LinkedHashMap<String headerName, String[] headerValues> to update
      * @param currentHeaderElement  <xforms:header> element to evaluate
      */
     private void handleHeaderElement(PipelineContext pipelineContext, XFormsContextStack contextStack, Map headerNameValues, Element currentHeaderElement) {
@@ -1267,7 +1258,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             contextStack.popBinding();
         }
 
-        headerNameValues.put(headerName, headerValue);
+        NetUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
     }
 
     public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {

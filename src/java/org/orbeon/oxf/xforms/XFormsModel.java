@@ -876,7 +876,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         // Run submission
         final ConnectionResult connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument,
                 null, "get", resourceAbsolutePathOrAbsoluteURL, isNoRewrite, null, null, null, false,
-                XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD);
+                XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD, null);
 
         final Object instanceDocument;// Document or DocumentInfo
         try {

@@ -30,12 +30,6 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <!--
-        TODO:
-            o test behavior of divs
-            o xforms:itemset
-    -->
-
     <test description="Calculator" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

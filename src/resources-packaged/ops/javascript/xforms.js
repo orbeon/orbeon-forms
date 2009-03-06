@@ -4719,6 +4719,9 @@ ORBEON.xforms.Server = {
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
             }
             var formID = ORBEON.xforms.Globals.requestForm.id;
+            // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and we
+            // don't want them to be filtered.
+            ORBEON.util.Utils.hideModalProgressPanel();
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events
             ORBEON.xforms.Globals.changedIdsRequest = {};
@@ -4726,7 +4729,6 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
-            ORBEON.util.Utils.hideModalProgressPanel();
             ORBEON.xforms.Server.executeNextRequest(false);
 
             // Notify listeners that we are done processing this request

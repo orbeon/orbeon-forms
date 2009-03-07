@@ -20,8 +20,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Table with checkboxes</xhtml:title>
-        <xforms:model>
+        <xhtml:title>Table with radio buttons in deferred mode</xhtml:title>
+        <xforms:model xxforms:client.events.mode="deferred">
             <xforms:instance id="countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
             <xforms:instance id="selected">
                 <selected/>
@@ -32,6 +32,12 @@
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+
+        <xhtml:p>
+            In this example, the client only sends events to the server when you press the <i>Send</i> button. However
+            the radio buttons still toggle properly because they are grouped with the <code>xxforms:group</code>
+            attribute.
+        </xhtml:p>
 
         <xhtml:p>
             Selected country codes:
@@ -48,12 +54,13 @@
                 <xxforms:variable name="country" select="."/>
                 <xhtml:tr>
                     <xhtml:td>
-                        <xforms:select appearance="full" ref="instance('selected')">
+                        <!-- Note the xxforms:group attribute which allows toggling the buttons in deferred events mode -->
+                        <xforms:select1 id="country-code" appearance="full" ref="instance('selected')" xxforms:group="country-code-group">
                             <xforms:item>
                                 <xforms:label/>
                                 <xforms:value value="$country/us-code"/>
                             </xforms:item>
-                        </xforms:select>
+                        </xforms:select1>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output value="name"/>
@@ -64,6 +71,10 @@
                 </xhtml:tr>
             </xforms:repeat>
         </xhtml:table>
+
+        <xforms:trigger>
+            <xforms:label>Send</xforms:label>
+        </xforms:trigger>
 
     </xhtml:body>
 </xhtml:html>

@@ -2407,6 +2407,55 @@
                     The data type for the resource must be <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
                 </p>
             </section>
+            <a name="xxforms-radio-button-group"/>
+            <section>
+                <title><code>xxforms:group</code> Attribute on <code>&lt;xforms:select1></code> with <code>appearance="full"</code></title>
+                <p>
+                    <code>&lt;xforms:select1></code> supports an extension attribute called <code>xxforms:group</code>
+                    which allows grouping a series of radio buttons together in a way similar to the <code>name</code>
+                    attribute in HTML.
+                </p>
+                <p>
+                    In general, this attribute is not necessary. It is useful in the following case:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Multiple <code>&lt;xforms:select1 appearance="full"></code> point to the same node.
+                        </p>
+                    </li>
+                        <li>
+                        <p>
+                            You enable <a
+                            href="http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties#TOC-Client-Events-Optimizations">deferred
+                            event handling</a> on the client.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The <code>xxforms:group</code> attribute must contain an identifier unique between groups of radio
+                    controls. Example:
+                </p>
+                <xml-source>
+                    <xforms:repeat nodeset="instance('countries')/country">
+                        <xxforms:variable name="country" select="."/>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 appearance="full" ref="instance('selected')" xxforms:group="country-code-group">
+                                    <xforms:item>
+                                        <xforms:label/>
+                                        <xforms:value value="$country/us-code"/>
+                                    </xforms:item>
+                                </xforms:select1>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xforms:repeat>
+                </xml-source>
+                <note>
+                    This attribute does not work in <i>noscript</i> mode yet even though it would be very useful in this
+                    case as well.
+                </note>
+            </section>
         </section>
     </body>
 </document>

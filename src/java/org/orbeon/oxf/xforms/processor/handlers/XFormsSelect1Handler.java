@@ -483,12 +483,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     public static void handleItemFull(PipelineContext pipelineContext, HandlerContext handlerContext, ContentHandler contentHandler,
                                        AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
-                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl, String id,
+                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl, String staticId,
                                        String effectiveId, boolean isMany, String type,
                                        XFormsItemUtils.Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
-        final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
+        final String itemEffectiveId = staticId + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
 
         // Whether this is selected
         boolean isSelected;
@@ -515,7 +515,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
-                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
+
+                // TODO: may have duplicate ids for itemsets [WHAT IS THIS COMMENT ABOUT?]
+                // Get group name from selection control if possible, otherwise use effective id
+                final String name = (!isMany && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : effectiveId;
+                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
+
                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
 
                 if (!handlerContext.isTemplate() && xformsControl != null) {

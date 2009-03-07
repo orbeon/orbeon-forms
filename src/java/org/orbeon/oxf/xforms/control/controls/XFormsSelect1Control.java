@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -35,9 +36,15 @@ import java.util.List;
  */
 public class XFormsSelect1Control extends XFormsValueControl {
 
+    public static final String FULL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
     public static final String TREE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
+
+    // List of attributes to handle as AVTs for select1 with appearance="full"
+    private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
+            XFormsConstants.XXFORMS_GROUP_QNAME
+    };
 
     private String xxformsRefresh;
     private List items;
@@ -45,6 +52,19 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public XFormsSelect1Control(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
+    }
+
+    protected QName[] getExtensionAttributes() {
+        if (!(this instanceof XFormsSelectControl) && FULL_APPEARANCE.equals(getAppearance()))
+            return EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL;
+        else
+            return super.getExtensionAttributes();
+    }
+
+    public String getGroupName() {
+        // Return the custom group name if present, otherwise return the effective id
+        final String customGroupName = getExtensionAttributeValue(XFormsConstants.XXFORMS_GROUP_QNAME);
+        return (customGroupName != null) ? customGroupName : getEffectiveId();
     }
 
     public boolean hasJavaScriptInitialization() {
@@ -205,6 +225,25 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Forward to superclass
             super.storeExternalValue(pipelineContext, value, type, filesElement);
         }
+    }
+
+// Work in progress for in-bounds/out-of-bounds
+//    protected void evaluateValue(PipelineContext pipelineContext) {
+//        super.evaluateValue(pipelineContext);
+//    }
+
+// Work in progress for in-bounds/out-of-bounds
+    public boolean isInBounds(List items) {
+        return true;
+//        final String value = getValue(null);
+//        for (Iterator i = items.iterator(); i.hasNext();) {
+//            final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+//            final String currentItemValue = currentItem.getValue();
+//            if (value.equals(currentItemValue)) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     /**

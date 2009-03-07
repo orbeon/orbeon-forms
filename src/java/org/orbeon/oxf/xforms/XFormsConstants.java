@@ -145,6 +145,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_COLS_QNAME = new QName("cols", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ROWS_QNAME = new QName("rows", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_GROUP_QNAME = new QName("group", XXFORMS_NAMESPACE);
 
     public static final String VALID_ATTRIBUTE_NAME = "valid";
     public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";

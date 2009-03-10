@@ -45,8 +45,9 @@
 
                 // Test pages to run
                 TestManager.setPages([
+                    "deferred-client-events",
                     "trigger-modal",
-                    "deferred-client-events"
+                    "upload-replace-instance"
                 ]);
 
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
@@ -78,7 +79,7 @@
             .progress img { vertical-align: middle; padding-right: 1em; }
             .test-pass { background-color: #efe; }
             .test-fail { background-color: #fee; }
-            .xforms-repeat-selected-item-3 { background-color: transparent; }
+            .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2, .xforms-repeat-selected-item-3 { background-color: transparent; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>

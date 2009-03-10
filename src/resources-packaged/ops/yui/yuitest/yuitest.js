@@ -2878,8 +2878,12 @@ YAHOO.tool.TestManager = {
             //create iframe if not already available
             if (!this._frame){
                 var frame /*:HTMLElement*/ = document.createElement("iframe");
-                frame.style.visibility = "hidden";
+                // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+                //frame.style.visibility = "hidden";
                 frame.style.position = "absolute";
+                frame.style.top = "0";
+                frame.style.width = "0";
+                frame.style.height = "0";
                 document.body.appendChild(frame);
                 this._frame = frame.contentWindow || frame.contentDocument.parentWindow;
             }

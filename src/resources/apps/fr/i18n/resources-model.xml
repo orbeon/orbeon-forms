@@ -45,7 +45,7 @@
     <xforms:instance id="fr-fr-resources"><dummy/></xforms:instance>
     <xforms:submission id="fr-get-fr-resources"
             serialization="none" method="get"
-            resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/i18n/fr-resources/{xxforms:instance('fr-form-metadata')/application-name}/{xxforms:instance('fr-form-metadata')/form-name}" 
+            resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/i18n/fr-resources/{xxforms:instance('fr-parameters-instance')/app}/{xxforms:instance('fr-parameters-instance')/form}" 
             replace="instance" instance="fr-fr-resources" xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- Instance containing the current Form Runner resources -->

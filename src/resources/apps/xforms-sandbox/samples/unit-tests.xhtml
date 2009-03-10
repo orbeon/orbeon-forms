@@ -17,194 +17,123 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    debug="true">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Unit Tests</xhtml:title>
-        <xforms:model id="main-model" xxforms:external-events="restore-instance">
-
-            <xforms:instance id="default-instance"><dummy/></xforms:instance>
-
-            <!-- Restore initial instance, used between tests -->
-            <xforms:action ev:event="restore-instance">
-                <xforms:insert nodeset="xxforms:instance('input-instance')" origin="xxforms:instance('input-initial-instance')"/>
-                <xforms:insert nodeset="xxforms:instance('output-instance')" origin="xxforms:instance('output-initial-instance')"/>
-                <xforms:insert nodeset="xxforms:instance('dialog-instance')" origin="xxforms:instance('dialog-initial-instance')"/>
+        <xhtml:title>XForms Unit Tests</xhtml:title>
+        <xforms:model id="main-model" xxforms:external-events="page-complete">
+            <xforms:instance id="instance">
+                <instance>
+                    <in-progress>true</in-progress>
+                    <page/>
+                    <report-text/>
+                    <reports/>
+                </instance>
+            </xforms:instance>
+            <xforms:action ev:event="page-complete">
+                <xforms:delete nodeset="reports/in-progress"/>
+                <xforms:insert context="reports" nodeset="report" origin="saxon:parse(/instance/report-text)"/>
+                <xforms:insert context="reports/report[last()]" origin="xxforms:attribute('page', /instance/page)"/>
             </xforms:action>
-
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:dispatch name="restore-instance" target="main-model"/>
-            </xforms:action>
-
         </xforms:model>
-
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/calendar/assets/calendar.css"/>
-        <xhtml:style type="text/css">
-            .xforms-label { display: block }
-        </xhtml:style>
-        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/calendar/calendar.js"/>
-        <xhtml:script type="text/javascript" src="/ops/javascript/xforms-unit-tests.js"/>
         <xhtml:script type="text/javascript">
-            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                ORBEON.testing.run();
-    //                ORBEON.testing.run("inputTestCase", "testClickOnDate");
-            });
+            <![CDATA[
+                var TestManager = YAHOO.tool.TestManager;
+
+                // Test pages to run
+                TestManager.setPages([
+                    "trigger-modal",
+                    "deferred-client-events"
+                ]);
+
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+
+                    // Test page stars:
+                    TestManager.subscribe(TestManager.TEST_PAGE_BEGIN_EVENT, function(data) {
+                        ORBEON.xforms.Document.setValue("page", data);
+                    });
+
+                    // Test page completed: update instance with results from this page
+                    TestManager.subscribe(TestManager.TEST_PAGE_COMPLETE_EVENT, function(data) {
+                        ORBEON.xforms.Document.setValue("report-text", YAHOO.tool.TestFormat.XML(data.results));
+                        ORBEON.xforms.Document.setValue("page", data.page);
+                        ORBEON.xforms.Document.dispatchEvent("main-model", "page-complete");
+                    });
+
+                    // Set "in progress" to false when all the test ran
+                    TestManager.subscribe(TestManager.TEST_MANAGER_COMPLETE_EVENT, function(data) {
+                        ORBEON.xforms.Document.setValue("in-progress", "false");
+                    });
+
+                    TestManager.start();
+                });
+            ]]>
         </xhtml:script>
+        <xhtml:style type="text/css">
+            .progress { margin-bottom: 2em; }
+            .progress span { vertical-align: middle;  }
+            .progress img { vertical-align: middle; padding-right: 1em; }
+            .test-pass { background-color: #efe; }
+            .test-fail { background-color: #fee; }
+            .xforms-repeat-selected-item-3 { background-color: transparent; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+        <xforms:input ref="in-progress" id="in-progress" style="display: none"/>
+        <xforms:input ref="page" id="page" style="display: none"/>
+        <xforms:input ref="report-text" id="report-text" style="display: none"/>
 
-        <!-- Input field -->
-        <xforms:model id="input-model">
-            <xforms:instance id="input-instance">
-                <instance/>
-            </xforms:instance>
-            <xforms:instance id="input-initial-instance">
-                <instance>
-                    <field>gaga</field>
-                    <label>field</label>
-                    <hint>hint</hint>
-                    <help>help</help>
-                    <alert>alert</alert>
-                    <type>string</type>
-                    <copy/>
-                    <time>20:12:21</time>
-                    <date>2008-09-01</date>
-                    <date-time>2008-09-01T20:12:21</date-time>
-                    <is-readonly>false</is-readonly>
-                    <is-relevant>true</is-relevant>
-                </instance>
-            </xforms:instance>
-            <xforms:bind nodeset="/instance">
-                <xforms:bind nodeset="field[../type = 'date']" type="xs:date"/>
-                <xforms:bind nodeset="field[../type = 'time']" type="xs:time"/>
-                <xforms:bind nodeset="field[../type = 'date-time']" type="xs:dateTime"/>
-                <xforms:bind nodeset="field" readonly="context()/is-readonly = 'true'" relevant="context()/is-relevant = 'true'"/>
-                <xforms:bind nodeset="copy" calculate="context()/field"/>
-                <xforms:bind nodeset="time" type="xs:time"/>
-                <xforms:bind nodeset="date" type="xs:date"/>
-                <xforms:bind nodeset="date-time" type="xs:dateTime"/>
-            </xforms:bind>
-        </xforms:model>
-        <xhtml:h1>xforms:input</xhtml:h1>
-        <xforms:group ref="/instance" model="input-model">
-            <xforms:input ref="field" id="input-field">
-                <xforms:label ref="../label"/>
-                <xforms:hint ref="../hint"/>
-                <xforms:help ref="../help"/>
-                <xforms:alert ref="../alert"/>
-            </xforms:input>
-            <xhtml:span>
-                <xhtml:span>
-                    <xforms:label ref="label" for="input-field-for"/>
-                    <xforms:hint ref="hint" for="input-field-for"/>
-                    <xforms:help ref="help" for="input-field-for"/>
-                    <xforms:alert ref="alert" for="input-field-for"/>
-                </xhtml:span>
-                <xforms:input ref="field" id="input-field-for"/>
-            </xhtml:span>
-            <xforms:input ref="type" id="input-type">
-                <xforms:label>type</xforms:label>
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:rebuild/>
-                    <xforms:recalculate/>
-                    <xforms:revalidate/>
-                    <xforms:refresh/>
-                </xforms:action>
-            </xforms:input>
-            <xforms:input ref="label" id="input-label">
-                <xforms:label>label</xforms:label>
-            </xforms:input>
-            <xforms:input ref="hint" id="input-hint">
-                <xforms:label>hint</xforms:label>
-            </xforms:input>
-            <xforms:input ref="help" id="input-help">
-                <xforms:label>help</xforms:label>
-            </xforms:input>
-            <xforms:input ref="alert" id="input-alert">
-                <xforms:label>alert</xforms:label>
-            </xforms:input>
-            <xforms:input ref="time" id="input-time">
-                <xforms:label>time</xforms:label>
-            </xforms:input>
-            <xforms:input ref="date" id="input-date">
-                <xforms:label>date</xforms:label>
-            </xforms:input>
-            <xforms:input ref="date-time" id="input-date-time">
-                <xforms:label>date-time</xforms:label>
-            </xforms:input>
-            <xforms:input ref="is-readonly" id="input-is-readonly">
-                <xforms:label>is-readonly</xforms:label>
-            </xforms:input>
-            <xforms:input ref="is-relevant" id="input-is-relevant">
-                <xforms:label>is-relevant</xforms:label>
-            </xforms:input>
-        </xforms:group>
+        <xhtml:div class="progress">
+            <xforms:group ref=".[in-progress = 'true']">
+                <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress"/>
+                <xforms:group ref=".[page != '']">
+                    Running test page
+                    <xhtml:b><xforms:output value="page"/></xhtml:b>
+                </xforms:group>
+            </xforms:group>
+            <xforms:group ref=".[in-progress != 'true']">
+                <xhtml:b>Done</xhtml:b> running all the test cases
+            </xforms:group>
+        </xhtml:div>
 
-        <!-- Output field -->
-        <xforms:model id="output-model">
-            <xforms:instance id="output-instance">
-                <instance/>
-            </xforms:instance>
-            <xforms:instance id="output-initial-instance">
-                <instance>
-                    <field>foo</field>
-                    <valid>false</valid>
-                </instance>
-            </xforms:instance>
-            <xforms:bind nodeset="/instance">
-                <xforms:bind nodeset="field" type="xs:integer"/>
-            </xforms:bind>
-        </xforms:model>
-        <xhtml:h1>xforms:output</xhtml:h1>
-        <xforms:group ref="/instance" model="output-model">
-            <xforms:output ref="field" id="output-field">
-                <xforms:label>field output</xforms:label>
-            </xforms:output>
-            <xforms:input ref="field" id="output-field-input">
-                <xforms:label>field input</xforms:label>
-            </xforms:input>
-            <xforms:input ref="valid" id="output-valid">
-                <xforms:label>valid</xforms:label>
-            </xforms:input>
-        </xforms:group>
-        
-        <!-- Dialog -->
-        <xforms:model id="dialog-model">
-            <xforms:instance id="dialog-instance">
-                <instance/>
-            </xforms:instance>
-            <xforms:instance id="dialog-initial-instance">
-                <instance>
-                    <label>label</label>
-                </instance>
-            </xforms:instance>
-
-        </xforms:model>
-        <xxforms:dialog model="dialog-model" id="dialog-control">
-            <xforms:label ref="label" id="dialog-label"/>
-            <xhtml:p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
-                scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
-                into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
-                release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
-                software like Aldus PageMaker including versions of Lorem Ipsum.
-            </xhtml:p>
-        </xxforms:dialog>
-        <xforms:input ref="label" id="dialog-label-input">
-            <xforms:label>label</xforms:label>
-        </xforms:input>
-        <xforms:trigger id="dialog-show">
-            <xforms:label>Show</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="dialog-control"/>
-        </xforms:trigger>
-
-
-        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+        <xhtml:table class="gridtable">
+            <xhtml:tr>
+                <xhtml:th>Page</xhtml:th>
+                <xhtml:th>Test case</xhtml:th>
+                <xhtml:th>Test</xhtml:th>
+                <xhtml:th>Result</xhtml:th>
+            </xhtml:tr>
+            <xforms:repeat nodeset="reports/report">
+                <xxforms:variable name="report" select="."/>
+                <xforms:repeat nodeset="testcase">
+                    <xxforms:variable name="testcase" select="."/>
+                    <xxforms:variable name="testcase-position" select="position()"/>
+                    <xforms:repeat nodeset="test">
+                        <xhtml:tr>
+                            <xxforms:variable name="test" select="."/>
+                            <xxforms:variable name="test-position" select="position()"/>
+                            <!-- Page -->
+                            <xhtml:td>
+                                <xforms:output value="if ($testcase-position = 1 and $test-position = 1) then $report/@page else ()"/>
+                            </xhtml:td>
+                            <!-- Test case -->
+                            <xhtml:td>
+                                <xforms:output value="if ($test-position = 1) then $testcase/@name else ()"/>
+                            </xhtml:td>
+                            <!-- Test -->
+                            <xhtml:td>
+                                <xforms:output value="$test/@name"/>
+                            </xhtml:td>
+                            <xhtml:td class="{if ($test/@result = 'pass') then 'test-pass' else 'test-fail'}">
+                                <xforms:output value="$test/@message"/>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xforms:repeat>
+                </xforms:repeat>
+            </xforms:repeat>
+        </xhtml:table>
     </xhtml:body>
 </xhtml:html>

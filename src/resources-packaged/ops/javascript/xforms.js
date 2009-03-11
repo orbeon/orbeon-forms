@@ -1962,7 +1962,7 @@ ORBEON.xforms.Controls = {
                 return true;
             } else {
                 ORBEON.util.Dom.addClass(control, "xforms-required-filled");
-                ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
+                ORBEON.util.Dom.removeClass(control, "xforms-required-empty");  
                 return false;
             }
         } else {
@@ -2426,7 +2426,7 @@ ORBEON.xforms.Events = {
      *      control with a new value coming from the server.
      */
     _isChangingKey: function(control, keyCode) {
-        return keyCode != 9 && keyCode != 13 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
+        return keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
             (ORBEON.util.Dom.hasClass(control, "xforms-input") || ORBEON.util.Dom.hasClass(control, "xforms-secret")
                     || ORBEON.util.Dom.hasClass(control, "xforms-textarea"));
     },

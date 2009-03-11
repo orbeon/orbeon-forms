@@ -34,6 +34,13 @@
         </section>
     </xforms:instance>
 
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+    <xxforms:variable name="app" select="$parameters/app"/>
+    <xxforms:variable name="form" select="$parameters/form"/>
+    <xxforms:variable name="animate" as="xs:boolean"
+        select="not(property('xxforms:noscript'))
+                    and not(xxforms:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"/>
+
     <!-- Handle section collapse -->
     <xforms:action ev:event="fr-after-collapse">
         <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-closed"/>
@@ -43,8 +50,8 @@
     <!-- Close section -->
     <xforms:action ev:event="fr-collapse">
         <!-- Different behavior depending on whether we support script or not -->
-        <xxforms:script if="not(property('xxforms:noscript'))">frCollapse();</xxforms:script>
-        <xforms:dispatch if="property('xxforms:noscript')" target="fr-sections-model" name="fr-after-collapse"/>
+        <xxforms:script if="$animate">frCollapse();</xxforms:script>
+        <xforms:dispatch if="not($animate)" target="fr-sections-model" name="fr-after-collapse"/>
     </xforms:action>
 
     <!-- Open section -->
@@ -52,6 +59,6 @@
         <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-open"/>
         <xforms:toggle case="case-button-{instance('fr-current-section-instance')/id}-open"/>
         <!-- Only if we support script -->
-        <xxforms:script if="not(property('xxforms:noscript'))">frExpand();</xxforms:script>
+        <xxforms:script if="$animate">frExpand();</xxforms:script>
     </xforms:action>
 </xforms:model>

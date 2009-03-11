@@ -53,7 +53,8 @@
     <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="is-noscript-table" select="not(not(pipeline:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="is-ajax-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s')" as="xs:string*"/>
@@ -61,13 +62,24 @@
     <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s')" as="xs:string*"/>
     <xsl:variable name="has-alfresco" select="pipeline:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-show-explanation" select="pipeline:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
+    <xsl:variable name="is-inline-hints" select="not(pipeline:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
+
         <xsl:copy>
-            <xsl:attribute name="class" select="string-join(('xforms-disable-hint-as-tooltip', 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
+            <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                <xsl:apply-templates select="node()"/>
+                <xsl:choose>
+                    <xsl:when test=".//fr:view">
+                        <!-- Explicit fr:view is processed by template down the line -->
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- No explicit fr:view so consider the whole of xhtml:body as fr:view/fr:body -->
+                        <xsl:call-template name="fr-view"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xforms:group>
             <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
@@ -207,7 +219,14 @@
 
         <!-- Copy and annotate existing main model -->
         <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
+            <xsl:apply-templates select="@*"/>
+
+            <!-- If the first model does't have an id, add fr-form-model -->
+            <xsl:if test="not(@id)">
+                <xsl:attribute name="id" select="'fr-form-model'"/>
+            </xsl:if>
+
+            <xsl:apply-templates select="node()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
@@ -224,6 +243,20 @@
             <xi:include href="../includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
         </xsl:if>
 
+    </xsl:template>
+
+    <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]/xforms:instance[1]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+
+            <!-- If there is no instance with fr-form-instance consider the first one is it -->
+            <xsl:if test="not(exists(../xforms:instance[@id = 'fr-form-instance']))">
+                <xsl:attribute name="id" select="'fr-form-instance'"/>
+            </xsl:if>
+
+            <xsl:apply-templates select="node()"/>
+
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

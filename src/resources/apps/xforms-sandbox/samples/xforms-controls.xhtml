@@ -1,0 +1,109 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XForms Controls</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance>
+                    <date>
+                        <value>2009-03-19</value>
+                        <readonly>false</readonly>
+                    </date>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="date">
+                <xforms:bind nodeset="value" type="xs:date" readonly="../readonly = 'true'"/>
+            </xforms:bind>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "xforms:input type xs:date",
+
+                    testOpenHideCalendar: function() {
+                        // Click on text field
+                        YAHOO.util.UserAction.click("date-value$xforms-input-1");
+                        // Check calendar div shown
+                        YAHOO.util.Assert.areEqual("block", document.getElementById("orbeon-calendar-div").style.display);
+                        // Click on body
+                        YAHOO.util.UserAction.click(document.body);
+                        // Check calendar div is hidden
+                        YAHOO.util.Assert.areEqual("none", document.getElementById("orbeon-calendar-div").style.display);
+                    },
+
+                    testCantOpenReadonly: function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            ORBEON.xforms.Document.setValue("date-readonly", "true");
+                        }, function() {
+                            // Check input field has been disabled
+                            YAHOO.util.Assert.areEqual(true, document.getElementById("date-value$xforms-input-1").disabled);
+                            // Click on text field
+                            YAHOO.util.UserAction.click("date-value" + "$xforms-input-1");
+                            // Check that the div is still hidden
+                            YAHOO.util.Assert.areEqual("none", document.getElementById("orbeon-calendar-div").style.display);
+                            // Restore read-only = false
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                ORBEON.xforms.Document.setValue("date-readonly", "false");
+                            }, function() {});
+                        });
+                    }
+
+                    //testChangesToReadonly
+                }));
+
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:h2>xforms:input type xs:date</xhtml:h2>
+        <xforms:group ref="date">
+            <xhtml:p>
+                <xforms:input ref="value" id="date-value">
+                    <xforms:label>Date: </xforms:label>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:input ref="readonly" id="date-readonly">
+                    <xforms:label>Readonly: </xforms:label>
+                </xforms:input>
+            </xhtml:p>
+        </xforms:group>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+    </xhtml:body>
+</xhtml:html>
+

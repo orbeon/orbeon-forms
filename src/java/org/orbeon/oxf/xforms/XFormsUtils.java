@@ -507,6 +507,7 @@ public class XFormsUtils {
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
+                    // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
                     currentModel.getContainer(null).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
                     return null;
                 }

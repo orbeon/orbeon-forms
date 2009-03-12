@@ -23,6 +23,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
+ *
+ * NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10.
  */
 public class XFormsLinkErrorEvent extends XFormsEvent {
     private Throwable throwable;

@@ -462,7 +462,7 @@
                 </xforms:group>
 
                 <xforms:group model="currency-model" class="fr-component-group">
-                    <xforms:input ref="."><xforms:alert/></xforms:input>
+                    <xforms:input ref="." id="currency-input"><xforms:alert/></xforms:input>
 
                     <!-- React to update to local values -->
                     <xforms:action ev:event="xforms-value-changed">

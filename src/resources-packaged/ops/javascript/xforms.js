@@ -5227,7 +5227,9 @@ ORBEON.xforms.Server = {
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-type-boolean");
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-incremental");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-input-appearance-minimal");
+
+                                                // Minimal control content can be different
+                                                var isMinimal = ORBEON.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
 
                                                 // Remove content of span
                                                 while (documentElement.childNodes.length != 0)
@@ -5245,8 +5247,15 @@ ORBEON.xforms.Server = {
                                                 if (isStringType) {
                                                     createInput("xforms-type-string", 1);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
-                                                } else if (isDateType) {
+                                                } else if (isDateType && !isMinimal) {
                                                     createInput("xforms-type-date", 1);
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                } else if (isDateType && isMinimal) {
+                                                    // Create image element
+                                                    var image = document.createElement("img");
+                                                    image.setAttribute("src", ORBEON.xforms.Globals.baseURL + "/ops/images/xforms/calendar.png");
+                                                    image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
+                                                    documentElement.appendChild(image);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 } else if (isTimeType) {
                                                     createInput("xforms-type-time", 1);

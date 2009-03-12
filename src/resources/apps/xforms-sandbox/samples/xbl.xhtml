@@ -84,6 +84,9 @@
 
                     name: "Date Picker",
 
+                    // If bound to a non-relevant node, when the page is produced by the server it doesn't contain the
+                    // image element, and it needs to be added when the server changes the relevancy for the control.
+                    // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313341&group_id=168&atid=350207
                     testBecomesRelevant: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             ORBEON.xforms.Document.setValue("date-picker-flag", "false");
@@ -92,7 +95,7 @@
                             var inputs = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", "input", initiallyHiddenDate);
                             YAHOO.util.Assert.areEqual(0, inputs.length, "No input in field");
                             var images = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", "img", initiallyHiddenDate);
-                            YAHOO.util.Assert.areEqual(1, inputs.length, "One image");
+                            YAHOO.util.Assert.areEqual(1, images.length, "One image");
                         });
                     }
 
@@ -103,7 +106,7 @@
                         parent.TestManager.load();
                     } else {
                         new YAHOO.tool.TestLogger();
-//                        YAHOO.tool.TestRunner.run();
+                        YAHOO.tool.TestRunner.run();
                     }
                 });
             ]]>

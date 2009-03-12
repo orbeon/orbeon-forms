@@ -45,6 +45,12 @@
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
+                <!-- Query list of documents -->
+                <xforms:send submission="search-submission"/>
+            </xforms:action>
+
+            <!-- Model initialization -->
+            <xforms:action ev:event="xforms-model-construct-done-foobar">
                 <!-- Store resources from configuration instance -->
                 <xxforms:variable name="resources-instance" as="element(xforms:instance)"
                                   select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
@@ -63,9 +69,6 @@
                 <xxforms:variable name="page-size" select="instance('fr-search-instance')/page-size" as="element(page-size)"/>
                 <xforms:setvalue ref="$page-size" model="fr-persistence-model"
                                  value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
-
-                <!-- Query list of documents -->
-                <xforms:send submission="search-submission"/>
             </xforms:action>
 
             <!-- Standard Form Runner data instance -->
@@ -182,7 +185,7 @@
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
-                <query xmlns="" name="" path="" type="" control="" search-field="" match="substring"/>
+                <query xmlns="" name="" path="" label="" type="" control="" search-field="" match="substring"/>
             </xforms:instance>
 
             <!-- Paging information -->
@@ -229,6 +232,8 @@
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
 
+                <xforms:dispatch name="xforms-model-construct-done-foobar" target="fr-form-model"/>
+
                 <xxforms:variable name="summary-elements" as="element()*"
                                   select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
 
@@ -249,12 +254,14 @@
                     <!-- Add whether we must show the search field -->
                     <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, ' ') = ('fr-search')"/>
 
+
                     <!-- Add meta-information to template -->
                     <xforms:action if="$control/@bind">
                         <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
                         <xforms:setvalue ref="$query/@name" value="substring-before($bind/@id, '-bind')"/>
                         <xforms:setvalue ref="$query/@path" value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+
                         <!--<xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>-->
                         <!--<xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>-->
 
@@ -272,6 +279,11 @@
                         <xforms:setvalue ref="$query/@name" value="$control/@ref"/>
                         <xforms:setvalue ref="$query/@path" value="string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')"/>
                     </xforms:action>
+
+                    <!-- Compute label information -->
+                    <xxforms:variable name="label" select="$control/xforms:label" as="xs:element(xforms:label)*"/>
+                    <xforms:setvalue ref="$query/@label"
+                                     value="if ($label/@ref or $label/@bind) then xxforms:instance('fr-current-form-resources')/*[local-name() = $query/@name]/label else $label"/>
                 </xforms:action>
 
             </xforms:action>
@@ -427,8 +439,7 @@
                                 <div class="fr-summary-search-item">
                                     <!-- Application -->
                                     <xforms:group ref="$app-query">
-                                        <xxforms:variable name="control-name" select="@name" as="xs:string"/>
-                                        <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                        <xxforms:variable name="label" select="@label" as="xs:string"/>
                                         <!-- Use an input if app name is a wildcard -->
                                         <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xforms:input ref=".[$is-input]">
@@ -457,8 +468,7 @@
                                 <div class="fr-summary-search-item">
                                     <!-- Form -->
                                     <xforms:group ref="$form-query">
-                                        <xxforms:variable name="control-name" select="@name" as="xs:string"/>
-                                        <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label" as="xs:string"/>
+                                        <xxforms:variable name="label" select="@label" as="xs:string"/>
                                         <xxforms:variable name="current-app" select="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
@@ -487,7 +497,7 @@
                             <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                 <xxforms:variable name="control-name" select="@name"/>
                                 <div class="fr-summary-search-item">
-                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
+                                    <xxforms:variable name="label" select="@label"/>
 
                                     <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
                                         <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
@@ -565,12 +575,13 @@
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
                                         <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
                                             <th>
-                                                <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
-                                                <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
+                                                <xxforms:variable name="control-info" select="." as="element()"/>
+                                                <xxforms:variable name="resourceId" select="substring-before($control-info/@id, '-control')" as="xs:string"/>
+                                                <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]" as="element()?"/>
                                                 <!-- control to make data accessible to JavaScript -->
                                                 <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
                                                 <!-- Output showing as the header of the column -->
-                                                <xforms:output value="if (exists($resource)) then $resource/label else concat('[', $resourceId, ']')"/>
+                                                <xforms:output value="if (exists($resource)) then $resource/label else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label else concat('[', $resourceId, ']')"/>
 
                                             </th>
                                         </xforms:repeat>

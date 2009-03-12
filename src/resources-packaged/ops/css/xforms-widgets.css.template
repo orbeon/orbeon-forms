@@ -104,3 +104,5 @@
 .widgets-xforms-instance-inspector h2 {
     margin: 0
 }
+
+.widgets-xforms-instance-inspector .xforms-mediatype-text-html { text-align: left }

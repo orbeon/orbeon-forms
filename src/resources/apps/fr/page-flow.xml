@@ -71,9 +71,7 @@
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
-          default-submission="submission-service-resource.xml"
           model="persistence/resource/crud.xpl">
-        <setvalue ref="/*/resource" matcher-group="1"/>
     </page>
 
     <!-- ==== Internationalization ================================================================================= -->
@@ -112,6 +110,15 @@
     </page>
 
     <!-- ==== Custom Services and Pages ============================================================================ -->
+
+    <!-- Custom persistence implementation provided by the application -->
+    <page path-info="/fr/service/custom/([^/]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/service/crud.xpl">
+    </page>
+
+    <page path-info="/fr/service/custom/([^/]+)/search/[^/]+/[^/]+" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/service/search.xpl">
+    </page>
 
     <!-- Custom services provided by the application -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"

@@ -515,7 +515,7 @@
                                 <xsl:otherwise>
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <xforms:output value="@label" class="fr-error-label"/>
+                                            <xforms:output value="normalize-space(@label)" class="fr-error-label"/>
                                         </xforms:label>
                                         <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
                                     </xforms:trigger>

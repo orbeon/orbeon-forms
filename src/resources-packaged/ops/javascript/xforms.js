@@ -2603,6 +2603,11 @@ ORBEON.xforms.Events = {
     click: function(event) {
         ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
+        if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {
+            // IE calls the click event handler on clicks on disabled controls, which Firefox doesn't.
+            // To make processing more similar on all browsers, we stop going further here if we go a click on a disabled control.
+            return;
+        }
         var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
 
         if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-output")) {
@@ -3207,7 +3212,6 @@ ORBEON.widgets.YUICalendar = function() {
         },
 
         click: function(event, target) {
-
             if (calendarDiv == null) {
                 // Try to get existing div
 

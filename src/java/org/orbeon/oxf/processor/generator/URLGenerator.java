@@ -321,7 +321,7 @@ public class URLGenerator extends ProcessorImpl {
                                         headerNameValues = new LinkedHashMap();
                                     }
 
-                                    headerNameValues.put(currentHeaderName, currentHeaderValue);
+                                    headerNameValues.put(currentHeaderName, new String[] {currentHeaderValue});
                                 }
 
                                 final String forwardHeaders = XPathUtils.selectStringValueNormalize(configElement, "/config/forward-headers");

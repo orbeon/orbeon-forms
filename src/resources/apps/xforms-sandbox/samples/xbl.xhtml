@@ -52,30 +52,22 @@
 
                     name: "Currency",
 
-                    startPriceInput: null,
-                    priceIncrement: null,
-
-                    setUp: function() {
-                        this.startPriceInput = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, document.getElementById("start-price"))[0];
-                        this.priceIncrement = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, document.getElementById("price-increment"))[0];
-                    },
-
                     testExpandsWithUserInput: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            this.startPriceInput.focus();
-                            this.startPriceInput.value = 42;
-                            this.priceIncrement.focus();
+                            ORBEON.xforms.Document.setValue("start-price$currency-input", "42");
                         }, function() {
-                            YAHOO.util.Assert.areEqual("$ 42.000", this.startPriceInput.value);
+                            var newValue = ORBEON.xforms.Document.getValue("start-price$currency-input");
+                            YAHOO.util.Assert.areEqual("$ 42.000", newValue);
                         });
                     },
 
                     testExpandsWithInstanceChange: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            this.startPriceInput.value = 42;
+                            ORBEON.xforms.Document.setValue("start-price$currency-input", "42");
                             YAHOO.util.UserAction.click(document.getElementById("increase-start-price"));
                         }, function() {
-                            YAHOO.util.Assert.areEqual("$ 43.000", this.startPriceInput.value);
+                            var newValue = ORBEON.xforms.Document.getValue("start-price$currency-input");
+                            YAHOO.util.Assert.areEqual("$ 43.000", newValue);
                         });
                     }
                 }));
@@ -105,7 +97,8 @@
                     if (parent && parent.TestManager) {
                         parent.TestManager.load();
                     } else {
-                        new YAHOO.tool.TestLogger();
+                        var testLogger = new YAHOO.tool.TestLogger();
+                        testLogger.showSource("global");
                         YAHOO.tool.TestRunner.run();
                     }
                 });

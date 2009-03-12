@@ -226,7 +226,8 @@ public class SecureUtils {
         return result;
     }
 
-    private static final char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    // As of 2009-03-11 XForms 1.1 says digits should be lowercase.
+    private static final char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     private static String byteArrayToHex(byte[] bytes) {
 //        final StringBuilder sb = new StringBuilder(bytes.length * 2);

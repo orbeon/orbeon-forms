@@ -97,8 +97,7 @@
                     if (parent && parent.TestManager) {
                         parent.TestManager.load();
                     } else {
-                        var testLogger = new YAHOO.tool.TestLogger();
-                        testLogger.showSource("global");
+                        new YAHOO.tool.TestLogger();
                         YAHOO.tool.TestRunner.run();
                     }
                 });

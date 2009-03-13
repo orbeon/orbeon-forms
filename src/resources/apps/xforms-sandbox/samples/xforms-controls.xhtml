@@ -25,15 +25,24 @@
         <xhtml:title>XForms Controls</xhtml:title>
         <xforms:model>
             <xforms:instance id="main-instance">
-                <instance>
+                <instance repeat-shown="true" readonly="" relevant="true">
                     <date>
                         <value>2009-03-19</value>
                         <readonly>false</readonly>
                     </date>
+                    <output-file>
+                        <uri>file:///tmp/dummy</uri>
+                    </output-file>
                 </instance>
             </xforms:instance>
+            <!-- Global MIPS that apply to all the controls -->
+            <xforms:bind nodeset="*" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
+            <xforms:bind nodeset="@*" type="xs:boolean"/>
             <xforms:bind nodeset="date">
                 <xforms:bind nodeset="value" type="xs:date" readonly="../readonly = 'true'"/>
+            </xforms:bind>
+            <xforms:bind nodeset="output-file">
+                <xforms:bind nodeset="uri" type="xs:anyURI"/>
             </xforms:bind>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -45,9 +54,11 @@
 
                     name: "xforms:input type xs:date",
 
+                    dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
+
                     testOpenHideCalendar: function() {
                         // Click on text field
-                        YAHOO.util.UserAction.click("date-value$xforms-input-1");
+                        YAHOO.util.UserAction.click(this.dateValueInputId);
                         // Check calendar div shown
                         YAHOO.util.Assert.areEqual("block", document.getElementById("orbeon-calendar-div").style.display);
                         // Click on body
@@ -58,22 +69,49 @@
 
                     testCantOpenReadonly: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            ORBEON.xforms.Document.setValue("date-readonly", "true");
+                            ORBEON.xforms.Document.setValue("readonly", "true");
                         }, function() {
                             // Check input field has been disabled
-                            YAHOO.util.Assert.areEqual(true, document.getElementById("date-value$xforms-input-1").disabled);
+                            YAHOO.util.Assert.areEqual(true, document.getElementById(this.dateValueInputId).disabled);
                             // Click on text field
-                            YAHOO.util.UserAction.click("date-value" + "$xforms-input-1");
+                            YAHOO.util.UserAction.click(this.dateValueInputId);
                             // Check that the div is still hidden
                             YAHOO.util.Assert.areEqual("none", document.getElementById("orbeon-calendar-div").style.display);
                             // Restore read-only = false
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                                ORBEON.xforms.Document.setValue("date-readonly", "false");
+                                ORBEON.xforms.Document.setValue("readonly", "false");
                             }, function() {});
                         });
                     }
+                }));
 
-                    //testChangesToReadonly
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "xforms:outout appearance=\"xxforms:download\"",
+
+                    outputFileId: "output-file-value" + XFORMS_SEPARATOR_1 + "1",
+
+                    // Test that the control is correctly restored when the iteration is recreated
+                    // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313369&group_id=168&atid=350207
+                    testRepeatCreate: function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            ORBEON.xforms.Document.setValue("repeat-shown", "false");
+                        }, function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                ORBEON.xforms.Document.setValue("repeat-shown", "true");
+                            }, function() {
+                                var control = document.getElementById(this.outputFileId);
+                                var children = YAHOO.util.Dom.getChildren(control);
+                                // Check we still have the link
+                                YAHOO.util.Assert.areEqual(1, children.length);
+                                var a = children[0];
+                                // The link points to a dynamic resource
+                                YAHOO.util.Assert.areNotEqual(-1, a.href.indexOf("/orbeon/xforms-server/dynamic/"));
+                                // The text for the link is still the same
+                                YAHOO.util.Assert.areEqual("Download file", ORBEON.util.Dom.getStringValue(a));
+                            });
+                        });
+                    }
                 }));
 
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
@@ -89,19 +127,42 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xhtml:h2>xforms:input type xs:date</xhtml:h2>
-        <xforms:group ref="date">
-            <xhtml:p>
-                <xforms:input ref="value" id="date-value">
-                    <xforms:label>Date: </xforms:label>
-                </xforms:input>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:input ref="readonly" id="date-readonly">
-                    <xforms:label>Readonly: </xforms:label>
-                </xforms:input>
-            </xhtml:p>
-        </xforms:group>
+        <xhtml:h2>Global properties</xhtml:h2>
+        <xhtml:p>
+            <xforms:input ref="@repeat-shown" id="repeat-shown">
+                <xforms:label>Repeat shown: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="@readonly" id="readonly">
+                <xforms:label>Readonly: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="@relevant" id="relevant">
+                <xforms:label>Relevant: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+
+        <xforms:repeat nodeset=".[@repeat-shown = 'true']">
+            <xhtml:h2>xforms:input type xs:date</xhtml:h2>
+            <xforms:group ref="date">
+                <xhtml:p>
+                    <xforms:input ref="value" id="date-value">
+                        <xforms:label>Date: </xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+            </xforms:group>
+
+            <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
+            <xforms:group ref="output-file">
+                <xhtml:p>
+                    <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value">
+                        <xforms:label>Download file</xforms:label>
+                    </xforms:output>
+                </xhtml:p>
+            </xforms:group>
+        </xforms:repeat>
 
         <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>

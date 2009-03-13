@@ -1687,6 +1687,10 @@ ORBEON.xforms.Controls = {
             var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             if (legend != null)
                 legend.innerHTML = message;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
+            // Download link
+            var anchor = YAHOO.util.Dom.getChildren(control)[0];
+            anchor.innerHTML = message;
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-label", message);
         }

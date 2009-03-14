@@ -7031,6 +7031,7 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
 
     if (!foundDojoContentPane) {
         ORBEON.xforms.Globals.pageLoadedRegistered = true;
+        YAHOO.util.Event.throwErrors = true;
         YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
         ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
         ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();

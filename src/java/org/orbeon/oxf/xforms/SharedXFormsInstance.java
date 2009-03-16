@@ -26,8 +26,8 @@ public class SharedXFormsInstance extends XFormsInstance {
         super(containerElement);
     }
 
-    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
-        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+    public SharedXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
     public void synchronizeInstanceDataEventState() {

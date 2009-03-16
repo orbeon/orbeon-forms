@@ -59,7 +59,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     private DocumentInfo documentInfo;
 
-    private String instanceId;
+    private String instanceStaticId;
     private String modelEffectiveId;
 
     private String sourceURI;
@@ -92,7 +92,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      */
     public XFormsInstance(Element containerElement) {
 
-        this.instanceId = containerElement.attributeValue("id");
+        this.instanceStaticId = containerElement.attributeValue("id");
         this.modelEffectiveId = containerElement.attributeValue("model-id");
 
         this.sourceURI = containerElement.attributeValue("source-uri");
@@ -143,17 +143,17 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelEffectiveId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelEffectiveId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(modelEffectiveId, instanceStaticId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String modelEffectiveId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
 
         if (applicationShared && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
 
-        this.instanceId = instanceId;
+        this.instanceStaticId = instanceStaticId;
         this.modelEffectiveId = modelEffectiveId;
 
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
@@ -191,7 +191,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         if (timeToLive >= 0)
             instanceElement.addAttribute("ttl", Long.toString(timeToLive));
 
-        instanceElement.addAttribute("id", instanceId);
+        instanceElement.addAttribute("id", instanceStaticId);
         instanceElement.addAttribute("model-id", modelEffectiveId);
         if (sourceURI != null)
             instanceElement.addAttribute("source-uri", sourceURI);
@@ -243,7 +243,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * Return the id of this instance.
      */
     public String getId() {
-        return instanceId;
+        return instanceStaticId;
     }
 
     public String getEffectiveId() {
@@ -592,13 +592,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelEffectiveId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
     }
 
-    public static String getInstanceId(Element xformsInstanceElement) {
-        // NOTE: There has to be an id, but we return a non-null value just for the legacy engine
-        final String idAttribute = xformsInstanceElement.attributeValue("id");
-        return (idAttribute != null) ? idAttribute : "";
+    public static String getInstanceStaticId(Element xformsInstanceElement) {
+        return xformsInstanceElement.attributeValue("id");
     }
 
     public static boolean isReadonlyHint(Element element) {

@@ -91,7 +91,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
     private String replaceInstanceId;
     private String xxfReplaceInstanceId;
-    private String avtSeparator = ";";
+    private String avtSeparator = "&";// XForms 1.1 changes back the default to the ampersand as of February 2009
     private String includenamespaceprefixes;
 
     private String avtXXFormsUsername;
@@ -750,7 +750,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getEffectiveId(), replaceInstance.getEffectiveModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getId(), replaceInstance.getEffectiveModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
 
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "replacing instance with read-only instance",

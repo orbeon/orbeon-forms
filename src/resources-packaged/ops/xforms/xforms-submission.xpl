@@ -79,7 +79,7 @@
                                                 </xsl:if>
                                             </xforms:submission>
                                         </xforms:model>
-                                        <properties xxforms:state-handling="client" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
+                                        <properties xxforms:state-handling="client" xxforms:noscript="false" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
                                     </static-state>
                                 </xsl:document>
                             </xsl:variable>

@@ -85,8 +85,8 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Handle document language -->
     <xsl:template match="/xhtml:html">
+        <!-- Handle document language -->
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
                     xml:lang="{{xxforms:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@*"/>
@@ -108,8 +108,9 @@
                                         instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
                                         instance('fr-form-metadata')/title[1],
                                         ({$view-label/@ref}),
+                                        ({$view-label/@value}),
                                         '{$view-label}',
-                                        /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                                        '{xhtml:head/xhtml:title}')[normalize-space() != ''])[1]"/>
 
             <xsl:apply-templates select="node()"/>
         </xhtml:html>

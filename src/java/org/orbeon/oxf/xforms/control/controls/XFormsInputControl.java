@@ -494,4 +494,8 @@ public class XFormsInputControl extends XFormsValueControl {
         return parse(matcher, XFormsInputControl.TIME_PARSE_PATTERNS, value);
     }
 
+    public static String testParseDate(String value) {
+        final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+        return parse(matcher, XFormsInputControl.DATE_PARSE_PATTERNS, value);
+    }
 }

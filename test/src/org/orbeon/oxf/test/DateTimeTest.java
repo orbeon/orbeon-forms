@@ -29,9 +29,12 @@ public class DateTimeTest extends TestCase {
         for (int i = 0; i < pmSuffixes.length; i++) {
             final String pmSuffix = pmSuffixes[i];
 
-            assertEquals(XFormsInputControl.testParseTime("3:34:56 " + pmSuffix), "15:34:56");
-            assertEquals(XFormsInputControl.testParseTime("3:34 " + pmSuffix), "15:34:00");
-            assertEquals(XFormsInputControl.testParseTime("3 " + pmSuffix), "15:00:00");
+            assertEquals("15:34:56", XFormsInputControl.testParseTime("3:34:56 " + pmSuffix));
+            assertEquals("15:34:00", XFormsInputControl.testParseTime("3:34 " + pmSuffix));
+            assertEquals("12:00:00", XFormsInputControl.testParseTime("12 " + pmSuffix));
+            assertEquals("15:00:00", XFormsInputControl.testParseTime("3 " + pmSuffix));
+            // 0 pm is rarely used
+            assertEquals("12:00:00", XFormsInputControl.testParseTime("0 " + pmSuffix));
         }
 
         // Test AM time parsing
@@ -39,12 +42,19 @@ public class DateTimeTest extends TestCase {
         for (int i = 0; i < amSuffixes.length; i++) {
             final String amSuffix = amSuffixes[i];
 
-            assertEquals(XFormsInputControl.testParseTime("3:34:56 " + amSuffix), "03:34:56");
-            assertEquals(XFormsInputControl.testParseTime("3:34 " + amSuffix), "03:34:00");
-            assertEquals(XFormsInputControl.testParseTime("3 " + amSuffix), "03:00:00");
+            assertEquals("03:34:56", XFormsInputControl.testParseTime("3:34:56 " + amSuffix));
+            assertEquals("03:34:00", XFormsInputControl.testParseTime("3:34 " + amSuffix));
+            // 12 am is rarely used
+            assertEquals("12:00:00", XFormsInputControl.testParseTime("12 " + amSuffix));
+            assertEquals("03:00:00", XFormsInputControl.testParseTime("3 " + amSuffix));
+            assertEquals("00:00:00", XFormsInputControl.testParseTime("0 " + amSuffix));
         }
 
         // TODO
 //        assertEquals(XFormsInputControl.testTimeParse("123456"), "xxx");
+    }
+
+    public void testDateParsing() {
+        // TODO
     }
 }

@@ -26,7 +26,7 @@ body {
     text-align: left /* Not sure why the YUI resets this to center */
 }
 
-td { border: 0 }
+td { border: 0; vertical-align: top }
 i { font-style: italic }
 b { font-weight: bold }
 th, td {border: 0; padding: 0 }
@@ -206,6 +206,26 @@ p, fieldset, table { margin-bottom: 1em }
 
 /* Add background to static read-only fields */
 .xforms-static { background-color: #EEE }
+
+/* Messages area */
+.fr-messages {
+    display: block;
+    clear: both;
+    padding: 1em;
+    margin-bottom: 1em;
+    background-color: white;
+    border: 1px solid #DDDDDD;
+}
+
+.fr-messages p {
+    margin: 0;
+}
+
+.fr-messages .fr-message-fatal-error { text-align: center; color: red }
+.fr-messages .fr-message-validation-error { text-align: center; color: #DF731B }
+.fr-messages .fr-message-success { text-align: center; color: green }
+
+.fr-messages p a { color: white }
 
 /* ***** Print and PDF ********************************************************************************************** */
 

@@ -380,7 +380,7 @@
             <template>
                 <!-- NOTE: We use oxf.fr.appserver.uri below until we have built-in support in Orbeon Forms for rewriting service URLs -->
                 <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment"
-                        value="for $v in . return if (starts-with($v, 'file:')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)">
+                        value="for $v in . return if (tokenize($v, ':')[1] = ('file', 'http', 'https')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>
                     <!-- No hint? -->
@@ -443,7 +443,7 @@
             </xforms:upload>
             <!-- NOTE: We use oxf.fr.appserver.uri below until we have built-in support in Orbeon Forms for rewriting service URLs -->
             <xforms:output appearance="xxforms:download" xbl:attr="context ref bind"
-                           value="for $v in . return if (starts-with($v, 'file:')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)">
+                           value="for $v in . return if (tokenize($v, ':')[1] = ('file', 'http', 'https')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)">
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/down.gif" alt=""/>
                     <xhtml:span>Download</xhtml:span>

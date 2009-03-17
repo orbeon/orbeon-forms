@@ -41,7 +41,7 @@
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
-    <xsl:variable name="is-detail" select="$mode != ''" as="xs:boolean"/>
+    <xsl:variable name="is-detail" select="$mode != 'summary'" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
     <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>

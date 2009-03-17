@@ -616,8 +616,8 @@ ORBEON.util.DateTime = {
                 return new Date();
             }
         },
-        // p.m.
-        {   re: /$(\d{1,2}):(\d{1,2}):(\d{1,2})(?:p| p)$/,
+        // 12:34:56 p.m.
+        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(p|pm|p\.\m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -628,8 +628,8 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
-        // p.m., no seconds
-        {   re: /^(\d{1,2}):(\d{1,2})(?:p| p)$/,
+        // 12:34 p.m.
+        {   re: /^(\d{1,2}):(\d{1,2}) ?(p|pm|p\.\m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -640,8 +640,8 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
-        // p.m., hour only
-        {   re: /^(\d{1,2})(?:p| p)$/,
+        // 12 p.m.
+        {   re: /^(\d{1,2}) ?(p|pm|p\.\m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -652,8 +652,8 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
-        // hh:mm:ss
-        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2})$/,
+        // 12:34:56 (a.m.)
+        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
@@ -662,12 +662,22 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
-        // hh:mm
-        {   re: /^(\d{1,2}):(\d{1,2})$/,
+        // 12:34 (a.m.)
+        {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
                 d.setMinutes(parseInt(bits[2], 10));
+                d.setSeconds(0);
+                return d;
+            }
+        },
+        // 12 (a.m.)
+        {   re: /^(\d{1,2}) ?(a|am|a\.\m\.)?$/,
+            handler: function(bits) {
+                var d = new Date();
+                d.setHours(parseInt(bits[1], 10));
+                d.setMinutes(0);
                 d.setSeconds(0);
                 return d;
             }

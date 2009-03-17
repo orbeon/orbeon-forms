@@ -172,7 +172,7 @@ public class XFormsInputControl extends XFormsValueControl {
         }
     }
 
-    private String parse(Perl5MatchProcessor matcher, ParsePattern[] patterns, String value) {
+    private static String parse(Perl5MatchProcessor matcher, ParsePattern[] patterns, String value) {
         for (int i = 0; i < patterns.length; i++) {
             final ParsePattern currentPattern = patterns[i];
             final MatchProcessor.Result result = matcher.match(currentPattern.getRe(), value);
@@ -270,11 +270,12 @@ public class XFormsInputControl extends XFormsValueControl {
     private static ParsePattern[] TIME_PARSE_PATTERNS = new ParsePattern[] {
             // TODO: remaining regexps from xforms.js?
             // Now
+            // TODO
 
-            // p.m.
+            // 12:34:56 p.m.
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{1,2}):(\\d{1,2}):(\\d{1,2})(?:p| p)";
+                    return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
                     byte hoursByte = Byte.parseByte((String) result.groups.get(0));
@@ -286,10 +287,10 @@ public class XFormsInputControl extends XFormsValueControl {
                     return value.getStringValue();
                 }
             },
-            // p.m., no seconds
+            // 12:34 p.m.
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{1,2}):(\\d{1,2})(?:p| p)";
+                    return "^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
                     byte hoursByte = Byte.parseByte((String) result.groups.get(0));
@@ -300,10 +301,10 @@ public class XFormsInputControl extends XFormsValueControl {
                     return value.getStringValue();
                 }
             },
-            // p.m., hour only
+            // 12 p.m.
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{1,2})(?:p| p)";
+                    return "^(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
                     byte hoursByte = Byte.parseByte((String) result.groups.get(0));
@@ -313,14 +314,12 @@ public class XFormsInputControl extends XFormsValueControl {
                     return value.getStringValue();
                 }
             },
-
-            // hh:mm:ss
+            // 12:34:56 (a.m.)
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{1,2}):(\\d{1,2}):(\\d{1,2})";
+                    return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.\\m\\.)?$";
                 }
                 public String handle(MatchProcessor.Result result) {
-
                     final String hours = (String) result.groups.get(0);
                     final String minutes = (String) result.groups.get(1);
                     final String seconds = (String) result.groups.get(2);
@@ -328,10 +327,10 @@ public class XFormsInputControl extends XFormsValueControl {
                     return value.getStringValue();
                 }
             },
-            // hh:mm
+            // 12:34 (a.m.)
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{1,2}):(\\d{1,2})";
+                    return "^(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.\\m\\.)?$";
                 }
                 public String handle(MatchProcessor.Result result) {
 
@@ -340,7 +339,46 @@ public class XFormsInputControl extends XFormsValueControl {
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
+            },
+            // 12 (a.m.)
+            new ParsePattern() {
+                public String getRe() {
+                    return "^(\\d{1,2}) ?(a|am|a\\.\\m\\.)?$";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String hours = (String) result.groups.get(0);
+                    final TimeValue value = new TimeValue(Byte.parseByte(hours), (byte) 0, (byte) 0, 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
+            },
+            // hhmmss
+            /* TODO: JS code has this, need to implement same logic
+            new ParsePattern() {
+                public String getRe() {
+                    return "^(\\d{1,6})$";
+                }
+                public String handle(MatchProcessor.Result result) {
+
+                    final String all = (String) result.groups.get(0);
+
+//                    var d = new Date();
+//                    var h = bits[1].substring(0,2);
+//                    var m = parseInt(bits[1].substring(2,4), 10);
+//                    var s = parseInt(bits[1].substring(4,6), 10);
+//                    if (isNaN(m)) {m = 0;}
+//                    if (isNaN(s)) {s = 0;}
+//                    d.setHours(parseInt(h, 10));
+//                    d.setMinutes(parseInt(m, 10));
+//                    d.setSeconds(parseInt(s, 10));
+
+
+                    final String minutes = (String) result.groups.get(1);
+                    final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
+                    return value.getStringValue();
+                }
             }
+            */
     };
 
     /**
@@ -450,4 +488,10 @@ public class XFormsInputControl extends XFormsValueControl {
             return null;
         }
     }
+
+    public static String testParseTime(String value) {
+        final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+        return parse(matcher, XFormsInputControl.TIME_PARSE_PATTERNS, value);
+    }
+
 }

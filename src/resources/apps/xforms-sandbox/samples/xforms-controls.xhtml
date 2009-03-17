@@ -28,8 +28,10 @@
                 <instance repeat-shown="true" readonly="" relevant="true">
                     <date>
                         <value>2009-03-19</value>
-                        <readonly>false</readonly>
                     </date>
+                    <time>
+                        <value>15:00:00</value>
+                    </time>
                     <output-file>
                         <uri>file:///tmp/dummy</uri>
                     </output-file>
@@ -39,7 +41,10 @@
             <xforms:bind nodeset="*" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
             <xforms:bind nodeset="@*" type="xs:boolean"/>
             <xforms:bind nodeset="date">
-                <xforms:bind nodeset="value" type="xs:date" readonly="../readonly = 'true'"/>
+                <xforms:bind nodeset="value" type="xs:date"/>
+            </xforms:bind>
+            <xforms:bind nodeset="time">
+                <xforms:bind nodeset="value" type="xs:time"/>
             </xforms:bind>
             <xforms:bind nodeset="output-file">
                 <xforms:bind nodeset="uri" type="xs:anyURI"/>
@@ -82,6 +87,21 @@
                                 ORBEON.xforms.Document.setValue("readonly", "false");
                             }, function() {});
                         });
+                    }
+                }));
+
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "xforms:input type xs:time",
+
+                    timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
+                    timeValueInputId: "time-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
+
+                    // Test for: Regression: dateTime field is always invalid when "p.m." is entered
+                    // http://forge.objectweb.org/tracker/?func=detail&atid=350207&aid=313427&group_id=168
+                    testParsing: function() {
+                        var parsedTime = ORBEON.util.DateTime.magicTimeToJSDate("6:00:00 p");
+                        YAHOO.util.Assert.isNotNull(parsedTime);
                     }
                 }));
 
@@ -143,8 +163,15 @@
                 <xforms:label>Relevant: </xforms:label>
             </xforms:input>
         </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger appearance="minimal" id="focus-trigger">
+                <xforms:label>(focus trigger)</xforms:label>
+            </xforms:trigger>
+        </xhtml:p>
 
         <xforms:repeat nodeset=".[@repeat-shown = 'true']">
+
+            <!-- Date -->
             <xhtml:h2>xforms:input type xs:date</xhtml:h2>
             <xforms:group ref="date">
                 <xhtml:p>
@@ -154,6 +181,17 @@
                 </xhtml:p>
             </xforms:group>
 
+            <!-- Time -->
+            <xhtml:h2>xforms:input type xs:date</xhtml:h2>
+            <xforms:group ref="time">
+                <xhtml:p>
+                    <xforms:input ref="value" id="time-value">
+                        <xforms:label>Time: </xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+            </xforms:group>
+
+            <!-- Download -->
             <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
             <xforms:group ref="output-file">
                 <xhtml:p>

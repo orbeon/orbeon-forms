@@ -50,15 +50,20 @@ public class XBLUtils {
      * @param binding           corresponding <xbl:binding>
      * @return                  shadow tree document
      */
-    public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper, final Element boundElement, Element binding, Map namespaceMappings) {
+    public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper,
+                                                    final Element boundElement, Element binding, Map namespaceMappings) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
             // Here we create a completely separate document
+
+            // 1. Apply optional preprocessing step (usually XSLT)
+            // TODO: call transformation here, OR:
             // Copy as the template element may be used many times
             final Document shadowTreeDocument = Dom4jUtils.createDocumentCopyParentNamespaces(templateElement);
 
+            // 2. Apply xbl:attr, xbl:content, xxbl:attr
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
                 public void startElement(Element element) {
 

@@ -357,6 +357,8 @@
         <copy file="${xforms-filter.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-private.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-public.jar.file}" todir="${war.lib}"/>
+        <copy file="${form-runner.jar.file}" todir="${war.lib}"/>
+        <copy file="${form-builder.jar.file}" todir="${war.lib}"/>
 
         <copy todir='${war.lib}/private' >
           <fileset refid='war.libs.private' />

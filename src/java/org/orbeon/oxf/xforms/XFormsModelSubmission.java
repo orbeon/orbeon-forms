@@ -758,7 +758,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             // Handle new instance and associated events
                             final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
-                            replaceModel.handleNewInstanceDocuments(pipelineContext, sharedInstance);
+                            replaceModel.handleNewInstanceDocument(pipelineContext, sharedInstance);
 
                             connectionResult = null;
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString, 200);
@@ -908,7 +908,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                                             // Handle new instance and associated events
                                             final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                                            replaceModel.handleNewInstanceDocuments(pipelineContext, newInstance);
+                                            replaceModel.handleNewInstanceDocument(pipelineContext, newInstance);
 
                                             // Notify that submission is done
                                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult);

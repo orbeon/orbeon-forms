@@ -486,7 +486,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
                 // Build initial instance documents
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getSharedInstancesMap() : null;
+                final Map staticStateInstancesMap = staticState.isInitialized() ? staticState.getSharedInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -1463,7 +1463,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     /**
      * Handle events related to externally updating one or more instance documents.
      */
-    public void handleNewInstanceDocuments(PipelineContext pipelineContext, final XFormsInstance newInstance) {
+    public void handleNewInstanceDocument(PipelineContext pipelineContext, final XFormsInstance newInstance) {
 
         // Set the instance on this model
         setInstance(newInstance, true);
@@ -1476,55 +1476,70 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
             deferredActionContext.revalidate = true;
         }
 
-        // Mark new instance nodes to which controls are bound for event dispatching
         final XFormsControls xformsControls = containingDocument.getControls();
-        if (!newInstance.isReadOnly()               // replacing a read-only instance does not cause value change events at the moment
-                && xformsControls.isInitialized()) {// no point in doing anything if there are no controls yet
+        if (xformsControls.isInitialized()) {
+            // Controls exist, otherwise there is no point in doing anything controls-related
 
             // The controls will be dirty
             containingDocument.getControls().markDirtySinceLastRequest(true);
-    
-            // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
-            if (deferredActionContext != null) {
-                deferredActionContext.refresh = true;
+
+            // As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
+            // performing RRRR directly
+            deferredActionContext.setAllDeferredFlags(true);
+
+            if (newInstance.isReadOnly()) {
+                // Read-only instance: replacing does not cause value change events at the moment, so we just set the
+                // flags but do not mark values as changed. Anyway, that event logic is broken, see below.
+
+                // NOP for now
+            } else {
+                // Read-write instance
+
+                // NOTE: Besides setting the flags, for read-write instances, we go through a marking process used for
+                // event dispatch. This process requires:
+                //
+                // o up-to-date control bindings, for 1) relevance handling and 2) type handling
+                // o which in turn requires RRR
+                //
+                // So we do perform RRR below, which clears the flags set above. This should be seen as temporary
+                // measure until we do proper (i.e. not like XForms 1.1 specifies!) UI event updates.
+
+                // Update control bindings if needed 
+                doRebuild(pipelineContext);
+                doRecalculate(pipelineContext);
+                doRevalidate(pipelineContext);
+                xformsControls.updateControlBindingsIfNeeded(pipelineContext);
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("model", "marking nodes for value change following instance replacement",
+                            new String[] { "instance id", newInstance.getEffectiveId() });
+
+                // Mark all nodes to which single-node controls are bound
+                xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+                    public void startVisitControl(XFormsControl control) {
+
+                        // Don't do anything if it's not a single node control
+                        if (!(control instanceof XFormsSingleNodeControl))
+                            return;
+
+                        // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
+                        final NodeInfo currentNodeInfo = control.getBoundNode();
+                        if (currentNodeInfo == null)
+                            return;
+
+                        // We only mark nodes in mutable documents
+                        if (!(currentNodeInfo instanceof NodeWrapper))
+                            return;
+
+                        // We only mark nodes in the replaced instance
+                        if (getInstanceForNode(currentNodeInfo) != newInstance)
+                            return;
+
+                        // Finally, mark node
+                        InstanceData.markValueChanged(currentNodeInfo);
+                    }
+                });
             }
-
-            // Update control bindings if needed
-            // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling
-            doRebuild(pipelineContext);
-            doRecalculate(pipelineContext);
-            doRevalidate(pipelineContext);
-            xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("model", "marking nodes for value change following instance replacement",
-                        new String[] { "instance id", newInstance.getEffectiveId() });
-
-            // Mark all nodes to which single-node controls are bound
-            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-                public void startVisitControl(XFormsControl control) {
-
-                    // Don't do anything if it's not a single node control
-                    if (!(control instanceof XFormsSingleNodeControl))
-                        return;
-
-                    // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
-                    final NodeInfo currentNodeInfo = control.getBoundNode();
-                    if (currentNodeInfo == null)
-                        return;
-
-                    // We only mark nodes in mutable documents
-                    if (!(currentNodeInfo instanceof NodeWrapper))
-                        return;
-
-                    // We only mark nodes in the replaced instance
-                    if (getInstanceForNode(currentNodeInfo) != newInstance)
-                        return;
-
-                    // Finally, mark node
-                    InstanceData.markValueChanged(currentNodeInfo);
-                }
-            });
         }
     }
 

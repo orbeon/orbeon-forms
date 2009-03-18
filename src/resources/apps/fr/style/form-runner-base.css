@@ -335,11 +335,15 @@ button.xforms-trigger img { margin-right: 10px }
     *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
 }
 
-.fr-grid-content .xforms-control {
+.fr-grid-content .xforms-control,
+        .fr-grid-content .xbl-fr-date-picker .xforms-group { /* The group inside a date picker is considered like a control */
     display: block;     /* So control is not displayed next to the help icon but on a new line */
     margin-top: 0.3em;  /* Insert some space between the label / help and the control */
     clear: both;
 }
+
+/* Undo effect of previous rule for components of the date picker, so date and icon are not on separate lines */
+.fr-grid-content .xbl-fr-date-picker .xforms-group .xforms-control { display: inline; }
 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
@@ -425,7 +429,9 @@ button.xforms-trigger img { margin-right: 10px }
 /* TODO: more controls */
 #doc4 .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
 #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
+#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
 
 #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,

@@ -26,6 +26,7 @@
             <xforms:instance id="instance">
                 <instance>
                     <text>Some text here</text>
+                    <tmp/>
                     <message/>
                 </instance>
             </xforms:instance>
@@ -63,18 +64,23 @@
         <!-- The dialog -->
         <xxforms:dialog id="myDialog" level="modeless" close="true" draggable="true" appearance="full">
 
-            <xforms:setvalue ev:event="xxforms-dialog-open" ref="message">Dialog open</xforms:setvalue>
-            <xforms:setvalue ev:event="xxforms-dialog-close" ref="message">Dialog closed</xforms:setvalue>
+            <xforms:setvalue ev:event="xxforms-dialog-open" ref="tmp" value="context()/text"/>
 
             <xforms:label>Dialog title</xforms:label>
             <xhtml:h3>Please complete the form</xhtml:h3>
             <xhtml:p>
-                <xforms:input ref="text" incremental="true">
-                    <xforms:label>Name:</xforms:label>
-                    <xforms:hint>This is a super cool hint for this input in a dialog</xforms:hint>
-                </xforms:input>
+                <xforms:group>
+                    <xxforms:hide ev:event="DOMActivate" dialog="myDialog"/>
+                    <xforms:trigger>
+                        <xforms:label>Update</xforms:label>
+                        <xforms:setvalue ref="text" value="context()/tmp" ev:event="DOMActivate"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>Undo</xforms:label>
+                    </xforms:trigger>
+                </xforms:group>
             </xhtml:p>
-            <xforms:textarea ref="text" mediatype="text/html"/>
+            <xforms:textarea ref="tmp" mediatype="text/html"/>
             <xhtml:p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut pretium, nisi non lobortis semper, elit
                 lacus lacinia arcu, sit amet elementum risus nisi a velit. In pellentesque tempus mi. Cras consectetur

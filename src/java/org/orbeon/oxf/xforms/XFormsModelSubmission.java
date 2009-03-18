@@ -701,7 +701,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // in that case
 
                         if (XFormsServer.logger.isDebugEnabled())
-                                containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
+                            containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
 
                         // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
                         // simulates a request from the browser! Useful in particular when the target URL renders XForms

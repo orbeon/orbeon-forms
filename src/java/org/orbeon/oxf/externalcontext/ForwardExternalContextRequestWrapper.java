@@ -47,9 +47,9 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a POST or a PUT.
      *
-     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
+     * @param customHeaderNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] headerNames, Map headerNameValues) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
@@ -57,24 +57,24 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         this.mediaType = mediaType;
         this.messageBody = messageBody;
 
-        initializeHeaders(request, headerNames, headerNameValues);
+        initializeHeaders(request, namesOfHeadersToForward, customHeaderNameValues);
     }
 
     /**
      * This simulates a GET.
      *
-     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
+     * @param customHeaderNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] headerNames, Map headerNameValues) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
 
-        initializeHeaders(request, headerNames, headerNameValues);
+        initializeHeaders(request, namesOfHeadersToForward, customHeaderNameValues);
     }
 
-    private void initializeHeaders(ExternalContext.Request request, String[] headerNames, Map headerNameValues) {
+    private void initializeHeaders(ExternalContext.Request request, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
         /**
          * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
          * we only pass 2 headers:
@@ -93,8 +93,8 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
             final Map requestHeaderValuesMap = request.getHeaderValuesMap();
 
             // Handle headers to forward
-            for (int i = 0; i < headerNames.length; i++) {
-                final String currentHeaderName = headerNames[i];
+            for (int i = 0; i < namesOfHeadersToForward.length; i++) {
+                final String currentHeaderName = namesOfHeadersToForward[i];
 
                 final Object v1 = requestHeaderMap.get(currentHeaderName);
                 if (v1 != null)
@@ -102,12 +102,12 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
                 final Object v2 = requestHeaderValuesMap.get(currentHeaderName);
                 if (v2 != null)
-                    headerMap.put(currentHeaderName, v2);
+                    headerValuesMap.put(currentHeaderName, v2);
             }
 
             // Handle custom headers. Those override existing headers if any.
-            if (headerNameValues != null) {
-                for (Iterator i = headerNameValues.entrySet().iterator(); i.hasNext();) {
+            if (customHeaderNameValues != null) {
+                for (Iterator i = customHeaderNameValues.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String currentHeaderName = (String) currentEntry.getKey();
                     final String[] currentHeaderValues = (String[]) currentEntry.getValue();

@@ -149,6 +149,8 @@
         <property name="cli.jar.file" value="${build.lib.dir}/${project.name}-cli.jar"/>
         <property name="resources-private.jar.file" value="${build.lib.dir}/${project.name}-resources-private.jar"/>
         <property name="resources-public.jar.file" value="${build.lib.dir}/${project.name}-resources-public.jar"/>
+        <property name="form-runner.jar.file" value="${build.lib.dir}/${project.name}-form-runner.jar"/>
+        <property name="form-builder.jar.file" value="${build.lib.dir}/${project.name}-form-builder.jar"/>
 
         <property name="build.portlet-classes.dir" value="${build.dir}/portlet-classes"/>
 
@@ -325,6 +327,20 @@
             <zipfileset dir="${war.dir}/WEB-INF/resources/ops" prefix="ops">
                 <include name="**/*.js"/>
             </zipfileset>
+        </jar>
+
+        <!-- Build Form Runner JAR -->
+        <jar destfile="${form-runner.jar.file}" compress="false">
+            <fileset dir="${resources.dir}">
+                <include name="apps/fr/**/*.*"/>
+            </fileset>
+        </jar>
+
+        <!-- Build Form Builder JAR -->
+        <jar destfile="${form-builder.jar.file}" compress="false">
+            <fileset dir="${resources.dir}">
+                <include name="forms/orbeon/builder/**/*.*"/>
+            </fileset>
         </jar>
 
     </target>
@@ -610,6 +626,7 @@
                 <path refid="class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>
                 <pathelement location="${resources-private.jar.file}"/>
+                <!-- SHOULD ADD THIS WHEN skip.compilation:  <pathelement location="${war.classes}"/>-->
                 <!-- FWIW tomcat 5 doesn't include this jar. -->
                 <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
             </classpath>
@@ -746,6 +763,10 @@
                 <exclude name="apps/doc/**/*.jsp"/>
                 <exclude name="apps/doc/**/*.cdr"/>
                 <exclude name="apps/doc/**/*.cpl"/>
+                <!-- Form Runner is packaged as a JAR -->
+                <exclude name="apps/fr/**/*.*"/>
+                <!-- Form Builder is packaged as a JAR -->
+                <exclude name="forms/orbeon/builder/**/*.*"/>
             </zipfileset>
             <!--<zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">-->
                 <!--<include name="*.css"/>-->

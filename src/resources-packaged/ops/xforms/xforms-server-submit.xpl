@@ -131,7 +131,8 @@
                                         <xsl:otherwise>
                                             <!-- Regular case -->
                                             <xsl:attribute name="source-control-id" select="name"/>
-                                            <xsl:value-of select="value"/>
+                                            <!-- There may be several times the same value with selection controls: keep only one so as not to confuse xforms:select1 -->
+                                            <xsl:value-of select="string-join(distinct-values(value), ' ')"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xxforms:event>

@@ -20,11 +20,11 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * ExternalContext abstracts context, request and response information so that compile-time
- * dependencies on the Servlet API or Portlet API can be removed.
+ * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
+ * Servlet API or Portlet API can be removed.
  *
- * It is also possible to use ExternalContext to embed Orbeon Forms and to provide a
- * web-like request/response interface.
+ * It is also possible to use ExternalContext to embed Orbeon Forms and to provide a web-like request/response
+ * interface.
  */
 public interface ExternalContext extends WebAppExternalContext {
 
@@ -162,10 +162,6 @@ public interface ExternalContext extends WebAppExternalContext {
         public boolean isDefaultContext();
     }
 
-    public Object getNativeRequest();
-    public Object getNativeResponse();
-    public Object getNativeSession(boolean flag);
-
     /**
      * Return a request dispatcher usable to perform forwards and includes.
      *
@@ -184,7 +180,22 @@ public interface ExternalContext extends WebAppExternalContext {
     public Session getSession(boolean create);
     public Application getApplication();
 
+    /**
+     * Rewrite a service URL. The URL is rewritten against a base URL which is:
+     *
+     * o specified externally or
+     * o the incoming request if not specified externally
+     *
+     * @param urlString     URL to rewrite
+     * @param forceAbsolute
+     * @return              rewritten URL
+     */
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute);
+
     public String getStartLoggerString();
     public String getEndLoggerString();
 
+    public Object getNativeRequest();
+    public Object getNativeResponse();
+    public Object getNativeSession(boolean flag);
 }

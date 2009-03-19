@@ -55,7 +55,7 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
             <config xsl:version="2.0">
                 <url>
-                    <xsl:value-of select="pipeline:rewriteResourceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
+                    <xsl:value-of select="pipeline:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
@@ -109,8 +109,7 @@
                             <xsl:variable name="uri" select="normalize-space()" as="xs:string"/>
                             <attachment filename="{@filename}" mediatype="{@mediatype}">
                                 <!-- URL may be absolute or already point to persistence layer -->
-                                <!-- TODO: Should this use oxf.fr.appserver.uri in case there is no protocol specified? -->
-                                <xsl:value-of select="pipeline:rewriteResourceURI($uri, true())"/>
+                                <xsl:value-of select="pipeline:rewriteServiceURI($uri, true())"/>
                             </attachment>
                         </xsl:for-each>
 

@@ -36,12 +36,11 @@
             <config xsl:version="2.0">
 
                 <!-- Create URI based on properties -->
-                <xsl:variable name="resource"
-                              select="concat(pipeline:property('oxf.fr.appserver.uri'),
-                                        pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'data'), '.')),
-                                        '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
+                <xsl:variable name="resource" as="xs:string"
+                              select="concat(pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'data'), '.')),
+                                        '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')"/>
                 <url>
-                    <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

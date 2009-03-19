@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.io.*;
 import java.security.Principal;
@@ -424,5 +425,9 @@ public class SimpleExternalContext implements ExternalContext {
 
     public ExternalContext.RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return null;
+    }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
     }
 }

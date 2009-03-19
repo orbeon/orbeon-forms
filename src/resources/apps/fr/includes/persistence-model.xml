@@ -563,7 +563,7 @@
                     <!-- Send PDF data if requested -->
                     <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
                         <!-- Get URI of PDF data -->
-                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteResourceURI(concat(xxforms:property('oxf.fr.appserver.uri'), instance('fr-workflow-confirmation-instance')), true())" as="xs:anyURI"/>
+                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteServiceURI(instance('fr-workflow-confirmation-instance'), true())" as="xs:anyURI"/>
 
                         <!-- Send everything to Alfresco -->
                         <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">

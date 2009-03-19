@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.ServletExternalContext;
+import org.orbeon.oxf.util.URLRewriterUtils;
 
 import javax.portlet.PortletContext;
 
@@ -99,5 +100,9 @@ public class PortletContextExternalContext extends PortletWebAppExternalContext 
             if (listeners != null)
                 listeners.removeListener(applicationListener);
         }
+    }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
     }
 }

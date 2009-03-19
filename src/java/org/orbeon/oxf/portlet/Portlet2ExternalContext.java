@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -815,5 +816,9 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 }
             });
         }
+    }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
     }
 }

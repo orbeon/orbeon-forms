@@ -55,7 +55,7 @@
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#matcher-groups">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="pipeline:rewriteResourceURI(concat(pipeline:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true())"/>
+                            <xsl:value-of select="pipeline:rewriteServiceURI(concat(pipeline:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true())"/>
                         </url>
                         <!-- Forward the same headers that the XForms engine forwards -->
                         <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

@@ -19,9 +19,8 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
- * This is the main interface the to the Resource Manager system. Users must
- * call the static <code>instance()</code> method to get the current Resource
- * Manager singelton
+ * This is the main interface the to the Resource Manager system. Users must call the static <code>instance()</code>
+ * method to get the current Resource Manager singelton
  */
 final public class ResourceManagerWrapper {
 
@@ -37,15 +36,15 @@ final public class ResourceManagerWrapper {
     synchronized public static void init(Map props) {
 
         // Create resource factory according to properties
-        String factoryImp = (String) props.get(FACTORY_PROPERTY);
+        final String factoryImp = (String) props.get(FACTORY_PROPERTY);
         if (factoryImp == null) {
             throw new OXFException("Declaration of resource factory missing: no value declared for property '" 
                     + FACTORY_PROPERTY + "'");
         }
         try {
-            Class c = Class.forName(factoryImp);
-            Constructor cons = c.getConstructor(new Class[]{java.util.Map.class});
-            factory = (ResourceManagerFactoryFunctor) cons.newInstance(new Object[]{props});
+            final Class c = Class.forName(factoryImp);
+            final Constructor constructor = c.getConstructor(new Class[]{java.util.Map.class});
+            factory = (ResourceManagerFactoryFunctor) constructor.newInstance(new Object[]{props});
             instance = null;
         } catch (ClassNotFoundException e) {
             throw new OXFException("class " + factoryImp + "not found", e);

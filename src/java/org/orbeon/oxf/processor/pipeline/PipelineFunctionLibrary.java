@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
+import org.orbeon.oxf.processor.pipeline.functions.RewriteServiceURI;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
@@ -80,6 +81,10 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return RewriteResourceURI.rewriteResourceURI(uri, absolute);
     }
 
+    public static String rewriteServiceURI(String uri, boolean absolute) {
+        return RewriteServiceURI.rewriteServiceURI(uri, absolute);
+    }
+
     static {
         StandardFunction.Entry e;
 
@@ -89,6 +94,11 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
 
         // rewrite-resource-uri() function
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-resource-uri", RewriteResourceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // rewrite-service-uri() function
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-service-uri", RewriteServiceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 

@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.ServletWebAppExternalContext;
+import org.orbeon.oxf.util.URLRewriterUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -243,5 +244,9 @@ public class ServletContextExternalContext implements ExternalContext {
         public void removeListener(ApplicationListener applicationListener) {
           throw new UnsupportedOperationException();
         }
+    }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
     }
 }

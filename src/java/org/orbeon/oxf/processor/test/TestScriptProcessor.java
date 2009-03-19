@@ -203,7 +203,7 @@ public class TestScriptProcessor extends ProcessorImpl {
     private void handleSetRequestCommand(ExecutionContext executionContext, Element commandElement, PipelineContext pipelineContext) {
 
         // Build request document
-        Document requestDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
+        final Document requestDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
         // Create external context
         executionContext.externalContext = new TestExternalContext(pipelineContext, requestDocument);

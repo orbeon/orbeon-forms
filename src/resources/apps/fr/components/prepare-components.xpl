@@ -102,7 +102,7 @@
                 <!-- Create URI based on properties -->
                 <xsl:variable name="resource" select="pipeline:property(string-join(('oxf.fb.components.uri', /*/app, /*/form), '.'))" as="xs:string"/>
                 <url>
-                    <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

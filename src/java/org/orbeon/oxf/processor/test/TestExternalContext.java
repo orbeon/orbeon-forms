@@ -504,4 +504,8 @@ public class TestExternalContext implements ExternalContext  {
     public void log(String msg) {
         logger.info(msg);
     }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
+    }
 }

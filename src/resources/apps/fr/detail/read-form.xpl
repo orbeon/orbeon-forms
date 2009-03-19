@@ -34,18 +34,12 @@
                 <xsl:variable name="document" select="/*/document" as="xs:string"/>
 
                 <!-- Create URI based on properties -->
-                <xsl:variable name="persistence-app-uri-no-appserver" as="xs:string"
-                              select="pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'form'), '.'))"/>
-                <xsl:variable name="persistence-app-uri" as="xs:string"
-                              select="if (starts-with($persistence-app-uri-no-appserver, 'http://') or starts-with($persistence-app-uri-no-appserver, 'https://'))
-                                      then $persistence-app-uri-no-appserver
-                                      else concat(pipeline:property('oxf.fr.appserver.uri'), $persistence-app-uri-no-appserver)"/>
                 <xsl:variable name="resource" as="xs:string"
-                              select="concat($persistence-app-uri,
+                              select="concat(pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'form'), '.')),
                                       '/crud/', /*/app, '/', /*/form, '/form/form.xhtml',
                                       if ($document != '') then concat('?document=', $document) else '')"/>
                 <url>
-                    <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

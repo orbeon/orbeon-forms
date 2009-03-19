@@ -32,7 +32,7 @@ public class URLRewriterUtils {
 
     // Versioned resources configuration
     public static final String RESOURCES_VERSIONED_PROPERTY = "oxf.resources.versioned";
-    public final static boolean RESOURCES_VERSIONED_DEFAULT = false;
+    public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
 
     private static final String REWRITING_STRATEGY_PROPERTY_PREFIX = "oxf.url-rewriting.strategy.";
     private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
@@ -40,15 +40,71 @@ public class URLRewriterUtils {
 
     public static final String RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number";
 
+    public static final String REWRITING_SERVICE_BASE_URI_PROPERTY = "oxf.url-rewriting.service.base-uri";
+    public static final String REWRITING_SERVICE_BASE_URI_DEFAULT = "";
+
     /**
-     * Rewrite a URL based on the request URL, a URL string, and a rewriting mode.
+     * Rewrite a URL based on the request URL, a URL, and a rewriting mode.
      *
      * @param request       incoming request
-     * @param urlString     URL string to rewrite
+     * @param urlString     URL to rewrite
      * @param rewriteMode   rewrite mode (see ExternalContext.Response)
-     * @return              rewritten URL string
+     * @return              rewritten URL
      */
     public static String rewriteURL(ExternalContext.Request request, String urlString, int rewriteMode) {
+        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+    }
+
+    /**
+     * Rewrite a service URL. The URL is rewritten against a base URL which is:
+     *
+     * o specified externally or
+     * o the incoming request if not specified externally
+     *
+     * @param request           incoming request
+     * @param urlString         URL to rewrite
+     * @param forceAbsolute     whether to force an absolute URL in case the request is used as a base
+     * @return                  rewritten URL
+     */
+    public static String rewriteServiceURL(ExternalContext.Request request, String urlString, boolean forceAbsolute) {
+
+        final int rewriteMode = forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
+
+        final String baseURIProperty = getServiceBaseURI();
+        if (baseURIProperty == null || baseURIProperty.trim().equals("")) {
+            // Property not specified, use request to build base URI
+            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+        } else {
+            // Property specified
+            try {
+                final URI baseURI = new URI(baseURIProperty.trim());
+                // NOTE: Force absolute URL to be returned in this case anyway
+                return rewriteURL(baseURI.getScheme() != null ? baseURI.getScheme() : request.getScheme(),
+                        baseURI.getHost() != null ? baseURI.getHost() : request.getServerName(),
+                        baseURI.getHost() != null ? baseURI.getPort() : request.getServerPort(),
+                        baseURI.getPath(), "", urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+
+            } catch (URISyntaxException e) {
+                // Default to using request
+                // TODO: should warn?
+                return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+            }
+        }
+    }
+
+    /**
+     * Rewrite a URL based on a base URL, a URL, and a rewriting mode.
+     *
+     * @param scheme            base URL scheme
+     * @param host              base URL host
+     * @param port              base URL port
+     * @param contextPath       base URL context path
+     * @param requestPath       base URL request path
+     * @param urlString         URL to rewrite
+     * @param rewriteMode       rewrite mode (see ExternalContext.Response)
+     * @return                  rewritten URL
+     */
+    public static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
         // Case where a protocol is specified: the URL is left untouched in any case
         if (NetUtils.urlHasProtocol(urlString))
             return urlString;
@@ -59,13 +115,13 @@ public class URLRewriterUtils {
                 String _baseURLString;
                 // Prepend absolute base if needed
                 if (rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE) {
-                    _baseURLString = request.getScheme() + "://" + request.getServerName() + (request.getServerPort() == 80 ? "" : ":" + request.getServerPort());
+                    _baseURLString = scheme + "://" + host + ((port == 80 || port == -1) ? "" : ":" + port);
                 } else {
                     _baseURLString = "";
                 }
                 // Append context path if needed
                 if (rewriteMode != ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
-                    _baseURLString = _baseURLString + request.getContextPath();
+                    _baseURLString = _baseURLString + contextPath;
 
                 baseURLString = _baseURLString;
             }
@@ -74,14 +130,14 @@ public class URLRewriterUtils {
             if (urlString.startsWith("?")) {
                 // This is a special case that appears to be implemented
                 // in Web browsers as a convenience. Users may use it.
-                return baseURLString + request.getRequestPath() + urlString;
+                return baseURLString + requestPath + urlString;
             } else if (rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE && !urlString.startsWith("/") && !"".equals(urlString)) {
                 // Don't change the URL if it is a relative path and we don't force absolute
                 return urlString;
             } else {
                 // Regular case, parse the URL
 
-                final URI baseURIWithPath = new URI("http", "example.org", request.getRequestPath(), null);
+                final URI baseURIWithPath = new URI("http", "example.org", requestPath, null);
                 final URI resolvedURI = baseURIWithPath.resolve(urlString).normalize();// normalize to remove "..", etc.
 
                 // Append path, query and fragment
@@ -105,13 +161,13 @@ public class URLRewriterUtils {
      *
      * @param request           incoming request
      * @param response          outgoing response (for rewriting resource URLs)
-     * @param urlString         URL string to rewrite
+     * @param urlString         URL to rewrite
      * @param pathMatchers      List of PathMatcher
-     * @return                  rewritten URL string
+     * @return                  rewritten URL
      */
     public static String rewriteResourceURL(ExternalContext.Request request, ExternalContext.Response response, String urlString, List pathMatchers) {
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            // We need to match the URL string against the matcher
+            // We need to match the URL against the matcher
 
             // 1. Rewrite to absolute path URI without context
             final String absoluteURINoContext = response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
@@ -212,6 +268,10 @@ public class URLRewriterUtils {
 
     public static String getRewritingContext(String rewritingStrategy, String defaultContext) {
         return Properties.instance().getPropertySet().getString(REWRITING_CONTEXT_PROPERTY_PREFIX + rewritingStrategy + REWRITING_CONTEXT_PROPERTY_SUFFIX, defaultContext);
+    }
+
+    public static String getServiceBaseURI() {
+        return Properties.instance().getPropertySet().getStringOrURIAsString(REWRITING_SERVICE_BASE_URI_PROPERTY, REWRITING_SERVICE_BASE_URI_DEFAULT);
     }
 
     public static String getApplicationResourceVersion() {

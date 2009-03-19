@@ -308,11 +308,11 @@ public class ProcessorTest extends TestCase {
             try {
                 for (; executionCount < REPEAT_COUNT; executionCount++) {
                     // Create pipeline context
-                    PipelineContext pipelineContext = new PipelineContext();
+                    final PipelineContext pipelineContext = new PipelineContext();
                     pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
                     // Create ExternalContext
-                    ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse()) {
+                    final ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse()) {
                         public String getRealPath(String path) {
                             if (path.equals("WEB-INF/exist-conf.xml")) {
                                 return ResourceManagerWrapper.instance().getRealPath("/ops/unit-tests/exist-conf.xml");
@@ -331,13 +331,13 @@ public class ProcessorTest extends TestCase {
                             processor.start(pipelineContext);
                         } else {
                             // Get output and compare to expected result
-                            Iterator domSerializersIterator = domSerializers.iterator();
-                            Iterator expectedNodesIterator = expectedDocuments.iterator();
+                            final Iterator domSerializersIterator = domSerializers.iterator();
+                            final Iterator expectedNodesIterator = expectedDocuments.iterator();
                             while (domSerializersIterator.hasNext()) {
 
                                 // Get expected
-                                DOMSerializer domSerializer = (DOMSerializer) domSerializersIterator.next();
-                                Document expectedData = (Document) expectedNodesIterator.next();
+                                final DOMSerializer domSerializer = (DOMSerializer) domSerializersIterator.next();
+                                final Document expectedData = (Document) expectedNodesIterator.next();
                                 // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(expectedData.getRootElement());
 
@@ -345,14 +345,14 @@ public class ProcessorTest extends TestCase {
                                 domSerializer.start(pipelineContext);
 
                                 // Get actual data
-                                Document actualData = domSerializer.getDocument(pipelineContext);
+                                final Document actualData = domSerializer.getDocument(pipelineContext);
                                 // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(actualData.getRootElement());
 
                                 // Compare converting to strings
                                 expectedDataString = Dom4jUtils.domToString(expectedData, true, false);
                                 actualDataString = Dom4jUtils.domToString(actualData, true, false);
-                                boolean outputPassed = expectedDataString.equals(actualDataString);
+                                final boolean outputPassed = expectedDataString.equals(actualDataString);
 
                                 // Display if test not passed
                                 if (!outputPassed) {
@@ -705,6 +705,22 @@ class TestHttpServletRequest implements HttpServletRequest {
 
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
     }
+
+    public int getRemotePort() {
+        return 0;
+    }
+
+    public String getLocalName() {
+        return null;
+    }
+
+    public String getLocalAddr() {
+        return null;
+    }
+
+    public int getLocalPort() {
+        return 0;
+    }
 }
 
 class TestHttpServletResponse implements HttpServletResponse {
@@ -807,5 +823,12 @@ class TestHttpServletResponse implements HttpServletResponse {
     }
 
     public void setLocale(Locale locale) {
+    }
+
+    public void setCharacterEncoding(String s) {
+    }
+
+    public String getContentType() {
+        return null;
     }
 }

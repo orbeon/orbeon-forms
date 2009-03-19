@@ -774,4 +774,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath), isDefaultContext);
         }
     }
+
+    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
+    }
 }

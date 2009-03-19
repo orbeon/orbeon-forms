@@ -129,28 +129,32 @@ public class ProcessorUtils {
         final Document result;
         if (urlString == null) {
             // Case of embedded XML
-            Element originalElement = (Element) ((Element) element).elementIterator().next();
+            final Element originalElement = (Element) ((Element) element).elementIterator().next();
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
-            Element copiedElement = originalElement.createCopy();
+            final Element copiedElement = originalElement.createCopy();
             addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
             result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
             // External URI
-            LocationData locationData = (LocationData) element.getData();
-            URL url = createRelativeURL(locationData, urlString);
-
-            URLGenerator urlGenerator = new URLGenerator(url);
-            urlGenerator.setLocationData(locationData);
-            DOMSerializer domSerializer = new DOMSerializer();
-            PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
-
-            PipelineContext domSerializerPipelineContext = new PipelineContext();
-            domSerializer.start(domSerializerPipelineContext);
-            result = domSerializer.getDocument(domSerializerPipelineContext);
+            final LocationData locationData = (LocationData) element.getData();
+            result = createDocumentFromURL(urlString, locationData);
         }
         return result;
+    }
+
+    public static Document createDocumentFromURL(String urlString, LocationData locationData) {
+        final URL url = createRelativeURL(locationData, urlString);
+
+        URLGenerator urlGenerator = new URLGenerator(url);
+        urlGenerator.setLocationData(locationData);
+        final DOMSerializer domSerializer = new DOMSerializer();
+        PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
+
+        final PipelineContext domSerializerPipelineContext = new PipelineContext();
+        domSerializer.start(domSerializerPipelineContext);
+        return domSerializer.getDocument(domSerializerPipelineContext);
     }
 
     private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {

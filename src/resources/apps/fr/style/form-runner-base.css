@@ -225,6 +225,8 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-error-alert { color: red }
 
 /* Buttons */
+.fr-buttons-group table { width: 100% }
+
 .fr-buttons {
     float: right;
     text-align: right;
@@ -466,4 +468,6 @@ button.xforms-trigger img { margin-right: 10px }
     /* Don't show download link */
     .xforms-output-appearance-xxforms-download { display: none } 
     noscript { display: none }
+    /* Since only value is shown, no need for special height */
+    .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }
 }

@@ -273,4 +273,10 @@ public class HTTPURLConnection extends URLConnection {
     public void setPassword(String password) {
         this.password = password.trim();
     }
+
+    public long getLastModified() {
+        // Default implementation throws an exception if the header is not present, so optimize on calling side
+        final String field = getHeaderField("last-modified");
+        return (field != null) ? super.getLastModified() : 0;
+    }
 }

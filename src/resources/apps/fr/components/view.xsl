@@ -252,7 +252,7 @@
                                 <!-- Buttons and status section -->
                                 <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                 <xhtml:div class="yui-g fr-buttons-block">
-                                    <xforms:group id="fr-buttons-group" model="fr-persistence-model">
+                                    <xforms:group id="fr-buttons-group" class="fr-buttons-group" model="fr-persistence-model">
 
                                         <xhtml:table>
                                             <xhtml:tr>

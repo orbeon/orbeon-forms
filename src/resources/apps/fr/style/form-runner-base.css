@@ -466,7 +466,7 @@ button.xforms-trigger img { margin-right: 10px }
     /* Remove background attachment image */
     .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
     /* Don't show download link */
-    .xforms-output-appearance-xxforms-download { display: none } 
+    .xbl-fr-attachment .xforms-output-appearance-xxforms-download { display: none }
     noscript { display: none }
     /* Since only value is shown, no need for special height */
     .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }

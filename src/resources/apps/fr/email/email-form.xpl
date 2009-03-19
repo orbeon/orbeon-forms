@@ -99,7 +99,8 @@
                                       select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
                                                 or @id = $attachment-controls/@bind])[number(current())]"/>
 
-                        <xsl:variable name="binds" select="$bind/ancestor-or-self::xforms:bind" as="element(xforms:bind)+"/>
+                        <!-- Look at all binds except top-level one -->
+                        <xsl:variable name="binds" select="$bind/ancestor-or-self::xforms:bind[position() lt last()]" as="element(xforms:bind)+"/>
                         <xsl:variable name="expression" select="string-join($binds/@nodeset, '/')" as="xs:string"/>
 
                         <xsl:variable name="holders" select="$data/saxon:evaluate($expression)"/>

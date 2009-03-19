@@ -170,7 +170,8 @@ a.fb-edit-help-trigger img {
 /* Publish dialog */
 #fb-publish-dialog { width: 35em }
 .fb-publish-message {
-    border: 2px solid #DDDDEE;
+    background-color: white;
+    border: 1px solid #DDDDDD;
     display: block;
     padding: .5em;
 }

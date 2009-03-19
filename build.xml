@@ -285,9 +285,9 @@
                 <exclude name="ops/**/*.jpg"/>
                 <exclude name="ops/**/*.html"/>
                 <exclude name="ops/**/*.htc"/>
-                <exclude name="ops/fckeditor/_samples/**/*.*"/>
-                <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
-                <exclude name="ops/fckeditor/_testcases/**/*.*"/>
+                <exclude name="ops/fckeditor/_samples/**"/>
+                <exclude name="ops/fckeditor/editor/_source/**"/>
+                <exclude name="ops/fckeditor/_testcases/**"/>
                 <exclude name="ops/fckeditor/**/*.cfm"/>
                 <exclude name="ops/fckeditor/**/*.cfc"/>
                 <exclude name="ops/fckeditor/**/*.asp"/>
@@ -298,9 +298,9 @@
                 <exclude name="ops/fckeditor/**/*.php"/>
                 <exclude name="ops/fckeditor/**/*.pl"/>
                 <exclude name="ops/fckeditor/**/*.lasso"/>
-                <include name="oxf/**/*.*"/>
-                <include name="config/**/*.*"/>
-                <exclude name="config/theme/**/*.*"/>
+                <include name="oxf/**"/>
+                <include name="config/**"/>
+                <exclude name="config/theme/**"/>
                 <!-- We keep these in orbeon.jar -->
                 <exclude name="config/*-processors.xml"/>
             </fileset>
@@ -316,9 +316,9 @@
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
                 <include name="ops/**/*.htc"/>
-                <exclude name="ops/fckeditor/_samples/**/*.*"/>
-                <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
-                <exclude name="ops/fckeditor/_testcases/**/*.*"/>
+                <exclude name="ops/fckeditor/_samples/**"/>
+                <exclude name="ops/fckeditor/editor/_source/**"/>
+                <exclude name="ops/fckeditor/_testcases/**"/>
                 <include name="config/theme/**/*.*"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
@@ -766,9 +766,9 @@
                 <exclude name="apps/doc/**/*.cdr"/>
                 <exclude name="apps/doc/**/*.cpl"/>
                 <!-- Form Runner is packaged as a JAR -->
-                <exclude name="apps/fr/**/*.*"/>
+                <exclude name="apps/fr/**"/>
                 <!-- Form Builder is packaged as a JAR -->
-                <exclude name="forms/orbeon/builder/**/*.*"/>
+                <exclude name="forms/orbeon/builder/**"/>
             </zipfileset>
             <!--<zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">-->
                 <!--<include name="*.css"/>-->

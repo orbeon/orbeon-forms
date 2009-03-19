@@ -39,9 +39,6 @@
                 business logic, similar to the way Java code "orchestrates" method calls within a
                 Java object.
             </p>
-            <!--<p>-->
-                <!--For a step-by-step introduction to pipelines, see the <link href="../apps/doc/images/OPS%20Tutorial.pdf"> Orbeon Forms Tutorial</link>.-->
-            <!--</p>-->
             <p>
                 Please also refer to the <a
                 href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XPL 1.0 Submission at
@@ -631,7 +628,31 @@
                         </p:when>
                     </xml-source>
                 </li>
+                <li>
+                    <a name="p-rewrite-resource-uri"/>
+                    <p>
+                        <code>p:rewrite-resource-uri($uri as xs:anyURI, $force-absolute as xs:boolean) as xs:string</code>.
+                    </p>
+                    <p>
+                        The <code>p:rewrite-resource-uri()</code> function rewrites a resource URI according to the
+                        rewriting rules associated with the incoming request.
+                    </p>
+                </li>
+                <li>
+                    <a name="p-rewrite-service-uri"/>
+                    <p>
+                        <code>p:rewrite-service-uri($uri as xs:anyURI, $force-absolute as xs:boolean) as xs:string</code>.
+                    </p>
+                    <p>
+                        The <code>p:rewrite-service-uri()</code> function rewrites a service URI according to the
+                        rewriting rules associated with the incoming request.
+                    </p>
+                </li>
             </ul>
+            <p>
+                In addition you can call the <code>format-date()</code>, <code>format-time()</code>,
+                <code>format-dateTime()</code>, and <code>format-number()</code> as defined in XSLT 2.0.
+            </p>
         </section>
         <section>
             <title>Processor Inputs and Outputs</title>

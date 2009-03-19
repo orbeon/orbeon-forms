@@ -617,9 +617,14 @@
             <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
+            <!-- resources -->
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
-            <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+            <!-- For resources associated with Java test files -->
+            <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="${test-src.dir}"/>
+            <!-- Classpath -->
+            <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />

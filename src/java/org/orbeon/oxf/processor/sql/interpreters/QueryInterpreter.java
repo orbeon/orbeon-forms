@@ -35,7 +35,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -43,6 +42,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -181,7 +181,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             if (!hasReplaceOrSeparator) {
                 final String queryString = query.toString();
                 if (type != CALL)
-                    stmt = getInterpreterContext().getConnection().prepareStatement(queryString);
+                    stmt = getInterpreterContext().getConnection().prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
                 else
                     stmt = getInterpreterContext().getConnection().prepareCall(queryString);
                 getInterpreterContext().setStatementString(queryString);
@@ -614,6 +614,8 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     // We know there is only a possible update count
                     final int updateCount = stmt.executeUpdate();
                     getInterpreterContext().setUpdateCount(updateCount);//FIXME: should add?
+                    if (updateCount > 0)
+                    	ResultSetInterpreter.setGeneratedKeysResultSetInfo(getInterpreterContext(), stmt);
                 }
             }
         } catch (Exception e) {

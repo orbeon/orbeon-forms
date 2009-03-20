@@ -132,7 +132,7 @@
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
-        <property name="test-src.dir" value="test/src"/>
+        <property name="test-src.dir" location="test/src"/>
 
         <property name="build.classes.dir" value="${build.dir}/classes"/>
         <property name="build.test-classes.dir" value="${build.dir}/test-classes"/>

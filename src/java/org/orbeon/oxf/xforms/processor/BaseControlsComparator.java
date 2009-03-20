@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -35,12 +32,14 @@ public abstract class BaseControlsComparator implements ControlsComparator {
 
     public static final boolean DEFAULT_RELEVANCE_FOR_NEW_ITERATION = true;
 
-    protected PipelineContext pipelineContext;
-    protected ContentHandlerHelper ch;
-    protected XFormsContainingDocument containingDocument;
-    protected Map itemsetsFull1;
-    protected Map itemsetsFull2;
-    protected Map valueChangeControlIds;
+    protected final PipelineContext pipelineContext;
+    protected final ContentHandlerHelper ch;
+    protected final XFormsContainingDocument containingDocument;
+    protected final Map itemsetsFull1;
+    protected final Map itemsetsFull2;
+    protected final Map valueChangeControlIds;
+
+    protected final boolean isStaticReadonly;
 
     public BaseControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
         this.pipelineContext = pipelineContext;
@@ -49,6 +48,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         this.itemsetsFull1 = itemsetsFull1;
         this.itemsetsFull2 = itemsetsFull2;
         this.valueChangeControlIds = valueChangeControlIds;
+        this.isStaticReadonly = XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
 
     protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
@@ -106,8 +106,10 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 //
                 // 1. Items are static...
                 // 2. ...and they have been outputted statically in the HTML page, directly or in repeat template
-            } else {
+            } else if (!xformsControl2.isStaticReadonly()) {
                 // There is a possible change
+                // Don't update itemset for static readonly controls
+
                 if (itemsetsFull1 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1)) {
                     final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
                     if (items != null)

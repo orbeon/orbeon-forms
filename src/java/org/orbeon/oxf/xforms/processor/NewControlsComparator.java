@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -62,7 +61,6 @@ public class NewControlsComparator extends BaseControlsComparator {
         }
 
         {
-            final boolean isStaticReadonly = XFormsProperties.isStaticReadonlyAppearance(containingDocument);
             final AttributesImpl attributesImpl = new AttributesImpl();
 
             final Iterator leftIterator = (state1 == null) ? null : state1.iterator();

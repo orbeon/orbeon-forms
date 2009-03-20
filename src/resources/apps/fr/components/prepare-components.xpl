@@ -95,27 +95,11 @@
         <p:output name="data" id="custom-template-xbl"/>
     </p:processor>
 
-    <!-- Read custom components -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
-            <config xsl:version="2.0">
-                <!-- Create URI based on properties -->
-                <xsl:variable name="resource" select="pipeline:property(string-join(('oxf.fb.components.uri', /*/app, /*/form), '.'))" as="xs:string"/>
-                <url>
-                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
-                </url>
-                <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
-            </config>
-        </p:input>
-        <p:output name="data" id="custom-xbl"/>
-    </p:processor>
-
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#global-template-xbl"/>
         <p:input name="custom-template-xbl" href="#custom-template-xbl"/>
-        <p:input name="custom-xbl" href="#custom-xbl"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:input name="config">
             <!-- Return an aggregate so that each xbl:xbl can have its own metadata -->
             <components xsl:version="2.0">
@@ -126,7 +110,24 @@
                 <!-- Custom section components -->
                 <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
                 <!-- Custom components -->
-                <xsl:copy-of select="doc('input:custom-xbl')/xbl:xbl"/>
+                <xsl:variable name="resources" select="pipeline:property(string-join(('oxf.fb.components.uri', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '.'))" as="xs:string"/>
+                <!-- Temporary solution: create a single XBL file so that components are grouped together in FB -->
+                <xbl:xbl>
+                    <!-- Add Form Builder metadata -->
+                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+                        <display-name lang="en">Custom Components</display-name>
+                        <display-name lang="fr">Composants</display-name>
+                        <icon lang="en">
+                            <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
+                            <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
+                        </icon>
+                    </metadata>
+                    <!-- Copy all the scripts and bindings --><!--  -->
+                    <xsl:for-each select="tokenize($resources, '\s')">
+                        <!-- XBL spec says script and binding can be in any order -->
+                        <xsl:copy-of select="doc(.)/*/*"/>
+                    </xsl:for-each>
+                </xbl:xbl>
             </components>
         </p:input>
         <!--<p:output name="data" ref="data"/>-->

@@ -27,4 +27,6 @@
     <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>
     <property as="xs:string"  name="oxf.xforms.store.application.collection"         value="/db/orbeon/xforms/cache/"/>
 
+    <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value="http://example.org/cool/service"/>
+
 </properties>

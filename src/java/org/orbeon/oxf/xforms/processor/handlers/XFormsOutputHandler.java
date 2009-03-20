@@ -104,19 +104,23 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                     // Download appearance
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-                    final AttributesImpl imgAttributes = new AttributesImpl();
+                    final AttributesImpl aAttributes = new AttributesImpl();
                     final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
 
                     if (hrefValue == null || hrefValue.trim().equals("")) {
                         // No URL so make sure a click doesn't cause navigation, and add class
-                        imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-                        imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-readonly");
+                        aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                        aAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-readonly");
                     } else {
                         // URL value
-                        imgAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+                        aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
                     }
 
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, imgAttributes);
+                    // Output xxforms:* extension attributes
+                    if (xformsControl != null)
+                        xformsControl.addExtensionAttributes(aAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
 
                     final String labelValue = (xformsControl != null) ? xformsControl.getLabel(pipelineContext) : null;
                     final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);

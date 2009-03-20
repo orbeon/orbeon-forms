@@ -34,6 +34,11 @@ import java.util.List;
  */
 public class XFormsOutputControl extends XFormsValueControl {
 
+    // List of attributes to handle as AVTs
+    private static final QName[] DOWNLOAD_APPEARANCE_EXTENSION_ATTRIBUTES = {
+            XFormsConstants.XXFORMS_TARGET_QNAME
+    };
+
     private static final String DOWNLOAD_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME);
 
     // Optional display format
@@ -58,6 +63,13 @@ public class XFormsOutputControl extends XFormsValueControl {
         this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);
 
         fileInfo = new FileInfo(this, getContextStack(), element);
+    }
+
+    protected QName[] getExtensionAttributes() {
+        if (DOWNLOAD_APPEARANCE.equals(getAppearance()))
+            return DOWNLOAD_APPEARANCE_EXTENSION_ATTRIBUTES;
+        else
+            return null;
     }
 
     protected void evaluate(PipelineContext pipelineContext) {

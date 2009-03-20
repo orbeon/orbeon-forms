@@ -3510,5 +3510,74 @@
         </output>
     </test>
 
+    <test description="Instance replacement on xforms-ready with read-only instance properly updates controls" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance id="initial-instance">
+                                        <instance>
+                                            <value>1</value>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="new-instance" xxforms:readonly="true">
+                                        <instance>
+                                            <value>2</value>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:submission id="replace-submission"
+                                                       ref="instance('new-instance')" method="post" resource="test:"
+                                                       replace="instance" instance="initial-instance"
+                                                       xxforms:readonly="true"/>
+
+                                    <!-- When this is called on xforms-ready, controls must update properly -->
+                                    <xforms:send ev:event="xforms-ready" submission="replace-submission"/>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:input ref="value">
+                                    <xforms:label>Value:</xforms:label>
+                                </xforms:input>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance readonly="true" id="initial-instance" model-id="xforms-element-1" replaced="true">
+                                <instance>
+                                    <value>2</value>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xforms-element-6" readonly="true" label="Value:">2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

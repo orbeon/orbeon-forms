@@ -109,8 +109,8 @@
                                         instance('fr-form-metadata')/title[1],
                                         ({$view-label/@ref}),
                                         ({$view-label/@value}),
-                                        '{$view-label}',
-                                        '{xhtml:head/xhtml:title}')[normalize-space() != ''])[1]"/>
+                                        '{replace($view-label, '''', '''''')}',
+                                        '{replace(xhtml:head/xhtml:title, '''', '''''')}')[normalize-space() != ''])[1]"/>
 
             <xsl:apply-templates select="node()"/>
         </xhtml:html>

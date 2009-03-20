@@ -109,8 +109,8 @@
     <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
     <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
 
-    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(fb:binding)*"/>
-    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="QName()*"/>
+    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
+    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
 
     <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
     <xxforms:variable name="current-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]" as="element()?"/>

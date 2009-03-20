@@ -38,7 +38,7 @@
                 seconds: 0.2,
                 easeOut: false,
                 animation:true
-            }
+            };
             new AccordionMenu.setting('fb-toolbox-dl', fbAccordionMenuOptions);
         </xhtml:script>
 
@@ -399,7 +399,7 @@
                                                     <xxforms:variable name="section-content-position" select="position()"/>
 
                                                     <!-- Current section content QName -->
-                                                    <xxforms:variable name="current-qname" select="resolve-QName(name(), .)" as="QName()"/>
+                                                    <xxforms:variable name="current-qname" select="resolve-QName(name(), .)" as="xs:QName"/>
                                                     <!-- Whether this is a component -->
                                                     <xxforms:variable name="is-component" select="$current-qname = $components-qnames" as="xs:boolean"/>
                                                     <!-- Component template if this is a component (take first one) -->
@@ -414,7 +414,7 @@
                                                             <!-- Find grid to display -->
 
                                                             <xxforms:variable name="readwrite-grid" select="not($is-component)" as="xs:boolean"/>
-                                                            <xxforms:variable name="grid" as="element(fb:grid)"
+                                                            <xxforms:variable name="grid" as="element(fr:grid)"
                                                                               select="if ($is-component) then $component-template//fr:grid[1] else ."/>
 
                                                             <!-- Use AVTs to set the style on the div depending on the number of columns -->

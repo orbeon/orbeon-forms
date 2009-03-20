@@ -1083,6 +1083,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         // Don't do anything if there are no children controls
         if (xformsControls.getCurrentControlTree().getChildren() == null) {
             containingDocument.logDebug("model", "not performing refresh because no controls are available");
+            // Don't forget to clear the flag or we risk infinite recursion
+            deferredActionContext.refresh = false;
             return;
         }
 
@@ -1162,6 +1164,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
 
                     final boolean newRelevantState = InstanceData.getInheritedRelevant(currentNodeInfo);
                     final boolean isControlValueChanged = InstanceData.isValueChanged(currentNodeInfo);
+                    // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
                     final boolean isShouldSendValueChangeEvent = newRelevantState && isControlValueChanged;
 
                     if (isAllowSendingValueChangedEvents && isShouldSendValueChangeEvent) {

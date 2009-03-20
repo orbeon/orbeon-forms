@@ -149,7 +149,7 @@
             <fr:body>
 
                 <!--<xforms:output ref="instance('fb-user-agent-instance')/value"/>-->
-                <xforms:group ref=".[true() or instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
+                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
                     <xforms:switch>
                         <xforms:case id="fb-ie-warning-case-on">
                             <xhtml:div class="fb-ie-warning">

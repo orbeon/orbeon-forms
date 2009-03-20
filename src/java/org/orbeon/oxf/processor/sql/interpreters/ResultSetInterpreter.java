@@ -123,15 +123,17 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
     }
 
     public static boolean setGeneratedKeysResultSetInfo(SQLProcessorInterpreterContext interpreterContext, PreparedStatement stmt) throws SQLException {
-    	final ResultSet resultSet = stmt.getGeneratedKeys();
-        
-		final boolean hasNext = resultSet.next();
-		interpreterContext.setEmptyResultSet(!hasNext);
-		interpreterContext.setResultSet(resultSet);
-		interpreterContext.setGotResults(hasNext || interpreterContext.isGotResults());
-		
-		if (SQLProcessor.logger.isDebugEnabled())
-			SQLProcessor.logger.debug("GeneratedKeysResultSet info: more result set, hasNext = " + hasNext);
+        if (false) {// TODO: temporarily disabled as Oracle doesn't like it as is
+            final ResultSet resultSet = stmt.getGeneratedKeys();
+            
+            final boolean hasNext = resultSet.next();
+            interpreterContext.setEmptyResultSet(!hasNext);
+            interpreterContext.setResultSet(resultSet);
+            interpreterContext.setGotResults(hasNext || interpreterContext.isGotResults());
+
+            if (SQLProcessor.logger.isDebugEnabled())
+                SQLProcessor.logger.debug("GeneratedKeysResultSet info: more result set, hasNext = " + hasNext);
+        }
 		
 		return true;
     }

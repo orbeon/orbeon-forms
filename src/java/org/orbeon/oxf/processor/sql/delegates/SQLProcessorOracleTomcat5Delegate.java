@@ -17,7 +17,7 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
 import org.apache.commons.dbcp.DelegatingResultSet;
 import org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement;
-import org.apache.tomcat.dbcp.dbcp.PoolablePreparedStatement;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 
@@ -41,12 +41,20 @@ public class SQLProcessorOracleTomcat5Delegate extends SQLProcessorOracleDelegat
         if (stmt instanceof OraclePreparedStatement)
             return (OraclePreparedStatement) stmt;
         else {
-//            PreparedStatement preparedStatement = ((DelegatingPreparedStatement) stmt).getDelegate();
-//            return (OraclePreparedStatement) preparedStatement;
 
-            DelegatingPreparedStatement delegatingPreparedStatement = (DelegatingPreparedStatement) stmt;
-            PoolablePreparedStatement poolablePreparedStatement = (PoolablePreparedStatement) delegatingPreparedStatement.getDelegate();
-            return (OraclePreparedStatement) poolablePreparedStatement.getDelegate();
+            // It seems that depending on the Tomcat version, there might be more levels of nesting. This works with
+            // Tomcat 5.5.27.
+            while (stmt instanceof DelegatingPreparedStatement) {
+                final DelegatingPreparedStatement delegatingPreparedStatement = (DelegatingPreparedStatement) stmt;
+
+                final PreparedStatement delegate = (PreparedStatement) delegatingPreparedStatement.getDelegate();
+
+                if (delegate instanceof OraclePreparedStatement)
+                    return (OraclePreparedStatement) delegate;
+
+                stmt = delegate;
+            }
+            throw new OXFException("OraclePreparedStatement not found");
         }
     }
 

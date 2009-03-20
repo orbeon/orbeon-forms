@@ -19,7 +19,7 @@
 
 #fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
 
-.fb-ie-warning { display: block; margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
+.fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
 /*.fr-section-title div {*/
     /*background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center*/

@@ -43,8 +43,6 @@ a.fb-edit-help-trigger img {
 
 #fb-toolbox {
     padding: .5em;
-    background-color: #F8F8F8;
-    border-right: 2px solid orange;
     position: fixed;
     left: 0;
     top: 0;
@@ -59,7 +57,10 @@ a.fb-edit-help-trigger img {
 }
 
 #fb-toolbox .fb-tools { margin: .5em }
-#fb-toolbox .bd { padding: .5em }
+#fb-toolbox .bd {
+    padding: .5em;
+    background-color: white;
+}
 
 #fb-toolbox .fb-tool button {
     width: 100%;
@@ -80,7 +81,7 @@ a.fb-edit-help-trigger img {
 }
 
 #fb-toolbox .fb-tool button img { margin-left: .5em }
-#fb-toolbox .fb-tool button:hover { background-color: white; background-image: none }
+#fb-toolbox .fb-tool button:hover` { background-color: white; background-image: none }
 #fb-toolbox .fb-tool button.xforms-readonly { color: white }
 #fb-toolbox .fb-tool button.xforms-readonly:hover {
     background-color: #F8F8F8;

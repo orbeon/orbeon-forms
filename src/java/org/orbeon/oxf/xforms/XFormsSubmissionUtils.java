@@ -53,7 +53,7 @@ public class XFormsSubmissionUtils {
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                            XFormsContainingDocument containingDocument,
                                                            XFormsModelSubmission xformsModelSubmission,
-                                                           String httpMethod, final String action, boolean isNorewrite, String mediatype,
+                                                           String httpMethod, final String resource, boolean isNorewrite, String mediatype,
                                                            byte[] messageBody, String queryString,
                                                            boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
 
@@ -66,17 +66,17 @@ public class XFormsSubmissionUtils {
             if (!containingDocument.getStaticState().isSeparateDeployment()) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
                 isContextRelative = true;
-                effectiveAction = action;
+                effectiveAction = resource;
             } else {
                 // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
                 final String contextPath = containingDocument.getStaticState().getRequestContextPath();
                 isContextRelative = false;
-                effectiveAction = contextPath + action;
+                effectiveAction = contextPath + resource;
             }
         } else {
             // Must not rewrite anyway, so mark path as not relative to the current context
             isContextRelative = false;
-            effectiveAction = action;
+            effectiveAction = resource;
         }
 
         return XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
@@ -90,19 +90,19 @@ public class XFormsSubmissionUtils {
     public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                            ExternalContext.Response response,
                                                            XFormsModelSubmission xformsModelSubmission,
-                                                           String httpMethod, final String action, boolean isContextRelative, String mediatype,
+                                                           String httpMethod, final String resource, boolean isContextRelative, String mediatype,
                                                            byte[] messageBody, String queryString,
                                                            final boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
 
         // Action must be an absolute path
-        if (!action.startsWith("/"))
-            throw new OXFException("Action does not start with a '/': " + action);
+        if (!resource.startsWith("/"))
+            throw new OXFException("Action does not start with a '/': " + resource);
 
         final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
 
             // Get dispatcher
-            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action, isContextRelative);
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(resource, isContextRelative);
             final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
             // Case of empty body
@@ -110,7 +110,7 @@ public class XFormsSubmissionUtils {
                 messageBody = new byte[0];
 
             // Destination context path is the context path of the current request, or the context path implied by the new URI
-            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(action);
+            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
 
             // Create requestAdapter depending on method
             final ForwardExternalContextRequestWrapper requestAdapter;
@@ -119,7 +119,7 @@ public class XFormsSubmissionUtils {
             {
                 if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
                     // Simulate a POST or PUT
-                    effectiveResourceURI = action;
+                    effectiveResourceURI = resource;
 
                     if (XFormsServer.logger.isDebugEnabled())
                         XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
@@ -127,16 +127,16 @@ public class XFormsSubmissionUtils {
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
-                        throw new OXFException("Action must start with a servlet context path: " + action);
+                        throw new OXFException("Action must start with a servlet context path: " + resource);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, customHeaderNameValues);
                 } else {
                     // Simulate a GET or DELETE
                     {
-                        final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
+                        final StringBuffer updatedActionStringBuffer = new StringBuffer(resource);
                         if (queryString != null) {
-                            if (action.indexOf('?') == -1)
+                            if (resource.indexOf('?') == -1)
                                 updatedActionStringBuffer.append('?');
                             else
                                 updatedActionStringBuffer.append('&');
@@ -147,7 +147,7 @@ public class XFormsSubmissionUtils {
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
-                        throw new OXFException("Action must start with a servlet context path: " + action);
+                        throw new OXFException("Action must start with a servlet context path: " + resource);
 
                     requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, headerNames, customHeaderNameValues);
@@ -170,21 +170,33 @@ public class XFormsSubmissionUtils {
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 public void close() {
                     if (getResponseInputStream() != null) {
-                        // Case of !XFormsContainingDocument.logDebugStatic where we read from the response
+                        // Case of !isReplaceAll where we read from the response
                         try {
                             getResponseInputStream().close();
                         } catch (IOException e) {
-                            throw new OXFException("Exception while closing input stream for action: " + action);
+                            throw new OXFException("Exception while closing input stream for resource: " + resource);
                         }
                     } else {
                         // Case of isReplaceAll where forwarded resource writes to the response directly
+
+                        // Try to obtain, flush and close the stream to work around WebSphere issue
                         try {
-                            // Try to obtain, flush and close the stream to work around WebSphere issue
                             final OutputStream os = effectiveResponse.getOutputStream();
                             os.flush();
                             os.close();
+                        } catch (IllegalStateException e) {
+                            XFormsServer.logger.debug("IllegalStateException caught while closing OutputStream after forward");
+                            try {
+                                final PrintWriter writer = effectiveResponse.getWriter();
+                                writer.flush();
+                                writer.close();
+                            } catch (IllegalStateException f) {
+                                XFormsServer.logger.debug("IllegalStateException caught while closing Writer after forward");
+                            } catch (IOException f) {
+                                XFormsServer.logger.debug("IOException caught while closing Writer after forward");
+                            }
                         } catch (IOException e) {
-                            throw new OXFException(e);
+                            XFormsServer.logger.debug("IOException caught while closing OutputStream after forward");
                         }
                     }
                 }

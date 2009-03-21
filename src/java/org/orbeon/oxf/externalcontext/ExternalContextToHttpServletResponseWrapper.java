@@ -168,7 +168,6 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
     }
 
     public ServletOutputStream getOutputStream() throws IOException {
-
         if (servletOutputStream == null) {
             final OutputStream outputStream = response.getOutputStream();
             servletOutputStream = new ServletOutputStream() {

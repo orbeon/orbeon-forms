@@ -92,7 +92,7 @@ public class XFormsSubmissionUtils {
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String action, boolean isContextRelative, String mediatype,
                                                            byte[] messageBody, String queryString,
-                                                           boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
+                                                           final boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
 
         // Action must be an absolute path
         if (!action.startsWith("/"))
@@ -164,13 +164,27 @@ public class XFormsSubmissionUtils {
                                     "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
                             });
 
+            // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
+            final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response != null ? response : externalContext.getResponse();
+
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 public void close() {
                     if (getResponseInputStream() != null) {
+                        // Case of !XFormsContainingDocument.logDebugStatic where we read from the response
                         try {
                             getResponseInputStream().close();
                         } catch (IOException e) {
                             throw new OXFException("Exception while closing input stream for action: " + action);
+                        }
+                    } else {
+                        // Case of isReplaceAll where forwarded resource writes to the response directly
+                        try {
+                            // Try to obtain, flush and close the stream to work around WebSphere issue
+                            final OutputStream os = effectiveResponse.getOutputStream();
+                            os.flush();
+                            os.close();
+                        } catch (IOException e) {
+                            throw new OXFException(e);
                         }
                     }
                 }
@@ -180,9 +194,8 @@ public class XFormsSubmissionUtils {
                 if (xformsModelSubmission != null)
                     xformsModelSubmission.getContainer(containingDocument).dispatchEvent(pipelineContext,
                             new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
-                // Just forward the reply
-                // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
-                requestDispatcher.forward(requestAdapter, response != null ? response : externalContext.getResponse());
+                // Just forward the reply to the response
+                requestDispatcher.forward(requestAdapter, effectiveResponse);
                 connectionResult.dontHandleResponse = true;
             } else {
                 // We must intercept the reply

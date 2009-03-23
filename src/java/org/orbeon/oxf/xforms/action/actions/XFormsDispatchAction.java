@@ -52,11 +52,11 @@ public class XFormsDispatchAction extends XFormsAction {
             if (resolvedNewEventName == null)
                 return;
         }
-        final String resolvedNewEventTargetId;
+        final String resolvedNewEventTargetStaticId;
         {
             // Resolve AVT
-            resolvedNewEventTargetId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, newEventTargetIdValue, true);
-            if (resolvedNewEventTargetId == null)
+            resolvedNewEventTargetStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, newEventTargetIdValue, true);
+            if (resolvedNewEventTargetStaticId == null)
                 return;
         }
 
@@ -90,7 +90,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // action."
 
             // Find actual target
-            final Object xformsEventTarget = resolveEffectiveObject(actionInterpreter, pipelineContext, eventObserver, resolvedNewEventTargetId, actionElement);
+            final Object xformsEventTarget = resolveEffectiveObject(actionInterpreter, pipelineContext, eventObserver, resolvedNewEventTargetStaticId, actionElement);
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
@@ -102,7 +102,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xforms:dispatch", "cannot find target, ignoring action",
-                            new String[] { "target id", resolvedNewEventTargetId } );
+                            new String[] { "target id", resolvedNewEventTargetStaticId } );
             }
         } else {
             // Event is dispatched after a delay
@@ -127,7 +127,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 progressMessage = null;
             }
 
-            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress, progressMessage);
+            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetStaticId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress, progressMessage);
         }
     }
 }

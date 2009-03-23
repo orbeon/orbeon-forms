@@ -39,11 +39,11 @@ public class XXFormsShowAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve all attributes as AVTs
-        final String dialogId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
+        final String dialogStaticId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
         final String effectiveNeighborId;
         {
-            final String neighborId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
-            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborId != null) ? resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), neighborId, actionElement) : null);
+            final String neighborStaticId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
+            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborStaticId != null) ? resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), neighborStaticId, actionElement) : null);
             effectiveNeighborId = (effectiveNeighbor != null) ? effectiveNeighbor.getEffectiveId() : null;
         }
         final boolean constrainToViewport;
@@ -52,10 +52,10 @@ public class XXFormsShowAction extends XFormsAction {
             constrainToViewport = !"false".equals(constrain);
         }
 
-        if (dialogId != null) {
+        if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-open event to dialog
             // TODO: use container.getObjectByEffectiveId() once XFormsContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogId, actionElement);
+            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventTarget, effectiveNeighborId, constrainToViewport);
@@ -64,7 +64,7 @@ public class XXFormsShowAction extends XFormsAction {
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
-                            new String[]{"dialog id", dialogId});
+                            new String[]{"dialog id", dialogStaticId});
             }
         }
     }

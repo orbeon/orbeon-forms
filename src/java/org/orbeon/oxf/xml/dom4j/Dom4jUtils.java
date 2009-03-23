@@ -536,16 +536,19 @@ public class Dom4jUtils {
     }
 
     /**
-     * Return a new document with a copy of newRoot as its root and all parent namespaces copied to
-     * the new root element, assuming they are not already declared on the new root element.
+     * Return a new document with all parent namespaces copied to the new root element, assuming they are not already
+     * declared on the new root element. The element passed is deep copied.
+     *
+     * @param newRoot   element which must become the new root element of the document
+     * @return          new document
      */
     public static Document createDocumentCopyParentNamespaces(final Element newRoot) {
         return createDocumentCopyParentNamespaces(newRoot, false);
     }
 
     /**
-     * Return a new document with all parent namespaces copied to
-     * the new root element, assuming they are not already declared on the new root element.
+     * Return a new document with all parent namespaces copied to the new root element, assuming they are not already
+     * declared on the new root element.
      *
      * @param newRoot   element which must become the new root element of the document
      * @param detach    if true the element is detached, otherwise it is deep copied

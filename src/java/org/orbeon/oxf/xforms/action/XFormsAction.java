@@ -164,11 +164,11 @@ public abstract class XFormsAction {
      * @param actionInterpreter current XFormsActionInterpreter
      * @param pipelineContext   current PipelineContext
      * @param sourceEffectiveId effective id of the source action
-     * @param targetId          target to resolve
+     * @param targetStaticId    target to resolve
      * @param actionElement     current action element
-     * @return                  effective control id if possible
+     * @return                  effective control if found
      */
-    protected Object resolveEffectiveControl(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String sourceEffectiveId, String targetId, Element actionElement) {
+    protected Object resolveEffectiveControl(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String sourceEffectiveId, String targetStaticId, Element actionElement) {
 
         final XFormsControls controls = actionInterpreter.getXFormsControls();
 
@@ -176,24 +176,34 @@ public abstract class XFormsAction {
         final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
         if (repeatindexes != null && !"".equals(repeatindexes.trim())) {
             // Effective id is provided, modify appropriately
-            // TODO: provided really, but what about prefix for components?
-            return controls.getObjectByEffectiveId(targetId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+            // TODO: this is broken within components: need to use prefixed id!
+            return controls.getObjectByEffectiveId(targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         } else {
             // Figure out effective id
-            return controls.resolveObjectById(sourceEffectiveId, targetId);
+            return controls.resolveObjectById(sourceEffectiveId, targetStaticId);
         }
     }
 
-    protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, XFormsEventObserver eventObserver, String resolvedNewEventTargetId, Element actionElement) {
+    /**
+     * Resolve an object by passing the
+     *
+     * @param actionInterpreter current XFormsActionInterpreter
+     * @param pipelineContext   current PipelineContext
+     * @param eventObserver     event observer
+     * @param objectStaticId    target to resolve
+     * @param actionElement     current action element
+     * @return                  effective control if found
+     */
+    protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, XFormsEventObserver eventObserver, String objectStaticId, Element actionElement) {
         // First try controls as we want to check on explicit repeat indexes first
         final XFormsContainer container = actionInterpreter.getContainer();
-        final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedNewEventTargetId, actionElement);
+        final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), objectStaticId, actionElement);
         if (tempXFormsEventTarget != null) {
             // Object with this id exists
             return tempXFormsEventTarget;
         } else {
             // Otherwise, try container
-            return (XFormsEventTarget) container.resolveObjectById(eventObserver.getEffectiveId(), resolvedNewEventTargetId);
+            return (XFormsEventTarget) container.resolveObjectById(eventObserver.getEffectiveId(), objectStaticId);
         }
     }
 }

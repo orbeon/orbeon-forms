@@ -42,15 +42,15 @@ public class XFormsToggleAction extends XFormsAction {
         if (caseAttribute == null)
             throw new OXFException("Missing mandatory case attribute on xforms:toggle element.");
 
-        final String caseId;
+        final String caseStaticId;
         if (bindingContext.getSingleNode() != null) {
-            caseId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, caseAttribute, true);
+            caseStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, caseAttribute, true);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
-            caseId = caseAttribute;
+            caseStaticId = caseAttribute;
         }
 
-        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), caseId, actionElement);
+        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), caseStaticId, actionElement);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
             if (!caseControl.isSelected()) {
@@ -66,7 +66,7 @@ public class XFormsToggleAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:toggle", "case does not refer to an existing xforms:case element, ignoring action",
-                        new String[] { "case id", caseId } );
+                        new String[] { "case id", caseStaticId } );
         }
     }
 }

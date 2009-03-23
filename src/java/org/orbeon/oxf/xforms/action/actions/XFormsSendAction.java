@@ -45,16 +45,16 @@ public class XFormsSendAction extends XFormsAction {
         if (submissionId == null)
             throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
 
-        final String resolvedSubmissionId;
+        final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, submissionId, true);
-            if (resolvedSubmissionId == null)
+            resolvedSubmissionStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, submissionId, true);
+            if (resolvedSubmissionStaticId == null)
                 return;
         }
 
         // Find actual target
-        final Object submission = resolveEffectiveObject(actionInterpreter, pipelineContext, eventObserver, resolvedSubmissionId, actionElement);
+        final Object submission = resolveEffectiveObject(actionInterpreter, pipelineContext, eventObserver, resolvedSubmissionStaticId, actionElement);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent((XFormsEventTarget) submission);

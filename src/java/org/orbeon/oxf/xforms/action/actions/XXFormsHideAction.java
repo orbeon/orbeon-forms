@@ -38,15 +38,15 @@ public class XXFormsHideAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve attribute as AVTs
-        final String dialogId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
-        if (dialogId == null) {
+        final String dialogStaticId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
+        if (dialogStaticId == null) {
             // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
         }
 
-        if (dialogId != null) {
+        if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
             // TODO: use container.getObjectByEffectiveId() once XFormsContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogId, actionElement);
+            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(eventTarget);
@@ -55,7 +55,7 @@ public class XXFormsHideAction extends XFormsAction {
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
-                            new String[]{"dialog id", dialogId});
+                            new String[]{"dialog id", dialogStaticId});
             }
         }
     }

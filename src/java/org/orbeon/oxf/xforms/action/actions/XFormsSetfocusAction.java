@@ -42,15 +42,15 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (controlIdAttributeValue == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
 
-        final String resolvedControlId;
+        final String resolvedControlStaticId;
         {
             // Resolve AVT
-            resolvedControlId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, controlIdAttributeValue, true);
-            if (resolvedControlId == null)
+            resolvedControlStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, controlIdAttributeValue, true);
+            if (resolvedControlStaticId == null)
                 return;
         }
 
-        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedControlId, actionElement);
+        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedControlStaticId, actionElement);
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
             containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
@@ -59,7 +59,7 @@ public class XFormsSetfocusAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setfocus", "control does not refer to an existing control element, ignoring action",
-                        new String[] { "control id", resolvedControlId } );
+                        new String[] { "control id", resolvedControlStaticId } );
         }
     }
 }

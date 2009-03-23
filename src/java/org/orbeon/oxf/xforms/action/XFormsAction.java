@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -180,6 +181,19 @@ public abstract class XFormsAction {
         } else {
             // Figure out effective id
             return controls.resolveObjectById(sourceEffectiveId, targetId);
+        }
+    }
+
+    protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, XFormsEventObserver eventObserver, String resolvedNewEventTargetId, Element actionElement) {
+        // First try controls as we want to check on explicit repeat indexes first
+        final XFormsContainer container = actionInterpreter.getContainer();
+        final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedNewEventTargetId, actionElement);
+        if (tempXFormsEventTarget != null) {
+            // Object with this id exists
+            return tempXFormsEventTarget;
+        } else {
+            // Otherwise, try container
+            return (XFormsEventTarget) container.resolveObjectById(eventObserver.getEffectiveId(), resolvedNewEventTargetId);
         }
     }
 }

@@ -17,6 +17,7 @@ import org.apache.commons.pool.ObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -365,23 +366,26 @@ public class XFormsContainingDocument extends XFormsContainer {
      * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
      * repeat or a component.
      *
-     * @param effectiveSourceId  effective id of the source, or null
-     * @param targetId           id of the target
+     * @param sourceEffectiveId  effective id of the source, or null
+     * @param targetStaticId     static id of the target
      * @return                   object, or null if not found
      */
-    public Object resolveObjectById(String effectiveSourceId, String targetId) {
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
+
+        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+            throw new OXFException("Target id must be static id: " + targetStaticId);
 
         // Search in controls
         // NOTE: we do this first now, because resolution of ids within components has priority
         {
-            final Object resultObject = xformsControls.resolveObjectById(effectiveSourceId, targetId);
+            final Object resultObject = xformsControls.resolveObjectById(sourceEffectiveId, targetStaticId);
             if (resultObject != null)
                 return resultObject;
         }
 
         // Search in parent (models and this)
         {
-            final Object resultObject = super.resolveObjectById(effectiveSourceId, targetId);
+            final Object resultObject = super.resolveObjectById(sourceEffectiveId, targetStaticId);
             if (resultObject != null)
                 return resultObject;
         }

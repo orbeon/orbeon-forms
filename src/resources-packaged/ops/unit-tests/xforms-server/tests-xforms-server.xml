@@ -3579,5 +3579,66 @@
         </output>
     </test>
 
+    <test description="Dispatch event to model within XBL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <!-- Model just so we get XForms processing -->
+                                <xforms:model xxforms:state-handling="client"/>
+                                <!-- XLB -->
+                                <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
+                                    <xbl:binding id="component" element="fr|component">
+                                        <xbl:template>
+                                            <xforms:model id="xbl-model">
+                                                <xforms:instance id="xbl-instance">
+                                                    <value/>
+                                                </xforms:instance>
+                                                <!-- Dispatch event -->
+                                                <xforms:dispatch ev:event="xforms-model-construct-done" name="doit" target="xbl-model"/>
+                                                <!-- React to dispatched event -->
+                                                <xforms:setvalue ev:event="doit" ref=".">gotit</xforms:setvalue>
+                                            </xforms:model>
+                                            <xforms:output id="xbl-output" model="xbl-model" ref="."/>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Use component -->
+                                <fr:component id="my-component"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xbl-instance" model-id="my-component$xbl-model">
+                                <value>gotit</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-component$xbl-output">gotit</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

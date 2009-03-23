@@ -190,25 +190,29 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
      * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
      * repeat or a component.
      *
-     * @param effectiveSourceId  effective id of the source, or null
-     * @param targetId           id of the target
+     * @param sourceEffectiveId  effective id of the source, or null
+     * @param targetStaticId     static id of the target
      * @return                   object, or null if not found
      */
-    public Object resolveObjectById(String effectiveSourceId, String targetId) {
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
 
-        if (targetId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
-            throw new OXFException("Target id must be static id: " + targetId);
+        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+            throw new OXFException("Target id must be static id: " + targetStaticId);
 
-        if (effectiveSourceId != null) {
-            final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveSourceId);
+        // Check this id
+        if (targetStaticId.equals(getId()))
+            return this;
+
+        if (sourceEffectiveId != null) {
+            final String prefix = XFormsUtils.getEffectiveIdPrefix(sourceEffectiveId);
             if (!prefix.equals("")) {
                 // Source is in a component so we can only reach items within this same component instance
-                final String effectiveTargetId = prefix + targetId;
+                final String effectiveTargetId = prefix + targetStaticId;
                 return getObjectByEffectiveId(effectiveTargetId);
             }
         }
 
-        return getObjectByEffectiveId(targetId);
+        return getObjectByEffectiveId(targetStaticId);
     }
 
     /**

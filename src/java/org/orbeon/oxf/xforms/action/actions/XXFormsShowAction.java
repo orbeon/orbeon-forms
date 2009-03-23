@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -38,7 +37,6 @@ public class XXFormsShowAction extends XFormsAction {
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        final XFormsContainer container = actionInterpreter.getContainer();
 
         // Resolve all attributes as AVTs
         final String dialogId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
@@ -57,9 +55,8 @@ public class XXFormsShowAction extends XFormsAction {
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog
             // TODO: use container.getObjectByEffectiveId() once XFormsContainer is able to have local controls
-            final Object controlObject = (dialogId != null) ? containingDocument.getObjectByEffectiveId(container.getFullPrefix() + dialogId) : null;
+            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
-
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventTarget, effectiveNeighborId, constrainToViewport);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);

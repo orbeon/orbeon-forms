@@ -3591,7 +3591,7 @@
                             <xhtml:head>
                                 <!-- Model just so we get XForms processing -->
                                 <xforms:model xxforms:state-handling="client"/>
-                                <!-- XLB -->
+                                <!-- XBL -->
                                 <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
                                     <xbl:binding id="component" element="fr|component">
                                         <xbl:template>
@@ -3635,6 +3635,55 @@
                     <xxf:control-values>
                         <xxf:control id="my-component$xbl-output">gotit</xxf:control>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Test namespace in attribute in XBL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <!-- Model just so we get XForms processing -->
+                                <xforms:model xxforms:state-handling="client"/>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- XBL -->
+                                <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
+                                    <xbl:binding id="fr-data-bound-select1" element="fr|foobar">
+                                        <xbl:template>
+                                            <xforms:model id="xbl-model">
+                                                <!-- Check that the namespace for xxforms:* is in scope: this must not cause a Java exception -->
+                                                <xforms:message ev:event="xforms-model-construct-done" level="xxforms:log-info">Done!</xforms:message>
+                                            </xforms:model>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                                <!-- Use component -->
+                                <fr:foobar id="my-component"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

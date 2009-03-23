@@ -1290,15 +1290,7 @@ public class XFormsStaticState {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                 final Element currentModelElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                final Document modelDocument;
-                if (detach) {
-                    modelDocument = Dom4jUtils.createDocument();
-                    modelDocument.setRootElement((Element) currentModelElement.detach());
-                } else {
-                    // Copy the element because we may need it in staticStateDocument for encoding
-                    modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement);
-                }
-
+                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement, detach);
                 result.add(modelDocument);
             }
         }

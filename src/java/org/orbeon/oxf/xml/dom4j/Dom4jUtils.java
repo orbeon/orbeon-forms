@@ -540,11 +540,32 @@ public class Dom4jUtils {
      * the new root element, assuming they are not already declared on the new root element.
      */
     public static Document createDocumentCopyParentNamespaces(final Element newRoot) {
+        return createDocumentCopyParentNamespaces(newRoot, false);
+    }
 
-        final Document document = Dom4jUtils.createDocumentCopyElement(newRoot);
-        final Element rootElement = document.getRootElement();
+    /**
+     * Return a new document with all parent namespaces copied to
+     * the new root element, assuming they are not already declared on the new root element.
+     *
+     * @param newRoot   element which must become the new root element of the document
+     * @param detach    if true the element is detached, otherwise it is deep copied
+     * @return          new document
+     */
+    public static Document createDocumentCopyParentNamespaces(final Element newRoot, boolean detach) {
 
         final Element parentElement = newRoot.getParent();
+        final Document document; {
+            if (detach) {
+                // Detach
+                document = createDocument();
+                document.setRootElement((Element) newRoot.detach());
+            } else {
+                // Copy
+                document = createDocumentCopyElement(newRoot);
+            }
+        }
+
+        final Element rootElement = document.getRootElement();
         final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
         final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 

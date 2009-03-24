@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ *  Copyright (C) 2008,2009 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -37,6 +37,13 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.util.PipelineUtils;
 
 /**
  * XBL utilities.
@@ -59,9 +66,8 @@ public class XBLUtils {
             // Here we create a completely separate document
 
             // 1. Apply optional preprocessing step (usually XSLT)
-            // TODO: call transformation here, OR:
             // Copy as the template element may be used many times
-            final Document shadowTreeDocument = Dom4jUtils.createDocumentCopyParentNamespaces(templateElement);
+            final Document shadowTreeDocument = transformTemplate(templateElement, boundElement);
 
             // 2. Apply xbl:attr, xbl:content, xxbl:attr
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
@@ -357,6 +363,57 @@ public class XBLUtils {
         }
 
         return compactShadowTree;
+    }
+
+    private static Document transformTemplate(Element templateElement, Element boundElement) {
+        final QName processorName = Dom4jUtils.extractAttributeValueQName(templateElement, XFormsConstants.XXBL_TRANSFORM_QNAME);
+        if (processorName == null) {
+            // @xxbl:transform is missing or empty: keep the template element alone
+            return Dom4jUtils.createDocumentCopyParentNamespaces(templateElement);
+        }
+
+        // Find a processor and create one
+        final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
+        if (processorFactory == null) {
+            throw new OXFException("Cannot find a processor for xxbl:transform='" +
+                    templateElement.attributeValue(XFormsConstants.XXBL_TRANSFORM_QNAME) + "'.");
+        }
+        final Processor processor = processorFactory.createInstance();
+
+        // Check if we have a single root for our transformation
+        final int nbChildElements = templateElement.elements().size();
+        if (nbChildElements != 1) {
+            throw new OXFException("xxbl:transform requires a single child element.");
+        }
+
+        // Connect this root to the processor config input
+        final Element templateChild = (Element) templateElement.elements().get(0);
+        final DOMGenerator domGeneratorConfig = PipelineUtils.createDOMGenerator(
+                Dom4jUtils.createDocumentCopyParentNamespaces(templateChild),
+                "xbl-xslt-config", processor, Dom4jUtils.makeSystemId(templateChild));
+        PipelineUtils.connect(domGeneratorConfig, "data", processor, "config");
+
+        // Connect the bound element to the processor data input
+        final DOMGenerator domGeneratorData = PipelineUtils.createDOMGenerator(
+                Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
+                "xbl-xslt-data", processor, Dom4jUtils.makeSystemId(boundElement));
+        PipelineUtils.connect(domGeneratorData, "data", processor, "data");
+
+        // Connect a DOM serializer to the processor data output
+        final DOMSerializer domSerializerData = new DOMSerializer();
+        PipelineUtils.connect(processor, "data", domSerializerData, "data");
+
+        // Run the transformation
+        final PipelineContext newPipelineContext = new PipelineContext();
+        domSerializerData.start(newPipelineContext);
+
+        // Get the result, move its root element into a xbl:template and return it
+        final Document generated = domSerializerData.getDocument(newPipelineContext);
+        final Element result = (Element) generated.getRootElement().detach();
+        generated.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"));
+        final Element newRoot = generated.getRootElement();
+        newRoot.add(result);
+        return generated;
     }
 }
 /**

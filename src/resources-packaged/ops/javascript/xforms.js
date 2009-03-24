@@ -521,6 +521,14 @@ ORBEON.util.String = {
     escapeHTMLMinimal: function(text) {
         text = ORBEON.util.String.replace(text, '&', '&amp;');
         return ORBEON.util.String.replace(text, '<', '&lt;');
+    },
+
+    /**
+     * Checks if a string ends with another string.
+     */
+    endsWith: function(text, suffix) {
+        var index = text.lastIndexOf(suffix);
+        return index != -1 && index + suffix.length == text.length;
     }
 };
 
@@ -1976,7 +1984,7 @@ ORBEON.xforms.Controls = {
                 return true;
             } else {
                 ORBEON.util.Dom.addClass(control, "xforms-required-filled");
-                ORBEON.util.Dom.removeClass(control, "xforms-required-empty");  
+                ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
                 return false;
             }
         } else {
@@ -2211,10 +2219,10 @@ ORBEON.xforms.Events = {
         while (true) {
             if (!element) return null; // No more parent, stop search
             if (element.xformsElement) {
-                // HTML area on Firefox: event target is the document, return the textarea
+                // FCKeditor HTML area on Firefox: event target is the document, return the textarea
                 return element.xformsElement;
             } else if (element.ownerDocument && element.ownerDocument.xformsElement) {
-                // HTML area on IE: event target is the body of the document, return the textarea
+                // FCKeditor HTML area on IE: event target is the body of the document, return the textarea
                 return element.ownerDocument.xformsElement;
             } else if (element.tagName != null
                     && element.tagName.toLowerCase() == "iframe") {
@@ -2225,7 +2233,18 @@ ORBEON.xforms.Events = {
                         return dialog.element;
                 }
             } else if (element.className != null) {
-                if (ORBEON.util.Dom.hasClass(element, "xforms-control")
+
+                if (element.id
+                        && ORBEON.util.String.endsWith(element.id, "_container")
+                        && ORBEON.util.Dom.hasClass(element, "xforms-textarea")
+                        && ORBEON.util.Dom.hasClass(element, "xforms-mediatype-text-html")
+                        && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                    // We may get a focus event on the container created by YUI. Instead, find the
+                    // original nested textarea element.
+
+                    return ORBEON.util.Dom.getChildElementByClass(element, "xforms-textarea");
+
+                } else if (ORBEON.util.Dom.hasClass(element, "xforms-control")
                         || ORBEON.util.Dom.hasClass(element, "xforms-dialog")
                         || ORBEON.util.Dom.hasClass(element, "xforms-help-image")
                         || ORBEON.util.Dom.hasClass(element, "xforms-alert")) {

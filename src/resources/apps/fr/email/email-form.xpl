@@ -223,15 +223,15 @@
                     </part>
                     <!-- XML attachment if needed -->
                     <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
-                        <part name="form-xml" content-type="application/xml" content-disposition="inline; filename=&quot;form.xml&quot;" src="input:form-xml"/>
+                        <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                     </xsl:if>
                     <!-- PDF attachment if needed -->
                     <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
-                        <part name="form-pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                        <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                     </xsl:if>
                     <!-- Other attachments if needed -->
                     <xsl:for-each select="$attachments/attachment">
-                        <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="inline; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
+                        <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="attachment; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
                     </xsl:for-each>
                 </body>
             </message>
@@ -281,6 +281,9 @@
                         <p:input name="config">
                             <config>
                                 <url><xsl:value-of select="$uri"/></url>
+                                <!-- Set content-type so that email processor can properly read in the data -->
+                                <content-type><xsl:value-of select="@mediatype"/></content-type>
+                                <force-content-type>true</force-content-type>
                                 <!-- Forward the same headers that the XForms engine forwards -->
                                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                             </config>

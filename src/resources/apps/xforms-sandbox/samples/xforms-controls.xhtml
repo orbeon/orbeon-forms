@@ -23,38 +23,35 @@
 
     <xhtml:head>
         <xhtml:title>XForms Controls</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
-                <instance repeat-shown="true" readonly="" relevant="true">
-                    <date>
-                        <value>2009-03-19</value>
-                    </date>
-                    <time>
-                        <value>15:00:00</value>
-                    </time>
-                    <output-file>
-                        <uri>file:///tmp/dummy</uri>
-                    </output-file>
-                </instance>
-            </xforms:instance>
-            <!-- Global MIPS that apply to all the controls -->
-            <xforms:bind nodeset="*" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
-            <xforms:bind nodeset="@*" type="xs:boolean"/>
-            <xforms:bind nodeset="date">
-                <xforms:bind nodeset="value" type="xs:date"/>
-            </xforms:bind>
-            <xforms:bind nodeset="time">
-                <xforms:bind nodeset="value" type="xs:time"/>
-            </xforms:bind>
-            <xforms:bind nodeset="output-file">
-                <xforms:bind nodeset="uri" type="xs:anyURI"/>
-            </xforms:bind>
-        </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript">
             <![CDATA[
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "xforms:select1 appearance=full",
+
+                    dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
+
+                    testAddToItemset: function() {
+                        // Get initial value for flavor and carrier
+                        var flavorSelect1 = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
+                        var carrierSelect1 = YAHOO.util.Dom.get("carrier-select1-full" + XFORMS_SEPARATOR_1 + "1");
+                        var initialFlavorValue = ORBEON.xforms.Controls.getCurrentValue(flavorSelect1);
+                        var initialCarrierValue = ORBEON.xforms.Controls.getCurrentValue(carrierSelect1);
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // Click on text field
+                            var addTrigger = YAHOO.util.Dom.get("add-flavor-carrier" + XFORMS_SEPARATOR_1 + "1");
+                            YAHOO.util.UserAction.click(addTrigger);
+                        }, function() {
+                            // Check that the values didn't change
+                            YAHOO.util.Assert.areEqual(initialFlavorValue, ORBEON.xforms.Controls.getCurrentValue(flavorSelect1));
+                            YAHOO.util.Assert.areEqual(initialCarrierValue, ORBEON.xforms.Controls.getCurrentValue(carrierSelect1));
+                       });
+                   }
+                }));
+
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
                     name: "xforms:input type xs:date",
@@ -144,8 +141,56 @@
                 });
             ]]>
         </xhtml:script>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance repeat-shown="true" readonly="" relevant="true">
+                    <radio>
+                        <flavor>s</flavor>
+                        <carrier>f</carrier>
+                    </radio>
+                    <date>
+                        <value>2009-03-19</value>
+                    </date>
+                    <time>
+                        <value>15:00:00</value>
+                    </time>
+                    <output-file>
+                        <uri>file:///tmp/dummy</uri>
+                    </output-file>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="flavors">
+                <flavors>
+                    <flavor name="a">Apple</flavor>
+                    <flavor name="s">Strawberry</flavor>
+                    <flavor name="c">Chocolate</flavor>
+                </flavors>
+            </xforms:instance>
+            <xforms:instance id="carriers">
+                <carriers>
+                    <carrier name="u">UPS</carrier>
+                    <carrier name="f">FedEx</carrier>
+                    <carrier name="d">DHL</carrier>
+                </carriers>
+            </xforms:instance>
+            <!-- Global MIPS that apply to all the controls -->
+            <xforms:bind nodeset="*" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
+            <xforms:bind nodeset="@*" type="xs:boolean"/>
+            <xforms:bind nodeset="date">
+                <xforms:bind nodeset="value" type="xs:date"/>
+            </xforms:bind>
+            <xforms:bind nodeset="time">
+                <xforms:bind nodeset="value" type="xs:time"/>
+            </xforms:bind>
+            <xforms:bind nodeset="output-file">
+                <xforms:bind nodeset="uri" type="xs:anyURI"/>
+            </xforms:bind>
+        </xforms:model>
     </xhtml:head>
     <xhtml:body>
+
+        <!-- Link to start Firebug Lite -->
+        <xhtml:a href="javascript:var firebug=document.createElement('script');firebug.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');document.body.appendChild(firebug);(function(){{if(window.firebug.version){{firebug.init();}}else{{setTimeout(arguments.callee);}}}})();void(firebug);">Start Firebub Lite</xhtml:a>
 
         <xhtml:h2>Global properties</xhtml:h2>
         <xhtml:p>
@@ -171,6 +216,44 @@
 
         <xforms:repeat nodeset=".[@repeat-shown = 'true']">
 
+            <!-- Radio -->
+            <xhtml:h2>xforms:select1 appearance=full</xhtml:h2>
+            <xforms:group ref="radio">
+                <xhtml:p>
+                    <xforms:select1 appearance="full" ref="flavor" id="flavor-select1-full">
+                        <xforms:itemset nodeset="instance('flavors')/flavor">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:select1 appearance="full" ref="carrier" id="carrier-select1-full">
+                        <xforms:itemset nodeset="instance('carriers')/carrier">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:trigger appearance="minimal" id="add-flavor-carrier">
+                        <xforms:label>Add flavor and carrier</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:insert nodeset="instance('flavors')/flavor"/>
+                            <xforms:action context="instance('flavors')/flavor[last()]">
+                                <xforms:setvalue ref=".">Key lime</xforms:setvalue>
+                                <xforms:setvalue ref="@name">k</xforms:setvalue>
+                            </xforms:action>
+                            <xforms:insert nodeset="instance('carriers')/carrier"/>
+                            <xforms:action context="instance('carriers')/carrier[last()]">
+                                <xforms:setvalue ref=".">TNT</xforms:setvalue>
+                                <xforms:setvalue ref="@name">t</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xhtml:p>
+            </xforms:group>
+
             <!-- Date -->
             <xhtml:h2>xforms:input type xs:date</xhtml:h2>
             <xforms:group ref="date">
@@ -195,14 +278,14 @@
             <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
             <xforms:group ref="output-file">
                 <xhtml:p>
-                    <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value">
+                    <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">
                         <xforms:label>Download file</xforms:label>
                     </xforms:output>
                 </xhtml:p>
             </xforms:group>
         </xforms:repeat>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </xhtml:body>
 </xhtml:html>
 

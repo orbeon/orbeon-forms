@@ -374,6 +374,42 @@ ORBEON.util.Dom = {
             element.tabIndex = value;
         } else if (name == "type") {
             element.type = value;
+        } else if (name == "name" && element.tagName.toLowerCase() == "input") {
+
+            // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.
+            // If changing the name doesn't work, we create the whole element with a new name and insert it into the DOM.
+            // This behavior is documented by Microsoft: http://msdn.microsoft.com/en-us/library/ms534184(VS.85).aspx
+
+            // Try to change the name
+            element.setAttribute(name, value);
+
+            // Check if changing the name worked
+            var controlsWithName = element.form[value];
+            var nameChangeSuccessful = false;
+            if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
+                // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
+                // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
+                for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
+                    if (controlsWithName[controlIndex] == element)
+                        nameChangeSuccessful = true;
+                }
+            } else if (YAHOO.lang.isObject(controlsWithName)) {
+                if (controlsWithName == element)
+                    nameChangeSuccessful = true;
+            }
+
+            if (!nameChangeSuccessful) {
+                // Get HTML for the element
+                var elementSource = element.outerHTML;
+                // Remove the name attribute
+                elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
+                // Add the name attribute with the new value
+                elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
+                var newElement = document.createElement(elementSource);
+                // Replacing current element by newly created one
+                element.parentNode.insertBefore(newElement, element);
+                element.parentNode.removeChild(element);
+            }
         } else {
             element.setAttribute(name, value);
         }
@@ -5124,7 +5160,7 @@ ORBEON.xforms.Server = {
                                             template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                             // Remove content and store current checked value
-                                            var valueToChecked = new Array();
+                                            var valueToChecked = {};
                                             while (documentElement.childNodes.length > 0) {
                                                 var input = xformsGetInputUnderNode(documentElement.firstChild);
                                                 valueToChecked[input.value] = input.checked;
@@ -5136,13 +5172,16 @@ ORBEON.xforms.Server = {
                                             for (var k = 0; k < itemsetTree.length; k++) {
                                                 var itemElement = itemsetTree[k];
                                                 var templateClone = template.cloneNode(true);
+                                                documentElement.appendChild(templateClone);
                                                 xformsStringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
                                                 xformsStringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
                                                 xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
-                                                documentElement.appendChild(templateClone);
+                                                xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
                                                 // Restore checked state after copy
-                                                if (valueToChecked[itemElement[1]] == true)
-                                                    xformsGetInputUnderNode(templateClone).checked = true;
+                                                if (valueToChecked[itemElement[1]] == true) {
+                                                    var inputToCheck = xformsGetInputUnderNode(templateClone);
+                                                    inputToCheck.checked = true;
+                                                }
                                                 itemIndex++;
                                             }
                                         }

@@ -70,7 +70,9 @@
                 <!-- Override node -->
                 <xsl:template match="*[generate-id() = $overriden-elements]">
                     <xsl:variable name="id" as="xs:string" select="generate-id()"/>
-                    <xsl:variable name="value" as="xs:string" select="$overriden-values[index-of($overriden-elements, $id)]"/>
+                     <!-- Tricky: index-of() may return more than one positions. We take the first one as
+                          propertiesStartsWith() returns more specific items first. -->
+                    <xsl:variable name="value" as="xs:string" select="$overriden-values[index-of($overriden-elements, $id)[1]]"/>
                     <xsl:copy>
                         <xsl:value-of select="$value"/>
                     </xsl:copy>

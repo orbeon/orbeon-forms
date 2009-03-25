@@ -54,7 +54,7 @@ public class NetUtils {
     private static final Pattern PATTERN_AMP;
 //    private static final Pattern PATTERN_AMP_AMP;
 
-    public static final String DEFAULT_URL_ENCODING = "utf-8";
+    public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
 
     private static final SimpleDateFormat dateHeaderFormats[] = {
         new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
@@ -215,7 +215,7 @@ public class NetUtils {
         try {
             long lastModified = urlConnection.getLastModified();
             if (lastModified == 0 && "file".equals(urlConnection.getURL().getProtocol()))
-                lastModified = new File(URLDecoder.decode(urlConnection.getURL().getFile(), DEFAULT_URL_ENCODING)).lastModified();
+                lastModified = new File(URLDecoder.decode(urlConnection.getURL().getFile(), STANDARD_PARAMETER_ENCODING)).lastModified();
             return lastModified;
         } catch (UnsupportedEncodingException e) {
             // Should not happen as we are using a required encoding
@@ -386,8 +386,8 @@ public class NetUtils {
                 try {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
                     // denoted ( with parens ) in the expression.  Hence we start with group 1.
-                    final String name = URLDecoder.decode(matcher.group(1), NetUtils.DEFAULT_URL_ENCODING);
-                    final String value = URLDecoder.decode(matcher.group(2), NetUtils.DEFAULT_URL_ENCODING);
+                    final String name = URLDecoder.decode(matcher.group(1), NetUtils.STANDARD_PARAMETER_ENCODING);
+                    final String value = URLDecoder.decode(matcher.group(2), NetUtils.STANDARD_PARAMETER_ENCODING);
 
                     NetUtils.addValueToStringArrayMap(result, name, value);
                 } catch (UnsupportedEncodingException e) {
@@ -428,9 +428,9 @@ public class NetUtils {
                         if (!first)
                             sb.append('&');
 
-                        sb.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
+                        sb.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
                         sb.append('=');
-                        sb.append(URLEncoder.encode((String) currentValue, NetUtils.DEFAULT_URL_ENCODING));
+                        sb.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
 
                         first = false;
                     }
@@ -525,9 +525,9 @@ public class NetUtils {
                     final Object currentValue = values[j];
                     if (currentValue instanceof String) {
                         redirectURL.append(first ? "?" : "&");
-                        redirectURL.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
+                        redirectURL.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
                         redirectURL.append("=");
-                        redirectURL.append(URLEncoder.encode((String) currentValue, NetUtils.DEFAULT_URL_ENCODING));
+                        redirectURL.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
                         first = false;
                     }
                 }
@@ -1576,7 +1576,8 @@ public class NetUtils {
                     // Add value to existing values if any
                     if (fileItem.isFormField()) {
                         // Simple form field
-                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: FORM_ENCODING getString() should use an encoding
+                        // Assume that form fields are in UTF-8. Can they have another encoding? If so, how is it specified?
+                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
                     } else {
                         // File
                         addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
@@ -1587,6 +1588,9 @@ public class NetUtils {
                 // Server error page anyway? Right now, this is going to fail
                 // miserably with an error.
                 throw e;
+            } catch (UnsupportedEncodingException e) {
+                // Should not happen
+                throw new OXFException(e);
             } finally {
                 // Close the input stream; if we don't nobody does, and if this stream is
                 // associated with a temporary file, that file may resist deletion

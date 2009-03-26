@@ -3689,5 +3689,87 @@
         </output>
     </test>
 
+    <test description="Send submission upon xforms-model-construct-done within XBL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <!-- Model just so we get XForms processing -->
+                                <xforms:model xxforms:state-handling="client"/>
+                                <!-- XBL -->
+                                <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
+                                    <xbl:binding id="component" element="fr|component">
+                                        <xbl:template>
+                                            <xforms:model id="xbl-model">
+
+                                                <xforms:instance id="initial-instance">
+                                                    <instance>
+                                                        <value>1</value>
+                                                    </instance>
+                                                </xforms:instance>
+
+                                                <xforms:instance id="new-instance">
+                                                    <instance>
+                                                        <value>2</value>
+                                                    </instance>
+                                                </xforms:instance>
+
+                                                <xforms:submission id="replace-submission"
+                                                                   ref="instance('new-instance')" method="post" resource="test:"
+                                                                   replace="instance" instance="initial-instance"
+                                                                   xxforms:readonly="false"/>
+
+                                                <!-- When this is called on xforms-ready, controls must update properly -->
+                                                <xforms:send ev:event="xforms-model-construct-done" submission="replace-submission"/>
+                                                
+                                            </xforms:model>
+                                            <xforms:output id="xbl-output" model="xbl-model" ref="."/>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Use component -->
+                                <fr:component id="my-component"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="initial-instance" model-id="my-component$xbl-model" replaced="true">
+                                <instance>
+                                    <value>2</value>
+                                </instance>
+                            </instance>
+                            <instance id="new-instance" model-id="my-component$xbl-model">
+                                <instance>
+                                    <value>2</value>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-component$xbl-output">2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

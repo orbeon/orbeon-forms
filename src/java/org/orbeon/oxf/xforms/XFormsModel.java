@@ -54,10 +54,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
     // Instances
     private List instanceIds;
     private List instances;
-    private Map instancesMap;
+    private Map instancesMap;   // Map<String instanceStaticId, XFormsInstance>
 
-    // Map<String, XFormsModelSubmission> of submission ids to submission objects
-    private Map submissions;
+    // Submissions
+    private Map submissions;    // Map<String submissionStaticId, XFormsModelSubmission>
 
     // Binds
     private XFormsModelBinds binds;
@@ -165,25 +165,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
      */
     public Object getObjectByEffectiveId(String effectiveId) {
 
-        // Check model itself
-        if (effectiveId.equals(modelEffectiveId))
-            return this;
-
-        // Search instances
-        if (instancesMap != null) {
-            final XFormsInstance instance = (XFormsInstance) instancesMap.get(effectiveId);
-            if (instance != null)
-                return instance;
+        // If prefixes or suffixes don't match, object can't be found here
+        if (!getContainer().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
+                || !XFormsUtils.getEffectiveIdSuffix(getContainer().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
+            return null;
         }
 
-        // Search submissions
-        if (submissions != null) {
-            final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(effectiveId);
-            if (resultSubmission != null)
-                return resultSubmission;
-        }
-
-        return null;
+        // Find by static id
+        return resolveObjectById(null, XFormsUtils.getStaticIdFromId(effectiveId));
     }
 
     /**
@@ -203,16 +192,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         if (targetStaticId.equals(getId()))
             return this;
 
-        if (sourceEffectiveId != null) {
-            final String prefix = XFormsUtils.getEffectiveIdPrefix(sourceEffectiveId);
-            if (!prefix.equals("")) {
-                // Source is in a component so we can only reach items within this same component instance
-                final String effectiveTargetId = prefix + targetStaticId;
-                return getObjectByEffectiveId(effectiveTargetId);
-            }
+        // Search instances
+        if (instancesMap != null) {
+            final XFormsInstance instance = (XFormsInstance) instancesMap.get(targetStaticId);
+            if (instance != null)
+                return instance;
         }
 
-        return getObjectByEffectiveId(targetStaticId);
+        // Search submissions
+        if (submissions != null) {
+            final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(targetStaticId);
+            if (resultSubmission != null)
+                return resultSubmission;
+        }
+
+        return null;
     }
 
     /**
@@ -326,8 +320,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Clon
         instances.set(instancePosition, instance);
 
         // Create mapping instance id -> instance
-        if (instanceId != null)
-            instancesMap.put(instanceId, instance);
+        instancesMap.put(instanceId, instance);
     }
 
     public String getId() {

@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, Cloneable {
+public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver, Cloneable {
 
     private Document modelDocument;
 

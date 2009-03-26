@@ -46,7 +46,7 @@ import java.util.*;
  * o as a container for models
  * o as a boundary for components
  */
-public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver {
+public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
 
     // PipelineContext attribute used during instance restoration
     protected static final String XFORMS_DYNAMIC_STATE_RESTORE = "xforms-dynamic-state-instances";

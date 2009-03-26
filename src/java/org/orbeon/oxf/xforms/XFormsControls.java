@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
  */
-public class XFormsControls {
+public class XFormsControls implements XFormsObjectResolver {
 
     private Locator locator;
 

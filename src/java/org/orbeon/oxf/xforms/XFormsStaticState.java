@@ -498,6 +498,11 @@ public class XFormsStaticState {
     }
 
     private void extractXFormsScripts(PipelineContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+
+        // TODO: Not sure why we actually extract the scripts: we could just keep pointers on them, right? There is
+        // probably not a notable performance if any at all, especially since this is needed at page generation time
+        // only.
+
         final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
                     "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);

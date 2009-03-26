@@ -383,32 +383,36 @@ ORBEON.util.Dom = {
             // Try to change the name
             element.setAttribute(name, value);
 
-            // Check if changing the name worked
-            var controlsWithName = element.form[value];
-            var nameChangeSuccessful = false;
-            if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
-                // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
-                // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
-                for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
-                    if (controlsWithName[controlIndex] == element)
+            // Check if changing the name worked. For this we need access to the form for this element, which
+            // we only have if the element is inside a form (it won't if the element is detached from the document).
+            // If we can't find the form for this element, we just hope for the best.
+            if (YAHOO.lang.isObject(element.form)) {
+                var controlsWithName = element.form[value];
+                var nameChangeSuccessful = false;
+                if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
+                    // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
+                    // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
+                    for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
+                        if (controlsWithName[controlIndex] == element)
+                            nameChangeSuccessful = true;
+                    }
+                } else if (YAHOO.lang.isObject(controlsWithName)) {
+                    if (controlsWithName == element)
                         nameChangeSuccessful = true;
                 }
-            } else if (YAHOO.lang.isObject(controlsWithName)) {
-                if (controlsWithName == element)
-                    nameChangeSuccessful = true;
-            }
 
-            if (!nameChangeSuccessful) {
-                // Get HTML for the element
-                var elementSource = element.outerHTML;
-                // Remove the name attribute
-                elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
-                // Add the name attribute with the new value
-                elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
-                var newElement = document.createElement(elementSource);
-                // Replacing current element by newly created one
-                element.parentNode.insertBefore(newElement, element);
-                element.parentNode.removeChild(element);
+                if (!nameChangeSuccessful) {
+                    // Get HTML for the element
+                    var elementSource = element.outerHTML;
+                    // Remove the name attribute
+                    elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
+                    // Add the name attribute with the new value
+                    elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
+                    var newElement = document.createElement(elementSource);
+                    // Replacing current element by newly created one
+                    element.parentNode.insertBefore(newElement, element);
+                    element.parentNode.removeChild(element);
+                }
             }
         } else {
             element.setAttribute(name, value);
@@ -5349,11 +5353,11 @@ ORBEON.xforms.Server = {
                                                     // This is also the template used for <xforms:select appearance="full"> and <xforms:select1 appearance="full">,
                                                     // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
                                                     // so there is no item label.
+                                                    documentElement.appendChild(templateClone);
                                                     xformsStringReplace(templateClone, "$xforms-template-label$", "");
                                                     xformsStringReplace(templateClone, "$xforms-template-value$", "true");
                                                     xformsStringReplace(templateClone, "$xforms-item-index$", "0");
                                                     xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
-                                                    documentElement.appendChild(templateClone);
 
                                                     // Update classes
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
@@ -5832,7 +5836,10 @@ ORBEON.xforms.Server = {
                 ORBEON.xforms.Server.showError("Server didn't respond with valid XML", "Server didn't respond with valid XML", formID);
             }
         } catch (e) {
+            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+            // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
+            throw e;
         }
     },
 

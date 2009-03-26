@@ -99,14 +99,14 @@
 
                 }));
 
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
+//                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+//                    if (parent && parent.TestManager) {
+//                        parent.TestManager.load();
+//                    } else {
+//                        new YAHOO.tool.TestLogger();
+//                        YAHOO.tool.TestRunner.run();
+//                    }
+//                });
             ]]>
         </xhtml:script>
     </xhtml:head>
@@ -161,18 +161,18 @@
                         nodeset="/states/state" label="@name" value="@abbreviation">
                     <xforms:label>State: </xforms:label>
                 </fr:data-bound-select1>
-                <fr:data-bound-select1 ref="city"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?sate-abbreviation=', state)"
-                        resource-dependency="state"
-                        nodeset="/cities/city" label="@name" value="@name">
-                    <xforms:label>City: </xforms:label>
-                </fr:data-bound-select1>
-                <fr:data-bound-select1 ref="zip"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?sate-abbreviation=', state, '&amp;city=', city)"
-                        resource-dependency="city"
-                        nodeset="/zips/zip" label="@code" value="@code">
-                    <xforms:label>Zip: </xforms:label>
-                </fr:data-bound-select1>
+                <!--<fr:data-bound-select1 ref="city"-->
+                        <!--appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?sate-abbreviation=', state)"-->
+                        <!--resource-dependency="state"-->
+                        <!--nodeset="/cities/city" label="@name" value="@name">-->
+                    <!--<xforms:label>City: </xforms:label>-->
+                <!--</fr:data-bound-select1>-->
+                <!--<fr:data-bound-select1 ref="zip"-->
+                        <!--appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?sate-abbreviation=', state, '&amp;city=', city)"-->
+                        <!--resource-dependency="city"-->
+                        <!--nodeset="/zips/zip" label="@code" value="@code">-->
+                    <!--<xforms:label>Zip: </xforms:label>-->
+                <!--</fr:data-bound-select1>-->
             </xhtml:p>
         </xforms:group>
 

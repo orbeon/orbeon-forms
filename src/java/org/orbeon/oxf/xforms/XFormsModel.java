@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver, Cloneable {
+public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
 
     private Document modelDocument;
 
@@ -1607,17 +1607,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (deferredActionContext.recalculate) {
             doRecalculate(pipelineContext);
         }
-    }
-
-    /**
-     * This class is cloneable.
-     */
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    public static interface InstanceConstructListener {
-        public void updateInstance(int position, XFormsInstance instance);
     }
 
     public XFormsEventObserver getParentEventObserver(XFormsContainer container) {

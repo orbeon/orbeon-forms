@@ -511,8 +511,6 @@ public class XFormsStaticState {
 
                 // Remember script content
                 xxformsScripts.put(prefix + scriptElement.attributeValue("id"), scriptElement.getStringValue());
-                // Detach as the element is no longer needed within the controls
-                //scriptElement.detach();
             }
         }
     }
@@ -997,12 +995,19 @@ public class XFormsStaticState {
                         // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
                         // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
 
-                        // If the document has a template, recurse into it
+                        // Generate the shadow content for this particular binding
                         final Document fullShadowTreeDocument = XBLUtils.generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap);
                         if (fullShadowTreeDocument != null) {
 
-                            // Extract models from components instances
                             final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
+
+                            // Find new prefix
+                            final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
+
+                            // Extract XForms scripts within this shadow tree (models and controls)
+                            extractXFormsScripts(pipelineContext, fullShadowTreeWrapper, newPrefix);
+
+                            // Extract models from components instances
                             final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
 
                             for (Iterator i = extractedModels.iterator(); i.hasNext();) {
@@ -1019,13 +1024,6 @@ public class XFormsStaticState {
                             // Generate compact shadow tree for this static id
                             final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument, controlElement);
                             xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
-
-                            // Find new prefix
-                            final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
-
-                            // Extract XForms scripts within this shadow tree
-                            final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
-                            extractXFormsScripts(pipelineContext, compactShadowTreeWrapper, newPrefix);
 
                             // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
                             // TODO: should do this here, in order to include only the scripts and resources actually used

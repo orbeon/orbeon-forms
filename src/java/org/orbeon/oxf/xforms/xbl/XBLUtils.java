@@ -412,6 +412,7 @@ public class XBLUtils {
         final Element result = (Element) generated.getRootElement().detach();
         generated.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"));
         final Element newRoot = generated.getRootElement();
+        newRoot.add(XFormsConstants.XBL_NAMESPACE);
         newRoot.add(result);
         return generated;
     }

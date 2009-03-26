@@ -63,7 +63,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
             final String labelValue = dialogXFormsControl.getLabel(pipelineContext);
             if (labelValue != null) {
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd");
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                 contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
@@ -71,7 +71,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
 
             // Child xhtml:div for body
             reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd xxforms-dialog-body");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
         } else {
             // Two nested xhtml:div

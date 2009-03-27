@@ -120,7 +120,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 var ORBEON = ORBEON || {};
 ORBEON.util = ORBEON.util || {};
 ORBEON.xforms = ORBEON.xforms || {};
-ORBEON.widgets = ORBEON.widgets || {};
+ORBEON.widgets = ORBEON.widgets || {};  // Legacy name used by non-XBL components
+ORBEON.widget = ORBEON.widget || {};    // New name to follow the same convention used by YUI
 ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};
 
 /**

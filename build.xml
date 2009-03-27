@@ -274,6 +274,7 @@
         <!-- Build private resources JAR -->
         <jar destfile="${resources-private.jar.file}" compress="false">
             <fileset dir="${resources-packaged.dir}">
+                <include name="xbl/**/*.xbl"/>
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
                 <exclude name="ops/css/*.template"/>
@@ -309,6 +310,13 @@
         <!-- Build public resources JAR -->
         <jar destfile="${resources-public.jar.file}" compress="false">
             <fileset dir="${resources-packaged.dir}">
+                <include name="xbl/**/*.css"/>
+                <include name="xbl/**/*.js"/>
+                <include name="xbl/**/*.gif"/>
+                <include name="xbl/**/*.png"/>
+                <include name="xbl/**/*.jpg"/>
+                <include name="xbl/**/*.html"/>
+                <include name="xbl/**/*.htc"/>
                 <include name="ops/**/*.css"/>
                 <include name="ops/**/*.js"/>
                 <include name="ops/**/*.gif"/>

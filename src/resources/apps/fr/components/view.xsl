@@ -23,6 +23,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:template match="xhtml:body//fr:view" name="fr-view">
@@ -598,6 +599,13 @@
 
     <!-- Add a default xforms:alert for those fields which don't have one -->
     <xsl:template match="xhtml:body//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="xhtml:head/xbl:xbl//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xforms:alert ref="$fr-resources/detail/labels/alert"/>

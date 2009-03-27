@@ -446,7 +446,8 @@ public class XFormsStaticState {
                     // TODO: should do this differently, in order to include only the scripts and resources actually used
                     final List scriptElements = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_SCRIPT_QNAME);
                     if (scriptElements != null && scriptElements.size() > 0) {
-                        xblScripts = new ArrayList();
+                        if (xblScripts == null)
+                            xblScripts = new ArrayList();
                         xblScripts.addAll(scriptElements);
                     }
 
@@ -931,10 +932,16 @@ public class XFormsStaticState {
 
     private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
 
+        // NOTE: We register event handlers on any element which has an id. The purpose of this is to allow registring
+        // event handlers on XBL components. This also follows the semantics of XML Events.
+
+        // NOTE: Placing a listener on say a <div> element won't work at this point. Listeners have to be placed within
+        // elements which have a representation in the compact component tree.
+
         // Two expressions depending on whether handlers within models are excluded or not
         final String xpathExpression = excludeModels ?
-                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::xforms:* | parent::xxforms:*)/@id]" :
-                "//(xforms:* | xxforms:*)[@ev:event and not(ancestor::xforms:instance) and (parent::xforms:* | parent::xxforms:*)/@id]";
+                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and parent::*/@id]" :
+                "//*[@ev:event and not(ancestor::xforms:instance) and parent::*/@id]";
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,

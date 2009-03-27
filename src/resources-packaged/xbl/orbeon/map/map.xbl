@@ -37,8 +37,7 @@
             <xforms:group id="map-container" ref=".">
 
                 <!-- Variables for attributes on the control -->
-                <xxforms:variable name="width" xbl:attr="xbl:text=width"/>
-                <xxforms:variable name="height" xbl:attr="xbl:text=height"/>
+                <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
 
                 <!-- Local model -->
                 <xforms:model id="map-model">
@@ -56,7 +55,7 @@
                 <xforms:input class="fb-map-longitude" xbl:attr="ref=longitude-ref" id="longitude" style="display: none"/>
                 <xforms:input class="fb-map-latitude" xbl:attr="ref=latitude-ref" id="latitude" style="display: none"/>
                 <!-- Div in which Google Maps does its rendering -->
-                <xhtml:div class="fb-map-gmap-div" id="gmap-div" style="width:{$width}px;height:{$height}px"></xhtml:div>
+                <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"></xhtml:div>
 
             </xforms:group>
 

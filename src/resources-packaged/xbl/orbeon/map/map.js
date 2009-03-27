@@ -57,7 +57,6 @@
         updateMarkerFromAddress: function() {
             var address = Document.getValue(this.addressOutputID);
             var map = this;
-            console.log("new address", address);
             this.geocoder.getLatLng(address, function(longLat) {
                 if (longLat != null) {
                     map._updateLongLat(longLat);
@@ -75,7 +74,6 @@
         },
 
         _updateLongLat: function(longLat) {
-            console.log("long/lat", longLat);
             Document.setValue(this.longitudeInputID, longLat.lng());
             Document.setValue(this.latitudeInputID, longLat.lat());
         }

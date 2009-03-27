@@ -18,6 +18,7 @@
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:utils="java:org.orbeon.oxf.xforms.XFormsUtils">
 
@@ -26,6 +27,7 @@
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance xmlns="">
+                    <filter-broken-pi xsi:type="xs:boolean">true</filter-broken-pi>
                     <html/>
                     <xhtml-jtidy/>
                     <xhtml-tagsoup/>
@@ -44,15 +46,23 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:textarea ref="html">
-            <xforms:label>Input HTML</xforms:label>
+        <xforms:group appearance="xxforms:internal">
+            <xforms:input ref="filter-broken-pi">
+                <xforms:label>Filter broken PI</xforms:label>
+            </xforms:input>
+
+            <xhtml:hr/>
+
+            <xforms:textarea ref="html">
+                <xforms:label>Input HTML</xforms:label>
+            </xforms:textarea>
+
             <xforms:action ev:event="xforms-value-changed">
-                <xxforms:variable name="filtered" select="replace(., '&lt;\?[^>]*>', '')" as="xs:string"/>
-                <!--<xxforms:variable name="filtered" select="." as="xs:string"/>-->
-                <xforms:setvalue ev:event="xforms-value-changed" ref="../xhtml-jtidy" value="saxon:serialize(utils:htmlStringToDocument($filtered, ()), instance('fr-xsl-output-instance'))"/>
-                <xforms:setvalue ref="../xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
+                <xxforms:variable name="filtered" select="if (filter-broken-pi = 'true') then replace(html, '&lt;\?[^>]*>', '') else html" as="xs:string"/>
+                <xforms:setvalue ref="xhtml-jtidy" value="saxon:serialize(utils:htmlStringToDocument($filtered, ()), instance('fr-xsl-output-instance'))"/>
+                <xforms:setvalue ref="xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
             </xforms:action>
-        </xforms:textarea>
+        </xforms:group>
 
         <xforms:textarea ref="xhtml-jtidy">
             <xforms:label>JTidy</xforms:label>

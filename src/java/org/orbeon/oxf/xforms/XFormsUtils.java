@@ -43,11 +43,15 @@ import org.orbeon.saxon.value.*;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.ccil.cowan.tagsoup.HTMLSchema;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
@@ -234,7 +238,7 @@ public class XFormsUtils {
 //        }
     }
 
-    private static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {
+    public static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {
         // Create and configure Tidy instance
         final Tidy tidy = new Tidy();
         tidy.setShowWarnings(false);
@@ -255,6 +259,46 @@ public class XFormsUtils {
         } catch (Exception e) {
             throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
         }
+    }
+
+    public static org.w3c.dom.Document htmlStringToDocumentTagSoup(String value, LocationData locationData) {
+
+        try {
+            final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
+            final HTMLSchema theSchema = new HTMLSchema();
+
+            xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, theSchema);
+            
+            xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true);
+
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+
+            final org.w3c.dom.Document document = XMLUtils.createDocument();
+            final DOMResult domResult = new DOMResult(document);
+            identity.setResult(domResult);
+
+            xmlReader.setContentHandler(identity);
+
+            final InputSource inputSource = new InputSource();
+            inputSource.setCharacterStream(new StringReader(value));
+
+            xmlReader.parse(inputSource);
+
+            return document;
+        } catch (Exception e) {
+            throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
+        }
+        
+//			r.setFeature(Parser.CDATAElementsFeature, false);
+//			r.setFeature(Parser.namespacesFeature, false);
+//			r.setFeature(Parser.ignoreBogonsFeature, true);
+//			r.setFeature(Parser.bogonsEmptyFeature, false);
+//			r.setFeature(Parser.defaultAttributesFeature, false);
+//			r.setFeature(Parser.translateColonsFeature, true);
+//			r.setFeature(Parser.restartElementsFeature, false);
+//			r.setFeature(Parser.ignorableWhitespaceFeature, true);
+//			r.setProperty(Parser.scannerProperty, new PYXScanner());
+//          r.setProperty(Parser.lexicalHandlerProperty, h);
     }
 
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {

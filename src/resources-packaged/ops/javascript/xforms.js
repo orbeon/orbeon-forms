@@ -62,7 +62,7 @@ var DATE_PICKER_PROPERTY = "datepicker";
 var HTML_EDITOR_PROPERTY = "htmleditor";
 var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
 var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
-
+var RESOURCES_VERSIONED = "oxf.resources.versioned";
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
 // Parameter defaults
@@ -977,6 +977,7 @@ ORBEON.util.Utils = {
             case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
             case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
             case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
+            case RESOURCES_VERSIONED: { return "false"; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
@@ -3716,7 +3717,12 @@ ORBEON.xforms.Init = {
                 if (startPathToJavaScript == -1)
                     startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
                 if (startPathToJavaScript != -1) {
-                    ORBEON.xforms.Globals.baseURL = scriptSrc.substr(0, startPathToJavaScript);
+                    // Take the part of the path before the JS path, which will look something like /context
+                    // or /context/version if versioned resources were enabled
+                    var contextPath = scriptSrc.substr(0, startPathToJavaScript);
+                    if (ORBEON.util.Utils.getProperty(RESOURCES_VERSIONED) == "true")
+                        contextPath = contextPath.substring(0, contextPath.lastIndexOf("/"));
+                    ORBEON.xforms.Globals.baseURL = contextPath;
                     break;
                 }
             }

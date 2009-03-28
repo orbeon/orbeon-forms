@@ -293,7 +293,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         final Object propertyValue = currentEntry.getValue();
 
                         final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
-                        if (propertyDefinition != null && propertyDefinition.isPropagateToClient() || URLRewriterUtils.RESOURCES_VERSION_NUMBER_PROPERTY.equals(propertyName)) {
+                        if (propertyDefinition != null && propertyDefinition.isPropagateToClient()
+                                || URLRewriterUtils.RESOURCES_VERSION_NUMBER_PROPERTY.equals(propertyName)
+                                || URLRewriterUtils.RESOURCES_VERSIONED_PROPERTY.equals(propertyName)) {
 
                             if (sb == null) {
                                 // First property found

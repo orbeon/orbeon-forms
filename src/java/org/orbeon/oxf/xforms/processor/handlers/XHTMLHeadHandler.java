@@ -242,11 +242,10 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Produce JavaScript paths for use on the client
                         {
-                            final boolean isVersionResources = URLRewriterUtils.isResourcesVersioned();
                             // FCKeditor path
                             {
                                 final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY);
-                                final String fckEditorPath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
+                                final String fckEditorPath = isVersionedResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
                                 if (!fckEditorPath.equals(propertyDefinition.getDefaultValue()))
                                     dynamicProperties.put(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY, fckEditorPath);
                             }
@@ -262,6 +261,10 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Application version
                         {
+                            // This is not an XForms property but we want to expose it on the client
+                            if (isVersionedResources != URLRewriterUtils.RESOURCES_VERSIONED_DEFAULT)
+                                dynamicProperties.put(URLRewriterUtils.RESOURCES_VERSIONED_PROPERTY, Boolean.toString(isVersionedResources));
+
                             if (isVersionedResources) {
                                 final String applicationVersion = URLRewriterUtils.getApplicationResourceVersion();
                                 if (applicationVersion != null) {

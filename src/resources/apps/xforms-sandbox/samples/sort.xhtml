@@ -50,27 +50,63 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="exforms:sort(composer, '.', 'text', instance('control')/order, instance('control')/case)">
-            <xhtml:div>
-                <xforms:output ref="."/>
-            </xhtml:div>
-        </xforms:repeat>
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>exforms:sort()</xforms:label>
+            <xforms:repeat nodeset="exforms:sort(composer, '.', 'text', instance('control')/order, instance('control')/case)">
+                <xhtml:div>
+                    <xforms:output ref="."/>
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>xxforms:sort()</xforms:label>
+            <xforms:repeat nodeset="xxforms:sort(composer, ., 'text', instance('control')/order, instance('control')/case)">
+                <xhtml:div>
+                    <xforms:output ref="."/>
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
 
         <xhtml:hr/>
 
-        <xforms:repeat nodeset="exforms:sort(composer, '@date', 'text', instance('control')/order, instance('control')/case)">
-            <xhtml:div>
-                <xforms:output value="."/> (<xforms:output value="@date"/>)
-            </xhtml:div>
-        </xforms:repeat>
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>exforms:sort()</xforms:label>
+            <xforms:repeat nodeset="exforms:sort(composer, '@date', 'text', instance('control')/order, instance('control')/case)">
+                <xhtml:div>
+                    <xforms:output value="."/> (<xforms:output value="@date"/>)
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>xxforms:sort()</xforms:label>
+            <xforms:repeat nodeset="xxforms:sort(composer, @date, 'text', instance('control')/order, instance('control')/case)">
+                <xhtml:div>
+                    <xforms:output value="."/> (<xforms:output value="@date"/>)
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
 
         <xhtml:hr/>
 
-        <xforms:repeat nodeset="exforms:sort(composer, '.', 'text')">
-            <xhtml:div>
-                <xforms:output ref="."/>
-            </xhtml:div>
-        </xforms:repeat>
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>exforms:sort()</xforms:label>
+            <xforms:repeat nodeset="exforms:sort(composer, '.', 'text')">
+                <xhtml:div>
+                    <xforms:output ref="."/>
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
+
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>xxforms:sort()</xforms:label>
+            <xforms:repeat nodeset="xxforms:sort(composer, ., 'text')">
+                <xhtml:div>
+                    <xforms:output ref="."/>
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
 
         <xhtml:hr/>
 

@@ -125,7 +125,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // The context() function (XForms 1.1)
         register("context", Context.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // Orbeon XXForms functions
+        // === Orbeon extension functions in the xxforms namespace
 
         // xxforms:event()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}event", XXFormsEvent.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
@@ -298,7 +298,15 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // Useful XSLT function
+        // xxforms:sort()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}sort", XXFormsSort.class, 0, 2, 5, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+
+        // === XSLT function
         e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.DATE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
@@ -325,19 +333,24 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
-        // eXForms functions
+        // === eXforms functions
+
+        // exf:relevant()
         e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}relevant", EXFormsRelevant.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
+        // exf:readonly()
         e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}readonly", EXFormsReadonly.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
+        // exf:required()
         e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}required", EXFormsRequired.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
-        
+
+        // exf:sort()
         e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}sort", EXFormsSort.class, 0, 2, 5, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
-        StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);

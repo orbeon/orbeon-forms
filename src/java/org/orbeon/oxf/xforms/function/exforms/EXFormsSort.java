@@ -13,22 +13,19 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.sort.SortExpression;
-import org.orbeon.saxon.sort.SortKeyDefinition;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
 
 import java.util.Iterator;
 
 /**
  * exforms:sort() function
  */
-public class EXFormsSort extends XFormsFunction {
+public class EXFormsSort extends XXFormsSort {
 
     // See comments in Saxon Evaluate.java
     private IndependentContext staticContext;
@@ -39,42 +36,11 @@ public class EXFormsSort extends XFormsFunction {
         final Expression sortKeyExpression;
         {
             final Expression selectExpression = argument[1];
-
-            if (selectExpression instanceof StringValue) {
-                // This is to be compatible with exforms:sort() as initially specified
-                sortKeyExpression = ExpressionTool.make(selectExpression.evaluateAsString(xpathContext),
-                    staticContext, 0, Token.EOF, getLineNumber());
-            } else {
-                // This is the "better way" as allowed by XPath 2.0
-                sortKeyExpression = selectExpression;
-            }
+            sortKeyExpression = ExpressionTool.make(selectExpression.evaluateAsString(xpathContext),
+                staticContext, 0, Token.EOF, getLineNumber());
         }
 
-        final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;
-        final Expression orderExpression = (argument.length > 3) ? argument[3] : null;
-        final Expression caseOrderExpression = (argument.length > 4) ? argument[4] : null;
-
-//        Expression langExpression = argument[5];// new in XSLT 2.0
-//        Expression collationExpression = argument[6];// new in XSLT 2.0
-//        Expression stableExpression = argument[7];// new in XSLT 2.0
-
-        final SortKeyDefinition sortKey = new SortKeyDefinition();
-        sortKey.setSortKey(sortKeyExpression);
-
-        if (datatypeExpression != null)
-            sortKey.setDataTypeExpression(datatypeExpression);
-        if (orderExpression != null)
-            sortKey.setOrder(orderExpression);
-        if (caseOrderExpression != null)
-            sortKey.setCaseOrder(caseOrderExpression);
-
-//        sortKey.setLanguage(langExpression);
-//        sortKey.setCollationName(collationExpression);
-//        sortKey.setStable(stableExpression);
-
-        final SortKeyDefinition[] sortKeys = { sortKey };
-
-        return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
+        return sort(xpathContext, sequenceToSortExpression, sortKeyExpression);
     }
 
     // The following copies all the StaticContext information into a new StaticContext

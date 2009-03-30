@@ -715,6 +715,20 @@
                         </p>
                     </li>
                     <li>
+                        <a name="xxforms-sort"/>
+                        <p><code>exf:sort($sequence as item()*, $sort-key as item(), $datatype as xs:string?, $order as xs:string?, $case-order as xs:string?) as item()*</code></p>
+                        <p>
+                           Note that the second argument differs from the <code>exforms:sort()</code> function: it does
+                           not take a plain string but a literal expression, for example:
+                        </p>
+                        <xml-source>
+                            <xforms:itemset nodeset="xxforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
+                                ...
+                            </xforms:itemset>
+                        </xml-source>
+                    </li>
+
+                    <li>
                         <a name="xxforms-repeat-current"/>
                         <p>
                             <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>
@@ -780,28 +794,12 @@
                 </p>
                 <ul>
                     <li>
-                        <p><code>exf:sort()</code></p>
+                        <p><code>exf:sort($sequence as item()*, $sort-key as xs:string, $datatype as xs:string?, $order as xs:string?, $case-order as xs:string?) as item()*</code></p>
                         <p>
-                            This function as specified by eXforms has the following XPath 1.0 signature:
-                        </p>
-                        <p>
-                            <code>node-set exf:sort(node-set, string, string?, string?, string?)</code>
-                        </p>
-                        <p>
-                            In Orbeon Forms and XPath 2.0, it is defined as follows:
-                        </p>
-                        <p>
-                            <code>exf:sort($sequence as item()*, $sort-key as item(), $datatype as xs:string?, $order as xs:string?, $case-order as xs:string?) as item()*</code>
-                        </p>
-                        <p>
-                           Note that the second argument is no longer a plain string. You can either pass a string
-                           containing an expression, or a literal expression, for example:
+                           Note that the second argument is interpreted as a string, unlike with
+                           <code>xxforms:sort()</code>:
                         </p>
                         <xml-source>
-                            <comment>With a literal expression</comment>
-                            <xforms:itemset nodeset="exforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
-                                ...
-                            </xforms:itemset><comment>With a string</comment>
                             <xforms:itemset nodeset="exforms:sort(instance('samples-instance')/file, '@name', 'text', 'ascending')">
                                 ...
                             </xforms:itemset>

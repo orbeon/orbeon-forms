@@ -1552,7 +1552,7 @@ ORBEON.xforms.Controls = {
                         xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
                         // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
                         // If there is no previousServerValue, go ahead and update field
-                        && (previousServerValue == null || htmlEditor.GetXHTML() == previousServerValue);
+                        && (previousServerValue == null || xformsNormalizeEndlines(htmlEditor.GetXHTML()) == xformsNormalizeEndlines(previousServerValue));
                 if (doUpdate) {
                     // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
                     // as we loose our listeners after using the later
@@ -3393,7 +3393,6 @@ ORBEON.widgets.RTE = function() {
      * of the editor.
      */
     function changeEvent(controlID) {
-
         // Simulate blur on previous, focus on this
         var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
         if (currentFocusControlId != controlID) {
@@ -3463,7 +3462,8 @@ ORBEON.widgets.RTE = function() {
                     xformsNormalizeEndlines(yuiRTE.getEditorHTML()) != xformsNormalizeEndlines(newValue)
                     // Update only if the value in the HTML area is the same now as it was when we sent it to the server
                     // If there is no previousServerValue, go ahead and update field
-                    && (previousServerValue == null || yuiRTE.getEditorHTML() == previousServerValue);
+                    && (previousServerValue == null || xformsNormalizeEndlines(yuiRTE.getEditorHTML()) == xformsNormalizeEndlines(previousServerValue));
+
             if (doUpdate) {
                 yuiRTE.setEditorHTML(newValue);
                 ORBEON.xforms.Globals.serverValue[control.id] = newValue;

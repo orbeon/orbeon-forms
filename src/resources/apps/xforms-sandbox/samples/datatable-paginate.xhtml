@@ -13,7 +13,8 @@
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom">
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
 
     <head>
         <title>Using YUI's datatable</title>
@@ -23,10 +24,12 @@
         </xf:model>
     </head>
     <body>
+        <!-- Include the widget definition -->
+        <xi:include href="oxf:/xbl/orbeon/table/table.xbl" xxi:omit-xml-base="true"/>
 
-        <h1>Paginated data table widgets</h1>
+        <h1>Paginated data table widgets (old generation)</h1>
 
-        <p/>
+        <p>This sample demonstratres the pagination feature of the datatable widget.</p>
 
         <widget:table id="table-repeat1" appearance="xxforms:data-table" paginated="true" rowsPerPage="5">
             <!-- Optional <thead>, otherwise try to build one from body -->

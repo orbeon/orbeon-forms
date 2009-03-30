@@ -28,29 +28,35 @@
 
         <h1>Using YUI's datatable (old generation) to display a RSS channel</h1>
 
-        <p>This sample shows that cells content isn't restricting to simple values but also support complex content (in that case, a link).</p>
+        <p>This sample has been developed to tests XForms functions "position()" and "index()" within a datatable.</p>
 
-        <widget:table id="table-repeat1" appearance="xxforms:data-table">
+        <widget:table id="table-repeat1" appearance="xxforms:data-table" sortedByKey="position()" sortedByDir="ascending">
             <!-- Optional <thead>, otherwise try to build one from body -->
-            <thead>
-                <tr>
-                    <th>Author</th>
-                    <th>Title</th>
-                </tr>
-            </thead>
             <tbody>
-                <tr repeat-nodeset="/rss/channel/item">
-                    <td>
-                        <!-- Classes allow setting column properties -->
-                        <xf:output ref="dc:creator" class="widget-sortable widget-resizeable"/>
-                    </td>
-                    <td>
-                        <!-- Classes allow setting column properties -->
-                        <a href="{link}" title="{title}">
-                            <xf:output value="title" class="widget-sortable widget-resizeable"/>
-                        </a>
-                    </td>
-                </tr>
+                <xf:repeat nodeset="/rss/channel/item" id="repeat">
+                    <tr>
+                        <td>
+                            <xf:output ref="dc:creator" class="widget-sortable widget-resizeable">
+                                <xf:label>Author</xf:label>
+                            </xf:output>
+                        </td>
+                        <td>
+                            <xf:output value="title" class="widget-sortable widget-resizeable">
+                                <xf:label>Title</xf:label>
+                            </xf:output>
+                        </td>
+                        <td>
+                            <xf:output value="position()" class="widget-sortable widget-resizeable xforms-type-integer">
+                                <xf:label>position()</xf:label>
+                            </xf:output>
+                        </td>
+                        <td>
+                            <xf:output value="index('repeat')" class="widget-sortable widget-resizeable xforms-type-integer">
+                                <xf:label>index('repeat')</xf:label>
+                            </xf:output>
+                        </td>
+                    </tr>
+                </xf:repeat>
             </tbody>
         </widget:table>
 

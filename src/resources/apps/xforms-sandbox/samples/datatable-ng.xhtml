@@ -14,10 +14,10 @@
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <head>
-        <title>Using YUI's datatable ("old generation")</title>
+        <title>Using YUI's datatable</title>
         <xf:model id="model">
             <xf:instance id="instance">
                 <instance xmlns="">
@@ -42,19 +42,20 @@
         </xf:model>
     </head>
     <body>
-        <!-- Include the widget definition -->
-        <xi:include href="oxf:/xbl/orbeon/table/table.xbl" xxi:omit-xml-base="true"/>
 
-        <h1>Using YUI's datatable</h1>
+        <h1>Using the datatable widget (new generation)</h1>
+
+        <!-- Include the widget definition -->
+        <xi:include href="oxf:/xbl/orbeon/table-ng/table-ng.xbl" xxi:omit-xml-base="true"/>
 
         <p>A first table with explicit labels. The first two colums are sortable and the first one is a number and is resizeable. The labels are
             defined separately in a thead element.</p>
-        <widget:table id="table-repeat1" appearance="xxforms:data-table">
+        <widget:table-ng id="table-repeat1" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
-                    <th>AAA (s)</th>
-                    <th>BBB (s)</th>
+                    <th widget:sortable="true" widget:sort-type="number">AAA (s)</th>
+                    <th widget:sortable="true">BBB (s)</th>
                     <th>CCC</th>
                 </tr>
             </thead>
@@ -62,11 +63,11 @@
                 <tr repeat-nodeset="record">
                     <td>
                         <!-- Classes allow setting column properties -->
-                        <xf:output ref="AAA" class="widget-sortable widget-resizeable"/>
+                        <xf:output ref="AAA"/>
                     </td>
                     <td>
                         <!-- Classes allow setting column properties -->
-                        <xf:output ref="BBB" class="widget-sortable"/>
+                        <xf:output ref="BBB"/>
                     </td>
                     <td>
                         <!-- Classes allow setting column properties -->
@@ -74,37 +75,35 @@
                     </td>
                 </tr>
             </tbody>
-        </widget:table>
+        </widget:table-ng>
 
         <p>Another table with implicit labels. All the colums are sortable and the first one is a number. The labels are defined as xforms labels.</p>
-        <widget:table id="table-repeat2" appearance="xxforms:data-table">
+        <widget:table-ng id="table-repeat2" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
-            <tbody>
-                <tr repeat-nodeset="record">
-                    <td>
-                        <!-- Classes allow setting column properties -->
-                        <xf:output ref="AAA" class="widget-sortable">
-                            <!-- Optional label used if there is no <head> -->
-                            <xf:label>AAA (imp)</xf:label>
-                        </xf:output>
-                    </td>
-                    <td>
-                        <!-- Classes allow setting column properties -->
-                        <xf:output ref="BBB" class="widget-sortable">
-                            <!-- Optional label used if there is no <head> -->
-                            <xf:label>BBB (imp)</xf:label>
-                        </xf:output>
-                    </td>
-                    <td>
-                        <!-- Classes allow setting column properties -->
-                        <xf:output ref="CCC" class="widget-sortable">
-                            <!-- Optional label used if there is no <head> -->
-                            <xf:label>CCC (imp)</xf:label>
-                        </xf:output>
-                    </td>
-                </tr>
-            </tbody>
-        </widget:table>
+            <tr repeat-nodeset="record">
+                <td widget:sortable="true" widget:sort-type="number">
+                    <!-- Classes allow setting column properties -->
+                    <xf:output ref="AAA">
+                        <!-- Optional label used if there is no <head> -->
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td widget:sortable="true">
+                    <!-- Classes allow setting column properties -->
+                    <xf:output ref="BBB">
+                        <!-- Optional label used if there is no <head> -->
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td widget:sortable="true">
+                    <!-- Classes allow setting column properties -->
+                    <xf:output ref="CCC">
+                        <!-- Optional label used if there is no <head> -->
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </td>
+            </tr>
+        </widget:table-ng>
 
         <widget:xforms-instance-inspector/>
 

@@ -34,6 +34,22 @@
         <p:output name="data" id="result"/>
     </p:processor>
 
+    <!-- Sort -->
+    <p:processor name="oxf:xslt-2.0">
+        <p:input name="data" href="#result"/>
+        <p:input name="config">
+            <directory xsl:version="2.0">
+                <xsl:copy-of select="/directory/@*"/>
+                <xsl:for-each select="/directory/file">
+                    <xsl:sort select="substring(@name, 1, string-length(@name) -6)"/>
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+            </directory>
+        </p:input>
+        <p:output name="data" id="sorted"/>
+    </p:processor>
+    
+    
     <!-- Convert and serialize to XML -->
     <p:processor name="oxf:xml-converter">
         <p:input name="config">
@@ -42,11 +58,11 @@
                 <encoding>utf-8</encoding>
             </config>
         </p:input>
-        <p:input name="data" href="#result"/>
+        <p:input name="data" href="#sorted"/>
         <p:output name="data" id="converted"/>
     </p:processor>
-
-    <p:processor name="oxf:http-serializer">
+    
+     <p:processor name="oxf:http-serializer">
         <p:input name="config">
             <config>
                 <cache-control>
@@ -56,5 +72,7 @@
         </p:input>
         <p:input name="data" href="#converted"/>
     </p:processor>
+
+
 
 </p:config>

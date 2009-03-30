@@ -626,6 +626,11 @@
                             available, the function returns an empty sequence. Otherwise, a QName associated with the
                             type is returned.
                         </p>
+                        <xml-source>
+                            <xforms:output value="for $t in xxforms:type(date) return concat('{', namespace-uri-from-QName($t), '}', local-name-from-QName($t))">
+                                <xforms:label>Type:</xforms:label>
+                            </xforms:output>
+                        </xml-source>
                     </li>
                     <li>
                         <a name="xxforms-invalid-binds"/>

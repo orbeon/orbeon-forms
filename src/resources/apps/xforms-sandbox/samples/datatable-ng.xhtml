@@ -48,14 +48,14 @@
         <!-- Include the widget definition -->
         <xi:include href="oxf:/xbl/orbeon/table-ng/table-ng.xbl" xxi:omit-xml-base="true"/>
 
-        <p>A first table with explicit labels. The first two colums are sortable and the first one is a number and is resizeable. The labels are
+        <p>A first table with explicit labels. The first two colums are sortable and resizeable and the first one is a number. The labels are
             defined separately in a thead element.</p>
         <widget:table-ng id="table-repeat1" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
-                    <th widget:sortable="true" widget:sort-type="number">AAA (s)</th>
-                    <th widget:sortable="true">BBB (s)</th>
+                    <th widget:sortable="true" widget:sort-type="number" widget:resizeable="true">AAA (s)</th>
+                    <th widget:sortable="true" widget:resizeable="true">BBB (s)</th>
                     <th>CCC</th>
                 </tr>
             </thead>
@@ -77,25 +77,25 @@
             </tbody>
         </widget:table-ng>
 
-        <p>Another table with implicit labels. All the colums are sortable and the first one is a number. The labels are defined as xforms labels.</p>
+        <p>Another table with implicit labels. All the colums are sortable and resizeable and the first one is a number. The labels are defined as xforms labels.</p>
         <widget:table-ng id="table-repeat2" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <tr repeat-nodeset="record">
-                <td widget:sortable="true" widget:sort-type="number">
+                <td widget:sortable="true" widget:sort-type="number" widget:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="AAA">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>AAA (imp)</xf:label>
                     </xf:output>
                 </td>
-                <td widget:sortable="true">
+                <td widget:sortable="true" widget:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="BBB">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>BBB (imp)</xf:label>
                     </xf:output>
                 </td>
-                <td widget:sortable="true">
+                <td widget:sortable="true" widget:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="CCC">
                         <!-- Optional label used if there is no <head> -->

@@ -39,7 +39,7 @@
 
     <xsl:template match="widget:table-ng">
         <!-- Matches the bound element -->
-        <xhtml:div class="data-table-ng yui-dt yui-dt-scrollable">
+        <xhtml:div class="table-ng yui-dt yui-dt-scrollable">
 
             <xsl:variable name="pass1">
                 <!-- 
@@ -98,7 +98,7 @@
             <xhtml:div>
                 <xxforms:variable name="sort" model="datatable-ng" instance="sort" select="."/>
 
-               <!-- <xforms:group ref="$sort">
+                <!-- <xforms:group ref="$sort">
                     <xhtml:p>
                         <xforms:output ref="@currentId">
                             <xforms:label>@currentId: </xforms:label>
@@ -110,7 +110,7 @@
                         </xforms:output>
                     </xhtml:p>
                     </xforms:group>-->
-                
+
             </xhtml:div>
 
             <!-- 
@@ -123,7 +123,7 @@
             and uses the "YUI" mode 
             
         -->
-            <xhtml:div class="yui-dt-hd" style="background-color: rgb(242, 242, 242); display: table;"> 
+            <xhtml:div class="yui-dt-hd" style="background-color: rgb(242, 242, 242); display: table;">
                 <!-- See http://snippets.dzone.com/posts/show/216... -->
                 <xsl:apply-templates select="$pass1" mode="YUI"/>
             </xhtml:div>
@@ -168,6 +168,51 @@
         </xhtml:tr>
     </xsl:template>
 
+    <xsl:template name="yui-dt-liner">
+        <xsl:param name="position"/>
+        <xhtml:div class="yui-dt-liner">
+            <xhtml:span class="yui-dt-label">
+                <xsl:choose>
+                    <xsl:when test="@widget:sortable = 'true'">
+                        <xforms:group model="datatable-ng" instance="sort">
+                            <xforms:group ref=".[$nextSortOrder = 'ascending']">
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xsl:apply-templates select="node()" mode="YUI"/>
+                                    </xforms:label>
+                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"/></xforms:hint>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
+                                        <xforms:setvalue ref="@currentId">
+                                            <xsl:value-of select="$position"/>
+                                        </xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <xforms:group ref=".[$nextSortOrder != 'ascending']">
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xsl:apply-templates select="node()" mode="YUI"/>
+                                    </xforms:label>
+                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"/></xforms:hint>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
+                                        <xforms:setvalue ref="@currentId">
+                                            <xsl:value-of select="$position"/>
+                                        </xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </xforms:group>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()" mode="YUI"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xhtml:span>
+        </xhtml:div>
+    </xsl:template>
+
     <xsl:template match="xhtml:thead/xhtml:tr/xhtml:th" mode="YUI">
         <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
         <xxforms:variable name="nextSortOrder" model="datatable-ng" instance="sort"
@@ -177,53 +222,28 @@
         <xhtml:th
             class="
             {if (@widget:sortable = 'true') then 'yui-dt-sortable' else ''} 
+            {if (@widget:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
             {{if ({$position} = $currentId) 
                 then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
                 else ''}}
             {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <xhtml:div class="yui-dt-liner">
-                <xhtml:span class="yui-dt-label">
-                    <xsl:choose>
-                        <xsl:when test="@widget:sortable = 'true'">
-                            <xforms:group model="datatable-ng" instance="sort">
-                                <xforms:group ref=".[$nextSortOrder = 'ascending']">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="node()" mode="YUI"/>
-                                        </xforms:label>
-                                        <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"/></xforms:hint>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                            <xforms:setvalue ref="@currentId">
-                                                <xsl:value-of select="$position"/>
-                                            </xforms:setvalue>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xforms:group>
-                                <xforms:group ref=".[$nextSortOrder != 'ascending']">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="node()" mode="YUI"/>
-                                        </xforms:label>
-                                        <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"/></xforms:hint>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                            <xforms:setvalue ref="@currentId">
-                                                <xsl:value-of select="$position"/>
-                                            </xforms:setvalue>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xforms:group>
-                            </xforms:group>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:apply-templates select="node()" mode="YUI"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xhtml:span>
-            </xhtml:div>
+            <xsl:choose>
+                <xsl:when test="@widget:resizeable = 'true'">
+                    <xhtml:div class="yui-dt-resizerliner">
+                        <xsl:call-template name="yui-dt-liner">
+                            <xsl:with-param name="position" select="$position"/>
+                        </xsl:call-template>
+                        <xhtml:div id="{generate-id()}" class="yui-dt-resizer" style="left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
+                    </xhtml:div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="yui-dt-liner">
+                        <xsl:with-param name="position" select="$position"/>
+                    </xsl:call-template>
+                </xsl:otherwise>
+            </xsl:choose>
         </xhtml:th>
     </xsl:template>
 

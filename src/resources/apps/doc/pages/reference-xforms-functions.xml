@@ -570,7 +570,7 @@
                     <li>
                         <a name="xxforms-valid"/>
                         <p>
-                            <code>xxforms:valid($node as node(), $recurse as xs:boolean) as xs:boolean</code>
+                            <code>xxforms:valid($node as node()?, $recurse as xs:boolean) as xs:boolean</code>
                         </p>
                         <p>
                             The <code>xxforms:valid()</code> function returns the validity of a instance data node
@@ -613,6 +613,19 @@
                             </xforms:trigger>
                         </xml-source>
                         -->
+                    </li>
+                    <li>
+                        <a name="xxforms-type"/>
+                        <p>
+                            <code>xxforms:type($node as node()?) as xs:QName?</code>
+                        </p>
+                        <p>
+                            The <code>xxforms:type()</code> function returns the type of the instance data node passed
+                            as parameter. If an empty sequence is passed, the function returns an empty sequence.
+                            Otherwise, the type of the instance data node is searched. If no type information is
+                            available, the function returns an empty sequence. Otherwise, a QName associated with the
+                            type is returned.
+                        </p>
                     </li>
                     <li>
                         <a name="xxforms-invalid-binds"/>

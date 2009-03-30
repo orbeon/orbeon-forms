@@ -781,6 +781,31 @@
                 <ul>
                     <li>
                         <p><code>exf:sort()</code></p>
+                        <p>
+                            This function as specified by eXforms has the following XPath 1.0 signature:
+                        </p>
+                        <p>
+                            <code>node-set exf:sort(node-set, string, string?, string?, string?)</code>
+                        </p>
+                        <p>
+                            In Orbeon Forms and XPath 2.0, it is defined as follows:
+                        </p>
+                        <p>
+                            <code>exf:sort($sequence as item()*, $sort-key as item(), $datatype as xs:string?, $order as xs:string?, $case-order as xs:string?) as item()*</code>
+                        </p>
+                        <p>
+                           Note that the second argument is no longer a plain string. You can either pass a string
+                           containing an expression, or a literal expression, for example:
+                        </p>
+                        <xml-source>
+                            <comment>With a literal expression</comment>
+                            <xforms:itemset nodeset="exforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
+                                ...
+                            </xforms:itemset><comment>With a string</comment>
+                            <xforms:itemset nodeset="exforms:sort(instance('samples-instance')/file, '@name', 'text', 'ascending')">
+                                ...
+                            </xforms:itemset>
+                        </xml-source>
                     </li>
                 </ul>
                 <p>

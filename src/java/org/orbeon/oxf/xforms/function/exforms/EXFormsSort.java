@@ -21,6 +21,7 @@ import org.orbeon.saxon.sort.SortExpression;
 import org.orbeon.saxon.sort.SortKeyDefinition;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.Iterator;
 
@@ -39,8 +40,14 @@ public class EXFormsSort extends XFormsFunction {
         {
             final Expression selectExpression = argument[1];
 
-            sortKeyExpression = ExpressionTool.make(selectExpression.evaluateAsString(xpathContext),
+            if (selectExpression instanceof StringValue) {
+                // This is to be compatible with exforms:sort() as initially specified
+                sortKeyExpression = ExpressionTool.make(selectExpression.evaluateAsString(xpathContext),
                     staticContext, 0, Token.EOF, getLineNumber());
+            } else {
+                // This is the "better way" as allowed by XPath 2.0
+                sortKeyExpression = selectExpression;
+            }
         }
 
         final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;

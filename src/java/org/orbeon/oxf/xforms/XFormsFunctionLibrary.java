@@ -337,7 +337,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         
         e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}sort", EXFormsSort.class, 0, 2, 5, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ONE);
+        StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);

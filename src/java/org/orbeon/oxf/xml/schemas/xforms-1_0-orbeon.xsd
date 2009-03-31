@@ -809,11 +809,11 @@
             <xsd:group ref="xforms:UI.Inline"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
+            <xsd:attribute name="value" type="xsd:string" use="optional"/>
             <xsd:attribute name="level" use="required">
                 <xsd:simpleType>
                     <xsd:union memberTypes="xforms:QNameButNotNCNAME">
-
-                        <xsd:simpleType>
+                    <xsd:simpleType>
                             <xsd:restriction base="xsd:string">
                                 <xsd:enumeration value="ephemeral"/>
                                 <xsd:enumeration value="modeless"/>

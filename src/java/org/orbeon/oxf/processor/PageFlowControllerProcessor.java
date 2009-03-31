@@ -469,7 +469,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         });
 
         // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
-        // oxf:x?html-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
+        // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
         // actually know what a "resource" is.
         final List pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
@@ -1232,15 +1232,27 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                             final boolean isVersioned) {
         when.addStatement(new ASTProcessorCall(XMLConstants.RESOURCE_SERVER_PROCESSOR_QNAME) {{
-            if (isVersioned) {
-                // Path is versioned, i.e. of the form /3.6.0.200801092029/..., so remove the version prefix
+            if (isVersioned && URLRewriterUtils.getApplicationResourceVersion() != null) {
+                // Path is versioned, i.e. of the form /3.6.0.200801092029/... (Orbeon resource) or /1.1/... (app resource), so remove the version prefix
                 addInput(new ASTInput("config",
-                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "concat('/', for $path in string(/request/request-path) return substring-after(substring($path, 2), '/'))"))
+                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
+                                    "for $path in string(/request/request-path) return concat('/', substring-after(substring($path, 2), '/'))"))
+                ));
+            } else if (isVersioned) {
+                // Path is versioned for Orbeon resources, but not for app resources
+                // TODO: add test for /xbl/orbeon and /forms/orbeon
+                addInput(new ASTInput("config",
+                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
+                                    "for $path in string(/request/request-path) return" +
+                                            " if (tokenize($path, '/')[3] = ('ops', 'config'))" + // Orbeon path
+                                            "    then concat('/', substring-after(substring($path, 2), '/'))" +
+                                            "    else $path"))
                 ));
             } else {
                 // Pass the path as is
                 addInput(new ASTInput("config",
-                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "string(/request/request-path)"))
+                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
+                                    "string(/request/request-path)"))
                 ));
             }
 

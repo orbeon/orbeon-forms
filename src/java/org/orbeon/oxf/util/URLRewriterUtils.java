@@ -192,11 +192,12 @@ public class URLRewriterUtils {
             }
 
             // 2. Determine if URL is a platform or application URL based on reserved paths
+            // TODO: add test for /xbl/orbeon and /forms/orbeon
             final boolean isPlatformURL = absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
 
             // TODO: get version only once for a run
             final String applicationVersion = getApplicationResourceVersion();
-            if (!isPlatformURL && (applicationVersion == null || applicationVersion.length() == 0)) {
+            if (!isPlatformURL && applicationVersion == null) {
                 // There is no application version so do usual rewrite
                 return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             }
@@ -275,7 +276,8 @@ public class URLRewriterUtils {
     }
 
     public static String getApplicationResourceVersion() {
-        return Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
+        final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
+        return (propertyString == null || propertyString.trim().length() == 0) ? null : propertyString.trim();
     }
 
     public static class PathMatcher {

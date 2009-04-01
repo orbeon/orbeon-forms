@@ -12,9 +12,9 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:exf="http://www.exforms.org/exf/1-0">
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
 
     <head>
         <title>Using YUI's datatable</title>
@@ -46,16 +46,16 @@
         <h1>Using the datatable widget (new generation)</h1>
 
         <!-- Include the widget definition -->
-        <xi:include href="oxf:/xbl/orbeon/table-ng/table-ng.xbl" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/xbl/orbeon/datatable/datatable.xbl" xxi:omit-xml-base="true"/>
 
         <p>A first table with explicit labels. The first two colums are sortable and resizeable and the first one is a number. The labels are defined
             separately in a thead element.</p>
-        <widget:table-ng id="table-repeat1" appearance="xxforms:data-table">
+        <fr:datatable id="table-repeat1" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
-                    <th widget:sortable="true" widget:sort-type="number" widget:resizeable="true">AAA (s)</th>
-                    <th widget:sortable="true" widget:resizeable="true">BBB (s)</th>
+                    <th fr:sortable="true" fr:sort-type="number" fr:resizeable="true">AAA (s)</th>
+                    <th fr:sortable="true" fr:resizeable="true">BBB (s)</th>
                     <th>CCC</th>
                 </tr>
             </thead>
@@ -75,28 +75,28 @@
                     </td>
                 </tr>
             </tbody>
-        </widget:table-ng>
+        </fr:datatable>
 
         <p>Another table with implicit labels. All the colums are sortable and resizeable and the first one is a number. The labels are defined as
             xforms labels.</p>
-        <widget:table-ng id="table-repeat2" appearance="xxforms:data-table">
+        <fr:datatable id="table-repeat2" appearance="xxforms:data-table">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <tr repeat-nodeset="record">
-                <td widget:sortable="true" widget:sort-type="number" widget:resizeable="true">
+                <td fr:sortable="true" fr:sort-type="number" fr:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="AAA">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>AAA (imp)</xf:label>
                     </xf:output>
                 </td>
-                <td widget:sortable="true" widget:resizeable="true">
+                <td fr:sortable="true" fr:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="BBB">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>BBB (imp)</xf:label>
                     </xf:output>
                 </td>
-                <td widget:sortable="true" widget:resizeable="true">
+                <td fr:sortable="true" fr:resizeable="true">
                     <!-- Classes allow setting column properties -->
                     <xf:output ref="CCC">
                         <!-- Optional label used if there is no <head> -->
@@ -104,9 +104,7 @@
                     </xf:output>
                 </td>
             </tr>
-        </widget:table-ng>
-
-        <widget:xforms-instance-inspector/>
+        </fr:datatable>
 
 
     </body>

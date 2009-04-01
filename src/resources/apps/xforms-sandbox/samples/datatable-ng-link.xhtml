@@ -12,9 +12,9 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:exf="http://www.exforms.org/exf/1-0">
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" >
 
     <head>
         <title>Using YUI's datatable</title>
@@ -24,18 +24,18 @@
     </head>
     <body>
         <!-- Include the widget definition -->
-        <xi:include href="oxf:/xbl/orbeon/table-ng/table-ng.xbl" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/xbl/orbeon/datatable/datatable.xbl" xxi:omit-xml-base="true"/>
 
         <h1>Using YUI's datatable (new generation) to display a RSS channel</h1>
 
         <p>This sample shows that cells content isn't restricting to simple values but also support complex content (in that case, a link).</p>
 
-        <widget:table-ng>
+        <fr:datatable>
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
-                    <th widget:sortable="true" widget:resizeable="true">Author</th>
-                    <th widget:sortable="true" widget:resizeable="true">Title</th>
+                    <th fr:sortable="true" fr:resizeable="true">Author</th>
+                    <th fr:sortable="true" fr:resizeable="true">Title</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,12 +52,7 @@
                     </td>
                 </tr>
             </tbody>
-        </widget:table-ng>
-
-
-
-        <widget:xforms-instance-inspector/>
-
+        </fr:datatable>
 
     </body>
 </html>

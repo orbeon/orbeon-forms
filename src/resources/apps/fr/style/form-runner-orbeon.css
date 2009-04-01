@@ -109,11 +109,8 @@ p, fieldset, table { margin-bottom: 1em }
     height: 4px;/* size in em seems to cause issues in Firefox as not all separators appear the same height */
 }
 
-.fr-metadata, .fr-buttons-block {
-    background-color: #F8F8F8;
-    background-image: url(logo-bg.gif);
-    background-position: top;
-    background-repeat: repeat-x;
+.fr-buttons-block {
+    background: #F8F8F8 url(logo-bg.gif) repeat-x top;
     padding: 1em;
 }
 
@@ -172,14 +169,21 @@ p, fieldset, table { margin-bottom: 1em }
 .xforms-upload-info { background-color: transparent }
 
 /* Metadata */
-.fr-metadata .fr-form-title {
-    color: #666699;
+.fr-metadata {
+    background-color: #004B92;
+    background-image: none;
+    padding: 1em;
+}
+.fr-separator {
+    background-color: orange;
+}
+.fr-metadata .fr-form-title, .fr-metadata .fr-form-description {
+    color: white;
 }
 
 .fr-metadata .fr-form-description {
     font-size: smaller;
     font-style: italic;
-    color: #6E6E6E;
 }
 
 /* Table of contents */

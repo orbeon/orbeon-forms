@@ -1,0 +1,132 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl script-type="application/xhtml+xml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/paginator/paginator-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/datasource/datasource.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/datatable/datatable.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/table/table.js"/>
+
+    <xbl:binding id="widget.table" element="widget|table">
+
+        <xbl:resources>
+            <xbl:style src="/ops/yui/paginator/assets/skins/sam/paginator.css"/>
+            <xbl:style src="/ops/yui/datatable/assets/skins/sam/datatable.css"/>
+            <xbl:style>.xforms-data {display: none}</xbl:style>
+        </xbl:resources>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xsl:transform version="2.0">
+
+                <xsl:variable name="parameters">
+                    <!-- These optional attributes are used as parameters -->
+                    <parameter>appearance</parameter>
+                    <parameter>scrollable</parameter>
+                    <parameter>width</parameter>
+                    <parameter>height</parameter>
+                    <parameter>paginated</parameter>
+                    <parameter>rowsPerPage</parameter>
+                    <parameter>sortedByKey</parameter>
+                    <parameter>sortedByDir</parameter>
+                </xsl:variable>
+
+                <xsl:template match="@*|node()">
+                    <!-- Default template == identity -->
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*|node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="widget:table">
+                    <!-- Matches the bound element -->
+                    <xhtml:div>
+
+                        <xforms:model id="datatable-model">
+
+                            <xforms:instance id="datatable-config">
+                                <config xmlns="">
+                                    <xsl:for-each select="$parameters/*">
+                                        <!-- Create an element with same name and values as each parameter -->
+                                        <xsl:element name="{.}">
+                                            <xsl:attribute name="xbl:attr">
+                                                <xsl:text>xbl:text=</xsl:text>
+                                                <xsl:value-of select="."/>
+                                            </xsl:attribute>
+                                        </xsl:element>
+                                    </xsl:for-each>
+                                </config>
+                            </xforms:instance>
+                            <xforms:bind nodeset="instance('datatable-config')/rowsPerPage"
+                                calculate="if (. castable as xs:positiveInteger) then . else 10"/>
+                            <xforms:bind nodeset="instance('datatable-config')/sortedByDir" calculate="if (. ='descending') then . else 'ascending'"/>
+                        </xforms:model>
+
+                        <xforms:group class="xforms-data" ref="instance('datatable-config')" model="datatable-model">
+                            <xsl:for-each select="$parameters/*">
+                                <!-- Generate hidden outputs that will be readable in JavaScript -->
+                                <xforms:output id="{.}" ref="{.}"/>
+                            </xsl:for-each>
+                        </xforms:group>
+
+                        <xhtml:div class="data-table">
+                            <!-- Create the table -->
+                            <xhtml:table>
+                                <!-- Copy attributes that are not parameters! -->
+                                <xsl:apply-templates select="@*[not(name() = $parameters/*)]"/>
+                                <xsl:if test="not(xhtml:thead)">
+                                    <!-- If there is no thead element, add one -->
+                                    <xhtml:thead>
+                                        <xhtml:tr>
+                                            <xsl:for-each select="xhtml:tbody//xhtml:tr[1]/xhtml:td">
+                                                <xhtml:th>
+                                                    <xsl:value-of select="xforms:*/xforms:label"/>
+                                                </xhtml:th>
+                                            </xsl:for-each>
+                                        </xhtml:tr>
+                                    </xhtml:thead>
+                                </xsl:if>
+                                <xsl:apply-templates select="node()"/>
+                            </xhtml:table>
+                        </xhtml:div>
+
+                    </xhtml:div>
+                    <!-- End of template on the bound element -->
+                </xsl:template>
+
+                <xsl:template match="xhtml:tr/@repeat-nodeset">
+                    <!-- Remove  repeat-nodeset attributes -->
+                </xsl:template>
+
+                <xsl:template match="xhtml:tr[@repeat-nodeset]">
+                    <!-- Generate xforms:repeat for  repeat-nodeset attributes-->
+                    <xforms:repeat nodeset="{@repeat-nodeset}">
+                        <xhtml:tr>
+                            <xsl:apply-templates select="@*|node()"/>
+                        </xhtml:tr>
+                    </xforms:repeat>
+                </xsl:template>
+
+                <xsl:template match="xhtml:td/xforms:output/xforms:label">
+                    <!-- Remove xforms:label since they are used as headers -->
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

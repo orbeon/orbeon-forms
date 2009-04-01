@@ -144,9 +144,39 @@
                 </p>
             </note>
         </section>
+        <a name="xxforms-custom-mips"/>
+        <section>
+            <title>Custom Model Item Properties</title>
+            <p>
+                You can place user-defined Model Item Properties (MIP) on the <code>&lt;xforms:bind></code> element. Any
+                attribute not in a standard Orbeon namespace is interpreted as a custom MIP:
+            </p>
+            <xml-source xmlns:foo="http://orbeon.org/oxf/xml/foo">
+                <xforms:bind nodeset="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
+            </xml-source>
+            <p>
+                The value of the attribute must be a valid XPath expression. The expression result is converted to a
+                string to set the MIP value.
+            </p>
+            <p>
+                Custom MIPs have the side effect of placing CSS classes on controls bound to affected nodes. Class
+                names are computed as the concatenation of:  
+            </p>
+            <ul>
+                <li>MIP attribute prefix</li>
+                <li>"-"</li>
+                <li>MIP attribute local name</li>
+                <li>"-"</li>
+                <li>MIP value</li>
+            </ul>
+            <p>
+                With the example above, the following class names can be set: <code>foo-bar-is-g</code> or
+                <code>foo-bar-is-not-g</code>.
+            </p>
+        </section>
         <a name="xxforms-default-mip"/>
         <section>
-            <title>Custom MIP to Specify default instance values</title>
+            <title>Extension Model Item Property to Specify default instance values</title>
             <p>
                 In XForms, default or initial values can be set by pre-populating an instance document's elements
                 and attributes with initial data, for example:

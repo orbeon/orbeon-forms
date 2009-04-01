@@ -351,7 +351,7 @@ button.xforms-trigger img { margin-right: 10px }
 
 .fb-edit-items { text-decoration: none; display: block; clear: both }
 
-/* Styling comon to all HTML form controls */
+/* Styling common to all HTML form controls */
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,
     .fr-grid .xforms-upload input,

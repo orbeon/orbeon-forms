@@ -1,0 +1,77 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xf:model id="model">
+            <xf:instance id="instance" src="http://feeds.feedburner.com/xml-web-apps"/>
+        </xf:model>
+    </head>
+    <body>
+
+        <h1>Using YUI's datatable (new generation) to display a RSS channel</h1>
+
+        <p>This sample has been developed to tests XForms functions "<tt>position()</tt>" and "<tt>index()</tt>" within a datatable.</p>
+
+        <p>Note the limitations when using these functions in sort expressions:</p>
+        <ul>
+            <li><tt>position()</tt> is evaluated as an XForms function when used in xforms:output and returns the position in the repeat nodeset after
+                the sort operation (1 in the first row, 2 in the second, ...). However, when evaluated in the sort expression this function returns
+                the position in the instance before the sort operation. This is demonstrated by the table below when you click on the
+                    <tt>position()</tt> column.</li>
+            <li><tt>index()</tt> is an XForms function that can be used in datatable cells but is unknown during sort operation. If you clik on the
+                    <tt>index()</tt> column, you will see that an exception is raised.</li>
+        </ul>
+
+        <fr:datatable>
+            <!-- Optional <thead>, otherwise try to build one from body -->
+            <tbody>
+                <xf:repeat nodeset="/rss/channel/item" id="repeat">
+                    <tr>
+                        <td fr:sortable="true" fr:resizeable="true">
+                            <xf:output ref="dc:creator">
+                                <xf:label>Author</xf:label>
+                            </xf:output>
+                        </td>
+                        <td fr:sortable="true" fr:resizeable="true">
+                            <xf:output value="title">
+                                <xf:label>Title</xf:label>
+                            </xf:output>
+                        </td>
+                        <td fr:sortable="true" fr:resizeable="true" fr:sort-type="number">
+                            <xf:output value="position()">
+                                <xf:label>
+                                    <tt>position()</tt>
+                                </xf:label>
+                            </xf:output>
+                        </td>
+                        <td fr:sortable="true" fr:resizeable="true" fr:sort-type="number">
+                            <xf:output value="index('repeat')">
+                                <xf:label>
+                                    <tt>index('repeat')</tt>
+                                </xf:label>
+                            </xf:output>
+                        </td>
+                    </tr>
+                </xf:repeat>
+            </tbody>
+        </fr:datatable>
+
+
+
+    </body>
+</html>

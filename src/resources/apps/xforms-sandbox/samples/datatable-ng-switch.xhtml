@@ -1,0 +1,92 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xf:model id="model">
+            <xf:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <AAA>1</AAA>
+                        <BBB>foo</BBB>
+                        <CCC>bar</CCC>
+                    </record>
+                    <record>
+                        <AAA>100</AAA>
+                        <BBB>bat</BBB>
+                        <CCC>baz</CCC>
+                    </record>
+                    <record>
+                        <AAA>2</AAA>
+                        <BBB>bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                </instance>
+            </xf:instance>
+            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:integer"/>
+        </xf:model>
+    </head>
+    <body>
+
+
+        <h1>Using YUI's datatable (new generation) in xforms:switch</h1>
+
+        <p>This sample has been developed to test datatable widgets within xforms:switch.</p>
+
+        <xf:switch>
+            <xf:case id="hide" selected="true">
+                <xf:trigger id="showT">
+                    <xf:label>Show</xf:label>
+                    <xf:toggle ev:event="DOMActivate" case="show"/>
+                </xf:trigger>
+            </xf:case>
+            <xf:case id="show" selected="false">
+                <fr:datatable id="table-repeat1" appearance="xxforms:data-table">
+                    <!-- Optional <thead>, otherwise try to build one from body -->
+                    <thead>
+                        <tr>
+                            <th fr:sortable="true" fr:sort-type="number" fr:resizeable="true">AAA (s)</th>
+                            <th fr:sortable="true" fr:resizeable="true">BBB (s)</th>
+                            <th>CCC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat-nodeset="record">
+                            <td>
+                                <!-- Classes allow setting column properties -->
+                                <xf:output ref="AAA"/>
+                            </td>
+                            <td>
+                                <!-- Classes allow setting column properties -->
+                                <xf:output ref="BBB"/>
+                            </td>
+                            <td>
+                                <!-- Classes allow setting column properties -->
+                                <xf:output ref="CCC"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </fr:datatable>
+                <xf:trigger id="hideT">
+                    <xf:label>Hide</xf:label>
+                    <xf:toggle ev:event="DOMActivate" case="hide"/>
+                </xf:trigger>
+            </xf:case>
+        </xf:switch>
+
+    </body>
+</html>

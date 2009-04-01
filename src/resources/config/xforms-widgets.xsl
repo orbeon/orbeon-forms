@@ -11,19 +11,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:variable name="has-widgets" as="xs:boolean" select="exists(//widget:*)"/>
+    <xsl:key name="xbl:bindings" match="xbl:binding" use="translate(@element, '|', ':')"/>
 
     <xsl:template match="@*|node()" priority="-100">
         <xsl:copy>
@@ -39,6 +34,21 @@
             <!-- Include XBL components -->
             <xsl:copy-of select="doc('oxf:/config/xforms-widgets.xbl')"/>
 
+            <!-- This should be generalized to all the fr:* widgets  -->
+            
+            <xsl:for-each-group select="//fr:datatable|//widget:table" group-by="name()">
+                <xsl:if test="not(key('xbl:bindings', name()))">
+                    <!-- 
+                        
+                        Test if the widget isn't defined locally (either directly or as a result on an xi:include
+                        
+                        Note that this test is weak because it relies on the namespace prefix of the bound element 
+                    
+                    -->
+                    <xsl:copy-of select="doc(concat('oxf:/xbl/orbeon/', local-name(), '/', local-name(), '.xbl'))"/>
+                </xsl:if>
+            </xsl:for-each-group>
+
             <xsl:if test="$has-widgets or pipeline:property('oxf.epilogue.xforms.inspector')">
                 <!-- NOTE: Would be nice to do this with the xbl:style element -->
                 <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css" media="all"/>
@@ -47,16 +57,20 @@
     </xsl:template>
 
     <xsl:template match="widget:tabs">
-        <xsl:variable name="tabs-element" select="."/><!-- as="element()"  -->
-        <xsl:variable name="tabs" select="widget:tab"/><!-- as="element()*"  -->
+        <xsl:variable name="tabs-element" select="."/>
+        <!-- as="element()"  -->
+        <xsl:variable name="tabs" select="widget:tab"/>
+        <!-- as="element()*"  -->
         <xhtml:table class="widget-tabs" cellpadding="0" cellspacing="0" border="0">
             <xsl:copy-of select="@*"/>
             <xhtml:tr>
                 <xhtml:td class="widget-tab-spacer-side"/>
                 <!-- Tabs at the top -->
-                <xsl:variable name="selected-tab-specified" select="count(widget:tab[@selected = 'true']) = 1"/><!-- as="xs:boolean"  -->
+                <xsl:variable name="selected-tab-specified" select="count(widget:tab[@selected = 'true']) = 1"/>
+                <!-- as="xs:boolean"  -->
                 <xsl:for-each select="$tabs">
-                    <xsl:variable name="tab-id" select="@id"/><!-- as="xs:string"  -->
+                    <xsl:variable name="tab-id" select="@id"/>
+                    <!-- as="xs:string"  -->
                     <xsl:if test="position() > 1">
                         <xhtml:td class="widget-tab-spacer-between"/>
                     </xsl:if>
@@ -74,7 +88,9 @@
                                                 <xforms:label ref="{widget:label/@ref}"/>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
+                                                <xforms:label>
+                                                    <xsl:value-of select="widget:label"/>
+                                                </xforms:label>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                         <xforms:action ev:event="DOMActivate">

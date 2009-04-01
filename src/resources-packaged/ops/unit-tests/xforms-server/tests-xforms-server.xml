@@ -3771,5 +3771,84 @@
         </output>
     </test>
 
+    <test description="Custom MIPs" name="oxf:pipeline" only="true">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" xmlns:foo="http://orbeon.org/oxf/xml/foo" id="my-model">
+                                    <xforms:instance id="my-instance">
+                                        <fruits>
+                                            <orange>bloody</orange>
+                                            <orange>valencia</orange>
+                                            <apple>green</apple>
+                                            <apple>red</apple>
+                                            <apple>iPod</apple>
+                                            <pear>green</pear>
+                                            <pear>williams</pear>
+                                            <pear>yellow</pear>
+                                        </fruits>
+                                    </xforms:instance>
+                                    <!-- This is the key: set a custom MIP depending on the value -->
+                                    <xforms:bind nodeset="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat id="my-repeat" nodeset="*">
+                                    <xforms:input id="my-control" ref="."/>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <fruits>
+                                    <orange>bloody</orange>
+                                    <orange>valencia</orange>
+                                    <apple>green</apple>
+                                    <apple>red</apple>
+                                    <apple>iPod</apple>
+                                    <pear>green</pear>
+                                    <pear>williams</pear>
+                                    <pear>yellow</pear>
+                                </fruits>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
+                        <xxf:control id="my-control·1" class="foo-bar-is-not-g">bloody</xxf:control>
+                        <xxf:control id="my-control·2" class="foo-bar-is-not-g">valencia</xxf:control>
+                        <xxf:control id="my-control·3" class="foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control·4" class="foo-bar-is-not-g">red</xxf:control>
+                        <xxf:control id="my-control·5" class="foo-bar-is-not-g">iPod</xxf:control>
+                        <xxf:control id="my-control·6" class="foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control·7" class="foo-bar-is-not-g">williams</xxf:control>
+                        <xxf:control id="my-control·8" class="foo-bar-is-not-g">yellow</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

@@ -33,9 +33,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * Base class for all XHTML and XForms element handlers.
  */
@@ -100,6 +97,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         if (hasBinding) {
             if (xformsControl != null) {
                 // The case of a concrete control
+
+                // Output standard MIP classes
                 if (!xformsControl.isRelevant()) {
                     if (sb.length() > 0)
                         sb.append(' ');
@@ -126,22 +125,16 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                             sb.append(" xforms-required-filled");
                     }
                 }
-                final Map customMIPs = xformsControl.getCustomMIPs();
+
+                // Output custom MIPs classes
+                final String customMIPs = xformsControl.getCustomMIPsClasses();
                 if (customMIPs != null) {
-                    for (Iterator i = customMIPs.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry entry = (Map.Entry) i.next();
-                        final String name = (String) entry.getKey();
-                        final String value = (String) entry.getValue();
-
-                        if (sb.length() > 0)
-                            sb.append(' ');
-
-                        // TODO: encode so that there are no spaces
-                        sb.append(name);
-                        sb.append('-');
-                        sb.append(value);
-                    }
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(customMIPs);
                 }
+
+                // Output type class
                 final String typeName = xformsControl.getBuiltinTypeName();
                 if (typeName != null) {
                     // Control is bound to built-in schema type

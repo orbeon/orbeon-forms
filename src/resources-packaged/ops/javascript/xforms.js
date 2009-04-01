@@ -2670,7 +2670,7 @@ ORBEON.xforms.Events = {
                 window.setTimeout(function() {
                     ORBEON.xforms.Events.dialogMinimalCheckMouseIn(yuiDialog);
                 },
-                        XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
+                XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
             }
         }
     },
@@ -4209,6 +4209,7 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
 
         // Create dialog object
+        var yuiDialog;
         if (isMinimal) {
             // Create minimal dialog
             yuiDialog = new YAHOO.widget.Panel(dialog.id, {
@@ -5227,6 +5228,7 @@ ORBEON.xforms.Server = {
                                         var relevant = ORBEON.util.Dom.getAttribute(controlElement, "relevant");
                                         var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                         var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
+                                        var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
 
                                         var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
@@ -5301,8 +5303,8 @@ ORBEON.xforms.Server = {
                                             var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date";
                                             var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time";
                                             var isDateTimeType = type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime";
-                                            var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean"
-                                            var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string"
+                                            var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean";
+                                            var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string";
 
                                             var isRecognizedType = isDateType || isTimeType || isDateTimeType || isBooleanType || isStringType;
                                             if (isRecognizedType) { // just ignore if we don't know the type
@@ -5378,6 +5380,19 @@ ORBEON.xforms.Server = {
                                         // Handle readonly
                                         if (readonly != null && !isStaticReadonly)
                                             ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
+
+                                        // Handle updates to custom classes
+                                        if (classes != null) {
+                                            var classesArray = classes.split(" ");
+                                            for (var classIndex = 0; classIndex < classesArray.length; classIndex++) {
+                                                var currentClass = classesArray[classIndex];
+                                                if (currentClass.charAt(0) == '-') {
+                                                    ORBEON.util.Dom.removeClass(documentElement, currentClass.substring(1));
+                                                } else {
+                                                    ORBEON.util.Dom.addClass(documentElement, currentClass.substring(1));
+                                                }
+                                            }
+                                        }
 
                                         // Update value
                                         if (isControl) {
@@ -5871,9 +5886,9 @@ ORBEON.xforms.DnD = {
 
     getClosestMatch: function(id) {
         var bestMatchId = YAHOO.util.DDM.getBestMatch(id);
-        var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1),XFORMS_SEPARATOR_2);
+        var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1), XFORMS_SEPARATOR_2);
         for(var i = 0 ; i < id.length; i++) {
-            var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1) ,XFORMS_SEPARATOR_2);
+            var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1), XFORMS_SEPARATOR_2);
             if(count > bestMatchCount) { //We get a more specific match
                 bestMatchId = id[i];
                 bestMatchCount = count;

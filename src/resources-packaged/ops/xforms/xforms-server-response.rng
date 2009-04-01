@@ -62,6 +62,7 @@
                                             <attribute name="style"/>
                                         </optional>
                                         <optional>
+                                            <!-- This attribute is a space-separate list of attributes names prefixed with either '-' or '+' -->
                                             <attribute name="class"/>
                                         </optional>
                                         <choice>

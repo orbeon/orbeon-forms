@@ -52,7 +52,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
         super.evaluate(pipelineContext);
     }
 
-    // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented natively
+    // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript
     public String getMaxlength() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_MAXLENGTH_QNAME);
     }

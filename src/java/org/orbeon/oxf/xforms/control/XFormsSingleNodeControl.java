@@ -20,9 +20,11 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
@@ -31,13 +33,21 @@ import java.util.HashMap;
  */
 public abstract class XFormsSingleNodeControl extends XFormsControl {
 
+    // Whether MIPs have been read from the node
     private boolean mipsRead;
+
+    // Standard MIPs
     private boolean readonly;
     private boolean required;
     private boolean relevant;
     private boolean valid;
+
+    // Custom MIPs
+    private Map customMIPs;
+    private String customMIPsAsString;
+
+    // Type
     private String type;
-    private Map customMips;
 
     public XFormsSingleNodeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -46,6 +56,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     public void markDirty() {
         super.markDirty();
         mipsRead = false;
+        customMIPsAsString = null;
     }
 
     public boolean isReadonly() {
@@ -80,7 +91,43 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     public Map getCustomMIPs() {
         getMIPsIfNeeded();
-        return customMips;
+        return customMIPs;
+    }
+
+    /**
+     * Return this control's custom MIPs as a String containing space-separated classes.
+     *
+     * @return  classes, or null if no custom MIPs
+     */
+    public String getCustomMIPsClasses() {
+        final Map customMIPs = getCustomMIPs();
+        if (customMIPs != null) {
+            // There are custom MIPs
+            if (customMIPsAsString == null) {
+                // Must compute now
+
+                final FastStringBuffer sb = new FastStringBuffer(20);
+
+                for (Iterator iterator = customMIPs.entrySet().iterator(); iterator.hasNext();) {
+                    final Map.Entry entry = (Map.Entry) iterator.next();
+                    final String name = (String) entry.getKey();
+                    final String value = (String) entry.getValue();
+
+                    if (sb.length() > 0)
+                        sb.append(' ');
+
+                    // TODO: encode so that there are no spaces
+                    sb.append(name);
+                    sb.append('-');
+                    sb.append(value);
+                }
+                customMIPsAsString = sb.toString();
+            }
+        } else {
+            // No custom MIPs so string value is null
+        }
+
+        return customMIPsAsString;
     }
 
     /**
@@ -129,9 +176,9 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     this.type = InstanceData.getType(currentNodeInfo);
 
                     // Custom MIPs
-                    this.customMips = InstanceData.getAllCustom(currentNodeInfo);
-                    if (this.customMips != null)
-                        this.customMips = new HashMap(this.customMips);
+                    this.customMIPs = InstanceData.getAllCustom(currentNodeInfo);
+                    if (this.customMIPs != null)
+                        this.customMIPs = new HashMap(this.customMIPs);
 
                     // Handle global read-only setting
                     if (XFormsProperties.isReadonly(containingDocument))
@@ -144,7 +191,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     this.relevant = false;
                     this.valid = true;// by default, a control is not invalid
                     this.type = null;
-                    this.customMips = null;
+                    this.customMIPs = null;
                 }
             } else {
                 // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
@@ -152,7 +199,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 this.required = false;
                 this.valid = true;// by default, a control is not invalid
                 this.type = null;
-                this.customMips = null;
+                this.customMIPs = null;
 
                 final XFormsControl parent = getParent();
                 if (parent instanceof XFormsSingleNodeControl) {
@@ -193,6 +240,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         getMIPsIfNeeded();
         other.getMIPsIfNeeded();;
 
+        // Stanard MIPs
         if (readonly != other.readonly)
             return false;
         if (required != other.required)
@@ -202,10 +250,20 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         if (valid != other.valid)
             return false;
 
+        // Custom MIPs
+        if (!compareCustomMIPs(customMIPs, other.customMIPs))
+            return false;
+
+        // Type
         if (!XFormsUtils.compareStrings(type, other.type))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);
+    }
+
+    public static boolean compareCustomMIPs(Map mips1, Map mips2) {
+        // equal if the mappings are equal, so Map equality should work fine
+        return mips1 == null && mips2 == null || mips1 != null && mips1.equals(mips2);
     }
 
     public boolean isStaticReadonly() {

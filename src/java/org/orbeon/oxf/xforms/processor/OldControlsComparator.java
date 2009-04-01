@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Collections;
@@ -130,66 +129,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             }
 
                             // Custom MIPs
-                            {
-                                final Map customMIPs1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getCustomMIPs();
-                                final Map customMIPs2 = xformsSingleNodeControl2.getCustomMIPs();
-
-                                if (isNewlyVisibleSubtree || !XFormsSingleNodeControl.compareCustomMIPs(customMIPs1, customMIPs2)) {
-                                    // Custom MIPs changed
-
-                                    final String attributeValue;
-                                    if (customMIPs1 == null) {
-                                        attributeValue = xformsSingleNodeControl2.getCustomMIPsClasses();
-                                    } else {
-                                        final FastStringBuffer sb = new FastStringBuffer(100);
-
-                                        // Classes to remove
-                                        for (Iterator k = customMIPs1.entrySet().iterator(); k.hasNext();) {
-                                            final Map.Entry entry = (Map.Entry) k.next();
-                                            final String name = (String) entry.getKey();
-                                            final String value = (String) entry.getValue();
-
-                                            final String newValue = (String) customMIPs2.get(name);
-                                            if (newValue == null || !value.equals(newValue)) {
-
-                                                if (sb.length() > 0)
-                                                    sb.append(' ');
-
-                                                sb.append('-'); 
-                                                // TODO: encode so that there are no spaces
-                                                sb.append(name);
-                                                sb.append('-');
-                                                sb.append(value);
-                                            }
-                                        }
-
-                                        // Classes to add
-                                        for (Iterator k = customMIPs2.entrySet().iterator(); k.hasNext();) {
-                                            final Map.Entry entry = (Map.Entry) k.next();
-                                            final String name = (String) entry.getKey();
-                                            final String value = (String) entry.getValue();
-
-                                            final String oldValue = (String) customMIPs1.get(name);
-                                            if (oldValue == null || !value.equals(oldValue)) {
-
-                                                if (sb.length() > 0)
-                                                    sb.append(' ');
-
-                                                sb.append('+');
-                                                // TODO: encode so that there are no spaces
-                                                sb.append(name);
-                                                sb.append('-');
-                                                sb.append(value);
-                                            }
-                                        }
-
-                                        attributeValue = sb.toString();
-                                    }
-                                    // This attribute is a space-separate list of attributes names prefixed with either '-' or '+'
-                                    if (attributeValue != null)
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "class", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
-                                }
-                            }
+                            doOutputElement = diffCustomMIPs(attributesImpl, xformsSingleNodeControl1, xformsSingleNodeControl2, isNewlyVisibleSubtree, doOutputElement);
 
                             // Type attribute
                             {

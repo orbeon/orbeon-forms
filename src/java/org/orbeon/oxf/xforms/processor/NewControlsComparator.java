@@ -144,6 +144,9 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 if (isNewlyVisibleSubtree && xformsSingleNodeControl2.isStaticReadonly() && xformsSingleNodeControl2.isRelevant())
                                     attributesImpl.addAttribute("", "static", "static", ContentHandlerHelper.CDATA, "true");
 
+                                // Custom MIPs
+                                doOutputElement = diffCustomMIPs(attributesImpl, xformsSingleNodeControl1, xformsSingleNodeControl2, isNewlyVisibleSubtree, doOutputElement);
+
                                 // Type attribute
                                 final boolean isOutputControlWithValueAttribute = xformsSingleNodeControl2 instanceof XFormsOutputControl && ((XFormsOutputControl) xformsSingleNodeControl2).getValueAttribute() != null;
                                 if (!isOutputControlWithValueAttribute) {

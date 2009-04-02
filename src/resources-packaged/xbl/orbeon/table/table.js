@@ -59,8 +59,8 @@ ORBEON.widgets.datatable = function (originalContent, position) {
     this.simplifiedContent = table.parentNode; 
     
     originalContent.parentNode.insertBefore(this.simplifiedContent, originalContent);
-    originalContent.setAttribute('class', 'xforms-data')
-    //YAHOO.util.Dom.setStyle(originalContent, 'display', 'none');
+    //originalContent.setAttribute('class', 'xforms-data')
+    YAHOO.util.Dom.setStyle(originalContent, 'display', 'none');
     
     //  Now we can create the datatable based on the simplified content
     

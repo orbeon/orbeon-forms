@@ -84,7 +84,7 @@
             </tbody>
         </fr:datatable>
 
-        <!--<p>Scrollable horizontally only</p>
+        <p>Scrollable horizontally only</p>
         <fr:datatable scrollable="horizontal" width="800px">
             <thead>
                 <tr>
@@ -94,7 +94,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr repeat-nodeset="/atom:feed/atom:entry">
+                <tr repeat-nodeset="/atom:feed/atom:entry[position() &lt;= 10]">
                     <td>
                         <xf:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
                     </td>
@@ -108,7 +108,7 @@
                     </td>
                 </tr>
             </tbody>
-        </fr:datatable>-->
+        </fr:datatable>
 
     </body>
 </html>

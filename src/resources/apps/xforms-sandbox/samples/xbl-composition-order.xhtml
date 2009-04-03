@@ -25,7 +25,7 @@
         <xbl:binding id="test-component" element="foo|component">
             <xbl:template xxbl:transform="oxf:xslt">
                 <div xsl:version="2.0">
-                    <p>Called with @number=<xsl:value-of select="/*/@number"/>, seeing <xsl:value-of select="count(//foo:*)"/> foo:* descendants</p>
+                    <p>Component with @number=<xsl:value-of select="/*/@number"/>, sees <xsl:value-of select="count(//foo:*)"/> bound elements.</p>
                     <xbl:content/>
                 </div>
             </xbl:template>
@@ -34,8 +34,11 @@
     <body>
 
 
-        <p>This test shows that, the current version (3rd April 2009) processes XBL expansions following the document order. The consequence is that
-            a component has the visibility over descendant component references that are not yet expanded.</p>
+        <p>This test shows that, the current version (3rd April 2009) processes XBL bound elements following the document order. You can tell that
+            because the first time the component is called (with number=1) it sees 2 bound elements (its own one and the embeded one which is not yet
+            replaced by its shadow tree) This can be issue in some cases (see <a
+                href="http://sites.google.com/a/orbeon.com/forms/projects/xforms-component-system/xbl-components-processing-order"
+                >projects/xforms-component-system/xbl-components-processing-order</a>).</p>
 
         <foo:component id="c1" number="1">
             <p>Test number 1</p>

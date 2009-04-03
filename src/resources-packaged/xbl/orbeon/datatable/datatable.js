@@ -37,30 +37,20 @@ ORBEON.widgets.datatable = function (element, index) {
     this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
     this.scrollH = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollH');
 
-//    if (this.scrollV) {
-//        var cRegion = YAHOO.util.Dom.getRegion(this.innerContainer);
-//        var thRegion = YAHOO.util.Dom.getRegion(this.thead);
-//        YAHOO.util.Dom.setStyle(this.tbody, 'height', ((cRegion.bottom - cRegion.top) - (thRegion.bottom - thRegion.top) - 4) + 'px' );
-//    }
 
-
-//    if (this.scrollH) {
-//         var cWidth = YAHOO.util.Dom.getStyle(this.innerContainer, 'width');
-//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', 'auto');
-//         var tRegion = YAHOO.util.Dom.getRegion(this.table);
-//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', cWidth);
-//         YAHOO.util.Dom.setStyle(this.table, 'width', (tRegion.right - tRegion.left + 20) + 'px');
-//    } 
+    if (this.scrollH) {
+         var cWidth = YAHOO.util.Dom.getStyle(this.innerContainer, 'width');
+         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', 'auto');
+         var tRegion = YAHOO.util.Dom.getRegion(this.table);
+         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', cWidth);
+         YAHOO.util.Dom.setStyle(this.table, 'width', (tRegion.right - tRegion.left + 15) + 'px');
+    } 
 
     if (this.scrollV) {
          var cRegion = YAHOO.util.Dom.getRegion(this.innerContainer);
          var thRegion = YAHOO.util.Dom.getRegion(this.thead);
          YAHOO.util.Dom.setStyle(this.tbody, 'height', ((cRegion.bottom - cRegion.top) - (thRegion.bottom - thRegion.top) - 4) + 'px');
     }
-
-//    this.theadY = YAHOO.util.Dom.getY(this.thead);
-//    YAHOO.util.Dom.setY(this.theadTr, this.theadTrY);
-//    YAHOO.util.Event.addListener(this.innerContainer, "scroll", ORBEON.widgets.datatable.scrollHandler, this, true);
 
     this.colResizers = [];
     var resizers = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', this.container);

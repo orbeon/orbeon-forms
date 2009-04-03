@@ -131,7 +131,7 @@
 
 
             <xhtml:div class="yui-dt-hd" id="{$id}-inner-container"
-                style="background-color: rgb(242, 242, 242);  {if ($scrollH or $scrollV) then 'overflow: auto; overflow-x: hidden; position:relative; ' else ''}  {$width} {$height}">
+                style="background-color: rgb(242, 242, 242);  {if ($scrollV) then 'overflow: auto; overflow-x: hidden; position:relative; ' else ''} {if ($scrollH) then 'overflow: auto;' else ''} {$width} {$height}">
                 <xsl:apply-templates select="$pass1" mode="YUI"/>
             </xhtml:div>
 
@@ -171,7 +171,8 @@
     -->
 
     <xsl:template match="xhtml:thead/xhtml:tr" mode="YUI">
-        <xhtml:tr class="yui-dt-first yui-dt-last {@class}" style="{if ($scrollV) then 'position:relative; top: expression(offsetParent.scrollTop);' else ''}" id="{$id}-thead-tr">
+        <xhtml:tr class="yui-dt-first yui-dt-last {@class}"
+            style="{if ($scrollV) then 'position:relative; top: expression(offsetParent.scrollTop);' else ''} " id="{$id}-thead-tr">
             <xsl:apply-templates select="@*[not(name() = ('class', 'id') )]|node()" mode="YUI"/>
         </xhtml:tr>
     </xsl:template>
@@ -238,8 +239,8 @@
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
             {{if ({$position} = $currentId) 
-                then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
-                else ''}}
+            then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
+            else ''}}
             {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
@@ -249,7 +250,7 @@
                         <xsl:call-template name="yui-dt-liner">
                             <xsl:with-param name="position" select="$position"/>
                         </xsl:call-template>
-                        <xhtml:div id="{generate-id()}" class="yui-dt-resizer" style="left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
+                        <xhtml:div id="{generate-id()}" class="yui-dt-resizer" style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
                     </xhtml:div>
                 </xsl:when>
                 <xsl:otherwise>
@@ -262,7 +263,8 @@
     </xsl:template>
 
     <xsl:template match="xhtml:tbody" mode="YUI">
-        <xhtml:tbody class="yui-dt-data {@class}" style="{if ($scrollV) then 'overflow-x: hidden; overflow-y: auto;' else ''} {$height}" id="{$id}-tbody">
+        <xhtml:tbody class="yui-dt-data {@class}" style="{if ($scrollV) then 'overflow-x: hidden; overflow-y: auto;' else ''} {$height}"
+            id="{$id}-tbody">
             <xsl:apply-templates select="@*[not(name() = ('class', 'id'))]|node()" mode="YUI"/>
         </xhtml:tbody>
     </xsl:template>

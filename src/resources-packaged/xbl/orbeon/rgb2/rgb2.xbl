@@ -1,0 +1,75 @@
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+    <xbl:binding id="fr-color-binding-2" element="fr|rgb2">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">RGB Color</display-name>
+            <display-name lang="fr">Couleur RGB</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/palette.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/palette.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                 <fr:rgb2>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </fr:rgb2>
+            </template>
+        </metadata>
+
+        <xbl:template>
+
+            <!-- Local model containing the date and time  -->
+            <xforms:model id="rgb-model">
+                <xforms:instance id="rgb-instance">
+                    <values>
+                        <r>255</r>
+                        <g>0</g>
+                        <b>0</b>
+                    </values>
+                </xforms:instance>
+                <xforms:bind nodeset="r | g | b" type="xs:integer"/>
+            </xforms:model>
+
+            <!-- Local controls -->
+            <xforms:group xbl:attr="ref bind">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+
+                <xforms:group model="rgb-model">
+                    <xhtml:div>
+                        <xforms:range ref="r" start="0" end="255">
+                            <xforms:label>R</xforms:label>
+                        </xforms:range>
+                        <!--<xhtml:div style="width: 100px; height: 2em; background-color: rgb({r},0,0)"/>-->
+                        <xforms:range ref="g" start="0" end="255">
+                            <xforms:label>G</xforms:label>
+                        </xforms:range>
+                        <!--<xhtml:div style="width: 100px; height: 2em; background-color: rgb(0,{g},0)"/>-->
+                        <xforms:range ref="b" start="0" end="255">
+                            <xforms:label>B</xforms:label>
+                        </xforms:range>
+                        <!--<xhtml:div style="width: 100px; height: 2em; background-color: rgb(0,0,{b})"/>-->
+                    </xhtml:div>
+
+                    <xforms:action ev:event="xforms-value-changed">
+                        <!--<xforms:setvalue ref="$result" value="concat()"/>-->
+                    </xforms:action>
+
+                    <xhtml:div style="margin-top: .5em; border: 1px solid black; width: 218px; height: 2em; background-color: rgb({r},{g},{b})"/>
+                </xforms:group>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

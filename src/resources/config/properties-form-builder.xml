@@ -16,8 +16,12 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Form Builder properties -->
-    <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/form/custom-controls.xbl"/>
-
+    <property as="xs:string"  name="oxf.fb.components.uri.*.*"                       value="oxf:/xbl/orbeon/rgb2/rgb2.xbl
+                                                                                            oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
+                                                                                            oxf:/xbl/orbeon/us-phone/us-phone.xbl
+                                                                                            oxf:/xbl/orbeon/fields-date/fields-date.xbl
+                                                                                            oxf:/xbl/orbeon/us-currency-thousands/us-currency-thousands.xbl
+                                                                                            oxf:/xbl/orbeon/date-picker/date-picker.xbl"/>
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>

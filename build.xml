@@ -492,6 +492,7 @@
     <target name="orbeon-minify-js" depends="init">
         <!-- Store those under ${war.dir}/WEB-INF/resources so they can be used in dev mode -->
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/editor"/>
@@ -507,6 +508,9 @@
         </antcall>
 
         <!-- YUI -->
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="yui/button/button"/>
+        </antcall>
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="yui/container/container"/>
         </antcall>

@@ -85,7 +85,7 @@
                     <title>Orbeon Form Runner</title>
                     <description>Orbeon Form Runner is the start page for all your forms.</description>
                     <author>Orbeon, Inc.</author>
-                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-42.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
+                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
                 </metadata>
             </xforms:instance>
 
@@ -426,12 +426,12 @@
                                 </td>
                                 <td class="fr-search-button-td">
                                     <!-- Send search -->
-                                    <fr:cool-button id="fr-search-trigger">
+                                    <fr:button id="fr-search-trigger">
                                         <xforms:label>
                                             <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt="Search" title="Search"/>
                                             <xhtml:span>Search</xhtml:span>
                                         </xforms:label>
-                                    </fr:cool-button>
+                                    </fr:button>
                                 </td>
                             </tr>
                         </table>
@@ -795,58 +795,58 @@
                         <xhtml:span>
                             <!-- New button -->
                             <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                             <!-- Edit button -->
                             <xforms:group ref="if (. = 'edit') then instance('fr-summary-triggers-instance')/edit else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit"/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-edit"/>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                             <!-- Print button (if not Form Builder) -->
                             <xforms:group ref="if (. = 'print') then instance('fr-summary-triggers-instance')/edit[not($is-form-builder)] else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/report.gif" alt="Print"/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-view"/>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                             <!-- PDF button (if not Form Builder) -->
                             <xforms:group ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/edit[not($is-form-builder)] else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt="Print PDF"/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                             <!-- Test button (if Form Builder) -->
                             <!-- TODO -->
                             <xforms:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/edit[$is-form-builder] else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
                                         <xhtml:span>Test</xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-test"/>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                             <!-- Delete button -->
                             <xforms:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
-                                <fr:cool-button>
+                                <fr:button>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
@@ -857,7 +857,7 @@
                                         </xforms:dispatch>
                                         <xforms:send submission="search-submission"/>
                                     </xforms:action>
-                                </fr:cool-button>
+                                </fr:button>
                             </xforms:group>
                         </xhtml:span>
                     </xforms:repeat>

@@ -107,41 +107,43 @@
                         <xforms:case id="fb-metadata-edit-case"/>
                         <xforms:case id="fb-metadata-view-case">
                             <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                            <fr:grid columns="4">
-                                <fr:tr>
-                                    <fr:td>
-                                        <!-- Application name -->
-                                        <xforms:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search" incremental="true">
-                                            <xforms:label ref="$form-resources/application-name/label"/>
-                                            <xforms:alert ref="$form-resources/application-name/alert"/>
-                                        </xforms:output>
-                                    </fr:td>
-                                    <fr:td>
-                                        <!-- Form name -->
-                                        <xforms:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search" incremental="true">
-                                            <xforms:label ref="$form-resources/form-name/label"/>
-                                            <xforms:alert ref="$form-resources/form-name/alert"/>
-                                        </xforms:output>
-                                    </fr:td>
-                                    <fr:td>
-                                        <!-- Edit button -->
-                                        <xforms:trigger>
-                                            <xforms:label ref="$form-resources/edit/label"/>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <!-- Copy data to editor instance -->
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="xxforms:bind('application-name-bind')"/>
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/form-name" value="xxforms:bind('form-name-bind')"/>
-                                                <!-- Tell that we allow the cancel button -->
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
+                            <xforms:group class="fb-metadata-view-group">
+                                <fr:grid columns="4">
+                                    <fr:tr>
+                                        <fr:td>
+                                            <!-- Application name -->
+                                            <xforms:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search" incremental="true">
+                                                <xforms:label ref="$form-resources/application-name/label"/>
+                                                <xforms:alert ref="$form-resources/application-name/alert"/>
+                                            </xforms:output>
+                                        </fr:td>
+                                        <fr:td>
+                                            <!-- Form name -->
+                                            <xforms:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search" incremental="true">
+                                                <xforms:label ref="$form-resources/form-name/label"/>
+                                                <xforms:alert ref="$form-resources/form-name/alert"/>
+                                            </xforms:output>
+                                        </fr:td>
+                                        <fr:td>
+                                            <!-- Edit button -->
+                                            <fr:button>
+                                                <xforms:label ref="$form-resources/edit/label"/>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Copy data to editor instance -->
+                                                    <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="xxforms:bind('application-name-bind')"/>
+                                                    <xforms:setvalue ref="instance('fb-metadata-instance')/form-name" value="xxforms:bind('form-name-bind')"/>
+                                                    <!-- Tell that we allow the cancel button -->
+                                                    <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
 
-                                                <xforms:toggle case="fb-editor-closed-case"/>
-                                                <xforms:toggle case="fb-metadata-edit-case"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                    </fr:td>
-                                    <fr:td/>
-                                </fr:tr>
-                            </fr:grid>
+                                                    <xforms:toggle case="fb-editor-closed-case"/>
+                                                    <xforms:toggle case="fb-metadata-edit-case"/>
+                                                </xforms:action>
+                                            </fr:button>
+                                        </fr:td>
+                                        <fr:td/>
+                                    </fr:tr>
+                                </fr:grid>
+                            </xforms:group>
                         </xforms:case>
                     </xforms:switch>
                 </xforms:group>
@@ -216,30 +218,34 @@
                                         </xforms:input>
                                     </fr:td>
                                     <fr:td>
-                                        <xforms:trigger ref="cancel-trigger">
-                                            <xforms:label value="$form-resources/cancel/label"/>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <!-- Show main form -->
-                                                <xforms:toggle case="fb-editor-open-case"/>
-                                                <xforms:toggle case="fb-metadata-view-case"/>
-                                                <!-- HACK: Store valid values so we don't see error message -->
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/application-name">dummy</xforms:setvalue>
-                                                <xforms:setvalue ref="instance('fb-metadata-instance')/form-name">dummy</xforms:setvalue>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                        <xforms:trigger ref="next-trigger">
-                                            <xforms:label value="$form-resources/apply/label"/>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <!-- Copy data to main instance -->
-                                                <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="instance('fb-metadata-instance')/application-name"/>
-                                                <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
-                                                <!-- Refresh components -->
-                                                <xforms:send submission="fb-load-components"/>
-                                                <!-- Show main form -->
-                                                <xforms:toggle case="fb-editor-open-case"/>
-                                                <xforms:toggle case="fb-metadata-view-case"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
+                                        <xforms:group ref="cancel-trigger">
+                                            <fr:button>
+                                                <xforms:label value="$form-resources/cancel/label"/>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Show main form -->
+                                                    <xforms:toggle case="fb-editor-open-case"/>
+                                                    <xforms:toggle case="fb-metadata-view-case"/>
+                                                    <!-- HACK: Store valid values so we don't see error message -->
+                                                    <xforms:setvalue ref="instance('fb-metadata-instance')/application-name">dummy</xforms:setvalue>
+                                                    <xforms:setvalue ref="instance('fb-metadata-instance')/form-name">dummy</xforms:setvalue>
+                                                </xforms:action>
+                                            </fr:button>
+                                        </xforms:group>
+                                        <xforms:group ref="next-trigger">
+                                            <fr:button>
+                                                <xforms:label value="$form-resources/apply/label"/>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Copy data to main instance -->
+                                                    <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="instance('fb-metadata-instance')/application-name"/>
+                                                    <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
+                                                    <!-- Refresh components -->
+                                                    <xforms:send submission="fb-load-components"/>
+                                                    <!-- Show main form -->
+                                                    <xforms:toggle case="fb-editor-open-case"/>
+                                                    <xforms:toggle case="fb-metadata-view-case"/>
+                                                </xforms:action>
+                                            </fr:button>
+                                        </xforms:group>
                                     </fr:td>
                                     <fr:td/>
                                 </fr:tr>
@@ -845,28 +851,30 @@
             <fr:buttons>
                 <!-- Back/Close -->
                 <fr:back-button/>
-                <!-- Clear -->
-                <!--<fr:clear-button/>-->
 
                 <!-- Test form -->
-                <xforms:trigger id="fb-test-button" model="fr-error-summary-model" ref="instance('fr-form-valid-instance')">
-                    <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
-                </xforms:trigger>
+                <xforms:group model="fr-error-summary-model" ref="instance('fr-form-valid-instance')">
+                    <fr:button id="fb-test-button">
+                        <xforms:label>
+                            <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
+                    </fr:button>
+                </xforms:group>
 
                 <!-- Publish form -->
-                <xforms:trigger id="fb-publish-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/world.png" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/publish"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xxforms:show dialog="fb-publish-dialog"/>
-                    </xforms:action>
-                </xforms:trigger>
+                <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
+                    <fr:button id="fb-publish-button">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/world.png" alt=""/>
+                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/publish"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xxforms:show dialog="fb-publish-dialog"/>
+                        </xforms:action>
+                    </fr:button>
+                </xforms:group>
 
                 <!-- Save form -->
                 <fr:save-button/>

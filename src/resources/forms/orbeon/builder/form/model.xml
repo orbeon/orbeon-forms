@@ -174,7 +174,7 @@
             <title xml:lang="fr">Orbeon Form Builder</title>
             <description xml:lang="fr">Orbeon Form Builder vous permet d'éditer des formulaires directement depuis votre navigateur et sans programmation.</description>
             <author>Orbeon, Inc.</author>
-            <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-42.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
+            <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
         </metadata>
     </xforms:instance>
 

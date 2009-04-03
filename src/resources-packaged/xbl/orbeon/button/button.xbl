@@ -26,11 +26,11 @@
     <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button.js"/>
     <!--<xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>-->
-    <xbl:binding element="fr|cool-button">
+    <xbl:binding element="fr|button">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>
-                .xbl-fr-cool-button { display: inline }
+                .xbl-fr-button { display: inline }
             </xbl:style>
         </xbl:resources>
         <xbl:template>
@@ -46,11 +46,13 @@
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readonly">
                             var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            button.set("disabled", true);
+                            if (button != null)
+                                button.set("disabled", true);
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readwrite">
                             var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            button.set("disabled", false);
+                            if (button != null)
+                                button.set("disabled", false);
                         </xxforms:script>
                     </xforms:trigger>
                 </xhtml:span>

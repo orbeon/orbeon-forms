@@ -248,17 +248,20 @@ a.fb-edit-help-trigger img {
 #fb-metadata-group .fr-grid { margin: 0 }
 #fb-metadata-group td { width: 50% }
 
-.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger { display: inline }
+.fb-metadata-edit-group .fr-grid td, .fb-metadata-view-group .fr-grid td { vertical-align: bottom }
+.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger,
+    .fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger
+        { display: inline; margin-top: 0 }
 
 /* Try some WYSIWYG appearance */
 .fb-title-control, .fb-description-control { text-align: right }
 
 .fb-title-control .xforms-label { text-align: right; display: none }
-.fb-title-control .fr-inplace-content .xforms-output { color: #666699; font-size: 197% }
+.fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
 .fb-title-control .fr-inplace-content .xforms-input input { color: #666699; font-size: 197%; text-align: right }
 
 .fb-description-control .xforms-label { text-align: right; display: none }
-.fb-description-control .fr-inplace-content .xforms-output { color: #6E6E6E; font-size: smaller; font-style: italic }
+.fb-description-control .fr-inplace-content .xforms-output { color: white; font-size: smaller; font-style: italic }
 .fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: smaller; font-style: italic; text-align: right }
 
 /* Highlighting of top-level blocks (sections, ...) */

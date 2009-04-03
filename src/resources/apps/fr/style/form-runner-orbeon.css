@@ -33,7 +33,7 @@ th, td {border: 0; padding: 0 }
 
 h1, h2, h3 {
 	margin: 1em 0;
-    color: #666699;
+    color: #004B92;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -56,11 +56,11 @@ h3, h4 {
     margin: 1em 0 1em 0;
 }
 
-body, body table, textarea.xforms-textarea {
+body, body table, textarea.xforms-textarea, button {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-a { color: #666699 }
+a { color: #004B92 }
 hr { border: 1px solid #eee }
 
 /* Some definitions from YUI base-min.css */
@@ -78,8 +78,8 @@ p, fieldset, table { margin-bottom: 1em }
 
 /* ***** Other ****************************************************************************************************** */
 
-.fr-top, .fr-bottom { background-repeat: no-repeat }
-.fr-top { line-height: 10px; }/* help background image display */
+.fr-top, .fr-bottom { background-repeat: no-repeat; clear: both }
+.fr-top { height: 10px; _height: 5px; font-size: 0 } /* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
 #doc .fr-top { background-image: url(top-750.png); _background-image: none }
 #doc4 .fr-top { background-image: url(top-974.png); _background-image: none }
@@ -106,12 +106,32 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-separator {
     background-color: #9999CC;
-    height: 4px;/* size in em seems to cause issues in Firefox as not all separators appear the same height */
+    height: 4px;    /* size in em seems to cause issues in Firefox as not all separators appear the same height */
+    font-size: 0;   /* help IE */
 }
 
 .fr-buttons-block {
     background: #F8F8F8 url(logo-bg.gif) repeat-x top;
     padding: 1em;
+}
+
+.yui-skin-sam .yui-button button {
+    *height: 2em;   /* IE doesn't honor the min-height provided by YUI */
+}
+
+/* Apply YUI SAM skin style for <input> buttons under IE 6 */
+.yui-skin-sam .xforms-noscript .yui-button input {
+    _color: #000000;
+    _font-size: 93%;
+    _line-height: 2;
+    _min-height: 2em;
+    _padding: 0 10px;
+
+    _background-color: transparent;
+    _cursor: pointer;
+    _border: medium none;
+    _display: block;
+    _margin: 0;
 }
 
 .fr-explanation .xforms-output {
@@ -146,8 +166,9 @@ p, fieldset, table { margin-bottom: 1em }
 /* Metadata */
 .fr-header { margin-top: .5em }
 .fr-logo { display: block; float: left }
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .5em }
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .2em }
 .fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a { color: #6E6E6E }
+.fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
 
 /* Make button appear the same color as a link */
 .xforms-trigger-appearance-xxforms-minimal {
@@ -194,7 +215,7 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 /* Table of contents */
-.fr-toc { color: #666699; padding: 0 1em 0 1em }
+.fr-toc { color: #004B92; padding: 0 1em 0 1em }
 
 /* Error summary */
 .fr-error-title {
@@ -210,7 +231,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 /* Sections */
 .fr-section-container div.fr-collapsible {
-    border-bottom: 1px dotted #666699;
+    border-bottom: 1px dotted #004B92;
 }
 
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }

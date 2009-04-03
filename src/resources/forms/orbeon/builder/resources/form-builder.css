@@ -21,10 +21,6 @@
 
 .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
-/*.fr-section-title div {*/
-    /*background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center*/
-/*}*/
-
 .fb-nowrap { white-space: nowrap }
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
@@ -36,8 +32,6 @@ a.fb-edit-help-trigger img {
     margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
     padding: 0;
 }
-
-/*.section-container { border-top: 1px solid #666699; margin-top: .5em }*/
 
 /* ***** Toolbox **************************************************************************************************** */
 
@@ -208,7 +202,7 @@ a.fb-edit-help-trigger img {
 
 
 /* In-place editing for section titles */
-.fr-section-title .fr-inplace-content .xforms-output { text-decoration: underline; color: #666699 }
+.fr-section-title .fr-inplace-content .xforms-output { text-decoration: underline; color: #004B92 }
 #fb-details-group .fr-section-title { display: block }
 
 /* Only show buttons when in edit mode or when hovering over the title */
@@ -258,18 +252,18 @@ a.fb-edit-help-trigger img {
         { display: inline; margin-top: 0 }
 
 .fr-metadata .fb-title-control .fr-inplace-content .xforms-output {
-    color: #666699;
+    color: #004B92;
 }
 
 .fr-metadata .fb-description-control .fr-inplace-content .xforms-output {
-    color: #666699;
+    color: #004B92;
 }
 
 .fb-title-control, .fb-description-control { text-align: right }
 
 .fb-title-control .xforms-label { text-align: right; display: none }
 .fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
-.fb-title-control .fr-inplace-content .xforms-input input { color: #666699; font-size: 197%; text-align: right }
+.fb-title-control .fr-inplace-content .xforms-input input { color: #004B92; font-size: 197%; text-align: right }
 
 .fb-description-control .xforms-label { text-align: right; display: none }
 .fb-description-control .fr-inplace-content .xforms-output { color: white; font-size: smaller; font-style: italic }
@@ -278,12 +272,12 @@ a.fb-edit-help-trigger img {
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
 .fb-top-level-content:hover { border-left: 4px solid #ccc }
-.fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #666699}
+.fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #004B92}
 
 /* Highlighting of section content (grids, ...) */
 .fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
 .fb-section-content:hover { border-left: 4px solid #ccc}
-.fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #666699}
+.fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #004B92}
 
 /* Control editor */
 .fb-control-label .xforms-label { display: none }
@@ -311,7 +305,8 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Grid */
 
 .fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
-.fb-grid-td { width: auto; vertical-align: top; border: 1px dotted gray; padding: .2em }
+.fb-grid-td { width: auto; vertical-align: top; border: 1px solid transparent; padding: .2em }
+.fb-grid:hover .fb-grid-td { border: 1px dotted gray }
 .fb-grid-td .xforms-alert { display: none }
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
@@ -339,9 +334,11 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-grid .fb-grid-td:hover .fb-grid-control-icons img { display: inline }
 
 /* Column icons */
-.fb-grid-column-toolbar-td { text-align: center; padding-bottom: 2px }/* padding so that the icon doesn't touch the table border */
+.fb-grid-column-toolbar-td { text-align: center; padding-bottom: 2px; height: 20px }/* padding so that the icon doesn't touch the table border */
 .fb-grid-column-toolbar-td .fb-insert-left { float: left }
 .fb-grid-column-toolbar-td .fb-insert-right { float: right }
+.fb-grid-column-toolbar-td a { display: none }
+.fb-grid:hover .fb-grid-column-toolbar-td a { display: block }
 
 /* Selected cell */
 .xforms-repeat-selected-item-4 {
@@ -378,7 +375,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 #fb-details-group .fb-grid-td .xforms-select1-appearance-compact { height: 6em }
 #fb-details-group .fb-grid-td .xforms-select-appearance-compact { height: 6em }
 
-#fb-details-group .fb-grid-td .xforms-mediatype-image { display: block; border: 2px solid #666699; overflow: auto }
+#fb-details-group .fb-grid-td .xforms-mediatype-image { display: block; border: 2px solid #004B92; overflow: auto }
 #fb-details-group .fb-grid-td .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
 #fb-details-group .fb-grid-td .xforms-mediatype-image img { display: block }
 
@@ -419,6 +416,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-empty-cell span { display: none }
 .xforms-repeat-selected-item-4 .fb-empty-cell, td:hover .fb-empty-cell { display: block }
 .xforms-repeat-selected-item-4 .fb-empty-cell .fb-use-toolbar-message { display: block }
+.xforms-repeat-selected-item-4 .fb-empty-cell .fb-use-toolbar-message span { display: block }
 .xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
 td:hover .fb-click-message { display: block }
 

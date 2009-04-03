@@ -155,19 +155,13 @@ button.xforms-trigger img { margin-right: 10px }
 }
 
 /* Language and mode selectors */
-.fr-goto-content, .fr-language-choice, .fr-noscript-choice { margin-right: 1em; margin-top: .2em; text-align: right }
-.fr-goto-content, .fr-noscript-choice { float: right }
-.fr-language-choice { float: right }
+.fr-goto-content, .fr-language-choice, .fr-noscript-choice { margin-right: 1em }
+.fr-language-choice { margin-right: 0 }
+
 .fr-goto-content .xforms-trigger-appearance-xxforms-minimal,
     .fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
     .fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
 .fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
-
-.fr-goto-content span, .fr-language-choice .xforms-output {
-    display: -moz-inline-box;
-    display: inline-block;
-    padding: 1px 0
-}
 
 /* Metadata */
 .fr-metadata { display: block }
@@ -239,11 +233,13 @@ button.xforms-trigger img { margin-right: 10px }
 }
 
 .fr-buttons .xforms-trigger {
-    width: 10em; *width: 9em
+    width: 9.5em; *width: 9em
 }
 
+/* Special sizing for expand/collapse buttons */
 .fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger {
-    width: auto;
+    min-width: 2em;
+    width: 2em;
     padding: 0;
 }
 

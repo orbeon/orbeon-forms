@@ -229,37 +229,41 @@
     </xsl:template>
 
     <xsl:template match="fr:collapse-all-button">
-        <xforms:group>
-            <fr:button id="fr-collapse-all-button">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
-                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/collapse-all"/>-->
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xsl:for-each select="$input-data//fr:section/@id">
-                        <xforms:toggle case="case-{.}-closed"/>
-                        <xforms:toggle case="case-button-{.}-closed"/>
-                    </xsl:for-each>
-                </xforms:action>
-            </fr:button>
-        </xforms:group>
+        <xsl:if test="$is-section-collapse">
+            <xforms:group>
+                <fr:button id="fr-collapse-all-button">
+                    <xforms:label>
+                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
+                        <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/collapse-all"/>-->
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xsl:for-each select="$input-data//fr:section/@id">
+                            <xforms:toggle case="case-{.}-closed"/>
+                            <xforms:toggle case="case-button-{.}-closed"/>
+                        </xsl:for-each>
+                    </xforms:action>
+                </fr:button>
+            </xforms:group>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:expand-all-button">
-        <xforms:group>
-            <fr:button id="fr-expand-all-button">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
-                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/expand-all"/>-->
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xsl:for-each select="$input-data//fr:section/@id">
-                        <xforms:toggle case="case-{.}-open"/>
-                        <xforms:toggle case="case-button-{.}-open"/>
-                    </xsl:for-each>
-                </xforms:action>
-            </fr:button>
-        </xforms:group>
+        <xsl:if test="$is-section-collapse">
+            <xforms:group>
+                <fr:button id="fr-expand-all-button">
+                    <xforms:label>
+                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
+                        <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/expand-all"/>-->
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xsl:for-each select="$input-data//fr:section/@id">
+                            <xforms:toggle case="case-{.}-open"/>
+                            <xforms:toggle case="case-button-{.}-open"/>
+                        </xsl:for-each>
+                    </xforms:action>
+                </fr:button>
+            </xforms:group>
+        </xsl:if>
     </xsl:template>
 
     <!-- === Offline Buttons (alpha code, not supported/documented) === -->

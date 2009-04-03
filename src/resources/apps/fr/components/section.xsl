@@ -49,7 +49,7 @@
 
                 <!-- Open/close button -->
                 <xforms:group appearance="xxforms:internal">
-                    <xsl:if test="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse">
+                    <xsl:if test="$is-section-collapse">
                         <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic">
                             <xforms:case id="case-button-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                                 <!-- "+" trigger -->
@@ -93,7 +93,7 @@
                             </xsl:variable>
                             <xsl:apply-templates select="$input"/>
                         </xsl:when>
-                        <xsl:when test="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse">
+                        <xsl:when test="$is-section-collapse">
                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
                             <xforms:trigger id="{$section-id}" appearance="minimal">
                                 <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>

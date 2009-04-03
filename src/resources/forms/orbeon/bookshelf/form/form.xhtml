@@ -42,6 +42,7 @@
                         <xs:element name="language" type="language"/>
                         <xs:element name="link" type="link"/>
                         <xs:element name="rating" type="rating"/>
+                        <xs:element name="publication-year" type="publication-year"/>
                         <xs:element name="image" type="image"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -75,6 +76,23 @@
                     </xs:restriction>
                 </xs:simpleType>
 
+                <!-- Type for publication year -->
+                <xs:simpleType name="publication-year">
+                    <xs:union>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:integer">
+                                <xs:minInclusive value="0"/>
+                                <xs:maxExclusive value="10000"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:length value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:union>                    
+                </xs:simpleType>
+
                 <!-- Type for language -->
                 <xs:simpleType name="language">
                     <xs:restriction base="xs:string">
@@ -104,6 +122,7 @@
                         <language/>
                         <link/>
                         <rating/>
+                        <publication-year/>
                         <image filename="" mediatype="" size=""/>
                     </details>
                     <notes>
@@ -117,6 +136,9 @@
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="author-bind" nodeset="author" required="true()"/>
                     <xforms:bind id="language-bind" nodeset="language"/>
+                    <xforms:bind id="link-bind" nodeset="link"/>
+                    <xforms:bind id="rating-bind" nodeset="rating"/>
+                    <xforms:bind id="publication-year-bind" nodeset="publication-year"/>
                     <xforms:bind id="image-bind" nodeset="image" type="xs:anyURI"/>
                 </xforms:bind>
                 <xforms:bind id="notes-bind" nodeset="notes">
@@ -226,6 +248,12 @@
                                 <value>5</value>
                             </item>
                         </rating>
+                        <publication-year>
+                            <label>Publication Year</label>
+                            <hint>Year the book was published</hint>
+                            <help>This is the year the book was published. For example: "2009".</help>
+                            <alert>The year selected is invalid</alert>
+                        </publication-year>
                         <image>
                             <label>Book Cover</label>
                             <hint>Upload a book cover image</hint>
@@ -314,6 +342,12 @@
                                 <value>5</value>
                             </item>
                         </rating>
+                        <publication-year>
+                            <label>Année de publication</label>
+                            <hint>Année durant laquelle le livre a été publié</hint>
+                            <help>Ceci est l'année durant laquelle le livre a été publié. Par exemple: "2009".</help>
+                            <alert>L'année sélectionnée est invalide</alert>
+                        </publication-year>
                         <image>
                             <label>Couverture</label>
                             <hint>Insérer une image de couverture</hint>
@@ -399,7 +433,7 @@
                                 </xforms:select1>
                             </fr:td>
                             <fr:td>
-                                <xforms:input id="link-control" ref="link" incremental="true">
+                                <xforms:input id="link-control" bind="link-bind" incremental="true">
                                     <xforms:label ref="$form-resources/link/label"/>
                                     <xforms:hint ref="$form-resources/link/hint"/>
                                     <xforms:help ref="$form-resources/link/help"/>
@@ -409,7 +443,7 @@
                         </fr:tr>
                         <fr:tr>
                             <fr:td>
-                                <xforms:select1 id="rating-control" ref="rating" appearance="minimal">
+                                <xforms:select1 id="rating-control" bind="rating-bind" appearance="minimal">
                                     <xforms:label ref="$form-resources/rating/label"/>
                                     <xforms:hint ref="$form-resources/rating/hint"/>
                                     <xforms:help ref="$form-resources/rating/help"/>
@@ -419,6 +453,14 @@
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select1>
+                            </fr:td>
+                            <fr:td>
+                                <xforms:input id="publication-year-control" bind="publication-year-bind">
+                                    <xforms:label ref="$form-resources/publication-year/label"/>
+                                    <xforms:hint ref="$form-resources/publication-year/hint"/>
+                                    <xforms:help ref="$form-resources/publication-year/help"/>
+                                    <xforms:alert ref="$form-resources/publication-year/alert"/>
+                                </xforms:input>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>
@@ -431,7 +473,6 @@
                         <fr:tr>
                             <fr:td>
                                 <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
-                                    <!--<xforms:label>Note</xforms:label>-->
                                     <fr:body>
                                         <fr:tr>
                                             <fr:td>

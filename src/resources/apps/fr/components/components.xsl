@@ -64,6 +64,8 @@
     <xsl:variable name="is-show-explanation" select="pipeline:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(pipeline:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
 
+    <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
+
     <xsl:template match="/xhtml:html/xhtml:body">
 
         <xsl:copy>

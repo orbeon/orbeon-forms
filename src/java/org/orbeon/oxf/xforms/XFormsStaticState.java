@@ -928,16 +928,16 @@ public class XFormsStaticState {
 
     private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
 
-        // NOTE: We register event handlers on any element which has an id. The purpose of this is to allow registring
-        // event handlers on XBL components. This also follows the semantics of XML Events.
+        // Register event handlers on any element which has an id or an observer attribute.
+        // This also allows registering event handlers on XBL components. This follows the semantics of XML Events.
 
         // NOTE: Placing a listener on say a <div> element won't work at this point. Listeners have to be placed within
         // elements which have a representation in the compact component tree.
 
         // Two expressions depending on whether handlers within models are excluded or not
         final String xpathExpression = excludeModels ?
-                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and parent::*/@id]" :
-                "//*[@ev:event and not(ancestor::xforms:instance) and parent::*/@id]";
+                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or ev:observer)]" :
+                "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or ev:observer)]";
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,
@@ -952,14 +952,7 @@ public class XFormsStaticState {
 
                 if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
                     // This is a known action name
-                    // TODO: The code below excludes cases like <xforms:model><xform:action ev:event="abc"><xforms:setvalue ev:event="def">
-
-//                    final Element parentElement = currentElement.getParent();
-//                    final String observerAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
-//                    if (isEventObserver(parentElement) || observerAttribute != null) {
-                        // Either 1) the parent is an observer or 2) there is an explicit ev:observer attribute  
-                        XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
-//                    }
+                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
                 }
             }
         }
@@ -1404,27 +1397,5 @@ public class XFormsStaticState {
         public boolean isValueControl() {
             return isValueControl;
         }
-    }
-
-    /**
-     * Return true if the given element is an event observer. Must return true for controls, xforms:model,
-     * xforms:instance, xforms:submission.
-     *
-     * @param element   element to check
-     * @return          true iif the element is an event observer
-     */
-    public static boolean isEventObserver(Element element) {
-
-        if (XFormsControlFactory.isBuiltinControl(element.getNamespaceURI(), element.getName())) {
-            return true;
-        }
-
-        final String localName = element.getName();
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(element.getNamespaceURI())
-                && ("model".equals(localName) || "instance".equals(localName) || "submission".equals(localName))) {
-            return true;
-        }
-
-        return false;
     }
 }

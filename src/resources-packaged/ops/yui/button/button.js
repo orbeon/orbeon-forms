@@ -305,7 +305,8 @@ version: 2.6.0
         
         }
 
-        p_oElement.removeAttribute("id");
+        // ORBEON: allows custom id
+        //p_oElement.removeAttribute("id");
         p_oElement.removeAttribute("name");
         
         if (!("tabindex" in p_oAttributes)) {
@@ -486,7 +487,7 @@ version: 2.6.0
     
     
                 oConfig.attributes.srcelement = p_oElement;
-        
+
                 initConfig.call(this, oConfig);
         
         
@@ -2975,9 +2976,9 @@ version: 2.6.0
 
             YAHOO.widget.Button.superclass.init.call(this, p_oElement, p_oAttributes);
 
-
+            // ORBEON: allows custom id
 			var sId = this.get("id"),
-				sButtonId = sId + "-button";
+				sButtonId = oButton.id != null ? oButton.id: sId + "-button";
 
 
         	oButton.id = sButtonId;

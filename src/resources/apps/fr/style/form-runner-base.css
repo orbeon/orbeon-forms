@@ -95,7 +95,7 @@ button.xforms-trigger img { margin-right: 10px }
     text-decoration: underline;
     font-size: inherit;
     padding: 0;
-    vertical-align: middle;
+    /*vertical-align: middle;*/ /* removing this for better alignment of top links/buttons */
 }
 
 /* But for boolean inputs, no background and border (for IE) */
@@ -156,12 +156,18 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* Language and mode selectors */
 .fr-goto-content, .fr-language-choice, .fr-noscript-choice { margin-right: 1em; margin-top: .2em; text-align: right }
-.fr-goto-content, .fr-noscript-choice { float: left }
+.fr-goto-content, .fr-noscript-choice { float: right }
 .fr-language-choice { float: right }
 .fr-goto-content .xforms-trigger-appearance-xxforms-minimal,
     .fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
     .fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
 .fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
+
+.fr-goto-content span, .fr-language-choice .xforms-output {
+    display: -moz-inline-box;
+    display: inline-block;
+    padding: 1px 0
+}
 
 /* Metadata */
 .fr-metadata { display: block }
@@ -194,7 +200,7 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* Messages */
 .fr-message-success { color: green  }
-.fr-message-validation-error { color: orange }
+.fr-message-validation-error { color: #DF731B }
 .fr-message-fatal-error { color: red }
 .fr-unsaved-data { color: red }
 .fr-message-fatal-error .xforms-trigger { margin-left: .5em }
@@ -233,7 +239,16 @@ button.xforms-trigger img { margin-right: 10px }
 }
 
 .fr-buttons .xforms-trigger {
-    width: 13em; *width: 11em
+    width: 10em; *width: 9em
+}
+
+.fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger {
+    width: auto;
+    padding: 0;
+}
+
+.fr-buttons #fr-collapse-all-button img, .fr-buttons #fr-expand-all-button img {
+    margin-right: 0
 }
 
 /* ***** Repeats **************************************************************************************************** */

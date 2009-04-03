@@ -143,13 +143,15 @@ p, fieldset, table { margin-bottom: 1em }
 
 .xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }
 
-/* Language and mode selectors */
-.fr-language-choice, .fr-noscript-choice { color: gray; font-size: 85% }
-.fr-language-choice a, .fr-noscript-choice a { color: #6E6E6E }
+/* Metadata */
+.fr-header { margin-top: .5em }
+.fr-logo { display: block; float: left }
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .5em }
+.fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a { color: #6E6E6E }
 
 /* Make button appear the same color as a link */
 .xforms-trigger-appearance-xxforms-minimal {
-    color: #666699;
+    color: #6E6E6E;
 }
 
 /* Set controls background */
@@ -163,27 +165,32 @@ p, fieldset, table { margin-bottom: 1em }
 /* NOTE: style required-empty as well to show user which are the required fields */
 .xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited,
     .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty
-        { border-color: orange }
+        { border-color: #DF731B }
 
 /* Upload control information */
 .xforms-upload-info { background-color: transparent }
 
 /* Metadata */
 .fr-metadata {
-    background-color: #004B92;
+    background-color: #146EB4;
     background-image: none;
     padding: 1em;
 }
 .fr-separator {
-    background-color: orange;
+    background-color: #004B92;
 }
 .fr-metadata .fr-form-title, .fr-metadata .fr-form-description {
     color: white;
 }
 
+.fr-metadata .fr-form-title {
+    float: left;
+}
+
 .fr-metadata .fr-form-description {
     font-size: smaller;
     font-style: italic;
+    float: right;
 }
 
 /* Table of contents */

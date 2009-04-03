@@ -58,7 +58,8 @@
     *width: auto;/* HACK: IE 7 misbehaves here, so don't use 100% */
 }
 
-.fr-search-trigger {}
+.fr-summary-search .fr-search-button-td { vertical-align: bottom }
+.fr-summary-search .xbl-fr-cool-button { margin-left: 1em }
 
 .fr-summary-search p { margin-bottom: 0 }
 

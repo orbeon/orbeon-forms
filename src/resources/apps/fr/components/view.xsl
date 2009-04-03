@@ -41,53 +41,23 @@
                 <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                            class="{if (fr:left) then 'yui-t2 ' else ''}{if ($mode = ('view', 'pdf', 'email')) then ' fr-print-mode' else ''}">
                     <xhtml:div class="fr-header">
+                        <!-- Logo -->
+                        <xxforms:variable name="logo-uri-no-appserver"
+                                          select="(($source-form-metadata/logo,
+                                                    instance('fr-form-metadata')/logo,
+                                                    '{$default-logo-uri}')[normalize-space() != ''])[1]"/>
+                        <xxforms:variable name="logo-uri"
+                                          select="if (starts-with($logo-uri-no-appserver, 'http://') or starts-with($logo-uri-no-appserver, 'https://'))
+                                                  then $logo-uri-no-appserver
+                                                  else concat(pipeline:property('oxf.fr.appserver.uri'), $logo-uri-no-appserver)"/>
+
+
+                        <xsl:if test="$default-logo-uri">
+                            <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
+                        </xsl:if>
+
                         <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
-                            <!-- Go to content link in noscript mode -->
-                            <xsl:if test="$is-noscript">
-                                <xhtml:div class="fr-goto-content">
-                                    <!-- Group to scope variables -->
-                                    <xforms:group appearance="xxforms:internal" model="fr-error-summary-model">
-                                        <!-- Link to form content or to errors if any -->
-                                        <xhtml:a href="#{{if (count($visible-errors) > 0) then 'fr-errors' else 'fr-form'}}">
-                                            <xforms:output value="$fr-resources/summary/labels/goto-content"/>
-                                        </xhtml:a>
-                                    </xforms:group>
-                                </xhtml:div>
-                            </xsl:if>
-                            <!-- Switch script/noscript -->
-                            <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
-                                <xhtml:div class="fr-noscript-choice">
-                                    <xforms:group appearance="xxforms:internal">
-                                        <xforms:group ref=".[not(property('xxforms:noscript'))]">
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label><xforms:output value="$fr-resources/summary/labels/noscript"/></xforms:label>
-                                            </xforms:trigger>
-                                            <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
-                                        </xforms:group>
-                                        <xforms:group ref=".[property('xxforms:noscript')]">
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label><xforms:output value="$fr-resources/summary/labels/script"/></xforms:label>
-                                            </xforms:trigger>
-                                        </xforms:group>
-                                        <!-- React to activation of both triggers -->
-                                        <xforms:action ev:event="DOMActivate">
-                                            <!-- Set data-safe-override -->
-                                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
-                                            <!-- Send submission -->
-                                            <xsl:choose>
-                                                <xsl:when test="$mode = 'summary'">
-                                                    <!-- Submission for summary mode -->
-                                                    <xforms:send submission="fr-edit-switch-script-summary-submission"/>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <!-- Submission for other modes -->
-                                                    <xforms:send submission="fr-edit-switch-script-submission"/>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xforms:action>
-                                    </xforms:group>
-                                </xhtml:div>
-                            </xsl:if>
+                            
                             <!-- Switch language -->
                             <xhtml:div class="fr-language-choice">
                                 <xxforms:variable name="default-language" select="xxforms:instance('fr-default-language-instance')"/>
@@ -123,6 +93,54 @@
                                     </xforms:repeat>
                                 </xforms:group>
                             </xhtml:div>
+
+                            <!-- Switch script/noscript -->
+                            <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
+                                <xhtml:div class="fr-noscript-choice">
+                                    <xforms:group appearance="xxforms:internal">
+                                        <xforms:group ref=".[not(property('xxforms:noscript'))]">
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label><xforms:output value="$fr-resources/summary/labels/noscript"/></xforms:label>
+                                            </xforms:trigger>
+                                            <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
+                                        </xforms:group>
+                                        <xforms:group ref=".[property('xxforms:noscript')]">
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label><xforms:output value="$fr-resources/summary/labels/script"/></xforms:label>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                        <!-- React to activation of both triggers -->
+                                        <xforms:action ev:event="DOMActivate">
+                                            <!-- Set data-safe-override -->
+                                            <xforms:setvalue model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
+                                            <!-- Send submission -->
+                                            <xsl:choose>
+                                                <xsl:when test="$mode = 'summary'">
+                                                    <!-- Submission for summary mode -->
+                                                    <xforms:send submission="fr-edit-switch-script-summary-submission"/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <!-- Submission for other modes -->
+                                                    <xforms:send submission="fr-edit-switch-script-submission"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xforms:action>
+                                    </xforms:group>
+                                </xhtml:div>
+                            </xsl:if>
+
+                            <!-- Go to content link in noscript mode -->
+                            <xsl:if test="$is-noscript">
+                                <xhtml:div class="fr-goto-content">
+                                    <!-- Group to scope variables -->
+                                    <xforms:group appearance="xxforms:internal" model="fr-error-summary-model">
+                                        <!-- Link to form content or to errors if any -->
+                                        <xhtml:a href="#{{if (count($visible-errors) > 0) then 'fr-errors' else 'fr-form'}}">
+                                            <xforms:output value="$fr-resources/summary/labels/goto-content"/>
+                                        </xhtml:a>
+                                    </xforms:group>
+                                </xhtml:div>
+                            </xsl:if>
                         </xsl:if>
                         <!-- Custom content added to the header -->
                         <xsl:if test="fr:header">
@@ -139,7 +157,6 @@
                                     <xsl:when test="fr:metadata">
                                         <!-- Custom metadata section -->
                                         <xsl:apply-templates select="fr:metadata/node()"/>
-                                        <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- Description in chosen language or first one if not found -->
@@ -149,23 +166,6 @@
                                                                    instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
                                                                    instance('fr-form-metadata')/description[1])[1]"/>
 
-                                        <!-- Logo -->
-                                        <xxforms:variable name="logo-uri-no-appserver"
-                                                          select="(($source-form-metadata/logo,
-                                                                    instance('fr-form-metadata')/logo,
-                                                                    '{$default-logo-uri}')[normalize-space() != ''])[1]"/>
-                                        <xxforms:variable name="logo-uri"
-                                                          select="if (starts-with($logo-uri-no-appserver, 'http://') or starts-with($logo-uri-no-appserver, 'https://'))
-                                                                  then $logo-uri-no-appserver
-                                                                  else concat(pipeline:property('oxf.fr.appserver.uri'), $logo-uri-no-appserver)"/>
-
-                                        <!--xxx noscript xxx-->
-                                        <!--<xforms:output value="property('xxforms:noscript')"/>                            -->
-
-                                        <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
-                                        <!--xxx-->
-                                        <!--<xforms:output value="string-join($source-form-metadata/(description[@xml:lang = $metadata-lang], description[1]), ' - ')"/>-->
-
                                         <xhtml:div class="yui-g fr-metadata">
                                             <xsl:choose>
                                                 <!-- If custom logo section is provided, use that -->
@@ -174,32 +174,17 @@
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                                                        <xhtml:table class="fr-layout-table">
-                                                            <xhtml:tr>
-                                                                <xhtml:td rowspan="2">
-                                                                    <xsl:if test="$default-logo-uri">
-                                                                        <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
-                                                                    </xsl:if>
-                                                                </xhtml:td>
-                                                                <xhtml:td>
-                                                                    <xhtml:h1 class="fr-form-title">
-                                                                        <xforms:output value="$title"/>
-                                                                    </xhtml:h1>
-                                                                </xhtml:td>
-                                                            </xhtml:tr>
-                                                            <xhtml:tr>
-                                                                <xhtml:td>
-                                                                    <xforms:output class="fr-form-description" value="$description"/>
-                                                                </xhtml:td>
-                                                            </xhtml:tr>
-                                                        </xhtml:table>
+                                                        <xhtml:h1 class="fr-form-title">
+                                                            <xforms:output value="$title"/>
+                                                        </xhtml:h1>
+                                                        <xforms:output class="fr-form-description" value="$description"/>
                                                     </xforms:group>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xhtml:div>
-                                        <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                     </xsl:otherwise>
                                 </xsl:choose>
+                                <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                                 <xhtml:div class="yui-g fr-body">
 
                                     <!-- Optional message (mostly for view mode) -->

@@ -172,7 +172,7 @@
             <summary-title>Votre formulaire contient les erreurs suivantes</summary-title>
             <some>Ce formulaire contient des erreurs</some>
             <none>Ce formulaire ne contient pas d'erreurs</none>
-            <unsaved>Modifications non sauvegardées</unsaved>
+            <unsaved>Modifications non enregistrées</unsaved>
         </errors>
         <email>
             <subject>Orbeon Forms: Confirmation</subject>
@@ -236,21 +236,21 @@
         </summary>
         <detail>
             <messages>
-                <save-success>Document sauvegardé avec succès!</save-success>
-                <form-validation-error>Document non sauvegardé: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
+                <save-success>Document enregistré avec succès!</save-success>
+                <form-validation-error>Document non enregistré: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
                 <database-error>Erreur de base de données: veuillez contacter votre administrateur système.</database-error>
-                <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas sauvegardées.</clear-confirm-message>
+                <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
                 <submit-dialog-title>[Form Submitted]</submit-dialog-title>
                 <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>[Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.]</saved-locally-open>
             </messages>
             <labels>
-                <save-document>Sauvegarder</save-document>
+                <save-document>Enregistrer</save-document>
                 <publish>Publier...</publish>
                 <test>Tester</test>
-                <save-locally>Sauvegarde Locale</save-locally>
-                <save-offline>Sauvegarde Or-ligne</save-offline>
+                <save-locally>Enregistrement Local</save-locally>
+                <save-offline>Enregistrement Hors-ligne</save-offline>
                 <submit-document>Envoyer</submit-document>
                 <workflow-review>Valider</workflow-review>
                 <workflow-send>Envoyer</workflow-send>

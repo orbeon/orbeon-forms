@@ -26,7 +26,7 @@
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
-    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="/apps/fr/style/orbeon-logo-trimmed-transparent-30.png"/>
     <property as="xs:string"  name="oxf.fr.css.uri.*.*"                                         value="/ops/css/yui/reset-fonts-grids.css
                                                                                                        /apps/fr/style/form-runner-base.css
                                                                                                        /apps/fr/style/form-runner-orbeon.css"/>

@@ -419,13 +419,6 @@ public class XFormsStaticState {
             }
         }
 
-        // Extract top-level scripts
-        {
-            final Document staticStateDocument = staticStateElement.getDocument();
-            final DocumentWrapper documentInfo = new DocumentWrapper(staticStateDocument, null, xpathConfiguration);
-            extractXFormsScripts(pipelineContext, documentInfo, "");
-        }
-
         // Extract components
         {
             final List xblElements = staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME);
@@ -503,9 +496,10 @@ public class XFormsStaticState {
         // TODO: Not sure why we actually extract the scripts: we could just keep pointers on them, right? There is
         // probably not a notable performance if any at all, especially since this is needed at page generation time
         // only.
+ 
+        final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]";
 
-        final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
-                    "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
+        final List scripts = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         if (scripts.size() > 0) {
@@ -912,7 +906,7 @@ public class XFormsStaticState {
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
-            // Iterate over models to extract event handlers
+            // Iterate over models to extract event handlers and scripts
             for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
 
@@ -921,6 +915,8 @@ public class XFormsStaticState {
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
                 extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
+
+                extractXFormsScripts(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
             }
 
             isAnalyzed = true;
@@ -977,6 +973,9 @@ public class XFormsStaticState {
         // Extract event handlers for this tree of controls
         extractEventHandlers(pipelineContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
 
+        // Extract scripts for this tree of controls
+        extractXFormsScripts(pipelineContext, controlsDocumentInfo, prefix);
+
         // Visit tree
         visitAllControlStatic(startElement, new XFormsStaticState.ControlElementVisitorListener() {
 
@@ -1015,9 +1014,6 @@ public class XFormsStaticState {
 
                             // Find new prefix
                             final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
-
-                            // Extract XForms scripts within this shadow tree (models and controls)
-                            extractXFormsScripts(pipelineContext, fullShadowTreeWrapper, newPrefix);
 
                             // Extract models from components instances
                             final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);

@@ -3382,9 +3382,8 @@ ORBEON.widgets.RTE = function() {
     editorWithFocus = null;     // The control ID of the RTE editor that has the focus, null if none
 
     function sendChangeToServer(controlID) {
-        yuiRTE = rteEditors[controlID];
         var event = new ORBEON.xforms.Server.Event(null, controlID, null,
-                yuiRTE.getEditorHTML(), "xxforms-value-change-with-focus-change");
+                ORBEON.widgets.RTE.getValue(ORBEON.util.Dom.getElementById(controlID)), "xxforms-value-change-with-focus-change");
         ORBEON.xforms.Server.fireEvents([event], true);
     }
 
@@ -3459,10 +3458,10 @@ ORBEON.widgets.RTE = function() {
             var yuiRTE = rteEditors[control.id];
             var doUpdate =
                     // Update only if the new value is different than the value already have in the HTML area
-                    xformsNormalizeEndlines(yuiRTE.getEditorHTML()) != xformsNormalizeEndlines(newValue)
+                    xformsNormalizeEndlines(ORBEON.widgets.RTE.getValue(control)) != xformsNormalizeEndlines(newValue)
                     // Update only if the value in the HTML area is the same now as it was when we sent it to the server
                     // If there is no previousServerValue, go ahead and update field
-                    && (previousServerValue == null || xformsNormalizeEndlines(yuiRTE.getEditorHTML()) == xformsNormalizeEndlines(previousServerValue));
+                    && (previousServerValue == null || xformsNormalizeEndlines(ORBEON.widgets.RTE.getValue(control)) == xformsNormalizeEndlines(previousServerValue));
 
             if (doUpdate) {
                 yuiRTE.setEditorHTML(newValue);
@@ -3472,7 +3471,14 @@ ORBEON.widgets.RTE = function() {
 
         getValue: function(control) {
             var yuiRTE = rteEditors[control.id];
-            return yuiRTE.getEditorHTML();
+            var value = yuiRTE.getEditorHTML();
+            // HACK: with Firefox, it seems that sometimes, when setting the value of the editor to "" you get"<br>" back
+            // The purpose of this hack is to work around that problem. It has drawbacks:
+            // o This means setting "<br>" will also result in ""
+            // o This doesn't fix the root of the problem so there may be other cases not caught by this
+            if (value == "<br>")
+                value = "";
+            return value;
         }
     };
 

@@ -62,9 +62,10 @@ import java.util.*;
  *   <!-- Models -->
  *   <xforms:model ...>
  *   <xforms:model ...>
- *   <!-- Controls -->
+ *   <!-- Controls including XBL-bound controls -->
  *   <xforms:group ...>
  *   <xforms:input ...>
+ *   <foo:bar ...>
  *   <!-- Global properties -->
  *   <properties xxforms:noscript="true" .../>
  * </static-state>

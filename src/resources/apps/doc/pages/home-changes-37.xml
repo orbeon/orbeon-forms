@@ -29,25 +29,14 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon Forms 3.7.1 (Developer Release)!
-            </p>
-            <p>
                 Orbeon Forms 3.7.1 (Developer Release) features over <a href="#changes-371-full">350 improvements</a>
                 since <a href="home-changes-36">Orbeon Forms 3.6</a>, including in the areas of performance, core
                 XForms engine enhancements, schema validation, session handling, caching, and application server
                 support.
             </p>
             <p>
-                This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.1 (Developer
-                Release).
+                This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.1.
             </p>
-            <p>
-                Starting with Orbeon Forms 3.7.1 (Developer Release), we are adopting a new numbering scheme:
-            </p>
-            <ul>
-                <li><p>Even-numbered releases (3.6, 3.8, etc.) are considered "stable" releases</p></li>
-                <li><p>Odd-numbered releases (3.7, 3.9, etc.) are considered "developer" releases</p></li>
-            </ul>
             <p>
                 <b style="color: red">NOTE: Orbeon Forms 3.7.1 is a Developer Release. The latest officially stable
                 release of Orbeon Forms is 3.6. Also make sure to check for any new stable release on the <a
@@ -60,6 +49,21 @@
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
+                    <li>
+                        <p>
+                            <b>New version numbering scheme.</b> Starting with Orbeon Forms 3.7.1, Orbeon Forms adopts a
+                            new numbering scheme:
+                        </p>
+                        <ul>
+                            <li><p>Even-numbered releases (3.6, 3.8, etc.) are considered "stable" releases</p></li>
+                            <li><p>Odd-numbered releases (3.7, 3.9, etc.) are considered "developer" releases</p></li>
+                        </ul>
+                        <p>
+                            <a
+                            href="http://en.wikipedia.org/wiki/Software_versioning#Odd-numbered_versions_for_development_releases">This
+                            scheme </a> follows the practice of a number of other open source projects.
+                        </p>
+                    </li>
                     <li>
                         <p>
                             <b>Form Runner environment.</b> Orbeon Form Runner is the Orbeon Forms runtime environment.

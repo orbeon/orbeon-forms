@@ -245,6 +245,10 @@ a.fb-edit-help-trigger img {
 
 /* ***** XXX ******************************************************************************************************** */
 
+#fb-metadata-group .fr-metadata {
+    background: #F8F8F8 url(logo-bg.gif) repeat-x top;
+}
+
 #fb-metadata-group .fr-grid { margin: 0 }
 #fb-metadata-group td { width: 50% }
 
@@ -253,7 +257,14 @@ a.fb-edit-help-trigger img {
     .fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger
         { display: inline; margin-top: 0 }
 
-/* Try some WYSIWYG appearance */
+.fr-metadata .fb-title-control .fr-inplace-content .xforms-output {
+    color: #666699;
+}
+
+.fr-metadata .fb-description-control .fr-inplace-content .xforms-output {
+    color: #666699;
+}
+
 .fb-title-control, .fb-description-control { text-align: right }
 
 .fb-title-control .xforms-label { text-align: right; display: none }

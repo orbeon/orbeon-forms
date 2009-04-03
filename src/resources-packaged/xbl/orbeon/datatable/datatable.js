@@ -17,30 +17,70 @@
  */
 
 /**
- * Implementation of table_ng constructor. Creates column resizers.
+ * Implementation of datatable constructor. Creates column resizers.
  *
- * @method ORBEON.widgets.table_ng
+ * @method ORBEON.widgets.datatable
  * @param element {DOM Element} The DOM element that contains the table.
  * @param index {integer} Index (position) of the table in the document.
  *        Currently not used, but might be useful to generate IDs.
  */
-ORBEON.widgets.table_ng = function (element, index) {
-    this.el = element;
+ORBEON.widgets.datatable = function (element, index) {
+    this.container = element;
     this.index = index;
+    var plainId = this.container.getAttribute('id');
+    this.id = plainId.substring(0, plainId.length - '-container'.length);
+    this.innerContainer = document.getElementById(this.id + '-inner-container');
+    this.table = document.getElementById(this.id + '-table');
+    this.thead = document.getElementById(this.id + '-thead');
+    this.theadTr = document.getElementById(this.id + '-thead-tr');
+    this.tbody = document.getElementById(this.id + '-tbody');
+    this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
+    this.scrollH = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollH');
+
+//    if (this.scrollV) {
+//        var cRegion = YAHOO.util.Dom.getRegion(this.innerContainer);
+//        var thRegion = YAHOO.util.Dom.getRegion(this.thead);
+//        YAHOO.util.Dom.setStyle(this.tbody, 'height', ((cRegion.bottom - cRegion.top) - (thRegion.bottom - thRegion.top) - 4) + 'px' );
+//    }
+
+
+//    if (this.scrollH) {
+//         var cWidth = YAHOO.util.Dom.getStyle(this.innerContainer, 'width');
+//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', 'auto');
+//         var tRegion = YAHOO.util.Dom.getRegion(this.table);
+//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', cWidth);
+//         YAHOO.util.Dom.setStyle(this.table, 'width', (tRegion.right - tRegion.left + 20) + 'px');
+//    } 
+
+    if (this.scrollV) {
+         var cRegion = YAHOO.util.Dom.getRegion(this.innerContainer);
+         var thRegion = YAHOO.util.Dom.getRegion(this.thead);
+         YAHOO.util.Dom.setStyle(this.tbody, 'height', ((cRegion.bottom - cRegion.top) - (thRegion.bottom - thRegion.top) - 4) + 'px');
+    }
+
+//    this.theadY = YAHOO.util.Dom.getY(this.thead);
+//    YAHOO.util.Dom.setY(this.theadTr, this.theadTrY);
+//    YAHOO.util.Event.addListener(this.innerContainer, "scroll", ORBEON.widgets.datatable.scrollHandler, this, true);
+
     this.colResizers = [];
-    var resizers = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', this.el);
+    var resizers = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', this.container);
     for (var i=0; i < resizers.length; i++) {
-        this.colResizers[this.colResizers.length] = new ORBEON.widgets.table_ng.colResizer(resizers[i]);
+        this.colResizers[this.colResizers.length] = new ORBEON.widgets.datatable.colResizer(resizers[i]);
     }
 }
 
+ORBEON.widgets.datatable.scrollHandler = function (e) {
+    //alert('scrolling');
+    YAHOO.util.Dom.setY(this.thead, this.theadY);
+}
+
 /**
- * Implementation of table_ng.colResizer constructor. Creates the YAHOO.util.DD object.
+ * Implementation of datatable.colResizer constructor. Creates the YAHOO.util.DD object.
  *
- * @method ORBEON.widgets.table_ng.colResizer
+ * @method ORBEON.widgets.datatable.colResizer
  * @param element {DOM Element} The DOM element that contains the resizer handle.
  */
-ORBEON.widgets.table_ng.colResizer = function (element) {
+ORBEON.widgets.datatable.colResizer = function (element) {
     this.el = element;
     this.col = this.el.parentNode.parentNode;
     this.dd = new YAHOO.util.DD(this.el);
@@ -48,29 +88,29 @@ ORBEON.widgets.table_ng.colResizer = function (element) {
     var colRegion = YAHOO.util.Dom.getRegion(this.col);
     var X = YAHOO.util.Dom.getX(this.el);
     this.delta = colRegion.right - X;
-    this.dd.on('mouseDownEvent', ORBEON.widgets.table_ng.colResizer.mouseDown, this, true);
-    this.dd.on('dragEvent', ORBEON.widgets.table_ng.colResizer.drag, this, true);
+    this.dd.on('mouseDownEvent', ORBEON.widgets.datatable.colResizer.mouseDown, this, true);
+    this.dd.on('dragEvent', ORBEON.widgets.datatable.colResizer.drag, this, true);
 }
 
 /**
- * Implementation of table_ng.colResizer.mouseDown event handler. Stores the positions as a D&D action might start.
+ * Implementation of datatable.colResizer.mouseDown event handler. Stores the positions as a D&D action might start.
  *
- * @method ORBEON.widgets.table_ng.colResizer.mouseDown
+ * @method ORBEON.widgets.datatable.colResizer.mouseDown
  * @param ev {Event}.
  */
-ORBEON.widgets.table_ng.colResizer.mouseDown = function (ev) {
+ORBEON.widgets.datatable.colResizer.mouseDown = function (ev) {
     this.colRegion = YAHOO.util.Dom.getRegion(this.col);
     this.colWidth = this.colRegion.right - this.colRegion.left;
     this.elX = YAHOO.util.Dom.getX(this.el);
 }
 
 /**
- * Implementation of table_ng.colResizer.drag event handler. Adjusts the column size.
+ * Implementation of datatable.colResizer.drag event handler. Adjusts the column size.
  *
- * @method ORBEON.widgets.table_ng.colResizer.drag
+ * @method ORBEON.widgets.datatable.colResizer.drag
  * @param ev {Event}.
  */
-ORBEON.widgets.table_ng.colResizer.drag = function (ev) {
+ORBEON.widgets.datatable.colResizer.drag = function (ev) {
     // Calculate the new length
     var newX = YAHOO.util.Dom.getX(this.el);
     var width = this.colWidth + newX -this.elX;
@@ -87,16 +127,16 @@ ORBEON.widgets.table_ng.colResizer.drag = function (ev) {
 }
 
 /**
- * Creates table_ng objects.
+ * Creates datatable objects.
  *
- * @method ORBEON.widgets.table_ng.init
+ * @method ORBEON.widgets.datatable.init
  */
-ORBEON.widgets.table_ng.init = function() {
+ORBEON.widgets.datatable.init = function() {
     // Transforms all the datatables in a document
     var tables = YAHOO.util.Dom.getElementsByClassName('datatable', 'div');
     for (var i=0; i < tables.length; i++) {
-        new ORBEON.widgets.table_ng(tables[i], i);
+        new ORBEON.widgets.datatable(tables[i], i);
     }
 }
 
-YAHOO.util.Event.onDOMReady(ORBEON.widgets.table_ng.init);
+YAHOO.util.Event.onDOMReady(ORBEON.widgets.datatable.init);

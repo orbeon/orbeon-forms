@@ -27,11 +27,12 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/event/event-min.js"/>
     <!--<xbl:script type="text/javascript" src="/ops/yui/paginator/paginator-min.js"/>-->
     <!--<xbl:script type="text/javascript" src="/ops/yui/datasource/datasource.js"/>-->
     <!--<xbl:script type="text/javascript" src="/ops/yui/datatable/datatable.js"/>-->
     <xbl:script type="text/javascript" src="/xbl/orbeon/datatable/datatable.js"/>
-    
+
     <xbl:binding id="fr.datatable" element="fr|datatable">
 
         <xbl:resources>

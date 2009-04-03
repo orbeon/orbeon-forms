@@ -28,6 +28,15 @@
         <parameter>rowsPerPage</parameter>
     </xsl:variable>
 
+    <!-- Set some variables that will dictate the geometry of the widget -->
+    <!-- Note that datatables scrollable in both direction are  not implemented yet -->
+    <xsl:variable name="scrollH" select="/fr:datatable/@scrollable = ('horizontal') and /fr:datatable/@width"/>
+    <xsl:variable name="scrollV" select="/fr:datatable/@scrollable = ('vertical') and /fr:datatable/@height"/>
+    <xsl:variable name="height" select="if ($scrollV) then concat('height: ', /fr:datatable/@height, ';') else ''"/>
+    <xsl:variable name="width" select="if (/fr:datatable/@width) then concat('width: ', /fr:datatable/@width, ';') else ''"/>
+    <xsl:variable name="id" select="if (/fr:datatable/@id) then /fr:datatable/@id else generate-id(/fr:datatable)"/>
+
+
     <xsl:template match="@*|node()" mode="#all">
         <!-- Default template == identity -->
         <xsl:copy>
@@ -37,7 +46,11 @@
 
     <xsl:template match="fr:datatable">
         <!-- Matches the bound element -->
-        <xhtml:div class="datatable yui-dt yui-dt-scrollable">
+
+
+        <xhtml:div class="datatable yui-dt  {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+            style="display: table;" id="{$id}-container">
+            <!-- See http://snippets.dzone.com/posts/show/216... for the display: table hack-->
             <xsl:copy-of select="namespace::*"/>
 
             <xsl:variable name="pass1">
@@ -45,9 +58,9 @@
                 This pass generates the XHTML structure .
                 and uses the default mode.
             -->
-                <xhtml:table>
+                <xhtml:table id="{$id}-table">
                     <!-- Copy attributes that are not parameters! -->
-                    <xsl:apply-templates select="@*[not(name() = $parameters/*)]"/>
+                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
                     <xsl:if test="not(xhtml:thead)">
                         <!-- If there is no thead element, add one -->
                         <xhtml:thead>
@@ -75,6 +88,13 @@
                     </xsl:choose>
                 </xhtml:table>
             </xsl:variable>
+
+            <!-- 
+
+            Now it's time to assemble all that stuff
+
+            -->
+
 
             <xforms:model id="datatable">
                 <xforms:instance id="sort">
@@ -106,42 +126,17 @@
                     </sort>
                 </xforms:instance>
                 <xforms:bind nodeset="@currentId" type="xs:integer"/>
+
             </xforms:model>
 
-            <xhtml:div>
-                <xxforms:variable name="sort" model="datatable" instance="sort" select="."/>
 
-                <!-- <xforms:group ref="$sort">
-                    <xhtml:p>
-                        <xforms:output ref="@currentId">
-                            <xforms:label>@currentId: </xforms:label>
-                        </xforms:output>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:output ref="@currentOrder">
-                            <xforms:label>@currentOrder: </xforms:label>
-                        </xforms:output>
-                    </xhtml:p>
-                    </xforms:group>-->
-
-            </xhtml:div>
-
-            <!-- 
-            sortKey mode builds a sort key from a cell content 
-        -->
-
-            <!-- 
-            
-            This second pass adds the YUI decorations
-            and uses the "YUI" mode 
-            
-        -->
-            <xhtml:div class="yui-dt-hd" style="background-color: rgb(242, 242, 242); display: table;">
-                <!-- See http://snippets.dzone.com/posts/show/216... -->
+            <xhtml:div class="yui-dt-hd" id="{$id}-inner-container"
+                style="background-color: rgb(242, 242, 242);  {if ($scrollH or $scrollV) then 'overflow: auto; overflow-x: hidden; position:relative; ' else ''}  {$width} {$height}">
                 <xsl:apply-templates select="$pass1" mode="YUI"/>
             </xhtml:div>
 
         </xhtml:div>
+
         <!-- End of template on the bound element -->
     </xsl:template>
 
@@ -176,9 +171,15 @@
     -->
 
     <xsl:template match="xhtml:thead/xhtml:tr" mode="YUI">
-        <xhtml:tr class="yui-dt-first yui-dt-last {@class}">
-            <xsl:apply-templates select="@*[name() != 'class']|node()" mode="YUI"/>
+        <xhtml:tr class="yui-dt-first yui-dt-last {@class}" style="{if ($scrollV) then 'position:relative; top: expression(offsetParent.scrollTop);' else ''}" id="{$id}-thead-tr">
+            <xsl:apply-templates select="@*[not(name() = ('class', 'id') )]|node()" mode="YUI"/>
         </xhtml:tr>
+    </xsl:template>
+
+    <xsl:template match="xhtml:thead" mode="YUI">
+        <xhtml:thead id="{$id}-thead">
+            <xsl:apply-templates select="@*[not(name() = ('id') )]|node()" mode="YUI"/>
+        </xhtml:thead>
     </xsl:template>
 
     <xsl:template name="yui-dt-liner">
@@ -261,8 +262,8 @@
     </xsl:template>
 
     <xsl:template match="xhtml:tbody" mode="YUI">
-        <xhtml:tbody class="yui-dt-data {@class}">
-            <xsl:apply-templates select="@*[name() != 'class']|node()" mode="YUI"/>
+        <xhtml:tbody class="yui-dt-data {@class}" style="{if ($scrollV) then 'overflow-x: hidden; overflow-y: auto;' else ''} {$height}" id="{$id}-tbody">
+            <xsl:apply-templates select="@*[not(name() = ('class', 'id'))]|node()" mode="YUI"/>
         </xhtml:tbody>
     </xsl:template>
 
@@ -288,7 +289,8 @@
             {{if (position() = last()) then 'yui-dt-last' else '' }}
             {{if (position() mod 2 = 0) then 'yui-dt-odd' else 'yui-dt-even' }}
             {{if (xxforms:index() = position()) then 'yui-dt-selected' else ''}}
-            {@class}">
+            {@class}"
+            style="height: auto;">
             <xsl:apply-templates select="@*[name() != 'class']|node()" mode="YUI"/>
         </xhtml:tr>
     </xsl:template>

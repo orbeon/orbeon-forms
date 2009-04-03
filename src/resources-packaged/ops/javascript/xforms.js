@@ -2002,6 +2002,13 @@ ORBEON.xforms.Controls = {
             ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(control, foundSelected ? itemIndex : 0), 0).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
+                && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                ORBEON.widgets.RTE.setFocus(control);
+            } else {
+                // TODO: can we do anything meaninful for FCK?
+            }
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }
@@ -3479,6 +3486,11 @@ ORBEON.widgets.RTE = function() {
             if (value == "<br>")
                 value = "";
             return value;
+        },
+
+        setFocus: function(control) {
+            var yuiRTE = rteEditors[control.id];
+            // NOP: not sure what we can do with YUI 2.6. It seems 2.7 has a focus() method.
         }
     };
 

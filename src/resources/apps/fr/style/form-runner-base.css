@@ -247,6 +247,10 @@ button.xforms-trigger img { margin-right: 10px }
     margin-right: 0
 }
 
+.fr-not-found p {
+    margin: 2em
+}
+
 /* ***** Repeats **************************************************************************************************** */
 
 /* Repeats: all */

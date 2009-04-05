@@ -2673,11 +2673,11 @@ ORBEON.xforms.Events = {
 
             if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
                 // Minimal dialog: register listener to maybe close the dialog
-                ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] = new Date().getTime();
-                window.setTimeout(function() {
-                    ORBEON.xforms.Events.dialogMinimalCheckMouseIn(yuiDialog);
-                },
-                XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
+//                ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] = new Date().getTime();
+//                window.setTimeout(function() {
+//                    ORBEON.xforms.Events.dialogMinimalCheckMouseIn(yuiDialog);
+//                },
+//                XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
             }
         }
     },

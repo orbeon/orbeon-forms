@@ -61,29 +61,36 @@
             this.gmap.addControl(new GOverviewMapControl());
 
             // Set location
-            this.updateMarkerFromAddress();
+            var initialLatitude = Document.getValue(this.latitudeInputID);
+            var initialLongitude = Document.getValue(this.longitudeInputID);
+            if (initialLatitude != "" && initialLongitude != "") {
+                var latLng = new GLatLng(new Number(initialLatitude), new Number(initialLongitude));
+                this.updateMarkerFromLatLng(latLng);
+            } else {
+                this.updateMarkerFromAddress();
+            }
         },
 
-        /**
-         * Updates the address
-         */
         updateMarkerFromAddress: function() {
-            var address = Document.getValue(this.addressOutputID);
             var map = this;
-            this.geocoder.getLatLng(address, function(longLat) {
-                if (longLat != null) {
-                    map._updateLongLat(longLat);
-                    // Mark location
-                    map.gmap.setCenter(longLat, 13);
-                    if (map.marker == null) {
-                        map.marker = new GMarker(longLat, {draggable: true});
-                        map.gmap.addOverlay(map.marker);
-                        GEvent.addListener(map.marker, "dragend", function(longLat) { map._updateLongLat(longLat); });
-                    } else{
-                        map.marker.setLatLng(longLat)
-                    }
+            var address = Document.getValue(map.addressOutputID);
+            this.geocoder.getLatLng(address, function(latLng) {
+                if (latLng != null) {
+                    map.updateMarkerFromLatLng(latLng);
                 }
             });
+        },
+
+        updateMarkerFromLatLng: function(latLng) {
+            var map = this;
+            map.gmap.setCenter(latLng, 13);
+            if (map.marker == null) {
+                map.marker = new GMarker(latLng, {draggable: true});
+                map.gmap.addOverlay(map.marker);
+                GEvent.addListener(map.marker, "dragend", function(latLng) { map._updateLongLat(latLng); });
+            } else{
+                map.marker.setLatLng(latLng);
+            }
         },
 
         _updateLongLat: function(longLat) {

@@ -3984,10 +3984,8 @@ ORBEON.xforms.Init = {
                     ORBEON.xforms.Globals.resourcesBaseURL = prefix;
                     if (versioned) {
                         // Remove version
-                        console.log("branch 1");
                         ORBEON.xforms.Globals.xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
                     } else {
-                        console.log("branch 2");
                         ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
                     }
 
@@ -4004,7 +4002,6 @@ ORBEON.xforms.Init = {
                         var prefix = scriptSrc.substr(0, startPathToJavaScript);
                         var jsPath = scriptSrc.substr(startPathToJavaScript);
                         if (versioned) {
-                            console.log("branch 3");
 
                             var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
                             var version = bits[2];
@@ -4012,7 +4009,6 @@ ORBEON.xforms.Init = {
                             ORBEON.xforms.Globals.resourcesBaseURL = prefix + version;
                             ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
                         } else {
-                            console.log("branch 4");
                             ORBEON.xforms.Globals.resourcesBaseURL = prefix;
                             ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
                         }

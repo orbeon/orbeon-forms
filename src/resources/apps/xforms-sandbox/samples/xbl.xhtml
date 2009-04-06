@@ -58,9 +58,6 @@
                 <xforms:bind nodeset="address" calculate="string-join((../street, ../street2, ../city, ../state, ../zip), ' ')"/>
             </xforms:bind>
         </xforms:model>
-        <xi:include href="/forms/orbeon/builder/form/custom-controls.xbl" xxi:omit-xml-base="true"/>
-        <xi:include href="/xbl/orbeon/databound-select1/databound-select1.xbl" xxi:omit-xml-base="true"/>
-        <xi:include href="/xbl/orbeon/map/map.xbl" xxi:omit-xml-base="true"/>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>

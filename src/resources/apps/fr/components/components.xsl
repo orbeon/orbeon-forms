@@ -140,9 +140,6 @@
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xhtml:link | xhtml:style)"/>
 
-            <!-- Include XBL components used by Form Runner -->
-            <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
-
             <!-- For IE debugging -->
             <!--<xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
             <!--<xhtml:script language="javascript" type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->

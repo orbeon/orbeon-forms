@@ -34,20 +34,25 @@
             <!-- Include XBL components -->
             <xsl:copy-of select="doc('oxf:/config/xforms-widgets.xbl')"/>
 
-            <!-- This should be generalized to all the fr:* widgets  -->
-            
-            <xsl:for-each-group select="//fr:datatable|//widget:table" group-by="name()">
-                <xsl:if test="not(key('xbl:bindings', name()))">
-                    <!-- 
+
+            <xsl:if test="pipeline:property('oxf.epilogue.xforms.widgets.auto-include-fr-widgets')">
+                <!-- Include fr:* widgets -->
+                <xsl:variable name="widgets-to-exclude" select="tokenize(pipeline:property('oxf.epilogue.xforms.widgets.fr-elements-to-skip'), '\s')"/>
+                <xsl:for-each-group select="//fr:*|//widget:table" group-by="name()">
+                     <xsl:if test="not( key('xbl:bindings', name())) and not( name() = $widgets-to-exclude )">
+                        <!-- 
                         
-                        Test if the widget isn't defined locally (either directly or as a result on an xi:include
+                        Test if the widget isn't defined locally (either directly or as a result on an xi:include and if 
+                        it's not in the list of FR elements that are not (yet?) implemented as XBL widgets.
                         
                         Note that this test is weak because it relies on the namespace prefix of the bound element 
                     
                     -->
-                    <xsl:copy-of select="doc(concat('oxf:/xbl/orbeon/', local-name(), '/', local-name(), '.xbl'))"/>
-                </xsl:if>
-            </xsl:for-each-group>
+                        <xsl:copy-of select="doc(concat('oxf:/xbl/orbeon/', local-name(), '/', local-name(), '.xbl'))"/>
+                             
+                    </xsl:if>
+                </xsl:for-each-group>
+            </xsl:if>
 
             <xsl:if test="$has-widgets or pipeline:property('oxf.epilogue.xforms.inspector')">
                 <!-- NOTE: Would be nice to do this with the xbl:style element -->

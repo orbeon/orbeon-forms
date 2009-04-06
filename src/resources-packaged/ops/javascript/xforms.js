@@ -97,9 +97,10 @@ var XFORMS_CLIENT_EVENTS_FILTER = "";
  */
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
+var XFORMS_SERVER_PATH = "/xforms-server";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
-var PATH_TO_JAVASCRIPT_2 = "/xforms-server/";
+var PATH_TO_JAVASCRIPT_2 = XFORMS_SERVER_PATH + "/";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
@@ -1004,7 +1005,7 @@ ORBEON.util.Utils = {
                 modal: true,
                 visible: true
             });
-            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + ORBEON.xforms.Globals.baseURL + '/ops/images/xforms/processing.gif"/>');
+            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + ORBEON.xforms.Globals.resourcesBaseURL + '/ops/images/xforms/processing.gif"/>');
             ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
         }
         ORBEON.xforms.Globals.modalProgressPanel.show();
@@ -1298,7 +1299,7 @@ ORBEON.xforms.Controls = {
     },
 
     getForm: function(control) {
-        // If the control is not an HTML form control look for an ancestor whch is a form
+        // If the control is not an HTML form control look for an ancestor which is a form
         if (typeof control.form == "undefined") {
             // There is a span around the control go through parents until we find the form element
             var candidateForm = control;
@@ -3615,8 +3616,8 @@ ORBEON.xforms.Init = {
              * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
              * just registering the event handler on the window object.
              */
-            baseURL: ORBEON.xforms.Globals.baseURL,
-            xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,
+            resourcesBaseURL: ORBEON.xforms.Globals.resourcesBaseURL,   // base URL for resources e.g. /context[/version]
+            xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,     // XForms Server URL
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
             requestForm: null,                   // HTML for the request currently in progress
@@ -3725,28 +3726,7 @@ ORBEON.xforms.Init = {
         }
 
         // Initialize XForms server URL
-        // NOTE: The server provides us with a base URL, but we must use a client-side value to support proxying
-        var scripts = document.getElementsByTagName("script");
-        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-            var script = scripts[scriptIndex];
-            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-            if (scriptSrc != null) {
-                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
-                if (startPathToJavaScript == -1)
-                    startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
-                if (startPathToJavaScript != -1) {
-                    // Take the part of the path before the JS path, which will look something like /context
-                    // or /context/version if versioned resources were enabled
-                    var contextPath = scriptSrc.substr(0, startPathToJavaScript);
-                    if (ORBEON.util.Utils.getProperty(RESOURCES_VERSIONED) == "true")
-                        contextPath = contextPath.substring(0, contextPath.lastIndexOf("/"));
-                    ORBEON.xforms.Globals.baseURL = contextPath;
-                    break;
-                }
-            }
-        }
-
-        ORBEON.xforms.Globals.xformsServerURL = ORBEON.xforms.Globals.baseURL + "/xforms-server";
+        ORBEON.xforms.Init._setBasePaths(document.getElementsByTagName("script"), ORBEON.util.Utils.getProperty(RESOURCES_VERSIONED) == "true");
 
         // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
         if (ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_PROPERTY)) {
@@ -3986,6 +3966,64 @@ ORBEON.xforms.Init = {
         }
     },
 
+    _setBasePaths: function(scripts, versioned) {
+        // NOTE: The server provides us with a base URL, but we must use a client-side value to support proxying
+        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+            var script = scripts[scriptIndex];
+            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
+            if (scriptSrc != null) {
+                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
+                if (startPathToJavaScript != -1) {
+                    // Found path to non-xforms-server resource
+                    // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
+
+                    // Take the part of the path before the JS path
+                    // prefix: (/context)(/version)
+                    // NOTE: may be "" if no context is present
+                    var prefix = scriptSrc.substr(0, startPathToJavaScript);
+                    ORBEON.xforms.Globals.resourcesBaseURL = prefix;
+                    if (versioned) {
+                        // Remove version
+                        console.log("branch 1");
+                        ORBEON.xforms.Globals.xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
+                    } else {
+                        console.log("branch 2");
+                        ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                    }
+
+                    break;
+                } else {
+                    startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
+                    if (startPathToJavaScript != -1) {
+                        // Found path to xforms-server resource
+                        // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
+
+                        // Take the part of the path before the JS path
+                        // prefix: (/context)
+                        // NOTE: may be "" if no context is present
+                        var prefix = scriptSrc.substr(0, startPathToJavaScript);
+                        var jsPath = scriptSrc.substr(startPathToJavaScript);
+                        if (versioned) {
+                            console.log("branch 3");
+
+                            var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
+                            var version = bits[2];
+
+                            ORBEON.xforms.Globals.resourcesBaseURL = prefix + version;
+                            ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                        } else {
+                            console.log("branch 4");
+                            ORBEON.xforms.Globals.resourcesBaseURL = prefix;
+                            ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    },
+
     _autoComplete: function(autoComplete) {
         var textfield = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 0);
         var select = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 1);
@@ -4173,7 +4211,7 @@ ORBEON.xforms.Init = {
             if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
                 ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
 
-            fckEditor.BasePath = ORBEON.xforms.Globals.baseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
+            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
             fckEditor.ToolbarSet = "OPS";
 
             // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
@@ -5360,7 +5398,7 @@ ORBEON.xforms.Server = {
                                                 } else if (isDateType && isMinimal) {
                                                     // Create image element
                                                     var image = document.createElement("img");
-                                                    image.setAttribute("src", ORBEON.xforms.Globals.baseURL + "/ops/images/xforms/calendar.png");
+                                                    image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL + "/ops/images/xforms/calendar.png");
                                                     image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
                                                     documentElement.appendChild(image);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");

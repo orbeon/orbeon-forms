@@ -46,9 +46,9 @@
                         (../../action = 'download' and starts-with(normalize-space(..), 'http://'))"/>
                 <xforms:bind nodeset="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
                 
-                <xforms:bind nodeset="upload-trigger" readonly="../file[1]/@selected = 'false'"/>
-                <xforms:bind nodeset="download-trigger" readonly="../file[2]/@valid = 'false'"/>
-                <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
+                <xforms:bind nodeset="upload-trigger" readonly="not(property('xxforms:noscript')) and ../file[1]/@selected = 'false'"/>
+                <xforms:bind nodeset="download-trigger" readonly="not(property('xxforms:noscript')) and ../file[2]/@valid = 'false'"/>
+                <xforms:bind nodeset="sample-trigger" readonly="not(property('xxforms:noscript')) and ../sample = ''"/>
             </xforms:bind>
             <xforms:instance id="samples-instance">
                 <directory xmlns=""/>
@@ -110,7 +110,7 @@
                         Please enter the HTTP URL of the XHTML + XForms to download from the web and run:
                     </p>
                     <xforms:group>
-                        <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/run?url={file[2]}"/>
+                        <xforms:load ev:event="DOMActivate" if="file[2]/@valid = 'true'" resource="/xforms-sandbox/run?url={file[2]}"/>
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">
@@ -136,7 +136,7 @@
                         existing XForms test samples from the list:
                     </p>
                     <xforms:group>
-                        <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/sample/{sample}"/>
+                        <xforms:load ev:event="DOMActivate" if="sample != ''" resource="/xforms-sandbox/sample/{sample}"/>
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">

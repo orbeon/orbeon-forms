@@ -41,7 +41,7 @@ public class XFormsSendAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Find submission object
-        final String submissionId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("submission"));
+        final String submissionId = actionElement.attributeValue("submission");
         if (submissionId == null)
             throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
 

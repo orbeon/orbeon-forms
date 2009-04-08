@@ -189,7 +189,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getEscapedAlert(PipelineContext pipelineContext) {
         getAlert(pipelineContext);
-        return isHTMLAlert ? rewriteHTMLValue(pipelineContext, alert) : XMLUtils.escapeXMLMinimal(alert);
+        return isHTMLAlert ? getEscapedHTMLValue(pipelineContext, alert) : XMLUtils.escapeXMLMinimal(alert);
     }
 
     public boolean isHTMLAlert(PipelineContext pipelineContext) {
@@ -211,7 +211,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getEscapedHelp(PipelineContext pipelineContext) {
         getHelp(pipelineContext);
-        return isHTMLHelp ? rewriteHTMLValue(pipelineContext, help) : XMLUtils.escapeXMLMinimal(help);
+        return isHTMLHelp ? getEscapedHTMLValue(pipelineContext, help) : XMLUtils.escapeXMLMinimal(help);
     }
 
     public boolean isHTMLHelp(PipelineContext pipelineContext) {
@@ -234,7 +234,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getEscapedHint(PipelineContext pipelineContext) {
         getHint(pipelineContext);
-        return isHTMLHint ? rewriteHTMLValue(pipelineContext, hint) : XMLUtils.escapeXMLMinimal(hint);
+        return isHTMLHint ? getEscapedHTMLValue(pipelineContext, hint) : XMLUtils.escapeXMLMinimal(hint);
     }
 
     public boolean isHTMLHint(PipelineContext pipelineContext) {
@@ -257,7 +257,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getEscapedLabel(PipelineContext pipelineContext) {
         getLabel(pipelineContext);
-        return isHTMLLabel ? rewriteHTMLValue(pipelineContext, label) : XMLUtils.escapeXMLMinimal(label);
+        return isHTMLLabel ? getEscapedHTMLValue(pipelineContext, label) : XMLUtils.escapeXMLMinimal(label);
     }
 
     public boolean isHTMLLabel(PipelineContext pipelineContext) {
@@ -586,7 +586,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param rawValue          value to rewrite
      * @return                  rewritten value
      */
-    public String rewriteHTMLValue(final PipelineContext pipelineContext, String rawValue) {
+    public String getEscapedHTMLValue(final PipelineContext pipelineContext, String rawValue) {
         // Quick check for the most common attributes, src and href. Ideally we should check more.
         final boolean needsRewrite = rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1;
         final String result;
@@ -614,7 +614,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                         // Rewrite URI attribute if needed
                         // NOTE: Sould probably use xml:base but we don't have an Element available to gather xml:base information
-                        final String rewrittenValue = XFormsUtils.rewriteURLAttributeIfNeeded(pipelineContext, null, currentName, currentValue);
+                        final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, null, currentName, currentValue);
 
                         sb.append(' ');
                         sb.append(currentName);

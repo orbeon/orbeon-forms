@@ -156,9 +156,4 @@ public class URLRewriterTest extends TestCase {
         assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(request, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(request, "/config/bar.png", pathMatchers , mode));
     }
-
-    public void testProxyURI() {
-        assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "/foo/bar.png", null, null, -1));
-        assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "http://example.org/foo/bar.png", null, null, -1));
-    }
 }

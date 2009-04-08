@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.common.Version;
 
 import java.util.Enumeration;
@@ -59,6 +60,8 @@ public class URLRewriterTest extends TestCase {
         externalContext = new TestExternalContext(pipelineContext, requestDocument);
         request = externalContext.getRequest();
         response = externalContext.getResponse();
+
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
     }
 
     public void testServiceRewrite() {
@@ -152,5 +155,10 @@ public class URLRewriterTest extends TestCase {
         assertEquals("/orbeon/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(request, "?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(request, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(request, "/config/bar.png", pathMatchers , mode));
+    }
+
+    public void testProxyURI() {
+        assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "/foo/bar.png", null, null, -1));
+        assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "http://example.org/foo/bar.png", null, null, -1));
     }
 }

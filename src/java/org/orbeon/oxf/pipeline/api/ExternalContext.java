@@ -110,6 +110,20 @@ public interface ExternalContext extends WebAppExternalContext {
         public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException;
 
         public void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
+
+        /**
+         * Set expiration headers for resources.
+         *
+         * o If lastModified is > 0, Last-Modified is set to that value
+         * o If lastModified is <= 0, Last-Modified and Expires are set to the time of the response
+         * o If expires is > 0 and lastModified is > 0, Expires is set to that value
+         * o If expires is <= 0 , Expires is set using the default policy: 1/10 of the age of the resource
+         *
+         * @param lastModified  last modification date of resource, or <= 0 if unknown
+         * @param expires       requested expiration, or <=0 if unknown or to trigger default policy
+         */
+        public void setResourceCaching(long lastModified, long expires);
+
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
 
         public String rewriteActionURL(String urlString);

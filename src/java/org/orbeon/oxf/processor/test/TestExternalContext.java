@@ -405,6 +405,9 @@ public class TestExternalContext implements ExternalContext  {
         public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
         }
 
+        public void setResourceCaching(long lastModified, long expires) {
+        }
+
         public void setContentLength(int len) {
         }
 
@@ -437,9 +440,62 @@ public class TestExternalContext implements ExternalContext  {
         return response;
     }
 
+    private ExternalContext.Session session;
+
     public ExternalContext.Session getSession(boolean create) {
-        // NIY
-        return null;
+        if (session == null && create) {
+            session = new ExternalContext.Session() {
+                final Map attributes = new HashMap();
+                public long getCreationTime() {
+                    return System.currentTimeMillis();
+                }
+
+                public String getId() {
+                    // TODO
+                    return null;
+                }
+
+                public long getLastAccessedTime() {
+                    // TODO
+                    return 0;
+                }
+
+                public int getMaxInactiveInterval() {
+                    // TODO
+                    return 0;
+                }
+
+                public void invalidate() {
+                    // TODO
+                }
+
+                public boolean isNew() {
+                    // TODO
+                    return false;
+                }
+
+                public void setMaxInactiveInterval(int interval) {
+                    // TODO
+                }
+
+                public Map getAttributesMap() {
+                    return attributes;
+                }
+
+                public Map getAttributesMap(int scope) {
+                    return attributes;
+                }
+
+                public void addListener(SessionListener sessionListener) {
+                    // TODO
+                }
+
+                public void removeListener(SessionListener sessionListener) {
+                    // TODO
+                }
+            };
+        }
+        return session;
     }
 
     public ExternalContext.Application getApplication() {

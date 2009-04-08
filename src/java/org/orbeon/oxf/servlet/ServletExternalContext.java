@@ -455,18 +455,41 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 // IMPORTANT NOTE #2: We do not set "must-revalidate" because is so with IE 6/7 form fields are not
                 // restored upon browser history navigation.
             } else {
-                // Regular expiration strategy. We use the HTTP spec heuristic
-                // to calculate the "Expires" header value (10% of the
-                // difference between the current time and the last modified
-                // time)
+                // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
+                // (10% of the difference between the current time and the last modified time)
                 nativeResponse.setDateHeader("Expires", now + (now - lastModified) / 10);
                 nativeResponse.setHeader("Cache-Control", "public");
             }
 
             /*
-             * HACK: Tomcat adds "Pragma", "Expires" and "Cache-Control"
-             * headers when resources are constrained, disabling caching if
-             * they are not set. We must re-set them to allow caching.
+             * HACK: Tomcat adds "Pragma", "Expires" and "Cache-Control" headers when resources are constrained,
+             * disabling caching if they are not set. We must re-set them to allow caching.
+             */
+            nativeResponse.setHeader("Pragma", "");
+        }
+
+        public void setResourceCaching(long lastModified, long expires) {
+
+            // Get current time and adjust parameters
+            final long now = System.currentTimeMillis();
+            if (lastModified <= 0) {
+                lastModified = now;
+                expires = now;
+            } else if (expires <= 0) {
+                // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
+                // (10% of the difference between the current time and the last modified time)
+                expires = now + (now - lastModified) / 10;
+            }
+
+            // Set last-modified
+            nativeResponse.setDateHeader("Last-Modified", lastModified);
+            nativeResponse.setDateHeader("Expires", expires);
+
+            nativeResponse.setHeader("Cache-Control", "public");
+
+            /*
+             * HACK: Tomcat adds "Pragma", "Expires" and "Cache-Control" headers when resources are constrained,
+             * disabling caching if they are not set. We must re-set them to allow caching.
              */
             nativeResponse.setHeader("Pragma", "");
         }

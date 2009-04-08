@@ -591,6 +591,9 @@ class ResponseAdapter implements ExternalContext.Response {
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
     }
 
+    public void setResourceCaching(long lastModified, long expires) {
+    }
+
     public void setContentLength(int len) {
     }
 

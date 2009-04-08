@@ -389,6 +389,10 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             // NIY / FIXME
         }
 
+        public void setResourceCaching(long lastModified, long expires) {
+            // NIY / FIXME
+        }
+
         public void setHeader(String name, String value) {
             // NIY / FIXME: This may not make sense here. Used only by XLS serializer as of 7/29/03.
         }

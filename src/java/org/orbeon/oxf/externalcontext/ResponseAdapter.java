@@ -65,6 +65,9 @@ public class ResponseAdapter implements ExternalContext.Response {
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
     }
 
+    public void setResourceCaching(long lastModified, long expires) {
+    }
+
     public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
         return false;
     }

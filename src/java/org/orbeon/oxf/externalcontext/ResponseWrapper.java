@@ -93,6 +93,10 @@ public class ResponseWrapper implements ExternalContext.Response {
         _response.setCaching(lastModified, revalidate, allowOverride);
     }
 
+    public void setResourceCaching(long lastModified, long expires) {
+        _response.setResourceCaching(lastModified, expires);
+    }
+
     public void setContentLength(int len) {
         _response.setContentLength(len);
     }

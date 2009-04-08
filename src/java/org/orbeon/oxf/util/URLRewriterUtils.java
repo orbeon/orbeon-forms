@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Utility class to rewrite URLs.
@@ -42,6 +43,14 @@ public class URLRewriterUtils {
 
     public static final String REWRITING_SERVICE_BASE_URI_PROPERTY = "oxf.url-rewriting.service.base-uri";
     public static final String REWRITING_SERVICE_BASE_URI_DEFAULT = "";
+
+    private static final PathMatcher MATCH_ALL_PATH_MATCHER;
+    private static final List MATCH_ALL_PATH_MATCHERS;
+
+    static {
+        MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/*", null, null, true);
+        MATCH_ALL_PATH_MATCHERS = Collections.singletonList(URLRewriterUtils.MATCH_ALL_PATH_MATCHER);
+    }
 
     /**
      * Rewrite a URL based on the request URL, a URL, and a rewriting mode.
@@ -159,20 +168,21 @@ public class URLRewriterUtils {
      * Rewrite a resource URL, possibly with version information, based on the incoming request as well as a list of
      * path matchers.
      *
+     * NOTE: As of April 2009, this is only used in Servlet mode.
+     *
      * @param request           incoming request
-     * @param response          outgoing response (for rewriting resource URLs)
      * @param urlString         URL to rewrite
      * @param pathMatchers      List of PathMatcher
      * @return                  rewritten URL
      */
-    public static String rewriteResourceURL(ExternalContext.Request request, ExternalContext.Response response, String urlString, List pathMatchers) {
+    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List pathMatchers, int rewriteMode) {
         if (pathMatchers != null && pathMatchers.size() > 0) {
             // We need to match the URL against the matcher
 
             // 1. Rewrite to absolute path URI without context
-            final String absoluteURINoContext = response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+            final String absoluteURINoContext = rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
             if (NetUtils.urlHasProtocol(absoluteURINoContext))
-                return absoluteURINoContext;
+                return absoluteURINoContext; // will be an absolute path
 
             // Obtain just the path
             final String absolutePathNoContext;
@@ -187,19 +197,18 @@ public class URLRewriterUtils {
             }
 
             if (absolutePathNoContext.startsWith("/xforms-server/")) {
-                // These special URLs must not be rewritten
-                return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                // Special URL must not be rewritten
+                return rewriteURL(request, urlString, rewriteMode);
             }
 
             // 2. Determine if URL is a platform or application URL based on reserved paths
-            // TODO: add test for /xbl/orbeon and /forms/orbeon
-            final boolean isPlatformURL = absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
+            final boolean isPlatformURL = isPlatformPath(absolutePathNoContext);
 
             // TODO: get version only once for a run
             final String applicationVersion = getApplicationResourceVersion();
             if (!isPlatformURL && applicationVersion == null) {
                 // There is no application version so do usual rewrite
-                return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                return rewriteURL(request, urlString, rewriteMode);
             }
 
             // 3. Iterate through matchers and see if we get a match
@@ -244,19 +253,28 @@ public class URLRewriterUtils {
                 if (isMatch) {
                     // 4. Found a match, perform additional rewrite at the beginning
 
-                    final String contextPath = request.getContextPath();
                     final String version = isPlatformURL ? Version.getVersion() : applicationVersion;
-
-                    return contextPath + "/" + version + absoluteURINoContext;
+                    return rewriteURL(request, "/" + version + absoluteURINoContext, rewriteMode);
                 }
             }
 
             // No match found, perform regular rewrite
-            return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            return rewriteURL(request, urlString, rewriteMode);
         } else {
             // No Page Flow context, perform regular rewrite
-            return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            return rewriteURL(request, urlString, rewriteMode);
         }
+    }
+
+    /**
+     * Check if the given path is a platform path (as opposed to a user application path).
+     *
+     * @param absolutePathNoContext path to check
+     * @return                      true iif path is a platform path
+     */
+    public static boolean isPlatformPath(String absolutePathNoContext) {
+        // TODO: add test for /xbl/orbeon and /forms/orbeon
+        return absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
     }
 
     public static boolean isResourcesVersioned() {
@@ -278,6 +296,14 @@ public class URLRewriterUtils {
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
         return (propertyString == null || propertyString.trim().length() == 0) ? null : propertyString.trim();
+    }
+
+    public static List getMatchAllPathMatcher() {
+        if (isResourcesVersioned()) {
+            return MATCH_ALL_PATH_MATCHERS;
+        } else {
+            return null;
+        }
     }
 
     public static class PathMatcher {

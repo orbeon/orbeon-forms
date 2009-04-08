@@ -1473,8 +1473,7 @@ public class NetUtils {
         }
 
         // Rewrite new URI to absolute path without the context
-        return externalContext.getResponse().rewriteResourceURL(DYNAMIC_RESOURCES_PATH + digest,
-                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+        return DYNAMIC_RESOURCES_PATH + digest;
     }
 
     /**

@@ -151,9 +151,9 @@ public class XFormsOutputControl extends XFormsValueControl {
             if (typeName == null || "anyURI".equals(typeName)) {// we picked xs:anyURI as default
                 // xs:anyURI type
                 if (!urlNorewrite) {
-                    // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
-                    final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-                    updatedValue = NetUtils.proxyURI(pipelineContext, rewrittenURI, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
+                    // Resolve xml:base and try to obtain a path which is an absolute path without the context
+                    final String resolvedURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    updatedValue = NetUtils.proxyURI(pipelineContext, resolvedURI, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -187,7 +187,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             }
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // Rewrite the HTML value
-            return rewriteHTMLValue(pipelineContext, getExternalValue(pipelineContext));
+            return getEscapedHTMLValue(pipelineContext, getExternalValue(pipelineContext));
         } else {
             return getExternalValue(pipelineContext);
         }

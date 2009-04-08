@@ -18,8 +18,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import java.util.List;
-
 /**
  * Base state. Simply forwards data to the destination content handler and returns itself. That is unless the (element)
  * depth becomes negative after an end element event. In this case the previous state is returned. This means btw that
@@ -33,10 +31,6 @@ public abstract class State {
      */
     private int depth = 0;
 
-    /**
-     * Page Flow context information.
-     */
-    protected final List pathMatchers;
     /**
      * The destination of the rewrite transformation.
      */
@@ -54,10 +48,9 @@ public abstract class State {
      * @see #previousState
      * @see #contentHandler
      */
-    public State(final State previousState, final ContentHandler contentHandler, List pathMatchers) {
+    public State(final State previousState, final ContentHandler contentHandler) {
         this.previousState = previousState;
         this.contentHandler = contentHandler;
-        this.pathMatchers = pathMatchers;
     }
 
     /**

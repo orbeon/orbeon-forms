@@ -990,6 +990,23 @@ public class XFormsUtils {
     }
 
     /**
+     * Resolve a resource URL including xml:base resolution.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param element               element used to start resolution (if null, no resolution takes place)
+     * @param url                   URL to resolve
+     * @param rewriteMode           rewrite mode (see ExternalContext.Response)
+     * @return                      resolved URL
+     */
+    public static String resolveServiceURL(PipelineContext pipelineContext, Element element, String url, int rewriteMode) {
+
+        final URI resolvedURI = resolveXMLBase(element, url);
+
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        return externalContext.rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+    }
+
+    /**
      * Rewrite an attribute if that attribute contains a URI, e.g. @href or @src.
      *
      * @param pipelineContext       current PipelineContext
@@ -998,7 +1015,7 @@ public class XFormsUtils {
      * @param attributeValue        attribute value
      * @return                      rewritten URL
      */
-    public static String rewriteURLAttributeIfNeeded(PipelineContext pipelineContext, Element element, String attributeName, String attributeValue) {
+    public static String getEscapedURLAttributeIfNeeded(PipelineContext pipelineContext, Element element, String attributeName, String attributeValue) {
         final String rewrittenValue;
         if ("src".equals(attributeName) || "href".equals(attributeName)) {
             rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);

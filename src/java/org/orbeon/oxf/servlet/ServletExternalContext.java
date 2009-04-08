@@ -331,11 +331,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    private abstract class Response implements ExternalContext.Response {
+    private class Response implements ExternalContext.Response {
 
-        private org.orbeon.oxf.externalcontext.URLRewriter urlRewriter;
+        private URLRewriter urlRewriter;
 
-        protected Response(org.orbeon.oxf.externalcontext.URLRewriter urlRewriter) {
+        private Response() {
+        }
+
+        public void setURLRewriter(URLRewriter urlRewriter) {
             this.urlRewriter = urlRewriter;
         }
 
@@ -524,18 +527,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    private class ResponseServletRewrite extends Response {
-        public ResponseServletRewrite(Request request) {
-            super(new ServletURLRewriter(request));
-        }
-    }
-
-    private class ResponsePortlet2Rewrite extends Response {
-        public ResponsePortlet2Rewrite(Request request) {
-            super(new Portlet2URLRewriter(request));
-        }
-    }
-
     private class Session implements ExternalContext.Session {
 
         private HttpSession httpSession;
@@ -703,7 +694,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public ExternalContext.Response getResponse() {
         if (response == null) {
-            response = "portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ? new ResponsePortlet2Rewrite(request) : (Response) new ResponseServletRewrite(request);
+            response = new Response();
+            final boolean isPortlet2 = "portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT));
+            response.setURLRewriter(isPortlet2 ? new Portlet2URLRewriter(getRequest()) : (URLRewriter) new ServletURLRewriter(pipelineContext, getRequest()));
         }
         return response;
     }

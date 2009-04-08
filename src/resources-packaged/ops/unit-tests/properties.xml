@@ -29,4 +29,8 @@
 
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value="http://example.org/cool/service"/>
 
+    <!-- Test versioned resources -->
+    <property as="xs:boolean" name="oxf.resources.versioned"                         value="true"/>
+    <property as="xs:string"  name="oxf.resources.version-number"                    value="42"/>
+
 </properties>

@@ -732,7 +732,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Resolve to absolute resource path
         final String resourceAbsolutePathOrAbsoluteURL
-                = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResourceHHRI,
+                = XFormsUtils.resolveServiceURL(pipelineContext, instanceContainerElement, instanceResourceHHRI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
 
         try {

@@ -14,38 +14,58 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.URLRewriterUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 
 public class ServletURLRewriter implements URLRewriter {
 
+    private final PipelineContext pipelineContext;
     private final ExternalContext.Request request;
 
-    public ServletURLRewriter(ExternalContext.Request request) {
+    private List pathMatchers;
+
+    public ServletURLRewriter(PipelineContext pipelineContext, ExternalContext.Request request) {
+        this.pipelineContext = pipelineContext;
         this.request = request;
     }
 
+    private List getPathMatchers() {
+        if (pathMatchers == null) {
+            pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            if (pathMatchers == null)
+                pathMatchers = Collections.EMPTY_LIST;
+        }
+        return pathMatchers;
+    }
+
     public String rewriteActionURL(String urlString) {
-            return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
+        return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    }
 
-        public String rewriteRenderURL(String urlString) {
-            return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
+    public String rewriteRenderURL(String urlString) {
+        return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    }
 
-        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
+    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+        return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    }
 
-        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
+    public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+        return URLRewriterUtils.rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    }
 
-        public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
-            return URLRewriterUtils.rewriteURL(request, urlString, generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
+    public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
+        // NOTE: Get path matchers lazily, as External Context might be created before PFC runs and sets matchers
+        return URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),
+                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    }
 
-        public String rewriteResourceURL(String urlString, int rewriteMode) {
-            return URLRewriterUtils.rewriteURL(request, urlString, rewriteMode);
-        }
+    public String rewriteResourceURL(String urlString, int rewriteMode) {
+        // NOTE: Get path matchers lazily, as External Context might be created before PFC runs and sets matchers
+        return URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(), rewriteMode);
+    }
 }

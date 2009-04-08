@@ -17,12 +17,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.List;
-
 /**
- * Ignores everything before start element. On startElement switches to nextState. So if this is used as the initial
- * state then the result is that the prologue and epilogue are ignored while the root element is passed to the next
- * state. nextState is initialized to this, consequently nothing interesting will happen unless setNext is called.
+ * Ignores everything before start element except for processing instructions. On startElement switches to nextState.
+ *
+ * So if this is used as the initial state then the result is that the prologue and epilogue are ignored (except
+ * processing instructions) while the root element is passed to the next state. nextState is initialized to this,
+ * consequently nothing interesting will happen unless setNext is called.
  */
 public class RootFilter extends State {
 
@@ -32,8 +32,8 @@ public class RootFilter extends State {
      * Simple calls super(...)
      *
      */
-    public RootFilter(final State previousState, final ContentHandler contentHandler, List pageFlowContext) {
-        super(previousState, contentHandler, pageFlowContext);
+    public RootFilter(final State previousState, final ContentHandler contentHandler) {
+        super(previousState, contentHandler);
     }
 
     /**
@@ -68,8 +68,10 @@ public class RootFilter extends State {
     /**
      * @return this. Does nothing else.
      */
-    public State processingInstruction(final String trgt, final String dat)
+    public State processingInstruction(final String target, final String data)
             throws SAXException {
+        // Forward processing instruction
+        super.processingInstruction(target, data);
         return this;
     }
 }

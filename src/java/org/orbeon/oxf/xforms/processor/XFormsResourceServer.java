@@ -89,7 +89,10 @@ public class XFormsResourceServer extends ProcessorImpl {
                     InputStream is = null;
                     OutputStream os = null;
                     try {
-                        is = URLFactory.createURL(resource.getURI()).openStream();
+                        // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
+                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.getURI(), true);
+
+                        is = URLFactory.createURL(absoluteResourceURI).openStream();
                         os = response.getOutputStream();
                         NetUtils.copyStream(is, os);
                         os.flush();
@@ -290,13 +293,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
             // Create matcher that matches all paths in case resources are versioned
-            final List matchAllPathMatcher;
-            if (URLRewriterUtils.isResourcesVersioned()) {
-                matchAllPathMatcher = new ArrayList(1);
-                matchAllPathMatcher.add(new URLRewriterUtils.PathMatcher("/*", null, null, true));
-            } else {
-                matchAllPathMatcher = null;
-            }
+            final List matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
 
             // Output Orbeon Forms version
             outputWriter.write("/* This file was produced by Orbeon Forms " + Version.getVersion() + " */\n");
@@ -356,7 +353,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                             final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim()).normalize();// normalize to remove "..", etc.
 
                             final String rewrittenURI = URLRewriterUtils.rewriteResourceURL(externalContext.getRequest(),
-                                    externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);
+                                    resolvedResourceURI.toString(), matchAllPathMatcher, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
 
                             outputWriter.write("url(" + rewrittenURI + ")");
                         } catch (Exception e) {

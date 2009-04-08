@@ -27,6 +27,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
@@ -228,6 +229,14 @@ public class XFormsServer extends ProcessorImpl {
                 boolean allEvents = false;
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+
+                // Set URL rewriter resource path information
+                if (!isNoscript) {
+                    // In regular Ajax mode, we assume that paths to all resources rewritten by the XForms engine are matched
+                    // TODO: when in noscript mode, we don't have a page flow, right? how is this handled then?
+                    pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, URLRewriterUtils.getMatchAllPathMatcher());
+                }
+
                 if (eventElements.size() > 0) {
                     // NOTE: We store here the last xxforms-value-change-with-focus-change event so
                     // we can coalesce values in case several such events are sent for the same

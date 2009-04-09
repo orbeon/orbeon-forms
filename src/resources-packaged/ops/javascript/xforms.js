@@ -5441,7 +5441,8 @@ ORBEON.xforms.Server = {
                                                 if (currentClass.charAt(0) == '-') {
                                                     ORBEON.util.Dom.removeClass(documentElement, currentClass.substring(1));
                                                 } else {
-                                                    ORBEON.util.Dom.addClass(documentElement, currentClass.substring(1));
+                                                    // '+' is optional
+                                                    ORBEON.util.Dom.addClass(documentElement, currentClass.charAt(0) == '+' ? currentClass.substring(1) : currentClass);
                                                 }
                                             }
                                         }

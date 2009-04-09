@@ -49,8 +49,6 @@
                         <address/>
                         <longitude/>
                         <latitude/>
-                        <!--<longitude>-122.28229522705078</longitude>-->
-                        <!--<latitude>37.497333309290134</latitude>-->
                     </map>
                 </instance>
             </xforms:instance>
@@ -136,74 +134,67 @@
     </xhtml:head>
     <xhtml:body>
 
-        <!--<xhtml:h2>Currency Field</xhtml:h2>-->
-        <!--<xforms:group ref="auction">-->
-            <!--<xhtml:p>-->
-                <!--<fr:us-currency-thousands ref="start-price" id="start-price">-->
-                    <!--<xforms:label class="fixed-width">Start price</xforms:label>-->
-                <!--</fr:us-currency-thousands>-->
-                <!--<fr:us-currency-thousands ref="price-increment" id="price-increment">-->
-                    <!--<xforms:label class="fixed-width">Price increment</xforms:label>-->
-                <!--</fr:us-currency-thousands>-->
-            <!--</xhtml:p>-->
-            <!--<xhtml:p>-->
-                <!--<xforms:trigger appearance="minimal" id="increase-start-price">-->
-                    <!--<xforms:label>Increase start price by $1K</xforms:label>-->
-                    <!--<xforms:setvalue ev:event="DOMActivate" if="start-price castable as xs:decimal" ref="start-price" value=". + 1"/>-->
-                <!--</xforms:trigger>-->
-            <!--</xhtml:p>-->
-        <!--</xforms:group>-->
+        <xhtml:h2>Currency Field</xhtml:h2>
+        <xforms:group ref="auction">
+            <xhtml:p>
+                <fr:us-currency-thousands ref="start-price" id="start-price">
+                    <xforms:label class="fixed-width">Start price</xforms:label>
+                </fr:us-currency-thousands>
+                <fr:us-currency-thousands ref="price-increment" id="price-increment">
+                    <xforms:label class="fixed-width">Price increment</xforms:label>
+                </fr:us-currency-thousands>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:trigger appearance="minimal" id="increase-start-price">
+                    <xforms:label>Increase start price by $1K</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" if="start-price castable as xs:decimal" ref="start-price" value=". + 1"/>
+                </xforms:trigger>
+            </xhtml:p>
+        </xforms:group>
 
-        <!--<xhtml:h2>Date Picker</xhtml:h2>-->
-        <!--<xforms:group ref="date-picker">-->
-            <!--<xhtml:p>-->
-                <!--<xforms:input ref="flag" id="date-picker-flag">-->
-                    <!--<xforms:label>Flag: </xforms:label>-->
-                <!--</xforms:input>-->
-            <!--</xhtml:p>-->
-            <!--<xhtml:p>-->
-                <!--<xforms:group ref=".[flag = 'true']">-->
-                    <!--<fr:date-picker ref="date" id="initially-visible-date">-->
-                        <!--<xforms:label>Date picker initially visible: </xforms:label>-->
-                    <!--</fr:date-picker>-->
-                <!--</xforms:group>-->
-            <!--</xhtml:p>-->
-            <!--<xhtml:p>-->
-                <!--<xforms:group ref=".[flag = 'false']">-->
-                    <!--<fr:date-picker ref="date" id="initially-hidden-date">-->
-                        <!--<xforms:label>Date picker initially hidden: </xforms:label>-->
-                    <!--</fr:date-picker>-->
-                <!--</xforms:group>-->
-            <!--</xhtml:p>-->
-        <!--</xforms:group>-->
+        <xhtml:h2>Date Picker</xhtml:h2>
+        <xforms:group ref="date-picker">
+            <xhtml:p>
+                <xforms:input ref="flag" id="date-picker-flag">
+                    <xforms:label>Flag: </xforms:label>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:group ref=".[flag = 'true']">
+                    <fr:date-picker ref="date" id="initially-visible-date">
+                        <xforms:label>Date picker initially visible: </xforms:label>
+                    </fr:date-picker>
+                </xforms:group>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:group ref=".[flag = 'false']">
+                    <fr:date-picker ref="date" id="initially-hidden-date">
+                        <xforms:label>Date picker initially hidden: </xforms:label>
+                    </fr:date-picker>
+                </xforms:group>
+            </xhtml:p>
+        </xforms:group>
 
-        <!--<xhtml:h2>Data-bound drop-down</xhtml:h2>-->
-        <!--<xforms:group ref="data-bound-select1">-->
-            <!--<xhtml:p>-->
-                <!--<fr:data-bound-select1 ref="state"-->
-                        <!--appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"-->
-                        <!--nodeset="/states/state" label="@name" value="@abbreviation">-->
-                    <!--<xforms:label>State: </xforms:label>-->
-                <!--</fr:data-bound-select1>-->
-                <!--<fr:data-bound-select1 ref="city"-->
-                        <!--appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?state-abbreviation=', state)"-->
-                        <!--resource-dependency="state"-->
-                        <!--nodeset="/cities/city" label="@name" value="@name">-->
-                    <!--<xforms:label>City: </xforms:label>-->
-                <!--</fr:data-bound-select1>-->
-                <!--<fr:data-bound-select1 ref="zip"-->
-                        <!--appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?state-abbreviation=', state, '&amp;city=', city)"-->
-                        <!--resource-dependency="city"-->
-                        <!--nodeset="/zips/zip" label="@code" value="@code">-->
-                    <!--<xforms:label>Zip: </xforms:label>-->
-                <!--</fr:data-bound-select1>-->
-            <!--</xhtml:p>-->
-        <!--</xforms:group>-->
-
-        <xhtml:h2>Google Map</xhtml:h2>
+        <xhtml:h2>Data-bound drop-down</xhtml:h2>
         <xforms:group ref="data-bound-select1">
             <xhtml:p>
-                <fr:map address=""/>
+                <fr:data-bound-select1 ref="state"
+                        appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"
+                        nodeset="/states/state" label="@name" value="@abbreviation">
+                    <xforms:label>State: </xforms:label>
+                </fr:data-bound-select1>
+                <fr:data-bound-select1 ref="city"
+                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?state-abbreviation=', state)"
+                        resource-dependency="state"
+                        nodeset="/cities/city" label="@name" value="@name">
+                    <xforms:label>City: </xforms:label>
+                </fr:data-bound-select1>
+                <fr:data-bound-select1 ref="zip"
+                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?state-abbreviation=', state, '&amp;city=', city)"
+                        resource-dependency="city"
+                        nodeset="/zips/zip" label="@code" value="@code">
+                    <xforms:label>Zip: </xforms:label>
+                </fr:data-bound-select1>
             </xhtml:p>
         </xforms:group>
 

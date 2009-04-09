@@ -78,21 +78,21 @@ p, fieldset, table { margin-bottom: 1em }
 
 /* ***** Other ****************************************************************************************************** */
 
-.fr-top, .fr-bottom { background-repeat: no-repeat; clear: both }
-.fr-top { height: 10px; _height: 5px; font-size: 0 } /* help display background image */
+.fr-top, .fr-footer { background-repeat: no-repeat; clear: both }
+.fr-shadow { height: 10px; _height: 5px; font-size: 0 } /* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
-#doc .fr-top { background-image: url(top-750.png); _background-image: none }
-#doc4 .fr-top { background-image: url(top-974.png); _background-image: none }
-#doc-fb .fr-top { background-image: url(top-974.png); _background-image: none }
+#doc .fr-shadow { background-image: url(top-750.png); _background-image: none }
+#doc4 .fr-shadow { background-image: url(top-974.png); _background-image: none }
+#doc-fb .fr-shadow { background-image: url(top-974.png); _background-image: none }
 
-#doc .fr-bottom { background-image: url(bottom-750.png); _background-image: none }
-#doc4 .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
-#doc-fb .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
+#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }
+#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }
+#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }
 
 /* Put margins here as they are not needed */
 #fr-form-group { margin: .5em 1em 1em }
 
-.fr-bottom .fr-orbeon-version {
+.fr-footer .fr-orbeon-version {
     text-align: center;
     font-size: smaller;
     padding: 10px;
@@ -110,7 +110,7 @@ p, fieldset, table { margin-bottom: 1em }
     font-size: 0;   /* help IE */
 }
 
-.fr-buttons-block {
+.fr-bottom {
     background: #F8F8F8 url(logo-bg.gif) repeat-x top;
     padding: 1em;
 }
@@ -192,7 +192,7 @@ p, fieldset, table { margin-bottom: 1em }
 .xforms-upload-info { background-color: transparent }
 
 /* Metadata */
-.fr-metadata {
+.fr-top {
     background-color: #146EB4;
     background-image: none;
     padding: 1em;
@@ -200,15 +200,15 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-separator {
     background-color: #004B92;
 }
-.fr-metadata .fr-form-title, .fr-metadata .fr-form-description {
+.fr-top .fr-form-title, .fr-top .fr-form-description {
     color: white;
 }
 
-.fr-metadata .fr-form-title {
+.fr-top .fr-form-title {
     float: left;
 }
 
-.fr-metadata .fr-form-description {
+.fr-top .fr-form-description {
     font-size: smaller;
     font-style: italic;
     float: right;
@@ -267,8 +267,8 @@ p, fieldset, table { margin-bottom: 1em }
     .fr-separator { background-color: black; height: 2px }
     h1, h2, h3 { color: black }
     a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }
-    .fr-metadata .fr-form-title, .fr-toc { color: black }
+    .fr-top .fr-form-title, .fr-toc { color: black }
     .fr-section-container div.fr-collapsible { color: black }
     .fr-container { border: none }
-    .fr-metadata, .fr-buttons-block { background: none }
+    .fr-top, .fr-bottom { background: none }
 }

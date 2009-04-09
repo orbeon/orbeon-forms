@@ -147,7 +147,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-container { *width: 100% }/* For IE6: otherwise the container can be narrower than the containing doc */
 .fr-separator { clear: both }
 .fr-body { padding: 0 }
-.fr-bottom { clear: both }
+.fr-footer { clear: both }
 
 #fr-form-group {
     display: block;
@@ -163,20 +163,18 @@ button.xforms-trigger img { margin-right: 10px }
     .fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
 .fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
 
-/* Metadata */
-.fr-metadata { display: block }
-.fr-metadata table { width: 100% }
-.fr-metadata table tr td { vertical-align: middle }
+/* Top area */
+.fr-top { display: block }
 
-.fr-metadata .fr-logo img { margin-right: 1em }
-.fr-metadata .fr-form-title {
+.fr-top .fr-logo img { margin-right: 1em }
+.fr-top .fr-form-title {
     margin: 0;
     padding: 0;
     white-space: nowrap;
-    text-align: right
+    /*text-align: right*/
 }
 
-.fr-metadata .fr-form-description {
+.fr-top .fr-form-description {
     display: block;
     float: right;
     padding: .5em;
@@ -225,7 +223,6 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-error-alert { color: red }
 
 /* Buttons */
-.fr-buttons-group table { width: 100% }
 
 .fr-buttons {
     float: right;
@@ -472,9 +469,9 @@ button.xforms-trigger img { margin-right: 10px }
     form.xforms-initially-hidden { display: block }
     .fr-header { display: none }
     .fr-top { display: none }
-    .fr-buttons-block { display: none }
-    .fr-status-icons { display: none }
     .fr-bottom { display: none }
+    .fr-status-icons { display: none }
+    .fr-footer { display: none }
     .fr-section-container .fr-section-open-close { display: none }
     /* Upload remove button */
     .xforms-upload-remove { display: none }

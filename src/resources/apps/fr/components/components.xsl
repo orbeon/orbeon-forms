@@ -66,27 +66,6 @@
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 
-    <xsl:template match="/xhtml:html/xhtml:body">
-
-        <xsl:copy>
-            <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
-            <xsl:apply-templates select="@* except @class"/>
-            <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                <xsl:choose>
-                    <xsl:when test=".//fr:view">
-                        <!-- Explicit fr:view is processed by template down the line -->
-                        <xsl:apply-templates select="node()"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- No explicit fr:view so consider the whole of xhtml:body as fr:view/fr:body -->
-                        <xsl:call-template name="fr-view"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xforms:group>
-            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
-        </xsl:copy>
-    </xsl:template>
-
     <xsl:template match="/xhtml:html">
         <!-- Handle document language -->
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
@@ -116,6 +95,29 @@
 
             <xsl:apply-templates select="node()"/>
         </xhtml:html>
+    </xsl:template>
+
+    <xsl:template match="/xhtml:html/xhtml:body">
+
+        <xsl:copy>
+            <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
+            <xsl:apply-templates select="@* except @class"/>
+            <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                <xsl:choose>
+                    <xsl:when test=".//fr:view">
+                        <!-- Explicit fr:view is processed by template down the line -->
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- No explicit fr:view so consider the whole of xhtml:body as fr:view/fr:body -->
+                        <xsl:call-template name="fr-view"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <!-- Dialogs -->
+                <xsl:call-template name="fr-dialogs"/>
+            </xforms:group>
+            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        </xsl:copy>
     </xsl:template>
 
     <!-- Insert stylesheets -->

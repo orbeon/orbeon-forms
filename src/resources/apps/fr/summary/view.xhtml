@@ -786,13 +786,12 @@
                 </xforms:group>
 
             </fr:body>
-            <fr:buttons>
-
+            <fr:bottom>
                 <!-- Custom buttons for the summary page -->
-                <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                <xforms:group model="fr-form-model" class="fr-buttons">
                     <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s')"/>
                     <xforms:repeat nodeset="for $button in $buttons return xxforms:element('button', $button)">
-                        <xhtml:span>
+                        <xhtml:span class="fr-button">
                             <!-- New button -->
                             <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
                                 <fr:button>
@@ -886,7 +885,7 @@
                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-online"/>
                 </xforms:trigger>
                 -->
-            </fr:buttons>
+            </fr:bottom>
         </fr:view>
     </body>
 </html>

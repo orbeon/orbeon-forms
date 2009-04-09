@@ -42,11 +42,11 @@
                         <xhtml:img src="{$default-logo-uri}" alt="Logo"/>
                     </xhtml:div>
                 </xhtml:div>
-                <xhtml:div id="hd" class="fr-top">&#160;</xhtml:div>
+                <xhtml:div id="hd" class="fr-shadow">&#160;</xhtml:div>
                 <xhtml:div id="bd" class="fr-container">
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
-                            <xhtml:div class="yui-g fr-metadata">
+                            <xhtml:div class="yui-g fr-top">
                                 <xhtml:h1 class="fr-form-title">
                                     Not Found
                                 </xhtml:h1>
@@ -64,7 +64,7 @@
                         </xhtml:div>
                     </xhtml:div>
                 </xhtml:div>
-                <xhtml:div id="ft" class="fr-bottom">
+                <xhtml:div id="ft" class="fr-footer">
                     <xsl:if test="not($has-version = false())">
                         <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
                         <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>

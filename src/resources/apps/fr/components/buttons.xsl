@@ -129,7 +129,7 @@
     </xsl:template>
 
     <xsl:template match="fr:save-button">
-        <xforms:group ref="instance('fr-triggers-instance')/save">
+        <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
             <fr:button id="fr-save-button" xxforms:modal="true">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>

@@ -18,7 +18,7 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/parameters/parameter[name = 'sate-abbreviation']</include>
+                <include>/request/parameters/parameter[name = 'state-abbreviation' or name = 'max']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -29,9 +29,11 @@
         <p:input name="data" href="zip-flat.xml"/>
         <p:input name="config">
             <cities xsl:version="2.0">
-                <xsl:variable name="state-abbreviation" as="xs:string?" select="doc('input:request')/request/parameters/parameter/value"/>
+                <xsl:variable name="parameters" as="element(parameter)*" select="doc('input:request')/request/parameters/parameter"/>
+                <xsl:variable name="state-abbreviation" as="xs:string?" select="$parameters[name = 'state-abbreviation']/value"/>
+                <xsl:variable name="max" as="xs:integer?" select="$parameters[name = 'max']/value"/>
                 <xsl:variable name="zips" as="element(zip)+" select="/zips/zip[state-abbreviation = $state-abbreviation]"/>
-                <xsl:for-each select="distinct-values($zips/city)">
+                <xsl:for-each select="distinct-values($zips/city)[empty($max) or position() lt $max]">
                     <xsl:sort/>
                     <city name="{.}"/>
                 </xsl:for-each>

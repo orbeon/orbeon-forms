@@ -188,7 +188,8 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         }
     }
 
-    protected boolean diffCustomMIPs(AttributesImpl attributesImpl, XFormsSingleNodeControl xformsSingleNodeControl1,
+    // public for unit tests
+    public static boolean diffCustomMIPs(AttributesImpl attributesImpl, XFormsSingleNodeControl xformsSingleNodeControl1,
                                      XFormsSingleNodeControl xformsSingleNodeControl2, boolean newlyVisibleSubtree, boolean doOutputElement) {
         final Map customMIPs1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getCustomMIPs();
         final Map customMIPs2 = xformsSingleNodeControl2.getCustomMIPs();

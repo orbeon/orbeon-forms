@@ -35,6 +35,8 @@ import java.util.*;
  */
 public class XFormsResourceServer extends ProcessorImpl {
 
+    private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
+
     public XFormsResourceServer() {
     }
 
@@ -158,14 +160,11 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             // Set Last-Modified, required for caching and conditional get
             if (URLRewriterUtils.isResourcesVersioned()) {
-
-                // Set old last modified date so that Expires header is set as far in the future as possible
-                // NOTE: the setCaching() implementation will specially handle values <= 0 as being not cacheable
-                // TODO: Need better API, right?
-                response.setCaching(1, false, false);
-
+                // Use expiration far in the future
+                response.setResourceCaching(combinedLastModified, combinedLastModified + ONE_YEAR_IN_MILLISECONDS);
             } else {
-                response.setCaching(combinedLastModified, false, false);
+                // Use standard expiration policy
+                response.setResourceCaching(combinedLastModified, 0);
             }
 
             // Check If-Modified-Since and don't return content if condition is met
@@ -174,9 +173,10 @@ public class XFormsResourceServer extends ProcessorImpl {
                 return;
             }
 
+            OutputStream os = null;
             try {
+                os = response.getOutputStream();
                 response.setContentType(isCSS ? "text/css" : "application/javascript");
-                final OutputStream responseOutputStream = response.getOutputStream();
                 {
                     final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
@@ -187,26 +187,34 @@ public class XFormsResourceServer extends ProcessorImpl {
                             if (isDebugEnabled)
                                 XFormsServer.logger.debug("XForms resources - serving from cache " + requestPath + ".");
                             final FileInputStream fis = new FileInputStream(resourceFile);
-                            NetUtils.copyStream(fis, responseOutputStream);
+                            NetUtils.copyStream(fis, os);
                             fis.close();
-                            responseOutputStream.flush();
+                            os.flush();
                         } else {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
-                            generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                            generate(resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
-                        generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                        generate(resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
                 throw e;
             } catch (Exception e) {
                 throw new OXFException(e);
+            } finally {
+                if (os != null) {
+                    try {
+                        os.close();
+                    } catch (IOException e) {
+                        XFormsServer.logger.error("Exception closing output stream", e);
+                    }
+                }
             }
         }
     }
@@ -258,7 +266,6 @@ public class XFormsResourceServer extends ProcessorImpl {
                             XFormsServer.logger.debug("XForms resources - cached combined resources out of date, saving " + resourcePath + ".");
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
                         generate(resources, pipelineContext, fos, isCSS, isMinimal);
-                        fos.close();
                     } else {
                         if (isDebugEnabled)
                             XFormsServer.logger.debug("XForms resources - cached combined resources exist and are up-to-date for " + resourcePath + ".");
@@ -271,7 +278,6 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
                     generate(resources, pipelineContext, fos, isCSS, isMinimal);
-                    fos.close();
                 }
             } else {
                 if (isDebugEnabled)
@@ -284,8 +290,19 @@ public class XFormsResourceServer extends ProcessorImpl {
         }
     }
 
-    private static void generate(List resources, PipelineContext pipelineContext, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
-        if (CSS) {
+    /**
+     * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
+     *
+     * @param resources             list of XFormsFeatures.ResourceConfig to consider
+     * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
+     * @param os                    OutputStream to write to
+     * @param isCSS                 whether to generate CSS or JavaScript resources
+     * @param isMinimal             whether to use minimal resources
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    private static void generate(List resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
+        if (isCSS) {
             // CSS: rewrite url() in content
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -300,7 +317,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             for (Iterator i = resources.iterator(); i.hasNext();) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                final String resourcePath = resourceConfig.getResourcePath(minimal);
+                final String resourcePath = resourceConfig.getResourcePath(isMinimal);
                 final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
 
                 final String content;
@@ -335,7 +352,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         {
                             final int closingIndex = content.indexOf(")", newIndex + 4);
                             if (closingIndex == -1)
-                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(minimal));
+                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(isMinimal));
 
                             uriString = content.substring(newIndex + 4, closingIndex);
 
@@ -376,7 +393,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             int index = 0;
             for (Iterator i = resources.iterator(); i.hasNext(); index++) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(minimal));
+                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
                 // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
                 if (index > 0)
                     os.write((byte) '\n');
@@ -385,5 +402,6 @@ public class XFormsResourceServer extends ProcessorImpl {
             }
         }
         os.flush();
+        os.close();
     }
 }

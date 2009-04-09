@@ -120,7 +120,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         assertTrue(result.startsWith("file:/"));
         assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
 
-        // All the following tests should not change the input
+        // All the following tests must not change the input
         assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataString,
                 XMLConstants.XS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME),
                 testDataString);

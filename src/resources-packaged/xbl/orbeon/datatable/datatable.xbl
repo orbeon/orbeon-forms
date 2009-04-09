@@ -28,6 +28,7 @@
 
     <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/event/event-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/selector/selector-beta-min.js"/>
     <!--<xbl:script type="text/javascript" src="/ops/yui/paginator/paginator-min.js"/>-->
     <!--<xbl:script type="text/javascript" src="/ops/yui/datasource/datasource.js"/>-->
     <!--<xbl:script type="text/javascript" src="/ops/yui/datatable/datatable.js"/>-->

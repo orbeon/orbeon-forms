@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
@@ -29,27 +28,12 @@ import org.orbeon.oxf.xforms.state.XFormsStateStore;
 
 import java.util.*;
 
-public class XFormsPersistentApplicationStateStoreTest extends TestCase {
+public class XFormsPersistentApplicationStateStoreTest extends ResourceManagerTestBase {
 
 	private XFormsStateStore fixture;
 	private ExtendedTestExternalContext externalContext;
 	private PipelineContext pipelineContext;
 	private Map sessionMap = new HashMap();
-
-	// TODO - need to clean this up
-	// Copied from ProcessorTest
-	static {
-		// Setup resource manager
-		final Map props = new HashMap();
-		final java.util.Properties properties = System.getProperties();
-		for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-			final String name = (String) e.nextElement();
-			if (name.startsWith("oxf.resources."))
-				props.put(name, properties.getProperty(name));
-		}
-		ResourceManagerWrapper.init(props);
-		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
-	}
 
 	protected void setUp() {
         try {

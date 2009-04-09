@@ -484,32 +484,32 @@ public class NetUtils {
      * "/". Occurrences of "..." or other similar patterns are ignored. Also, contiguous "/" are
      * left as is.
      */
-    public static String canonicalizePathString(String path) {
-
-        StringTokenizer st = new StringTokenizer(path, "/", true);
-        Stack elements = new Stack();
-        while (st.hasMoreTokens()) {
-            String s = st.nextToken();
-            if (s.equals("..")) {
-                elements.pop();
-            } else if (s.equals(".")) {
-                ;// Do nothing
-            } else {
-                elements.push(s);
-            }
-        }
-        StringBuffer sb = new StringBuffer();
-        int count = 0;
-        for (Iterator i = elements.iterator(); i.hasNext(); count++) {
-            String s = (String) i.next();
-            if (count > 0 || path.startsWith("/"))
-                sb.append("/");
-            sb.append(s);
-        }
-        if (path.endsWith("/"))
-            sb.append("/");
-        return sb.toString();
-    }
+//    public static String canonicalizePathString(String path) {
+//
+//        StringTokenizer st = new StringTokenizer(path, "/", true);
+//        Stack elements = new Stack();
+//        while (st.hasMoreTokens()) {
+//            String s = st.nextToken();
+//            if (s.equals("..")) {
+//                elements.pop();
+//            } else if (s.equals(".")) {
+//                ;// Do nothing
+//            } else {
+//                elements.push(s);
+//            }
+//        }
+//        StringBuffer sb = new StringBuffer();
+//        int count = 0;
+//        for (Iterator i = elements.iterator(); i.hasNext(); count++) {
+//            String s = (String) i.next();
+//            if (count > 0 || path.startsWith("/"))
+//                sb.append("/");
+//            sb.append(s);
+//        }
+//        if (path.endsWith("/"))
+//            sb.append("/");
+//        return sb.toString();
+//    }
 
     /**
      * Combine a path info and a parameters map to form a path info with a query string.
@@ -843,7 +843,7 @@ public class NetUtils {
         InputStream is = null;
         try {
             // Read from URL and convert to Base64
-            is = new URL(value).openStream();
+            is = URLFactory.createURL(value).openStream();
             final StringBuffer sb = new StringBuffer();
             XMLUtils.inputStreamToBase64Characters(is, new ContentHandlerAdapter() {
                 public void characters(char ch[], int start, int length) {
@@ -868,7 +868,7 @@ public class NetUtils {
     public static void anyURIToOutputStream(String value, OutputStream outputStream) {
         InputStream is = null;
         try {
-            is = new URL(value).openStream();
+            is = URLFactory.createURL(value).openStream();
             copyStream(is, outputStream);
         } catch (IOException e) {
             throw new OXFException(e);

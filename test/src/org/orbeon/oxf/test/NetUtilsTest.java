@@ -13,44 +13,26 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.HttpServletRequestStub;
-import org.orbeon.oxf.externalcontext.ExternalContextToHttpServletRequestWrapper;
+import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xml.XMLConstants;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
-public class NetUtilsTest extends TestCase {
+public class NetUtilsTest extends ResourceManagerTestBase {
 
     private PipelineContext pipelineContext;
     private ExternalContext externalContext;
     private ExternalContext.Request request;
     private ExternalContext.Response response;
-
-    // TODO - need to clean this up
-	// Copied from ProcessorTest
-    static {
-		// Setup resource manager
-		final Map props = new HashMap();
-		final java.util.Properties properties = System.getProperties();
-		for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-			final String name = (String) e.nextElement();
-			if (name.startsWith("oxf.resources."))
-				props.put(name, properties.getProperty(name));
-		}
-		ResourceManagerWrapper.init(props);
-		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
-	}
 
     protected void setUp() throws Exception {
 
@@ -92,5 +74,67 @@ public class NetUtilsTest extends TestCase {
     public void testProxyURI() {
         assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "/foo/bar.png", null, null, -1));
         assertEquals("/xforms-server/dynamic/674c2ff956348155ff60c01c0c0ec2e0", NetUtils.proxyURI(pipelineContext, "http://example.org/foo/bar.png", null, null, -1));
+    }
+
+    public void testConvertUploadTypes() {
+
+        final String testDataURI = "oxf:/org/orbeon/oxf/test/anyuri-test-content.xml";
+        final String testDataString = "You have to let people challenge your ideas.";
+        final String testDataBase64 = "WW91IGhhdmUgdG8gbGV0IHBlb3BsZSBjaGFsbGVuZ2UgeW91ciBpZGVhcy4=";
+
+        // anyURI -> base64
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataURI,
+                XMLConstants.XS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataURI,
+                XMLConstants.XS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataURI,
+                XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataURI,
+                XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
+
+        // base64 -> anyURI
+        String result = XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+        assertTrue(result.startsWith("file:/"));
+        assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
+
+        result = XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME);
+        assertTrue(result.startsWith("file:/"));
+        assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
+
+        result = XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+        assertTrue(result.startsWith("file:/"));
+        assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
+
+        result = XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME);
+        assertTrue(result.startsWith("file:/"));
+        assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
+
+        // All the following tests should not change the input
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataString,
+                XMLConstants.XS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME),
+                testDataString);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataString,
+                XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME),
+                testDataString);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
+
+        assertEquals(XFormsUtils.convertUploadTypes(pipelineContext, testDataBase64,
+                XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
+                testDataBase64);
     }
 }

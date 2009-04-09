@@ -13,43 +13,22 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
 import org.dom4j.Document;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.common.Version;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 
-public class URLRewriterTest extends TestCase {
+public class URLRewriterTest extends ResourceManagerTestBase {
 
     private PipelineContext pipelineContext;
     private ExternalContext externalContext;
     private ExternalContext.Request request;
     private ExternalContext.Response response;
-
-    // TODO - need to clean this up
-	// Copied from ProcessorTest
-    static {
-		// Setup resource manager
-		final Map props = new HashMap();
-		final java.util.Properties properties = System.getProperties();
-		for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-			final String name = (String) e.nextElement();
-			if (name.startsWith("oxf.resources."))
-				props.put(name, properties.getProperty(name));
-		}
-		ResourceManagerWrapper.init(props);
-		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
-	}
 
     protected void setUp() throws Exception {
 

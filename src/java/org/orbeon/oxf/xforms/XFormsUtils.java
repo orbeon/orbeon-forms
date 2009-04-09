@@ -71,10 +71,10 @@ public class XFormsUtils {
     // Binary types supported for upload, images, etc.
     private static final Map SUPPORTED_BINARY_TYPES = new HashMap();
     static {
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "");
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "");
-        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, "");
-        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "anyURI");
+        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
+        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, "anyURI");
     }
 
     /**
@@ -914,19 +914,33 @@ public class XFormsUtils {
         }
     }
 
+    /**
+     * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
+     * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param value             value to convert
+     * @param currentType       current type as exploded QName
+     * @param newType           new type as exploded QName
+     * @return                  converted value, or value passed
+     */
     public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
-        if (currentType.equals(newType))
-            return value;
-        if (SUPPORTED_BINARY_TYPES.get(currentType) == null)
+
+        final String currentTypeLocalName = (String) SUPPORTED_BINARY_TYPES.get(currentType);
+        if (currentTypeLocalName == null)
             throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        if (SUPPORTED_BINARY_TYPES.get(newType) == null)
+        final String newTypeLocalName = (String) SUPPORTED_BINARY_TYPES.get(newType);
+        if (newTypeLocalName == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
-        if (currentType.equals(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME)) {
-            // Convert from xs:base64Binary to xs:anyURI
+        if (currentTypeLocalName.equals(newTypeLocalName))
+            return value;
+
+        if (currentTypeLocalName.equals("base64Binary")) {
+            // Convert from xs:base64Binary or xforms:base64Binary to xs:anyURI or xforms:anyURI
             return NetUtils.base64BinaryToAnyURI(pipelineContext, value, NetUtils.REQUEST_SCOPE);
         } else {
-            // Convert from xs:anyURI to xs:base64Binary
+            // Convert from xs:anyURI or xforms:anyURI to xs:base64Binary or xforms:base64Binary
             return NetUtils.anyURIToBase64Binary(value);
         }
     }

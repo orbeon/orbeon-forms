@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -122,11 +123,14 @@ public class XFormsSetvalueAction extends XFormsAction {
             // Actually set the value
             XFormsInstance.setValueForNodeInfo(pipelineContext, containingDocument, eventTarget, currentNode, valueToSet, type);
 
-            if (!isCalculate) {
-                // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
+            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+            if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
-                final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-                if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
+                // Dispatch extension event to instance
+                modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XXFormsValueChanged(modifiedInstance));
+
+                if (!isCalculate) {
+                    // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
 
                     // "XForms Actions that change only the value of an instance node results in setting the flags for
                     // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".

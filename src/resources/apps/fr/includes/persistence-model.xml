@@ -681,20 +681,10 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Mark status as dirty if data changes -->
-    <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete"
-                     ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-
-    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-value-changed">
-
+    <!-- React to instance mutation events -->
+    <xforms:action ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
         <!-- Mark status as dirty if data changes -->
-        <!-- NOTE: We used to check on event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance'), but this
-             doesn't work with nested XBL components which handle their own local data. So now just rely on observers. -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-
-        <!-- HACK: Force a recalculate as value changed in the form may inpact binds in this form -->
-        <xforms:recalculate/>
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->

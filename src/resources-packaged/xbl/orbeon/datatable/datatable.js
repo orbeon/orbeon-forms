@@ -29,14 +29,19 @@ ORBEON.widgets.datatable = function (element, index) {
     // Store useful stuff as properties
     this.table = element;
     this.header = this.table;
+    this.headerColumns = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByTagName('th');
+    this.bodyRows = this.table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    this.bodyColumns = this.bodyRows[2].getElementsByTagName('td');
     var plainId = this.table.getAttribute('id');
     this.id = plainId.substring(0, plainId.length - '-table'.length);
-    this.width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
+    var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
     this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
     this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
     this.scroll = this.scrollV || this.scrollH;
     this.headBodySplit = this.scroll;
+    this.hasFixedWidthContainer = width != 'auto';
+    this.hasFixedWidthTable = this.hasFixedWidthContainer && !this.scrollH;
 
     // Create a global container
     this.container = document.createElement('div');
@@ -55,27 +60,26 @@ ORBEON.widgets.datatable = function (element, index) {
     // See how big the table would be without its size restriction
     YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
     YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
-    //YAHOO.util.Dom.setStyle(this.table, 'position', 'absolute');
-    this.region = YAHOO.util.Dom.getRegion(this.table);
-    this.tableWidth = (this.region.right - this.region.left);
-    this.tableHeight = (this.region.bottom - this.region.top);
+
+    var region = YAHOO.util.Dom.getRegion(this.table);
+    this.tableWidth = (region.right - region.left);
+    this.tableHeight = (region.bottom - region.top);
     if (this.scrollH) {
         for (var i = this.tableWidth; i < 2000; i+=50){
             YAHOO.util.Dom.setStyle(this.table, 'width', i + 'px');
-            var region = YAHOO.util.Dom.getRegion(this.table);
+            region = YAHOO.util.Dom.getRegion(this.table);
             var tableWidth = (region.right - region.left);
             var tableHeight = (region.bottom - region.top);
             if (tableHeight < this.tableHeight) {
-                this.region = region;
                 this.tableWidth = tableWidth;
                 this.tableHeight = tableHeight;
             }
         }
         
     } else if (this.scrollV) {
-        this.width = (this.tableWidth + 17) + 'px';
+        width = (this.tableWidth + 17) + 'px';
     } else {
-        this.width = this.tableWidth + 'px';
+        width = this.tableWidth + 'px';
     }
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 
@@ -83,17 +87,17 @@ ORBEON.widgets.datatable = function (element, index) {
         this.height = (this.tableHeight + 22)  + 'px';
     }
 
-this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', this.table, true));
+    this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', this.table, true));
     this.bodyRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('tbody', this.table, true));
 
     // Resize the container
-    YAHOO.util.Dom.setStyle(this.container, 'width', this.width);
+    YAHOO.util.Dom.setStyle(this.container, 'width', width);
     if (this.height != 'auto') {
         YAHOO.util.Dom.setStyle(this.container, 'height', this.height);
     }
 
     // Resize the header container
-    YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width);
+    YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
     if (this.height != 'auto' && this.headBodySplit) {
         YAHOO.util.Dom.setStyle(this.headerContainer, 'height', (this.headerRegion.bottom - this.headerRegion.top) + 'px');
     } else if (!this.headBodySplit && this.height == 'auto') {
@@ -104,7 +108,7 @@ this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', 
 
         // Create a container for the body
         this.bodyContainer = document.createElement('div');
-        YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width);
+        YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
         YAHOO.util.Dom.addClass(this.bodyContainer, 'yui-dt-bd');
 
         // Duplicate the table to populate the body
@@ -129,53 +133,61 @@ this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', 
         this.container.appendChild(this.bodyContainer);
         this.bodyContainer.appendChild(this.table);
 
-        var headerColumns = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByTagName('th');
-        var bodyColumns = this.table.getElementsByTagName('tbody')[0].getElementsByTagName('tr')[2].getElementsByTagName('td');
-
-        for (var i=0; i< bodyColumns.length; i++) {
-            var r = YAHOO.util.Dom.getRegion(bodyColumns[i]);
-            YAHOO.util.Dom.setStyle(headerColumns[i], 'width', (r.right - r.left - 1) + 'px');
+ 
+        for (var i=0; i< this.bodyColumns.length; i++) {
+            var r = YAHOO.util.Dom.getRegion(this.bodyColumns[i]);
+            YAHOO.util.Dom.setStyle(this.headerColumns[i], 'width', (r.right - r.left - 1) + 'px');
         }
     }
+
+    region = YAHOO.util.Dom.getRegion(this.container);
+    this.width = region.right - region.left;
 
     if (this.scrollH) {
         YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
     }
 
-//    this.container = element;
-//    this.index = index;
-//    var plainId = this.container.getAttribute('id');
-//    this.id = plainId.substring(0, plainId.length - '-container'.length);
-//    this.innerContainer = document.getElementById(this.id + '-inner-container');
-//    this.table = document.getElementById(this.id + '-table');
-//    this.thead = document.getElementById(this.id + '-thead');
-//    this.theadTr = document.getElementById(this.id + '-thead-tr');
-//    this.tbody = document.getElementById(this.id + '-tbody');
-//    this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
-//    this.scrollH = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollH');
-//
-//
-//    if (this.scrollH) {
-//         var cWidth = YAHOO.util.Dom.getStyle(this.innerContainer, 'width');
-//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', 'auto');
-//         var tRegion = YAHOO.util.Dom.getRegion(this.table);
-//         YAHOO.util.Dom.setStyle(this.innerContainer, 'width', cWidth);
-//         YAHOO.util.Dom.setStyle(this.table, 'width', (tRegion.right - tRegion.left + 15) + 'px');
-//    }
-//
-//    if (this.scrollV) {
-//         var cRegion = YAHOO.util.Dom.getRegion(this.innerContainer);
-//         var thRegion = YAHOO.util.Dom.getRegion(this.thead);
-//         YAHOO.util.Dom.setStyle(this.tbody, 'height', ((cRegion.bottom - cRegion.top) - (thRegion.bottom - thRegion.top) - 4) + 'px');
-//    }
-//
-//    this.colResizers = [];
-//    var resizers = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', this.container);
-//    for (var i=0; i < resizers.length; i++) {
-//        this.colResizers[this.colResizers.length] = new ORBEON.widgets.datatable.colResizer(resizers[i]);
-//    }
+    this.colResizers = [];
+    for (var j=0; j < this.headerColumns.length; j++) {
+        var childDiv = YAHOO.util.Selector.query('div', this.headerColumns[j], true);
+        var region = YAHOO.util.Dom.getRegion(this.headerColumns[j]);
+        var width = (region.right - region.left - 19) + 'px';
+        var style = childDiv.style;
+        style.width = width;
+        var styles = [style];
+        for (var k=0; k < this.bodyRows.length; k++) {
+            row=this.bodyRows[k];
+            if (row.cells.length > j && !YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
+                style = YAHOO.util.Selector.query('div', row.cells[j], true).style;
+                style.width = width;
+                styles[styles.length] = style;
+            }
+        }
+
+        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+            this.colResizers[this.colResizers.length] = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], styles, this);
+        }
+    }
 }
 
+
+ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
+    if (! this.hasFixedWidthContainer) {
+        this.width += deltaX;
+        YAHOO.util.Dom.setStyle(this.container, 'width', this.width + 'px');
+        YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
+        if (this.headBodySplit) {
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
+        }
+    }
+    if (! this.hasFixedWidthTable) {
+        this.tableWidth += deltaX;
+        YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
+        if (this.headBodySplit) {
+            YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
+        }
+    }
+}
 
 ORBEON.widgets.datatable.scrollHandler = function (e) {
     //alert('scrolling');
@@ -191,22 +203,52 @@ ORBEON.widgets.datatable.utils.getStyle = function (elt, property, defolt) {
     return elt.style[property];
 }
 
+ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
+    region = YAHOO.util.Dom.getRegion(elt);
+    YAHOO.util.Dom.setStyle(elt, 'width', (region.right - region.left) + 'px');
+}
+
 /**
  * Implementation of datatable.colResizer constructor. Creates the YAHOO.util.DD object.
  *
  * @method ORBEON.widgets.datatable.colResizer
- * @param element {DOM Element} The DOM element that contains the resizer handle.
+ * @param col {DOM Element} The th DOM element.
  */
-ORBEON.widgets.datatable.colResizer = function (element) {
-    this.el = element;
-    this.col = this.el.parentNode.parentNode;
-    this.dd = new YAHOO.util.DD(this.el);
+ORBEON.widgets.datatable.colResizer = function (index, th, styles, datatable) {
+    this.index = index;
+    this.th = th;
+    this.styles = styles;
+
+    this.datatable = datatable;
+
+    this.resizerliner = document.createElement('div');
+    YAHOO.util.Dom.addClass(this.resizerliner, 'yui-dt-resizerliner');
+
+    this.liner = YAHOO.util.Selector.query('div', this.th, true);
+
+    this.th.replaceChild(this.resizerliner, this.liner);
+
+    this.resizerliner.appendChild(this.liner);
+
+    this.resizer = document.createElement('div');
+    YAHOO.util.Dom.addClass(this.resizer, 'yui-dt-resizer');
+    this.resizer.style.left='auto';
+    this.resizer.style.right='0pt';
+    this.resizer.style.top='auto';
+    this.resizer.style.bottom='0pt';
+    this.resizer.style.height='25px';
+    this.resizerliner.appendChild(this.resizer);
+
+  
+    this.dd = new YAHOO.util.DD(this.resizer);
     this.dd.setYConstraint(0, 0);
-    var colRegion = YAHOO.util.Dom.getRegion(this.col);
-    var X = YAHOO.util.Dom.getX(this.el);
+  
+    var colRegion = YAHOO.util.Dom.getRegion(this.th);
+    var X = YAHOO.util.Dom.getX(this.resizer);
     this.delta = colRegion.right - X;
-    this.dd.on('mouseDownEvent', ORBEON.widgets.datatable.colResizer.mouseDown, this, true);
-    this.dd.on('dragEvent', ORBEON.widgets.datatable.colResizer.drag, this, true);
+
+    this.dd.on('mouseDownEvent', ORBEON.widgets.datatable.colResizer.prototype.mouseDown, this, true);
+    this.dd.on('dragEvent', ORBEON.widgets.datatable.colResizer.prototype.drag, this, true);
 }
 
 /**
@@ -215,10 +257,10 @@ ORBEON.widgets.datatable.colResizer = function (element) {
  * @method ORBEON.widgets.datatable.colResizer.mouseDown
  * @param ev {Event}.
  */
-ORBEON.widgets.datatable.colResizer.mouseDown = function (ev) {
-    this.colRegion = YAHOO.util.Dom.getRegion(this.col);
-    this.colWidth = this.colRegion.right - this.colRegion.left;
-    this.elX = YAHOO.util.Dom.getX(this.el);
+ORBEON.widgets.datatable.colResizer.prototype.mouseDown = function (ev) {
+    var thRegion = YAHOO.util.Dom.getRegion(this.th);
+    this.thWidth = thRegion.right - thRegion.left;
+    this.resizerX = YAHOO.util.Dom.getX(this.resizer);
 }
 
 /**
@@ -227,20 +269,27 @@ ORBEON.widgets.datatable.colResizer.mouseDown = function (ev) {
  * @method ORBEON.widgets.datatable.colResizer.drag
  * @param ev {Event}.
  */
-ORBEON.widgets.datatable.colResizer.drag = function (ev) {
+ORBEON.widgets.datatable.colResizer.prototype.drag = function (ev) {
     // Calculate the new length
-    var newX = YAHOO.util.Dom.getX(this.el);
-    var width = this.colWidth + newX -this.elX;
+    var newX = YAHOO.util.Dom.getX(this.resizer);
+    this.datatable.table.style.display = 'none';
+    var deltaX = newX -this.resizerX;
+    this.datatable.adjustWidth(deltaX, this.index);
+    this.resizerX = newX;
+    var width = this.thWidth + deltaX;
+    var widthStyle = (width - 19 )+ 'px';
     // If different and non null, try to set it
-    if (width > 0 && width != this.colWidth) {
-        YAHOO.util.Dom.setStyle(this.col, 'width', width + 'px');
+    if (width > 0 && width != this.thWidth) {
+        for (var i= 0; i < this.styles.length; i++) {
+            this.styles[i].width = widthStyle;
+        }
     }
     // If the width adjustement has failed, the column is probably
     // too small, move the handle back to its normal position
-    var colRegion = YAHOO.util.Dom.getRegion(this.col);
-    if (width != colRegion.right - colRegion.left) {
-        YAHOO.util.Dom.setX(this.el, colRegion.right - this.delta);
-    }
+    this.datatable.table.style.display = '';
+    var thRegion = YAHOO.util.Dom.getRegion(this.th);
+    YAHOO.util.Dom.setX(this.resizer, thRegion.right - this.delta);
+    this.thWidth = thRegion.right - thRegion.left;
 }
 
 ORBEON.widgets.datatable.removeIdAttributes = function(element, skipSelf) {

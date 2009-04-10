@@ -61,6 +61,14 @@
                     style="{$height} {$width}">
                     <!-- Copy attributes that are not parameters! -->
                     <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
+                    <xsl:if test="not(xhtml:colgroup)">
+                        <!-- If there is no colgroup element, add one -->
+                        <xhtml:colgroup>
+                            <xsl:for-each select="((xhtml:tbody|self::*)/(xforms:repeat|self::*)/xhtml:tr)[1]/xhtml:td">
+                                <xhtml:col/>
+                            </xsl:for-each>
+                        </xhtml:colgroup>
+                    </xsl:if>
                     <xsl:if test="not(xhtml:thead)">
                         <!-- If there is no thead element, add one -->
                         <xhtml:thead>
@@ -244,7 +252,7 @@
                 <xsl:when test="@fr:resizeable = 'true'">
                     <xhtml:div class="yui-dt-resizerliner">
                         <xsl:call-template name="yui-dt-liner">
-                            <xsl:with-param name="position" select="$position"/>
+                            <xsl:with-param name="position" select="$position"/>table
                         </xsl:call-template>
                         <xhtml:div id="{generate-id()}" class="yui-dt-resizer" style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"
                         />

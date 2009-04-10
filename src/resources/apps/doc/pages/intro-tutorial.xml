@@ -1810,12 +1810,12 @@
                         <tr>
                             <td>
                                 <xforms:submit submission="save-submission" appearance="minimal">
-                                    <xforms:label><img src="../apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
+                                    <xforms:label><img src="../apps/my-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
                                 </xforms:submit>
                             </td>
                             <td>
                                 <xforms:submit submission="list-submission" appearance="minimal">
-                                    <xforms:label><img src="../apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                                    <xforms:label><img src="../apps/my-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
                                 </xforms:submit>
                             </td>
                         </tr>
@@ -1846,7 +1846,7 @@
                         <tr>
                             <td>
                                 <xforms:trigger appearance="minimal">
-                                    <xforms:label><img src="../apps/xforms-bookcast/images/add.gif"/></xforms:label>
+                                    <xforms:label><img src="../apps/my-bookcast/images/add.gif"/></xforms:label>
                                     <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
                                 </xforms:trigger>
                             </td>
@@ -1861,7 +1861,7 @@
                             <tr>
                                 <td>
                                     <xforms:trigger appearance="minimal">
-                                        <xforms:label><img src="../apps/xforms-bookcast/images/remove.gif"/></xforms:label>
+                                        <xforms:label><img src="../apps/my-bookcast/images/remove.gif"/></xforms:label>
                                         <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="index('book-repeat')"/>
                                     </xforms:trigger>
                                 </td>
@@ -2216,7 +2216,7 @@
                     and <code>page-flow.xml</code>. Then link it to the XForms page as follows:
                 </p>
                 <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
-                    <xforms:model schema="/apps/xforms-bookcast/schema.xsd">
+                    <xforms:model schema="/apps/my-bookcast/schema.xsd">
                         <comment> Rest of the XForms model </comment>
                         ...
                     </xforms:model>
@@ -2227,18 +2227,18 @@
                 </p>
                 <note>
                     <p>
-                        The URL of the schema, "/apps/xforms-bookcast/schema.xsd", is resolved relatively to the
+                        The URL of the schema, "/apps/my-bookcast/schema.xsd", is resolved relatively to the
                         external URL of the Bookcast page, so the schema is actually loaded though:
                     </p>
                     <xml-source>
-                        http://localhost:8080/orbeon/apps/xforms-bookcast/schema.xsd
+                        http://localhost:8080/orbeon/apps/my-bookcast/schema.xsd
                     </xml-source>
                     <p>
                         Because retrieving documents through HTTP takes some time, you can also use the Orbeon Forms
                         protocol, <code>oxf:</code>, to load the schema:
                     </p>
                     <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:model schema="oxf:/apps/xforms-bookcast/schema.xsd">
+                        <xforms:model schema="oxf:/apps/my-bookcast/schema.xsd">
                             <comment> Rest of the XForms model </comment>
                             ...
                         </xforms:model>
@@ -2260,7 +2260,7 @@
                 </p>
                 <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
                     <xforms:submission id="save-submission" ref="instance('books-instance')"
-                            resource="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                            resource="/exist/rest/db/orbeon/my-bookcast/books.xml"
                             method="put" replace="none">
                         <xforms:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xforms:message>
                     </xforms:submission>
@@ -2378,7 +2378,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" serialization="none"
-                                               method="get" resource="/exist/rest/db/orbeon/xforms-bookcast/books.xml"/>
+                                               method="get" resource="/exist/rest/db/orbeon/my-bookcast/books.xml"/>
                         </p:input>
                         <p:input name="request"><dummy/></p:input>
                         <p:output name="response" ref="data"/>
@@ -2409,14 +2409,14 @@
                     <title>Orbeon Forms Bookcast</title>
                     <subtitle>An Orbeon Forms tutorial example</subtitle>
                     <updated><xsl:value-of select="current-dateTime()"/></updated>
-                    <id>http://www.orbeon.com/ops/xforms-bookcast/</id>
+                    <id>http://www.orbeon.com/ops/my-bookcast/</id>
                     <link href="http://www.orbeon.com/"/>
-                    <generator uri="http://www.orbeon.com/ops/xforms-bookcast/" version="1.0">Orbeon Forms Bookcast</generator>
+                    <generator uri="http://www.orbeon.com/ops/my-bookcast/" version="1.0">Orbeon Forms Bookcast</generator>
 
                     <xsl:for-each select="/books/book">
                         <entry>
                             <title><xsl:value-of select="concat(author, ' - ', title)"/></title>
-                            <id>http://www.orbeon.com/ops/xforms-bookcast/<xsl:value-of select="concat(author, ' - ', title)"/>"/></id>
+                            <id>http://www.orbeon.com/ops/my-bookcast/<xsl:value-of select="concat(author, ' - ', title)"/>"/></id>
                             <updated><xsl:value-of select="current-dateTime()"/></updated>
                             <content type="xhtml" xml:lang="en">
                                 <div xmlns="http://www.w3.org/1999/xhtml">

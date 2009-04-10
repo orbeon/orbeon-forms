@@ -12,6 +12,14 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
+/*
+    Alternate shades of blue:
+
+    #004B92
+    #2647A0
+    #146EB4
+*/
+
 /* ***** Colors, fonts, etc. **************************************************************************************** */
 
 /* TODO: repeats and dialogs still have colors and fonts settings in form-runner-base.css */
@@ -21,7 +29,6 @@
 html { overflow: scroll }/* TODO: add comment about why this is useful (if is actually is) */
 
 body {
-    /*background: #FFE27F url( images/stripes-bright2.png );*/
     background-color: #DDD;
     text-align: left /* Not sure why the YUI resets this to center */
 }
@@ -119,19 +126,19 @@ p, fieldset, table { margin-bottom: 1em }
     *height: 2em;   /* IE doesn't honor the min-height provided by YUI */
 }
 
-/* Apply YUI SAM skin style for <input> buttons under IE 6 */
+/* Apply YUI SAM skin style for <input> buttons under IE 6 (other browsers use <button>) */
 .yui-skin-sam .xforms-noscript .yui-button input {
-    _color: #000000;
-    _font-size: 93%;
-    _line-height: 2;
-    _min-height: 2em;
-    _padding: 0 10px;
+    color: #000000;
+    font-size: 93%;
+    line-height: 2;
+    min-height: 2em;
+    padding: 0 10px;
 
-    _background-color: transparent;
-    _cursor: pointer;
-    _border: medium none;
-    _display: block;
-    _margin: 0;
+    background-color: transparent;
+    cursor: pointer;
+    border: medium none;
+    display: block;
+    margin: 0;
 }
 
 .fr-explanation .xforms-output {
@@ -195,9 +202,12 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-top {
     background-color: #146EB4;
     background-image: none;
+    /*background-image: url(/orbeon/apps/fr/style/images/top-gradient.png);*/
+    /*background-repeat: repeat-x;*/
     padding: 1em;
 }
 .fr-separator {
+    /*background-color: #004B92;*/
     background-color: #004B92;
 }
 .fr-top .fr-form-title, .fr-top .fr-form-description {

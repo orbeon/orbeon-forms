@@ -49,17 +49,14 @@ h1.fr-form-title {
 /* ***** Toolbox **************************************************************************************************** */
 
 #fb-toolbox {
-    padding: .5em;
-    position: fixed;
+    position: static;
     left: 0;
     top: 0;
     height: 100%;
-    overflow: auto;
 }
 
 #fb-toolbox .fb-toolbox-inside {
-    width: 13.077em; *width: 12.75em;
-    margin-right: 15px;
+    width: 100%;
     padding-bottom: 1.5em /* with Firefox and Safari, scrollable content appears otherwise clipped a little (because content gets out of the box?) */
 }
 
@@ -88,7 +85,7 @@ h1.fr-form-title {
 }
 
 #fb-toolbox .fb-tool button img { margin-left: .5em }
-#fb-toolbox .fb-tool button:hover` { background-color: white; background-image: none }
+#fb-toolbox .fb-tool button:hover { background-color: white; background-image: none }
 #fb-toolbox .fb-tool button.xforms-readonly { color: white }
 #fb-toolbox .fb-tool button.xforms-readonly:hover {
     background-color: #F8F8F8;
@@ -460,9 +457,11 @@ html.accordion-menu-js dt.a-m-t-expand {}
 dl.accordion-menu dd.a-m-d .bd {
 	border: solid 1px gray;
     border-top-width: 0;
-    /*border-bottom-width: 0;*/
     border-left-color: #CCCCCC
 }
+
+dl.accordion-menu dt.a-m-t { border-right: none; border-left: none }
+dl.accordion-menu dd.a-m-d .bd { border-right: none; border-left: none }
 
 html.accordion-menu-js dt.a-m-t{
 	cursor: pointer;
@@ -498,11 +497,14 @@ html.accordion-menu-js dd.a-m-d-anim {
 
 #fb-layout .yui-layout-bd { border: none }
 #fb-layout .yui-layout-unit-top .yui-layout-bd { border-bottom: 2px solid #ccc; background-color: white }
-#fb-layout .yui-layout-unit-left .yui-layout-bd { border-right: 2px solid #ccc; background-color: white  }
-#fb-layout .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #ccc; background-color: white  }
+#fb-layout .yui-layout-unit-left .yui-layout-bd { border-right: 2px solid #ccc; background-color: #CCCCCC }
+#fb-layout .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #ccc; background-color: white }
 #top1 { padding: 0.4em .5em 0 .5em }
 
-#fb-toolbox { position: static }
+/* Always show vertial scrollbar so that there is no reflow of the left pannel when it becomes shorter/taller */
+.yui-layout .yui-layout-unit-left div.yui-layout-bd {
+    overflow-y: scroll;
+}
 
 /* ***** Other media ************************************************************************************************ */
 

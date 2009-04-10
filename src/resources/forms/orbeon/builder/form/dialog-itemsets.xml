@@ -57,7 +57,7 @@
                                 <xforms:label ref="$form-resources/dialog-itemsets/value/label"/>
                                 <!-- Propose default value upon focus -->
                                 <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
-                                    <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s') return lower-case($w), '-')"/>
+                                    <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s+') return lower-case($w), '-')"/>
                                 </xforms:action>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
@@ -98,26 +98,18 @@
         <xforms:delete context="instance('fb-items-instance')" nodeset="*"/>
 
         <!-- Iterate over all of the current language's items -->
-        <xforms:action xxforms:iterate="$current-resources/*[name() = $resource-id]/item">
-            <xxforms:variable name="item" select="."/>
-            <!-- Insert the current language's item and add xml:lang attribute on label -->
-            <xforms:insert context="instance('fb-items-instance')" nodeset="item" origin="$item"/>
-            <xforms:insert context="instance('fb-items-instance')/item[last()]/label" origin="$current-resources/@xml:lang"/>
-            <!-- Iterate over all the other languages  -->
-            <xforms:action xxforms:iterate="$resources/resource[@xml:lang != $fb-lang]">
-                <xxforms:variable name="other-resource" select="."/>
-                <xxforms:variable name="other-item" select="*[name() = $resource-id]/item[value = $item/value]"/>
 
-                <!-- Insert the label for the other language and add xml:lang attribute -->
-                <xforms:action if="exists($other-item/label)">
-                    <xforms:insert nodeset="instance('fb-items-instance')/item[last()]/label" origin="$other-item/label"/>
-                </xforms:action>
-                <xforms:action if="not(exists($other-item/label))">
-                    <xforms:insert nodeset="instance('fb-items-instance')/item[last()]/label" origin="xxforms:element('label')"/>
-                </xforms:action>
-                <xforms:insert context="instance('fb-items-instance')/item[last()]/label[last()]" origin="$other-resource/@xml:lang"/>
-            </xforms:action>
-        </xforms:action>
+        <!-- Perform a single insert to improve performance if a large number of items is present -->
+        <!-- For each item, this inserts the item, a number of labels by language, and the values -->
+        <xforms:insert context="instance('fb-items-instance')"
+                       origin="for $item in $current-resources/*[name() = $resource-id]/item return
+                                    xxforms:element('item', (xxforms:element('label', ($current-resources/@xml:lang, string($item/label))),
+                                                             for $other-resource in $resources/resource[@xml:lang != $fb-lang] return
+                                                                 for $other-item in $other-resource/*[name() = $resource-id]/item[value = $item/value] return
+                                                                     xxforms:element('label', ($other-resource/@xml:lang,
+                                                                         if (exists($other-item/label)) then string($other-item/label) else '')),
+                                                             $item/value)
+                                                    )"/>
 
         <!-- Insert new blank item if there were no items -->
         <xforms:action if="not(exists(instance('fb-items-instance')/item))">
@@ -145,7 +137,6 @@
     <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
 
         <!-- Copy back the items to all languages -->
-
         <xxforms:variable name="resource-id" select="itemset-resource-id" as="xs:string"/>
         <xforms:action xxforms:iterate="$resources/resource">
             <xxforms:variable name="current-lang" select="@xml:lang"/>

@@ -445,7 +445,7 @@
                             <xforms:label ref="$form-resources/http-services/label"/>
                             <!-- Repeat over existing services -->
                             <xhtml:ul>
-                                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, ' ') = 'fr-service']">
+                                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
                                     <xhtml:li>
                                         <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
                                         <xforms:trigger appearance="minimal">
@@ -498,7 +498,7 @@
                             <xforms:label ref="$form-resources/database-services/label"/>
                             <!-- Repeat over existing services -->
                             <xhtml:ul>
-                                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, ' ') = 'fr-database-service']">
+                                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
                                     <xhtml:li>
                                         <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
                                         <xforms:trigger appearance="minimal">

@@ -422,7 +422,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="xforms-element-3" model-id="main-model">
+                            <instance id="xf-3" model-id="main-model">
                                 <equation>
                                     <screen>0</screen>
                                     <screenbuffer>0</screenbuffer>
@@ -625,7 +625,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="xforms-element-2" model-id="xforms-element-1">
+                            <instance id="xf-2" model-id="xf-1">
                                 <form>
                                     <departments>
                                         <department>
@@ -1840,13 +1840,13 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="xforms-element-6" index="1"/>
+                            <control effective-id="xf-6" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="xf-6" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="title-control·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
                         <xxf:control id="author-control·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
                         <xxf:control id="title-control·2" required="true" label="Title">Jacques le fataliste et son maître</xxf:control>
@@ -2050,19 +2050,19 @@
                     <dynamic-state>
                         <instances/>
                         <controls>
-                            <control effective-id="xforms-element-3" index="1"/>
+                            <control effective-id="xf-3" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="xforms-element-4·1" readonly="true" label="City: ">San Francisco</xxf:control>
-                        <xxf:control id="xforms-element-6·1" label="Position: ">1</xxf:control>
-                        <xxf:control id="xforms-element-4·2" readonly="true" label="City: ">Los Angeles</xxf:control>
-                        <xxf:control id="xforms-element-6·2" label="Position: ">2</xxf:control>
-                        <xxf:control id="xforms-element-4·3" readonly="true" label="City: ">San Diego</xxf:control>
-                        <xxf:control id="xforms-element-6·3" label="Position: ">3</xxf:control>
+                        <xxf:copy-repeat-template id="xf-3" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="xf-4·1" readonly="true" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="xf-6·1" label="Position: ">1</xxf:control>
+                        <xxf:control id="xf-4·2" readonly="true" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="xf-6·2" label="Position: ">2</xxf:control>
+                        <xxf:control id="xf-4·3" readonly="true" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="xf-6·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2329,10 +2329,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-8">+s85RSYyKV8=</xxf:control>
+                        <xxf:control id="xf-8">+s85RSYyKV8=</xxf:control>
                     </xxf:control-values>
                     <xxf:itemsets>
-                        <xxf:itemset id="xforms-element-8">[["Select...","W7rJ9Oprkm4="],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
+                        <xxf:itemset id="xf-8">[["Select...","W7rJ9Oprkm4="],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
                     </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
@@ -2386,7 +2386,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-5">green-bloody, williams-bloody, yellow-bloody</xxf:control>
+                        <xxf:control id="xf-5">green-bloody, williams-bloody, yellow-bloody</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2574,17 +2574,17 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="fruits" model-id="xforms-element-2">
+                            <instance id="fruits" model-id="xf-2">
                                 <fruits>
                                     <orange>bloody</orange>
                                     <pear>yellow</pear>
                                     <apple>green</apple>
                                 </fruits>
                             </instance>
-                            <instance id="fruit-template" model-id="xforms-element-2">
+                            <instance id="fruit-template" model-id="xf-2">
                                 <pear>yellow</pear>
                             </instance>
-                            <instance id="events" model-id="xforms-element-2">
+                            <instance id="events" model-id="xf-2">
                                 <events>
                                     <event type="xforms-enabled" target="my-repeat" indexes="2"/>
                                     <event type="xforms-optional" target="my-repeat" indexes="2"/>
@@ -2667,7 +2667,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="xforms-element-1">
+                            <instance id="main-instance" model-id="xf-1">
                                 <instance>
                                     <value1>42</value1>
                                     <value2>101</value2>
@@ -2678,8 +2678,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-10">42</xxf:control>
-                        <xxf:control id="xforms-element-11">101</xxf:control>
+                        <xxf:control id="xf-10">42</xxf:control>
+                        <xxf:control id="xf-11">101</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2751,7 +2751,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="xforms-element-1">
+                            <instance id="instance" model-id="xf-1">
                                 <instance>
                                     <a/>
                                     <b/>
@@ -2767,7 +2767,7 @@
                                     <true>true</true>
                                 </instance>
                             </instance>
-                            <instance id="result" model-id="xforms-element-1">
+                            <instance id="result" model-id="xf-1">
                                 <result>
                                     <a>true</a><!-- this might change in the future if instead the xs:boolean() logic is used -->
                                     <b>false</b>
@@ -3015,7 +3015,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="xforms-element-1">
+                            <instance id="instance" model-id="xf-1">
                                 <instance>
                                     <emails>
                                         <email/>
@@ -3032,7 +3032,7 @@
                                     </emails>
                                 </instance>
                             </instance>
-                            <instance id="result" model-id="xforms-element-1">
+                            <instance id="result" model-id="xf-1">
                                 <result>
                                     <email>true</email>
                                     <email>true</email>
@@ -3499,9 +3499,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="fr-super-control-1$component-group" label="Internal value 1: "/>
-                        <xxf:control id="fr-super-control-1$xforms-element-13">foo-value</xxf:control>
+                        <xxf:control id="fr-super-control-1$xf-13">foo-value</xxf:control>
                         <xxf:control id="fr-super-control-2$component-group" label="Internal value 2: "/>
-                        <xxf:control id="fr-super-control-2$xforms-element-13">bar-value</xxf:control>
+                        <xxf:control id="fr-super-control-2$xf-13">bar-value</xxf:control>
                         <xxf:control id="input-1" label="External value 1: ">foo-value</xxf:control>
                         <xxf:control id="input-2" label="External value 2: ">bar-value</xxf:control>
                     </xxf:control-values>
@@ -3562,7 +3562,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance readonly="true" id="initial-instance" model-id="xforms-element-1" replaced="true">
+                            <instance readonly="true" id="initial-instance" model-id="xf-1" replaced="true">
                                 <instance>
                                     <value>2</value>
                                 </instance>
@@ -3572,7 +3572,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-6" readonly="true" label="Value:">2</xxf:control>
+                        <xxf:control id="xf-6" readonly="true" label="Value:">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

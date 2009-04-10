@@ -334,7 +334,7 @@
                             <line>8</line>
                             <column>109</column>
                             <description>xforms:bind element</description>
-                            <element>&lt;xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="xforms-element-2" ref="/instance/a" calculate=". + 1"/&gt;</element>
+                            <element>&lt;xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="xf-2" ref="/instance/a" calculate=". + 1"/&gt;</element>
                         </location>
                         <location>
                             <system-id>oxf:/ops/pfc/xforms-epilogue.xpl</system-id>

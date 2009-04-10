@@ -1027,7 +1027,7 @@ RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ 
                     The following shows a sample XForms logging session:
                 </p>
                 <pre class="ops-doc-code">
-event - dispatching {name: "DOMFocusIn", id: "xforms-element-222", location: "line 28 of XFormsDOMFocusInEvent.java"}
+event - dispatching {name: "DOMFocusIn", id: "xf-222", location: "line 28 of XFormsDOMFocusInEvent.java"}
   action - executing {action name: "setvalue"}
 setvalue - setting instance value {value: "4", instance: "fr-form-instance"}
 event - dispatching {name: "xforms-recalculate", id: "fr-form-model", location: "line 1895 of XFormsModel.java"}
@@ -1041,10 +1041,10 @@ event - dispatching {name: "xforms-refresh", id: "fr-form-model", location: "lin
   controls - start building
     model - evaluated variables {count: "1"}
   controls - end building {time (ms): "22"}
-  event - dispatching {name: "xforms-value-changed", id: "xforms-element-222", location: "line 27 of XFormsValueChangeEvent.java"}
+  event - dispatching {name: "xforms-value-changed", id: "xf-222", location: "line 27 of XFormsValueChangeEvent.java"}
     action - executing {action name: "setvalue"}
       setvalue - setting instance value {value: "dirty", instance: "fr-persistence-instance"}
-  event - dispatching {name: "xforms-valid", id: "xforms-element-222", location: "line 27 of XFormsValidEvent.java"}
+  event - dispatching {name: "xforms-valid", id: "xf-222", location: "line 27 of XFormsValidEvent.java"}
 event - dispatching {name: "xforms-recalculate", id: "fr-persistence-model", location: "line 1895 of XFormsModel.java"}
   model - performing recalculate {model id: "fr-persistence-model"}
   model - done recalculating {time: "5"}

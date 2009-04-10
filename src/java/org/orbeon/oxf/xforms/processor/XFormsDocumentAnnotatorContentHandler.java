@@ -46,6 +46,8 @@ import java.util.Map;
  */
 public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHandler {
 
+    private static final String AUTOMATIC_ID_PREFIX = "xf-";
+
     private int currentId = 1;
     private int level = 0;
     private boolean inHead;
@@ -483,10 +485,10 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         // Skip existing ids to handle these cases:
         // o user uses attribute of the form xforms-element-*
         // o XBL copies id attributes from bound element, so within template the id may be of the form xforms-element-*
-        String newId = "xforms-element-" + currentId;
+        String newId = AUTOMATIC_ID_PREFIX + currentId;
         while (ids.get(newId) != null) {
             currentId++;
-            newId = "xforms-element-" + currentId;
+            newId = AUTOMATIC_ID_PREFIX + currentId;
         }
 
         return newId;

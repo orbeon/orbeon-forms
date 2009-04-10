@@ -3219,7 +3219,7 @@
                                         <xforms:insert ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
                                     </xforms:trigger>
 
-                                    <xforms:trigger>
+                                    <xforms:trigger id="remove-row-trigger">
                                         <xforms:label>Remove</xforms:label>
                                         <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
                                     </xforms:trigger>
@@ -3367,7 +3367,7 @@
                         <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
                         <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
                         <xxf:control id="add-row-trigger" label="Add"/>
-                        <xxf:control id="xforms-element-17" label="Remove"/>
+                        <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
                     <xxf:itemsets>
                         <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>

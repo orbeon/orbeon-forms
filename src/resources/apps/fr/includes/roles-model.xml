@@ -113,7 +113,7 @@
             <xxforms:variable name="all-roles" select="instance('fr-roles-config')/role" as="element(role)*"/>
 
             <xxforms:variable name="header-roles" as="element(role)*"
-                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s')) then $r else ()"/>
+                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s+')) then $r else ()"/>
             <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
             
             <!-- Remember whether roles configuration was provided -->

@@ -60,7 +60,7 @@
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
-        <xforms:action xxforms:iterate="tokenize($pass-request-parameters, '\s')">
+        <xforms:action xxforms:iterate="tokenize($pass-request-parameters, '\s+')">
             <xxforms:variable name="parameter-name" select="."/>
             <xxforms:variable name="parameter-value" select="xxforms:get-request-parameter($parameter-name)"/>
             <xforms:insert context="instance('fr-service-parameters')" origin="xxforms:element($parameter-name, $parameter-value)"/>
@@ -71,7 +71,7 @@
             <!-- Case where we get the username and roles from the container -->
             <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-remote-user()"/>
             <xforms:message level="xxforms:log-debug">Roles: <xforms:output value="xxforms:property('oxf.fr.authentication.container.roles')"/></xforms:message>
-            <xforms:action xxforms:iterate="tokenize(xxforms:property('oxf.fr.authentication.container.roles'), '\s')">
+            <xforms:action xxforms:iterate="tokenize(xxforms:property('oxf.fr.authentication.container.roles'), '\s+')">
                 <xxforms:variable name="role" select="."/>
                 <xforms:action if="xxforms:is-user-in-role($role)">
                     <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'roles']/@value" value="if (. = '') then $role else concat(., ' ', $role)"/>

@@ -225,7 +225,7 @@
                                                 <xsl:otherwise>
                                                     <!-- Other multiple-selection controls: just use the label -->
                                                     <field acro-field-name="'{$field-name}'"
-                                                           value="'{string-join(for $v in tokenize($control-value, '\s')
+                                                           value="'{string-join(for $v in tokenize($control-value, '\s+')
                                                                         return $control-resources/item[value = $v]/label, ' - ')}'"/>
                                                 </xsl:otherwise>
                                             </xsl:choose>

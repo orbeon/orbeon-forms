@@ -673,7 +673,7 @@
                                                             if ($control = 'textarea') then
                                                                 if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
                                                             else if ($control = 'select') then
-                                                                string-join(for $v in tokenize(., '\s') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                                string-join(for $v in tokenize(., '\s+') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
                                                             else if ($control = 'select1') then
                                                                 for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
                                                             else
@@ -789,7 +789,7 @@
             <fr:bottom>
                 <!-- Custom buttons for the summary page -->
                 <xforms:group model="fr-form-model" class="fr-buttons">
-                    <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s')"/>
+                    <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')"/>
                     <xforms:repeat nodeset="for $button in $buttons return xxforms:element('button', $button)">
                         <xhtml:span class="fr-button">
                             <!-- New button -->

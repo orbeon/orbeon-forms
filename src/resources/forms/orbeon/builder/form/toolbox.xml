@@ -178,7 +178,7 @@
                                     <xxforms:variable name="binding" select="." as="element(xbl:binding)"/>
 
                                     <!-- Whether the component is a section component or not -->
-                                    <xxforms:variable name="is-section-component" select="tokenize($binding/@class, '\s') = 'fr-section-component'" as="xs:boolean"/>
+                                    <xxforms:variable name="is-section-component" select="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
 
                                     <xhtml:div class="fb-tool">
                                         <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">

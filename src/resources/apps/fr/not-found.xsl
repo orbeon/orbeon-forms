@@ -28,7 +28,7 @@
 
         <!-- Form Runner CSS stylesheets -->
         <xsl:if test="normalize-space($css-uri) != ''">
-            <xsl:for-each select="tokenize($css-uri, '\s')[normalize-space() != '']">
+            <xsl:for-each select="tokenize($css-uri, '\s+')">
                 <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
             </xsl:for-each>
         </xsl:if>

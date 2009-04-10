@@ -122,8 +122,8 @@
                             <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
                         </icon>
                     </metadata>
-                    <!-- Copy all the scripts and bindings --><!--  -->
-                    <xsl:for-each select="tokenize($resources, '\s')">
+                    <!-- Copy all the scripts and bindings -->
+                    <xsl:for-each select="tokenize($resources, '\s+')">
                         <!-- XBL spec says script and binding can be in any order -->
                         <xsl:copy-of select="doc(.)/*/*"/>
                     </xsl:for-each>

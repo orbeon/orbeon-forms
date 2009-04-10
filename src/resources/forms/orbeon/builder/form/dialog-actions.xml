@@ -342,9 +342,9 @@
                     <xforms:bind name="submission-bind" nodeset="xforms:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xforms:bind nodeset="@ev:observer"
-                                 required="tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 relevant="tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (tokenize(../@ev:event, '\s') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else ('fr-form-model')"
+                                 required="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 relevant="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 calculate="if (tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else ('fr-form-model')"
                                  readonly="false()"/>
                 </xforms:bind>
                 <!-- xforms-submit -->

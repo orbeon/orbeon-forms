@@ -57,9 +57,9 @@
     <xsl:variable name="is-ajax-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s')" as="xs:string*"/>
-    <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s')" as="xs:string*"/>
-    <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s')" as="xs:string*"/>
+    <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="has-alfresco" select="pipeline:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-show-explanation" select="pipeline:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(pipeline:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
@@ -127,7 +127,7 @@
 
             <!-- Form Runner CSS stylesheets -->
             <xsl:if test="normalize-space($css-uri) != ''">
-                <xsl:for-each select="tokenize($css-uri, '\s')[normalize-space() != '']">
+                <xsl:for-each select="tokenize($css-uri, '\s+')">
                     <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
                 </xsl:for-each>
             </xsl:if>
@@ -237,7 +237,7 @@
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
             <!-- Variable exposing all the user roles -->
-            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s')" as="xs:string*"/>
+            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s+')" as="xs:string*"/>
 
         </xsl:copy>
 

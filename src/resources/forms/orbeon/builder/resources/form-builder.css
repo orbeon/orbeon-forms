@@ -66,30 +66,20 @@ h1.fr-form-title {
     background-color: white;
 }
 
-#fb-toolbox .fb-tool button {
+#fb-toolbox .fb-tool .yui-button {
     width: 100%;
-    text-align: left;
-    font-size: 11px;
-    font-weight: normal;
+    margin-bottom: .1em;
     color: #333333;
-    margin: 1px 1px 2px 1px;
-    padding: 1px 2px 1px 2px;
-    background-color: #F8F8F8;
-    background-image: url( ../../../../apps/fr/style/logo-bg.gif );
-    background-repeat: repeat-x;
-    border-width: 1px;
-    border-left-color: #ccc;
-    border-top-color: #ccc;
-    border-right-color: gray;
-    border-bottom-color: gray;
 }
 
-#fb-toolbox .fb-tool button img { margin-left: .5em }
-#fb-toolbox .fb-tool button:hover { background-color: white; background-image: none }
-#fb-toolbox .fb-tool button.xforms-readonly { color: white }
-#fb-toolbox .fb-tool button.xforms-readonly:hover {
-    background-color: #F8F8F8;
-    background-image: url( ../../../../apps/fr/style/logo-bg.gif )
+#fb-toolbox .fb-tool .yui-button button {
+    padding: 0 4px;
+    text-align: left;
+    width: 100%;
+}
+
+#fb-toolbox .fb-tool .yui-button button span {
+    color: #333333;
 }
 
 /* Cut / Copy / Paste */

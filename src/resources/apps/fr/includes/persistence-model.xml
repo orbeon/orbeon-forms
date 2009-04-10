@@ -245,11 +245,11 @@
 
                 <!-- Handle attachments -->
                 <xxforms:variable name="attachment-controls" as="element()*"
-                                  select="instance('fr-source-form-instance')/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, ' ') = 'fr-attachment']"/>
+                                  select="instance('fr-source-form-instance')/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, '\s+') = 'fr-attachment']"/>
 
                 <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
                 <xxforms:variable name="attachment-binds" as="element(xforms:bind)*"
-                                  select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                  select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
                                             or @id = $attachment-controls/@bind]"/>
 
                 <!--<xforms:message level="xxforms:log-debug">-->
@@ -266,7 +266,7 @@
 
                     <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
                         <xxforms:variable name="bind" as="element(xforms:bind)"
-                                          select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                          select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
                                                     or @id = $attachment-controls/@bind])[number(context())]"/>
 
                         <!--

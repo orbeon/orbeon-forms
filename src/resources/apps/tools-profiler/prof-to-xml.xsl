@@ -42,8 +42,7 @@
 
     <xsl:variable name="samples" as="element(sample)*">
         <xsl:for-each select="$samples-lines">
-            <xsl:variable name="tokens-with-space" as="xs:string*" select="tokenize(., ' ')"/>
-            <xsl:variable name="tokens" as="xs:string*" select="for $t in $tokens-with-space return if ($t = '') then () else $t"/>
+            <xsl:variable name="tokens" as="xs:string*" select="tokenize(., '\s+')"/>
             <sample trace="{$tokens[5]}" count="{$tokens[4]}"/>
         </xsl:for-each>
     </xsl:variable>

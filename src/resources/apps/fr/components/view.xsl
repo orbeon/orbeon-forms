@@ -329,6 +329,8 @@
             <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
         </xsl:if>
     </xsl:template>
+    
+    <xsl:template match="fr:dialogs"/>
 
     <xsl:template name="fr-dialogs">
         <xforms:group id="fr-dialogs-group" appearance="xxforms:internal">

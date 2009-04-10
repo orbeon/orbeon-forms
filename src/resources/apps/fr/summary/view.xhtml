@@ -236,7 +236,7 @@
                 <xforms:dispatch name="xforms-model-construct-done-foobar" target="fr-form-model"/>
 
                 <xxforms:variable name="summary-elements" as="element()*"
-                                  select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+                                  select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
 
                 <!-- Extract fields which must appear in the summary -->
                 <xforms:insert context="instance('fr-configuration-instance')" nodeset="*" origin="$summary-elements"/>
@@ -253,7 +253,7 @@
                     <xforms:setvalue ref="$query/@control" value="$control/local-name()"/>
 
                     <!-- Add whether we must show the search field -->
-                    <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, ' ') = ('fr-search')"/>
+                    <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, '\s+') = ('fr-search')"/>
 
 
                     <!-- Add meta-information to template -->
@@ -580,7 +580,7 @@
                             </thead>
                             <tbody>
                                 <tr repeat-nodeset="document">
-                                    <td repeat-nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']">
+                                    <td repeat-nodeset="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']">
                                         <xxforms:variable name="control-info" select="." as="element()"/>
                                         <xxforms:variable name="resourceId" select="substring-before($control-info/@id, '-control')" as="xs:string"/>
                                         <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]" as="element()?"/>
@@ -605,7 +605,7 @@
                                             <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
                                         </xforms:group>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                        <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary']" id="fr-summary-repeat-column-number">
+                                        <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']" id="fr-summary-repeat-column-number">
                                             <th>
                                                 <xxforms:variable name="control-info" select="." as="element()"/>
                                                 <xxforms:variable name="resourceId" select="substring-before($control-info/@id, '-control')" as="xs:string"/>
@@ -704,7 +704,7 @@
                                     </xforms:repeat>
                                     <xforms:group ref=".[not(document)]">
                                         <tr>
-                                            <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, ' ') = 'fr-summary'])}">
+                                            <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary'])}">
                                                 <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </td>
                                         </tr>

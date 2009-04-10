@@ -85,18 +85,18 @@
 
                 <!--  NOTE: code below partially duplicated in persistence-model.xml but in XForms! -->
                 <xsl:variable name="attachment-controls" as="element()*"
-                              select="$xhtml/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, ' ') = 'fr-attachment']"/>
+                              select="$xhtml/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, '\s+') = 'fr-attachment']"/>
 
                 <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
                 <xsl:variable name="attachment-binds" as="element(xforms:bind)*"
-                              select="$xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                              select="$xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
                                         or @id = $attachment-controls/@bind]"/>
 
                 <!-- Iterate over attachment controls while there is no submission error -->
                 <xsl:for-each select="(1 to count($attachment-binds))">
 
                         <xsl:variable name="bind" as="element(xforms:bind)"
-                                      select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                      select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
                                                 or @id = $attachment-controls/@bind])[number(current())]"/>
 
                         <!-- Look at all binds except top-level one -->
@@ -146,7 +146,7 @@
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="recipient-controls" as="element()*"
-                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-email-recipient']"/>
+                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, '\s+') = 'fr-email-recipient']"/>
                 <xsl:variable name="recipient-binds" as="element(xforms:bind)*"
                               select="for $control in $recipient-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
@@ -159,7 +159,7 @@
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="subject-controls" as="element()*"
-                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = 'fr-email-subject']"/>
+                              select="$xhtml/xhtml:body//xforms:*[@class and tokenize(@class, '\s+') = 'fr-email-subject']"/>
                 <xsl:variable name="subject-binds" as="element(xforms:bind)*"
                               select="for $control in $subject-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 

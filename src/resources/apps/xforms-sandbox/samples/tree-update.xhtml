@@ -107,17 +107,17 @@
                     <!-- Copy -->
                     <xforms:action if="instance('instance')/operation = 'copy'">
                         <xforms:insert context="instance('items')//item[@value = instance('instance')/select1]"
-                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, ' ')]"/>
+                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
                     </xforms:action>
                     <!-- Move to purgatory -->
                     <xforms:action if="instance('instance')/operation = 'move'">
                         <xforms:insert context="instance('instance')/purgatory"
-                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, ' ')]"/>
+                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
                     </xforms:action>
                     <!-- Delete -->
                     <xforms:action if="instance('instance')/operation = ('delete', 'move')">
-                        <xforms:delete while="exists(instance('items')//item[@value = tokenize(instance('instance')/select, ' ')])"
-                                nodeset="instance('items')//item[@value = tokenize(instance('instance')/select, ' ')]"/>
+                        <xforms:delete while="exists(instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')])"
+                                nodeset="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
                         <xforms:setvalue ref="instance('instance')/select"/>
                     </xforms:action>
                     <!-- Move from purgatory -->

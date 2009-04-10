@@ -712,12 +712,12 @@
         </form-name>
         <title>
             <label>Titre du formulaire</label>
-            <hint>titre du formulaire</hint>
+            <hint>cliquer pour entrer le titre du formulaire</hint>
             <alert>Le titre de formulaire est requis dans toutes les langues</alert>
         </title>
         <description>
             <label>Description du formulaire</label>
-            <hint>description du formulaire</hint>
+            <hint>cliquer pour entrer une description du formulaire</hint>
         </description>
         <logo>
             <label>Logo</label>

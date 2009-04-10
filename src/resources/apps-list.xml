@@ -15,8 +15,8 @@
     <section label="Welcome">
         <application id="welcome" label="Welcome"/>
     </section>
-    <section label="Form Builder (ALPHA)">
-        <application id="fr/orbeon/builder/summary" label="Form Builder (ALPHA)"/>
+    <section label="Form Builder (Preview)">
+        <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
         <application id="fr/orbeon/provinces/summary" label="Provinces Form"/>
     </section>

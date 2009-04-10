@@ -77,7 +77,7 @@ ORBEON.widgets.datatable = function (element, index) {
         }
         
     } else if (this.scrollV) {
-        width = (this.tableWidth + 17) + 'px';
+        width = (this.tableWidth + 19) + 'px';
     } else {
         width = this.tableWidth + 'px';
     }
@@ -150,23 +150,52 @@ ORBEON.widgets.datatable = function (element, index) {
     this.colResizers = [];
     for (var j=0; j < this.headerColumns.length; j++) {
         var childDiv = YAHOO.util.Selector.query('div', this.headerColumns[j], true);
+        var colResizer = null;
+        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+            colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
+            this.colResizers[this.colResizers.length] = colResizer;
+        }
         var region = YAHOO.util.Dom.getRegion(this.headerColumns[j]);
         var width = (region.right - region.left - 19) + 'px';
-        var style = childDiv.style;
-        style.width = width;
-        var styles = [style];
-        for (var k=0; k < this.bodyRows.length; k++) {
-            row=this.bodyRows[k];
-            if (row.cells.length > j && !YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
-                style = YAHOO.util.Selector.query('div', row.cells[j], true).style;
-                style.width = width;
-                styles[styles.length] = style;
+        var rule;
+        // See _setColumnWidth in YUI datatable.js...
+        if (YAHOO.env.ua.ie == 0 ) {
+            var className = '.dt-'+ this.id + '-col-' + (j + 1);
+            if (!this.styleElt) {
+                this.styleElt = document.createElement('style');
+                this.styleElt.type = 'text/css';
+                document.getElementsByTagName('head').item(0).appendChild(this.styleElt);
+            }
+            if (this.styleElt) {
+                if(this.styleElt.styleSheet && this.styleElt.styleSheet.addRule) {
+                    this.styleElt.styleSheet.addRule(classname,'width:'+ width);
+                    rule = this.styleElt.styleSheet.rules[this.styleElt.styleSheet.rules.length-1];
+                } else if(this.styleElt.sheet && this.styleElt.sheet.insertRule) {
+                    this.styleElt.sheet.insertRule(className+' {width:'+width+';}',this.styleElt.sheet.cssRules.length);
+                    rule = this.styleElt.sheet.cssRules[this.styleElt.sheet.cssRules.length-1];
+                }
+            }
+            if (rule && YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                colResizer.setRule(rule);
+            }
+        }
+        if (!rule) {
+            var style = childDiv.style;
+            style.width = width;
+            var styles = [style];
+            for (var k=0; k < this.bodyRows.length; k++) {
+                row=this.bodyRows[k];
+                if (row.cells.length > j && !YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
+                    style = YAHOO.util.Selector.query('div', row.cells[j], true).style;
+                    style.width = width;
+                    styles[styles.length] = style;
+                }
+            }
+            if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                colResizer.setStyleArray(styles);
             }
         }
 
-        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
-            this.colResizers[this.colResizers.length] = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], styles, this);
-        }
     }
 }
 
@@ -214,12 +243,12 @@ ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
  * @method ORBEON.widgets.datatable.colResizer
  * @param col {DOM Element} The th DOM element.
  */
-ORBEON.widgets.datatable.colResizer = function (index, th, styles, datatable) {
+ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
     this.index = index;
     this.th = th;
-    this.styles = styles;
-
     this.datatable = datatable;
+    this.rule = null;
+    this.styles = null;
 
     this.resizerliner = document.createElement('div');
     YAHOO.util.Dom.addClass(this.resizerliner, 'yui-dt-resizerliner');
@@ -240,16 +269,92 @@ ORBEON.widgets.datatable.colResizer = function (index, th, styles, datatable) {
     this.resizerliner.appendChild(this.resizer);
 
   
-    this.dd = new YAHOO.util.DD(this.resizer);
-    this.dd.setYConstraint(0, 0);
+    //this.dd = new YAHOO.util.DD(this.resizer);
+    //this.dd.setYConstraint(0, 0);
+
+    this.init(this.resizer, this.resizer, {dragOnly:true, dragElId: this.resizer.id});
+    this.setYConstraint(0, 0);
+    this.initFrame();
   
     var colRegion = YAHOO.util.Dom.getRegion(this.th);
     var X = YAHOO.util.Dom.getX(this.resizer);
     this.delta = colRegion.right - X;
 
-    this.dd.on('mouseDownEvent', ORBEON.widgets.datatable.colResizer.prototype.mouseDown, this, true);
-    this.dd.on('dragEvent', ORBEON.widgets.datatable.colResizer.prototype.drag, this, true);
 }
+
+//ORBEON.widgets.datatable.colResizer.prototype.setStyleArray = function (styles) {
+//    this.styles = styles;
+//}
+//
+//ORBEON.widgets.datatable.colResizer.prototype.setRule = function (rule) {
+//    this.rule = rule;
+//}
+
+YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
+        /////////////////////////////////////////////////////////////////////////////
+        //
+        // Public methods
+        //
+        /////////////////////////////////////////////////////////////////////////////
+
+        setStyleArray : function (styles) {
+            this.styles = styles;
+        },
+
+        setRule : function (rule) {
+            this.rule = rule;
+        },
+
+        /////////////////////////////////////////////////////////////////////////////
+        //
+        // Public DOM event handlers
+        //
+        /////////////////////////////////////////////////////////////////////////////
+
+
+        /**
+         * Handles mousedown events on the Column resizer.
+         *
+         * @method onMouseDown
+         * @param e {string} The mousedown event
+         */
+        onMouseDown : function(ev) {
+            var region = YAHOO.util.Dom.getRegion(this.liner);
+            this.width = region.right - region.left;
+            //this.resizerX = YAHOO.util.Dom.getX(this.resizer);
+            this.resizerX = YAHOO.util.Event.getXY(ev)[0];
+        },
+
+
+        /**
+         * Handles drag events on the Column resizer.
+         *
+         * @method onDrag
+         * @param e {string} The drag event
+         */
+        onDrag : function(ev) {
+            var newX = YAHOO.util.Event.getXY(ev)[0];
+            this.datatable.table.style.display = 'none';
+            var deltaX = newX - this.resizerX;
+            this.datatable.adjustWidth(deltaX, this.index);
+            this.resizerX = newX;
+            var width = this.width + deltaX;
+            var widthStyle = (width - 20) + 'px'; //TODO : determine 20 from padding
+            // If different and non null, try to set it
+            if (width > 0 && width != this.width) {
+                if (this.rule) {
+                    this.rule.style.width = widthStyle;
+                } else {
+                    for (var i= 0; i < this.styles.length; i++) {
+                        this.styles[i].width = widthStyle;
+                    }
+                }
+                this.width = width;
+            }
+            this.datatable.table.style.display = '';        }
+    });
+
+
 
 /**
  * Implementation of datatable.colResizer.mouseDown event handler. Stores the positions as a D&D action might start.
@@ -257,11 +362,12 @@ ORBEON.widgets.datatable.colResizer = function (index, th, styles, datatable) {
  * @method ORBEON.widgets.datatable.colResizer.mouseDown
  * @param ev {Event}.
  */
-ORBEON.widgets.datatable.colResizer.prototype.mouseDown = function (ev) {
-    var thRegion = YAHOO.util.Dom.getRegion(this.th);
-    this.thWidth = thRegion.right - thRegion.left;
-    this.resizerX = YAHOO.util.Dom.getX(this.resizer);
-}
+//ORBEON.widgets.datatable.colResizer.prototype.mouseDown = function (ev) {
+//    var region = YAHOO.util.Dom.getRegion(this.liner);
+//    this.width = region.right - region.left;
+//    //this.resizerX = YAHOO.util.Dom.getX(this.resizer);
+//    this.resizerX = YAHOO.util.Event.getXY(ev)[0];
+//}
 
 /**
  * Implementation of datatable.colResizer.drag event handler. Adjusts the column size.
@@ -269,28 +375,32 @@ ORBEON.widgets.datatable.colResizer.prototype.mouseDown = function (ev) {
  * @method ORBEON.widgets.datatable.colResizer.drag
  * @param ev {Event}.
  */
-ORBEON.widgets.datatable.colResizer.prototype.drag = function (ev) {
-    // Calculate the new length
-    var newX = YAHOO.util.Dom.getX(this.resizer);
-    this.datatable.table.style.display = 'none';
-    var deltaX = newX -this.resizerX;
-    this.datatable.adjustWidth(deltaX, this.index);
-    this.resizerX = newX;
-    var width = this.thWidth + deltaX;
-    var widthStyle = (width - 19 )+ 'px';
-    // If different and non null, try to set it
-    if (width > 0 && width != this.thWidth) {
-        for (var i= 0; i < this.styles.length; i++) {
-            this.styles[i].width = widthStyle;
-        }
-    }
-    // If the width adjustement has failed, the column is probably
-    // too small, move the handle back to its normal position
-    this.datatable.table.style.display = '';
-    var thRegion = YAHOO.util.Dom.getRegion(this.th);
-    YAHOO.util.Dom.setX(this.resizer, thRegion.right - this.delta);
-    this.thWidth = thRegion.right - thRegion.left;
-}
+//ORBEON.widgets.datatable.colResizer.prototype.drag = function (ev) {
+//    // Calculate the new length
+//    //var newX = YAHOO.util.Dom.getX(this.resizer);
+//    var newX = YAHOO.util.Event.getXY(ev)[0];
+//    if (newX == 0) {
+//        return;
+//    }
+//    this.datatable.table.style.display = 'none';
+//    var deltaX = newX -this.resizerX;
+//    this.datatable.adjustWidth(deltaX, this.index);
+//    this.resizerX = newX;
+//    var width = this.width + deltaX;
+//    var widthStyle = width + 'px';
+//    // If different and non null, try to set it
+//    if (width > 0 && width != this.thWidth) {
+//        if (this.rule) {
+//            this.rule.style.width = widthStyle;
+//        } else {
+//            for (var i= 0; i < this.styles.length; i++) {
+//                this.styles[i].width = widthStyle;
+//            }
+//        }
+//        this.width = width;
+//    }
+//    this.datatable.table.style.display = '';
+//}
 
 ORBEON.widgets.datatable.removeIdAttributes = function(element, skipSelf) {
     if (!skipSelf) {

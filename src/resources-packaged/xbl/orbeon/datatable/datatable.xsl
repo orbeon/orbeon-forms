@@ -189,7 +189,7 @@
 
     <xsl:template name="yui-dt-liner">
         <xsl:param name="position"/>
-        <xhtml:div class="yui-dt-liner">
+        <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
             <xhtml:span class="yui-dt-label">
                 <xsl:choose>
                     <xsl:when test="@fr:sortable = 'true'">
@@ -311,11 +311,11 @@
             {{if ({$position} = $currentId) 
                 then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
                 else ''}}
-            {@class}
+            {@class}            
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <xhtml:div class="yui-dt-liner">
+            <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:td) + 1}">
                 <xsl:apply-templates select="node()" mode="YUI"/>
             </xhtml:div>
         </xhtml:td>

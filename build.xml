@@ -282,6 +282,7 @@
         <jar destfile="${resources-private.jar.file}" compress="false">
             <fileset dir="${resources-packaged.dir}">
                 <include name="xbl/**/*.xbl"/>
+                <include name="xbl/**/*.xsl"/>
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
                 <exclude name="ops/css/*.template"/>

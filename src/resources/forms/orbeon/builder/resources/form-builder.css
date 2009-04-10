@@ -277,14 +277,14 @@ h1.fr-form-title {
 .fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; fonttext-align: right }
 
 /* Highlighting of top-level blocks (sections, ...) */
-.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
-.fb-top-level-content:hover { border-left: 4px solid #ccc }
-.fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #004B92}
+.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0px solid transparent }
+.fb-top-level-content:hover { border-left: 0px solid #ccc }
+.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0px solid #004B92}
 
 /* Highlighting of section content (grids, ...) */
-.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
-.fb-section-content:hover { border-left: 4px solid #ccc}
-.fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #004B92}
+.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0px solid transparent }
+.fb-section-content:hover { border-left: 0px solid #ccc}
+.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0px solid #004B92}
 
 /* Control editor */
 .fb-control-label .xforms-label { display: none }
@@ -311,7 +311,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* ***** Grid ******************************************************************************************************* */
 
-.fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
+.fb-grid-table { margin: 0 0 0 1px; width: 99.5%; *width: 99.5% }
 .fb-grid-td { width: auto; vertical-align: top; border: 1px solid transparent; padding: .2em }
 .fb-grid:hover .fb-grid-td { border: 1px dotted gray }
 .fb-grid-td .xforms-alert { display: none }

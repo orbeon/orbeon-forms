@@ -378,7 +378,6 @@
             </icon>
             <datatype>xforms:anyURI</datatype>
             <template>
-                <!-- NOTE: We use oxf.fr.appserver.uri below until we have built-in support in Orbeon Forms for rewriting service URLs -->
                 <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment" value=".">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>
@@ -437,17 +436,18 @@
         </metadata>
 
         <xbl:template>
-            <xforms:upload xbl:attr="context ref bind">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert,xforms|filename,xforms|mediatype,xxforms:size"/>
-            </xforms:upload>
-            <!-- NOTE: We use oxf.fr.appserver.uri below until we have built-in support in Orbeon Forms for rewriting service URLs -->
-            <xforms:output appearance="xxforms:download" xbl:attr="context ref bind" value=".">
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/down.gif" alt=""/>
-                    <xhtml:span>Download</xhtml:span>
-                </xforms:label>
-                <xbl:content includes="xforms|filename,xforms|mediatype"/>
-            </xforms:output>
+            <xforms:group appearance="xxforms:internal" xbl:attr="context ref bind">
+                <xforms:upload ref=".">
+                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert,xforms|filename,xforms|mediatype,xxforms:size"/>
+                </xforms:upload>
+                <xforms:output appearance="xxforms:download" ref=".[normalize-space()]">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/down.gif" alt=""/>
+                        <xhtml:span>Download</xhtml:span>
+                    </xforms:label>
+                    <xbl:content includes="xforms|filename,xforms|mediatype"/>
+                </xforms:output>
+            </xforms:group>
         </xbl:template>
     </xbl:binding>
 

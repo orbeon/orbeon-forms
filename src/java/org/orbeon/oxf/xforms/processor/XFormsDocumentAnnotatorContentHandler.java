@@ -70,9 +70,11 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
     private boolean inXForms;       // whether we are in a model
     private int xformsLevel;
-    private boolean inPreserve;     // whether we are in a label, etc., schema or instance
+    private boolean inPreserve;     // whether we are in LHHA, schema or instance
     private int preserveLevel;
-    private boolean inXBL;          // whether we are in xbl:xbl
+    private boolean inLHHA;         // whether we are in LHHA (meaningful only if inPreserve == true)
+    private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
+
 
     private Map xblBindings;        // Map<String uri, Map<String localname, ">>
 
@@ -124,6 +126,12 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
         final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
 
+        // If there is already an id, gather namespace information if not in preserved content
+        final int idIndex = attributes.getIndex("id");
+        if (namespaceMappings != null && idIndex != -1 && !inPreserve) {
+            addNamespaces(attributes.getValue(idIndex));
+        }
+
         // Entering model or controls
         if (!inXForms && isXFormsOrExtension) {
             inXForms = true;
@@ -133,16 +141,26 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         if (inPreserve) {
             // Within preserved content
 
-            // Gather binding information in xbl:xbl/xbl:binding
-            if (inXBL && level - 1 == preserveLevel && isXBL && "binding".equals(localname)) {
 
+            if (inLHHA) {
+                // Gather id and namespace information about content of LHHA
+                if (isXForms) {
+                    // Must be xforms:output
+                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                } else if (hostLanguageAVTs && hasAVT(attributes)) {
+                    // Must be an AVT on an host language element
+                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                }
+            } else if (inXBL && level - 1 == preserveLevel && isXBL && "binding".equals(localname)) {
+                // Gather binding information in xbl:xbl/xbl:binding
                 final String elementAttribute = attributes.getValue("element");
                 if (elementAttribute != null) {
                     storeXBLBinding(elementAttribute);
                 }
+                // Gather id and namespace information
+                attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
             }
-
-            // Don't do anything fancy with the element
+            // Output element
             super.startElement(uri, localname, qName, attributes);
         } else if (isXFormsOrExtension) {
             // This is an XForms element
@@ -150,7 +168,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
 
             // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
 
             if (inTitle && "output".equals(localname)) {
                 // Special case of xforms:output within title, which produces an xxforms:text control
@@ -165,7 +183,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // Element with a binding
 
             // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
 
             // Leave element untouched (except for the id attribute)
             super.startElement(uri, localname, qName, attributes);
@@ -189,7 +207,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                     // Entering title
                     inTitle = true;
                     // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xforms:output)
-                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
                     htmlElementId = reusableStringArray[0];
                     htmlTitleElementId = htmlElementId;
                 }
@@ -211,7 +229,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
                                 // Create a new id and update the attributes if needed
                                 if (htmlElementId == null) {
-                                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+                                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
                                     htmlElementId = reusableStringArray[0];
 
                                     // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
@@ -226,7 +244,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                                 // Create a new xxforms:attribute control
                                 reusableAttributes.clear();
 
-                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray);
+                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray, idIndex);
 
                                 newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
                                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
@@ -257,28 +275,71 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
 
         // Check for preserved content
-        if (inXForms && !inPreserve) {
-            // Preserve as is the content of labels, etc., instances, and schemas
-            // Within other XForms: check for labels, xforms:instance, and xs:schema
-            if (isXForms && (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null   // labels, etc. may contain XHTML
-                    || "instance".equals(localname))                                                // xforms:instance
-                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {            // xs:schema
-                inPreserve = true;
-                preserveLevel = level;
-            }
-        } else if (!inPreserve) {
-            // At the top-level: check for labels and xbl:xbl
-            final boolean isXBLXBL = isXBL && "xbl".equals(localname);
-            if (isXForms && XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null    // labels, etc. may contain XHTML
-                    || isXBLXBL ) {                                                                 // xbl:xbl
-                inPreserve = true;
-                preserveLevel = level;
-                if (isXBLXBL)
+        if (!inPreserve) {
+            if (inXForms) {
+                // Preserve as is the content of labels, etc., instances, and schemas
+                // Within other XForms: check for labels, xforms:instance, and xs:schema
+                if (isXForms) {
+                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null; // labels, etc. may contain XHTML
+                    if (inLHHA || "instance".equals(localname)) {                                  // xforms:instance
+                        inPreserve = true;
+                        preserveLevel = level;
+                    }
+                } else if ("schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {       // xs:schema
+                    inPreserve = true;
+                    preserveLevel = level;
+
+                }
+            } else {
+                // At the top-level: check for labels and xbl:xbl
+                final boolean isXBLXBL = isXBL && "xbl".equals(localname);
+                if (isXForms) {
+                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null; // labels, etc. may contain XHTML
+                    if (inLHHA) {
+                        inPreserve = true;
+                        preserveLevel = level;
+                    }
+                } else if (isXBLXBL) {// xbl:xbl
+                    inPreserve = true;
+                    preserveLevel = level;
                     inXBL = true;
+                }
             }
         }
 
         level++;
+    }
+
+    private boolean hasAVT(Attributes attributes) {
+        final int attributesCount = attributes.getLength();
+        if (attributesCount > 0) {
+            for (int i = 0; i < attributesCount; i++) {
+                final String currentAttributeURI = attributes.getURI(i);
+                if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                    // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
+                    final String attributeValue = attributes.getValue(i);
+                    if (attributeValue.indexOf('{') != -1) {
+                        // This is an AVT
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void addNamespaces(String id) {
+        final Map namespaces = new HashMap();
+        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            final String namespacePrefix = (String) e.nextElement();
+            if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+        }
+        // Re-add standard "xml" prefix mapping
+        // TODO: WHY?
+        namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
+        namespaceMappings.put(id, namespaces);
     }
 
     private final void storeXBLBinding(String elementAttribute) {
@@ -321,6 +382,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         if (inPreserve && level == preserveLevel) {
             // Leaving preserved content
             inPreserve = false;
+            inLHHA = false;
             inXBL = false;
         } if (inXForms && level == xformsLevel) {
             // Leaving model or controls
@@ -365,16 +427,14 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         return documentLocator;
     }
 
-    private Attributes getAttributesGatherNamespaces(Attributes attributes, String[] newIdAttribute) {
-        final int idIndex = attributes.getIndex("id");
+    private Attributes getAttributesGatherNamespaces(Attributes attributes, String[] newIdAttribute, final int idIndex) {
         if (isGenerateIds) {
             // Process ids
             final String newIdAttributeUnprefixed;
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                final String newId = getNextId();
-                newIdAttributeUnprefixed = newId;
+                newIdAttributeUnprefixed = getNextId();
                 newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
                 attributes = newAttributes;
@@ -416,16 +476,9 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
 
         // Gather namespace information if there is an id
-        if (namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
-            final Map namespaces = new HashMap();
-            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-                final String namespacePrefix = (String) e.nextElement();
-                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                    namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
-            }
-            // Re-add standard "xml" prefix mapping
-            namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
-            namespaceMappings.put(newIdAttribute[0], namespaces);
+        // Don't do it here if the id was already present as this is gathered before
+        if (namespaceMappings != null && isGenerateIds) {
+            addNamespaces(newIdAttribute[0]);
         }
 
         return attributes;

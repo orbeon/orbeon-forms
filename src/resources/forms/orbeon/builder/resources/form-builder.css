@@ -12,6 +12,9 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
+/* Overwrite definition in form-runner-orbeon.css if any */
+html { overflow: hidden }
+
 #fr-view { margin-left: 15.5em; *margin-left: 15.126 }/* because the toolbox is on the left */
 /*.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }*/
 
@@ -30,6 +33,16 @@ a.fb-edit-help-trigger img {
     vertical-align: -0.2em;
     display: inline;
     margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
+    padding: 0;
+}
+
+h1.fr-form-title {
+    clear: none;
+    color: #004B92;
+    float: left;
+    font-size: 197%;
+    font-style: normal;
+    margin: 0 0 0 1em;
     padding: 0;
 }
 
@@ -189,12 +202,12 @@ a.fb-edit-help-trigger img {
 
 /* Highlighting of in-place outputs depending on hovering */
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
-#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
-#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: #004B92 }
+#fb-metadata-group .fr-metadata:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: #004B92 }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: #004B92 }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: #004B92 }
+#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: #004B92 }
+#fb-details-group .fb-grid-td:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: #004B92 }
 
 /* In-place editing for metadata section */
 #fb-metadata-group .fr-inplace-input .xforms-input input { width: 100% }
@@ -237,11 +250,13 @@ a.fb-edit-help-trigger img {
     white-space: nowrap;
 }
 
-/* ***** XXX ******************************************************************************************************** */
+/* ***** Misc ******************************************************************************************************* */
 
-#fb-metadata-group .fr-metadata {
-    background: #F8F8F8 url(logo-bg.gif) repeat-x top;
-}
+/* Show placeholder frame for buttons */
+.fb-buttons-placeholder { width: 100%; background: white; display: block; border: 2px dashed #004B92; text-align: center }
+.fb-buttons-placeholder div { margin: .5em }
+/* Give height to footer so it shows up even if empty */
+.fr-footer div { height: 1em }
 
 #fb-metadata-group .fr-grid { margin: 0 }
 #fb-metadata-group td { width: 50% }
@@ -251,23 +266,15 @@ a.fb-edit-help-trigger img {
     .fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger
         { display: inline; margin-top: 0 }
 
-.fr-metadata .fb-title-control .fr-inplace-content .xforms-output {
-    color: #004B92;
-}
-
-.fr-metadata .fb-description-control .fr-inplace-content .xforms-output {
-    color: #004B92;
-}
-
-.fb-title-control, .fb-description-control { text-align: right }
-
-.fb-title-control .xforms-label { text-align: right; display: none }
+.fb-title-control .xforms-label { display: none }
 .fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
-.fb-title-control .fr-inplace-content .xforms-input input { color: #004B92; font-size: 197%; text-align: right }
+.fb-title-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
+.fb-title-control .fr-inplace-content .xforms-input input { color: #004B92; font-size: 197% }
 
-.fb-description-control .xforms-label { text-align: right; display: none }
-.fb-description-control .fr-inplace-content .xforms-output { color: white; font-size: smaller; font-style: italic }
-.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: smaller; font-style: italic; text-align: right }
+.fb-description-control .xforms-label { display: none }
+.fb-description-control .fr-inplace-content .xforms-output { color: white }
+.fb-description-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
+.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; fonttext-align: right }
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
@@ -302,7 +309,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
     color: gray
 }
 
-/* Grid */
+/* ***** Grid ******************************************************************************************************* */
 
 .fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
 .fb-grid-td { width: auto; vertical-align: top; border: 1px solid transparent; padding: .2em }
@@ -476,6 +483,22 @@ html.accordion-menu-js dd.a-m-d-anim {
 	overflow: hidden;
 	display: block;
 }
+
+/* ***** YUI Layout ************************************************************************************************* */
+
+#fr-view { margin: auto }
+.yui-layout-unit-left { background-color: white }
+.yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }
+
+.fr-bottom { padding: .8em }
+
+#fb-layout .yui-layout-bd { border: none }
+#fb-layout .yui-layout-unit-top .yui-layout-bd { border-bottom: 2px solid #ccc; background-color: white }
+#fb-layout .yui-layout-unit-left .yui-layout-bd { border-right: 2px solid #ccc; background-color: white  }
+#fb-layout .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #ccc; background-color: white  }
+#top1 { padding: 0.4em .5em 0 .5em }
+
+#fb-toolbox { position: static }
 
 /* ***** Other media ************************************************************************************************ */
 

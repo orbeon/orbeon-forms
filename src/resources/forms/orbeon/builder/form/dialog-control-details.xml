@@ -107,7 +107,7 @@
         </xforms:action>
 
         <!-- Set proper classes -->
-        <xxforms:variable name="classes" select="tokenize($instance/classes, ' ')"/>
+        <xxforms:variable name="classes" select="tokenize($instance/classes, '\s+')"/>
         <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
         <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $instance/classes)"/>
 

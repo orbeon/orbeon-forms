@@ -13,6 +13,10 @@
  */
 package org.orbeon.oxf.xml;
 
+import orbeon.apache.xerces.impl.Constants;
+import orbeon.apache.xerces.impl.XMLEntityManager;
+import orbeon.apache.xerces.impl.XMLErrorReporter;
+import orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
@@ -48,11 +52,6 @@ import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-
-import orbeon.apache.xerces.xni.parser.XMLInputSource;
-import orbeon.apache.xerces.impl.XMLEntityManager;
-import orbeon.apache.xerces.impl.Constants;
-import orbeon.apache.xerces.impl.XMLErrorReporter;
 
 public class XMLUtils {
 
@@ -347,6 +346,30 @@ public class XMLUtils {
             }
         } else {
             readerToSAX(new StringReader(xml), systemId, contentHandler, validating, handleXInclude);
+        }
+    }
+
+    /**
+     * Read a URL into SAX events.
+     *
+     * @param systemId          system id of the document
+     * @param contentHandler    SAX content handler to output to
+     * @param validating        whether validation must be performed
+     * @param handleXInclude    whether XInclude must be performed
+     */
+    public static void urlToSAX(String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
+        try {
+            final URL url = URLFactory.createURL(systemId);
+            final InputStream is = url.openStream();
+            final InputSource inputSource = new InputSource(is);
+            inputSource.setSystemId(systemId);
+            try {
+                inputSourceToSAX(inputSource, contentHandler, validating, handleXInclude);
+            } finally {
+                is.close();
+            }
+        } catch (IOException e) {
+            throw new OXFException(e);
         }
     }
 

@@ -1,0 +1,71 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:foo="http://orbeon.org/oxf/xml/foo"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+
+        id="html"
+
+        lang="{'en'}">
+
+    <xhtml:head>
+        <xhtml:title><xforms:output id="output-in-title" value="'My Title'"/></xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance id="instance-root">
+                    <value id="instance-value"/>
+                </instance>
+            </xforms:instance>
+            <xforms:setvalue ev:event="xforms-model-construct-done" ref="value1" value="current-dateTime()"/>
+            <xs:schema>
+                <xs:element name="form" id="schema-element">
+                </xs:element>
+            </xs:schema>
+        </xforms:model>
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="dateTime-component" element="foo|dateTime">
+                <xbl:template>
+                    <xforms:instance id="instance-in-xbl">
+                        <instance id="xbl-instance-root">
+                            <value id="xbl-instance-value"/>
+                        </instance>
+                    </xforms:instance>
+
+                    <div id="div-in-xbl"/>
+
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+
+        <foo:dateTime id="dateTime1-control" ref="value1"/>
+        <foo:dateTime ref="value2"/>
+
+        <xforms:input id="value1-control" ref="value1"/>
+        <xforms:input ref="value2">
+            <xforms:label>
+                <xforms:output id="output-in-label" value="'My Label'"/>
+                <xhtml:img id="img-in-label" src="{'avt-image.png'}"/>
+            </xforms:label>
+        </xforms:input>
+
+        <xhtml:span id="span" style="{'background-color: red'}"/>
+
+    </xhtml:body>
+</xhtml:html>

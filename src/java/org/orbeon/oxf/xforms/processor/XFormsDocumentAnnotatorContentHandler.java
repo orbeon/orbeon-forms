@@ -126,11 +126,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
         final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
 
-        // If there is already an id, gather namespace information if not in preserved content
         final int idIndex = attributes.getIndex("id");
-        if (namespaceMappings != null && idIndex != -1 && !inPreserve) {
-            addNamespaces(attributes.getValue(idIndex));
-        }
 
         // Entering model or controls
         if (!inXForms && isXFormsOrExtension) {
@@ -476,8 +472,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
 
         // Gather namespace information if there is an id
-        // Don't do it here if the id was already present as this is gathered before
-        if (namespaceMappings != null && isGenerateIds) {
+        if (namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
             addNamespaces(newIdAttribute[0]);
         }
 

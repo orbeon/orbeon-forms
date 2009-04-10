@@ -1837,6 +1837,10 @@ version: 2.6.0
                     }
                     var c = Dom.getElementsByClassName('close', 'div', this.header)[0];
                     if (close) {
+// ORBEON: propose moving code above to here
+//                        if (!this.header) {
+//                            this._createHeader();
+//                        }
                         //Force some header text if there isn't any
                         if (!this.get('header')) {
                             this.set('header', '&nbsp;');
@@ -1873,6 +1877,10 @@ version: 2.6.0
                     }
                     var c = Dom.getElementsByClassName('collapse', 'div', this.header)[0];
                     if (collapse) {
+// ORBEON: propose moving code above to here
+//                        if (!this.header) {
+//                            this._createHeader();
+//                        }
                         //Force some header text if there isn't any
                         if (!this.get('header')) {
                             this.set('header', '&nbsp;');

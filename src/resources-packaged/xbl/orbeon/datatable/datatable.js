@@ -148,6 +148,7 @@ ORBEON.widgets.datatable = function (element, index) {
     }
 
     this.colResizers = [];
+    this.colSorters = [];
     for (var j=0; j < this.headerColumns.length; j++) {
         var childDiv = YAHOO.util.Selector.query('div', this.headerColumns[j], true);
         var colResizer = null;
@@ -162,7 +163,11 @@ ORBEON.widgets.datatable = function (element, index) {
         if (YAHOO.env.ua.ie == 0 ) {
             var className = '.dt-'+ this.id + '-col-' + (j + 1);
             if (!this.styleElt) {
-                this.styleElt = document.createElement('style');
+                this.styleElt = document.createElement('style');        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
+
+        }
+
+
                 this.styleElt.type = 'text/css';
                 document.getElementsByTagName('head').item(0).appendChild(this.styleElt);
             }
@@ -195,6 +200,12 @@ ORBEON.widgets.datatable = function (element, index) {
                 colResizer.setStyleArray(styles);
             }
         }
+
+        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
+            this.colSorters[this.colSorters.length] = new ORBEON.widgets.datatable.colSorter(this.headerColumns[j]);
+        }
+
+
 
     }
 }
@@ -235,6 +246,16 @@ ORBEON.widgets.datatable.utils.getStyle = function (elt, property, defolt) {
 ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
     region = YAHOO.util.Dom.getRegion(elt);
     YAHOO.util.Dom.setStyle(elt, 'width', (region.right - region.left) + 'px');
+}
+
+ORBEON.widgets.datatable.colSorter = function (th) {
+            var liner =  YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
+            YAHOO.util.Event.addListener(liner, "click", function(ev) {
+                var a = YAHOO.util.Selector.query('a.xforms-trigger:not(.xforms-disabled)', liner, true);
+                ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+            });
+
+
 }
 
 /**

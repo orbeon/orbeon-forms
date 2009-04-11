@@ -69,17 +69,12 @@ h1.fr-form-title {
 #fb-toolbox .fb-tool .yui-button {
     width: 100%;
     margin-bottom: .1em;
-    color: #333333;
 }
 
 #fb-toolbox .fb-tool .yui-button button {
     padding: 0 4px;
     text-align: left;
     width: 100%;
-}
-
-#fb-toolbox .fb-tool .yui-button button span {
-    color: #333333;
 }
 
 #fb-toolbox .yui-button .first-child { *width: 100% } /* IE hack otherwise button border appears incorrectly */

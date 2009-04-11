@@ -21,7 +21,7 @@
                 <section-name>Section Name</section-name>
             </labels>
         </components>
-        <errors>
+        <errors>    
             <summary-title>Your Form Contains the Following Errors</summary-title>
             <some>Errors on Form</some>
             <none>No Errors on Form</none>

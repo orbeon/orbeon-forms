@@ -13,14 +13,10 @@
  */
 package org.orbeon.oxf.resources;
 
-import orbeon.apache.xml.serialize.OutputFormat;
-import orbeon.apache.xml.serialize.XMLSerializer;
-import org.apache.log4j.Logger;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -38,6 +34,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,10 +45,8 @@ import java.util.Map;
  */
 public abstract class ResourceManagerBase implements ResourceManager {
 
-    private static Logger logger = LoggerFactory.createLogger(ResourceManagerBase.class);
     private static final String MIN_RELOAD_INTERVAL_KEY = "oxf.resources.common.min-reload-interval";
     private static final long DEFAULT_MIN_RELOAD_INTERVAL = 2 * 1000;
-    private static OutputFormat DEFAULT_OUTPUT_FORMAT = new OutputFormat();
 
     private Map lastCalltoLastModified = Collections.synchronizedMap(new HashMap());
     private ExpirationMap lastModifiedMap;
@@ -292,18 +287,10 @@ public abstract class ResourceManagerBase implements ResourceManager {
      * @return A ContentHandler
      */
     public ContentHandler getWriteContentHandler(String key) {
-        final Writer writer = getWriter(key);
-        return new XMLSerializer(writer, DEFAULT_OUTPUT_FORMAT) {
-            public void endDocument()
-                    throws SAXException {
-                try {
-                    super.endDocument();
-                    writer.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        };
+        final OutputStream os = getOutputStream(key);
+        final TransformerHandler transformer = TransformerUtils.getIdentityTransformerHandler();
+        transformer.setResult(new StreamResult(os));
+        return transformer;
     }
 
     final synchronized public long lastModified(String key, boolean doNotThrowResourceNotFound) {
@@ -334,32 +321,4 @@ public abstract class ResourceManagerBase implements ResourceManager {
     protected void invalidateLastModifiedCache(String key) {
         lastCalltoLastModified.remove(key);
     }
-
-    private static class LastModifiedEntry {
-        private long lastAccess;
-        private Object lastModified;
-
-        public LastModifiedEntry(long lastAccess, Object lastModified) {
-            this.lastAccess = lastAccess;
-            this.lastModified = lastModified;
-        }
-
-        public long getLastAccess() {
-            return lastAccess;
-        }
-
-        public void setLastAccess(long lastAccess) {
-            this.lastAccess = lastAccess;
-        }
-
-        public Object getLastModified() {
-            return lastModified;
-        }
-
-        public void setLastModified(Object lastModified) {
-            this.lastModified = lastModified;
-        }
-    }
-
-
 }

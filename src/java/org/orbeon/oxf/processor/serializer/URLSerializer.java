@@ -26,7 +26,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -60,8 +59,18 @@ public class URLSerializer extends ProcessorImpl {
 
             if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                 // NOTE: This is probably done as an optimization. Is this really necessary?
-                final ContentHandler contentHandler = ResourceManagerWrapper.instance().getWriteContentHandler(url.getFile());
-                readInputAsSAX(pipelineContext, INPUT_DATA, contentHandler);
+
+                final OutputStream os = ResourceManagerWrapper.instance().getOutputStream(url.getFile());
+                try {
+                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                    identity.setResult(new StreamResult(os));
+
+                    readInputAsSAX(pipelineContext, INPUT_DATA, identity);
+                } finally {
+                    // Clean up
+                    if (os != null)
+                        os.close();
+                }
             } else {
                 // Open the URL
                 final URLConnection conn = url.openConnection();

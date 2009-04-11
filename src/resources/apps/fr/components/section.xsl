@@ -88,10 +88,12 @@
                                     <xsl:apply-templates select="xforms:hint | xforms:alert"/>
                                     <!-- Put a hidden label for the error sumnmary -->
                                     <xforms:label class="fr-hidden" ref="$fr-resources/components/labels/section-name"/>
-                                    <xsl:apply-templates select="fr:buttons"/>
                                 </xforms:input>
                             </xsl:variable>
                             <xsl:apply-templates select="$input"/>
+                            <span class="fr-section-buttons">
+                                <xsl:apply-templates select="fr:buttons/node()"/>
+                            </span>
                         </xsl:when>
                         <xsl:when test="$is-section-collapse">
                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->

@@ -82,6 +82,9 @@ h1.fr-form-title {
     color: #333333;
 }
 
+#fb-toolbox .yui-button .first-child { *width: 100% } /* IE hack otherwise button border appears incorrectly */
+#fb-toolbox button.xforms-trigger img { margin-right: .2em }
+
 /* Cut / Copy / Paste */
 #fb-toolbox .fb-xvc { text-align: center }
 #fb-toolbox .fb-xvc .xforms-trigger { margin-right: .5em }
@@ -206,11 +209,10 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title { display: block }
 
 /* Only show buttons when in edit mode or when hovering over the title */
-#fb-details-group .fr-section-title .fr-inplace-buttons { display: none }
-#fb-details-group .fr-section-title .fr-inplace-edit .fr-inplace-buttons,
-    #fb-details-group .fr-section-title:hover .fr-inplace-buttons { display: inline }
+#fb-details-group .fr-section-title .fr-section-buttons { display: none }
+#fb-details-group .fr-section-title:hover .fr-section-buttons { display: inline }
 
-#fb-details-group .fr-section-title .fr-inplace-view .fr-inplace-buttons {
+#fb-details-group .fr-section-title .fr-section-buttons {
     margin-left: .5em;
     margin-right: .5em;
     padding-right: .2em;/* not sure why we need this, but there is some visual padding to the left so use this to balance */
@@ -223,19 +225,9 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title .fr-inplace-content .xforms-label { display: none }
 #fb-details-group .fr-section-title .xforms-input input { width: 20em }
 
-/* For section alert, restore to something closer from the old-style alert icons */
-#fb-details-group .fr-section-title .xforms-alert-active {
-    background: transparent url(../../../../ops/images/xforms/exclamation.png) no-repeat left center;
-    display: inline-block;
-    font-size: 0;
-    height: 16px;
-    width: 16px;
-    text-indent: 16px;
-    margin-left: .25em;
-    overflow: hidden;
-    vertical-align: middle;
-    white-space: nowrap;
-}
+/* Make section title alert look nicer */
+#fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }
+#fb-details-group .fr-section-title .fr-inplace-content { display: inline-block; display: -moz-inline-box; *zoom: 1 }
 
 /* ***** Misc ******************************************************************************************************* */
 
@@ -479,11 +471,18 @@ html.accordion-menu-js dd.a-m-d-anim {
 
 /* ***** YUI Layout ************************************************************************************************* */
 
+#fb-layout .xforms-disabled { display: none }
 #fr-view { margin: auto }
 .yui-layout-unit-left { background-color: white }
 .yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }
 
 .fr-bottom { padding: .8em }
+.fr-bottom .fr-messages {
+    clear: none;
+    padding: .5em;
+    float: left;
+    margin: 0;
+}
 
 #fb-layout .yui-layout-bd { border: none }
 #fb-layout .yui-layout-unit-top .yui-layout-bd { border-bottom: 2px solid #ccc; background-color: white }

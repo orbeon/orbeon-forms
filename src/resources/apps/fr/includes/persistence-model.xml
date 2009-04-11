@@ -697,7 +697,7 @@
     <!-- Perform background submission upon xforms-select for xforms:upload -->
     <!-- NOTE: We used to check on event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance'), but this
          doesn't work with nested XBL components which handle their own local data. So now just rely on observers. -->
-    <xforms:action ev:observer="fr-form-group fb-metadata-group fr-dialogs-group" ev:event="xforms-select"
+    <xforms:action ev:observer="fr-form-group fb-logo-group fr-dialogs-group" ev:event="xforms-select"
             if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>

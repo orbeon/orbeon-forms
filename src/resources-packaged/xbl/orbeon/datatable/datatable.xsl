@@ -138,7 +138,7 @@
                         <sort currentId="{if ($sorted) then count($sorted/../preceding-sibling::xhtml:th) + 1 else -1}" currentOrder="{$sorted}"
                             xmlns="">
                             <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
-                                <key type="{if (@fr:sort-type) then if (@fr:sort-type = 'number') then 'number' else 'text' else ''}">
+                                <key type="{if (@fr:sortType) then if (@fr:sortType = 'number') then 'number' else 'text' else ''}">
                                     <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
                                     <xsl:if test="@fr:sortable='true'">
                                         <xsl:variable name="sortKeys">
@@ -165,7 +165,7 @@
                 <xsl:copy-of select="$sort-instance"/>
                 <xsl:variable name="repeat-nodeset" select="$pass1//xforms:repeat[1]/@nodeset"/>
                 <xxforms:variable name="nodeset" select="xxforms:component-context()/{$pass1//xforms:repeat/@nodeset}"/>
-                <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sort-type)]">
+                <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
                     <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
                     <xxforms:variable name="node" select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
                     <xxforms:variable name="type" select="xxforms:type($node)"/>

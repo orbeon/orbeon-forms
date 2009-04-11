@@ -46,7 +46,7 @@
 
         <p>A first table with explicit labels. The first two colums are sortable and resizeable and the first one is a number. The labels are defined
             separately in a thead element.</p>
-        <fr:datatable id="table-repeat1" appearance="xxforms:data-table">
+        <fr:datatable id="table-repeat1">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
@@ -58,15 +58,12 @@
             <tbody>
                 <tr repeat-nodeset="record">
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <xf:output ref="AAA"/>
                     </td>
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <xf:output ref="BBB"/>
                     </td>
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <xf:output ref="CCC"/>
                     </td>
                 </tr>
@@ -75,25 +72,21 @@
 
         <p>Another table with implicit labels. All the colums are sortable and resizeable and the first one is a number. The labels are defined as
             xforms labels.</p>
-        <fr:datatable id="table-repeat2" appearance="xxforms:data-table">
+        <fr:datatable id="table-repeat2">
             <!-- Optional <thead>, otherwise try to build one from body -->
             <tr repeat-nodeset="record">
-                <td fr:sortable="true" fr:sort-type="number" fr:resizeable="true">
-                    <!-- Classes allow setting column properties -->
+                <td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
                     <xf:output ref="AAA">
-                        <!-- Optional label used if there is no <head> -->
                         <xf:label>AAA (imp)</xf:label>
                     </xf:output>
                 </td>
                 <td fr:sortable="true" fr:resizeable="true">
-                    <!-- Classes allow setting column properties -->
                     <xf:output ref="BBB">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>BBB (imp)</xf:label>
                     </xf:output>
                 </td>
                 <td fr:sortable="true" fr:resizeable="true">
-                    <!-- Classes allow setting column properties -->
                     <xf:output ref="CCC">
                         <!-- Optional label used if there is no <head> -->
                         <xf:label>CCC (imp)</xf:label>

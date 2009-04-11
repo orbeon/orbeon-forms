@@ -28,7 +28,7 @@
 
         <p>This sample demonstrates the support of pre-sorted datasets by the datatable widget.</p>
 
-        <fr:datatable sortedByKey="Date" sortedByDir="descending">
+        <fr:datatable>
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
@@ -40,17 +40,14 @@
             <tbody>
                 <tr repeat-nodeset="/atom:feed/atom:entry">
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <xf:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
                     </td>
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <a href="{atom:author/atom:uri}">
                             <xf:output value="atom:author/atom:name"/>
                         </a>
                     </td>
                     <td>
-                        <!-- Classes allow setting column properties -->
                         <xf:output value="atom:title"/>
                     </td>
                 </tr>

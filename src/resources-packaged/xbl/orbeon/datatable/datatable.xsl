@@ -74,7 +74,7 @@
             <!-- See http://snippets.dzone.com/posts/show/216... for the display: table hack-->
             <xsl:copy-of select="namespace::*"/>
 
-  
+
 
             <xsl:variable name="pass1">
                 <!-- 
@@ -131,55 +131,90 @@
             -->
 
             <xforms:model id="datatable">
-                <xforms:instance id="sort">
-                    <xsl:variable name="sorted"
-                        select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sorted = ('descending', 'ascending')][1]/@fr:sorted"/>
-                    <sort currentId="{if ($sorted) then count($sorted/../preceding-sibling::xhtml:th) + 1 else -1}" currentOrder="{$sorted}" xmlns="">
-                        <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
-                            <key type="{if (@fr:sort-type = 'number') then 'number' else 'text'}">
-                                <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
-                                <xsl:if test="@fr:sortable='true'">
-                                    <xsl:variable name="sortKeys">
-                                        <xsl:apply-templates
-                                            select="$pass1/xhtml:table/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td[position() = $position]"
-                                            mode="sortKey"/>
-                                    </xsl:variable>
-                                    <xsl:choose>
-                                        <xsl:when test="count($sortKeys/*) > 1">
-                                            <xsl:text>concat(</xsl:text>
-                                            <xsl:value-of select="string-join($sortKeys/*, ',')"/>
-                                            <xsl:text>)</xsl:text>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="$sortKeys/*"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xsl:if>
-                            </key>
+                <xsl:variable name="sort-instance">
+                    <xforms:instance id="sort">
+                        <xsl:variable name="sorted"
+                            select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sorted = ('descending', 'ascending')][1]/@fr:sorted"/>
+                        <sort currentId="{if ($sorted) then count($sorted/../preceding-sibling::xhtml:th) + 1 else -1}" currentOrder="{$sorted}"
+                            xmlns="">
+                            <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
+                                <key type="{if (@fr:sort-type) then if (@fr:sort-type = 'number') then 'number' else 'text' else ''}">
+                                    <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
+                                    <xsl:if test="@fr:sortable='true'">
+                                        <xsl:variable name="sortKeys">
+                                            <xsl:apply-templates
+                                                select="$pass1/xhtml:table/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td[position() = $position]"
+                                                mode="sortKey"/>
+                                        </xsl:variable>
+                                        <xsl:choose>
+                                            <xsl:when test="count($sortKeys/*) > 1">
+                                                <xsl:text>concat(</xsl:text>
+                                                <xsl:value-of select="string-join($sortKeys/*, ',')"/>
+                                                <xsl:text>)</xsl:text>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:value-of select="$sortKeys/*"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:if>
+                                </key>
+                            </xsl:for-each>
+                        </sort>
+                    </xforms:instance>
+                </xsl:variable>
+                <xsl:copy-of select="$sort-instance"/>
+                <xsl:variable name="repeat-nodeset" select="$pass1//xforms:repeat[1]/@nodeset"/>
+                <xxforms:variable name="nodeset" select="xxforms:component-context()/{$pass1//xforms:repeat/@nodeset}"/>
+                <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sort-type)]">
+                    <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
+                    <xxforms:variable name="node" select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
+                    <xxforms:variable name="type" select="xxforms:type($node)"/>
+                    <xsl:variable name="numberTypes">
+                        <type>xs:decimal</type>
+                        <type>xs:integer</type>
+                        <type>xs:nonPositiveInteger</type>
+                        <type>xs:negativeInteger</type>
+                        <type>xs:long</type>
+                        <type>xs:int</type>
+                        <type>xs:short</type>
+                        <type>xs:byte</type>
+                        <type>xs:nonNegativeInteger</type>
+                        <type>xs:unsignedLong</type>
+                        <type>xs:unsignedInt</type>
+                        <type>xs:unsignedShort</type>
+                        <type>xs:unsignedByte</type>
+                        <type>xs:positiveInteger</type>
+                    </xsl:variable>
+                    <xsl:variable name="numberTypesEnumeration">
+                        <xsl:for-each select="$numberTypes/*">
+                            <xsl:if test="position() >1">,</xsl:if>
+                            <xsl:text>resolve-QName('</xsl:text>
+                            <xsl:value-of select="."/>
+                            <xsl:text>',..)</xsl:text>
                         </xsl:for-each>
-                    </sort>
-                </xforms:instance>
+                    </xsl:variable>
+                    <xforms:bind nodeset="key[{$position}]/@type" calculate="if ($type = ({$numberTypesEnumeration})) then 'number' else 'text'"/>
+                </xsl:for-each>
                 <xsl:if test="$paginated">
                     <xforms:instance id="page">
                         <page xmlns="">1</page>
                     </xforms:instance>
-                    <xforms:bind id="page-binding" instance="page"/>
                 </xsl:if>
                 <xforms:bind nodeset="@currentId" type="xs:integer"/>
 
             </xforms:model>
-            
+
             <xsl:if test="$paginated">
                 <xxforms:variable name="page" model="datatable" select="instance('page')"/>
                 <xxforms:variable name="nbRows" select="count({$pass1//xforms:repeat[1]/@nodeset})"/>
                 <xxforms:variable name="nbPages" select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
                 <xxforms:variable name="pages" select="for $p in 1 to $nbPages return xxforms:element('page', $p)"/>
             </xsl:if>
-            
+
             <xsl:variable name="pagination">
                 <xsl:if test="$paginated">
                     <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
-                          
+
                         <xforms:group ref=".[$page = 1]">
                             <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
                         </xforms:group>
@@ -189,7 +224,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" model="datatable" ref="instance('page')" value="1"/>
                             </xforms:trigger>
                         </xforms:group>
-                        
+
                         <xforms:group ref=".[$page = 1]">
                             <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
                         </xforms:group>
@@ -199,7 +234,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" model="datatable" ref="instance('page')" value=". - 1"/>
                             </xforms:trigger>
                         </xforms:group>
-                        
+
                         <xhtml:span class="yui-pg-pages">
                             <xforms:repeat nodeset="$pages">
                                 <xforms:group ref=".[. = $page]">
@@ -216,7 +251,7 @@
                                 </xforms:group>
                             </xforms:repeat>
                         </xhtml:span>
-                        
+
                         <xforms:group ref=".[$page = $nbPages]">
                             <xhtml:span class="yui-pg-next">next ></xhtml:span>
                         </xforms:group>
@@ -226,7 +261,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" model="datatable" ref="instance('page')" value=". + 1"/>
                             </xforms:trigger>
                         </xforms:group>
-                        
+
                         <xforms:group ref=".[$page = $nbPages]">
                             <xhtml:span class="yui-pg-last">last >></xhtml:span>
                         </xforms:group>
@@ -236,7 +271,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" model="datatable" ref="instance('page')" value="$nbPages"/>
                             </xforms:trigger>
                         </xforms:group>
-                        
+
                         <!-- <xhtml:div>
                             <xhtml:p>
                             <xforms:output value="$page">
@@ -255,8 +290,8 @@
                             </xhtml:p>
                             </xhtml:div>-->
                     </xhtml:div>
-                    
-                    
+
+
                 </xsl:if>
             </xsl:variable>
 

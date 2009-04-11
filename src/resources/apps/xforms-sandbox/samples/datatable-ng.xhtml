@@ -13,7 +13,7 @@
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" >
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Using YUI's datatable</title>
@@ -37,7 +37,7 @@
                     </record>
                 </instance>
             </xf:instance>
-            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:integer"/>
+            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xf:model>
     </head>
     <body>
@@ -50,7 +50,7 @@
             <!-- Optional <thead>, otherwise try to build one from body -->
             <thead>
                 <tr>
-                    <th fr:sortable="true" fr:sort-type="number" fr:resizeable="true">AAA (s)</th>
+                    <th fr:sortable="true" fr:resizeable="true">AAA (s)</th>
                     <th fr:sortable="true" fr:resizeable="true">BBB (s)</th>
                     <th>CCC</th>
                 </tr>

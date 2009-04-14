@@ -20,30 +20,60 @@ import orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.SequenceReader;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -51,7 +81,11 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class XMLUtils {
 
@@ -1052,6 +1086,44 @@ public class XMLUtils {
         str = StringUtils.replace(str, "\"", "&quot;");
         str = StringUtils.replace(str, "'", "&#39;");
         return str;
+    }
+
+    public static org.dom4j.Document cleanXML(org.dom4j.Document doc, String stylesheetURL) {
+      try {
+        final org.dom4j.Element element = doc.getRootElement();
+        final String systemId = Dom4jUtils.makeSystemId(element);
+        // The date to clean
+        final DOMGenerator dataToClean = new DOMGenerator(doc, "clean xml", DOMGenerator.ZeroValidity, systemId);
+        // The stylesheet
+        URLGenerator stylesheetGenerator = new URLGenerator(stylesheetURL);
+        // The transformation
+        // Define the name of the processor (this is a QName)
+        final QName processorName = new QName("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
+        // Get a factory for this processor
+        final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
+        if (processorFactory == null)
+          throw new OXFException("Cannot find processor factory with name '"
+                                 + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
+
+        // Create processor
+        final Processor xsltProcessor = processorFactory.createInstance();
+        // Where the result goes
+        DOMSerializer transformationOutput = new DOMSerializer();
+
+        // Connect
+        PipelineUtils.connect(stylesheetGenerator, "data", xsltProcessor, "config");
+        PipelineUtils.connect(dataToClean, "data", xsltProcessor, "data");
+        PipelineUtils.connect(xsltProcessor, "data", transformationOutput, "data");
+
+        // Run the pipeline
+        PipelineContext pipelineContext = new PipelineContext();
+        transformationOutput.start(pipelineContext);
+        // Get the output
+        return transformationOutput.getDocument(pipelineContext);
+      }
+      catch(Exception e) {
+        throw new OXFException(e);
+      }
     }
 
     public static String toString(final Locator loc) {

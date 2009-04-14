@@ -1101,9 +1101,8 @@ ORBEON.xforms.Document = {
     setValue: function(controlId, newValue) {
         var control = ORBEON.util.Dom.getElementById(controlId);
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
-        // If we are offline, directly change the value of the control
-        if (!ORBEON.xforms.Offline.isOnline)
-            ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+        // Directly change the value of the control in the UI without waiting for a response from the server
+        ORBEON.xforms.Controls.setCurrentValue(control, newValue);
         var event = new ORBEON.xforms.Server.Event(null, control.id, null, newValue, "xxforms-value-change-with-focus-change");
         ORBEON.xforms.Server.fireEvents([event], false);
     },
@@ -1402,7 +1401,7 @@ ORBEON.xforms.Controls = {
      * @param attribute3        Optional
      * @param attribute4        Optional
      */
-    setCurrentValue: function(control, newControlValue, previousServerValue, attribute1, attribute2, attribute3, attribute4) {
+    setCurrentValue: function(control, newControlValue, attribute1, attribute2, attribute3, attribute4) {
         var isStaticReadonly = ORBEON.util.Dom.hasClass(control, "xforms-static");
         if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
             // XForms output with xxforms:download appearance
@@ -1544,30 +1543,15 @@ ORBEON.xforms.Controls = {
             // HTML area
             if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
                 // YUI RTE
-                ORBEON.widgets.RTE.setValue(control, previousServerValue, newControlValue);
+                ORBEON.widgets.RTE.setValue(control, newControlValue);
             } else {
                 // FCK
                 var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-                var doUpdate =
-                        // Update only if the new value is different than the value already have in the HTML area
-                        xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
-                        // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
-                        // If there is no previousServerValue, go ahead and update field
-                        && (previousServerValue == null || xformsNormalizeEndlines(htmlEditor.GetXHTML()) == xformsNormalizeEndlines(previousServerValue));
-                if (doUpdate) {
-                    // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
-                    // as we loose our listeners after using the later
-                    htmlEditor.EditorDocument.body.innerHTML = newControlValue;
-                    // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
-                    // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
-                    // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
-                    // since the last time we sent the value to the serer. The bottom line is that we are going to compare
-                    // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
-                    // server accounts for the slight difference there might be in those 2 representations.
-                    ORBEON.xforms.Globals.serverValue[control.id] = htmlEditor.GetXHTML();
-                    control.value = newControlValue;
-                    control.previousValue = newControlValue;
-                }
+                // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
+                // as we loose our listeners after using the later
+                htmlEditor.EditorDocument.body.innerHTML = newControlValue;
+                control.value = newControlValue;
+                control.previousValue = newControlValue;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")) {
             // Select tree
@@ -2503,13 +2487,16 @@ ORBEON.xforms.Events = {
      *      from the server
      * Testing on key code:
      *      Ignore some key codes that won't modify the value of the field
+     *      (including when key code if undefined, which the RTE triggers in some cases).
      * Testing on type control:
      *      We only do this for text fields and text areas, because for other inputs (say select/select1) the user
      *      can press a key that doesn't change the value of the field, in which case we *do* want to update the
      *      control with a new value coming from the server.
      */
     _isChangingKey: function(control, keyCode) {
-        return keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
+        return
+            ! YAHOO.lang.isUndefined(keyCode) &&
+            keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
             (ORBEON.util.Dom.hasClass(control, "xforms-input") || ORBEON.util.Dom.hasClass(control, "xforms-secret")
                     || ORBEON.util.Dom.hasClass(control, "xforms-textarea"));
     },
@@ -2517,10 +2504,11 @@ ORBEON.xforms.Events = {
     keydown: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
+            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode)) {
                 ORBEON.xforms.Globals.changedIdsRequest[target.id] =
                     ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
                             : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
+            }
             if (ORBEON.widgets.JSCalendar.appliesToControl(target)) {
                 ORBEON.widgets.JSCalendar.keydown(event, target);
             } else if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
@@ -3389,6 +3377,14 @@ ORBEON.widgets.RTE = function() {
     isIncremental = {};         // Maps control ID to boolean telling us if this control is in incremental model
     editorWithFocus = null;     // The control ID of the RTE editor that has the focus, null if none
 
+    /**
+     * Maps control ID to either:
+     *      undefined:      if the control is not rendered yet, and nobody is listening on render event.
+     *      true:           if the control is rendered and nobody listened to a render event before it was rendered.
+     *      a custom event: if someone listened to the render event before the control was rendered.
+     */
+    renderedCustomEvents = {};
+
     function sendChangeToServer(controlID) {
         var event = new ORBEON.xforms.Server.Event(null, controlID, null,
                 ORBEON.widgets.RTE.getValue(ORBEON.util.Dom.getElementById(controlID)), "xxforms-value-change-with-focus-change");
@@ -3437,9 +3433,14 @@ ORBEON.widgets.RTE = function() {
             rteEditors[control.id] = yuiRTE;
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
-            yuiRTE.on("afterRender", function() {
+            yuiRTE.on("editorContentLoaded", function() {
                 var rteContainer = control.parentNode;
                 rteContainer.className += " " + control.className;
+                // Fire event we have a custom event listener from this RTE
+                if (YAHOO.lang.isObject(renderedCustomEvents[control.id]))
+                    renderedCustomEvents[control.id].fire();
+                // Set to true, so future listeners are called back right away
+                renderedCustomEvents[control.id] = true;
             });
             yuiRTE.render();
         },
@@ -3462,19 +3463,9 @@ ORBEON.widgets.RTE = function() {
         /**
          * Called to set the value of the RTE
          */
-        setValue: function(control, previousServerValue, newValue) {
+        setValue: function(control, newValue) {
             var yuiRTE = rteEditors[control.id];
-            var doUpdate =
-                    // Update only if the new value is different than the value already have in the HTML area
-                    xformsNormalizeEndlines(ORBEON.widgets.RTE.getValue(control)) != xformsNormalizeEndlines(newValue)
-                    // Update only if the value in the HTML area is the same now as it was when we sent it to the server
-                    // If there is no previousServerValue, go ahead and update field
-                    && (previousServerValue == null || xformsNormalizeEndlines(ORBEON.widgets.RTE.getValue(control)) == xformsNormalizeEndlines(previousServerValue));
-
-            if (doUpdate) {
-                yuiRTE.setEditorHTML(newValue);
-                ORBEON.xforms.Globals.serverValue[control.id] = newValue;
-            }
+            yuiRTE.setEditorHTML(newValue);
         },
 
         getValue: function(control) {
@@ -3492,6 +3483,19 @@ ORBEON.widgets.RTE = function() {
         setFocus: function(control) {
             var yuiRTE = rteEditors[control.id];
             // NOP: not sure what we can do with YUI 2.6. It seems 2.7 has a focus() method.
+        },
+
+        onRendered: function(control, callback) {
+            if (renderedCustomEvents[control.id] === true) {
+                // Already rendered.
+                callback();
+            } else {
+                // Create custom event if necessary
+                if (renderedCustomEvents[control.id] === undefined)
+                    renderedCustomEvents[control.id] = new YAHOO.util.CustomEvent("rteRendered");
+                // Custom event was already created
+                renderedCustomEvents[control.id].subscribe(callback);
+            }
         }
     };
 
@@ -5458,16 +5462,35 @@ ORBEON.xforms.Server = {
                                                 var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
                                                 var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue, state, filename, mediatype, size);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, state, filename, mediatype, size);
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                 // Additional attributes for xforms:input
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                 var maxlength = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
                                                 var autocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue, size, maxlength, autocomplete);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, size, maxlength, autocomplete);
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                    && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                var currentValue = xformsNormalizeEndlines(ORBEON.xforms.Controls.getCurrentValue(documentElement));
+                                                var doUpdate =
+                                                        // Update only if the new value is different than the value already have in the HTML area
+                                                        currentValue != xformsNormalizeEndlines(newControlValue)
+                                                        // Update only if the value in the HTML area is the same now as it was when we sent it to the server
+                                                        // If there is no previousServerValue, go ahead and update field
+                                                        && (previousServerValue == null || currentValue == xformsNormalizeEndlines(previousServerValue));
+                                                if (doUpdate) {
+                                                    ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                    // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                                                    // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                                                    // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                                                    // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                                                    // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                                                    // server accounts for the slight difference there might be in those 2 representations.
+                                                    ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                }
                                             } else {
                                                 // Other control just have a new value
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, previousServerValue);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                             }
 
                                             // Call custom listener if any (temporary until we have a good API for custom components)

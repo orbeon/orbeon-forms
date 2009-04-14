@@ -6,7 +6,7 @@
         </dummy-root>
     </xsl:template>
 
-    <xsl:template match="*:b | *:i | *:ul | *:li | *:ol | *:p | *:span | *:u | *:div" priority="2">
+    <xsl:template match="*:a | *:b | *:i | *:ul | *:li | *:ol | *:p | *:span | *:u | *:div" priority="2">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </xsl:element>

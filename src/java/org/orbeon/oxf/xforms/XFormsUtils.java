@@ -15,7 +15,12 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.dom4j.*;
+import org.ccil.cowan.tagsoup.HTMLSchema;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Text;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -23,14 +28,23 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.SoftReferenceObjectPool;
+import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.HTMLBodyContentHandler;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -38,27 +52,52 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.om.AxisIterator;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.value.AnyURIValue;
+import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.value.DoubleValue;
+import org.orbeon.saxon.value.FloatValue;
+import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.ccil.cowan.tagsoup.HTMLSchema;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -261,34 +300,21 @@ public class XFormsUtils {
         }
     }
 
-    public static org.w3c.dom.Document htmlStringToDocumentTagSoup(String value, LocationData locationData) {
-
+    private static void htmlStringToResult(String value, LocationData locationData, Result result) {
         try {
             final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
             final HTMLSchema theSchema = new HTMLSchema();
-
             xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, theSchema);
-            
             xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true);
-
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-
-            final org.w3c.dom.Document document = XMLUtils.createDocument();
-            final DOMResult domResult = new DOMResult(document);
-            identity.setResult(domResult);
-
+            identity.setResult(result);
             xmlReader.setContentHandler(identity);
-
             final InputSource inputSource = new InputSource();
             inputSource.setCharacterStream(new StringReader(value));
-
             xmlReader.parse(inputSource);
-
-            return document;
         } catch (Exception e) {
             throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
         }
-        
 //			r.setFeature(Parser.CDATAElementsFeature, false);
 //			r.setFeature(Parser.namespacesFeature, false);
 //			r.setFeature(Parser.ignoreBogonsFeature, true);
@@ -299,6 +325,20 @@ public class XFormsUtils {
 //			r.setFeature(Parser.ignorableWhitespaceFeature, true);
 //			r.setProperty(Parser.scannerProperty, new PYXScanner());
 //          r.setProperty(Parser.lexicalHandlerProperty, h);
+    }
+
+
+    public static org.w3c.dom.Document htmlStringToDocumentTagSoup(String value, LocationData locationData) {
+        final org.w3c.dom.Document document = XMLUtils.createDocument();
+        final DOMResult domResult = new DOMResult(document);
+        htmlStringToResult(value, locationData, domResult);
+        return document;
+    }
+
+    public static Document htmlStringToDom4jTagSoup(String value, LocationData locationData) {
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
+        htmlStringToResult(value, locationData, documentResult);
+        return documentResult.getDocument();
     }
 
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {

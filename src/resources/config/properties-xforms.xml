@@ -81,6 +81,7 @@
     <property as="xs:integer" name="oxf.xforms.request-retries"                         value="1"/>
     <property as="xs:string"  name="oxf.xforms.datepicker"                              value="yui"/>  <!-- jcalendar or yui -->
     <property as="xs:string"  name="oxf.xforms.htmleditor"                              value="yui"/>  <!-- fck or yui -->
+    <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                       value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                    value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"        value="500"/>
@@ -89,6 +90,9 @@
 
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                      value="default"/>  <!-- default or deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                    value=""/>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.map."                             value=""/>
+
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                  value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"              value=""/>

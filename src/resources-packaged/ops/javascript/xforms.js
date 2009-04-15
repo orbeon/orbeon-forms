@@ -60,6 +60,7 @@ var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
 var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
 var DATE_PICKER_PROPERTY = "datepicker";
 var HTML_EDITOR_PROPERTY = "htmleditor";
+var SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
 var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
 var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 var RESOURCES_VERSIONED = "oxf.resources.versioned";
@@ -976,6 +977,7 @@ ORBEON.util.Utils = {
             case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
             case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
             case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
+            case SHOW_ERROR_DIALOG_PROPERTY: { return "true"; }
             case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
             case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
             case RESOURCES_VERSIONED: { return "false"; }
@@ -3092,7 +3094,8 @@ ORBEON.xforms.Events = {
 
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
-    clickEvent: new YAHOO.util.CustomEvent("clickEvent")
+    clickEvent: new YAHOO.util.CustomEvent("clickEvent"),
+    errorEvent: new YAHOO.util.CustomEvent("errorEvent")
 };
 
 ORBEON.widgets.Base = function() {
@@ -4343,7 +4346,8 @@ ORBEON.xforms.Server = {
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
     showError: function(title, details, formID) {
-        if (!ORBEON.xforms.Globals.requestIgnoreErrors) {
+        ORBEON.xforms.Events.errorEvent.fire();
+        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Utils.getProperty(SHOW_ERROR_DIALOG_PROPERTY) == "true") {
             if (ORBEON.xforms.Globals.formErrorPanel[formID]) {
                 ORBEON.xforms.Globals.formErrorPanel[formID].element.style.display = "block";
                 ORBEON.xforms.Globals.formErrorPanel[formID].errorTitleDiv.innerHTML = title;

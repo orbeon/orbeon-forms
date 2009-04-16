@@ -496,7 +496,6 @@
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/editor"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
@@ -517,9 +516,6 @@
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="yui/treeview/treeview"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/editor/editor"/>
         </antcall>
 
         <!-- From YUI examples -->
@@ -575,7 +571,7 @@
         </antcall>
 
     </target>
-    
+
     <target name="orbeon-minify-maybe-js">
         <echo message='srcfile: ${resources-packaged.dir}/ops/${name}.js'/>
         <echo message='targetfile: ${war.dir}/WEB-INF/resources/ops/${name}-min.js'/>

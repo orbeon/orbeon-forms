@@ -242,7 +242,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                                 // Create a new xxforms:attribute control
                                 reusableAttributes.clear();
 
-                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray, idIndex);
+                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray, -1);
 
                                 newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
                                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);

@@ -479,6 +479,9 @@ button.xforms-trigger img { margin-right: 10px }
     .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
     /* Don't show download link */
     .xbl-fr-attachment .xforms-output-appearance-xxforms-download { display: none }
+    /* There should not be a <style> element in the body, but if there is hide it for Flying Saucer */
+    style { display: none }
+    /* This must now show in the PDF */
     noscript { display: none }
     /* Since only value is shown, no need for special height */
     .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }

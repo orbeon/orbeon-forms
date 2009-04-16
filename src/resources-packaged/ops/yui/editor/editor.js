@@ -4455,9 +4455,8 @@ var Dom = YAHOO.util.Dom,
                         { type: 'separator' },
                         { group: 'insertitem', label: 'Insert Item',
                             buttons: [
-                                // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
-                                { type: 'push', label: 'Insert Image', value: 'insertimage' },
-                                { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
+                                { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true },
+                                { type: 'push', label: 'Insert Image', value: 'insertimage' }
                             ]
                         }
                     ]
@@ -7243,9 +7242,8 @@ var Dom = YAHOO.util.Dom,
                     { type: 'separator' },
                     { group: 'insertitem', label: 'Insert Item',
                         buttons: [
-                            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
-                            { type: 'push', label: 'Insert Image', value: 'insertimage' },
-                            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
+                            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true },
+                            { type: 'push', label: 'Insert Image', value: 'insertimage' }
                         ]
                     }
                 ]

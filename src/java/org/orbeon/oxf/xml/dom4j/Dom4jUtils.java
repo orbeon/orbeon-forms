@@ -23,12 +23,14 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import java.io.*;
 import java.util.*;
+import java.net.URL;
 
 /**
  * Collection of util routines for working with DOM4J.  In particular offers many methods found
@@ -96,6 +98,35 @@ public class Dom4jUtils {
             frmt.setTrimText(trm);
         }
         return domToString(brnch, frmt);
+    }
+
+    /**
+     * Read a document from a URL.
+     *
+     * @param urlString         URL
+     * @param validating        whether to validate
+     * @param handleXInclude    whether to process XInclude
+     * @return
+     * @throws SAXException
+     * @throws DocumentException
+     */
+    public static Document readFromURL(String urlString, boolean validating, boolean handleXInclude) {
+        InputStream is = null;
+        try {
+            final URL url = URLFactory.createURL(urlString);
+            is = url.openStream();
+            return readDom4j(is, urlString, validating, handleXInclude);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new OXFException("Exception while closing stream", e);
+                }
+            }
+        }
     }
 
     public static Document readDom4j(Reader reader) throws SAXException, DocumentException {

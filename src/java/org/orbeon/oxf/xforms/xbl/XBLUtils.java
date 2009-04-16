@@ -271,7 +271,8 @@ public class XBLUtils {
         }
     }
 
-    private static Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings) {
+    // Keep public for unit tests
+    public static Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings) {
         // Create transformer
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -280,7 +281,7 @@ public class XBLUtils {
         identity.setResult(documentResult);
 
         // Write the document through the annotator and gather namespace mappings
-        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings)); // XXX TODO FIXME use from static state
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings));
 
         // Return annotated document
         return documentResult.getDocument();

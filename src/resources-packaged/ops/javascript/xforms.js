@@ -3531,7 +3531,6 @@ ORBEON.widgets.RTE = function() {
                     ]
                 }
             });
-            console.log(yuiRTE);
             // Register event listener for user interacting with the control
             yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
             yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
@@ -5570,34 +5569,43 @@ ORBEON.xforms.Server = {
                                                 var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                 ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, state, filename, mediatype, size);
-                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                                // Additional attributes for xforms:input
-                                                var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                var maxlength = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
-                                                var autocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, size, maxlength, autocomplete);
-                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                    && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                var currentValue = xformsNormalizeEndlines(ORBEON.xforms.Controls.getCurrentValue(documentElement));
-                                                var doUpdate =
-                                                        // Update only if the new value is different than the value already have in the HTML area
-                                                        currentValue != xformsNormalizeEndlines(newControlValue)
-                                                        // Update only if the value in the HTML area is the same now as it was when we sent it to the server
-                                                        // If there is no previousServerValue, go ahead and update field
-                                                        && (previousServerValue == null || currentValue == xformsNormalizeEndlines(previousServerValue));
-                                                if (doUpdate) {
-                                                    ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                                                    // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
-                                                    // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
-                                                    // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
-                                                    // since the last time we sent the value to the serer. The bottom line is that we are going to compare
-                                                    // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
-                                                    // server accounts for the slight difference there might be in those 2 representations.
-                                                    ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                                }
                                             } else {
-                                                // Other control just have a new value
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                // If the control doesn't have a "current value" then it isn't a control that can hold a value (e.g. trigger)
+                                                // and there is no point in trying to update it.
+                                                if (currentValue != null) {
+                                                    currentValue = xformsNormalizeEndlines(currentValue);
+                                                    var doUpdate =
+                                                            // Update only if the new value is different than the value already have in the HTML area
+                                                            currentValue != xformsNormalizeEndlines(newControlValue)
+                                                            // Update only if the value in the HTML area is the same now as it was when we sent it to the server
+                                                            // If there is no previousServerValue, go ahead and update field
+                                                            && (previousServerValue == null || currentValue == xformsNormalizeEndlines(previousServerValue));
+                                                    if (doUpdate) {
+                                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                                            // Additional attributes for xforms:input
+                                                            var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                                            var maxlength = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
+                                                            var autocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, size, maxlength, autocomplete);
+                                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                            if (doUpdate) {
+                                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                                // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                                                                // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                                                                // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                                                                // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                                                                // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                                                                // server accounts for the slight difference there might be in those 2 representations.
+                                                                ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                            }
+                                                        } else {
+                                                            // Other control just have a new value
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                        }
+                                                    }
+                                                }
                                             }
 
                                             // Call custom listener if any (temporary until we have a good API for custom components)

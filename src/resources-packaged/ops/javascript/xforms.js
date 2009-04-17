@@ -4448,7 +4448,7 @@ ORBEON.xforms.Server = {
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
     showError: function(title, details, formID) {
-        ORBEON.xforms.Events.errorEvent.fire();
+        ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
         if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Utils.getProperty(SHOW_ERROR_DIALOG_PROPERTY) == "true") {
             if (ORBEON.xforms.Globals.formErrorPanel[formID]) {
                 ORBEON.xforms.Globals.formErrorPanel[formID].element.style.display = "block";

@@ -256,6 +256,7 @@ public class XFormsConstants {
     public static final QName CLASS_QNAME = new QName("class", Namespace.NO_NAMESPACE);
     public static final QName STYLE_QNAME = new QName("style", Namespace.NO_NAMESPACE);
 
+    public static final String XFORMS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "string");
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");
     public static final String XFORMS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "integer");
     public static final String XFORMS_DATE_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "date");

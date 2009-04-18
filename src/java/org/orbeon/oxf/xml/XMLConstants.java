@@ -96,6 +96,7 @@ public class XMLConstants {
     public static final QName XS_FLOAT_QNAME = new QName("float", XSD_NAMESPACE);
     public static final QName XS_DOUBLE_QNAME = new QName("double", XSD_NAMESPACE);
 
+    public static final String XS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "string");
     public static final String XS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "boolean");
     public static final String XS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "integer");
     public static final String XS_DATE_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "date");

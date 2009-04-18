@@ -1,0 +1,93 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Modal Trigger</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="instance">
+                <instance>
+                    <input/>
+                    <count>0</count>
+                </instance>
+            </xforms:instance>
+            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "Modal trigger",
+
+                    testDoubleClick: function() {
+                        var control = document.getElementById("modal-trigger");
+                        var countControl = document.getElementById("click-count");
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            YAHOO.util.UserAction.click(control);
+                            YAHOO.util.UserAction.click(control);
+                        }, function() {
+                            var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
+                            YAHOO.util.Assert.areEqual(1, count);
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                YAHOO.util.UserAction.click(control);
+                                YAHOO.util.UserAction.click(control);
+                            }, function() {
+                                var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
+                                YAHOO.util.Assert.areEqual(2, count);
+                            });
+                        });
+                    }
+                }));
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <xforms:output ref="count" id="click-count">
+                <xforms:label>Number of clicks: </xforms:label>
+            </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="input" id="input">
+                <xforms:label>Input: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger id="modal-trigger" xxforms:modal="true">
+                <xforms:label>Do long operation</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="count" value="number(.) + 1"/>
+                    <xforms:send submission="sleep-5-seconds"/>
+                </xforms:action>
+            </xforms:trigger>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

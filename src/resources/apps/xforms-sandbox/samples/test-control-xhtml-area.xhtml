@@ -1,0 +1,94 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>HTML Editor</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
+            <xforms:instance>
+                <gaga>Some &lt;b>text&lt;/b> here</gaga>
+            </xforms:instance>
+        </xforms:model>
+        <!--<xhtml:script type='text/javascript'  src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'/>-->
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                
+				YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "HTML Area",
+					
+                    settingValue: function(htmlIn, htmlOut) {
+                        var testCase = this;
+                        window.setTimeout(function() {
+                            ORBEON.widgets.RTE.onRendered(ORBEON.util.Dom.getElementById("xhtml-editor"), function() {
+                                testCase.resume(function() {
+                                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                        ORBEON.xforms.Document.setValue("xhtml-editor", htmlIn);
+                                    }, function() {
+                                        var htmlActualOut = ORBEON.xforms.Document.getValue("xhtml-textarea");
+                                        var htmlNormalizedOut = YAHOO.lang.trim(htmlActualOut).replace(new RegExp("  +", "g"), " ");
+                                        YAHOO.util.Assert.areEqual(htmlOut, htmlNormalizedOut);
+                                    });
+                                });
+                            });
+                        }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                        testCase.wait();
+                    },
+
+                    testSimpleHTML: function() {
+                        var simpleHTML = "Some different <b>content</b>.";
+                        this.settingValue(simpleHTML, simpleHTML);
+                    },
+
+					testWordHTML: function() {
+                        this.settingValue(
+                                "<p class=MsoNormal align=center"+
+                                    " style='margin-bottom:0in;margin-bottom:.0001pt;text-align:center;line-height:normal'><b"+
+                                    " style='mso-bidi-font-weight:normal'><u><span"+
+                                    " style='font-size:14.0pt;mso-bidi-font-size:11.0pt;mso-fareast-font-family:&quot;Times New"+
+                                    " Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;color:#0070C0'>Project"+
+                                    " Description<o:p></o:p></span></u></b></p>",
+                                "<p align=\"center\" class=\"MsoNormal\" style=\"margin-bottom:0in;margin-bottom:.0001pt;text-align:center;line-height:normal\"> <b" +
+                                    " style=\"mso-bidi-font-weight:normal\"> <u> <span" +
+                                    " style=\"font-size:14.0pt;mso-bidi-font-size:11.0pt;mso-fareast-font-family:&quot;Times New" +
+                                    " Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;color:#0070C0\">Project" +
+                                    " Description</span> </u> </b> </p>");
+                    },
+
+					testJSInjection: function() {
+                        this.settingValue(
+                                "<div>Text to keep<scr" + "ipt>doSomethingBad()</scr" + "ipt></div>",
+                                "<div>Text to keep</div>");
+                    }
+                }));
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+		
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Add "42"</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="/gaga" value="concat(., '42')"/>
+        </xforms:trigger>
+        <xhtml:h2>text/html texarea</xhtml:h2>
+        <xhtml:div>
+            <xforms:textarea id="xhtml-editor" mediatype="text/html" ref="/gaga"/>
+            <xforms:textarea ref="/gaga" id="xhtml-textarea"/>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

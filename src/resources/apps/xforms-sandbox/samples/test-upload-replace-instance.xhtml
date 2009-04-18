@@ -1,0 +1,89 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Upload with replace="instance"</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <file filename="" mediatype="" size=""/>
+                    <text/>
+                </instance>
+            </xforms:instance>
+            <xforms:submission action="/xforms-sandbox/service/identity" method="post" replace="none" id="submission">
+                <xforms:setvalue ev:event="xforms-submit-done" ref="/instance/text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ligula ante, lacinia at, facilisis eget, cursus ac, ligula. Etiam orci lectus, adipiscing in, pretium imperdiet, hendrerit in, nulla. Donec elementum euismod libero. Fusce tellus purus, varius sit amet, hendrerit sit amet, tempus posuere, ipsum. Integer viverra auctor sem. Donec in enim et tortor hendrerit sodales. Duis aliquet feugiat orci. Cras eu tellus. Sed a enim. Vivamus ac est. Suspendisse dignissim sapien quis neque. Sed dictum. Maecenas arcu lorem, tristique eget, suscipit in, molestie vel, ligula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi facilisis fermentum elit. Cras tristique, magna a vestibulum tempor, nisl augue vulputate libero, sed convallis quam eros vel tellus.</xforms:setvalue>
+            </xforms:submission>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "Upload replace instance",
+
+                    /**
+                     * Tests that when we receive an xxf:event-response that is inside a html/body as a result of an upload,
+                     * that response doesn't contain additional carriage returns.
+                     */
+                    testLineBreaks: function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            var upload = document.getElementById("upload-trigger");
+                            YAHOO.util.UserAction.click(upload);
+                        }, function() {
+                            // The second call to executeCausingAjaxRequest() is because when we click on the Upload
+                            // button, there is a first Ajax request made and the response tells us to do for a form submission
+                            // for the upload. We want to run code when that second Ajax response arrives.
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {}, function() {
+                                var textSpan = document.getElementById("text-output");
+                                var textValue = ORBEON.util.Dom.getStringValue(textSpan);
+                                YAHOO.util.Assert.isTrue(textValue.indexOf("\n") == -1);
+                            });
+                        });
+                    }
+                }));
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:upload ref="file">
+            <xforms:filename ref="@filename"/>
+            <xforms:mediatype ref="@mediatype"/>
+            <xxforms:size ref="@size"/>
+        </xforms:upload>
+        <xhtml:pre><xforms:output ref="text" id="text-output"/></xhtml:pre>
+        <xforms:trigger id="upload-trigger">
+            <xforms:label>Upload</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="submission" />
+            </xforms:action>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

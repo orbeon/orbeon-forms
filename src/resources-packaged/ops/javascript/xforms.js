@@ -485,7 +485,7 @@ ORBEON.util.Dom = {
         newInputElement.setAttribute("size", inputElement.size);
         newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
         parentElement.replaceChild(newInputElement, inputElement);
-        // For non-W3C compliant browsers we must re-register listeners on the new upload element we just created
+        // For non-W3C compliant browsers we must re-register a listener on the new element we just created
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             ORBEON.xforms.Init.registerChangeListenerOnFormElement(newInputElement);
         }
@@ -3647,7 +3647,9 @@ ORBEON.xforms.Init = {
                 var elementCount = form.elements.length;
                 for (var j = 0; j < elementCount; j++) {
                     var element = form.elements[j];
-                    ORBEON.xforms.Init.registerChangeListenerOnFormElement((element));
+                    if (element.id != null && element.id != "") {// No need to handle listeners on elements which don't have an id
+                        ORBEON.xforms.Init.registerChangeListenerOnFormElement(element);
+                    }
                 }
             }
         }
@@ -3660,7 +3662,9 @@ ORBEON.xforms.Init = {
                 var elementCount = form.elements.length;
                 for (var j = 0; j < elementCount; j++) {
                     var element = form.elements[j];
-                    ORBEON.xforms.Init.removeChangeListenerOnFormElement((element));
+                    if (element.id != null && element.id != "") {// No need to handle listeners on elements which don't have an id
+                        ORBEON.xforms.Init.removeChangeListenerOnFormElement(element);
+                    }
                 }
             }
         }
@@ -4526,14 +4530,34 @@ ORBEON.xforms.Server = {
         }
     },
 
+    _debugEventQueue: function() {
+        ORBEON.util.Utils.logMessage("Event queue:");
+        for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
+            var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+            ORBEON.util.Utils.logMessage(" " + eventIndex + " - name: " + event.eventName + " | targetId: " + event.targetId + " | value: " + event.value);
+        }
+    },
+
     executeNextRequest: function(bypassRequestQueue) {
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
+
+        // For debug only
+        //ORBEON.xforms.Server._debugEventQueue();
 
         ORBEON.xforms.Globals.executeEventFunctionQueued--;
         var executedRequest = false;
         if (!ORBEON.xforms.Globals.requestInProgress
                 && ORBEON.xforms.Globals.eventQueue.length > 0
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
+
+            // Populate map for efficiency
+            // TODO: could compute this once and for all
+            var eventsToFilter = {};
+            {
+                var eventsToFilterProperty = ORBEON.util.Utils.getProperty(CLIENT_EVENTS_FILTER_PROPERTY).split(" ");
+                for (var eventIndex = 0; eventIndex < eventsToFilterProperty.length; eventIndex++)
+                    eventsToFilter[eventsToFilterProperty[eventIndex]] = true;
+            }
 
             var foundActivatingEvent = false;
             if (ORBEON.util.Utils.getProperty(CLIENT_EVENTS_MODE_PROPERTY) == "deferred") {
@@ -4555,7 +4579,8 @@ ORBEON.xforms.Server = {
                     }
 
                     // Check if we find a class on the target that tells us this is an activating event
-                    if (event.targetId != null) {
+                    // Do NOT consider a filtered event as an activating event
+                    if (event.targetId != null && eventsToFilter[event.eventName] == null) {
                         var target = ORBEON.util.Dom.getElementById(event.targetId);
                         if (target == null) {
                             // Target is not on the client. For most use cases, assume event should be dispatched right away.
@@ -4603,6 +4628,7 @@ ORBEON.xforms.Server = {
                     }
                 }
             } else {
+                // Every event is an activating event
                 var foundActivatingEvent = true;
             }
 
@@ -4612,12 +4638,6 @@ ORBEON.xforms.Server = {
                 {
                     var seenControlValue = {};
                     var newEvents = [];
-                    var eventsToFilterProperty = ORBEON.util.Utils.getProperty(CLIENT_EVENTS_FILTER_PROPERTY).split(" ");
-
-                    // Populate properties for efficiency
-                    var eventsToFilter = {};
-                    for (var eventIndex = 0; eventIndex < eventsToFilterProperty.length; eventIndex++)
-                        eventsToFilter[eventsToFilterProperty[eventIndex]] = true;
 
                     for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                         // Extract information from event array
@@ -5310,7 +5330,7 @@ ORBEON.xforms.Server = {
                                                 documentElement = ORBEON.util.Dom.getElementByIdNoCache(controlId);
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = documentElement;
-                                                // Re-register handlers on the newly created control
+                                                // For non-W3C compliant browsers we must re-register a listener on the new element we just created
                                                 ORBEON.xforms.Init.registerChangeListenerOnFormElement(documentElement);
                                             } else {
                                                 // Version for compliant browsers
@@ -5399,7 +5419,7 @@ ORBEON.xforms.Server = {
                                             if (documentElement == null) ORBEON.util.Utils.logMessage ("Can't find element or iteration with ID '" + controlId + "'");
                                         }
                                         var documentElementClasses = documentElement.className.split(" ");
-                                        var isControl = ORBEON.util.Dom.hasClass(documentElement, "xforms-control");
+                                        var isLeafControl = ORBEON.util.Dom.hasClass(documentElement, "xforms-control");
 
                                         // Save new value sent by server (upload controls don't carry their value the same way as other controls)
                                         var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
@@ -5409,7 +5429,7 @@ ORBEON.xforms.Server = {
                                         // Handle migration of control from non-static to static if needed
                                         var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
                                         if (!isStaticReadonly && staticReadonly == "true") {
-                                            if (isControl) {
+                                            if (isLeafControl) {
                                                 // Replace existing element with span
                                                 var parentElement = documentElement.parentNode;
                                                 var newDocumentElement = document.createElement("span");
@@ -5487,12 +5507,16 @@ ORBEON.xforms.Server = {
                                                     documentElement.removeChild(documentElement.childNodes[0]);
 
                                                 function createInput(typeClassName, inputIndex) {
-                                                    var input = document.createElement("input");
-                                                    input.setAttribute("type", "text");
-                                                    input.className = "xforms-input-input " + typeClassName;
-                                                    input.name = controlId + "$xforms-input-" + inputIndex;
-                                                    input.id = input.name;
-                                                    documentElement.appendChild(input);
+                                                    var newInputElement = document.createElement("input");
+                                                    newInputElement.setAttribute("type", "text");
+                                                    newInputElement.className = "xforms-input-input " + typeClassName;
+                                                    newInputElement.name = controlId + "$xforms-input-" + inputIndex;
+                                                    newInputElement.id = newInputElement.name;
+                                                    documentElement.appendChild(newInputElement);
+                                                    // For non-W3C compliant browsers we must re-register a listener on the new element we just created
+                                                    if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                                                        ORBEON.xforms.Init.registerChangeListenerOnFormElement(newInputElement);
+                                                    }
                                                 }
 
                                                 if (isStringType) {
@@ -5558,7 +5582,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Update value
-                                        if (isControl) {
+                                        if (isLeafControl) {
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
                                                 // Additional attributes for xforms:upload
                                                 // <xxforms:control id="xforms-control-id"
@@ -5569,10 +5593,16 @@ ORBEON.xforms.Server = {
                                                 var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                 ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, state, filename, mediatype, size);
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")
+                                                        || ORBEON.util.Dom.hasClass(documentElement, "xforms-static")) {
+                                                // Output-only control, just set the value
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")
+                                                        || ORBEON.util.Dom.hasClass(documentElement, "xforms-submit")) {
+                                                // It isn't a control that can hold a value (e.g. trigger) and there is no point in trying to update it
+                                                // NOP
                                             } else {
                                                 var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                                // If the control doesn't have a "current value" then it isn't a control that can hold a value (e.g. trigger)
-                                                // and there is no point in trying to update it.
                                                 if (currentValue != null) {
                                                     currentValue = xformsNormalizeEndlines(currentValue);
                                                     var doUpdate =
@@ -5590,16 +5620,14 @@ ORBEON.xforms.Server = {
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, size, maxlength, autocomplete);
                                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                            if (doUpdate) {
-                                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                                                                // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
-                                                                // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
-                                                                // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
-                                                                // since the last time we sent the value to the serer. The bottom line is that we are going to compare
-                                                                // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
-                                                                // server accounts for the slight difference there might be in those 2 representations.
-                                                                ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                                            }
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                            // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                                                            // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                                                            // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                                                            // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                                                            // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                                                            // server accounts for the slight difference there might be in those 2 representations.
+                                                            ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                                         } else {
                                                             // Other control just have a new value
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);

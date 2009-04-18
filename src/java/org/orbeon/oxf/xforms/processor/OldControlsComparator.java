@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Collections;
@@ -139,7 +140,10 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                                 if (isNewlyVisibleSubtree || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
                                     final String attributeValue = typeValue2 != null ? typeValue2 : "";
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+                                    // NOTE: No type is considered equivalent to xs:string or xforms:string
+                                    // TODO: should have more generic code in XForms engine to equate "no type" and "xs:string"
+                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree,
+                                            attributeValue.equals("") || XMLConstants.XS_STRING_EXPLODED_QNAME.equals(attributeValue) || XFormsConstants.XFORMS_STRING_EXPLODED_QNAME.equals(attributeValue));
                                 }
                             }
 

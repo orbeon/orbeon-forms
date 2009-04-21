@@ -572,6 +572,14 @@ ORBEON.util.String = {
     endsWith: function(text, suffix) {
         var index = text.lastIndexOf(suffix);
         return index != -1 && index + suffix.length == text.length;
+    },
+
+    normalizeSerializedHTML: function(text) {
+        if (text == null) {
+            return null;
+        } else {
+            return text.replace(XFORMS_REGEXP_CR, "");
+        }
     }
 };
 
@@ -1617,13 +1625,11 @@ ORBEON.xforms.Controls = {
             }
         } else if (typeof(control.value) == "string") {
             // Textarea, password
-            if (xformsNormalizeEndlines(control.value) != xformsNormalizeEndlines(newControlValue)) {
-                control.value = newControlValue;
-                control.previousValue = newControlValue;
-                // Autosize textarea
-                if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
-                    ORBEON.xforms.Controls.autosizeTextarea(control);
-                }
+            control.value = newControlValue;
+            control.previousValue = newControlValue;
+            // Autosize textarea
+            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
+                ORBEON.xforms.Controls.autosizeTextarea(control);
             }
         }
     },
@@ -2551,7 +2557,14 @@ ORBEON.xforms.Events = {
             if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
-            if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")
+                    // We don't support incremental mode for HTML area.
+                    // See: http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Limitations
+                    // The reason for this limitation is that as HTML clean-up happens on the server, so when we get a new
+                    // new value from the server we can't know if the value has changed because it has been cleaned up, or because
+                    // it really is a new value. Now we just update the field with the value we get from the server, but if done
+                    // when the user types, this leads to the cursor moving back to the beginning of the HTML area while typing.
+                    && !(ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html") && ORBEON.util.Dom.hasClass(target, "xforms-textarea"))) {
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
                 ORBEON.xforms.Server.fireEvents([event], false);
             }
@@ -5605,13 +5618,15 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                                 if (currentValue != null) {
-                                                    currentValue = xformsNormalizeEndlines(currentValue);
+                                                    currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
+                                                    newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
+                                                    previousServerValue = ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
                                                     var doUpdate =
                                                             // Update only if the new value is different than the value already have in the HTML area
-                                                            currentValue != xformsNormalizeEndlines(newControlValue)
+                                                            currentValue != newControlValue
                                                             // Update only if the value in the HTML area is the same now as it was when we sent it to the server
                                                             // If there is no previousServerValue, go ahead and update field
-                                                            && (previousServerValue == null || currentValue == xformsNormalizeEndlines(previousServerValue));
+                                                            && (previousServerValue == null || currentValue == previousServerValue);
                                                     if (doUpdate) {
                                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                             // Additional attributes for xforms:input
@@ -6885,10 +6900,6 @@ function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
 function xformsStringReplace(node, placeholder, replacement) {
     var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
     xformsStringReplaceWorker(node, placeholderRegExp, replacement);
-}
-
-function xformsNormalizeEndlines(text) {
-    return text.replace(XFORMS_REGEXP_CR, "");
 }
 
 function xformsAppendRepeatSuffix(id, suffix) {

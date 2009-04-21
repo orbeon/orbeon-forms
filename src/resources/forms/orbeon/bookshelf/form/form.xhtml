@@ -123,6 +123,7 @@
                         <link/>
                         <rating/>
                         <publication-year/>
+                        <review/>
                         <image filename="" mediatype="" size=""/>
                     </details>
                     <notes>
@@ -139,6 +140,7 @@
                     <xforms:bind id="link-bind" nodeset="link"/>
                     <xforms:bind id="rating-bind" nodeset="rating"/>
                     <xforms:bind id="publication-year-bind" nodeset="publication-year"/>
+                    <xforms:bind id="review-bind" nodeset="review"/>
                     <xforms:bind id="image-bind" nodeset="image" type="xs:anyURI"/>
                 </xforms:bind>
                 <xforms:bind id="notes-bind" nodeset="notes">
@@ -254,6 +256,10 @@
                             <help>This is the year the book was published. For example: "2009".</help>
                             <alert>The year selected is invalid</alert>
                         </publication-year>
+                        <review>
+                            <label>Review</label>
+                            <help>Your review for this book</help>
+                        </review>
                         <image>
                             <label>Book Cover</label>
                             <hint>Upload a book cover image</hint>
@@ -348,6 +354,10 @@
                             <help>Ceci est l'année durant laquelle le livre a été publié. Par exemple: "2009".</help>
                             <alert>L'année sélectionnée est invalide</alert>
                         </publication-year>
+                        <review>
+                            <label>Critique</label>
+                            <help>Votre critique pour ce livre</help>
+                        </review>
                         <image>
                             <label>Couverture</label>
                             <hint>Insérer une image de couverture</hint>
@@ -464,6 +474,18 @@
                             </fr:td>
                         </fr:tr>
                     </fr:grid>
+                    <fr:grid columns="1">
+                        <fr:tr>
+                            <fr:td>
+                                <xforms:textarea id="review-control" bind="review-bind" mediatype="text/html">
+                                    <xforms:label ref="$form-resources/review/label"/>
+                                    <xforms:hint ref="$form-resources/review/hint"/>
+                                    <xforms:help ref="$form-resources/review/help"/>
+                                    <xforms:alert ref="$form-resources/review/alert"/>
+                                </xforms:textarea>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
                 </fr:section>
 
                 <fr:section id="notes-section" bind="notes-bind">
@@ -492,5 +514,6 @@
                 </fr:section>
             </fr:body>
         </fr:view>
+        <widget:xforms-instance-inspector id="instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </body>
 </html>

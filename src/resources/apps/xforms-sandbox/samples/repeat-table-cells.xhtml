@@ -45,7 +45,10 @@
                 </variable>
             </xforms:instance>
         </xforms:model>
-        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background: transparent }
+            .xforms-repeat-selected-item-2 { background: transparent }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
@@ -119,19 +122,45 @@
             </xforms:action>
         </xforms:trigger>
 
-        <table>
-            <xforms:repeat nodeset="tr" id="row-repeat" xxforms:dnd="true">
-                <tr>
-                    <xforms:repeat nodeset="td" id="cell-repeat" xxforms:dnd="true" xxforms:dnd-over="true">
-                        <td>
-                            (<xforms:output value="count(xxforms:context('row-repeat')/preceding-sibling::*) + 1"/>,
-                            <xforms:output value="."/>,
+        <xhtml:h2>Table D&amp;D of Rows</xhtml:h2>
+        
+        <xhtml:table>
+            <xforms:repeat nodeset="tr" xxforms:dnd="true" id="row-repeat-dd-row">
+                <xhtml:tr>
+                    <xforms:repeat nodeset="td">
+                        <xhtml:td>
+                            (<xforms:output value="count(xxforms:context('row-repeat-dd-row')/preceding-sibling::*) + 1"/>,
                             <xforms:output value="position()"/>)
-                        </td>
+                        </xhtml:td>
                     </xforms:repeat>
-                </tr>
+                </xhtml:tr>
             </xforms:repeat>
-        </table>
+        </xhtml:table>
+
+        <xhtml:h2>Table D&amp;D of Cells</xhtml:h2>
+
+        <xhtml:table>
+            <xforms:repeat nodeset="tr" id="row-repeat-dd-cell">
+                <xhtml:tr>
+                    <xforms:repeat nodeset="td" xxforms:dnd="true">
+                        <xhtml:td>
+                            (<xforms:output value="count(xxforms:context('row-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
+                            <xforms:output value="position()"/>)
+                        </xhtml:td>
+                    </xforms:repeat>
+                </xhtml:tr>
+            </xforms:repeat>
+        </xhtml:table>
+
+        <xhtml:h2>List</xhtml:h2>
+
+        <xhtml:ol>
+            <xforms:repeat nodeset="tr" xxforms:dnd="true">
+                <xhtml:li>
+                    Item number <xforms:output value="position()"/>
+                </xhtml:li>
+            </xforms:repeat>
+        </xhtml:ol>
 
         <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 

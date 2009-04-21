@@ -321,7 +321,7 @@
         <!-- Generate xforms:repeat for  repeat-nodeset attributes-->
         <!-- The ID is added here as a work-around to a bug in Orbeon Forms that happens when the same ID is used
              (here generated if this is missing) inside an XBL control and outside.
-             [Need to add link to bug here] -->
+             http://forge.ow2.org/tracker/index.php?func=detail&aid=313628&group_id=168&atid=350207 -->
         <xforms:repeat nodeset="{@repeat-nodeset}" id="fr-dt-{generate-id()}">
             <xhtml:tr>
                 <xsl:apply-templates select="@*|node()"/>

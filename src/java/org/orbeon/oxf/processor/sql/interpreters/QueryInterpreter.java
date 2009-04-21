@@ -444,7 +444,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Convert Document into a String
                                                     boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
-                                                    value = Dom4jUtils.domToString(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
+                                                    value = Dom4jUtils.domToString(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11));
                                                 }
                                                 if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Set DOM using native XML type
@@ -458,7 +458,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
                                                         boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
-                                                        String stringValue = Dom4jUtils.domToString(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
+                                                        String stringValue = Dom4jUtils.domToString(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11));
 
                                                         // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String
 //                                                            org.w3c.dom.Node node = XMLUtils.stringToDOM(stringValue);

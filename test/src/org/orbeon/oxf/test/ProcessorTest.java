@@ -350,8 +350,8 @@ public class ProcessorTest extends TestCase {
                                 removeUnusedNamespaceDeclarations(actualData.getRootElement());
 
                                 // Compare converting to strings
-                                expectedDataString = Dom4jUtils.domToString(expectedData, true, false);
-                                actualDataString = Dom4jUtils.domToString(actualData, true, false);
+                                expectedDataString = Dom4jUtils.domToCompactString(expectedData);
+                                actualDataString = Dom4jUtils.domToCompactString(actualData);
                                 final boolean outputPassed = expectedDataString.equals(actualDataString);
 
                                 // Display if test not passed

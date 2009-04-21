@@ -69,35 +69,101 @@ public class Dom4jUtils {
         return createSAXReader(XMLUtils.DEFAULT_VALIDATING, XMLUtils.DEFAULT_HANDLE_XINCLUDE);
     }
 
-    private static String domToString
-            (final Node n, final OutputFormat frmt) {
+    /**
+     * Convert a dom4j document to a string.
+     *
+     * @param document  document to convert
+     * @return          resulting string
+     */
+    public static String domToString(final Document document) {
+        final Element rootElement = document.getRootElement();
+        return domToString((Branch) rootElement);
+    }
+
+    /**
+     * Convert a dom4j element to a string.
+     *
+     * @param element   element to convert
+     * @return          resulting string
+     */
+    public static String domToString(final Element element) {
+        return domToString((Branch) element);
+    }
+
+    /**
+     * Convert a dom4j node to a string.
+     *
+     * @param node  node to convert
+     * @return      resulting string
+     */
+    public static String nodeToString(final Node node) {
+        final String ret;
+        switch (node.getNodeType()) {
+            case Node.DOCUMENT_NODE: {
+                ret = domToString((Branch) ((Document) node).getRootElement());
+                break;
+            }
+            case Node.ELEMENT_NODE: {
+                ret = domToString((Branch) node);
+                break;
+            }
+            case Node.TEXT_NODE: {
+                ret = ((Text) node).getText();
+                break;
+            }
+            default :
+                ret = domToString(node, null);
+                break;
+        }
+        return ret;
+    }
+
+    /**
+     * Convert a dom4j document to a pretty string, for formatting/debugging purposes only.
+     *
+     * @param document  document to convert
+     * @return          resulting string
+     */
+    public static String domToPrettyString(final Document document) {
+        final OutputFormat format = new OutputFormat();
+        format.setIndentSize(4);
+        format.setNewlines(true);
+        format.setTrimText(true);
+        return domToString(document.getRootElement(), format);
+    }
+
+    /**
+     * Convert a dom4j document to a compact string, with all text being trimmed.
+     *
+     * @param document  document to convert
+     * @return          resulting string
+     */
+    public static String domToCompactString(final Document document) {
+        final OutputFormat format = new OutputFormat();
+        format.setIndent(false);
+        format.setNewlines(false);
+        format.setTrimText(true);
+        return domToString(document.getRootElement(), format);
+    }
+
+    private static String domToString(final Branch branch) {
+        final OutputFormat format = new OutputFormat();
+        format.setIndent(false);
+        format.setNewlines(false);
+        return domToString(branch, format);
+    }
+
+    private static String domToString(final Node node, final OutputFormat format) {
         try {
-            final StringWriter wrtr = new StringWriter();
-            // Ugh, XMLWriter doesn't accept null formatter _and_ default 
-            // formatter is protected.
-            final XMLWriter xmlWrtr
-                    = frmt == null
-                    ? new XMLWriter(wrtr) : new XMLWriter(wrtr, frmt);
-            xmlWrtr.write(n);
-            xmlWrtr.close();
-            return wrtr.toString();
+            final StringWriter writer = new StringWriter();
+            // Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
+            final XMLWriter xmlWriter = format == null ? new XMLWriter(writer) : new XMLWriter(writer, format);
+            xmlWriter.write(node);
+            xmlWriter.close();
+            return writer.toString();
         } catch (final IOException e) {
             throw new OXFException(e);
         }
-    }
-
-    private static String domToString(final Branch brnch, final boolean trm, final boolean cmpct) {
-        final OutputFormat frmt = new OutputFormat();
-        if (cmpct) {
-            frmt.setIndent(false);
-            frmt.setNewlines(false);
-            frmt.setTrimText(true);
-        } else {
-            frmt.setIndentSize(4);
-            frmt.setNewlines(trm);
-            frmt.setTrimText(trm);
-        }
-        return domToString(brnch, frmt);
     }
 
     /**
@@ -202,61 +268,6 @@ public class Dom4jUtils {
         else
             throw new OXFException("Should never happen");
         return buff.toString();
-    }
-
-    public static String domToString(final Element e, final boolean trm, final boolean cmpct) {
-        return Dom4jUtils.domToString((Branch) e, trm, cmpct);
-    }
-
-    public static String domToString(final Element e) {
-        return domToString(e, false, false);
-    }
-
-    public static String domToString(final Document d, final boolean trm, final boolean cmpct) {
-        final Element relt = d.getRootElement();
-        return domToString(relt, trm, cmpct);
-    }
-
-    public static String domToString(final Document d) {
-        return domToString(d, false, false);
-    }
-
-    public static String domToString(final Text txt, final boolean t, final boolean c) {
-        return txt.getText();
-    }
-
-    public static String domToString(final Text t) {
-        return domToString(t, false, false);
-    }
-
-    /**
-     * Checks type of n and, if apropriate, downcasts and returns
-     * domToString( ( Type )n, t, c ).  Otherwise returns domToString( n, null )
-     */
-    public static String domToString(final Node n, final boolean t, final boolean c) {
-        final String ret;
-        switch (n.getNodeType()) {
-            case Node.DOCUMENT_NODE: {
-                ret = domToString((Document) n, t, c);
-                break;
-            }
-            case Node.ELEMENT_NODE: {
-                ret = domToString((Element) n, t, c);
-                break;
-            }
-            case Node.TEXT_NODE: {
-                ret = domToString((Text) n, t, c);
-                break;
-            }
-            default :
-                ret = domToString(n, null);
-                break;
-        }
-        return ret;
-    }
-
-    public static String domToString(final Node nd) {
-        return domToString(nd, false, false);
     }
 
     /**

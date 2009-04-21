@@ -352,7 +352,7 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
         for (Iterator i = list.iterator(); i.hasNext();) {
             Object object = i.next();
-            buffer.append(object instanceof Node ? Dom4jUtils.domToString((Node) object) : object.toString());
+            buffer.append(object instanceof Node ? Dom4jUtils.nodeToString((Node) object) : object.toString());
         }
         return buffer.toString();
     }

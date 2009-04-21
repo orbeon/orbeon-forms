@@ -47,7 +47,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     // List of standard extension attributes
     private static final QName[] EXTENSION_ATTRIBUTES = {
             XFormsConstants.STYLE_QNAME,
-            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsbaseHandler
+            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsBaseHandler
     };
 
     private XFormsContainer container;

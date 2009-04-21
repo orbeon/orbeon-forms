@@ -1105,6 +1105,7 @@ ORBEON.xforms.Document = {
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
         // Directly change the value of the control in the UI without waiting for a response from the server
         ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+        // And also fire server event
         var event = new ORBEON.xforms.Server.Event(null, control.id, null, newValue, "xxforms-value-change-with-focus-change");
         ORBEON.xforms.Server.fireEvents([event], false);
     },

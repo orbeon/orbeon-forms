@@ -36,11 +36,6 @@
                         <readonly-date>2009-08-16</readonly-date>
                         <flag>true</flag>
                     </date-picker>
-                    <data-bound-select1>
-                        <state/>
-                        <city/>
-                        <zip/>
-                    </data-bound-select1>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="date-picker">
@@ -160,52 +155,6 @@
                         <xforms:label>Date picker initially hidden: </xforms:label>
                     </fr:date-picker>
                 </xforms:group>
-            </xhtml:p>
-        </xforms:group>
-
-        <xhtml:h2>Data-bound drop-down</xhtml:h2>
-        <xforms:group ref="data-bound-select1">
-            <xhtml:p>
-                <fr:data-bound-select1 ref="state"
-                        appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"
-                        nodeset="/states/state" label="@name" value="@abbreviation">
-                    <xforms:label>State: </xforms:label>
-                </fr:data-bound-select1>
-                <fr:data-bound-select1 ref="city"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?state-abbreviation=', state)"
-                        resource-dependency="state"
-                        nodeset="/cities/city" label="@name" value="@name">
-                    <xforms:label>City: </xforms:label>
-                </fr:data-bound-select1>
-                <fr:data-bound-select1 ref="zip"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?state-abbreviation=', state, '&amp;city=', city)"
-                        resource-dependency="city"
-                        nodeset="/zips/zip" label="@code" value="@code">
-                    <xforms:label>Zip: </xforms:label>
-                </fr:data-bound-select1>
-            </xhtml:p>
-        </xforms:group>
-
-        <xhtml:h2>Data-bound drop-down</xhtml:h2>
-        <xforms:group ref="data-bound-select1">
-            <xhtml:p>
-                <fr:data-bound-select1 id="state" ref="state"
-                        appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"
-                        nodeset="/states/state" label="@name" value="@abbreviation">
-                    <xforms:label>State: </xforms:label>
-                </fr:data-bound-select1>
-                <fr:data-bound-select1 id="city" ref="city"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-cities?state-abbreviation=', state)"
-                        resource-dependency="state"
-                        nodeset="/cities/city" label="@name" value="@name">
-                    <xforms:label>City: </xforms:label>
-                </fr:data-bound-select1>
-                <fr:data-bound-select1 id="zip" ref="zip"
-                        appearance="minimal" resource="concat('/xforms-sandbox/service/zip-zips?state-abbreviation=', state, '&amp;city=', city)"
-                        resource-dependency="city"
-                        nodeset="/zips/zip" label="@code" value="@code">
-                    <xforms:label>Zip: </xforms:label>
-                </fr:data-bound-select1>
             </xhtml:p>
         </xforms:group>
 

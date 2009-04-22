@@ -80,8 +80,13 @@ ORBEON.widgets.datatable = function (element, index) {
             }
         }
         this.tableWidth = this.tableWidth + 19;
-    } else if (this.scrollV && !this.hasFixedWidthTable) {
-        width = (this.tableWidth + 19) + 'px';
+    } else if (this.scrollV) {
+        if (this.hasFixedWidthTable) {
+            width = this.tableWidth + 'px';
+            this.tableWidth = this.tableWidth - 19;
+        } else {
+            width = (this.tableWidth + 19) + 'px';
+        }
     } else {
         width = this.tableWidth + 'px';
     }

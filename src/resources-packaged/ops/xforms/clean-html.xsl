@@ -14,7 +14,7 @@
 
     <xsl:template match="*:script" priority="2"/>
 
-    <xsl:template match="@*" priority="1">
+    <xsl:template match="@*[not(starts-with(., 'on'))]" priority="1">
         <xsl:copy-of select="."/>
     </xsl:template>
 

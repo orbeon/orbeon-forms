@@ -58,8 +58,12 @@ ORBEON.widgets.datatable = function (element, index) {
     this.headerContainer.appendChild(this.header);
  
     // See how big the table would be without its size restriction
-    YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
-    YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
+    if (this.scrollH) {
+        YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
+    }
+    if (this.scrollV) {
+        YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
+    }
 
     var region = YAHOO.util.Dom.getRegion(this.table);
     this.tableWidth = (region.right - region.left);
@@ -75,8 +79,8 @@ ORBEON.widgets.datatable = function (element, index) {
                 this.tableHeight = tableHeight;
             }
         }
-        
-    } else if (this.scrollV) {
+        this.tableWidth = this.tableWidth + 19;
+    } else if (this.scrollV && !this.hasFixedWidthTable) {
         width = (this.tableWidth + 19) + 'px';
     } else {
         width = this.tableWidth + 'px';

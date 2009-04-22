@@ -83,7 +83,6 @@
     <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
     <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-invalid"
-                   if="normalize-space(xxforms:event('xxforms:label'))"
                    context="instance('fr-errors-instance')">
 
         <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>

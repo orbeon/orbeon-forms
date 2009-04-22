@@ -243,12 +243,35 @@
                                         xxforms:instance('fr-form-resources')/resource[not(@xml:lang = $default-language)]/@xml:lang)"/>
 
             <!-- Group below implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized, e.g.: -->
-            <!--<fb:select1 appearance="xxforms:full" ref="instance('fr-language-instance')">-->
+
+            <!--<fb:select1 ref="instance('fr-language-instance')">-->
                 <!--<xforms:itemset nodeset="$available-languages">-->
-                    <!--<xforms:label ref="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>-->
+                    <!--<xforms:label ref="(xxforms:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>-->
                     <!--<xforms:value ref="."/>-->
                 <!--</xforms:itemset>-->
             <!--</fb:select1>-->
+
+            <!--<xbl:template xxbl:transform="oxf:xslt">-->
+                <!--<xforms:group xbl:attr="ref bind" appearance="xxforms:internal">-->
+                    <!--<xxforms:variable name="result" select="." as="node()"/>-->
+                    <!--<xforms:repeat model="fr-resources-model" nodeset="{/*/xforms:itemset/@nodeset}">-->
+                        <!--<xxforms:variable name="position" select="position()" as="xs:integer"/>-->
+                        <!--<xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/@ref}" as="xs:string"/>-->
+                        <!--<xxforms:variable name="value" select="{/*/xforms:itemset/xforms:value/@ref}" as="xs:string"/>-->
+                        <!---->
+                        <!--<xforms:group ref=".[$position > 1]"> | </xforms:group>-->
+                        <!--<xforms:group ref=".[$value != $result]">-->
+                            <!--<xforms:trigger appearance="minimal">-->
+                                <!--<xforms:label value="$label"/>-->
+                                <!--<xforms:action ev:event="DOMActivate">-->
+                                    <!--<xforms:setvalue ref="$result" value="$value"/>-->
+                                <!--</xforms:action>-->
+                            <!--</xforms:trigger>-->
+                        <!--</xforms:group>-->
+                        <!--<xforms:output ref=".[$value = $result]" value="$label"/>-->
+                    <!--</xforms:repeat>-->
+                <!--</xforms:group>-->
+            <!--</xbl:template>-->
 
             <!-- Don't display language selector if there is only one language -->
             <xforms:group id="fr-language-selector" ref=".[count($available-languages) gt 1]">
@@ -446,22 +469,26 @@
                 <xhtml:ol class="fr-error-list">
                     <xforms:repeat nodeset="$visible-errors">
                         <xhtml:li>
-                            <xsl:choose>
-                                <xsl:when test="$is-noscript">
-                                    <!-- In noscript mode, use a plain link -->
-                                    <xhtml:a href="#{{@id}}">
-                                        <xforms:output value="@label" class="fr-error-label"/>
-                                    </xhtml:a>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xforms:output value="normalize-space(@label)" class="fr-error-label"/>
-                                        </xforms:label>
-                                        <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
-                                    </xforms:trigger>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
+                            <xforms:group ref=".[$has-label]">
+                                <xsl:choose>
+                                    <xsl:when test="$is-noscript">
+                                        <!-- In noscript mode, use a plain link -->
+                                        <xhtml:a href="#{{@id}}">
+                                            <xforms:output value="@label" class="fr-error-label"/>
+                                        </xhtml:a>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- Otherwise use trigger -->
+                                        <xforms:trigger appearance="minimal">
+                                            <xforms:label>
+                                                <xforms:output value="normalize-space(@label)" class="fr-error-label"/>
+                                            </xforms:label>
+                                            <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
+                                        </xforms:trigger>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xforms:group>
 
                             <!--<xhtml:a href="#{{@id}}">-->
                                 <!--<xforms:output value="@label" class="fr-error-label"/>-->
@@ -470,7 +497,7 @@
                                 <xforms:output value="concat(' (', @indexes, ')')"/>
                             </xforms:group>
                             <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
-                                - <xforms:output value="@alert"/>
+                                <xforms:output value="string-join((' -'[$has-label], @alert), ' ')"/>
                             </xforms:group>
                         </xhtml:li>
                     </xforms:repeat>

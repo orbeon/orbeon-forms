@@ -422,6 +422,7 @@ button.xforms-trigger img { margin-right: 10px }
 
 /*  Buttons */
 .fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content input.xforms-trigger { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
+.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content .yui-button input.xforms-trigger { margin-top: 0 } /* except YUI buttons don't appear right with top margin! */ 
 
 /* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }

@@ -92,9 +92,14 @@
 
     <xforms:action ev:event="xforms-ready">
         <!-- Show editor case if mode is not new -->
-        <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
+        <xxforms:variable name="is-new" select="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
+        <xforms:action if="not($is-new)">
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
+        </xforms:action>
+        <!-- Set focus -->
+        <xforms:action if="$is-new">
+            <xforms:setfocus control="fb-application-name-input"/>
         </xforms:action>
     </xforms:action>
 
@@ -721,7 +726,7 @@
     </xforms:instance>
 
     <!-- Instance for metadata editor -->
-    <xforms:instance id="fb-metadata-instance" >
+    <xforms:instance id="fb-metadata-instance">
         <metadata>
             <application-name/>
             <form-name/>
@@ -737,7 +742,7 @@
 
     <xforms:bind nodeset="instance('fb-metadata-instance')">
         <!-- App/form name -->
-        <!-- NOTE: check normalize-space() = . because type validation seems to allow leading and trailing spaces -->
+        <!-- NOTE: use normalize-space() = . because type validation seems to allow leading and trailing spaces -->
         <xforms:bind nodeset="application-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->

@@ -59,6 +59,9 @@
         <controls>
             <label>Controls</label>
         </controls>
+        <metadata>
+            <label>Metadata</label>
+        </metadata>
         <i18n>
             <label>Internationalization</label>
         </i18n>
@@ -185,6 +188,9 @@
         <help-icon>
             <label>Edit Help</label>
         </help-icon>
+        <edit-metadata>
+            <label>Edit Metadata</label>
+        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -196,6 +202,9 @@
             <label>Edit</label>
         </edit>
         <!-- Dialogs -->
+        <continue>
+            <label>Continue →</label>
+        </continue>
         <apply>
             <label>Apply</label>
         </apply>
@@ -692,7 +701,7 @@
             <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
             <publish-success>The form was published successfully.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
-            <new-metadata>Before editing your new form, please provide an application name and a form name:</new-metadata>
+            <new-metadata>Before editing your new form, please provide an application name and a form name (you can change them later):</new-metadata>
             <edit-metadata>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata>
         </messages>
     </resource>
@@ -741,6 +750,9 @@
         <controls>
             <label>Contrôles</label>
         </controls>
+        <metadata>
+            <label>Metadonnées</label>
+        </metadata>
         <i18n>
             <label>Internationalisation</label>
         </i18n>
@@ -867,6 +879,9 @@
         <help-icon>
             <label>Editer l'aide</label>
         </help-icon>
+        <edit-metadata>
+            <label>Editer métadonnées</label>
+        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Ajouter</label>
@@ -878,6 +893,9 @@
             <label>Editer</label>
         </edit>
         <!-- Dialogs -->
+        <continue>
+            <label>Continuer →</label>
+        </continue>
         <apply>
             <label>Appliquer</label>
         </apply>
@@ -1374,7 +1392,7 @@
             <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
             <publish-success>Le formulaire a été publié avec succès.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
-            <new-metadata>Avant d'éditer votre nouveau formulaire, veuillez fournir un nom d'application et un nom de formulaire:</new-metadata>
+            <new-metadata>Avant d'éditer votre nouveau formulaire, veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata>
             <edit-metadata>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata>
         </messages>
     </resource>

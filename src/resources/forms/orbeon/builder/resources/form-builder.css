@@ -235,10 +235,10 @@ h1.fr-form-title {
 #fb-metadata-group .fr-grid { margin: 0 }
 #fb-metadata-group td { width: 50% }
 
-.fb-metadata-edit-group .fr-grid td, .fb-metadata-view-group .fr-grid td { vertical-align: bottom }
-.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger,
-    .fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger
-        { display: inline; margin-top: 0 }
+/*.fb-metadata-edit-group .fr-grid td, .fb-metadata-view-group .fr-grid td { vertical-align: bottom }*/
+/*.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger,*/
+    /*.fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger*/
+        /*{ display: inline; margin-top: 0 }*/
 
 .fb-title-control .xforms-label { display: none }
 .fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
@@ -464,10 +464,25 @@ html.accordion-menu-js dd.a-m-d-anim {
 	display: block;
 }
 
+/* ***** Welcome page *********************************************************************************************** */
+#doc {
+    margin: 1em auto auto auto;
+}
+
+#doc .fb-welcome-body {
+    background-color: white;
+    padding: 0.5em 1em 1em;
+}
+
+#doc .fb-welcome-buttons {
+    background-color: white;
+    padding: 1em;
+}
+
 /* ***** YUI Layout ************************************************************************************************* */
 
 #fb-layout .xforms-disabled { display: none }
-#fr-view { margin: auto }
+#fr-view { margin-left: 0 }
 .yui-layout-unit-left { background-color: white }
 .yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }
 

@@ -97,8 +97,10 @@
                 </xhtml:p>
                 <!-- Display response content if present -->
                 <xxforms:variable name="response" model="fr-publish-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
-                <xforms:group ref=".[normalize-space($response) != '']" class="fb-publish-message">
-                    <xforms:output value="$response" mediatype="text/html"/>
+                <xforms:group ref=".[normalize-space($response) != '']">
+                    <xhtml:div class="fb-publish-message">
+                        <xforms:output value="$response" mediatype="text/html"/>
+                    </xhtml:div>
                 </xforms:group>
             </xhtml:div>
             <xhtml:div class="fr-dialog-buttons">

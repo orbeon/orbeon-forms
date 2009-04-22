@@ -87,6 +87,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-top, .fr-footer { background-repeat: no-repeat; clear: both }
 .fr-shadow { height: 10px; _height: 5px; font-size: 0 } /* help display background image */
+.fr-footer { min-height: 10px } /* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
 #doc .fr-shadow { background-image: url(top-750.png); _background-image: none }
 #doc4 .fr-shadow { background-image: url(top-974.png); _background-image: none }
@@ -246,8 +247,8 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 
-/* Add background to static read-only fields */
-.xforms-static { background-color: #EEE }
+/* Add background to static read-only fields and special output fields */
+.xforms-static, .fr-static { background-color: #EEE }
 
 /* Messages area */
 .fr-messages {

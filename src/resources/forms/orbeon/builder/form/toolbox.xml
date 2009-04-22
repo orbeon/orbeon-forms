@@ -309,6 +309,51 @@
 
                 </xhtml:div>
             </xhtml:dd>
+            <xhtml:dt id="fb-toolbox-metadata-dt" class="a-m-t"><xforms:output value="$form-resources/metadata/label"/></xhtml:dt>
+            <xhtml:dd class="a-m-d">
+                <xhtml:div class="bd">
+                    <!-- Metadata toolbox -->
+                    <xhtml:div class="fb-tools fb-hide-alert">
+                        <xhtml:div class="fr-grid">
+                            <xhtml:div class="fr-grid-content">
+                                <xhtml:div>
+                                    <!-- Application name -->
+                                    <xforms:output id="application-name-control" bind="application-name-bind"
+                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                        <xforms:label ref="$form-resources/application-name/label"/>
+                                        <xforms:alert ref="$form-resources/application-name/alert"/>
+                                    </xforms:output>
+                                </xhtml:div>
+                                <xhtml:div>
+                                    <xforms:output id="form-name-control" bind="form-name-bind"
+                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                        <xforms:label ref="$form-resources/form-name/label"/>
+                                        <xforms:alert ref="$form-resources/form-name/alert"/>
+                                    </xforms:output>
+                                </xhtml:div>
+                                <xhtml:div>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label ref="$form-resources/edit-metadata/label"/>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <!-- Copy data to editor instance -->
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/application-name"
+                                                             value="xxforms:bind('application-name-bind')"/>
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/form-name"
+                                                             value="xxforms:bind('form-name-bind')"/>
+                                            <!-- Tell that we allow the cancel button -->
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
+
+                                            <!-- Show and focus -->
+                                            <xforms:toggle case="fb-editor-closed-case"/>
+                                            <xforms:setfocus control="fb-application-name-input"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                            </xhtml:div>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:div>
+            </xhtml:dd>
             <xhtml:dt id="fb-toolbox-i18n-dt" class="a-m-t"><xforms:output value="$form-resources/i18n/label"/></xhtml:dt>
             <xhtml:dd class="a-m-d">
                 <xhtml:div class="bd">

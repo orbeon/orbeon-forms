@@ -25,7 +25,7 @@
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>

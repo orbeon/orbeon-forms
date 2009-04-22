@@ -77,8 +77,12 @@ public class XFormsTextareaControl extends XFormsValueControl {
 
             // Remove dummy tags (the dummy tags are added by the XSLT, as we need a root element for XSLT processing)
             value = Dom4jUtils.domToString(cleanedDocument);
-            value = value.substring("<dummy-root>".length());                       // Remove start dummy tag
-            value = value.substring(0, value.length() - "</dummy-root>".length());     // Remove end dummy tag
+            if ("<dummy-root/>".equals(value)) {
+                value = "";                                                                 // Becomes empty
+            } else {
+                value = value.substring("<dummy-root>".length());                           // Remove start dummy tag
+                value = value.substring(0, value.length() - "</dummy-root>".length());      // Remove end dummy tag
+            }
             XFormsServer.logger.debug("XForms - Cleaning HTML - after XSLT cleanup:  " + value);
         }
         super.storeExternalValue(pipelineContext, value, type, filesElement);

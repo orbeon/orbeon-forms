@@ -338,7 +338,7 @@
                         <xxforms:size ref="@size"/>
                     </xforms:upload>
                 </xforms:group>
-                <xforms:group ref="xforms:upload | fr:attachment">
+                <xforms:group ref="xforms:upload | fr:attachment | fr:image-attachment">
                     <!-- Upload/attachment -->
                     <xforms:upload ref="$instance-holder" id="fb-edit-upload-control">
                         <xforms:label class="fb-xforms-disabled"/>

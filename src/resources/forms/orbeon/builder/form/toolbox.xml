@@ -646,6 +646,8 @@
                 </xhtml:div>
             </xhtml:dd>
         </xhtml:dl>
+        <!-- Orbeon Forms version -->
+        <fr:version/>
     </xhtml:div>
 
 </xhtml:div>

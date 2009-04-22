@@ -45,7 +45,7 @@
             </icon>
             <datatype>xs:string</datatype>
             <template>
-                <xforms:input id="" ref="" incremental="true">
+                <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -65,7 +65,7 @@
             </icon>
             <datatype>xs:string</datatype>
             <template>
-                <xforms:textarea id="" ref="" incremental="true">
+                <xforms:textarea id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -88,7 +88,7 @@
             </icon>
             <datatype>xs:string</datatype>
             <template>
-                <xforms:textarea id="" ref="" incremental="true" appearance="xxforms:autosize">
+                <xforms:textarea id="" ref="" appearance="xxforms:autosize">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -109,7 +109,7 @@
             </icon>
             <datatype>xs:string</datatype>
             <template>
-                <xforms:textarea id="" ref="" incremental="true" mediatype="text/html">
+                <xforms:textarea id="" ref="" mediatype="text/html">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -189,7 +189,7 @@
             </icon>
             <datatype>xforms:email</datatype>
             <template>
-                <xforms:input id="" ref="" incremental="true">
+                <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>

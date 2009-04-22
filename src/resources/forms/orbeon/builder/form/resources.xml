@@ -703,6 +703,7 @@
             <publish-error>There was an error during form publishing.</publish-error>
             <new-metadata>Before editing your new form, please provide an application name and a form name (you can change them later):</new-metadata>
             <edit-metadata>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata>
+            <form-buttons>Your form's buttons will be placed here</form-buttons>
         </messages>
     </resource>
     <resource xml:lang="fr">
@@ -1394,6 +1395,7 @@
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <new-metadata>Avant d'éditer votre nouveau formulaire, veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata>
             <edit-metadata>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata>
+            <form-buttons>Les boutons de votre formulaire seront placés ici</form-buttons>
         </messages>
     </resource>
 </resources>

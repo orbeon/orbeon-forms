@@ -23,7 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-section-details-dialog" appearance="minimal" model="fb-section-details-model" level="modal">
+      id="fb-section-details-dialog" appearance="full" model="fb-section-details-model" level="modal">
 
     <xforms:label ref="$form-resources/dialog-section-details/dialog-title"/>
 

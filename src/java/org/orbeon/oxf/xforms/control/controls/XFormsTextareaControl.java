@@ -69,20 +69,16 @@ public class XFormsTextareaControl extends XFormsValueControl {
         if ("text/html".equals(getMediatype())) {
             XFormsServer.logger.debug("XForms - Cleaning HTML - before cleanup: " + value);
 
-            // Dummy tags are added around HTML, as we need a root element for XSLT processing
-            String startDummy = "<dummy-root>";
-            String endDummy = "</dummy-root>";
-
             // Do TagSoup and XSLT cleaning
-            Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(XMLUtils.unescapeXML(startDummy + value + endDummy), null);
-            Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
+            Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(value, null);
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsServer.logger.debug("XForms - Cleaning HTML - after TagSoup cleanup: " + Dom4jUtils.domToString(tagSoupedDocument));
+            Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
 
-            // Remove dummy tags
+            // Remove dummy tags (the dummy tags are added by the XSLT, as we need a root element for XSLT processing)
             value = Dom4jUtils.domToString(cleanedDocument);
-            value = value.substring(startDummy.length());                       // Remove start dummy tag
-            value = value.substring(0, value.length() - endDummy.length());     // Remove end dummy tag
+            value = value.substring("<dummy-root>".length());                       // Remove start dummy tag
+            value = value.substring(0, value.length() - "</dummy-root>".length());     // Remove end dummy tag
             XFormsServer.logger.debug("XForms - Cleaning HTML - after XSLT cleanup:  " + value);
         }
         super.storeExternalValue(pipelineContext, value, type, filesElement);

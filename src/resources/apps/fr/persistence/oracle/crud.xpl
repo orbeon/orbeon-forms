@@ -58,6 +58,24 @@
                 <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
                 <content-type><xsl:value-of select="$request/content-type"/></content-type>
                 <document>
+                    <!-- See comments below -->
+                    <!--<xsl:variable name="output" as="element(xsl:output)">-->
+                        <!--<xsl:element name="output">-->
+                            <!--<xsl:attribute name="method">xml</xsl:attribute>-->
+                            <!--<xsl:attribute name="omit-xml-declaration">yes</xsl:attribute>-->
+                        <!--</xsl:element>-->
+                    <!--</xsl:variable>-->
+                    <!--<xsl:value-of select="saxon:serialize(doc('input:instance'), $output)"/>-->
+
+                    <!-- NOTE: This is not a good way because:
+
+                         o the current XSLT stylesheet has some namespaces in scope, e.g. xmlns:sql
+                         o if the form declares xmlns:sql for use in attribute values only, the resulting namespace
+                            declaration might be moved to the document's root element after extraction
+
+                         It would be better to use saxon:serialize() and then saxon:parse() in oxf:sql, but oxf:sql
+                         doesn't support saxon:parse() as of 2009-0422.
+                     -->
                     <xsl:copy-of select="doc('input:instance')"/>
                 </document>
                 <timestamp><xsl:value-of select="adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration('PT0H'))"/></timestamp>
@@ -348,6 +366,8 @@
                                                             </xsl:if>
                                                             <xsl:if test="not($is-attachment)">
                                                                 XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*"/>)
+                                                                <!-- See comments above -->
+                                                                <!--XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="saxon:parse(/request/document)"/>)-->
                                                             </xsl:if>
                                                         );
                                                 end;

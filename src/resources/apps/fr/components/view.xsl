@@ -38,7 +38,7 @@
 
         <xsl:for-each select="$view"><!-- Just to set the context -->
 
-            <xhtml:div id="fr-view">
+            <xforms:group id="fr-view">
                 <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                            class="{if (fr:left) then 'yui-t2 ' else ''}{if ($mode = ('view', 'pdf', 'email')) then ' fr-print-mode' else ''}">
                     <!-- Header -->
@@ -157,8 +157,8 @@
                                             <!-- Standard bottom -->
 
                                             <xsl:variable name="default-objects" as="element()+">
-                                                <fr:status-icons/>
                                                 <fr:messages/>
+                                                <fr:status-icons/>
                                                 <fr:buttons-bar/>
                                             </xsl:variable>
 
@@ -192,7 +192,7 @@
                         </xsl:choose>
                     </xhtml:div>
                 </xhtml:div>
-            </xhtml:div>
+            </xforms:group>
 
             <xhtml:span class="fr-hidden">
                 <!-- Hidden field to communicate to the client the current section to collapse or expand -->
@@ -539,25 +539,31 @@
     </xsl:template>
 
     <xsl:template match="fr:messages">
-        <!-- Messages -->
-        <xforms:group class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
-            <!-- Display messages -->
-            <xforms:switch>
-                <xforms:case id="fr-message-none">
-                    <xhtml:p/>
-                </xforms:case>
-                <xforms:case id="fr-message-success">
-                    <xhtml:p class="fr-message-success">
+        <!-- Display messages -->
+        <xforms:switch class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
+            <xforms:case id="fr-message-none">
+                <xhtml:span/>
+            </xforms:case>
+            <xforms:case id="fr-message-success">
+                <!-- NOTE: nest spans so that class is put on inner span -->
+                <xhtml:span>
+                    <xhtml:span class="fr-message-success">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
-                    </xhtml:p>
-                </xforms:case>
-                <xforms:case id="fr-message-validation-error">
-                    <xhtml:p class="fr-message-validation-error">
+                    </xhtml:span>
+                </xhtml:span>
+            </xforms:case>
+            <xforms:case id="fr-message-validation-error">
+                <!-- NOTE: nest spans so that class is put on inner span -->
+                <xhtml:span>
+                    <xhtml:span class="fr-message-validation-error">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
-                    </xhtml:p>
-                </xforms:case>
-                <xforms:case id="fr-message-fatal-error">
-                    <xhtml:p class="fr-message-fatal-error">
+                    </xhtml:span>
+                </xhtml:span>
+            </xforms:case>
+            <xforms:case id="fr-message-fatal-error">
+                <!-- NOTE: nest spans so that class is put on inner span -->
+                <xhtml:span>
+                    <xhtml:span class="fr-message-fatal-error">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
                         <!-- We can't show the dialog in noscript mode so don't show the trigger then -->
                         <xforms:trigger ref=".[not(property('xxforms:noscript')) and normalize-space(instance('fr-persistence-instance')/error) != '']" appearance="minimal">
@@ -565,10 +571,10 @@
                             <xforms:label>[Details]</xforms:label>
                             <xxforms:show ev:event="DOMActivate" dialog="fr-error-details-dialog"/>
                         </xforms:trigger>
-                    </xhtml:p>
-                </xforms:case>
-            </xforms:switch>
-        </xforms:group>
+                    </xhtml:span>
+                </xhtml:span>
+            </xforms:case>
+        </xforms:switch>
     </xsl:template>
 
     <xsl:template match="fr:buttons-bar">

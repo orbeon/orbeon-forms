@@ -81,7 +81,7 @@
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
-        <xforms:switch>
+        <xforms:switch id="fb-editor-switch">
             <xforms:case id="fb-editor-closed-case">
                 <!-- Welcome screen -->
                 <xhtml:div id="doc">
@@ -202,16 +202,16 @@
             <xforms:case id="fb-editor-open-case">
                 <!-- Editor screen -->
                 <xhtml:div id="fb-layout">
-                    <xhtml:div id="top1">
+                    <xhtml:div id="top1" class="fb-top">
                         <fr:logo/>
                         <fr:title/>
                         <fr:language-selector/>
+                        <fr:messages/>
                     </xhtml:div>
-                    <xhtml:div id="bottom1">
-                        <xhtml:div class="fr-bottom">
+                    <xhtml:div id="bottom1" class="fb-bottom">
+                        <xhtml:div>
 
                             <fr:status-icons/>
-                            <fr:messages/>
 
                             <xhtml:div class="fr-buttons">
                                 <!-- Back/Close -->
@@ -244,6 +244,7 @@
                                 <!-- Save form -->
                                 <fr:save-button/>
                             </xhtml:div>
+
                             <div class="fr-clear"/>
                         </xhtml:div>
                     </xhtml:div>
@@ -866,6 +867,8 @@
                                         </xforms:repeat>
                                     </xhtml:div>
                                 </xforms:group>
+
+                                <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
                             </fr:body>
                         </fr:view>

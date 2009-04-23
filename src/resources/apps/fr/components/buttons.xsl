@@ -162,10 +162,11 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-review-button">
-        <xforms:group ref="instance('fr-triggers-instance')/workflow-review">
+        <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-review">
             <fr:button xxforms:modal="true" id="fr-workflow-review-button">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>-->
+                    <xhtml:span>→ </xhtml:span>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -173,10 +174,11 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-edit-button">
-        <xforms:group ref="instance('fr-triggers-instance')/workflow-edit">
+        <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-edit">
             <fr:button xxforms:modal="true" id="fr-workflow-edit-button">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/previous.gif" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/previous.gif" alt=""/>-->
+                    <xhtml:span>← </xhtml:span>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -184,10 +186,11 @@
     </xsl:template>
 
     <xsl:template match="fr:workflow-send-button">
-        <xforms:group ref="instance('fr-triggers-instance')/workflow-send">
+        <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-send">
             <fr:button xxforms:modal="true" id="fr-workflow-send-button">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>-->
+                    <xhtml:span>→ </xhtml:span>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
                 </xforms:label>
             </fr:button>

@@ -27,7 +27,7 @@
 
     <xforms:label ref="$form-resources/dialog-itemsets/dialog-title"/>
 
-    <xhtml:div class="fb-dialog-body">
+    <xhtml:div class="fb-dialog-body fb-hide-alert">
 
         <xforms:group class="fb-language-choice fb-hide-alert">
             <xforms:select1 appearance="minimal" ref="$itemset-lang">

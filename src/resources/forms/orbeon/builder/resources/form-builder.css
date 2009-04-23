@@ -464,6 +464,48 @@ html.accordion-menu-js dd.a-m-d-anim {
 	display: block;
 }
 
+/* ***** Message **************************************************************************************************** */
+
+.fb-top .fr-messages {
+    display: inline;
+    background: inherit;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+.fb-top .fr-messages .fr-message-validation-error {
+    display: inline-block;
+    display: -moz-inline-box;
+    margin:0.35em 0 0 2em;
+    padding: .2em;
+    color: white;
+    background-color: #DF731B;
+    border-color: white;
+    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
+}
+
+.fb-top .fr-messages .fr-message-fatal-error {
+    display: inline-block;
+    display: -moz-inline-box;
+    margin:0.35em 0 0 2em;
+    padding: .2em;
+    color: white;
+    background-color: red;
+    border-color: white;
+    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
+}
+
+.fb-top .fr-messages .fr-message-success {
+    display: inline-block;
+    display: -moz-inline-box;
+    margin:0.35em 0 0 2em;
+    padding: .2em;
+    color: white;
+    background-color: green;
+    border-color: white;
+    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
+}
+
 /* ***** Welcome page *********************************************************************************************** */
 #doc {
     margin: 1em auto auto auto;
@@ -486,13 +528,7 @@ html.accordion-menu-js dd.a-m-d-anim {
 .yui-layout-unit-left { background-color: white }
 .yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }
 
-.fr-bottom { padding: .8em }
-.fr-bottom .fr-messages {
-    clear: none;
-    padding: .5em;
-    float: left;
-    margin: 0;
-}
+.fr-bottom, .fb-bottom { padding: .8em }
 
 #fb-layout .yui-layout-bd { border: none }
 #fb-layout .yui-layout-unit-top .yui-layout-bd { border-bottom: 2px solid #ccc; background-color: white }

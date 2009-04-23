@@ -430,7 +430,7 @@
     <xforms:submission id="get-source-form-submission"
             method="get" serialization="none"
             resource="{instance('fr-uris-instance')/form-collection}/crud/{$app}/{$form}/form/form.xhtml"
-            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:shared="document" xxforms:xinclude="true">
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 
@@ -478,12 +478,19 @@
 
     <xforms:instance id="fr-triggers-instance">
         <triggers xmlns="">
+            <!-- Regular save/submuit -->
             <save/>
             <submit/>
+            <!-- These versions are disabled when possible -->
+            <strict-save/>
+            <strict-submit/>
+            <!-- Form Builder stuff, should not be here! -->
             <publish/>
+            <!-- Workflow buttons -->
             <workflow-review/>
             <workflow-edit/>
             <workflow-send/>
+            <!-- Discard button -->
             <discard/>
         </triggers>
     </xforms:instance>
@@ -496,20 +503,25 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">
-        <!-- Condition for disabling Save button -->
-        <!-- NOTE: Don't disable save button; user can always press it; better experience in non-incremental mode this way; also allows user to force showing error -->
-        <!--<xforms:bind nodeset="save" readonly="not(property('xxforms:noscript'))-->
-            <!--and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>-->
-        <!-- Condition for disabling Submit button -->
-        <xforms:bind nodeset="submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <!--
+            NOTE: Don't disable basic save/submit buttons so that user can always press it. This arguably yields a
+            better experience in non-incremental mode and also allows user to force showing errors.
+        -->
+
+        <!-- Condition for disabling strict Save button -->
+        <xforms:bind nodeset="strict-save" readonly="not(property('xxforms:noscript'))
+            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>
+        <!-- Condition for disabling strict Submit button -->
+        <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-form-valid-instance') = 'false'"/>
+
         <!-- Condition for disabling Publish button -->
         <xforms:bind nodeset="publish" readonly="not(property('xxforms:noscript'))
             and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-form-valid-instance') = 'false'"/>
 
         <!-- Conditions for disabling workflow buttons -->
         <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
-        <xforms:bind nodeset="workflow-edit" readonly="exforms:readonly(../submit)"/>
-        <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../submit)"/>
+        <xforms:bind nodeset="workflow-edit" readonly="exforms:readonly(../strict-submit)"/>
+        <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../strict-submit)"/>
     </xforms:bind>
 
     <!-- HACK: recalculate this model when instance validity changes, so that the triggers instance in particular is kept up to date -->
@@ -689,7 +701,7 @@
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->
-    <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusIn DOMActivate xforms-value-changed">
+    <xforms:action ev:observer="fr-view fb-editor-switch" ev:event="DOMFocusIn xforms-value-changed">
         <xforms:toggle case="fr-message-none"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>

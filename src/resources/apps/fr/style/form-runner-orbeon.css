@@ -100,7 +100,7 @@ p, fieldset, table { margin-bottom: 1em }
 /* Put margins here as they are not needed */
 #fr-form-group { margin: .5em 1em 1em }
 
-.fr-footer .fr-orbeon-version {
+.fr-orbeon-version {
     text-align: center;
     font-size: smaller;
     padding: 10px;
@@ -248,7 +248,7 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 
 /* Add background to static read-only fields and special output fields */
-.xforms-static, .fr-static { background-color: #EEE }
+.xforms-static, .fr-static { background-color: #EEE; min-height: 1em }
 
 /* Messages area */
 .fr-messages {

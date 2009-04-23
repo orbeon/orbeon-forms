@@ -74,7 +74,9 @@
             <xforms:trigger class="fr-inplace-rename">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
-                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog"/>
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog">
+                    <xxforms:context name="fb:save" select="true()"/>
+                </xforms:dispatch>
             </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
@@ -133,29 +135,34 @@
         <xforms:setfocus control="fb-itemset-label-input"/>
     </xforms:action>
 
-    <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
 
-        <!-- Copy back the items to all languages -->
-        <xxforms:variable name="resource-id" select="itemset-resource-id" as="xs:string"/>
-        <xforms:action xxforms:iterate="$resources/resource">
-            <xxforms:variable name="current-lang" select="@xml:lang"/>
-            <xxforms:variable name="current-resource" select="*[name() = $resource-id]"/>
+    <xforms:action ev:event="xxforms-dialog-close">
 
-            <xforms:action context="$current-resource">
-                <!-- Delete all the existing items -->
-                <xforms:delete nodeset="item"/>
+        <!-- Save data upon close if required -->
+        <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
+             an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+        <xforms:action if="event('fb:save')">
+            <!-- Copy back the items to all languages -->
+            <xxforms:variable name="resource-id" select="itemset-resource-id" as="xs:string"/>
+            <xforms:action xxforms:iterate="$resources/resource">
+                <xxforms:variable name="current-lang" select="@xml:lang" as="xs:string"/>
+                <xxforms:variable name="current-resource" select="*[name() = $resource-id][1]" as="element()"/>
 
-                <!-- Copy all the new items (after existing elements if any) -->
-                <xforms:insert context="." nodeset="*" origin="instance('fb-items-instance')/item"/>
+                <xforms:action context="$current-resource">
+                    <!-- Delete all the existing items -->
+                    <xforms:delete nodeset="item"/>
 
-                <!-- Delete all labels with a different language -->
-                <xforms:delete nodeset="item/label[@xml:lang != $current-lang]"/>
+                    <!-- Copy all the new items (after existing elements if any) -->
+                    <xforms:insert context="." nodeset="*" origin="instance('fb-items-instance')/item"/>
 
-                <!-- Delete all xml:lang attributes -->
-                <xforms:delete nodeset="item/label/@xml:lang"/>
+                    <!-- Delete all labels with a different language -->
+                    <xforms:delete nodeset="item/label[@xml:lang != $current-lang]"/>
+
+                    <!-- Delete all xml:lang attributes -->
+                    <xforms:delete nodeset="item/label/@xml:lang"/>
+                </xforms:action>
+
             </xforms:action>
-
         </xforms:action>
 
         <!-- Clear itemset instance -->

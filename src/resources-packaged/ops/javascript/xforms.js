@@ -5192,7 +5192,6 @@ ORBEON.xforms.Server = {
                                     for (var j = 0; j < deleteRepeatTemplateElementsLength; j++) {
 
                                         // Extract data from server response
-                                        //var deleteElementElement = controlValuesElement.childNodes[j];
                                         var deleteElementElement = deleteRepeatTemplateElements[j];
                                         var deleteId = ORBEON.util.Dom.getAttribute(deleteElementElement, "id");
                                         var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
@@ -5236,6 +5235,12 @@ ORBEON.xforms.Server = {
                                                     }
                                                 }
                                                 var previous = lastElementToDelete.previousSibling;
+                                                // Since we are removing an element that can contain controls, remove the known server value
+                                                if (lastElementToDelete.nodeType == ELEMENT_TYPE) {
+                                                    YAHOO.util.Dom.getElementsByClassName("xforms-control", null, lastElementToDelete, function(control) {
+                                                        ORBEON.xforms.Globals.serverValue[control.id] = null;
+                                                    });
+                                                }
                                                 lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                 lastElementToDelete = previous;
                                                 if (wasDelimiter) break;
@@ -5618,9 +5623,9 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                                 if (currentValue != null) {
+                                                    previousServerValue = ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
                                                     currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
                                                     newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
-                                                    previousServerValue = ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
                                                     var doUpdate =
                                                             // Update only if the new value is different than the value already have in the HTML area
                                                             currentValue != newControlValue

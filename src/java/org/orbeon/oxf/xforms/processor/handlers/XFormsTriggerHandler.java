@@ -80,13 +80,13 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
+        if (isStaticReadonly(xformsControl))
+            return;
+
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         // xforms:trigger and xforms:submit
-
-        if (isStaticReadonly(triggerControl))
-            return;
 
         final boolean isConcreteControl = triggerControl != null;
 

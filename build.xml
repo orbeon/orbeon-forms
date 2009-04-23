@@ -100,9 +100,9 @@
         <include name="exist-xmldb.jar"/>
         <include name="exist-xmlrpc-1_2-patched.jar"/>
 
-        <include name="flying-saucer-r8pre2-core-renderer.jar"/>
-        <include name="flying-saucer-itext-paulo-155.jar"/>
-        <include name="flying-saucer-minium.jar"/>
+        <include name="flying-saucer-r8-core-renderer.jar"/>
+        <include name="flying-saucer-r8-core-renderer-minimal.jar"/>
+        <include name="flying-saucer-r8-itext-2_0_8.jar"/>
 
         <include name="barcode4j-1.0.jar"/>
 

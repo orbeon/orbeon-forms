@@ -547,7 +547,7 @@
             <xforms:case id="fr-message-success">
                 <!-- NOTE: nest spans so that class is put on inner span -->
                 <xhtml:span>
-                    <xhtml:span class="fr-message-success">
+                    <xhtml:span class="fr-message fr-message-success">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
                     </xhtml:span>
                 </xhtml:span>
@@ -555,7 +555,7 @@
             <xforms:case id="fr-message-validation-error">
                 <!-- NOTE: nest spans so that class is put on inner span -->
                 <xhtml:span>
-                    <xhtml:span class="fr-message-validation-error">
+                    <xhtml:span class="fr-message fr-message-validation-error">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
                     </xhtml:span>
                 </xhtml:span>
@@ -563,7 +563,7 @@
             <xforms:case id="fr-message-fatal-error">
                 <!-- NOTE: nest spans so that class is put on inner span -->
                 <xhtml:span>
-                    <xhtml:span class="fr-message-fatal-error">
+                    <xhtml:span class="fr-message fr-message-fatal-error">
                         <xforms:output value="instance('fr-persistence-instance')/message"/>
                         <!-- We can't show the dialog in noscript mode so don't show the trigger then -->
                         <xforms:trigger ref=".[not(property('xxforms:noscript')) and normalize-space(instance('fr-persistence-instance')/error) != '']" appearance="minimal">

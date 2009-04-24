@@ -29,7 +29,7 @@
         <xsl:if test="normalize-space(@id) = ''">
             <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
         </xsl:if>
-        <xhtml:div id="{@id}" class="fr-inplace-input">
+        <xhtml:span id="{@id}" class="fr-inplace-input">
             <xforms:switch>
                 <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
                 <!-- We handle validity at the switch level so we have only one alert in use for view/edit -->
@@ -90,7 +90,7 @@
                 <!-- Copy other children elements, including event handlers -->
                 <xsl:apply-templates select="* except (xforms:label, xforms:hint, fr:buttons)"/>
             </xforms:switch>
-        </xhtml:div>
+        </xhtml:span>
     </xsl:template>
 
     <xsl:template match="xhtml:body//xforms:textarea[@appearance = 'fr:in-place']">

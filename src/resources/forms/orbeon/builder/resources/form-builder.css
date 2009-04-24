@@ -472,38 +472,30 @@ html.accordion-menu-js dd.a-m-d-anim {
     border: none;
     margin: 0;
     padding: 0;
+    clear: none; /* override "both" so that IE 7 support for inline-block works */
 }
-.fb-top .fr-messages .fr-message-validation-error {
-    display: inline-block;
+
+.fb-top .fr-messages .fr-message {
     display: -moz-inline-box;
+    display: inline-block;
+    *zoom: 1; /* IE 7 hack */
     margin:0.35em 0 0 2em;
     padding: .2em;
     color: white;
-    background-color: #DF731B;
     border-color: white;
     border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
+}
+
+.fb-top .fr-messages .fr-message-validation-error {
+    background-color: #DF731B;
 }
 
 .fb-top .fr-messages .fr-message-fatal-error {
-    display: inline-block;
-    display: -moz-inline-box;
-    margin:0.35em 0 0 2em;
-    padding: .2em;
-    color: white;
     background-color: red;
-    border-color: white;
-    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
 }
 
 .fb-top .fr-messages .fr-message-success {
-    display: inline-block;
-    display: -moz-inline-box;
-    margin:0.35em 0 0 2em;
-    padding: .2em;
-    color: white;
     background-color: green;
-    border-color: white;
-    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
 }
 
 /* ***** Welcome page *********************************************************************************************** */

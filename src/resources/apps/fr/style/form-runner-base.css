@@ -178,7 +178,7 @@ button.xforms-trigger img { margin-right: 10px }
     display: block;
     float: right;
     padding: .5em;
-    max-width: 30em;/* not strong feelings about this one */
+    width: 30em;/* can do better? */
     text-align: right;
 }
 

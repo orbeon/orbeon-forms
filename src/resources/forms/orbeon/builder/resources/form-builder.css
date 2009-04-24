@@ -222,7 +222,7 @@ h1.fr-form-title {
 
 /* Make section title alert look nicer */
 #fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }
-#fb-details-group .fr-section-title .fr-inplace-content { display: inline-block; display: -moz-inline-box; *zoom: 1 }
+#fb-details-group .fr-section-title .fr-inplace-input { display: inline-block; display: -moz-inline-box; *zoom: 1 }
 
 /* ***** Misc ******************************************************************************************************* */
 

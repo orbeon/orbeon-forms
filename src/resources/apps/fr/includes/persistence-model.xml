@@ -239,6 +239,8 @@
                 <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                                  value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
                 <xforms:toggle case="fr-message-validation-error"/>
+                <!-- Mark all active alerts as visited -->
+                <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
             </xforms:action>
             <xforms:action if="$continue-with-save">
                 <!-- Data valid: proceed with saving attachments and data -->
@@ -649,10 +651,22 @@
         <uri/>
     </xforms:instance>
 
+    <!-- Mark all active alerts as visited -->
+    <xxforms:script ev:event="fr-visit-alerts">
+        <![CDATA[
+        var rootElement = ORBEON.util.Dom.getElementById("fr-form");
+        var elements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active", "label", rootElement);
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            YAHOO.util.Dom.addClass(element, "xforms-alert-active-visited")
+        }
+        ]]>
+    </xxforms:script>
+
     <!-- React to failed submission when saving, updating, getting, creating PDF, sending to Alfresco, sending email,
          or sending to workflow -->
     <xforms:action ev:event="xforms-submit-error" ev:observer="fr-persistence-model"
-                   ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission fr-workflow-confirmation-submission">
+                   ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission fr-workflow-review-submission fr-workflow-confirmation-submission">
         <!-- Remember there was an error -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
@@ -670,6 +684,8 @@
                              value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
+        <!-- Mark all active alerts as visited -->
+        <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
     </xforms:action>
 
     <!-- TODO: duplicated for now from above, which is no good; we need to implement the @handler attribute and
@@ -692,6 +708,8 @@
                              value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
+        <!-- Mark all active alerts as visited -->
+        <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
     </xforms:action>
 
     <!-- React to instance mutation events -->

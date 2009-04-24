@@ -195,34 +195,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
         // Create "class" attribute if necessary
         {
-            final FastStringBuffer sb = new FastStringBuffer(50);
-            // User-defined classes go first
-            {
-                final String value = elementAttributes.getValue("class");
-                if (value != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(value);
-                }
-            }
-            {
-                final String value = elementAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
-                if (value != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(value);
-                }
-            }
-            // XForms engine classes go next
-            {
-                if (classes != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(classes);
-                }
-            }
-            if (sb.length() > 0) {
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, sb.toString());
+            if (classes != null && classes.length() > 0) {
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, classes);
             }
         }
         // Copy attributes in the xhtml namespace to no namespace
@@ -244,15 +218,38 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     protected FastStringBuffer getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
 
-        // Control name
-        final FastStringBuffer sb;
+        final FastStringBuffer sb = new FastStringBuffer(50);
+        // User-defined classes go first
         {
+            {
+                final String value = controlAttributes.getValue("class");
+                if (value != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(value);
+                }
+            }
+            {
+                final String value = controlAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
+                if (value != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(value);
+                }
+            }
+        }
+
+        // Control name
+        {
+            if (sb.length() > 0)
+                sb.append(' ');
+
             // We only call xforms-control the actual controls as per the spec
-            // TODO: no longer, XForms 1.1 has core and container controls
+            // TODO: XForms 1.1 has core and container controls, but now we depend on xforms-control class in client
             if (!XFormsControlFactory.isContainerControl(controlURI, controlName))
-                sb = new FastStringBuffer("xforms-control xforms-");
+                sb.append("xforms-control xforms-");
             else
-                sb = new FastStringBuffer("xforms-");
+                sb.append("xforms-");
             sb.append(controlName);
         }
         {
@@ -395,15 +392,24 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         if (labelHintHelpAlertAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
-            final StringBuffer classes = new StringBuffer();
+            final FastStringBuffer classes = new FastStringBuffer(30);
+
+            // Put user classes first if any
+            if (labelHintHelpAlertAttributes != null) {
+                final String userClass = labelHintHelpAlertAttributes.getValue("class");
+                if (userClass != null)
+                    classes.append(userClass);
+            }
 
             // Handle alert state
             // TODO: Once we have the new HTML layout, this won't be needed anymore
             if (isAlert) {
+                if (classes.length() > 0)
+                    classes.append(' ');
                 if (control != null && (!control.isValid() || control.isRequired() && isEmpty(control)))
-                    classes.append(" xforms-alert-active");
+                    classes.append("xforms-alert-active");
                 else
-                    classes.append(" xforms-alert-inactive");
+                    classes.append("xforms-alert-inactive");
             }
 
             // Handle visibility
@@ -411,21 +417,30 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             if (control != null) {
                 if (isAlert || isLabel) {
                     // Allow empty labels and alerts
-                    if (!control.isRelevant())
-                        classes.append(" xforms-disabled");
+                    if (!control.isRelevant()) {
+                        if (classes.length() > 0)
+                            classes.append(' ');
+                        classes.append("xforms-disabled");
+                    }
                 } else {
                     // For help and hint, consider "non-relevant" if empty
                     final boolean isHintHelpRelevant = control.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
                     if (!isHintHelpRelevant) {
-                        classes.append(" xforms-disabled");
+                        if (classes.length() > 0)
+                            classes.append(' ');
+                        classes.append("xforms-disabled");
                     }
                 }
             } else if (!isTemplate || isHelp) {
                 // Null control outside of template OR help within template
-                classes.append(" xforms-disabled");
+                if (classes.length() > 0)
+                    classes.append(' ');
+                classes.append("xforms-disabled");
             }
 
-            classes.append(" xforms-");
+            if (classes.length() > 0)
+                classes.append(' ');
+            classes.append("xforms-");
             classes.append(lhhaType);
 
             final String labelClasses = classes.toString();

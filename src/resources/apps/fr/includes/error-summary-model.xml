@@ -62,10 +62,8 @@
     <xforms:bind nodeset="instance('fr-form-valid-instance')" readonly="not(property('xxforms:noscript')) and . = 'false'"/>
 
     <!-- Handle "control visited" events on #fr-form-group -->
-    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
-    <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
+    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section templates" -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="DOMFocusOut xforms-value-changed"
-
                    context="instance('fr-visited-instance')">
         <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
         <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
@@ -80,8 +78,7 @@
     </xforms:action>
 
     <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->
-    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section components" -->
-    <!-- if="xxforms:event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance')" -->
+    <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this doesn't work with "section templates" -->
     <xforms:action ev:observer="fr-form-group fb-metadata-group" ev:event="xforms-invalid"
                    context="instance('fr-errors-instance')">
 
@@ -129,7 +126,7 @@
 
     <!-- Only count errors for controls that have been visited -->
     <xxforms:variable name="visible-errors" select="
-        for $e in xxforms:instance('fr-errors-instance')/error
+        for $e in xxforms:instance('fr-errors-instance')/error[normalize-space(@alert)]
         return if (instance('fr-visited-instance')/@all = 'true'
                     or exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes]))
                then $e else () " as="element(error)*"/>

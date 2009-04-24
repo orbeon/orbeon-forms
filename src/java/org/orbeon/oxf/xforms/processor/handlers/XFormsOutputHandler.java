@@ -38,12 +38,6 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        // Handle alert only if there is no value attribute
-        if (attributes.getValue("value") == null)
-            super.handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
-    }
-
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         if (!XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes))) {
             super.handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);

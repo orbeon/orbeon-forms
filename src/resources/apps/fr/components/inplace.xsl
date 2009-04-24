@@ -29,67 +29,68 @@
         <xsl:if test="normalize-space(@id) = ''">
             <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
         </xsl:if>
-        <xforms:switch id="{@id}">
-            <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
-            <xforms:case id="fr-inplace-{@id}-view">
-                <!-- View mode -->
-                <xhtml:span class="fr-inplace-view">
-                    <xhtml:span class="fr-inplace-content">
-                        <xforms:output>
-                            <xsl:if test="@tabindex | @navindex">
-                                <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
-                            </xsl:if>
-                            <!-- Handle inline hint-->
-                            <xsl:call-template name="fr-handle-inplace-hint"/>
-                            <!-- Keep label as is -->
-                            <xsl:apply-templates select="xforms:label"/>
-                            <!-- React to user click -->
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:toggle case="fr-inplace-{@id}-edit"/>
-                                <xforms:setfocus control="fr-inplace-{@id}-input"/>
-                            </xforms:action>
-                        </xforms:output>
-                        <!-- Hidden output just to display alert -->
-                        <xforms:output class="fr-hidden">
-                            <xsl:apply-templates select="@ref | @bind | xforms:alert"/>
-                        </xforms:output>
-                        <xsl:if test="fr:buttons">
-                            <xhtml:span class="fr-inplace-buttons">
-                                <xsl:apply-templates select="fr:buttons/node()"/>
-                            </xhtml:span>
-                        </xsl:if>
-                    </xhtml:span>
-                </xhtml:span>
-            </xforms:case>
-            <xforms:case id="fr-inplace-{@id}-edit">
-                <!-- Edit mode -->
-                <xhtml:span class="fr-inplace-edit">
-                    <xhtml:span class="fr-inplace-content">
-                        <xforms:input id="fr-inplace-{@id}-input">
-                            <xsl:if test="@tabindex | @navindex">
-                                <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
-                            </xsl:if>
-                            <xsl:apply-templates select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
-                            <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
-                        </xforms:input>
-                        <xhtml:span class="fr-inplace-buttons">
-                            <xforms:trigger class="fr-inplace-rename">
-                                <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
-                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
-                            </xforms:trigger>
-                            <!-- Cancel not supported for now -->
-                            <!--or-->
-                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-cancel">-->
-                                <!--<xforms:label>Cancel</xforms:label>-->
-                                <!--<xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>-->
-                            <!--</xforms:trigger>-->
+        <xhtml:div id="{@id}" class="fr-inplace-input">
+            <xforms:switch>
+                <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
+                <!-- We handle validity at the switch level so we have only one alert in use for view/edit -->
+                <xsl:apply-templates select="@class | @ref | @bind | xforms:alert"/>
+                <!-- Place hidden label for error summary -->
+                <xsl:for-each select="xforms:label[1]">
+                    <xforms:label>
+                        <xsl:attribute name="class" select="string-join(('fr-hidden', @class), ' ')"/>
+                        <xsl:apply-templates select="@* except @class|node()"/>
+                    </xforms:label>
+                </xsl:for-each>
+
+                <xforms:case id="fr-inplace-{@id}-view">
+                    <!-- View mode -->
+                    <xhtml:span class="fr-inplace-view">
+                        <xhtml:span class="fr-inplace-content">
+                            <xforms:output>
+                                <xsl:if test="@tabindex | @navindex">
+                                    <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
+                                </xsl:if>
+                                <!-- Handle inline hint-->
+                                <xsl:call-template name="fr-handle-inplace-hint"/>
+                                <!-- React to user click -->
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:toggle case="fr-inplace-{@id}-edit"/>
+                                    <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                                </xforms:action>
+                            </xforms:output>
                         </xhtml:span>
                     </xhtml:span>
-                </xhtml:span>
-            </xforms:case>
-            <!-- Copy other children elements, including event handlers -->
-            <xsl:apply-templates select="* except (xforms:label, xforms:hint, fr:buttons)"/>
-        </xforms:switch>
+                </xforms:case>
+                <xforms:case id="fr-inplace-{@id}-edit">
+                    <!-- Edit mode -->
+                    <xhtml:span class="fr-inplace-edit">
+                        <xhtml:span class="fr-inplace-content">
+                            <xforms:input id="fr-inplace-{@id}-input" ref=".">
+                                <xsl:if test="@tabindex | @navindex">
+                                    <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
+                                </xsl:if>
+                                <xsl:apply-templates select="@incremental"/>
+                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                            </xforms:input>
+                            <xhtml:span class="fr-inplace-buttons">
+                                <xforms:trigger class="fr-inplace-rename">
+                                    <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                                </xforms:trigger>
+                                <!-- Cancel not supported for now -->
+                                <!--or-->
+                                <!--<xforms:trigger appearance="minimal" class="fr-inplace-cancel">-->
+                                    <!--<xforms:label>Cancel</xforms:label>-->
+                                    <!--<xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>-->
+                                <!--</xforms:trigger>-->
+                            </xhtml:span>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xforms:case>
+                <!-- Copy other children elements, including event handlers -->
+                <xsl:apply-templates select="* except (xforms:label, xforms:hint, fr:buttons)"/>
+            </xforms:switch>
+        </xhtml:div>
     </xsl:template>
 
     <xsl:template match="xhtml:body//xforms:textarea[@appearance = 'fr:in-place']">
@@ -101,6 +102,8 @@
                         <xforms:output>
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
+                            <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
+                            <xsl:apply-templates select="@ref | @bind | xforms:alert"/>
                             <!-- Keep label as is -->
                             <xsl:apply-templates select="xforms:label"/>
                             <!-- React to user click -->
@@ -108,10 +111,6 @@
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-textarea"/>
                             </xforms:action>
-                        </xforms:output>
-                        <!-- Hidden output just to display alert -->
-                        <xforms:output class="fr-hidden">
-                            <xsl:apply-templates select="@ref | @bind | xforms:alert"/>
                         </xforms:output>
                     </xhtml:span>
                 </xhtml:div>

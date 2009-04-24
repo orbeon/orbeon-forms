@@ -101,7 +101,8 @@
     </xsl:template>
 
     <xsl:template match="fr:print-button">
-        <xforms:group ref="instance('fr-triggers-instance')/submit">
+        <!-- TODO: bind to strict-submit, but maybe fr-print-submission should check validity instead -->
+        <xforms:group ref="instance('fr-triggers-instance')/strict-submit">
             <fr:button id="fr-print-button">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
@@ -115,7 +116,8 @@
     </xsl:template>
 
     <xsl:template match="fr:pdf-button">
-        <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit">
+        <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
+        <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
             <fr:button id="fr-pdf-button">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
@@ -218,7 +220,8 @@
 
     <xsl:template match="fr:email-button">
         <!-- Don't show this button in noscript mode -->
-        <xforms:group ref="instance('fr-triggers-instance')/submit" >
+        <!-- TODO: bind to strict-submit, but maybe fr-email-service-submission should check validity instead -->
+        <xforms:group ref="instance('fr-triggers-instance')/strict-submit" >
             <fr:button xxforms:modal="true" id="fr-email-button">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>

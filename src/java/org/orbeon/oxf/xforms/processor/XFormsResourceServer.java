@@ -125,6 +125,13 @@ public class XFormsResourceServer extends ProcessorImpl {
         } else {
             // CSS or JavaScript resource requested
             final boolean isCSS = filename.endsWith(".css");
+            final boolean isJS = filename.endsWith(".js");
+
+            // Eliminate funny requests
+            if (!isCSS && !isJS) {
+                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                return;
+            }
 
             // Find what features are requested
             // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
@@ -136,13 +143,23 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final String currentToken = st.nextToken();
 
                     if (currentToken.equals("min")) {
+                        // Request for minimal resources
                         isMinimal = true;
+                        continue;
+                    } else if (currentToken.equals("xforms")) {
+                        // Ignore this token
                         continue;
                     }
 
                     final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
-                    if (currentFeature != null)
+                    if (currentFeature != null) {
+                        // Add feature
                         requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
+                    } else {
+                        // Don't allow unknown features
+                        response.setStatus(ExternalContext.SC_NOT_FOUND);
+                        return;
+                    }
                 }
             }
 

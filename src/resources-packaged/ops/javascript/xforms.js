@@ -5500,6 +5500,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Update input control type
+                                        var recreatedInput = false;
                                         if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date";
                                             var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time";
@@ -5509,6 +5510,9 @@ ORBEON.xforms.Server = {
 
                                             var isRecognizedType = isDateType || isTimeType || isDateTimeType || isBooleanType || isStringType;
                                             if (isRecognizedType) { // just ignore if we don't know the type
+
+                                                // Remember that this input has be recreated which means we need to update its value
+                                                recreatedInput = true;
 
                                                 // Clean-up document element by removing type classes
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
@@ -5627,11 +5631,15 @@ ORBEON.xforms.Server = {
                                                     currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
                                                     newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
                                                     var doUpdate =
-                                                            // Update only if the new value is different than the value already have in the HTML area
-                                                            currentValue != newControlValue
-                                                            // Update only if the value in the HTML area is the same now as it was when we sent it to the server
-                                                            // If there is no previousServerValue, go ahead and update field
-                                                            && (previousServerValue == null || currentValue == previousServerValue);
+                                                            // If this was an input that was recreated because of a type change, we always set its value
+                                                            recreatedInput ||
+                                                            (
+                                                                // Update only if the new value is different than the value already have in the HTML area
+                                                                currentValue != newControlValue
+                                                                // Update only if the value in the HTML area is the same now as it was when we sent it to the server
+                                                                // If there is no previousServerValue, go ahead and update field
+                                                                && (previousServerValue == null || currentValue == previousServerValue)
+                                                            );
                                                     if (doUpdate) {
                                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                             // Additional attributes for xforms:input

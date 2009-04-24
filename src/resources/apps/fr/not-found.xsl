@@ -21,17 +21,15 @@
 
     <xsl:variable name="has-version" select="pipeline:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property('oxf.fr.default-logo.uri.*.*')" as="xs:string?"/>
-    <xsl:variable name="css-uri" select="pipeline:property('oxf.fr.css.uri.*.*')" as="xs:string?"/>
+    <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
 
     <xhtml:head>
         <xhtml:title>Not Found</xhtml:title>
 
         <!-- Form Runner CSS stylesheets -->
-        <xsl:if test="normalize-space($css-uri) != ''">
-            <xsl:for-each select="tokenize($css-uri, '\s+')">
-                <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
-            </xsl:for-each>
-        </xsl:if>
+        <xsl:for-each select="$css-uri">
+            <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
+        </xsl:for-each>
     </xhtml:head>
     <xhtml:body>
         <xhtml:div id="fr-view">

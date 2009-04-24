@@ -56,7 +56,7 @@
     <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-ajax-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="test-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.test', $app, $form), '.')), '\s+')" as="xs:string*"/>
@@ -126,11 +126,9 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Form Runner CSS stylesheets -->
-            <xsl:if test="normalize-space($css-uri) != ''">
-                <xsl:for-each select="tokenize($css-uri, '\s+')">
-                    <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
-                </xsl:for-each>
-            </xsl:if>
+            <xsl:for-each select="$css-uri">
+                <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
+            </xsl:for-each>
 
             <!-- Handle existing stylesheets -->
             <xsl:for-each select="xhtml:link | xhtml:style">

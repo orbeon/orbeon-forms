@@ -44,11 +44,12 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-date-picker .fr-component-group img { vertical-align: bottom }
+                .xbl-fr-date-picker .xforms-readonly .xforms-input { display: none }
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:group xbl:attr="ref bind" class="fr-component-group"><xbl:content includes="xforms|label,xforms|help,xforms|hint"/><xforms:output ref="."/>
-                <xforms:input ref="." appearance="minimal"/>
+            <xforms:group xbl:attr="ref bind" class="fr-component-group">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/><xforms:output ref="."/><xforms:input ref="." appearance="minimal"/>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

@@ -359,6 +359,10 @@ public class XFormsContainingDocument extends XFormsContainer {
                 return resultObject;
         }
 
+        // Check container id
+        if (effectiveId.equals(getEffectiveId()))
+            return this;
+
         return null;
     }
 

@@ -341,9 +341,9 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
             }
         }
 
-        // Check container id
-        if (effectiveId.equals(getEffectiveId()))
-            return this;
+//        // Check container id
+//        if (effectiveId.equals(getEffectiveId()))
+//            return this;
 
         return null;
     }

@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,17 +104,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
     }
 
-    public static void addActionHandler(Map eventNamesMap, Map eventHandlersMap, Element actionElement, String prefix) {
+    public static void addActionHandler(Map eventNamesMap, Map eventHandlersMap, Element actionElement, String prefix, String ancestorObserverStaticId) {
 
         // Create event handler
-        final XFormsEventHandlerImpl newEventHandlerImpl;
-        {
-            // Find closest ancestor observer for XPath context evaluation
-            final Element ancestorObserver = findAncestorObserver(actionElement);
-            final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
-
-            newEventHandlerImpl = new XFormsEventHandlerImpl(actionElement, ancestorObserverStaticId);
-        }
+        final XFormsEventHandlerImpl newEventHandlerImpl = new XFormsEventHandlerImpl(actionElement, ancestorObserverStaticId);
 
         // Register event handler
         final String[] observersStaticIds = newEventHandlerImpl.getObserversStaticIds();
@@ -151,39 +143,6 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             for (int j = 0; j < eventNames.length; j++)
                 eventNamesMap.put(eventNames[j], "");
         }
-    }
-
-    private static Element findAncestorObserver(Element actionElement) {
-
-        // Recurse until we find an element which is an event observer
-        Element currentAncestor = actionElement.getParent();
-        while (currentAncestor.getParent() != null && !isEventObserver(currentAncestor)) {
-            currentAncestor = currentAncestor.getParent();
-        }
-
-        return currentAncestor;
-    }
-
-    /**
-     * Return true if the given element is an event observer. Must return true for controls, xforms:model,
-     * xforms:instance, xforms:submission.
-     *
-     * @param element   element to check
-     * @return          true iif the element is an event observer
-     */
-    private static boolean isEventObserver(Element element) {
-
-        if (XFormsControlFactory.isBuiltinControl(element.getNamespaceURI(), element.getName())) {
-            return true;
-        }
-
-        final String localName = element.getName();
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(element.getNamespaceURI())
-                && ("model".equals(localName) || "instance".equals(localName) || "submission".equals(localName))) {
-            return true;
-        }
-
-        return false;
     }
 
     public void handleEvent(PipelineContext pipelineContext, XFormsContainer container,

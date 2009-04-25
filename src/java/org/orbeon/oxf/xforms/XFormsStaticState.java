@@ -952,10 +952,49 @@ public class XFormsStaticState {
 
                 if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
                     // This is a known action name
-                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix);
+
+                    // If possible, find closest ancestor observer for XPath context evaluation
+                    final Element ancestorObserver = findAncestorObserver(currentElement);
+                    final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
+
+                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix, ancestorObserverStaticId);
                 }
             }
         }
+    }
+
+    private Element findAncestorObserver(Element actionElement) {
+
+        // Recurse until we find an element which is an event observer
+        Element currentAncestor = actionElement.getParent();
+        while (currentAncestor.getParent() != null && !isEventObserver(currentAncestor)) {
+            currentAncestor = currentAncestor.getParent();
+        }
+
+        return currentAncestor;
+    }
+
+    /**
+     * Return true if the given element is an event observer. Must return true for controls, components, xforms:model,
+     * xforms:instance, xforms:submission.
+     *
+     * @param element       element to check
+     * @return              true iif the element is an event observer
+     */
+    private boolean isEventObserver(Element element) {
+
+        // Whether this is a built-in cointrol or a component
+        if (XFormsControlFactory.isBuiltinControl(element.getNamespaceURI(), element.getName()) || isComponent(element.getQName())) {
+            return true;
+        }
+
+        final String localName = element.getName();
+        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(element.getNamespaceURI())
+                && ("model".equals(localName) || "instance".equals(localName) || "submission".equals(localName))) {
+            return true;
+        }
+
+        return false;
     }
 
     private void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,

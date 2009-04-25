@@ -43,7 +43,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar
-        final String classes = "xbl-" + qName.replace(':', '-');
+        final String classes = "xbl-component xbl-" + qName.replace(':', '-');
 
         // Start xhtml:span element
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes, effectiveId));

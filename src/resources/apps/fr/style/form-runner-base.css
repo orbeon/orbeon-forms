@@ -349,15 +349,15 @@ button.xforms-trigger img { margin-right: 10px }
     *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
 }
 
-.fr-grid-content .xforms-control,
-        .fr-grid-content .xbl-fr-date-picker .xforms-group { /* The group inside a date picker is considered like a control */
+/* Style controls or component groups */
+.fr-grid-content .xforms-control, .fr-grid-content .fr-component-group {
     display: block;     /* So control is not displayed next to the help icon but on a new line */
     margin-top: 0.3em;  /* Insert some space between the label / help and the control */
     clear: both;
 }
 
-/* Undo effect of previous rule for components of the date picker, so date and icon are not on separate lines */
-.fr-grid-content .xbl-fr-date-picker .xforms-group .xforms-control { display: inline; }
+/* Restore defaults for controls within component */
+.fr-grid-content .xbl-component .xforms-control { display: inline; clear: none }
 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 

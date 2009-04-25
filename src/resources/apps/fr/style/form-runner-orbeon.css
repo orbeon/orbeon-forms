@@ -216,13 +216,11 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 .fr-top .fr-form-title {
-    float: left;
 }
 
 .fr-top .fr-form-description {
     font-size: smaller;
     font-style: italic;
-    float: right;
 }
 
 /* Table of contents */

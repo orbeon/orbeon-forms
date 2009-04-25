@@ -36,12 +36,13 @@ a.fb-edit-help-trigger img {
     padding: 0;
 }
 
+/* This is for the form builder title at the top */
 h1.fr-form-title {
     clear: none;
     color: #004B92;
     float: left;
-    font-size: 197%;
-    font-style: normal;
+    /*font-size: 197%;*/
+    /*font-style: normal;*/
     margin: 0 0 0 1em;
     padding: 0;
 }
@@ -171,6 +172,11 @@ h1.fr-form-title {
 
 /* ***** In-Place Editing ******************************************************************************************* */
 
+/* Title and description */
+.fb-title-control, .fb-description-control { width: 49% }
+.fb-title-control .xbl-fr-inplace-input, .fb-description-control .xbl-fr-inplace-input { display: block }
+.fb-title-control input, .fb-description-control input { width: 100% }
+
 /* In-place editing for regular fields */
 
 .fr-inplace-input { display: inline-block; display: -moz-inline-box; *zoom: 1 }
@@ -219,7 +225,7 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
 #fb-details-group .fr-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
 #fb-details-group .fr-section-title .fr-inplace-content .xforms-label { display: none }
-#fb-details-group .fr-section-title .xforms-input input { width: 20em }
+#fb-details-group .fr-section-title .xforms-input input { width: 38em }/* try to make editable title as wide as possible */
 
 /* Make section title alert look nicer */
 #fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }
@@ -231,14 +237,6 @@ h1.fr-form-title {
 .fb-buttons-placeholder div { margin: .5em }
 /* Give height to footer so it shows up even if empty */
 .fr-footer div { height: 1em }
-
-#fb-metadata-group .fr-grid { margin: 0 }
-#fb-metadata-group td { width: 50% }
-
-/*.fb-metadata-edit-group .fr-grid td, .fb-metadata-view-group .fr-grid td { vertical-align: bottom }*/
-/*.fb-metadata-edit-group .fr-grid .fr-grid-content button.xforms-trigger,*/
-    /*.fb-metadata-view-group .fr-grid .fr-grid-content button.xforms-trigger*/
-        /*{ display: inline; margin-top: 0 }*/
 
 .fb-title-control .xforms-label { display: none }
 .fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }

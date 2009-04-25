@@ -83,12 +83,12 @@
 
                     <xsl:choose>
                         <xsl:when test="@editable = 'true'">
-                            <xsl:variable name="input" as="element(xforms:input)">
-                                <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}" appearance="fr:in-place">
+                            <xsl:variable name="input" as="element(fr:inplace-input)">
+                                <fr:inplace-input id="{$section-id}-input-closed" ref="{xforms:label/@ref}">
                                     <xsl:apply-templates select="xforms:hint | xforms:alert"/>
                                     <!-- Put a hidden label for the error sumnmary -->
                                     <xforms:label class="fr-hidden" ref="$fr-resources/components/labels/section-name"/>
-                                </xforms:input>
+                                </fr:inplace-input>
                             </xsl:variable>
                             <xsl:apply-templates select="$input"/>
                             <span class="fr-section-buttons">

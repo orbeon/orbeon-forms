@@ -168,18 +168,19 @@ button.xforms-trigger img { margin-right: 10px }
 
 .fr-top .fr-logo img { margin-right: 1em }
 .fr-top .fr-form-title {
+    float: left;
     margin: 0;
     padding: 0;
-    white-space: nowrap;
-    /*text-align: right*/
+    /*white-space: nowrap;*/
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 .fr-top .fr-form-description {
-    display: block;
     float: right;
-    padding: .5em;
-    width: 30em;/* can do better? */
     text-align: right;
+    margin: 0;
+    padding: .5em;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 /* Status icons */
@@ -451,12 +452,6 @@ button.xforms-trigger img { margin-right: 10px }
 
 #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
     #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time { *width: 7.3em }
-
-/* ***** Components ************************************************************************************************* */
-
-/* Handle the common case where a component is made of a series of nested controls to display inline within a box */
-.fr-component-group { display: block }
-.fr-component-group .xforms-control { display: inline }
 
 /* ***** Print and PDF ********************************************************************************************** */
 

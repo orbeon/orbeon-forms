@@ -16,7 +16,9 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Form Builder properties -->
-    <property as="xs:string"  name="oxf.fb.components.uri.*.*"                       value="oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
+    <property as="xs:string"  name="oxf.fb.components.uri.*.*"                       value="oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
+                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl
+                                                                                            oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
                                                                                             oxf:/xbl/orbeon/fields-date/fields-date.xbl
                                                                                             oxf:/xbl/orbeon/date-picker/date-picker.xbl
                                                                                             oxf:/xbl/orbeon/us-phone/us-phone.xbl

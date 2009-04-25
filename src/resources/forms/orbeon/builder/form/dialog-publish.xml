@@ -49,7 +49,7 @@
             </xhtml:div>
             <xhtml:div class="fr-dialog-buttons">
                 <xforms:group>
-                    <xforms:trigger xxforms:modal="true">
+                    <fr:button xxforms:modal="true">
                         <xforms:label>
                             <xhtml:img src="/forms/orbeon/builder/images/upload.png"/>
                             <xhtml:span><xforms:output value="$form-resources/dialog-publish/publish/label"/></xhtml:span>
@@ -57,36 +57,19 @@
                         <xforms:action ev:event="DOMActivate">
                             <!-- Clear submission result -->
                             <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
-                            <!-- TODO: make sure form is saved -->
                             <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
                                 <xxforms:context name="fb:application" select="$metadata-instance/application-name"/>
                                 <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
                             </xforms:dispatch>
                         </xforms:action>
-                    </xforms:trigger>
-                    <xforms:trigger xxforms:modal="true">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt=""/>
-                            <xhtml:span><xforms:output value="$form-resources/dialog-publish/publish-and-open/label"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <!-- Clear submission result -->
-                            <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
-                            <!-- TODO: make sure form is saved -->
-                            <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
-                                <xxforms:context name="fb:application" select="$metadata-instance/application-name"/>
-                                <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
-                            </xforms:dispatch>
-                            <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary/" xxforms:target="_blank"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <xforms:trigger>
+                    </fr:button>
+                    <fr:button>
                         <xforms:label>
                             <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                             <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                         </xforms:label>
                         <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                    </xforms:trigger>
+                    </fr:button>
                 </xforms:group>
             </xhtml:div>
         </xforms:case>
@@ -102,17 +85,32 @@
                         <xforms:output value="$response" mediatype="text/html"/>
                     </xhtml:div>
                 </xforms:group>
+                <xforms:group ref=".[not(normalize-space($response) != '')]">
+                    <xhtml:div class="fb-publish-message">
+                        <xhtml:ol>
+                            <xhtml:li>
+                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary/" target="_blank">
+                                    <xforms:output value="$form-resources/dialog-publish/messages/open-summary"/>
+                                </xhtml:a>
+                            </xhtml:li>
+                            <xhtml:li>
+                                <!-- TODO: i18n -->
+                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/new/" target="_blank">
+                                    <xforms:output value="$form-resources/dialog-publish/messages/open-new"/>
+                                </xhtml:a>
+                            </xhtml:li>
+                        </xhtml:ol>
+                    </xhtml:div>
+                </xforms:group>
             </xhtml:div>
             <xhtml:div class="fr-dialog-buttons">
-                <xforms:group>
-                    <xforms:trigger id="fb-publish-dialog-close-button">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
-                        </xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                    </xforms:trigger>
-                </xforms:group>
+                <fr:button id="fb-publish-dialog-close-button">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
+                    </xforms:label>
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                </fr:button>
             </xhtml:div>
         </xforms:case>
         <xforms:case id="fb-publish-dialog-error">
@@ -122,15 +120,13 @@
                 </xhtml:p>
             </xhtml:div>
             <xhtml:div class="fr-dialog-buttons">
-                <xforms:group>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
-                        </xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                    </xforms:trigger>
-                </xforms:group>
+                <fr:button>
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
+                    </xforms:label>
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                </fr:button>
             </xhtml:div>
         </xforms:case>
     </xforms:switch>

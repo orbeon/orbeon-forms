@@ -282,17 +282,16 @@
                                 <!-- TODO: we use this group to detect focus, value changed, select, and focus events, keep this until better solution is in -->
                                 <xforms:group id="fb-metadata-group">
                                     <xhtml:div class="fb-title-control fr-form-title">
-                                        <xforms:input id="title-control" bind="title-bind"
-                                                      appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                                        <fr:inplace-input id="title-control" bind="title-bind" class="fr-summary fr-search">
                                             <xforms:label ref="$form-resources/title/label"/>
                                             <xforms:hint ref="$form-resources/title/hint"/>
                                             <xforms:alert ref="$form-resources/title/alert"/>
-                                        </xforms:input>
+                                        </fr:inplace-input>
                                     </xhtml:div>
 
                                     <xhtml:div class="fb-description-control fr-form-description">
                                         <xforms:textarea id="description-control" bind="description-bind"
-                                                         appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                                                         appearance="fr:in-place" class="fr-summary fr-search">
                                             <xforms:label ref="$form-resources/description/label"/>
                                             <xforms:hint ref="$form-resources/description/hint"/>
                                         </xforms:textarea>

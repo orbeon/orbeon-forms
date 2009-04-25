@@ -244,6 +244,7 @@ h1.fr-form-title {
 .fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
 .fb-title-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
 .fb-title-control .fr-inplace-content .xforms-input input { color: #004B92; font-size: 197% }
+.fb-title-control .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
 
 .fb-description-control .xforms-label { display: none }
 .fb-description-control .fr-inplace-content .xforms-output { color: white }
@@ -278,7 +279,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
     font-size: smaller;
     font-style: italic;
     display: block;
-    margin-left: .5em;
+    margin-left: .2em;
     margin-top: .2em;
     color: gray
 }

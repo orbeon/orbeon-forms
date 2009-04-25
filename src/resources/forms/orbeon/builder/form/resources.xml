@@ -415,6 +415,10 @@
             <publish-and-open>
                 <label>Publish and Open</label>
             </publish-and-open>
+            <messages>
+                <open-summary>Open Published Form Summary Page</open-summary>
+                <open-new>Open Published Form New Page</open-new>
+            </messages>
         </dialog-publish>
         <dialog-add-language>
             <dialog-title>Add Language</dialog-title>
@@ -1107,6 +1111,10 @@
             <publish-and-open>
                 <label>Publier et ouvrir</label>
             </publish-and-open>
+            <messages>
+                <open-summary>Ouvrir la page d'accueil du formulaire publié</open-summary>
+                <open-new>Ouvrir le formulaire publié en création</open-new>
+            </messages>
         </dialog-publish>
         <dialog-add-language>
             <dialog-title>Ajouter une langue</dialog-title>

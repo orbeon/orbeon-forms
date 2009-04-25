@@ -1,3 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -53,6 +67,8 @@
                 <xforms:bind nodeset="area" type="xs:integer" constraint="for $i in xs:integer(.) return $i ge 100 and $i le 999"/>
                 <!-- Ensure the local number contains only digits and spaces -->
                 <xforms:bind nodeset="local" constraint="matches(normalize-space(), '^[0-9\s]*$') and string-length(translate(normalize-space(), ' ', '')) = 7"/>
+                <!-- Make instance read-only when the form must be read-only -->
+                <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind">
@@ -79,8 +95,12 @@
                         <xxforms:variable name="is-valid-phone-string" as="xs:boolean"
                                           select="$phone-string castable as xs:positiveInteger and string-length($phone-string) = 10"/>
                         <xforms:setvalue if="$is-valid-phone-string" ref="$result" value="$phone-string"/>
-                        <xforms:setvalue if="not($is-valid-phone-string)" ref="$result">INVALID_NUMBER</xforms:setvalue>
+                        <xforms:setvalue if="not($is-valid-phone-string)" ref="$result" value="if ($phone-string = '') then '' else 'INVALID_NUMBER'"/>
                     </xforms:action>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="xforms-enabled xforms-disabled xforms-readonly xforms-readwrite xforms-required xforms-optional xforms-valid xforms-invalid xforms-value-changed DOMActivate"
+                                   ev:propagate="stop"/>
                 </xforms:group>
 
             </xforms:group>

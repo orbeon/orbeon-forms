@@ -677,11 +677,12 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="xhtml:head/xbl:xbl//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()"/>
-            <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-        </xsl:copy>
-    </xsl:template>
+    <!-- I don't think we want to do this for components -->
+    <!--<xsl:template match="xhtml:head/xbl:xbl//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">-->
+        <!--<xsl:copy>-->
+            <!--<xsl:apply-templates select="@* | node()"/>-->
+            <!--<xforms:alert ref="$fr-resources/detail/labels/alert"/>-->
+        <!--</xsl:copy>-->
+    <!--</xsl:template>-->
 
 </xsl:stylesheet>

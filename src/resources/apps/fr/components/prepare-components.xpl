@@ -107,8 +107,10 @@
                 <xsl:copy-of select="doc('/forms/orbeon/builder/form/standard-controls.xbl')/xbl:xbl"/>
                 <!-- Global section components -->
                 <xsl:copy-of select="/xbl:xbl"/>
-                <!-- Custom section components -->
-                <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
+                <!-- Custom section components (if different from "orbeon" as we don't want to copy components twice) -->
+                <xsl:if test="doc('input:parameters')/*/app != 'orbeon'">
+                    <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
+                </xsl:if>
                 <!-- Custom components -->
                 <xsl:variable name="resources" select="pipeline:property(string-join(('oxf.fb.components.uri', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '.'))" as="xs:string"/>
                 <!-- Temporary solution: create a single XBL file so that components are grouped together in FB -->

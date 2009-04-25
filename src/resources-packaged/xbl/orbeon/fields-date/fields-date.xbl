@@ -1,3 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -17,7 +31,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Fields Date</display-name>
-            <display-name lang="fr">Date avec Champs</display-name>
+            <display-name lang="fr">Date avec champs</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
@@ -35,14 +49,10 @@
 
         <xbl:resources>
             <xbl:style>
-                .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
-
-                <!-- Make hidden date picker invisible -->
-                .fr-hidden-date-picker { position: relative }
-                .fr-hidden-date-picker img { z-index: 1; position: absolute; top: 0; left: 0; *top: 4px }
-                .fr-hidden-date-picker input.xforms-type-date { width: 1px; opacity: 0; -moz-opacity: 0; *filter: alpha(opacity: 0) }
-                .fr-hidden-date-picker span.xforms-type-date { display: inline; z-index: 2; position: relative  }
+                .xbl-fr-fields-date .xforms-control { display: inline; clear: none }
+                .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-2 input { width: 2em }
+                .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-4 input { width: 4em }
+                .xbl-fr-fields-date .xforms-group .fr-component-group img { vertical-align: bottom }
             </xbl:style>
         </xbl:resources>
         <xbl:template>
@@ -60,11 +70,12 @@
                 </xforms:instance>
                 <!-- Set the validity on the whole instance -->
                 <xforms:bind nodeset="." constraint="is-valid = 'true'"/>
-
+                <!-- Make instance read-only when the form must be read-only -->
+                <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
             <!-- Local controls -->
             <xforms:group xbl:attr="ref bind context">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
                 <xxforms:variable name="result" select="." as="node()?"/>
 
@@ -78,7 +89,7 @@
                     </xforms:action>
                 </xforms:group>
 
-                <xforms:group model="fields-date-model" ref="." class="fr-component-group" xbl:attr="id">
+                <xforms:group model="fields-date-model" class="fr-component-group">
 
                     <xforms:input ref="month" class="fr-width-2"/>
                     <xforms:input ref="day" class="fr-width-2"/>
@@ -97,17 +108,19 @@
                                 <xforms:setvalue ref="$result" value="$date-string"/>
                             </xforms:action>
                         </xforms:action>
+                        <!-- Set invalid string -->
+                        <xforms:action if="is-valid = 'false'">
+                            <xforms:setvalue ref="$result" value="if (concat(context()/year, context()/month, context()/day) = '') then '' else concat(context()/year, '-', context()/month, '-', context()/day)"/>
+                        </xforms:action>
                     </xforms:action>
+
+                    <!-- Date picker -->
+                    <xforms:input ref="$result" appearance="minimal"/>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="xforms-enabled xforms-disabled xforms-readonly xforms-readwrite xforms-required xforms-optional xforms-valid xforms-invalid xforms-value-changed DOMActivate"
+                                   ev:propagate="stop"/>
                 </xforms:group>
-
-                <!-- This builds a date picker hidden hidden behind a calendar image -->
-                <xhtml:span class="fr-hidden-date-picker">
-                    <xhtml:img src="/ops/images/xforms/calendar.png" alt="Date Picker"/>
-                    <xforms:input ref="$result" id="fr-hidden-date-picker"/>
-                </xhtml:span>
-
-                <!-- Place date validity after the date picker -->
-                <xbl:content includes="xforms|alert" xbl:attr="for=id"/>
 
             </xforms:group>
         </xbl:template>

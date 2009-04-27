@@ -1,0 +1,4 @@
+/* Override position: absolute in YUI */
+.fr-autocomplete-input .xforms-input-input { position: relative; }
+/* Make the div that contains the text field inline-block so the component can be used in inline mode */
+/*.fr-autocomplete-container div { display: inline-block; }*/

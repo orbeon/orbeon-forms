@@ -1,0 +1,104 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Autocomplete</xhtml:title>
+        <xforms:model id="main-model">
+
+            <!-- Instance with the currently selected country -->
+            <xforms:instance id="instance-static">
+                <instance><country-name/></instance>
+            </xforms:instance>
+            <xforms:instance id="instance-dynamic">
+                <instance><country-name/></instance>
+            </xforms:instance>
+
+            <!-- Instance with all the countries -->
+            <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+            <!-- Instance with subset of the countries to show in the auto-complete -->
+            <xforms:instance id="selected-countries" src="/xforms-controls/services/countries"/>
+
+            <!-- Submission getting list of updated countries -->
+            <xforms:submission ref="instance('instance-dynamic')" id="update-countries" validate="false"
+                method="post" resource="/xforms-controls/services/countries" replace="instance" instance="selected-countries"/>
+
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+//                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+//
+//                    name: "Map",
+//
+//                    testInitialLogitudeNotSet: function() {
+//
+//                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-longitude"));
+//                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-latitude"));
+//                    }
+//
+//                }));
+//
+//                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+//                    if (parent && parent.TestManager) {
+//                        parent.TestManager.load();
+//                    } else {
+//                        new YAHOO.tool.TestLogger();
+//                        YAHOO.tool.TestRunner.run();
+//                    }
+//                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:h2>Static itemset</xhtml:h2>
+
+        <fr:autocomplete ref="instance('instance-static')/country-name" id="country-name-static"
+                         incremental="false" dynamic-itemset="false"
+                         style="width: 15em">
+            <xforms:label>Enter a country name: </xforms:label>
+            <xforms:itemset nodeset="instance('all-countries')/country">
+                <xforms:label ref="name"/>
+                <xforms:value ref="name"/>
+            </xforms:itemset>
+        </fr:autocomplete>
+
+        <xhtml:h2>Dynamic itemset</xhtml:h2>
+
+        <fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"
+                         incremental="true" dynamic-itemset="true"
+                         style="width: 15em">
+            <xforms:label>Enter a country name: </xforms:label>
+            <xforms:itemset nodeset="instance('selected-countries')/country">
+                <xforms:label ref="name"/>
+                <xforms:value ref="name"/>
+            </xforms:itemset>
+            <xforms:send submission="update-countries" ev:event="xforms-value-changed" />
+        </fr:autocomplete>
+
+    </xhtml:body>
+</xhtml:html>

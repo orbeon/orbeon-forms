@@ -1,0 +1,61 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xbl:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
+    <xbl:script src="/ops/yui/datasource/datasource.js"/>
+    <xbl:script src="/ops/yui/autocomplete/autocomplete.js"/>
+
+    <xbl:binding id="fr-autocomplete" element="fr|autocomplete">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
+            <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" ref=".">
+                <xbl:content includes="> xforms|label, > xforms|help, > xforms|hint"/>
+                <!--<xforms:label>yyy</xforms:label>-->
+
+                <!-- Variables for attributes on the control -->
+                <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
+                <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
+
+                <!-- Event listeners -->
+                <xforms:action ev:event="xforms-enabled" ev:observer="autocomplete-container"><xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script></xforms:action>
+                <!--<xforms:action ev:event="xforms-value-changed" ev:observer="address"><xxforms:script>ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this);</xxforms:script></xforms:action>-->
+
+                <!-- Controls -->
+                <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                <xforms:select1 id="select1" xbl:attr="ref" class="fr-autocomplete-select1" style="display: none" appearance="minimal">
+                    <xbl:content includes="xforms|itemset, xforms|item"/>
+                </xforms:select1>
+                <xhtml:div xbl:attr="class style">
+                    <xforms:input xbl:attr="ref bind incremental" id="input" class="fr-autocomplete-input"/>
+                    <xhtml:div class="fr-autocomplete-yui-div"/>
+                </xhtml:div>
+
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

@@ -247,7 +247,10 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
 }
 
 .xforms-disabled {
-    display: none;
+    top: -10000px;
+    left: -10000px;
+    visibility: hidden;
+    position: static;
 }
 
 
@@ -257,6 +260,8 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
  */
 
 .xforms-case-selected {
+    top: -10000px;
+    left: -10000px;
     visibility: visible;
     position: static;
 }

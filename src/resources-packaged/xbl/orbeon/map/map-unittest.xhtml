@@ -38,7 +38,7 @@
                 </map>
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done local-update-address">
-                <!-- Reset address, so the component gets a value changed event, even if the address hasn't chnanged -->
+                <!-- Reset address, so the component gets a value changed event, even if the address hasn't changed -->
                 <xforms:setvalue ref="/map/address"/>
                 <xforms:setvalue ref="/map/address" value="string-join((../street, ../street2, ../city, ../state, ../zip), ' ')"/>
             </xforms:action>

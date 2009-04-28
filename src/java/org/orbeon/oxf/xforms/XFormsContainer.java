@@ -49,7 +49,8 @@ import java.util.*;
 public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
 
     // PipelineContext attribute used during instance restoration
-    protected static final String XFORMS_DYNAMIC_STATE_RESTORE = "xforms-dynamic-state-instances";
+    protected static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
+    protected static final String XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS = "xforms-dynamic-state-controls";
 
     // Static id of the control containing this container, e.g. my-foo-bar
     private String staticId;

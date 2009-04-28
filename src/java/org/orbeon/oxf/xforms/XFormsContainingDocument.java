@@ -1370,25 +1370,33 @@ public class XFormsContainingDocument extends XFormsContainer {
         // Get dynamic state document
         final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
 
-        // Store instances state in PipelineContext for use down the line
-        final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
-        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE, instancesElement);
+        // Restore models state
+        {
+            // Store instances state in PipelineContext for use down the line
+            final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
 
-        // Create XForms controls and models
-        createControlsAndModels(pipelineContext);
-        
-        // Restore top-level models state, including instances
-        restoreModelsState(pipelineContext);
+            // Create XForms controls and models
+            createControlsAndModels(pipelineContext);
+
+            // Restore top-level models state, including instances
+            restoreModelsState(pipelineContext);
+        }
 
         // Restore controls state
         {
+            // Store serialized control state for retrieval later
+            final Map serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateDocument.getRootElement());
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
+
             xformsControls.initializeState(pipelineContext, true);
-            xformsControls.deserializeControls(dynamicStateDocument.getRootElement());
             xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
+
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
         }
 
         // Indicate that instance restoration process is over
-        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE, null);
+        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, null);
     }
 
     /**
@@ -1398,7 +1406,11 @@ public class XFormsContainingDocument extends XFormsContainer {
      * @return                  true iif restore is in process
      */
     public boolean isRestoringDynamicState(PipelineContext pipelineContext) {
-        return pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE) != null;
+        return pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
+    }
+
+    public Map getSerializedControlStatesMap(PipelineContext pipelineContext) {
+        return (Map) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
     /**

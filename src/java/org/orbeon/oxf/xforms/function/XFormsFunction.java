@@ -50,10 +50,10 @@ abstract public class XFormsFunction extends SystemFunction {
     public XFormsControls getControls(XPathContext xpathContext) {
         final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
         if (functionContext instanceof XFormsControls) {
-            // Deprecated
+            // TODO: Deprecated
             return (XFormsControls) functionContext;
         } else if (functionContext instanceof XFormsModel) {
-            // Deprecated
+            // TODO: Deprecated
             final XFormsModel xformsModel = (XFormsModel) functionContext;
             return xformsModel.getContainingDocument().getControls();
         } else if (functionContext instanceof Context) {

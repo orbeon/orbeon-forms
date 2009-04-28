@@ -122,8 +122,13 @@ public class XFormsControls implements XFormsObjectResolver {
 
             } else {
                 // Create new controls tree
-                initialControlTree = createControlsTree(pipelineContext, evaluateItemsets);
-                currentControlTree = initialControlTree;
+                // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case() 
+                currentControlTree = initialControlTree = new ControlTree();
+
+                // Initialize new control tree
+                containingDocument.startHandleOperation("controls", "building");
+                currentControlTree.initialize(pipelineContext, containingDocument, rootContainer, evaluateItemsets);
+                containingDocument.endHandleOperation();
             }
 
             // We are now clean
@@ -163,20 +168,22 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Deserialize controls from the dynamic state. Only the information that cannot be rebuilt from the instances is
+     * Get serialized control state as a Map. Only the information that cannot be rebuilt from the instances is
      * deserialized.
      *
-     * @param dynamicStateElement
+     * @param   dynamicStateElement
+     * @return  Map<String effectiveId, Element serializedState>
      */
-    public void deserializeControls(Element dynamicStateElement) {
+    public Map getSerializedControlStateMap(Element dynamicStateElement) {
+        final Map result = new HashMap();;
         final Element controlsElement = dynamicStateElement.element("controls");
         if (controlsElement != null) {
             for (Iterator i = controlsElement.elements("control").iterator(); i.hasNext();) {
                 final Element currentControlElement = (Element) i.next();
-                final XFormsControl currentControl = (XFormsControl) getObjectByEffectiveId(currentControlElement.attributeValue("effective-id"));
-                currentControl.deserializeLocal(currentControlElement);
+                result.put(currentControlElement.attributeValue("effective-id"), currentControlElement);
             }
         }
+        return result;
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -186,22 +193,6 @@ public class XFormsControls implements XFormsObjectResolver {
     // TODO: Many callers of this won't get the proper context stack when dealing with components
     public XFormsContextStack getContextStack() {
         return rootContainer.getContextStack();
-    }
-
-    /**
-     * Build the entire tree of controls and associated information.
-     *
-     * @param pipelineContext   pipeline context
-     * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
-     * @return                  controls tree
-     */
-    private ControlTree createControlsTree(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
-
-        containingDocument.startHandleOperation("controls", "building");
-        final ControlTree result = new ControlTree(pipelineContext, containingDocument, rootContainer, evaluateItemsets);
-        containingDocument.endHandleOperation();
-
-        return result;
     }
 
     /**

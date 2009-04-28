@@ -38,17 +38,14 @@ import java.util.*;
 public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     private int startIndex;
-    
+    private transient boolean restoredState;  // used by deserializeLocal() and childrenAdded()
+
     public static class XFormsRepeatControlLocal extends XFormsControlLocal {
         private int index = -1;
 
         private XFormsRepeatControlLocal() {
         }
-
-        private XFormsRepeatControlLocal(int index) {
-            this.index = index;
-        }
-
+        
         public int getIndex() {
             return index;
         }
@@ -68,9 +65,12 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     public void childrenAdded() {
         // This is called once all children have been added
 
-        // Ensure that the initial index is set
-        final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-        local.index = ensureIndexBounds(getStartIndex());
+        // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
+        // reset from serialized data and the initial index must not be used.
+        if (!restoredState) {
+            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
+            local.index = ensureIndexBounds(getStartIndex());
+        }
     }
 
     public int getStartIndex() {
@@ -481,7 +481,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Deserialize index
 
         // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-        final String index = element.attributeValue("index");
-        setLocal(new XFormsRepeatControlLocal(Integer.parseInt(index)));
+        final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
+        local.index = Integer.parseInt(element.attributeValue("index"));
+
+        // Indicate to childrenAdded() that default index must not be set
+        restoredState = true;
     }
 }

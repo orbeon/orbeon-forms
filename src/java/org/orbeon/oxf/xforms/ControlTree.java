@@ -46,23 +46,31 @@ public class ControlTree implements Cloneable {
      * @param pipelineContext   pipeline context
      * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
      */
-    public ControlTree(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContainer rootContainer, boolean evaluateItemsets) {
+    public void initialize(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContainer rootContainer, boolean evaluateItemsets) {
+        // Create temporary root control
+        final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
+            public void addChild(XFormsControl XFormsControl) {
+                // Add child to root control
+                super.addChild(XFormsControl);
+                // Forward children list to ControlTree. This so that the tree is made available during construction
+                // to XPath functions like index() or xxforms:case()
+                if (ControlTree.this.children == null) {
+                    ControlTree.this.children = super.getChildren();
+                }
+            }
+        };
 
-        // Create the tree of controls
-        final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument);// this is temporary and won't be stored
+        // Visit the static tree of controls to create the actual tree of controls
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer,
-                new CreateControlsListener(pipelineContext, this, rootControl, evaluateItemsets, false));
+                new CreateControlsListener(pipelineContext, this, rootControl, containingDocument.getSerializedControlStatesMap(pipelineContext), evaluateItemsets, false));
 
         // Detach all root XFormsControl
-        final List rootChildren = rootControl.getChildren();
-        if (rootChildren != null) {
-            for (Iterator i = rootChildren.iterator(); i.hasNext();) {
+        if (children != null) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
                 currentXFormsControl.detach();
             }
         }
-
-        setChildren(rootChildren);
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -112,7 +120,7 @@ public class ControlTree implements Cloneable {
 
         // Create the subtree
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, repeatControl, iterationIndex,
-                new CreateControlsListener(pipelineContext, this, repeatIterationControl, false, true));
+                new CreateControlsListener(pipelineContext, this, repeatIterationControl, null, false, true));
 
         return repeatIterationControl;
     }
@@ -121,7 +129,7 @@ public class ControlTree implements Cloneable {
 
         final XFormsControl control = (XFormsControl) containerControl;
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containerControl,
-                new CreateControlsListener(pipelineContext, this, control, false, true));
+                new CreateControlsListener(pipelineContext, this, control, null, false, true));
     }
 
     /**
@@ -467,15 +475,17 @@ public class ControlTree implements Cloneable {
 
         private XFormsControl currentControlsContainer;
 
+        private final Map serializedControls;
         private final boolean evaluateItemsets;
         private final PipelineContext pipelineContext;
         private final ControlTree result;
         private final boolean registerEvents;
 
-        public CreateControlsListener(PipelineContext pipelineContext, ControlTree result, XFormsControl rootControl, boolean evaluateItemsets, boolean registerEvents) {
+        public CreateControlsListener(PipelineContext pipelineContext, ControlTree result, XFormsControl rootControl, Map serializedControlStateMap, boolean evaluateItemsets, boolean registerEvents) {
 
             this.currentControlsContainer = rootControl;
 
+            this.serializedControls = serializedControlStateMap;
             this.evaluateItemsets = evaluateItemsets;
             this.pipelineContext = pipelineContext;
             this.result = result;
@@ -486,6 +496,13 @@ public class ControlTree implements Cloneable {
 
             // Create XFormsControl with basic information
             final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
+
+            // If needed, deserialize control state
+            if (serializedControls != null) {
+                final Element element = (Element) serializedControls.get(effectiveControlId);
+                if (element != null)
+                    control.deserializeLocal(element);
+            }
 
             // Control type-specific handling
             if (control instanceof XFormsSelectControl || control instanceof XFormsSelect1Control) {

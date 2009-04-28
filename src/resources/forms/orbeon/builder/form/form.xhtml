@@ -570,7 +570,8 @@
                                                                                                                                     return $grid/*:tr[count($c/../preceding-sibling::r) + 1]/*:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                                         <xforms:action xxforms:iterate="$insert-tds">
-                                                                                                            <xforms:insert nodeset="." origin="xxforms:element('*:td', context()/@rowspan)" position="before"/>
+                                                                                                            <!-- TODO: should insert fr:td instead? -->
+                                                                                                            <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="before"/>
                                                                                                         </xforms:action>
                                                                                                     </xforms:action>
                                                                                                 </xforms:trigger>
@@ -595,7 +596,8 @@
                                                                                                                                     return $grid/*:tr[count($c/../preceding-sibling::r) + 1]/*:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                                         <xforms:action xxforms:iterate="$insert-tds">
-                                                                                                            <xforms:insert nodeset="." origin="xxforms:element('*:td', context()/@rowspan)" position="after"/>
+                                                                                                            <!-- TODO: should insert fr:td instead? -->
+                                                                                                            <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="after"/>
                                                                                                         </xforms:action>
                                                                                                     </xforms:action>
                                                                                                 </xforms:trigger>
@@ -695,9 +697,10 @@
                                                                                                                 <!-- Number of tds that must be in the new row -->
                                                                                                                 <xxforms:variable name="new-td-count" select="count(instance('fb-span-grid-instance')/r[$tr-position]/c[. != 'x'])"/>
                                                                                                                 <!-- Insert new row -->
+                                                                                                                <!-- TODO: should insert fr:tr/fr:td instead? -->
                                                                                                                 <xforms:insert context="$grid" nodeset="*:tr"
                                                                                                                                at="$tr-position" position="before"
-                                                                                                                               origin="xxforms:element('*:tr', for $td in (1 to $new-td-count) return xxforms:element('*:td'))"/>
+                                                                                                                               origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                                             </xforms:action>
                                                                                                         </xforms:action>
                                                                                                     </xforms:trigger>
@@ -796,9 +799,10 @@
                                                                                                                                       else xs:integer($grid/@columns)"/>
 
                                                                                                             <!-- Insert new row -->
+                                                                                                            <!-- TODO: should insert fr:tr/fr:td instead? -->
                                                                                                             <xforms:insert context="$grid" nodeset="*:tr"
                                                                                                                            at="$tr-position" position="after"
-                                                                                                                           origin="xxforms:element('*:tr', for $td in (1 to $new-td-count) return xxforms:element('*:td'))"/>
+                                                                                                                           origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                                         </xforms:action>
                                                                                                     </xforms:trigger>
                                                                                                 </xhtml:div>

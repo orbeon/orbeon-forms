@@ -1,0 +1,78 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Simple Master-Detail</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <oranges>
+                    <orange><type>Persian</type><id>1</id></orange>
+                    <orange><type>Navel</type><id>2</id></orange>
+                    <orange><type>Valencia</type><id>3</id></orange>
+                    <orange><type>Blood</type><id>4</id></orange>
+                </oranges>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <!-- Button to add a row after currently selected row -->
+        <xforms:trigger>
+            <xforms:label>Add</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <!-- Insert new row and populate id with max of exising ids + 1 -->
+                <xforms:insert nodeset="*" at="index('orange-repeat')"
+                               origin="xxforms:element('orange',
+                                            (xxforms:element('type'),
+                                             xxforms:element('id', max(for $n in /*/orange/id[. castable as xs:integer] return xs:integer($n)) + 1)))"/>
+            </xforms:action>
+        </xforms:trigger>
+
+        <xhtml:h2>Master</xhtml:h2>
+
+        <xhtml:table>
+            <xforms:repeat nodeset="orange" id="orange-repeat">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:output ref="type">
+                            <xforms:label>Orange type:</xforms:label>
+                        </xforms:output>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+        </xhtml:table>
+
+        <xhtml:hr/>
+
+        <xhtml:h2>Detail</xhtml:h2>
+
+        <xforms:group ref="orange[index('orange-repeat')]">
+            <xforms:input ref="type">
+                <xforms:label>Orange type:</xforms:label>
+            </xforms:input>
+            <xforms:input ref="id">
+                <xforms:label>Orange id:</xforms:label>
+            </xforms:input>
+        </xforms:group>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+    </xhtml:body>
+
+</xhtml:html>

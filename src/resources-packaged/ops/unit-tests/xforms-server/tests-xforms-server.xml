@@ -3863,8 +3863,8 @@
                                 <xforms:model xxforms:state-handling="client">
                                     <xforms:instance>
                                         <oranges>
-                                            <orange><type>Persian</type><foo>1</foo></orange>
-                                            <orange><type>Navel</type><foo>2</foo></orange>
+                                            <orange><type>Persian</type><id>1</id></orange>
+                                            <orange><type>Navel</type><id>2</id></orange>
                                         </oranges>
                                     </xforms:instance>
                                 </xforms:model>
@@ -3882,7 +3882,7 @@
                                     <xforms:input ref="type" id="detail-type">
                                         <xforms:label>Orange type:</xforms:label>
                                     </xforms:input>
-                                    <xforms:input ref="foo" id="detail-id">
+                                    <xforms:input ref="id" id="detail-id">
                                         <xforms:label>Orange id:</xforms:label>
                                     </xforms:input>
                                 </xforms:group>
@@ -3904,11 +3904,11 @@
                                 <oranges>
                                     <orange>
                                         <type>Persian</type>
-                                        <foo>1</foo>
+                                        <id>1</id>
                                     </orange>
                                     <orange>
                                         <type>Navel</type>
-                                        <foo>2</foo>
+                                        <id>2</id>
                                     </orange>
                                 </oranges>
                             </instance>

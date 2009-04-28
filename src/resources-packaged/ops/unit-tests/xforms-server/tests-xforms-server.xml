@@ -3850,5 +3850,86 @@
         </output>
     </test>
 
+    <test description="Simple master-detail repeat initialization" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance>
+                                        <oranges>
+                                            <orange><type>Persian</type><foo>1</foo></orange>
+                                            <orange><type>Navel</type><foo>2</foo></orange>
+                                        </oranges>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:repeat nodeset="orange" id="orange-repeat">
+                                    <xforms:output ref="type" id="orange-repeat-output">
+                                        <xforms:label>Orange type:</xforms:label>
+                                    </xforms:output>
+                                </xforms:repeat>
+
+                                <!-- This is the key of this test: index() here must return 1, not 0 -->
+                                <xforms:group ref="orange[index('orange-repeat')]">
+                                    <xforms:input ref="type" id="detail-type">
+                                        <xforms:label>Orange type:</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input ref="foo" id="detail-id">
+                                        <xforms:label>Orange id:</xforms:label>
+                                    </xforms:input>
+                                </xforms:group>
+                            </xhtml:body>
+
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-2" model-id="xf-1">
+                                <oranges>
+                                    <orange>
+                                        <type>Persian</type>
+                                        <foo>1</foo>
+                                    </orange>
+                                    <orange>
+                                        <type>Navel</type>
+                                        <foo>2</foo>
+                                    </orange>
+                                </oranges>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="orange-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="orange-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="orange-repeat-output·1" label="Orange type:">Persian</xxf:control>
+                        <xxf:control id="orange-repeat-output·2" label="Orange type:">Navel</xxf:control>
+                        <xxf:control id="detail-type" label="Orange type:">Persian</xxf:control>
+                        <xxf:control id="detail-id" label="Orange id:">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

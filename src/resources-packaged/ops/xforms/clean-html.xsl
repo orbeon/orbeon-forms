@@ -6,7 +6,7 @@
         </dummy-root>
     </xsl:template>
 
-    <xsl:template match="*:a | *:b | *:i | *:ul | *:li | *:ol | *:p | *:span | *:u | *:div | *:br | *:strong | *:em" priority="2">
+    <xsl:template match="*:a | *:b | *:i | *:ul | *:li | *:ol | *:p | *:span | *:u | *:div | *:br | *:strong | *:em | *:img" priority="2">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </xsl:element>
@@ -14,6 +14,7 @@
 
     <xsl:template match="*:script" priority="2"/>
 
+    <!-- Remove everything that looks like a JavaScript event handler -->
     <xsl:template match="@*[not(starts-with(., 'on'))]" priority="1">
         <xsl:copy-of select="."/>
     </xsl:template>

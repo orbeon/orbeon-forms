@@ -1,0 +1,158 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Error Dialog</xhtml:title>
+        <xforms:model id="xforms-model" xxforms:external-events="provoke-error">
+            <xforms:instance id="instance">
+                <root position="1">
+                    <a>1</a>
+                    <b>2</b>
+                </root>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+
+				YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+                    name: "AJAX error",
+					listenerInvoked: null,
+					testType: null,
+					initialShowDialogValue: opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY],
+
+					myErrorListener: function(eventName, eventData) {
+						// Handler here.
+						var testCase = this;
+						listenerInvoked = "set";
+					},
+					setProperties: function() {
+						opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY] = (((this.testType % 2) == 0) ? "true" : "false");
+						if ((this.testType % 4) < 2) {
+							ORBEON.xforms.Events.errorEvent.subscribe(this.myErrorListener);
+						}
+						else {
+							ORBEON.xforms.Events.errorEvent.unsubscribeAll();
+						}
+					},
+
+					doTest: function(type) {
+						this.testType = type;
+						this.setProperties();
+						this.triggerTest();
+					},
+
+					getExpectedVisibility: function() {
+						return ((this.testType % 2) == 0) ? "visible" : "hidden";
+					},
+
+					getExpectedListenerResponse: function() {
+						return ((this.testType % 4) < 2) ? "set" : null;
+					},
+
+					triggerTest: function() {
+						var button = YAHOO.util.Dom.getElementsByClassName("xforms-trigger")[this.testType < 4 ? 0 : 1];
+						button.click();
+						this.wait(this.checkConditions, XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
+					},
+					checkConditions: function() {
+						var errorPanel = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel")[0];
+						var errorPanelContainer = errorPanel.parentNode;
+						var visibility = YAHOO.util.Dom.getStyle(errorPanelContainer.id, "visibility");
+						var listenerValueSet = listenerInvoked ;
+
+						listenerInvoked = null;
+						var form = ORBEON.xforms.Controls.getForm(errorPanel);
+						ORBEON.xforms.Globals.formErrorPanel[form.id].hide();
+						opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY] = this.initialShowDialogValue;
+
+						YAHOO.util.Assert.areEqual(this.getExpectedVisibility(), visibility);
+						YAHOO.util.Assert.areEqual(this.getExpectedListenerResponse(), listenerValueSet);
+					},
+
+                    testServerSideShowErrorDialogWithListenerRegistered: function() {
+						this.doTest(0);
+                    },
+                    testServerSideHideErrorDialogWithListenerRegistered: function() {
+						this.doTest(1);
+                    },
+                    testServerSideShowErrorDialogWithListenerNotRegistered: function() {
+						this.doTest(2);
+                    },
+                    testServerSideHideErrorDialogWithListenerNotRegistered: function() {
+						this.doTest(3);
+                    },
+					testClientSideShowErrorDialogWithListenerRegistered: function() {
+						this.doTest(4);
+                    },
+                    testClientSideHideErrorDialogWithListenerRegistered: function() {
+						this.doTest(5);
+                    },
+                    testClientSideShowErrorDialogWithListenerNotRegistered: function() {
+						this.doTest(6);
+                    },
+                    testClientSideHideErrorDialogWithListenerNotRegistered: function() {
+						this.doTest(7);
+                    }
+                }));
+
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+
+    <xhtml:body>
+
+        <xforms:input ref="/root/*[number(/root/@position)] treat as element(a)"/>
+
+        <xforms:trigger>
+            <xforms:label>Server-side XPath error</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="/root/@position" value="'2'"/>
+            </xforms:action>
+        </xforms:trigger>
+
+        <xforms:trigger>
+            <xforms:label>Client-side JS error</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xxforms:script>
+					try {
+						invalidFunctionCall();
+					}
+					catch(e) {
+						var form = YAHOO.util.Dom.getElementsByClassName("xforms-form")[0];
+						ORBEON.xforms.Server.exceptionWhenTalkingToServer(e,form.id);
+					}
+				</xxforms:script>
+            </xforms:action>
+        </xforms:trigger>
+
+    </xhtml:body>
+</xhtml:html>

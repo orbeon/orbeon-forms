@@ -390,7 +390,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private void restoreInstances(PipelineContext pipelineContext) {
 
         // Find serialized instances from context
-        final Element instancesElement = (Element) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE);
+        final Element instancesElement = (Element) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
 
         // Get instances from dynamic state first
         if (instancesElement != null) {
@@ -744,6 +744,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // Make sure URL is absolute to make it unique
                 final String absoluteResolvedURLString; {
+                    // TODO: most likely WRONG; should use resolveServiceURL(), right?
                     final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
                     absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
                 }

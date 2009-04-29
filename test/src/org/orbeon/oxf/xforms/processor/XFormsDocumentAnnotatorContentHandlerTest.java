@@ -106,7 +106,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
         final Map mappings = new HashMap();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final Document annotatedDocument = XBLUtils.annotateShadowTree(document, mappings);
+        final Document annotatedDocument = XBLUtils.annotateShadowTree(document, mappings, "");
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

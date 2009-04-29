@@ -327,7 +327,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         return false;
     }
 
-    private void addNamespaces(String id) {
+    protected void addNamespaces(String id) {
         final Map namespaces = new HashMap();
         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();

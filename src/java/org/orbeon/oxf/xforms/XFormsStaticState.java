@@ -102,8 +102,7 @@ public class XFormsStaticState {
     private Map eventHandlersMap;           // Map<String controlPrefixedId, List<XFormsEventHandler> eventHandler>
     private Map controlInfoMap;             // Map<String controlPrefixedId, ControlInfo>
     private Map attributeControls;          // Map<String forPrefixedId, Map<String name, ControlInfo info>>
-    // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
-    private Map namespacesMap;              // Map<String staticId, Map<String prefix, String uri>> of namespace mappings
+    private Map namespacesMap;              // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
     private Map itemsInfoMap;               // Map<String controlPrefixedId, ItemsInfo>
@@ -783,6 +782,25 @@ public class XFormsStaticState {
         }
     }
 
+    public Map getNamespaceMappings(String prefix, Element element) {
+        final String id = element.attributeValue("id");
+        if (id != null) {
+            // There is an id attribute
+            final String prefixedId = (prefix != null) ? prefix + id : id; 
+            final Map cachedMap = (Map) namespacesMap.get(prefixedId);
+            if (cachedMap != null) {
+                return cachedMap;
+            } else {
+                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+                return Dom4jUtils.getNamespaceContextNoDefault(element);
+            }
+        } else {
+            // No id attribute
+            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+            return Dom4jUtils.getNamespaceContextNoDefault(element);
+        }
+    }
+
     public String getRepeatHierarchyString() {
         return repeatHierarchyString;
     }
@@ -1016,7 +1034,6 @@ public class XFormsStaticState {
             public void startVisitControl(Element controlElement, String controlStaticId) {
 
                 // Check for mandatory id
-                // TODO: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
                 if (controlStaticId == null)
                     throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName(), locationData);
 
@@ -1035,17 +1052,14 @@ public class XFormsStaticState {
                     if (bindingElement != null) {
                         // A custom component is bound to this element
 
-                        // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
-                        // NOTE: namespaces are gathered fully statically (no use of prefix ids); may be right or not
+                        // Find new prefix
+                        final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
                         // Generate the shadow content for this particular binding
-                        final Document fullShadowTreeDocument = XBLUtils.generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap);
+                        final Document fullShadowTreeDocument = XBLUtils.generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap, newPrefix);
                         if (fullShadowTreeDocument != null) {
 
                             final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
-
-                            // Find new prefix
-                            final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
                             // Extract models from components instances
                             final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);

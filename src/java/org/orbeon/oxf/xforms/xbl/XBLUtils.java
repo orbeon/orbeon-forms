@@ -58,7 +58,7 @@ public class XBLUtils {
      * @return                  shadow tree document
      */
     public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper,
-                                                    final Element boundElement, Element binding, Map namespaceMappings) {
+                                                    final Element boundElement, Element binding, Map namespaceMappings, String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -258,7 +258,7 @@ public class XBLUtils {
             });
 
             // Annotate tree
-            final Document annotedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings);
+            final Document annotedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 XFormsContainingDocument.logDebugStatic("static state", "annotated shadow tree",
@@ -272,7 +272,7 @@ public class XBLUtils {
     }
 
     // Keep public for unit tests
-    public static Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings) {
+    public static Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings, final String prefix) {
         // Create transformer
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -281,7 +281,17 @@ public class XBLUtils {
         identity.setResult(documentResult);
 
         // Write the document through the annotator and gather namespace mappings
-        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings));
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings) {
+            protected void addNamespaces(String id) {
+                // Store prefixed id in order to avoid clashes between top-level controls and shadow trees 
+//                super.addNamespaces(prefix + id);
+
+                // TODO: Implement this once callers of XFormsStaticState.getNamespaceMappings() and
+                // XFormsContainingDocument.getNamespaceMappings() have been modified to provide a prefix.
+
+                super.addNamespaces(id);
+            }
+        });
 
         // Return annotated document
         return documentResult.getDocument();

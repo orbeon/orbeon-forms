@@ -129,7 +129,8 @@
                 query = query.toLowerCase();
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                     var option = options[optionIndex];
-                    if (option.text.toLowerCase().indexOf(query) == 0)
+                    // We only do filtering for the static itemset mode
+                    if (autoComplete.isDynamicItemset() || option.text.toLowerCase().indexOf(query) == 0)
                         result[result.length] = option.text;
                 }
             }

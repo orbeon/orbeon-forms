@@ -84,7 +84,7 @@
                             <xforms:case id="fr-inplace-view">
                                 <!-- View mode -->
                                 <xhtml:span class="fr-inplace-content fr-inplace-view">
-                                    <xforms:output ref="." xbl:attr="navindex navindex=tabindex">
+                                    <xforms:output ref="." xbl:attr="navindex navindex=tabindex" id="fr-inplace-input-view-output">
                                         <!-- Handle inline hint-->
                                         <xsl:choose>
                                             <xsl:when test="xforms:hint">
@@ -113,7 +113,7 @@
                             <xforms:case id="fr-inplace-edit">
                                 <!-- Edit mode -->
                                 <!-- Show edit mode unless the bound node is readonly -->
-                                <xforms:group class="fr-inplace-content fr-inplace-edit" model="fr-inplace-model" ref=".[not(exf:readonly($result))]">
+                                <xforms:group class="fr-inplace-content fr-inplace-edit" model="fr-inplace-model" ref=".[not(exf:readonly($result))]" id="fr-inplace-input-edit-group">
                                     <xforms:input id="fr-inplace-input" xbl:attr="navindex navindex=tabindex incremental" ref=".">
                                         <xforms:action ev:event="DOMActivate">
                                             <!-- Write value back -->

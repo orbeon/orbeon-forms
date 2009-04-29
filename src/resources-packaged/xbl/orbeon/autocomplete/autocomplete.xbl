@@ -32,9 +32,8 @@
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
         </xbl:resources>
         <xbl:template>
-            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" ref=".">
+            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" xbl:attr="context ref bind">
                 <xbl:content includes="> xforms|label, > xforms|help, > xforms|hint"/>
-                <!--<xforms:label>yyy</xforms:label>-->
 
                 <!-- Variables for attributes on the control -->
                 <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
@@ -42,15 +41,14 @@
 
                 <!-- Event listeners -->
                 <xforms:action ev:event="xforms-enabled" ev:observer="autocomplete-container"><xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script></xforms:action>
-                <!--<xforms:action ev:event="xforms-value-changed" ev:observer="address"><xxforms:script>ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this);</xxforms:script></xforms:action>-->
 
                 <!-- Controls -->
                 <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
-                <xforms:select1 id="select1" xbl:attr="ref" class="fr-autocomplete-select1" style="display: none" appearance="minimal">
+                <xforms:select1 id="select1" ref="." class="fr-autocomplete-select1" style="display: none" appearance="minimal">
                     <xbl:content includes="xforms|itemset, xforms|item"/>
                 </xforms:select1>
                 <xhtml:div xbl:attr="class style">
-                    <xforms:input xbl:attr="ref bind incremental" id="input" class="fr-autocomplete-input"/>
+                    <xforms:input ref="." xbl:attr="incremental" id="input" class="fr-autocomplete-input"/>
                     <xhtml:div class="fr-autocomplete-yui-div"/>
                 </xhtml:div>
 

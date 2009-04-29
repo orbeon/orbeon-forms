@@ -250,7 +250,7 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
     top: -10000px;
     left: -10000px;
     visibility: hidden;
-    position: static;
+    position: absolute;
 }
 
 

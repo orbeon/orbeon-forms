@@ -37,7 +37,7 @@
             <!-- Instance with all the countries -->
             <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
             <!-- Instance with subset of the countries to show in the auto-complete -->
-            <xforms:instance id="selected-countries" src="/xforms-controls/services/countries"/>
+            <xforms:instance id="selected-countries"><empty/></xforms:instance>
 
             <!-- Submission getting list of updated countries -->
             <xforms:submission ref="instance('instance-dynamic')" id="update-countries" validate="false"
@@ -97,7 +97,11 @@
                 <xforms:label ref="name"/>
                 <xforms:value ref="name"/>
             </xforms:itemset>
-            <xforms:send submission="update-countries" ev:event="xforms-value-changed" />
+            <xforms:action ev:event="xforms-value-changed">
+                <xxforms:variable name="make-suggestion" select="string-length(instance('instance-dynamic')/country-name) >= 3"/>
+                <xforms:send if="$make-suggestion" submission="update-countries"/>
+                <xforms:delete if="not($make-suggestion)" nodeset="instance('selected-countries')/country"/>
+            </xforms:action>
         </fr:autocomplete>
 
     </xhtml:body>

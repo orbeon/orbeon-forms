@@ -78,6 +78,7 @@
 
                     name: "xforms:input type xs:date",
 
+                    dateValueControlId: "date-value" + XFORMS_SEPARATOR_1 + "1",
                     dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
 
                     testOpenHideCalendar: function() {
@@ -106,7 +107,20 @@
                                 ORBEON.xforms.Document.setValue("readonly", "false");
                             }, function() {});
                         });
-                    }
+                    },
+
+                    checkDateConversion: function(twoDigits, fourDigits) {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // This year taken in the 21th century
+                            ORBEON.xforms.Document.setValue(this.dateValueControlId, "1/1/" + twoDigits);
+                        }, function() {
+                            YAHOO.util.Assert.areEqual(fourDigits + "-01-01", ORBEON.xforms.Document.getValue(this.dateValueControlId));
+                       });
+                    },
+
+                    testTwoDigitClose: function() { this.checkDateConversion ("02", "2002"); },
+                    testTwoDigitTwentyFirt: function() { this.checkDateConversion ("40", "2040"); },
+                    testTwoDigitTwentieth: function() { this.checkDateConversion ("85", "1985"); }
                 }));
 
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

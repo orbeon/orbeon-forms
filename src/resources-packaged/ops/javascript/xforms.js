@@ -802,7 +802,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
                 var d = new Date();
-                d.setYear(bits[3]);
+                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
                 d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
                 d.setDate(parseInt(bits[1], 10));
                 return d;
@@ -823,7 +823,7 @@ ORBEON.util.DateTime = {
                 var d = new Date();
                 d.setDate(parseInt(bits[2], 10));
                 d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
-                d.setYear(bits[3]);
+                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
                 return d;
             }
         },
@@ -851,7 +851,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setYear(bits[3]);
+                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
                 d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
                 d.setDate(parseInt(bits[2], 10));
                 return d;
@@ -870,7 +870,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setYear(bits[3]);
+                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
                 d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
                 d.setDate(parseInt(bits[1], 10));
                 return d;
@@ -880,7 +880,7 @@ ORBEON.util.DateTime = {
         {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setYear(parseInt(bits[1]));
+                d.setYear(ORBEON.util.DateTime._parseYear(bits[1]));
                 d.setMonth(parseInt(bits[2], 10) - 1);
                 d.setDate(parseInt(bits[3], 10));
                 return d;
@@ -938,6 +938,18 @@ ORBEON.util.DateTime = {
             throw new Error("Ambiguous weekday");
         }
         return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
+    },
+
+    _currentYear: new Date().getFullYear(),
+    _parseYear: function(year) {
+        year = parseInt(year, 10);
+        if (year < 100) {
+            var twentiethCentury = 1900 + year;
+            var twentyFirstCentury = 2000 + year;
+            year = Math.abs(twentiethCentury - ORBEON.util.DateTime._currentYear) < Math.abs(twentyFirstCentury - ORBEON.util.DateTime._currentYear)
+                ? twentiethCentury : twentyFirstCentury;
+        }
+        return year;
     }
 };
 

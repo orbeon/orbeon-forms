@@ -843,6 +843,7 @@
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:choice>
                         <xsd:group ref="xforms:Form.Controls"/>
+                        <xsd:group ref="xforms:Action"/>
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>

@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes" xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:f="http://orbeon.org/oxf/xml/formatting">
+    <head>
+        <title>xforms:insert/@while issue</title>
+        <xforms:model>
+            <!-- form instance -->
+            <xforms:instance id="main-instance" xmlns="">
+                <instance>
+                    <record>
+                        <id>1</id>
+                    </record>
+                    <record>
+                        <id>2</id>
+                    </record>
+                </instance>
+            </xforms:instance>
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:insert context="record[not(foo)]" origin="xxforms:element('foo', 'N/A')"
+                    while="/instance/record[not(foo)]"/>
+            </xforms:action>
+
+        </xforms:model>
+    </head>
+    <body>
+        <xforms:value ref="record[2]/foo">
+            <xforms:label>That's working!</xforms:label>
+        </xforms:value>
+        <br/>
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+    </body>
+</html>

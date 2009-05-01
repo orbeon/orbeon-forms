@@ -1,0 +1,49 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:saxon="http://saxon.sf.net/">
+    <head>
+        <title>EXForms:sort repro</title>
+        <xforms:model>
+            <!-- form instance -->
+            <xforms:instance id="main-instance">
+                <instance xmlns="">
+                    <record code="c"/>
+                    <record code="a"/>
+                    <record code="b"/>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="lookup-instance">
+                <instance xmlns="">
+                    <record code="c">1-CCC</record>
+                    <record code="a">3-AAA</record>
+                    <record code="b">2-BBB</record>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </head>
+    <body>
+        <h2>Sorted instance</h2>
+        <ul>
+
+            <xforms:repeat
+                nodeset="xxforms:sort(record, saxon:evaluate('instance(&quot;lookup-instance&quot;)/record[@code=$p1]', @code), 'text')">
+
+                <!--<xforms:repeat
+                nodeset="xxforms:sort(record, saxon:evaluate('for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c]'), 'text')">
+     -->
+                <!--<xforms:repeat
+                nodeset="exf:sort(record, 'for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c]', 'text')">-->
+                <!--<xforms:repeat
+                nodeset="xxforms:sort(record, for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c], 'text')">-->
+                <li>
+                    <xforms:output
+                        value="saxon:evaluate('instance(&quot;lookup-instance&quot;)/record[@code=$p1]', @code)"
+                    />
+                </li>
+            </xforms:repeat>
+        </ul>
+    </body>
+</html>

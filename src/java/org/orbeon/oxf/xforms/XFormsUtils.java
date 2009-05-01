@@ -341,6 +341,17 @@ public class XFormsUtils {
         return documentResult.getDocument();
     }
 
+    // TODO: implement server-side plain text output with <br> insertion
+//    public static void streamPlainText(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
+//        // 1: Split string along 0x0a and remove 0x0d (?)
+//        // 2: Output string parts, and between them, output <xhtml:br> element
+//        try {
+//            contentHandler.characters(filteredValue.toCharArray(), 0, filteredValue.length());
+//        } catch (SAXException e) {
+//            throw new OXFException(e);
+//        }
+//    }
+
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
         
         if (value != null && value.trim().length() > 0) { // don't parse blank values
@@ -1069,10 +1080,16 @@ public class XFormsUtils {
      * @param attributeValue        attribute value
      * @return                      rewritten URL
      */
-    public static String getEscapedURLAttributeIfNeeded(PipelineContext pipelineContext, Element element, String attributeName, String attributeValue) {
+    public static String getEscapedURLAttributeIfNeeded(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element element, String attributeName, String attributeValue) {
         final String rewrittenValue;
-        if ("src".equals(attributeName) || "href".equals(attributeName)) {
+        if ("src".equals(attributeName)) {
             rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        } else if ("href".equals(attributeName)) {
+
+            // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
+
+            final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
+            rewrittenValue = resolveRenderOrActionURL(isPortletLoad, pipelineContext, element, attributeValue, false);
         } else {
             rewrittenValue = attributeValue;
         }

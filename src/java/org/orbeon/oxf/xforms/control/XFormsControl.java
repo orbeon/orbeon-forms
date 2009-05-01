@@ -614,7 +614,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                         // Rewrite URI attribute if needed
                         // NOTE: Sould probably use xml:base but we don't have an Element available to gather xml:base information
-                        final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, null, currentName, currentValue);
+                        final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, containingDocument, null, currentName, currentValue);
 
                         sb.append(' ');
                         sb.append(currentName);

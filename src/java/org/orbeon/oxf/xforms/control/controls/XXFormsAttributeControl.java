@@ -79,7 +79,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         // Rewrite URI attribute if needed
-        return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getControlElement(), nameAttribute, getExternalValue(pipelineContext));
+        return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue(pipelineContext));
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {

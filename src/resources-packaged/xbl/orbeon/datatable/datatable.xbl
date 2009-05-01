@@ -38,6 +38,7 @@
     <xbl:binding id="fr.datatable" element="fr|datatable">
 
         <xbl:resources>
+            <xbl:style src="/xbl/orbeon/datatable/datatable.css"/>
             <xbl:style src="/ops/yui/paginator/assets/skins/sam/paginator.css"/>
             <xbl:style src="/ops/yui/datatable/assets/skins/sam/datatable.css"/>
             <xbl:style>.xforms-data {display: none}</xbl:style>

@@ -2066,7 +2066,6 @@ ORBEON.xforms.Controls = {
 			scrollHeight = textarea.scrollHeight;
             textarea.style.height = null;
 		}
-
         var rowHeight = clientHeight / textarea.rows;
         var linesAdded = 0;
 
@@ -2074,6 +2073,11 @@ ORBEON.xforms.Controls = {
             // Grow
             while (scrollHeight >= clientHeight) {
                 textarea.rows = textarea.rows + 1;
+                if (textarea.clientHeight <= clientHeight) {
+                    // If adding a row didn't increase the height if the text area, there is nothing we can do, so stop here.
+                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    break;
+                }
                 clientHeight = textarea.clientHeight;
                 linesAdded++;
 
@@ -2082,6 +2086,11 @@ ORBEON.xforms.Controls = {
             // Shrink
             while (textarea.rows > XFORMS_WIDE_TEXTAREA_MIN_ROWS && scrollHeight < clientHeight - rowHeight) {
                 textarea.rows = textarea.rows - 1;
+                if (textarea.clientHeight >= clientHeight) {
+                    // If adding a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
+                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    break;
+                }
                 clientHeight = textarea.clientHeight;
                 linesAdded--;
             }

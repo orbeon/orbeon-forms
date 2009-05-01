@@ -14,6 +14,9 @@
 
 /* ***** Summary Page *********************************************************************************************** */
 
+.fr-summary-repeat-selection-checkbox { width: 1em } /*force minimum column width*/
+.fr-summary-repeat-selection-checkbox label { display: none } /*prevent second line in td after checkbox*/
+
 .fr-summary-repeat-column-number { text-align: right; width: 3em }
 
 .fr-summary-search .xforms-label {
@@ -23,9 +26,9 @@
     margin-bottom: .1em;
 }
 
-.fr-summary-table tbody .xforms-repeat-selected-item-1 { background-image: url(logo-bg.gif) }
-.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-image: url(logo-bg.gif) }/* HACK for IE 7 only */
-.fr-summary-table tbody tr:hover { background-image: url(logo-bg.gif) }
+.fr-summary-table tbody tr.fr-summary-row-not-selected:hover { background-image: url(logo-bg.gif) }
+
+.fr-summary-row-selected { background: #e8e8ff }
 
 .fr-summary-table .xforms-label { display: none }
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
@@ -40,6 +43,9 @@
 
 /* Mainly to prevent dates to wrap */
 .fr-summary-table td { white-space: nowrap }
+
+/* Links in table must appear as normal text */
+.fr-summary-table tbody a { text-decoration: none; color: black; outline: 0 } /*inherit not supported by IE 6/7*/
 
 .fr-summary-table {
     margin: 1px;/* should't have to do this, but FF3 behaves funny otherwise */

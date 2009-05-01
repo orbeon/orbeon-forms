@@ -106,8 +106,8 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Checkboxes */
-.xforms-select-appearance-full span { display: block; clear: both }
-.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
+.fr-grid .xforms-select-appearance-full span { display: block; clear: both }
+.fr-grid .xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Upload control information */
 .xforms-upload-info {

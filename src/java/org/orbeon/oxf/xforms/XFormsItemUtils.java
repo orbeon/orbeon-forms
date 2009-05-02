@@ -233,9 +233,7 @@ public class XFormsItemUtils {
 //        final List existingItems = containingDocument.getXFormsControls().getConstantItems(getOriginalId());
 //        final boolean[] mayReuse = new boolean[] { existingItems != null };
 
-        final boolean isOpenSelection = select1Control.isOpenSelection();
-        final boolean isEncryptItemValues = !isOpenSelection && XFormsProperties.isEncryptItemValues(containingDocument);
-
+        final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
         Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
 
             private int hierarchyLevel = 0;
@@ -401,8 +399,7 @@ public class XFormsItemUtils {
         final List newItems = new ArrayList();
 
         final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(prefixedId)).getElement();
-        final boolean isOpenSelection = XFormsSelect1Control.isOpenSelection(controlElement);
-        final boolean isEncryptItemValues = !isOpenSelection && XFormsProperties.isEncryptItemValues(containingDocument);
+        final boolean isEncryptItemValues = XFormsSelect1Control.isEncryptItemValues(containingDocument, controlElement);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {
 

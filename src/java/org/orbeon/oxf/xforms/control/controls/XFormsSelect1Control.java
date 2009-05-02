@@ -41,17 +41,25 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
+    public static final QName ENCRYPT_ITEM_VALUES = new QName("encrypt-item-values", XFormsConstants.XXFORMS_NAMESPACE);
+
     // List of attributes to handle as AVTs for select1 with appearance="full"
     private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
             XFormsConstants.XXFORMS_GROUP_QNAME
     };
 
-    private String xxformsRefresh;
+    private final String xxformsRefresh;
+    private final boolean xxformsEncryptItemValues;
     private List items;
 
     public XFormsSelect1Control(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
+        // TODO: part of static state?
         this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
+        final String isLocalEncryptItemValues = element.attributeValue(ENCRYPT_ITEM_VALUES);
+        // Local property overrides global property
+        this.xxformsEncryptItemValues = isLocalEncryptItemValues != null ?
+                "true".equals(isLocalEncryptItemValues) : XFormsProperties.isEncryptItemValues(containingDocument);
     }
 
     protected QName[] getExtensionAttributes() {
@@ -145,13 +153,17 @@ public class XFormsSelect1Control extends XFormsValueControl {
         return "open".equals(controlElement.attributeValue("selection"));
     }
 
+    protected boolean isEncryptItemValues() {
+        return xxformsEncryptItemValues;
+    }
+
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
         final String internalValue = getValue(pipelineContext);
         final String updatedValue;
         if (internalValue == null) {
             updatedValue = null;
         } else {
-            if (!isOpenSelection() && XFormsProperties.isEncryptItemValues(containingDocument)) {
+            if (!isOpenSelection() && isEncryptItemValues()) {
                 // For closed selection, values sent to client must be encrypted
                 updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
             } else {
@@ -168,7 +180,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Handle xforms:select1-specific logic
 
             // Decrypt incoming value. With open selection, values are sent to the client.
-            if (!isOpenSelection() && XFormsProperties.isEncryptItemValues(containingDocument))
+            if (!isOpenSelection() && isEncryptItemValues())
                 value = XFormsItemUtils.decryptValue(pipelineContext, value);
 
             // Current control value

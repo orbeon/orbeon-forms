@@ -21,6 +21,7 @@
     <page path-info="/xforms-sandbox/sample/xbl/(.+)" matcher="oxf:perl5-matcher" view="/xbl/${1}.xhtml"/>
     <page path-info="/xforms-sandbox/sample/(.+)" matcher="oxf:perl5-matcher" view="samples/${1}.xhtml"/>
     <page path-info="/xforms-sandbox/service/get-files" model="get-files.xpl"/>
+    <page path-info="/xforms-sandbox/service/css-after-5-seconds" model="services/css-after-5-seconds.xpl"/>
     <page path-info="/xforms-sandbox/service/(.+)" matcher="oxf:perl5-matcher" view="services/${1}.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

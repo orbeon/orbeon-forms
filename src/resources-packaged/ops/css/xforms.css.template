@@ -253,6 +253,11 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
     position: absolute;
 }
 
+tr.xforms-disabled, .xforms-disabled tr,
+        th.xforms-disabled, .xforms-disabled th,
+        td.xforms-disabled, .xforms-disabled td {
+    border-style: none ! important;
+}
 
 /**
  * XForms Switch / Case
@@ -275,15 +280,12 @@ html body .xforms-form .xforms-repeat-template, html body .xforms-form .xforms-t
     display: none;
 }
 
-body #xforms-form .xforms-case-deselected tr td {
-    border: none;
+tr.xforms-case-deselected, .xforms-case-deselected tr,
+        th.xforms-case-deselected, .xforms-case-deselected th,
+        td.xforms-case-deselected, .xforms-case-deselected td {
+    border-style: none ! important;
 }
 
-tr.xforms-case-deselected, .xforms-case-deselected tr.xforms-case-selected,
-        th.xforms-case-deselected, .xforms-case-deselected th.xforms-case-selected,
-        td.xforms-case-deselected, .xforms-case-deselected td.xforms-case-selected {
-    display: none;
-}
 
 .xforms-case-deselected-subsequent {
     display: none;

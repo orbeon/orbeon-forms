@@ -44,7 +44,7 @@
 
                 <!-- Controls -->
                 <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
-                <xforms:select1 id="select1" ref="." class="fr-autocomplete-select1" style="display: none" appearance="minimal">
+                <xforms:select1 id="select1" ref="." class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
                     <xbl:content includes="xforms|itemset, xforms|item"/>
                 </xforms:select1>
                 <xhtml:div xbl:attr="class style">

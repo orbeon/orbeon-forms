@@ -105,6 +105,12 @@
     cursor: hand;
 }
 
+/* Hide the label inside the checkbox used for a boolean, as it is there just because we used the same template
+   for this checkbox as the template we use for the xforms:select appearance="full". This label is always
+   empty for inputs of type boolean and creates a ghost on IE6 in certain cases where the checkbox has the
+   focus. */
+.xforms-type-boolean label { display: none; }
+
 .xforms-input input.xforms-type-date {
     width: 8em;
     padding-right: 16px;

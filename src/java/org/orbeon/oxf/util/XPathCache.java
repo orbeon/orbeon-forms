@@ -455,7 +455,7 @@ public class XPathCache {
                     expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
                 } else {
                     // We used to use XPathEvaluator.createExpression(), but there is a bug in it related to slots allocation, so we do the work ourselves instead.
-                    final Expression tempExpression = ExpressionTool.make(xpathString, independentContext, 0, -1, 1);
+                    final Expression tempExpression = ExpressionTool.make(xpathString, independentContext, 0, Token.EOF, 1);
                     expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
                 }
 

@@ -3931,5 +3931,82 @@
         </output>
     </test>
 
+    <test description="Text exf:sort()" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                        <instance xmlns="">
+                                            <record code="c"/>
+                                            <record code="a"/>
+                                            <record code="b"/>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:instance id="lookup-instance">
+                                        <instance xmlns="">
+                                            <record code="c">1-CCC</record>
+                                            <record code="a">3-AAA</record>
+                                            <record code="b">2-BBB</record>
+                                        </instance>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Sort expression with variable and use of instance() -->
+                                <xforms:repeat id="repeat" nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
+                                    <xforms:output id="output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="model">
+                                <instance>
+                                    <record code="c"/>
+                                    <record code="a"/>
+                                    <record code="b"/>
+                                </instance>
+                            </instance>
+                            <instance id="lookup-instance" model-id="model">
+                                <instance>
+                                    <record code="c">1-CCC</record>
+                                    <record code="a">3-AAA</record>
+                                    <record code="b">2-BBB</record>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="output·1">3-AAA</xxf:control>
+                        <xxf:control id="output·2">2-BBB</xxf:control>
+                        <xxf:control id="output·3">1-CCC</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>            
+        </output>
+    </test>
+
 </group>
 

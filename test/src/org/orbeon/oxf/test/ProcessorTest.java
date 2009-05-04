@@ -242,8 +242,8 @@ public class ProcessorTest extends TestCase {
             // Check if got expected result
             if (!threads[i].isExpectedEqualsActual()) {
                 System.err.println(description);
-                System.err.println("\nExpected data:\n" + threads[i].getExpectedDataString());
-                System.err.println("\nActual data:\n" + threads[i].getActualDataString());
+                System.err.println("\nExpected data:\n" + threads[i].getExpectedDataStringFormatted());
+                System.err.println("\nActual data:\n" + threads[i].getActualDataStringFormatted());
                 fail();
             }
         }
@@ -298,6 +298,9 @@ public class ProcessorTest extends TestCase {
         private boolean expectedEqualsActual = true;
         private String expectedDataString;
         private String actualDataString;
+
+        private String expectedDataStringFormatted;
+        private String actualDataStringFormatted;
 
         public TestThread(String name) {
             super(name);
@@ -357,6 +360,9 @@ public class ProcessorTest extends TestCase {
                                 // Display if test not passed
                                 if (!outputPassed) {
                                     expectedEqualsActual = false;
+                                    // Store pretty strings
+                                    expectedDataStringFormatted = Dom4jUtils.domToPrettyString(expectedData);
+                                    actualDataStringFormatted = Dom4jUtils.domToPrettyString(actualData);
                                     break;
                                 }
                             }
@@ -381,12 +387,12 @@ public class ProcessorTest extends TestCase {
             return expectedEqualsActual;
         }
 
-        public String getExpectedDataString() {
-            return expectedDataString;
+        public String getExpectedDataStringFormatted() {
+            return expectedDataStringFormatted;
         }
 
-        public String getActualDataString() {
-            return actualDataString;
+        public String getActualDataStringFormatted() {
+            return actualDataStringFormatted;
         }
     }
 

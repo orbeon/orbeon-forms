@@ -4086,7 +4086,12 @@ ORBEON.xforms.Init = {
         }
 
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
-        ORBEON.xforms.Events.orbeonLoadedEvent.fire();
+
+        // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
+        // YUI event.js’s call to this.subscribers.length in fire method hangs. 
+        window.setTimeout(function() {
+            ORBEON.xforms.Events.orbeonLoadedEvent.fire(); 
+        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
     },
 
     /**

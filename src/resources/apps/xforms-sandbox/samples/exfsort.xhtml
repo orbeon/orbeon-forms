@@ -25,23 +25,20 @@
         </xforms:model>
     </head>
     <body>
-        <h2>Sorted instance</h2>
+        <h2>Sorted instance using exforms:sort()</h2>
         <ul>
-
             <xforms:repeat
-                nodeset="xxforms:sort(record, saxon:evaluate('instance(&quot;lookup-instance&quot;)/record[@code=$p1]', @code), 'text')">
-
-                <!--<xforms:repeat
-                nodeset="xxforms:sort(record, saxon:evaluate('for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c]'), 'text')">
-     -->
-                <!--<xforms:repeat
-                nodeset="exf:sort(record, 'for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c]', 'text')">-->
-                <!--<xforms:repeat
-                nodeset="xxforms:sort(record, for $c in @code return instance(&quot;lookup-instance&quot;)/record[@code=$c], 'text')">-->
+                nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
                 <li>
-                    <xforms:output
-                        value="saxon:evaluate('instance(&quot;lookup-instance&quot;)/record[@code=$p1]', @code)"
-                    />
+                    <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
+                </li>
+            </xforms:repeat>
+        </ul>
+        <h2>Sorted instance using xxforms:sort()</h2>
+        <ul>
+            <xforms:repeat nodeset="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
+                <li>
+                    <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                 </li>
             </xforms:repeat>
         </ul>

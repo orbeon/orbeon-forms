@@ -3931,7 +3931,7 @@
         </output>
     </test>
 
-    <test description="Text exf:sort()" name="oxf:pipeline">
+    <test description="Text exforms:sort() / xxforms:sort()" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -3960,8 +3960,11 @@
                             </xhtml:head>
                             <xhtml:body>
                                 <!-- Sort expression with variable and use of instance() -->
-                                <xforms:repeat id="repeat" nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
-                                    <xforms:output id="output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
+                                <xforms:repeat id="exforms-sort-repeat" nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
+                                    <xforms:output id="exforms-sort-output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
+                                </xforms:repeat>
+                                <xforms:repeat id="xxforms-sort-repeat" nodeset="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
+                                    <xforms:output id="xxforms-sort-output" value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                                 </xforms:repeat>
                             </xhtml:body>
                         </xhtml:html>
@@ -3992,16 +3995,21 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="repeat" index="1"/>
+                            <control effective-id="exforms-sort-repeat" index="1"/>
+                            <control effective-id="xxforms-sort-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output·1">3-AAA</xxf:control>
-                        <xxf:control id="output·2">2-BBB</xxf:control>
-                        <xxf:control id="output·3">1-CCC</xxf:control>
+                        <xxf:copy-repeat-template id="exforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="exforms-sort-output·1">3-AAA</xxf:control>
+                        <xxf:control id="exforms-sort-output·2">2-BBB</xxf:control>
+                        <xxf:control id="exforms-sort-output·3">1-CCC</xxf:control>
+                        <xxf:copy-repeat-template id="xxforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="xxforms-sort-output·1">3-AAA</xxf:control>
+                        <xxf:control id="xxforms-sort-output·2">2-BBB</xxf:control>
+                        <xxf:control id="xxforms-sort-output·3">1-CCC</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>            

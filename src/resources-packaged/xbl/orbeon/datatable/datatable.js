@@ -166,7 +166,7 @@ ORBEON.widgets.datatable = function (element, index) {
             this.colResizers[this.colResizers.length] = colResizer;
         }
         var region = YAHOO.util.Dom.getRegion(this.headerColumns[j]);
-        var width = (region.right - region.left - 19) + 'px';
+        var width = (region.right - region.left - 20) + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0 ) {

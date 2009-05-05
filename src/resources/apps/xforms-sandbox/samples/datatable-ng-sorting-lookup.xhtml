@@ -1,0 +1,114 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+    
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+    
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting">
+    <head>
+        <title>REMSi - Create New Submission</title>
+        <xforms:model>
+            <!-- form instance -->
+            <xforms:instance id="attachmentForm-instance" xmlns="">
+                <AttachmentForm>
+                    <TIV/>
+                    <appUser/>
+                    <id>41873472</id>
+                    <submissionId>10001</submissionId>
+                    <submission_artifact_backref>
+                        <artifact>
+                            <id>1</id>
+                            <idArtifactType>EP</idArtifactType>
+                        </artifact>
+                        <artifact>
+                            <id>2</id>
+                            <idArtifactType>ADDUINFO</idArtifactType>
+                        </artifact>
+                        <artifact>
+                            <id>3</id>
+                            <idArtifactType>BIND</idArtifactType>
+                        </artifact>
+                   </submission_artifact_backref>
+               </AttachmentForm>
+            </xforms:instance>
+
+            <!-- artifact type drop-down -->
+            <xforms:instance id="artifactTypeList-instance" xmlns="">
+            <results>
+                <artifactType>
+                    <code>AOPR</code>
+                    <hasArtifactTypeName>AOP Rating</hasArtifactTypeName>
+                </artifactType>
+                <artifactType>
+                    <code>ADDSINFO</code>
+                    <hasArtifactTypeName>Add'l Submission Information</hasArtifactTypeName>
+                </artifactType>
+                <artifactType>
+                    <code>ADDUINFO</code>
+                    <hasArtifactTypeName>Add'l UW Information</hasArtifactTypeName>
+                </artifactType>
+                <artifactType>
+                    <code>BIND</code>
+                    <hasArtifactTypeName>Binder</hasArtifactTypeName>
+                </artifactType>
+                <artifactType>
+                    <code>BRKCORR</code>
+                    <hasArtifactTypeName>Broker Correspondance</hasArtifactTypeName>
+                </artifactType>
+                <artifactType>
+                    <code>EP</code>
+                    <hasArtifactTypeName>EP Curve</hasArtifactTypeName>
+                </artifactType>
+            </results>
+            </xforms:instance>
+        </xforms:model>
+    </head>
+    <body>
+    <h2>Sorting Datatable</h2>
+       <fr:datatable>
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true"  fr:sortType="text">Attachment Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="instance('attachmentForm-instance')/submission_artifact_backref/artifact">
+                <tr>
+                    <td>
+                        <!--
+                            
+                            Defining a variable wouldn't survive the reorganisations 
+                            done by the datatable component, instead we'll be using
+                            a for expression that loops over a single node to
+                            simulate this variable
+                            
+                            <xxforms:variable name="type" select="idArtifactType" />
+                        -->
+                        <xforms:output value="
+                            if (../idArtifactType='') 
+                            then 'N/A' 
+                            else 
+                                for $type in idArtifactType 
+                                return instance('artifactTypeList-instance')/artifactType[code = $type]/hasArtifactTypeName" />
+                    </td>
+                </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:datatable><br/>
+    </body>
+</html>

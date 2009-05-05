@@ -15,7 +15,14 @@ package org.orbeon.oxf.xforms.xbl;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -37,13 +44,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.util.PipelineUtils;
 
 /**
  * XBL utilities.
@@ -58,7 +58,7 @@ public class XBLUtils {
      * @return                  shadow tree document
      */
     public static Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper,
-                                                    final Element boundElement, Element binding, Map namespaceMappings, String prefix) {
+                                                    final Element boundElement, Element binding, Map namespaceMappings, final String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -223,11 +223,51 @@ public class XBLUtils {
                                 if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
                                     // This is an attribute
                                     final Attribute currentAttribute = (Attribute) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-                                    element.addAttribute(currentAttribute.getQName(), currentAttribute.getValue());
+                                    setAttribute(resultingNodes, currentAttribute.getQName(), currentAttribute.getValue());
                                 }
                             }
                         }
                     }
+
+                    // Prefix resulting xhtml:*/(@id |@for)
+
+                    // NOTE: We could also do the prefixing in the handlers, when the page is output.
+                    //
+                    // * Benefit of prefixing here: done statically
+                    // * Drawback of prefixing here: in the future if we try to reuse simple shadow trees this won't work
+
+//                    {
+//                        if (resultingNodes != null && resultingNodes.size() > 0) {
+//                            for (Iterator i = resultingNodes.iterator(); i.hasNext();) {
+//                                final Node node = (Node) i.next();
+//                                if (node instanceof Element) {
+//                                    Dom4jUtils.visitSubtree((Element) node, new Dom4jUtils.VisitorListener() {
+//                                        public void startElement(Element element) {
+//                                            if (XMLConstants.XHTML_NAMESPACE_URI.equals(element.getNamespaceURI())) {
+//                                                // Found XHTML element
+//
+//                                                // Update @id and @for if any
+//                                                final Attribute idAttribute = element.attribute("id");
+//                                                if (idAttribute != null) {
+//                                                    idAttribute.setValue(prefix + idAttribute.getValue());
+//                                                }
+//                                                final Attribute forAttribute = element.attribute("for");
+//                                                if (forAttribute != null) {
+//                                                    forAttribute.setValue(prefix + forAttribute.getValue());
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        public void endElement(Element element) {
+//                                        }
+//
+//                                        public void text(Text text) {
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                        }
+//                    }
                 }
 
                 private final void setAttribute(List nodes, QName attributeQName, String attributeValue) {

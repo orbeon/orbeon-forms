@@ -4016,5 +4016,86 @@
         </output>
     </test>
 
+    <test description="Prefixing of @id and @for on HTML elements within XBL and repeats" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <values xmlns="">
+                                            <value1>color: red</value1>
+                                            <value2>font-weight: bold</value2>
+                                        </values>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+                                </xforms:model>
+                                <xbl:xbl>
+                                    <xbl:binding id="fr-super-control-binding" element="fr|super-control">
+                                        <xbl:template>
+                                            <xforms:group xbl:attr="ref" id="component-group">
+                                                <xhtml:div id="my-div" style="{.}">
+                                                    Div 3
+                                                </xhtml:div>
+                                                <xhtml:input id="my-html-input" name="my-html-input"/>
+                                                <xhtml:label for="my-html-input">This is an HTML control</xhtml:label>
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <fr:super-control ref="value1" id="fr-super-control-1"/>
+                                <fr:super-control ref="value2" id="fr-super-control-2"/>
+                                <xforms:repeat id="repeat" nodeset="value1 | value2">
+                                    <xhtml:div id="my-repeated-id">
+                                        <fr:super-control ref="." id="fr-super-control-3"/>
+                                    </xhtml:div>
+                                </xforms:repeat>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value1>color: red</value1>
+                                    <value2>font-weight: bold</value2>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="fr-super-control-1$xf-3" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-2$xf-3" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:attribute id="fr-super-control-3$xf-3·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-3·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

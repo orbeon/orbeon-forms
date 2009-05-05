@@ -22,7 +22,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xhtml:* when AVTs are turned on.
+ * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
  */
 public class XHTMLElementHandler extends XFormsBaseHandler {
     public XHTMLElementHandler() {
@@ -39,12 +39,12 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
         if (staticId != null) {
             final boolean hasAVT = containingDocument.getStaticState().hasAttributeControl(prefixedId);
+            final String effectiveId = handlerContext.getEffectiveId(attributes);
+            boolean found = false;
             if (hasAVT) {
                 // This element has at least one AVT so process its attributes
 
-                final String effectiveId = handlerContext.getEffectiveId(attributes);
                 final int attributesCount = attributes.getLength();
-                boolean found = false;
                 for (int i = 0; i < attributesCount; i++) {
                     final String attributeValue = attributes.getValue(i);
                     if (attributeValue.indexOf('{') != -1) {
@@ -86,6 +86,21 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                     // Update the value of the id attribute
                     attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
                 }
+            }
+
+            if (!found) {
+                // Id was not replaced
+
+                // Update the value of the id attribute
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
+            }
+        }
+
+        // Check @for attribute
+        {
+            final String forAttribute = attributes.getValue("for");
+            if (forAttribute != null) {
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", handlerContext.getIdPrefix() + forAttribute + handlerContext.getIdPostfix());
             }
         }
 

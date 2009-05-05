@@ -1,0 +1,80 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Prefixing of @id and @for on HTML elements within XBL and repeats</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="main-instance">
+                <values xmlns="">
+                    <value1>color: red</value1>
+                    <value2/>
+                </values>
+            </xforms:instance>
+            <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+        </xforms:model>
+        <xbl:xbl>
+            <xbl:binding id="fr-super-control-binding" element="fr|super-control">
+                <xbl:template>
+                    <xforms:group xbl:attr="ref bind" id="component-group">
+                        <xhtml:div id="my-inner-id">
+                            Div 1
+                        </xhtml:div>
+                        <xhtml:div>
+                            Div 2
+                        </xhtml:div>
+                        <xhtml:div style="{.}">
+                            Div 3
+                        </xhtml:div>
+                        <xhtml:input id="my-html-input" name="my-html-input"/>
+                        <xhtml:label for="my-html-input">This is an HTML control</xhtml:label>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:input ref="value1"/>
+        <xforms:input ref="value2"/>
+
+        <xhtml:hr/>
+
+        <fr:super-control ref="value1" id="fr-super-control-1"/>
+
+        <xhtml:hr/>
+
+        <fr:super-control ref="value2" id="fr-super-control-2"/>
+
+        <xhtml:hr/>
+
+        <xforms:repeat nodeset="value1 | value2">
+            <xhtml:div id="my-repeated-id">
+                <fr:super-control ref="." id="fr-super-control-3"/>
+            </xhtml:div>
+        </xforms:repeat>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

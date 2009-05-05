@@ -502,7 +502,12 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
         }
         // Recurse into children containers
         if (childrenContainers != null) {
-            for (Iterator i = childrenContainers.values().iterator(); i.hasNext();) {
+            // NOTE: childrenContainers might be modified down the line and cause a ConcurrentModificationException
+            // so make a copy here before processing.
+            // TODO: The exact situation is not entirely clear and there might be other places in this class where this
+            // might happen!
+            final Map tempMap = new LinkedHashMap(childrenContainers);
+            for (Iterator i = tempMap.values().iterator(); i.hasNext();) {
                 final XFormsContainer currentContainer = (XFormsContainer) i.next();
                 currentContainer.endOutermostActionHandler(pipelineContext);
             }

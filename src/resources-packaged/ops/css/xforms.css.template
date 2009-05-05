@@ -271,13 +271,13 @@ tr.xforms-disabled, .xforms-disabled tr,
  */
 
 .xforms-case-selected {
-    top: -10000px;
-    left: -10000px;
     visibility: visible;
     position: static;
 }
 
 .xforms-case-deselected, .xforms-case-deselected .xforms-case-selected {
+    top: -10000px;
+    left: -10000px;
     visibility: hidden;
     position: absolute;
 }

@@ -250,7 +250,7 @@ public class XPathCache {
         new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true).makeObject();
     }
 
-    private static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
                                                            List contextItems, int contextPosition,
                                                            String xpathString,
                                                            Map prefixToURIMap,

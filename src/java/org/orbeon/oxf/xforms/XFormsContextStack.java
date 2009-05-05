@@ -870,11 +870,11 @@ public class XFormsContextStack {
          *
          * @return  Map<String, List> of variable name to value
          */
-        public Map getInScopeVariables() {
+        public Map /* <String, ValueRepresentation> */ getInScopeVariables() {
             return getInScopeVariables(true);
         }
 
-        public Map getInScopeVariables(boolean useCache) {
+        public Map /* <String, ValueRepresentation> */ getInScopeVariables(boolean useCache) {
             // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
             if (inScopeVariablesMap == null || !useCache) {
                 final Map tempVariablesMap = new HashMap();

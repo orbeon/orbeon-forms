@@ -13,21 +13,24 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.functions.Evaluate;
+import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.DynamicError;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.QNameValue;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * exforms:sort() function
@@ -45,18 +48,34 @@ public class EXFormsSort extends XXFormsSort {
         final Expression sortKeyExpression;
         final XPathContextMajor newXPathContext;
         {
-            Evaluate.PreparedExpression preparedExpression = prepareExpression(xpathContext, selectExpression);
-            for (int i = 1; i < argument.length; i++) {
-                preparedExpression.variables[i - 1].setXPathValue(ExpressionTool.eagerEvaluate(argument[i], xpathContext));
-            }
+            // NOTE: It would be better if we could use XPathCache/PooledXPathExpression instead of rewriting custom
+            // code below. This would provide caching of compiled expressions, abstraction and some simplicity.
+
+            // Prepare sorting expression
+            final PreparedExpression preparedExpression = prepareExpression(xpathContext, selectExpression);
+
+            // Create new dynamic context
             newXPathContext = xpathContext.newCleanContext();
             newXPathContext.openStackFrame(preparedExpression.stackFrameMap);
             newXPathContext.setCurrentIterator(xpathContext.getCurrentIterator());
 
-            sortKeyExpression = preparedExpression.expression;
+            // Set variable values
+            if (preparedExpression.variables != null) {
+                for (Iterator i = preparedExpression.variables.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry entry = (Map.Entry) i.next();
+                    final String name = (String) entry.getKey();
+                    final Variable variable = (Variable) entry.getValue();
 
-//            return Value.getIterator(
-//                    ExpressionTool.lazyEvaluate(pexpr.expression,  c2, 1));
+                    final Object object = preparedExpression.inScopeVariables.get(name);
+                    if (object != null) {
+                        // Convert Java object to Saxon object
+                        final ValueRepresentation valueRepresentation = XFormsUtils.convertJavaObjectToSaxonObject(object);
+                        newXPathContext.setLocalVariable(variable.getLocalSlotNumber(), valueRepresentation);
+                    }
+                }
+            }
+
+            sortKeyExpression = preparedExpression.expression;
         }
 
         return sort(newXPathContext, sequenceToSortExpression, sortKeyExpression);
@@ -88,22 +107,42 @@ public class EXFormsSort extends XXFormsSort {
         }
     }
 
-    // The following is heavily inspired by saxon:evaluate(). Ideally, we would just use call up the saxon:evaluate() code.
-    private Evaluate.PreparedExpression prepareExpression(XPathContext xpathContext, Expression expressionToPrepare) throws XPathException {
+    // The following is inspired by saxon:evaluate()
+    private PreparedExpression prepareExpression(XPathContext xpathContext, Expression expressionToPrepare) throws XPathException {
 
-        final Evaluate.PreparedExpression preparedExpression = new Evaluate.PreparedExpression();
+        final PreparedExpression preparedExpression = new PreparedExpression();
 
-        final AtomicValue exprSource = (AtomicValue) expressionToPrepare.evaluateItem(xpathContext);
-        final String exprText = exprSource.getStringValue();
-        final IndependentContext env = staticContext.copy();
-        env.setFunctionLibrary(getExecutable().getFunctionLibrary());
-        preparedExpression.expStaticContext = env;
-        preparedExpression.variables = new Variable[10];
-        for (int i = 1; i < 10; i++) {
-            final QNameValue qname = new QNameValue("", "", "p" + i, null);
-            preparedExpression.variables[i - 1] = env.declareVariable(qname);
+        final String exprText;
+        {
+            final AtomicValue exprSource = (AtomicValue) expressionToPrepare.evaluateItem(xpathContext);
+            exprText = exprSource.getStringValue();
         }
 
+        // Copy static context information
+        final IndependentContext env = staticContext.copy();
+        // We do staticContext.setFunctionLibrary(env.getFunctionLibrary()) above, so why would we need this?
+//        env.setFunctionLibrary(getExecutable().getFunctionLibrary());
+        preparedExpression.expStaticContext = env;
+
+        // Propagate in-scope variable definitions since they are not copied automatically
+        final XFormsContextStack contextStack = getContextStack(xpathContext);
+        preparedExpression.inScopeVariables = contextStack.getCurrentBindingContext().getInScopeVariables();
+        preparedExpression.variables = new HashMap();
+        {
+            if (preparedExpression.inScopeVariables != null) {
+                for (Iterator i = preparedExpression.inScopeVariables.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String name = (String) currentEntry.getKey();
+
+                    final Variable variable = env.declareVariable(name);
+                    variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
+
+                    preparedExpression.variables.put(name, variable);
+                }
+            }
+        }
+
+        // Create expression
         Expression expr;
         try {
             expr = ExpressionTool.make(exprText, env, 0, Token.EOF, 1);
@@ -114,12 +153,21 @@ public class EXFormsSort extends XXFormsSort {
             err.setXPathContext(xpathContext);
             throw err;
         }
-        final ItemType contextItemType = Type.ITEM_TYPE;
-        expr = expr.typeCheck(env, contextItemType);
+
+        // Prepare expression
+        expr = expr.typeCheck(env, Type.ITEM_TYPE);
         preparedExpression.stackFrameMap = env.getStackFrameMap();
         ExpressionTool.allocateSlots(expr, preparedExpression.stackFrameMap.getNumberOfVariables(), preparedExpression.stackFrameMap);
         preparedExpression.expression = expr;
 
         return preparedExpression;
+    }
+
+    public static class PreparedExpression implements java.io.Serializable {
+        public IndependentContext expStaticContext;
+        public Expression expression;
+        public Map /* <String name, ValueRepresentation value> */ inScopeVariables;
+        public Map /* <String name, Variable variable> */ variables;
+        public SlotManager stackFrameMap;
     }
 }

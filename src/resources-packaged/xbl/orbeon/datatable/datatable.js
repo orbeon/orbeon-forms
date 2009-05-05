@@ -170,13 +170,10 @@ ORBEON.widgets.datatable = function (element, index) {
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0 ) {
-            var className = '.dt-'+ this.id + '-col-' + (j + 1);
+            // This is a hack! We need to remove the prefix to match classes added in XSLT!
+            var className = '.dt-'+ this.id.substring(this.id.indexOf('$') + 1) + '-col-' + (j + 1);
             if (!this.styleElt) {
-                this.styleElt = document.createElement('style');        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
-
-        }
-
-
+                this.styleElt = document.createElement('style');        
                 this.styleElt.type = 'text/css';
                 document.getElementsByTagName('head').item(0).appendChild(this.styleElt);
             }

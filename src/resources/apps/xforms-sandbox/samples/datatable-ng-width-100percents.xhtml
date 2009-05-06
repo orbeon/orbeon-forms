@@ -1,0 +1,153 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xf:model id="model">
+            <xf:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <AAA>1</AAA>
+                        <BBB>foo</BBB>
+                        <CCC>bar</CCC>
+                    </record>
+                    <record>
+                        <AAA>100</AAA>
+                        <BBB>bat</BBB>
+                        <CCC>baz</CCC>
+                    </record>
+                    <record>
+                        <AAA>2</AAA>
+                        <BBB>bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                    <record>
+                        <AAA>3</AAA>
+                        <BBB>ddd ddd ddd</BBB>
+                        <CCC>eee eee eee</CCC>
+                    </record>
+                    <record>
+                        <AAA>4</AAA>
+                        <BBB>fff fff fff</BBB>
+                        <CCC>ggg ggg ggg</CCC>
+                    </record>
+                    <record>
+                        <AAA>1000</AAA>
+                        <BBB>A looooong, looooong, looooong, looooong, line</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                    <record>
+                        <AAA>2000</AAA>
+                        <BBB></BBB>
+                        <CCC>A looooong, looooong, looooong, looooong, line</CCC>
+                    </record>
+                </instance>
+            </xf:instance>
+            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+        </xf:model>
+    </head>
+    <body>
+
+        <h1>Testing 100% width</h1>
+
+        
+        <p>100%</p>
+        <fr:datatable width="100%">
+            <tr repeat-nodeset="record">
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="AAA">
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="BBB">
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="CCC">
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </td>
+            </tr>
+        </fr:datatable>
+        
+        <p>100%, with an vertical scrollbar</p>
+        <fr:datatable width="100%" scrollable="vertical"  height="120px">
+            <tr repeat-nodeset="record">
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="AAA">
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="BBB">
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="CCC">
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </td>
+            </tr>
+        </fr:datatable>
+        
+        <p>100%, with an horizontal scrollbar</p>
+        <fr:datatable width="100%" scrollable="horizontal">
+            <tr repeat-nodeset="record">
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="AAA">
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="BBB">
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="CCC">
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </td>
+            </tr>
+        </fr:datatable>
+        
+        <p>100%, with two scrollbars</p>
+        <fr:datatable width="100%" scrollable="both" height="120px">
+            <tr repeat-nodeset="record">
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="AAA">
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="BBB">
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </td>
+                <td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="CCC">
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </td>
+            </tr>
+        </fr:datatable>
+        
+    </body>
+</html>

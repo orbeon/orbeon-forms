@@ -75,6 +75,9 @@
 
             // Create YUI auto-complete object
             autoComplete.yuiAutoComplete = new YAHOO.widget.AutoComplete(inputField.id, yuiDiv.id, dataSource);
+            // Use iframe method for IE6/7
+            if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7)
+                autoComplete.yuiAutoComplete.useIFrame = true;
             autoComplete.yuiAutoComplete.animVert = false;
         },
 

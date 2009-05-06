@@ -26,6 +26,7 @@
  */
 ORBEON.widgets.datatable = function (element, index) {
 
+    
     // Store useful stuff as properties
     this.table = element;
     this.header = this.table;
@@ -35,6 +36,12 @@ ORBEON.widgets.datatable = function (element, index) {
     var plainId = this.table.getAttribute('id');
     this.id = plainId.substring(0, plainId.length - '-table'.length);
     var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
+    var region = YAHOO.util.Dom.getRegion(this.table);
+    var pxWidth = region.right - region.left;
+    if (width.indexOf('%') != -1) {
+        // Convert % into px...
+        width = pxWidth + 'px';
+    }
     this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
     this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
@@ -65,10 +72,14 @@ ORBEON.widgets.datatable = function (element, index) {
         YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
     }
 
-    var region = YAHOO.util.Dom.getRegion(this.table);
+    region = YAHOO.util.Dom.getRegion(this.table);
     this.tableWidth = (region.right - region.left);
     this.tableHeight = (region.bottom - region.top);
     if (this.scrollH) {
+        if (pxWidth > this.tableWidth) {
+            // Can be the case if table width was expressed as %
+            this.tableWidth = pxWidth;
+        }
         for (var i = this.tableWidth; i < 2000; i+=50){
             YAHOO.util.Dom.setStyle(this.table, 'width', i + 'px');
             region = YAHOO.util.Dom.getRegion(this.table);

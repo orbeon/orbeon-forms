@@ -79,6 +79,13 @@
             if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7)
                 autoComplete.yuiAutoComplete.useIFrame = true;
             autoComplete.yuiAutoComplete.animVert = false;
+            // When a new value is selected, set the value of the XForms input control
+            // We are doing this because when a value is set by clicking on it with the mouse, a change event is
+            // dispatched to the input, but when it arrives the value of the input hasn't changed yet.
+            autoComplete.yuiAutoComplete.itemSelectEvent.subscribe(function(type, args) {
+                var selectedValue = args[2][0];
+                Document.setValue(inputSpan.id, selectedValue);
+            });
         },
 
         /**

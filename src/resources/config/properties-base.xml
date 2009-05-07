@@ -25,6 +25,8 @@
 
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
     <property as="xs:string"  name="oxf.url-rewriting.strategy.servlet"              value="servlet"/>
+    <!-- TODO: support for base context for servlet rewriting strategy -->
+    <!--<property as="xs:string"  name="oxf.url-rewriting.portlet.context"               value=""/>-->
     <property as="xs:string"  name="oxf.url-rewriting.portlet2.context"              value=""/>
 
     <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->

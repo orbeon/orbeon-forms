@@ -32,14 +32,14 @@
             <xsl:apply-templates select="node()"/>
 
             <!-- Include XBL components -->
-            <xsl:copy-of select="doc('oxf:/config/xforms-widgets.xbl')"/>
-
+            <xi:include href="oxf:/config/xforms-widgets.xbl" xxi:omit-xml-base="true"/>
 
             <xsl:if test="pipeline:property('oxf.epilogue.xforms.widgets.auto-include-fr-widgets')">
                 <!-- Include fr:* widgets -->
-                <xsl:variable name="widgets-to-exclude" select="tokenize(pipeline:property('oxf.epilogue.xforms.widgets.fr-elements-to-skip'), '\s')"/>
+                <xsl:variable name="widgets-to-exclude"
+                              select="tokenize(pipeline:property('oxf.epilogue.xforms.widgets.fr-elements-to-skip'), '\s+')"/>
                 <xsl:for-each-group select="//fr:*|//widget:table" group-by="name()">
-                     <xsl:if test="not( key('xbl:bindings', name())) and not( name() = $widgets-to-exclude )">
+                    <xsl:if test="not( key('xbl:bindings', name())) and not( name() = $widgets-to-exclude )">
                         <!-- 
                         
                         Test if the widget isn't defined locally (either directly or as a result on an xi:include and if 
@@ -47,9 +47,10 @@
                         
                         Note that this test is weak because it relies on the namespace prefix of the bound element 
                     
-                    -->
-                        <xsl:copy-of select="doc(concat('oxf:/xbl/orbeon/', local-name(), '/', local-name(), '.xbl'))"/>
-                             
+                        -->
+                        <!-- NOTE: use XInclude to allow caching. doc() would disable caching here. -->
+                        <xi:include href="oxf:/xbl/orbeon/{local-name()}/{local-name()}.xbl" xxi:omit-xml-base="true"/>
+
                     </xsl:if>
                 </xsl:for-each-group>
             </xsl:if>

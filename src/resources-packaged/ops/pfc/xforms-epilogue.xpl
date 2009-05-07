@@ -100,9 +100,15 @@
                         <!--<p:input name="data" href="#data2"/>-->
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:input name="config" href="#aggregate"/>
-                        <p:output name="data" id="widgeted-view"/>
+                        <p:output name="data" id="widgeted-view-no-xbl"/>
                         <!-- This is here just so that we can reload the form when the properties or the resources change -->
                         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
+                    </p:processor>
+
+                    <!-- XInclude processing to include XBL if any -->
+                    <p:processor name="oxf:xinclude">
+                        <p:input name="config" href="#widgeted-view-no-xbl"/>
+                        <p:output name="data" id="widgeted-view"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

@@ -528,8 +528,18 @@ ORBEON.util.Dom = {
             // Use IE's innerText, which is faster on IE
             element.innerText = text;
         }
-    }
+    },
 
+    /**
+     * Nudge element after a short delay for IE6/7 to force IE to "do the right thing".
+     */
+    nudgeAferDelay: function(element) {
+        if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
+            window.setTimeout(function() {
+                element.className = element.className;
+            }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+        }
+    }
 };
 
 /**
@@ -1824,8 +1834,12 @@ ORBEON.xforms.Controls = {
             while (true) {
                 if (ORBEON.util.Dom.isElement(current)) {
                     if (current.id == endMarker) break;
-                    if (isRelevant) ORBEON.util.Dom.removeClass(current, "xforms-disabled");
-                    else ORBEON.util.Dom.addClass(current, "xforms-disabled");
+                    if (isRelevant) {
+                        ORBEON.util.Dom.removeClass(current, "xforms-disabled");
+                        ORBEON.util.Dom.nudgeAferDelay(current);
+                    } else {
+                        ORBEON.util.Dom.addClass(current, "xforms-disabled");
+                    }
                 }
                 current = current.nextSibling;
             }
@@ -1845,8 +1859,12 @@ ORBEON.xforms.Controls = {
             for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
                 var element = elementsToUpdate[elementIndex];
                 if (element != null) {
-                    if (isRelevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled");
-                    else ORBEON.util.Dom.addClass(element, "xforms-disabled");
+                    if (isRelevant) {
+                        ORBEON.util.Dom.removeClass(element, "xforms-disabled");
+                        ORBEON.util.Dom.nudgeAferDelay(element);
+                    } else {
+                        ORBEON.util.Dom.addClass(element, "xforms-disabled");
+                    }
                 }
             }
         }

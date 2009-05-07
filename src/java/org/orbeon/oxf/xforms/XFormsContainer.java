@@ -590,7 +590,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent originalEvent) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.startHandleOperation("event", "dispatching", new String[] { "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location", originalEvent.getLocationData().toString() });
+            containingDocument.startHandleOperation("event", "dispatching", new String[] { "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+                    originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null });
         }
 
         final XFormsEventTarget targetObject = originalEvent.getTargetObject();

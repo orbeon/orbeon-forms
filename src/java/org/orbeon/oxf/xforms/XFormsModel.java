@@ -1098,8 +1098,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             return;
         }
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("model", "performing refresh", new String[] { "model id", getEffectiveId() });
+        containingDocument.startHandleOperation("model", "performing refresh", new String[] { "model id", getEffectiveId() });
 
         // Update control bindings if needed
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
@@ -1451,6 +1450,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // have an immediate effect, and clear the corresponding flag."
             deferredActionContext.refresh = false;
         }
+
+        containingDocument.endHandleOperation();
     }
 
     private void sendDefaultEventsForDisabledControl(PipelineContext pipelineContext, XFormsControl xformsControl,

@@ -338,6 +338,17 @@
                 <!--</xxforms:script>-->
             </xforms:submission>
 
+            <!-- List of buttons -->
+            <xforms:instance id="fr-buttons-instance">
+                <buttons xmlns=""/>
+            </xforms:instance>
+
+            <!-- Create list of buttons -->
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
+                <xforms:insert context="instance('fr-buttons-instance')" origin="(for $b in $buttons return xxforms:element($b))"/>
+            </xforms:action>
+
             <xforms:action ev:event="fr-offline">
                 <xxforms:script ev:event="DOMActivate">
                     frTakeOnlineOrOffline(false);
@@ -551,6 +562,9 @@
                     </xforms:group>
 
                     <xforms:group ref="instance('fr-summary-instance')">
+
+                        <!-- Stop propagation of all the UI events here because we don't care about validity and visited properties -->
+                        <xforms:action ev:event="#all" ev:propagate="stop"/>
 
                         <xforms:group ref=".[document]">
                             <!-- Display welcome message -->
@@ -810,8 +824,7 @@
             <fr:bottom>
                 <!-- Custom buttons for the summary page -->
                 <xforms:group model="fr-form-model" class="fr-buttons">
-                    <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')"/>
-                    <xforms:repeat nodeset="for $button in $buttons return xxforms:element('button', $button)">
+                    <xforms:repeat nodeset="instance('fr-buttons-instance')/*">
                         <xhtml:span class="fr-button">
                             <!-- New button -->
                             <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">

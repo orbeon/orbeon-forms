@@ -94,10 +94,9 @@
         </xforms:instance>
 
         <!-- Create list of buttons -->
-        <xforms:action ev:event="xforms-model-construct-done" id="xxxx">
+        <xforms:action ev:event="xforms-model-construct-done">
             <!-- Buttons in the dialog -->
-            <xxforms:variable name="submit-buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')"/>
-            <!-- Add dummy element in front, so none of the buttons is the current button, which otherwise would change its style -->
+            <xxforms:variable name="submit-buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
             <xforms:insert context="instance('fr-submission-buttons-instance')"
                            origin="(for $b in $submit-buttons return xxforms:element($b))"/>
         </xforms:action>

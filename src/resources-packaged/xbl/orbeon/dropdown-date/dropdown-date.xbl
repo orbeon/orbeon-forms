@@ -165,9 +165,7 @@
                     </xforms:action>
 
                     <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="xforms-enabled xforms-disabled xforms-readonly xforms-readwrite xforms-required xforms-optional xforms-valid xforms-invalid xforms-value-changed DOMActivate"
-                                   ev:propagate="stop"/>
-
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
                 </xforms:group>
 
             </xforms:group>

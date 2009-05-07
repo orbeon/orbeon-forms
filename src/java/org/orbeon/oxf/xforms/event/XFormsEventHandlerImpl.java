@@ -21,10 +21,7 @@ import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
@@ -35,6 +32,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private String ancestorObserverStaticId;
 
     private Map eventNames;
+    private boolean isAllEvents;
     private String[] observerStaticIds;
     private Map targetStaticIds;
     //private String handler;
@@ -72,6 +70,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             final String[] eventNamesArray = StringUtils.split(eventAttribute);
             for (int i = 0; i < eventNamesArray.length; i++) {
                 eventNames.put(eventNamesArray[i], "");
+            }
+            // Special #all value catches all events
+            if (eventNames.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null) {
+                eventNames = null;
+                isAllEvents = true;
             }
         }
 
@@ -138,10 +141,14 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             }
 
             // Remember all event names
-            final String eventAttribute = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
-            final String[] eventNames = StringUtils.split(eventAttribute);
-            for (int j = 0; j < eventNames.length; j++)
-                eventNamesMap.put(eventNames[j], "");
+            if (newEventHandlerImpl.isAllEvents) {
+                eventNamesMap.put(XFormsConstants.XXFORMS_ALL_EVENTS, "");
+            } else {
+                for (Iterator i = newEventHandlerImpl.eventNames.keySet().iterator(); i.hasNext();) {
+                    final String eventName = (String) i.next();
+                    eventNamesMap.put(eventName, "");
+                }
+            }
         }
     }
 
@@ -169,7 +176,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public boolean isMatchEventName(String eventName) {
-        return eventNames.get(eventName) != null;
+        return isAllEvents || eventNames.get(eventName) != null;
     }
 
     public boolean isMatchTarget(String targetStaticId) {

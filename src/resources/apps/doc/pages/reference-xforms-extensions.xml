@@ -2167,10 +2167,20 @@
                     </li>
                 </ul>
                 <p>
-                    This feature has been <a
+                    The extensions above have been <a
                     href="http://lists.w3.org/Archives/Public/www-html-editor/2008JanMar/0012.html">requested</a>
                     for inclusion in XML Events 2.
                 </p>
+                <p>
+                    In addition, the special <code>#all</code> event name can be used to catch all events:
+                </p>
+                <xml-source>
+                    <xforms:group>
+                        <comment>Stop propagation of all events</comment>
+                        <xforms:action ev:event="#all" ev:propagate="stop"/>
+                        ...
+                    </xforms:group>
+                </xml-source>
             </section>
             <a name="modal-trigger"/>
             <section>

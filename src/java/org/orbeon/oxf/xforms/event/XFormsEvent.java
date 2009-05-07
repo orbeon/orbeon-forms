@@ -73,8 +73,8 @@ public abstract class XFormsEvent implements Cloneable {
         this.cancelable = cancelable;
 
         // Get Java location information for debugging only (getting Java location data is very inefficient)
-        if (XFormsServer.logger.isDebugEnabled())
-            this.locationData = Dom4jUtils.getLocationData(2, true);
+//        if (XFormsServer.logger.isDebugEnabled())
+//            this.locationData = Dom4jUtils.getLocationData(2, true);
     }
 
     public String getEventName() {

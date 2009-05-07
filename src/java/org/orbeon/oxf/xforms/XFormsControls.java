@@ -80,7 +80,9 @@ public class XFormsControls implements XFormsObjectResolver {
      * @return          true if there is a handler, false otherwise
      */
     public boolean hasHandlerForEvent(String eventName) {
-        return containingDocument.getStaticState().getEventNamesMap().get(eventName) != null;
+        final Map eventNamesMap = containingDocument.getStaticState().getEventNamesMap();
+        // Check for #all as well as specific event
+        return eventNamesMap.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null || eventNamesMap.get(eventName) != null;
     }
 
     /**

@@ -652,9 +652,10 @@
                                                 </td>
                                                 <td class="fr-summary-repeat-column-number">
                                                     <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
-                                                    <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
+                                                    <!-- This element must be present only when offline is supported -->
+                                                    <!--<xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>-->
                                                     <!-- Expose to JavaScript name of this form -->
-                                                    <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
+                                                    <!--<xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>-->
                                                     <xforms:trigger appearance="minimal">
                                                         <!-- Just output the number -->
                                                         <xforms:label><xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/></xforms:label>
@@ -677,7 +678,9 @@
                                                 <xforms:repeat nodeset="details/detail" id="document-details-repeat">
                                                     <td>
                                                         <!-- control to make data accessible to JavaScript -->
-                                                        <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
+
+                                                        <!-- This element must be present only when offline is supported -->
+                                                        <!--<xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>-->
 
                                                         <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
                                                         <xxforms:variable name="control" select="$query/@control" as="xs:string"/>

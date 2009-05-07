@@ -432,7 +432,7 @@
     <xforms:submission id="get-source-form-submission"
             method="get" serialization="none"
             resource="{instance('fr-uris-instance')/form-collection}/crud/{$app}/{$form}/form/form.xhtml"
-            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:shared="document" xxforms:xinclude="true">
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="true">
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 

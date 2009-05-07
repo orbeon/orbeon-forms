@@ -456,7 +456,8 @@ button.xforms-trigger img { margin-right: 10px }
 /* ***** Print and PDF ********************************************************************************************** */
 
 /* Textarea in output mode can contain line breaks so keep them (works w/ IE 6, Firefox) */
-span.xforms-textarea { white-space: pre }
+
+span.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap }
 
 .fr-print-mode .fr-section-title img { display: none }
 .fr-print-mode .xforms-help-image { display: none }

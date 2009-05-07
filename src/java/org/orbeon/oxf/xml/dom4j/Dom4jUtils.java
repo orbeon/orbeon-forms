@@ -610,7 +610,12 @@ public class Dom4jUtils {
             }
         }
 
-        final Element rootElement = document.getRootElement();
+        copyParentNamespaces(parentElement, document.getRootElement());
+
+        return document;
+    }
+
+    private static void copyParentNamespaces(Element parentElement, Element rootElement) {
         final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
         final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
@@ -623,8 +628,6 @@ public class Dom4jUtils {
                 rootElement.addNamespace(prefix, uri);
             }
         }
-
-        return document;
     }
 
     /**
@@ -669,18 +672,20 @@ public class Dom4jUtils {
 
         final Element newElement = sourceElement.createCopy();
 
-        final Map sourceElementNamespaceContext = Dom4jUtils.getNamespaceContext(sourceElement);
-        final Map newElementNamespaceContext = Dom4jUtils.getNamespaceContext(newElement);
+        copyParentNamespaces(sourceElement.getParent(), newElement);
 
-        for (Iterator k = sourceElementNamespaceContext.keySet().iterator(); k.hasNext();) {
-            final String prefix = (String) k.next();
-            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
-            // namespace even if there are no namespace nodes
-            if (newElementNamespaceContext.get(prefix) == null) {
-                final String uri = (String) sourceElementNamespaceContext.get(prefix);
-                newElement.addNamespace(prefix, uri);
-            }
-        }
+//        final Map sourceElementNamespaceContext = Dom4jUtils.getNamespaceContext(sourceElement);
+//        final Map newElementNamespaceContext = Dom4jUtils.getNamespaceContext(newElement);
+//
+//        for (Iterator k = sourceElementNamespaceContext.keySet().iterator(); k.hasNext();) {
+//            final String prefix = (String) k.next();
+//            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
+//            // namespace even if there are no namespace nodes
+//            if (newElementNamespaceContext.get(prefix) == null) {
+//                final String uri = (String) sourceElementNamespaceContext.get(prefix);
+//                newElement.addNamespace(prefix, uri);
+//            }
+//        }
 
         return newElement;
     }

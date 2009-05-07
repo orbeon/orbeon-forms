@@ -86,7 +86,9 @@ public class XBLUtils {
                             final List clonedContent = new ArrayList();
                             for (Iterator i = elementContent.iterator(); i.hasNext();) {
                                 final Node node = (Node) i.next();
-                                if (!(node instanceof Namespace)) {
+                                if (node instanceof Element) {
+                                    clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces((Element) node));
+                                } else if (!(node instanceof Namespace)) {
                                      clonedContent.add(Dom4jUtils.createCopy(node));
                                 }
                             }
@@ -111,7 +113,7 @@ public class XBLUtils {
                                     final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                                     final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                                    contentToInsert.add(Dom4jUtils.createCopy(currentElement));
+                                    contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                                 }
                             } else {
                                 contentToInsert = null;

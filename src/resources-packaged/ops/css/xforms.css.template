@@ -286,13 +286,6 @@ tr.xforms-disabled, .xforms-disabled tr,
     display: none;
 }
 
-tr.xforms-case-deselected, .xforms-case-deselected tr,
-        th.xforms-case-deselected, .xforms-case-deselected th,
-        td.xforms-case-deselected, .xforms-case-deselected td {
-    border-style: none ! important;
-}
-
-
 .xforms-case-deselected-subsequent {
     display: none;
 }

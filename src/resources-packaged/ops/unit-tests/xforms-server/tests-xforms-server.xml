@@ -4117,5 +4117,70 @@
         </output>
     </test>
 
+    <test description="XInclude upon replacement of shared instance" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <!-- Instance with XInclude -->
+                                    <xforms:instance id="instance-xinclude">
+                                        <dummy xmlns=""/>
+                                    </xforms:instance>
+                                    <!-- Load instance upon init -->
+                                    <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-xinclude"/>
+                                    <xforms:submission id="get-instance-xinclude" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
+                                            replace="instance" instance="instance-xinclude" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="true"/>
+
+                                    <!-- Instance without XInclude -->
+                                    <xforms:instance id="instance-no-xinclude">
+                                        <dummy xmlns=""/>
+                                    </xforms:instance>
+                                    <!-- Load instance upon init -->
+                                    <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
+                                    <xforms:submission id="get-instance-no-xinclude" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
+                                            replace="instance" instance="instance-no-xinclude" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="false"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- The title is found under the XIncluded content -->
+                                <xforms:output id="my-output-xinclude" ref="instance('instance-xinclude')//xhtml:title"/>
+
+                                <xforms:output id="my-output-no-xinclude" ref="instance('instance-no-xinclude')//xhtml:title"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance readonly="true" shared="application" id="instance-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" xinclude="true" replaced="true"/>
+                            <instance readonly="true" shared="application" id="instance-no-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" replaced="true"/>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output-xinclude" readonly="true">Summary</xxf:control>
+                        <xxf:control id="my-output-no-xinclude" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

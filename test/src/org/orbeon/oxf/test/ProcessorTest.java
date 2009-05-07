@@ -315,6 +315,7 @@ public class ProcessorTest extends TestCase {
                     pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
                     // Create ExternalContext
+                    // TODO: wondering why we use ServletExternalContext here
                     final ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse()) {
                         public String getRealPath(String path) {
                             if (path.equals("WEB-INF/exist-conf.xml")) {
@@ -536,11 +537,11 @@ class TestHttpServletRequest implements HttpServletRequest {
     }
 
     public Enumeration getHeaderNames() {
-        return null;
+        return Collections.enumeration(Collections.EMPTY_LIST);
     }
 
     public Enumeration getHeaders(String s) {
-        return null;
+        return Collections.enumeration(Collections.EMPTY_LIST);
     }
 
     public int getIntHeader(String s) {

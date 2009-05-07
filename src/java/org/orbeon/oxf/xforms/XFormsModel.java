@@ -272,7 +272,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI,
+                                              String username, String password, boolean shared, long timeToLive, String validation, boolean handleXInclude) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -283,9 +284,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation, handleXInclude);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new SharedXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation, handleXInclude);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -413,7 +414,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                             throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
 
                         final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getId(), newInstance.getEffectiveModelId(),
+                                    newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation(), newInstance.isHandleXInclude());
 
                         setInstance(sharedInstance, false);
                     } else {
@@ -445,7 +447,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                                 throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getId(),
+                                        currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation(), currentInstance.isHandleXInclude());
                             setInstance(sharedInstance, false);
                         } else {
                             // Instance is initialized, just use it
@@ -523,7 +526,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                                                 new String[] { "id", staticStateInstance.getEffectiveId() });
 
                                     final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getId(), staticStateInstance.getEffectiveModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getId(),
+                                                staticStateInstance.getEffectiveModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(),
+                                                staticStateInstance.getValidation(), staticStateInstance.isHandleXInclude());
                                     setInstance(sharedInstance, false);
 
                                 } else {
@@ -586,7 +591,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                                     final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
                                     // Set instance and associated information if everything went well
-                                    setInstanceDocument(instanceDocument, modelEffectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation);
+                                    // NOTE: No XInclude supported to read instances with @src for now
+                                    setInstanceDocument(instanceDocument, modelEffectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
                                 } catch (Exception e) {
                                     final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
                                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
@@ -750,7 +756,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
                 }
 
-                final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
+                // NOTE: No XInclude supported to read instances with @src for now
+                final SharedXFormsInstance sharedXFormsInstance
+                        = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceStaticId, modelEffectiveId,
+                            absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation, false);
                 setInstance(sharedXFormsInstance, false);
             } else {
                 // Instance cannot be shared
@@ -859,7 +868,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
 
         // Set instance and associated information if everything went well
-        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, absoluteResolvedURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation);
+        // NOTE: No XInclude supported to read instances with @src for now
+        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, absoluteResolvedURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation, false);
     }
 
     private void loadInstanceOptimized(PipelineContext pipelineContext, ExternalContext externalContext, Element instanceContainerElement,
@@ -899,7 +909,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
 
         // Set instance and associated information if everything went well
-        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation);
+        // NOTE: No XInclude supported to read instances with @src for now
+        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
     }
 
     public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {

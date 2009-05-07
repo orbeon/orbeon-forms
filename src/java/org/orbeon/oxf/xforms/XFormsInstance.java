@@ -70,6 +70,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private String username;
     private String password;
     private String validation;
+    private boolean handleXInclude;
 
     /**
      * Whether the instance was ever replaced. This is useful so that we know whether we can use an instance from the
@@ -105,6 +106,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
         this.validation = containerElement.attributeValue("validation");
+        this.handleXInclude = "true".equals(containerElement.attributeValue("xinclude"));
 
         this.replaced = "true".equals(containerElement.attributeValue("replaced"));
 
@@ -143,12 +145,15 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI,
+                          String username, String password, boolean applicationShared, long timeToLive, String validation, boolean handleXInclude) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelEffectiveId, instanceStaticId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(modelEffectiveId, instanceStaticId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
+                instanceSourceURI, username, password, applicationShared, timeToLive, validation, handleXInclude);
     }
 
-    protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
+                             String username, String password, boolean applicationShared, long timeToLive, String validation, boolean handleXInclude) {
 
         if (applicationShared && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
@@ -165,6 +170,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.username = username;
         this.password = password;
         this.validation = validation;
+        this.handleXInclude = handleXInclude;
 
         this.documentInfo = instanceDocumentInfo;
     }
@@ -201,6 +207,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             instanceElement.addAttribute("password", password);
         if (validation != null)
             instanceElement.addAttribute("validation", validation);
+        if (handleXInclude)
+            instanceElement.addAttribute("xinclude", "true");
 
         if (replaced)
             instanceElement.addAttribute("replaced", "true");
@@ -294,6 +302,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public String getValidation() {
         return validation;
+    }
+
+    public boolean isHandleXInclude() {
+        return handleXInclude;
     }
 
     public boolean isReplaced() {
@@ -504,7 +516,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
             // Invalidate instance if it is shared read-only
             if (applicationShared) {
-                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI);
+                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI, handleXInclude);
             } else {
                 XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-shared instance with id: " + getEffectiveId());
             }
@@ -601,7 +613,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, sourceURI, username, password, false, timeToLive, validation, handleXInclude);
     }
 
     public static String getInstanceStaticId(Element xformsInstanceElement) {

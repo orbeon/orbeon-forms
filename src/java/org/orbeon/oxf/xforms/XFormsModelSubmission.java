@@ -457,6 +457,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean isReadonlyHint = "true".equals(resolvedXXFormsReadonly);
                 final boolean isApplicationSharedHint = "application".equals(resolvedXXFormsShared);
                 final long timeToLive = XFormsInstance.getTimeToLive(submissionElement);
+                // TODO: move this to XFormsInstance.checkSharedHints(), and check how to deal w/ use of XFormsInstance.checkSharedHints() by XFormsInstance
                 if (isApplicationSharedHint) {
                     if (!actualHttpMethod.equals("GET"))
                         throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".",
@@ -750,7 +751,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getId(), replaceInstance.getEffectiveModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getId(), replaceInstance.getEffectiveModelId(),
+                                        absoluteResolvedURLString, timeToLive, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
 
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "replacing instance with read-only instance",
@@ -887,7 +889,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                     final Document resultingInstanceDocument
                                                             = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new XFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
                                                 } else {
                                                     // Resulting instance is read-only
 
@@ -899,7 +901,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
                                                 }    
                                             } catch (Exception e) {
                                                 submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR);

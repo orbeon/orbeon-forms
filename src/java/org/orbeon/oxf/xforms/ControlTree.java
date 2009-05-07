@@ -116,7 +116,8 @@ public class ControlTree implements Cloneable {
 
         // Index this control
         // NOTE: Must do after setting the context, so that relevance can be properly determined
-        indexControl(repeatIterationControl, true);
+        // NOTE: We don't dispatch events to repeat iterations
+        indexControl(repeatIterationControl, false);
 
         // Create the subtree
         XFormsControls.visitControlElementsHandleRepeat(pipelineContext, repeatControl, iterationIndex,
@@ -160,7 +161,8 @@ public class ControlTree implements Cloneable {
         }
 
         // Add event if necessary
-        if (registerEvents && control instanceof XFormsSingleNodeControl) {
+        // NOTE: We don't dispatch events to repeat iterations
+        if (registerEvents && control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
             final NodeInfo boundNode = control.getBoundNode();
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control just came to existence and is now bound to a node and relevant
@@ -194,7 +196,8 @@ public class ControlTree implements Cloneable {
         }
 
         // Add event if necessary
-        if (registerEvents && control instanceof XFormsSingleNodeControl) {
+        // NOTE: We don't dispatch events to repeat iterations
+        if (registerEvents && control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
             final NodeInfo boundNode = control.getBoundNode();
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control was bound to a node and relevant and is going out of existence
@@ -567,7 +570,8 @@ public class ControlTree implements Cloneable {
 
             // Index this control
             // NOTE: Must do after setting the context, so that relevance can be properly determined
-            result.indexControl(repeatIterationControl, registerEvents);
+            // NOTE: We don't dispatch events to repeat iterations
+            result.indexControl(repeatIterationControl, false);
 
             return true;
         }

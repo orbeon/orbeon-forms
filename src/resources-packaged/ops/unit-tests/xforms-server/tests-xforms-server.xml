@@ -2586,10 +2586,11 @@
                             </instance>
                             <instance id="events" model-id="xf-2">
                                 <events>
-                                    <event type="xforms-enabled" target="my-repeat" indexes="2"/>
-                                    <event type="xforms-optional" target="my-repeat" indexes="2"/>
-                                    <event type="xforms-readwrite" target="my-repeat" indexes="2"/>
-                                    <event type="xforms-valid" target="my-repeat" indexes="2"/>
+                                    <!-- NOTE: We no longer dispatch events to repeat iterations -->
+                                    <!--<event type="xforms-enabled" target="my-repeat" indexes="2"/>-->
+                                    <!--<event type="xforms-optional" target="my-repeat" indexes="2"/>-->
+                                    <!--<event type="xforms-readwrite" target="my-repeat" indexes="2"/>-->
+                                    <!--<event type="xforms-valid" target="my-repeat" indexes="2"/>-->
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
                                     <event type="xforms-optional" target="my-input" indexes="2"/>
                                     <event type="xforms-readwrite" target="my-input" indexes="2"/>
@@ -3252,7 +3253,8 @@
                                     <event type="xforms-enabled" target="month-select" indexes="2"/>
                                     <event type="xforms-enabled" target="component-result-group" indexes="2"/>
                                     <event type="xforms-enabled" target="component-group" indexes="2"/>
-                                    <event type="xforms-enabled" target="date-repeat" indexes="2"/>
+                                    <!-- NOTE: We no longer dispatch events to repeat iterations -->
+                                    <!--<event type="xforms-enabled" target="date-repeat" indexes="2"/>-->
                                     <event type="xforms-value-changed" target="year-select" indexes="2"/>
                                     <event type="xforms-enabled" target="year-select" indexes="2"/>
                                     <event type="xforms-value-changed" target="month-select" indexes="2"/>

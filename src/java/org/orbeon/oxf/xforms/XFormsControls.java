@@ -606,7 +606,8 @@ public class XFormsControls implements XFormsObjectResolver {
             final XFormsContextStack.BindingContext newBindingContext = container.getContextStack().getCurrentBindingContext();
 
             // Handle special relevance events
-            if (control instanceof XFormsSingleNodeControl) {
+            // NOTE: We don't dispatch events to repeat iterations
+            if (control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
                 final NodeInfo boundNode1 = control.getBoundNode();
                 final NodeInfo boundNode2 = newBindingContext.getSingleNode();
 

@@ -172,6 +172,8 @@ public class XFormsStaticState {
      */
     private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
 
+        XFormsContainingDocument.logDebugStatic("static state", "initializing", null);
+
         final Element staticStateElement = staticStateDocument.getRootElement();
 
 //        System.out.println(Dom4jUtils.domToString(staticStateDocument));

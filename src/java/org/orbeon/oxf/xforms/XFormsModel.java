@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
@@ -1116,7 +1117,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 public void startVisitControl(XFormsControl control) {
 
                     // We must be an XFormsSingleNodeControl
-                    if (!(control instanceof XFormsSingleNodeControl))
+                    // NOTE: We don't dispatch events to repeat iterations
+                    if (!(control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)))
                         return;
 
                     // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
@@ -1520,7 +1522,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     public void startVisitControl(XFormsControl control) {
 
                         // Don't do anything if it's not a single node control
-                        if (!(control instanceof XFormsSingleNodeControl))
+                        // NOTE: We don't dispatch events to repeat iterations
+                        if (!(control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)))
                             return;
 
                         // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])

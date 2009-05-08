@@ -61,6 +61,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                     // Found URI, stream it out
 
                     // Set caching headers
+
+                    // NOTE: Algorithm is that XFOutputControl currently passes either -1 or the last modified of the
+                    // resource if "fast" to obtain last modified ("oxf:" or "file:"). Would be nice to do better: pass
+                    // whether resource is cacheable or not; here, when dereferencing the resource, we get the last
+                    // modified (Last-Modified header from HTTP even) and store it. Then we can handle conditional get.
+                    // This is some work though. Might have to proxy conditional GET as well. So for now we don't
+                    // handle conditional GET and produce a non-now last modified only in a few cases.
+                    
                     response.setCaching(resource.getLastModified(), false, false);
 
                     if (resource.getSize() > 0)

@@ -165,6 +165,28 @@ public class NetUtils {
     }
 
     /**
+     * Return the last modification date of the given absolute URL if it is "fast" to do so, i.e. if it is an "oxf:" or
+     * a "file:" protocol.
+     *
+     * @param absoluteURL   absolute URL to check
+     * @return              last modification date if "fast" or -1 if not fast or if an error occurred
+     */
+    public static long getLastModifiedIfFast(String absoluteURL) {
+        final long lastModified;
+        if (absoluteURL.startsWith("oxf:") || absoluteURL.startsWith("file:")) {
+            try {
+                lastModified = getLastModified(URLFactory.createURL(absoluteURL));
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        } else {
+            // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
+            lastModified = -1;
+        }
+        return lastModified;
+    }
+
+    /**
      * Get the last modification date of a URL.
      *
      * * @return last modified timestamp, null if le 0

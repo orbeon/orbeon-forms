@@ -21,8 +21,8 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
@@ -121,11 +121,12 @@ public class XFormsOutputControl extends XFormsValueControl {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
             final String dynamicMediatype = fileInfo.getFileMediatype(pipelineContext);
-            // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not desirable in most cases
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute, 0);
+            // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute, System.currentTimeMillis());// use dummy image so that client always has something to load
+            // Use dummy image as default value so that client always has something to load
+            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -144,7 +145,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype, long lastModified) {
+    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
         if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
@@ -153,6 +154,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
                     final String resolvedURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
                     updatedValue = NetUtils.proxyURI(pipelineContext, resolvedURI, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
                 } else {
                     // Otherwise we leave the value as is
@@ -160,9 +162,9 @@ public class XFormsOutputControl extends XFormsValueControl {
                 }
             } else if ("base64Binary".equals(typeName)) {
                 // xs:base64Binary type
-
                 final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
-                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
+                // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
+                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype, -1);
 
             } else {
                 // Return dummy image

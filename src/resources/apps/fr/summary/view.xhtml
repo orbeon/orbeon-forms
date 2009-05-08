@@ -480,6 +480,8 @@
                                                 <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
                                                 <xforms:setvalue ref="$form-query"/>
                                                 <!-- Update search results when selection changes (recalculate is done automatically as well) -->
+                                                <xforms:setindex repeat="documents-repeat" index="1"/>
+                                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
                                                 <xforms:send submission="search-submission"/>
                                             </xforms:action>
                                         </xforms:select1>
@@ -507,7 +509,11 @@
                                             </xforms:itemset>
 
                                             <!-- Update search results when selection changes -->
-                                            <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+                                            <xforms:action ev:event="xforms-value-changed">
+                                                <xforms:setindex repeat="documents-repeat" index="1"/>
+                                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                                <xforms:send submission="search-submission"/>
+                                            </xforms:action>
                                         </xforms:select1>
                                     </xforms:group>
                                 </div>
@@ -556,7 +562,11 @@
                         </xforms:group>
 
                         <!-- Search also when user presses "enter" in a field -->
-                        <xforms:send ev:event="DOMActivate" submission="search-submission"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                            <xforms:send submission="search-submission"/>
+                        </xforms:action>
 
                         <div class="fr-clear"/>
                     </xforms:group>

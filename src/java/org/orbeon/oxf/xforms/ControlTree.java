@@ -167,7 +167,7 @@ public class ControlTree implements Cloneable {
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control just came to existence and is now bound to a node and relevant
                 eventsToDispatch.put(control.getEffectiveId(),
-                        new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
+                        new XFormsControls.EventSchedule(control.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, control));
             }
         }
     }
@@ -202,7 +202,7 @@ public class ControlTree implements Cloneable {
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control was bound to a node and relevant and is going out of existence
                 eventsToDispatch.put(control.getEffectiveId(),
-                        new XFormsModel.EventSchedule(control.getEffectiveId(), XFormsModel.EventSchedule.RELEVANT_BINDING, control));
+                        new XFormsControls.EventSchedule(control.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, control));
             }
         }
     }

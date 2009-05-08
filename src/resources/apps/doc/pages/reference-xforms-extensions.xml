@@ -2018,6 +2018,31 @@
                     </xforms:action>
                 </xml-source>
                 <p>
+                    The <code>xxforms:invalidate-instance</code> action allows invalidating a shared instance by
+                    resource URI, for example:
+                </p>
+                <xml-source>
+                    <xxforms:invalidate-instance ev:event="DOMActivate" resource="/forms/resources/fr"/>
+                </xml-source>
+                <p>
+                    This action also supports the <code>xinclude</code> attribute, which if present will only invalidate
+                    the instance with the given resource if it was loaded with a matching <code>xxforms:xinclude</code>
+                    attribute:
+                </p>
+                <xml-source>
+                    <comment> Submission loading a shared instance and enabling XInclude processing </comment>
+                    <xforms:submission serialization="none" resource="/forms/resources/fr" method="get"
+                                       replace="instance" instance="resources-instance"
+                                       xxforms:readonly="true" xxforms:shared="application"
+                                       xxforms:xinclude="true"/>
+                    <comment> Action invalidating only the instance which was loaded with xxforms:xinclude="true" </comment>
+                    <xxforms:invalidate-instance ev:event="DOMActivate" resource="/forms/resources/fr" xinclude="true"/>
+                </xml-source>
+                <p>
+                    If the <code>xinclude</code> attribute is not specified, any shared instance matching the resource
+                    URI is invalidated.
+                </p>
+                <p>
                     It is also possible to remove all shared instances from the cache by using the
                     <code>xxforms:invalidate-instances</code> action, for example:
                 </p>

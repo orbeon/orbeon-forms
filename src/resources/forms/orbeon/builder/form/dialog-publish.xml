@@ -147,13 +147,8 @@
             <!-- Determine the URI of the collection to deploy to -->
             <xxforms:variable name="app" select="event('fb:application')"/>
             <xxforms:variable name="form" select="event('fb:form')"/>
-            <xxforms:variable name="collection-no-appserver"
-                              select="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
-            <xxforms:variable name="collection"
-                              select="if (starts-with($collection-no-appserver, 'http://') or starts-with($collection-no-appserver, 'https://')) then $collection-no-appserver
-                                      else concat(xxforms:property('oxf.fr.appserver.uri'), $collection-no-appserver)"/>
             <xforms:send submission="fr-publish-form-submission">
-                <xxforms:context name="fb:collection" select="$collection"/>
+                <xxforms:context name="fb:collection" select="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
                 <xxforms:context name="fb:application" select="$app"/>
                 <xxforms:context name="fb:form" select="$form"/>
             </xforms:send>
@@ -206,6 +201,10 @@
 
             <!-- Respond to successful publish submission -->
             <xforms:action ev:event="xforms-submit-done">
+                <!-- Try to invalidate shared instances with the given resource URI so that the deployed form will be
+                     re-read by Form Runner. This works only if Form Builder is in the same webapp as the Form Runner
+                     running the deployed form. -->
+                <xxforms:invalidate-instance resource="{event('resource-uri')}"/>
                 <!-- Clear response if not HTML -->
                 <xforms:setvalue if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
                     ref="instance('fr-publish-form-submission-response')"/>

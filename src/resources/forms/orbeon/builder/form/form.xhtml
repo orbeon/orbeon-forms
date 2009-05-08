@@ -73,6 +73,10 @@
                     });
 
                     layout.render();
+
+                    // Only make content visible after initialization to prevent expensive relayout
+                    YAHOO.util.Dom.setStyle("left1", "display", "block");
+                    YAHOO.util.Dom.setStyle("center1", "display", "block");
                 });
             })();
         </xhtml:script>
@@ -248,11 +252,13 @@
                             <div class="fr-clear"/>
                         </xhtml:div>
                     </xhtml:div>
-                    <xhtml:div id="left1">
+                    <!-- Initially hide to prevent expensive relayout upon load -->
+                    <xhtml:div id="left1" style="display: none">
                         <!-- Toolbox -->
                         <xi:include href="oxf:/forms/orbeon/builder/form/toolbox.xml" xxi:omit-xml-base="true"/>
                     </xhtml:div>
-                    <xhtml:div id="center1">
+                    <!-- Initially hide to prevent expensive relayout upon load -->
+                    <xhtml:div id="center1" style="display: none">
 
                         <fr:view width="974px">
                             <xforms:label>Orbeon Form Builder</xforms:label>

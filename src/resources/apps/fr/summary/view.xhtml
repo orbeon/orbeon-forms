@@ -113,32 +113,27 @@
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
             <xforms:action ev:event="fr-summary-create">
-                <xforms:recalculate/>
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
-            <xforms:action ev:event="fr-summary-edit">
-                <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/edit/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank"/>
-            </xforms:action>
+            <!-- Currently unused -->
+            <!--<xforms:action ev:event="fr-summary-edit">-->
+                <!--<xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/edit/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank"/>-->
+            <!--</xforms:action>-->
 
             <xforms:action ev:event="fr-summary-view" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-pdf" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{normalize-space(instance('fr-selection-instance'))}/?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-test">
-                <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-xml">
-                <xforms:recalculate/>
                 <!-- TODO -->
                 <!--<xforms:load resource="abc" f:url-type="resource"/>-->
             </xforms:action>
@@ -479,9 +474,12 @@
                                             <xforms:action ev:event="xforms-value-changed">
                                                 <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
                                                 <xforms:setvalue ref="$form-query"/>
-                                                <!-- Update search results when selection changes (recalculate is done automatically as well) -->
+
+                                                <!-- Reset search selection and navigation -->
+                                                <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
                                                 <xforms:setindex repeat="documents-repeat" index="1"/>
                                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+
                                                 <xforms:send submission="search-submission"/>
                                             </xforms:action>
                                         </xforms:select1>
@@ -510,8 +508,11 @@
 
                                             <!-- Update search results when selection changes -->
                                             <xforms:action ev:event="xforms-value-changed">
+                                                <!-- Reset search selection and navigation -->
+                                                <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
                                                 <xforms:setindex repeat="documents-repeat" index="1"/>
                                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+
                                                 <xforms:send submission="search-submission"/>
                                             </xforms:action>
                                         </xforms:select1>
@@ -563,8 +564,11 @@
 
                         <!-- Search also when user presses "enter" in a field -->
                         <xforms:action ev:event="DOMActivate">
+                            <!-- Reset search selection and navigation -->
+                            <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
                             <xforms:setindex repeat="documents-repeat" index="1"/>
                             <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+
                             <xforms:send submission="search-submission"/>
                         </xforms:action>
 
@@ -654,15 +658,22 @@
                                 </thead>
                                 <tbody>
                                     <xforms:repeat nodeset="document" id="documents-repeat">
+                                        <!-- 1-based position in the current page -->
                                         <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                                        <!-- 1-based position in the entire result set -->
+                                        <xxforms:variable name="document-number" select="instance('fr-paging-instance')/from + $position - 1" as="xs:integer"/>
+
+                                        <!-- Document name and href for edition -->
+                                        <xxforms:variable name="document-name" select="@name" as="xs:string"/>
                                         <xxforms:variable name="document-href" select="concat('/fr/', $parameters/app, '/', $parameters/form, '/edit/',
-                                                instance('fr-summary-instance')/document[$position]/@name, '/', if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
+                                                $document-name, '/', if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
+
                                         <!-- Don't open a document on click in the checkbox or when the trigger gets the focus (e.g. by the user tabbing to it). -->
                                         <xforms:action ev:event="DOMActivate DOMFocusIn">
                                             <xforms:message level="xxforms:log-info" value="concat('xxforms:target: ', event('xxforms:target'))"/>
                                         </xforms:action>
 
-                                        <tr class="{if (exists(index-of(tokenize(instance('fr-selection-instance'), '\s+'), string($position)))) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
+                                        <tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                             <xforms:group appearance="xxforms:internal">
                                                 <!-- Upon focus on the row, edit document -->
 
@@ -670,7 +681,7 @@
                                                     <xforms:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xforms:item>
                                                             <xforms:label/>
-                                                            <xforms:value value="$position"/>
+                                                            <xforms:value value="$document-name"/>
                                                         </xforms:item>
                                                     </xforms:select>
                                                 </td>
@@ -682,7 +693,7 @@
                                                     <!--<xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>-->
                                                     <xforms:trigger appearance="minimal">
                                                         <!-- Just output the number -->
-                                                        <xforms:label><xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/></xforms:label>
+                                                        <xforms:label><xforms:output ref=".[not(property('xxforms:noscript'))]" value="$document-number"/></xforms:label>
                                                     </xforms:trigger>
                                                 </td>
                                                 <xforms:group ref="if ($show-created) then @created else ()">
@@ -857,7 +868,7 @@
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Assertion: only one document selected -->
-                                        <xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>
+                                        <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
                                         <xforms:dispatch target="fr-form-model" name="fr-summary-view"/>
                                     </xforms:action>
                                 </fr:button>
@@ -871,13 +882,12 @@
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Assertion: only one document selected -->
-                                        <xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>
+                                        <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
                                         <xforms:dispatch target="fr-form-model" name="fr-summary-pdf"/>
                                     </xforms:action>
                                 </fr:button>
                             </xforms:group>
                             <!-- Test button (if Form Builder) -->
-                            <!-- TODO -->
                             <xforms:group ref="if (name() = 'test') then instance('fr-summary-triggers-instance')/view[$is-form-builder] else ()">
                                 <fr:button>
                                     <xforms:label>
@@ -886,7 +896,7 @@
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Assertion: only one document selected -->
-                                        <xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>
+                                        <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
                                         <xforms:dispatch target="fr-form-model" name="fr-summary-test"/>
                                     </xforms:action>
                                 </fr:button>
@@ -901,13 +911,17 @@
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Parse the selected rows -->
                                         <xforms:action xxforms:iterate="tokenize(instance('fr-selection-instance'), '\s+')">
-                                            <xxforms:variable name="position" select="." as="xs:integer"/>
+                                            <!--<xxforms:variable name="position" select="." as="xs:integer"/>-->
+                                            <xxforms:variable name="document-name" select="." as="xs:string"/>
                                             <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
-                                                <xxforms:context name="document-id" select="instance('fr-summary-instance')/document[xs:integer($position)]/@name"/>
+                                                <xxforms:context name="document-id" select="$document-name"/>
                                             </xforms:dispatch>
                                         </xforms:action>
-                                        <!-- Unselect all rows -->
+                                        <!-- Reset search selection and navigation -->
                                         <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
+                                        <xforms:setindex repeat="documents-repeat" index="1"/>
+                                        <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                        <!-- Update search -->
                                         <xforms:send submission="search-submission"/>
                                     </xforms:action>
                                 </fr:button>

@@ -48,6 +48,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private Map constantItems;
 
     private boolean isPlainValueChange;
+    private boolean isInitialRefreshEvents;
 
     private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
 
@@ -62,6 +63,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Get properties
         isPlainValueChange = XFormsProperties.isPlainValueChange(containingDocument);
+        isInitialRefreshEvents = XFormsProperties.isInitialRefreshEvents(containingDocument);
     }
 
     public boolean isInitialized() {
@@ -762,7 +764,7 @@ public class XFormsControls implements XFormsObjectResolver {
             // There are potentially event handlers for UI events, so do the whole processing
 
             // If this is the first refresh we mark nodes to dispatch MIP events
-            final boolean isFirstRefresh = containingDocument.isInitializationFirstRefreshClear();
+            final boolean isFirstRefresh = isInitialRefreshEvents && containingDocument.isInitializationFirstRefreshClear();
 
             // Build list of events to send
             final Map relevantBindingEvents = getCurrentControlTree().getEventsToDispatch();

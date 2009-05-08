@@ -172,7 +172,7 @@
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}"
-                      xxforms:plain-value-change="true">
+                      xxforms:server.events.plain-value-change="true">
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

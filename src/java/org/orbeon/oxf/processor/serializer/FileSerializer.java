@@ -316,7 +316,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = NetUtils.proxyURI(pipelineContext, localURL, null, config.getRequestedContentType(), 0);
+                            resultURL = NetUtils.proxyURI(pipelineContext, localURL, null, config.getRequestedContentType(), -1);
                         else
                             resultURL = localURL;
                     }

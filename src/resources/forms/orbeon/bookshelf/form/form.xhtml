@@ -388,7 +388,6 @@
     <body>
         <fr:view>
             <xforms:label>XForms Bookcast</xforms:label>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <fr:section id="details-section" bind="details-bind">
                     <xforms:label ref="$form-resources/details/label"/>
@@ -421,9 +420,7 @@
                                     <xforms:mediatype ref="@mediatype"/>
                                     <xxforms:size ref="@size"/>
                                 </xforms:upload>
-                                <!-- Orbeon Form Builder Component Metadata -->
-                                <xforms:output id="image-output-control" ref="image" mediatype="image/*"
-                                               value="for $v in . return if (tokenize($v, ':')[1] = ('file', 'http', 'https')) then $v else concat(xxforms:property('oxf.fr.appserver.uri'), $v)"/>
+                                <xforms:output id="image-output-control" ref="image" mediatype="image/*" value="."/>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>

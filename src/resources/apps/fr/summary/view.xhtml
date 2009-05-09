@@ -85,7 +85,7 @@
                     <title>Orbeon Form Runner</title>
                     <description>Orbeon Form Runner is the start page for all your forms.</description>
                     <author>Orbeon, Inc.</author>
-                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
+                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">oxf:/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
                 </metadata>
             </xforms:instance>
 
@@ -414,7 +414,6 @@
         <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <xforms:group appearance="xxforms:internal">
                     <!-- Stop value change propagation so changes in this section of the form don't cause data

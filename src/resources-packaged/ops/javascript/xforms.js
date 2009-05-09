@@ -1389,6 +1389,9 @@ ORBEON.xforms.Controls = {
                     spanValue += input.value;
                 }
             }
+            // For boolean inputs, if the checkbox isn't checked, then the value is false
+            if (spanValue == "" && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+                spanValue = "false";
             return spanValue;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")

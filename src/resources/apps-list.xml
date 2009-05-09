@@ -18,7 +18,7 @@
     <section label="Form Builder (Preview)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
-        <application id="fr/orbeon/provinces/summary" label="Provinces Form"/>
+        <!--<application id="fr/orbeon/provinces/summary" label="Provinces Form"/>-->
     </section>
     <section label="XForms Tutorial Apps">
         <application id="xforms-hello" label="XForms Hello"/>

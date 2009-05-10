@@ -69,12 +69,11 @@
                 <xforms:input class="fb-map-longitude" xbl:attr="ref=longitude-ref" id="longitude" style="display: none"/>
                 <xforms:input class="fb-map-latitude" xbl:attr="ref=latitude-ref" id="latitude" style="display: none"/>
                 <!-- Div in which Google Maps does its rendering -->
-                <!-- Commented because of issue with AVTs -->
                 <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>
 
             </xforms:group>
 
-            <xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA29DoCyTBBHWCx75dFud5rxT4lftsSa3SaZIzQGxOmBuGKTUk8hQ4hiDXmoFdYblBeyWah68wn_JosQ" type="text/javascript"/>
+            <xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={xxforms:property('oxf.xforms.xbl.fr.map.key')}" type="text/javascript"/>
         </xbl:template>
     </xbl:binding>
 

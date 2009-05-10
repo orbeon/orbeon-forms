@@ -32,9 +32,10 @@
          * Attributes
          */
         element: null,
-        gmapDivID: null,
+        gmapDiv: null,
         gmap: null,
         geocoder: null,
+        keyOutputID: null,
         addressOutputID: null,
         longitudeInputID: null,
         latitudeInputID: null,
@@ -44,30 +45,30 @@
          * Constructor
          */
         init: function(element) {
+            var map = this;
 
             // Init object attributes
-            var gmapDiv = Dom.getElementsByClassName("fb-map-gmap-div", null, element)[0];
-            this.element = element;
-            this.gmapDivID = gmapDiv.id;
-            this.addressOutputID = Dom.getElementsByClassName("fb-map-address", null, element)[0].id;
-            this.longitudeInputID = Dom.getElementsByClassName("fb-map-longitude", null, element)[0].id;
-            this.latitudeInputID = Dom.getElementsByClassName("fb-map-latitude", null, element)[0].id;
-            this.geocoder = new GClientGeocoder();
+            map.gmapDiv = Dom.getElementsByClassName("fb-map-gmap-div", null, element)[0];
+            map.element = element;
+            map.addressOutputID = Dom.getElementsByClassName("fb-map-address", null, element)[0].id;
+            map.longitudeInputID = Dom.getElementsByClassName("fb-map-longitude", null, element)[0].id;
+            map.latitudeInputID = Dom.getElementsByClassName("fb-map-latitude", null, element)[0].id;
 
             // Create map with its controls
-            this.gmap = new GMap2(gmapDiv);
-            this.gmap.addControl(new GSmallZoomControl3D());
-            this.gmap.addControl(new GScaleControl());
-            this.gmap.addControl(new GOverviewMapControl());
+            map.gmap = new GMap2(map.gmapDiv);
+            map.gmap.addControl(new GSmallZoomControl3D());
+            map.gmap.addControl(new GScaleControl());
+            map.gmap.addControl(new GOverviewMapControl());
+            map.geocoder = new GClientGeocoder();
 
             // Set location
-            var initialLatitude = Document.getValue(this.latitudeInputID);
-            var initialLongitude = Document.getValue(this.longitudeInputID);
+            var initialLatitude = Document.getValue(map.latitudeInputID);
+            var initialLongitude = Document.getValue(map.longitudeInputID);
             if (initialLatitude != "" && initialLongitude != "") {
                 var latLng = new GLatLng(new Number(initialLatitude), new Number(initialLongitude));
-                this.updateMarkerFromLatLng(latLng);
+                map.updateMarkerFromLatLng(latLng);
             } else {
-                this.updateMarkerFromAddress();
+                map.updateMarkerFromAddress();
             }
         },
 

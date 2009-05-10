@@ -35,14 +35,20 @@
                     <address/>
                     <longitude/>
                     <latitude/>
+                    <!--<longitude>-122.25362777709961</longitude>-->
+                    <!--<latitude>37.502372279912294</latitude>-->
                 </map>
             </xforms:instance>
-            <xforms:action ev:event="xforms-model-construct-done local-update-address">
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:dispatch if="/map/longitude = '' and /map/latitude = ''" name="local-update-address" target="main-model"/>
+            </xforms:action>
+            <xforms:action ev:event="local-update-address">
                 <!-- Reset address, so the component gets a value changed event, even if the address hasn't changed -->
                 <xforms:setvalue ref="/map/address"/>
                 <xforms:setvalue ref="/map/address" value="string-join((../street, ../street2, ../city, ../state, ../zip), ' ')"/>
+                <xforms:setvalue ref="/map/longitude"/>
+                <xforms:setvalue ref="/map/latitude"/>
             </xforms:action>
-
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -54,7 +60,6 @@
 //                    name: "Map",
 //
 //                    testInitialLogitudeNotSet: function() {
-//
 //                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-longitude"));
 //                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-latitude"));
 //                    }
@@ -113,6 +118,5 @@
                 <xforms:label>Longitude: </xforms:label>
             </xforms:output>
         </xhtml:p>
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

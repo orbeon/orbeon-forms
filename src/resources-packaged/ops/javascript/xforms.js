@@ -5303,6 +5303,7 @@ ORBEON.xforms.Server = {
 
                         // Second handle the <xxforms:itemsets> actions (we want to do this before we set the value of
                         // controls as the value of the select might be in the new values of the itemset).
+                        var controlsWithUpdatedItemsets = {};
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                             // Change values in an itemset
                             if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
@@ -5314,6 +5315,7 @@ ORBEON.xforms.Server = {
                                         var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");
+                                        controlsWithUpdatedItemsets[controlId] = true;
 
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
 
@@ -5683,6 +5685,8 @@ ORBEON.xforms.Server = {
                                                     var doUpdate =
                                                             // If this was an input that was recreated because of a type change, we always set its value
                                                             recreatedInput ||
+                                                            // If this is a control for which we recreated the itemset, we want to set its value
+                                                            controlsWithUpdatedItemsets[controlId] ||
                                                             (
                                                                 // Update only if the new value is different than the value already have in the HTML area
                                                                 currentValue != newControlValue

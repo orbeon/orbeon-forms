@@ -1,0 +1,111 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Checkbox selection update bug</xhtml:title>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <selection>1 2</selection>
+                    <value>1</value>
+                    <value>2</value>
+                    <index>1</index>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+            YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                name: "Checkbox selection update bug",
+
+                testUpdateItemset: function() {
+                    var radioSpan = document.getElementById("value-selection");
+                    var radios = radioSpan.getElementsByTagName("input");
+                    YAHOO.util.Assert.areEqual("1", ORBEON.xforms.Document.getValue("checkbox"));
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        ORBEON.xforms.Document.setValue("value-selection", radios[1].value);
+                    }, function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            YAHOO.util.Assert.areEqual("2", ORBEON.xforms.Document.getValue("checkbox"));
+                            ORBEON.xforms.Document.setValue("value-selection", radios[0].value);
+                        }, function() {
+                            YAHOO.util.Assert.areEqual("1", ORBEON.xforms.Document.getValue("checkbox"));
+                        });
+                    });
+                }
+            }));
+            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                if (parent && parent.TestManager) {
+                    parent.TestManager.load();
+                } else {
+                    new YAHOO.tool.TestLogger();
+                    YAHOO.tool.TestRunner.run();
+                }
+            });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:p>
+            Repro steps (tried with Firefox or IE):
+        </xhtml:p>
+        <xhtml:ul>
+            <xhtml:li>Change radio from 1 to 2</xhtml:li>
+            <xhtml:li>Checkbox remains selected</xhtml:li>
+            <xhtml:li>Change radio back from 2 to 1</xhtml:li>
+            <xhtml:li>Checkbox now deselected</xhtml:li>
+            <xhtml:li>Ajax response seems good, server seems to send right information</xhtml:li>
+        </xhtml:ul>
+
+        <xforms:select id="checkbox" ref="selection" appearance="full" xxforms:encrypt-item-values="false">
+            <xforms:label>Selection: </xforms:label>
+            <xforms:item>
+                <xforms:label/>
+                <xforms:value ref="../value[xs:integer(../index)]"/>
+            </xforms:item>
+        </xforms:select>
+
+        <xhtml:hr/>
+
+        <xforms:select1 id="value-selection" ref="index" appearance="full">
+            <xforms:label>Switch value here: </xforms:label>
+            <xforms:item>
+                <xforms:label>1</xforms:label>
+                <xforms:value>1</xforms:value>
+            </xforms:item>
+            <xforms:item>
+                <xforms:label>2</xforms:label>
+                <xforms:value>2</xforms:value>
+            </xforms:item>
+        </xforms:select1>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
+    </xhtml:body>
+</xhtml:html>

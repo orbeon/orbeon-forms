@@ -28,7 +28,7 @@
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Attachment</display-name>
+            <display-name lang="en">File Attachment</display-name>
             <display-name lang="fr">Fichier joint</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/attach.png</small-icon>

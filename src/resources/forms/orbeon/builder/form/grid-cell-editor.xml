@@ -316,7 +316,13 @@
                         <xforms:hint ref="$form-resources/enter-text/label"/>
                     </xforms:input>
                 </xforms:group>
-                <xforms:group ref="xforms:trigger">
+                <!-- NOTES:
+                     o We don't show button with empty label as it appears bad
+                     o In case of fr:button, should actually use fr:button, but that's more markup which will make the DOM bigger so not now
+                       OR: use YUI button classes / CSS
+                     o TODO: Need WYSIWYG editor for button label (e.g. using YUI button classes / CSS to create button appearance )
+                 -->
+                <xforms:group ref="(xforms:trigger | fr:button)[normalize-space($resource-holder/label)]">
                     <xforms:trigger ref="$instance-holder" id="fb-edit-trigger-control">
                         <!-- Trigger shows its label -->
                         <xforms:label ref="$resource-holder/label"/>
@@ -356,7 +362,7 @@
                     <xxforms:variable name="icon-url" as="xs:string?"
                                       select="$component-metadata/(fb:icon[@lang = $form-resources/@xml:lang], fb:icon)[1]/fb:small-icon"/>
 
-                    <xhtml:img src="{($icon-url, '/apps/fr/style/images/silk/plugin.png')[1]}"
+                    <xhtml:img class="fb-component-icon" src="{($icon-url, '/apps/fr/style/images/silk/plugin.png')[1]}"
                                alt="{($component-metadata/fb:display-name[@lang = $form-resources/@xml:lang], 'Component')[1]}"
                                title="{($component-metadata/fb:display-name[@lang = $form-resources/@xml:lang], 'Component')[1]}"/>
                 </xforms:group>

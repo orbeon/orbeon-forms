@@ -201,7 +201,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:valid
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 1, 2, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 0, 2, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 
@@ -336,15 +336,15 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // === eXforms functions
 
         // exf:relevant()
-        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}relevant", EXFormsRelevant.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}relevant", EXFormsRelevant.class, 0, 0, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // exf:readonly()
-        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}readonly", EXFormsReadonly.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}readonly", EXFormsReadonly.class, 0, 0, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // exf:required()
-        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}required", EXFormsRequired.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}required", EXFormsRequired.class, 0, 0, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // exf:sort()

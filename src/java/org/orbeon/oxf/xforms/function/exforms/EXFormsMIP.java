@@ -29,7 +29,7 @@ public abstract class EXFormsMIP extends XFormsFunction {
 
     public Item evaluateItem(XPathContext c) throws XPathException {
 
-        final Expression nodesetExpression = argument[0];
+        final Expression nodesetExpression = (argument.length > 0) ? argument[0] : null;
         // "If the argument is omitted, it defaults to a node-set with the context node as its only
         // member."
         final Item item;

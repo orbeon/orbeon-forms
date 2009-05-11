@@ -84,11 +84,6 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
-    <!-- ==== Loading of components ================================================================================ -->
-    <page path-info="/fr/service/components/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          model="components/prepare-components.xpl">
-    </page>
-
     <!-- ==== Other Services ======================================================================================= -->
 
     <!-- Email document -->
@@ -123,6 +118,11 @@
     <!-- Custom services provided by the application -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/service/${2}.xpl"/>
+
+    <!-- Custom services provided by Form Builder -->
+    <!-- NOTE: This shouldn't be here, but this service uses its own serialization -->
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/toolbox" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/${2}/service/toolbox.xpl"/>
 
     <!-- Custom services provided by the form -->
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"

@@ -642,8 +642,9 @@
                        method="post" replace="none" resource="test:"/>
 
     <!-- Submission to load the components library -->
+    <!-- NOTE: We only pass the app name, not the form name -->
     <xforms:submission id="fb-load-components" serialization="none"
-                       method="get" resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/components/{xxforms:bind('application-name-bind')}/{xxforms:bind('form-name-bind')}"
+                       method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={xxforms:bind('application-name-bind')}"
                        replace="instance" instance="fb-components-instance"
                        xxforms:readonly="true" xxforms:shared="document"/>
 

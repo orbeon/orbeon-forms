@@ -47,11 +47,6 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-        // Nothing to output in static read-only
-        // TODO: xforms:trigger does this, but should we output a <span> instead?
-        if (isStaticReadonly(xformsControl))
-            return;
-
         final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -76,8 +71,8 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             // Create enclosing xhtml:span
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-            {
-                // Create xhtml:input
+            if (!isStaticReadonly(xformsControl)) {
+                // Create xhtml:input unless static readonly
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
                 reusableAttributes.clear();

@@ -4192,7 +4192,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="model" xxforms:state-handling="client">->
+                                <xforms:model id="model" xxforms:state-handling="client">
                                     <xforms:instance id="instance">
                                         <value xmlns=""/>
                                     </xforms:instance>
@@ -4257,6 +4257,85 @@
                     <xxf:control-values>
                         <xxf:control id="my-input-1">New value</xxf:control>
                         <xxf:control id="my-input-2">New value</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Test extension MIP XPath functions" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <instance xmlns="">
+                                            <readonly/>
+                                            <required/>
+                                            <relevant/>
+                                            <valid/>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:bind nodeset="readonly" readonly="true()"/>
+                                    <xforms:bind nodeset="required" required="true()"/>
+
+                                    <xforms:bind nodeset="relevant" relevant="false()"/>
+                                    <xforms:bind nodeset="valid" constraint="false()"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body xmlns:exforms="http://www.exforms.org/exf/1-0">
+
+                                <!-- Test a few possibilities -->
+                                <xforms:output id="output-readonly-1" ref=".[exforms:readonly(readonly)]" value="'I am readonly'"/>
+                                <xforms:output id="output-readonly-2" ref="readonly[exforms:readonly()]" value="'I am readonly'"/>
+                                <xforms:output id="output-required-1" ref=".[exforms:required(required)]" value="'I am required'"/>
+                                <xforms:output id="output-required-2" ref="required[exforms:required()]" value="'I am required'"/>
+
+                                <xforms:output id="output-relevant" ref=".[not(exforms:relevant(relevant))]" value="'I am not relevant'"/>
+
+                                <xforms:output id="output-valid-1" ref=".[not(xxforms:valid(valid))]" value="'I am not valid'"/>
+                                <xforms:output id="output-valid-2" ref="valid[not(xxforms:valid())]" value="'I am not valid'"/>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <readonly/>
+                                    <required/>
+                                    <relevant/>
+                                    <valid/>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-readonly-1">I am readonly</xxf:control>
+                        <xxf:control id="output-readonly-2" readonly="true">I am readonly</xxf:control>
+                        <xxf:control id="output-required-1">I am required</xxf:control>
+                        <xxf:control id="output-required-2" required="true" valid="false">I am required</xxf:control>
+                        <xxf:control id="output-relevant">I am not relevant</xxf:control>
+                        <xxf:control id="output-valid-1">I am not valid</xxf:control>
+                        <xxf:control id="output-valid-2" valid="false">I am not valid</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -41,4 +41,7 @@
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
 
+    <!-- Don't animate section collapse -->
+    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.orbeon.builder"  value="false"/>
+
 </properties>

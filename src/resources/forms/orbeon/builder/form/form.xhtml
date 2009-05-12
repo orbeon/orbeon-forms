@@ -482,6 +482,9 @@
                                                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid | *[resolve-QName(name(), .) = $components-qnames]" id="fb-section-content-repeat" xxforms:dnd="none">
                                                             <xxforms:variable name="section-content-position" select="position()"/>
 
+                                                            <!-- Stop propagation of DOMFocusOut as we don't care about listening for visited controls within grids, and handling this takes time -->
+                                                            <xforms:action ev:event="DOMFocusOut" ev:propagate="stop"/>
+
                                                             <!-- Current section content QName -->
                                                             <xxforms:variable name="current-qname" select="resolve-QName(name(), .)" as="xs:QName"/>
                                                             <!-- Whether this is a component -->

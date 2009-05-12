@@ -240,7 +240,7 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
 #fb-details-group .fr-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
 #fb-details-group .fr-section-title .fr-inplace-content .xforms-label { display: none }
-#fb-details-group .fr-section-title .xforms-input input { width: 38em }/* try to make editable title as wide as possible */
+#fb-details-group .fr-section-title .xforms-input input { width: 37em }/* try to make editable title as wide as possible */
 
 /* Make section title alert look nicer */
 #fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }

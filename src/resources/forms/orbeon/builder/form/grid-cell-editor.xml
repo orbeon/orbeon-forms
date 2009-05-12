@@ -241,7 +241,7 @@
                 <xforms:group ref=".[not($is-component)]">
                     <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
                                   appearance="fr:in-place" class="fb-control-label">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:hint ref="$form-resources/enter-label/label"/>
                     </xforms:input>
                 </xforms:group>
@@ -251,22 +251,21 @@
             <xhtml:div class="fb-control-control">
                 <xforms:group ref="xforms:input">
                     <xforms:input ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
-                        <!--<xforms:hint value="$control-name"/>-->
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                     </xforms:input>
                 </xforms:group>
                 <xforms:group ref="xforms:textarea">
                     <xforms:textarea ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                     </xforms:textarea>
                 </xforms:group>
                 <xforms:group ref="xforms:select1[@appearance = 'minimal']">
                     <xforms:select1 appearance="minimal" ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:item>
-                        <xforms:label ref="$form-resources/select/label"/>
-                        <xforms:value/>
-                    </xforms:item>
+                            <xforms:label ref="$form-resources/select/label"/>
+                            <xforms:value/>
+                        </xforms:item>
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -275,7 +274,7 @@
                 </xforms:group>
                 <xforms:group ref="xforms:select1[@appearance = 'full']">
                     <xforms:select1 appearance="full" ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -284,7 +283,7 @@
                 </xforms:group>
                 <xforms:group ref="xforms:select1[@appearance = 'compact']">
                     <xforms:select1 appearance="compact" ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -293,7 +292,7 @@
                 </xforms:group>
                 <xforms:group ref="xforms:select[@appearance = 'full']">
                     <xforms:select appearance="full" ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -302,7 +301,7 @@
                 </xforms:group>
                 <xforms:group ref="xforms:select[@appearance = 'compact']">
                     <xforms:select appearance="compact" ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:itemset nodeset="$resource-holder/item">
                             <xforms:label ref="label"/>
                             <xforms:value ref="value"/>
@@ -312,13 +311,13 @@
                 <xforms:group ref="xforms:output[not(@mediatype)]">
                     <!-- In-place text -->
                     <xforms:input id="fb-xforms-output-text-input" ref="$instance-holder" appearance="fr:in-place" incremental="false">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:hint ref="$form-resources/enter-text/label"/>
                     </xforms:input>
                 </xforms:group>
                 <!-- NOTES:
                      o We don't show button with empty label as it appears bad
-                     o In case of fr:button, should actually use fr:button, but that's more markup which will make the DOM bigger so not now
+                     o In case of fr:button, should actually use fr:button, but that's more markup which will make the DOM bigger so not until we have improved switch/case/group handling
                        OR: use YUI button classes / CSS
                      o TODO: Need WYSIWYG editor for button label (e.g. using YUI button classes / CSS to create button appearance )
                  -->
@@ -332,13 +331,13 @@
                     <!-- Image -->
                     <xforms:group ref="$instance-holder[normalize-space() != '']">
                         <xforms:output ref="." mediatype="image/*" id="fb-edit-output-image-control">
-                            <xforms:label class="fb-xforms-disabled"/>
+                            <!--<xforms:label class="fb-xforms-disabled"/>-->
                         </xforms:output>
                     </xforms:group>
                     <!-- File chooser -->
                     <!--<xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/image.png"/>-->
                     <xforms:upload ref="$instance-holder">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
@@ -347,7 +346,7 @@
                 <xforms:group ref="xforms:upload | fr:attachment | fr:image-attachment">
                     <!-- Upload/attachment -->
                     <xforms:upload ref="$instance-holder" id="fb-edit-upload-control">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
@@ -388,7 +387,7 @@
                 <xforms:group ref=".[not($is-component)]">
                     <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
                                   appearance="fr:in-place" class="fb-control-hint">
-                        <xforms:label class="fb-xforms-disabled"/>
+                        <!--<xforms:label class="fb-xforms-disabled"/>-->
                         <xforms:hint ref="$form-resources/enter-hint/label"/>
                     </xforms:input>
                 </xforms:group>

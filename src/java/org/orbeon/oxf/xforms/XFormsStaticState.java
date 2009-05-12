@@ -1259,57 +1259,6 @@ public class XFormsStaticState {
 
         // Gather online/offline information
         {
-            // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
-            final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                "for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                "for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            final List offlineSaveTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                "for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            offlineInsertTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                "for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            final List offlineDeleteTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                "for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                addClasses(prefix + currentId, "xxforms-online");
-            }
-
-            for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                addClasses(prefix + currentId, "xxforms-offline");
-            }
-
-            for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                addClasses(prefix + currentId, "xxforms-offline-save");
-            }
-
-            for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                addClasses(prefix + currentId, "xxforms-offline-insert");
-            }
-
-            for (Iterator i = offlineDeleteTriggerIds.iterator(); i.hasNext();) {
-                final String currentId = (String) i.next();
-                addClasses(prefix + currentId, "xxforms-offline-delete");
-            }
-
             {
                 // Create list of all the documents to search
                 final List documentInfos = new ArrayList(modelDocuments.size() + 1);
@@ -1326,6 +1275,63 @@ public class XFormsStaticState {
                     hasOfflineSupport |= ((Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
                         "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
                         null, null, null, null, locationData)).booleanValue();
+
+                    if (hasOfflineSupport) {
+                        break;
+                    }
+                }
+            }
+
+            if (hasOfflineSupport) {
+                // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
+                final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "distinct-values(for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "distinct-values(for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineSaveTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "distinct-values(for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                offlineInsertTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "distinct-values(for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineDeleteTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "distinct-values(for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(prefix + currentId, "xxforms-online");
+                }
+
+                for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(prefix + currentId, "xxforms-offline");
+                }
+
+                for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(prefix + currentId, "xxforms-offline-save");
+                }
+
+                for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(prefix + currentId, "xxforms-offline-insert");
+                }
+
+                for (Iterator i = offlineDeleteTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(prefix + currentId, "xxforms-offline-delete");
                 }
             }
         }

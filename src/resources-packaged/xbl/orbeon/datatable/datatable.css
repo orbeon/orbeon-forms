@@ -12,6 +12,10 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
+.xforms-data {
+    display: none
+}
+
 .yui-dt-table th, .yui-dt-table td {
     overflow:hidden;
 }

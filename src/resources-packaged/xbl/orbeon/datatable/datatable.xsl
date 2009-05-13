@@ -92,7 +92,7 @@
 
 
                 <xhtml:table id="{$id}-table"
-                    class="datatable yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                    class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
                     style="{$height} {$width}">
                     <!-- Copy attributes that are not parameters! -->
                     <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
@@ -221,6 +221,17 @@
                 <xforms:bind nodeset="@currentId" type="xs:integer"/>
 
             </xforms:model>
+
+            <xforms:group ref="xxforms:component-context()">
+                <xforms:action ev:event="xforms-enabled">
+                    <xxforms:script> 
+                        YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info"); 
+                        ORBEON.widgets.datatable.init('datatable-<xsl:value-of select="$id"/>');
+                    </xxforms:script>
+                </xforms:action>
+            </xforms:group>
+
+
 
             <xsl:if test="$paginated">
                 <xxforms:variable name="page" model="datatable" select="instance('page')"/>

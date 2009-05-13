@@ -26,7 +26,7 @@
  */
 ORBEON.widgets.datatable = function (element, index) {
 
-    
+    YAHOO.log("Creating datatable index " + index, "info")
     // Store useful stuff as properties
     this.table = element;
     this.header = this.table;
@@ -357,6 +357,7 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
          * @param e {string} The mousedown event
          */
         onMouseDown : function(ev) {
+            this.resetConstraints();
             var region = YAHOO.util.Dom.getRegion(this.liner);
             this.width = region.right - region.left;
             //this.resizerX = YAHOO.util.Dom.getX(this.resizer);
@@ -457,12 +458,24 @@ ORBEON.widgets.datatable.removeIdAttributes = function(element, skipSelf) {
  *
  * @method ORBEON.widgets.datatable.init
  */
-ORBEON.widgets.datatable.init = function() {
+/*ORBEON.widgets.datatable.init = function() {
     // Transforms all the datatables in a document
     var tables = YAHOO.util.Dom.getElementsByClassName('datatable', 'table');
     for (var i=0; i < tables.length; i++) {
         new ORBEON.widgets.datatable(tables[i], i);
     }
+}*/
+
+ORBEON.widgets.datatable.init = function(klass) {
+    // Initializes a datatable (called by xforms-enabled events)
+    if (ORBEON.widgets.datatable.datatables[klass] == undefined) {
+        var tables = YAHOO.util.Dom.getElementsByClassName(klass, 'table');
+        ORBEON.widgets.datatable.datatables[klass] = new ORBEON.widgets.datatable(tables[0], klass);
+    }
 }
 
-YAHOO.util.Event.onDOMReady(ORBEON.widgets.datatable.init);
+// Comment/uncomment in normal/debug mode...
+//var myLogReader = new YAHOO.widget.LogReader();
+
+ORBEON.widgets.datatable.datatables = {};
+//YAHOO.util.Event.onDOMReady(ORBEON.widgets.datatable.init);

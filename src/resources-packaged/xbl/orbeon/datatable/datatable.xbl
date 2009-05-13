@@ -30,12 +30,16 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <!-- YUI -->
     <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/event/event-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/selector/selector-beta-min.js"/>
-    <!--<xbl:script type="text/javascript" src="/ops/yui/paginator/paginator-min.js"/>-->
-    <!--<xbl:script type="text/javascript" src="/ops/yui/datasource/datasource.js"/>-->
-    <!--<xbl:script type="text/javascript" src="/ops/yui/datatable/datatable.js"/>-->
+    <xbl:script type="text/javascript" src="/ops/yui/dragdrop/dragdrop-min.js"/>
+
+    <!-- Comment/uncomment for normal/debug mode -->
+    <!--<xbl:script type="text/javascript" src="/ops/yui/logger/logger-min.js"/>-->
+
+    <!-- Our own JavaScript... -->
     <xbl:script type="text/javascript" src="/xbl/orbeon/datatable/datatable.js"/>
 
     <xbl:binding id="fr.datatable" element="fr|datatable">
@@ -44,7 +48,10 @@
             <xbl:style src="/xbl/orbeon/datatable/datatable.css"/>
             <xbl:style src="/ops/yui/paginator/assets/skins/sam/paginator.css"/>
             <xbl:style src="/ops/yui/datatable/assets/skins/sam/datatable.css"/>
-            <xbl:style>.xforms-data {display: none}</xbl:style>
+
+            <!-- Comment/uncomment for normal/debug mode -->
+            <!--<xbl:style src="/ops/yui/logger/assets/skins/sam/logger.css"/>-->
+
         </xbl:resources>
 
         <xbl:template xxbl:transform="oxf:xslt">

@@ -15,9 +15,6 @@
 /* Overwrite definition in form-runner-orbeon.css if any */
 html { overflow: hidden }
 
-#fr-view { margin-left: 15.5em; *margin-left: 15.126 }/* because the toolbox is on the left */
-/*.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }*/
-
 .xforms-select table { margin-bottom: 0 }
 
 #fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
@@ -193,10 +190,9 @@ h1.fr-form-title {
 .fb-title-control input, .fb-description-control input { width: 100% }
 
 /* In-place editing for regular fields */
-
-.fr-inplace-input { display: inline-block; display: -moz-inline-box; *zoom: 1 }
+.fb-grid .fr-inplace-input { display: inline }
 .fr-inplace-buttons { display: block; margin-top: .3em; margin-bottom: .5em }
-.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 }/* because another rule puts a margin to position buttons further down in the grid */
+.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 } /* because another rule puts a margin to position buttons further down in the grid */
 .fr-inplace-input input {
     border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none; width: 100%
 }
@@ -229,12 +225,16 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title .fr-section-buttons { display: none }
 #fb-details-group .fr-section-title:hover .fr-section-buttons { display: inline }
 
+/* Make section title open/close button, title text, and title icons top aligned */
+#fb-details-group .fr-section-title .xforms-switch { vertical-align: top }
+
 #fb-details-group .fr-section-title .fr-section-buttons {
     margin-left: .5em;
     margin-right: .5em;
     padding-right: .2em;/* not sure why we need this, but there is some visual padding to the left so use this to balance */
     background-color: lightyellow;
-    border: 1px solid yellow
+    border: 1px solid yellow;
+    vertical-align: top;
 }
 #fb-details-group .fr-section-title .fr-inplace-buttons img { vertical-align: baseline }
 #fb-details-group .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
@@ -262,17 +262,17 @@ h1.fr-form-title {
 .fb-description-control .xforms-label { display: none }
 .fb-description-control .fr-inplace-content .xforms-output { color: white }
 .fb-description-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
-.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; fonttext-align: right }
+.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; text-align: right }
 
 /* Highlighting of top-level blocks (sections, ...) */
-.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0px solid transparent }
-.fb-top-level-content:hover { border-left: 0px solid #ccc }
-.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0px solid #004B92}
+.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
+.fb-top-level-content:hover { border-left: 0 solid #ccc }
+.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0 solid #004B92}
 
 /* Highlighting of section content (grids, ...) */
-.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0px solid transparent }
-.fb-section-content:hover { border-left: 0px solid #ccc}
-.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0px solid #004B92}
+.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
+.fb-section-content:hover { border-left: 0 solid #ccc}
+.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid #004B92}
 
 /* Control editor */
 .fb-control-label .xforms-label { display: none }
@@ -292,7 +292,6 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
     font-size: smaller;
     font-style: italic;
     display: block;
-    margin-left: .2em;
     margin-top: .2em;
     color: gray
 }

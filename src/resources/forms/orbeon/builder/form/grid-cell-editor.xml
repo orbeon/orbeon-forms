@@ -232,20 +232,18 @@
             </xforms:trigger>
 
             <!-- Set label for any control -->
-            <xhtml:span>
-                <xforms:group ref=".[$is-component]">
-                    <xforms:output ref="$resource-holder/label">
-                        <xforms:help ref="$resource-holder/help"/>
-                    </xforms:output>
-                </xforms:group>
-                <xforms:group ref=".[not($is-component)]">
-                    <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
-                                  appearance="fr:in-place" class="fb-control-label">
-                        <!--<xforms:label class="fb-xforms-disabled"/>-->
-                        <xforms:hint ref="$form-resources/enter-label/label"/>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:span>
+            <xforms:group ref=".[$is-component]">
+                <xforms:output ref="$resource-holder/label">
+                    <xforms:help ref="$resource-holder/help"/>
+                </xforms:output>
+            </xforms:group>
+            <xforms:group ref=".[not($is-component)]">
+                <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
+                              appearance="fr:in-place" class="fb-control-label">
+                    <!--<xforms:label class="fb-xforms-disabled"/>-->
+                    <xforms:hint ref="$form-resources/enter-label/label"/>
+                </xforms:input>
+            </xforms:group>
 
             <!-- Display representation of the control -->
             <xhtml:div class="fb-control-control">
@@ -380,18 +378,16 @@
             </xhtml:div>
 
             <!-- Edit hint for any control -->
-            <xhtml:span>
-                <xforms:group ref=".[$is-component]">
-                    <xforms:output ref="$resource-holder/hint"/>
-                </xforms:group>
-                <xforms:group ref=".[not($is-component)]">
-                    <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
-                                  appearance="fr:in-place" class="fb-control-hint">
-                        <!--<xforms:label class="fb-xforms-disabled"/>-->
-                        <xforms:hint ref="$form-resources/enter-hint/label"/>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:span>
+            <xforms:group ref=".[$is-component]">
+                <xforms:output ref="$resource-holder/hint"/>
+            </xforms:group>
+            <xforms:group ref=".[not($is-component)]">
+                <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
+                              appearance="fr:in-place" class="fb-control-hint">
+                    <!--<xforms:label class="fb-xforms-disabled"/>-->
+                    <xforms:hint ref="$form-resources/enter-hint/label"/>
+                </xforms:input>
+            </xforms:group>
         </xforms:group>
     </xhtml:div>
 </xhtml:td>

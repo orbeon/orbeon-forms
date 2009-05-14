@@ -186,6 +186,9 @@
                                 var layout = YAHOO.widget.Layout.getLayoutById("fb-layout");
                                 layout.set('height', YAHOO.util.Dom.getViewportHeight());
                                 layout.set('width', YAHOO.util.Dom.getViewportWidth());
+                                <!-- This seems necessary w/ IE 7 -->
+                                YAHOO.util.Dom.setStyle("left1", "display", "block");
+                                YAHOO.util.Dom.setStyle("center1", "display", "block");
                                 layout.resize();
                             </xxforms:script>
                         </xforms:action>

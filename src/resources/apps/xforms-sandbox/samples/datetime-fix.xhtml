@@ -1,0 +1,67 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Fixing bogus date times</title>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <dt>2009-05-11T17:38:00</dt>
+                        <comment>Correct</comment>
+                    </record>
+                    <record>
+                        <dt>2009-05-11T9:38:00</dt>
+                        <comment>Missing leading 0 on hours</comment>
+                    </record>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('instance')/record/dt[matches(., '.*T[0-9]:')]"
+                calculate="replace(., '^(.*T)([0-9]:.*)$', '$10$2')" type="xs:dateTime"/>
+            <xforms:bind nodeset="instance('instance')/record/dt" type="xs:dateTime"/>
+        </xforms:model>
+    </head>
+    <body>
+
+        <h1>Fixing bogus date times</h1>
+
+        <p>xforms:bind statements are your friend if you need to fix bogus date time values</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>date time value</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="record">
+                    <tr>
+                        <td>
+                            <xforms:output ref="dt"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="comment"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </table>
+
+    </body>
+</html>

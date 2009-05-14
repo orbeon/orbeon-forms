@@ -3399,9 +3399,18 @@ ORBEON.widgets.YUICalendar = function() {
                 yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
                 yuiCalendar.cfg.setProperty("pagedate", date, false);
             }
-            yuiCalendar.cfg.applyConfig();
+            // Set min/max dates
+            var dateContainer = control.parentNode.parentNode;
+            var isDateContainer = ORBEON.util.Dom.hasClass(dateContainer, "xbl-fr-date");
+            var mindateControl = isDateContainer ? YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-mindate", null, dateContainer)[0] : null;
+            yuiCalendar.cfg.setProperty("mindate", mindateControl == null ? null :
+                ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(mindateControl)));
+            var maxdateControl = isDateContainer ? YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-maxdate", null, dateContainer)[0] : null;
+            yuiCalendar.cfg.setProperty("maxdate", maxdateControl == null ? null :
+                ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(maxdateControl)));
 
             // Show calendar
+            yuiCalendar.cfg.applyConfig();
             yuiCalendar.render();
             YAHOO.util.Dom.setStyle(calendarDiv, "display", "block");
 

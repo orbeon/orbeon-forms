@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xbl:binding id="fr-date" element="fr|date">
+        <xbl:resources>
+            <xbl:style>
+                .xbl-fr-date { display: inline }
+                .xbl-fr-date-mindate, .xbl-fr-date-maxdate { display: none }
+            </xbl:style>
+        </xbl:resources>
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xsl:transform version="2.0">
+                <xsl:template match="fr:date">
+                    <xhtml:span>
+                        <xsl:if test="@mindate">
+                            <xforms:output id="mindate" class="xbl-fr-date-mindate" value="{@mindate}"/>
+                        </xsl:if>
+                        <xsl:if test="@maxdate">
+                            <xforms:output id="maxdate" class="xbl-fr-date-maxdate" value="{@maxdate}"/>
+                        </xsl:if>
+                        <xforms:input id="input">
+                            <xsl:copy-of select="@ref|node()"/>
+                        </xforms:input>
+                    </xhtml:span>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

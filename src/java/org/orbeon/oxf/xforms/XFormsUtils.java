@@ -1852,4 +1852,18 @@ public class XFormsUtils {
     public static String getStaticIdFromId(String anyId) {
         return getEffectiveIdNoSuffix(getEffectiveIdNoPrefix(anyId));
     }
+
+    /**
+     * Append a new string to an effective id.
+     *
+     *   foo$bar.1-2 and my-ending => foo$bar-my-ending.1-2
+     *
+     * @param effectiveId   base effective id
+     * @param ending        new ending
+     * @return              effective id
+     */
+    public static String appendToEffectiveId(String effectiveId, String ending) {
+        final String prefixedId = getEffectiveIdNoSuffix(effectiveId);
+        return prefixedId + ending + getEffectiveIdSuffixWithSeparator(effectiveId);
+    }
 }

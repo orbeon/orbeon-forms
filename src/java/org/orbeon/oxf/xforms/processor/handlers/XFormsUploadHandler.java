@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -78,6 +79,9 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-select");
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
+                // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
+                // this causes issues with IE where we register handlers directly on controls
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.appendToEffectiveId(effectiveId, "-input"));
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
                 // disable pasting in the file. See http://tinyurl.com/6dcd6a

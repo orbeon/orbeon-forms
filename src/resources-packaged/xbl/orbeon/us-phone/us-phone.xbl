@@ -50,8 +50,9 @@
 
         <xbl:resources>
             <xbl:style>
-                .xbl-fr-us-phone .fr-component-group .fr-us-phone-area input { width: 3em }
-                .xbl-fr-us-phone .fr-component-group .fr-us-phone-local input { width: 8em }
+                <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
+                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-area input.xforms-input-input { width: 3em }
+                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-local input.xforms-input-input { width: 8em }
             </xbl:style>
         </xbl:resources>
         <xbl:template>

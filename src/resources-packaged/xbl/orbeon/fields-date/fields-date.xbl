@@ -50,9 +50,11 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-fields-date .xforms-control { display: inline; clear: none }
-                .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-2 input { width: 2em }
-                .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-4 input { width: 4em }
                 .xbl-fr-fields-date .xforms-group .fr-component-group img { vertical-align: bottom }
+
+                <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
+                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-2 input { width: 2em }
+                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .xforms-group .fr-component-group .fr-width-4 input { width: 4em }
             </xbl:style>
         </xbl:resources>
         <xbl:template>

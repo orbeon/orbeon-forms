@@ -128,7 +128,7 @@
     <page path-info="/fr/service/custom/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/${2}/service/${3}.xpl"/>
 
-    <!-- Custom pages provided by the project -->
+    <!-- Custom pages provided by the application -->
     <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/page/${2}.xhtml"/>
 

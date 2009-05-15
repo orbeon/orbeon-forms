@@ -105,7 +105,7 @@ public class PropertySet {
         while (st.hasMoreTokens()) {
             final String currentToken = st.nextToken();
             if (currentNode.children == null) {
-                currentNode.children = new HashMap();
+                currentNode.children = new LinkedHashMap();
             }
             PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
             if (newNode == null) {

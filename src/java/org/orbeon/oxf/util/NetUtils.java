@@ -957,9 +957,7 @@ public class NetUtils {
             return false;
 
         final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-
-        final String lowerCaseUserAgent = userAgent.toLowerCase();
-        return lowerCaseUserAgent.indexOf("msie") != -1 && lowerCaseUserAgent.indexOf("opera") == -1;
+        return userAgent.indexOf("msie") != -1 && userAgent.indexOf("opera") == -1;
     }
 
     /**
@@ -991,6 +989,15 @@ public class NetUtils {
         }
         return version <= 6;
     }
+
+//    public static boolean isRenderingEngineSafari(ExternalContext.Request request) {
+//        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
+//        if (userAgentHeader == null)
+//            return false;
+//
+//        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
+//        return userAgent.indexOf("safari") != -1;
+//    }
 
     /**
      * Create an absolute URL from an action string and a search string.

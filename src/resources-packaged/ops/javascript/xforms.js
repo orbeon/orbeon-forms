@@ -3784,8 +3784,9 @@ ORBEON.xforms.Init = {
 
         ORBEON.xforms.Globals = {
             // Booleans used for browser detection
+            // TODO: use Yahoo.env.ua for this
             isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
-            isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox
+            isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox [TODO: Safari and Chrome also have "Gecko" in their user agent!]
             isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0 (NOTE: will have to fix this for Firefox 4 and later)
             isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
             isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari

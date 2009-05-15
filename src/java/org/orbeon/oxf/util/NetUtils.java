@@ -169,7 +169,7 @@ public class NetUtils {
      * a "file:" protocol.
      *
      * @param absoluteURL   absolute URL to check
-     * @return              last modification date if "fast" or -1 if not fast or if an error occurred
+     * @return              last modification date if "fast" or 0 if not fast or if an error occurred
      */
     public static long getLastModifiedIfFast(String absoluteURL) {
         final long lastModified;
@@ -180,8 +180,8 @@ public class NetUtils {
                 throw new OXFException(e);
             }
         } else {
-            // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
-            lastModified = -1;
+            // Value of 0 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
+            lastModified = 0;
         }
         return lastModified;
     }
@@ -189,7 +189,7 @@ public class NetUtils {
     /**
      * Get the last modification date of a URL.
      *
-     * * @return last modified timestamp, null if le 0
+     * @return last modified timestamp, null if le 0
      */
     public static Long getLastModifiedAsLong(URL url) throws IOException {
         final long connectionLastModified = getLastModified(url);
@@ -200,7 +200,7 @@ public class NetUtils {
     /**
      * Get the last modification date of a URL.
      *
-     * * @return last modified timestamp "as is"
+     * @return last modified timestamp "as is"
      */
     public static long getLastModified(URL url) throws IOException {
         if ("file".equals(url.getProtocol())) {
@@ -224,7 +224,7 @@ public class NetUtils {
      *
      * This handles the (broken at some point in the Java libraries) case of the file: protocol.
      *
-     * * @return last modified timestamp, null if le 0
+     * @return last modified timestamp, null if le 0
      */
     public static Long getLastModifiedAsLong(URLConnection urlConnection) {
         final long connectionLastModified = getLastModified(urlConnection);

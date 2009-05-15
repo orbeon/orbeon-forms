@@ -110,6 +110,12 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                         aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
                     }
 
+                    // Add _blank target in order to prevent:
+                    // 1. The browser replacing the current page, and
+                    // 2. The browser displaying the "Are you sure you want to navigate away from this page?" warning dialog
+                    // This, as of 2009-05, seems to be how most sites handle this
+                    aAttributes.addAttribute("", "target", "target", ContentHandlerHelper.CDATA, "_blank");
+
                     // Output xxforms:* extension attributes
                     if (xformsControl != null)
                         xformsControl.addExtensionAttributes(aAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);

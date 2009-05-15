@@ -203,13 +203,19 @@ public class NetUtils {
      * * @return last modified timestamp "as is"
      */
     public static long getLastModified(URL url) throws IOException {
-        final URLConnection urlConnection = url.openConnection();
-        if (urlConnection instanceof HttpURLConnection)
-            ((HttpURLConnection) urlConnection).setRequestMethod("HEAD");
-        try {
-            return getLastModified(urlConnection);
-        } finally {
-            urlConnection.getInputStream().close();
+        if ("file".equals(url.getProtocol())) {
+            // Optimize file: access. Also, this prevents throwing an exception if the file doesn't exist as we try to close the stream below.
+            return new File(URLDecoder.decode(url.getFile(), STANDARD_PARAMETER_ENCODING)).lastModified();
+        } else {
+            // Use URLConnection
+            final URLConnection urlConnection = url.openConnection();
+            if (urlConnection instanceof HttpURLConnection)
+                ((HttpURLConnection) urlConnection).setRequestMethod("HEAD");
+            try {
+                return getLastModified(urlConnection);
+            } finally {
+                urlConnection.getInputStream().close();
+            }
         }
     }
 

@@ -90,6 +90,7 @@ button.xforms-trigger, input.xforms-trigger { white-space: nowrap }
 button.xforms-trigger img { margin-right: 10px }
 
 /* Make the button look like a link for noscript mode */
+/* TODO: add *zoom: 1 for IE? */
 .xforms-trigger-appearance-xxforms-minimal {
     display: -moz-inline-box; display: inline-block;
     text-decoration: underline;

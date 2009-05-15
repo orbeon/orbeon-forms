@@ -758,7 +758,7 @@
                                     </xforms:repeat>
                                     <xforms:group ref=".[not(document)]">
                                         <tr>
-                                            <td colspan="{3 + count(instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary'])}">
+                                            <td colspan="{4 + count(instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary'])}">
                                                 <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </td>
                                         </tr>

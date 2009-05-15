@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -819,6 +820,11 @@ public class XFormsControls implements XFormsObjectResolver {
 //                            = newRelevantState
 //                                && (isControlValueChanged
 //                                    || isFirstRefresh && (!isContainerControl || Dom4jUtils.isSimpleContent((Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode())));
+
+                    // Don't dispatch events to static readonly triggers, as they in fact behave as if they were not relevant!
+                    if (control instanceof XFormsTriggerControl && control.isStaticReadonly()) {
+                        return;
+                    }
 
                     final boolean newRelevantState = InstanceData.getInheritedRelevant(currentNodeInfo);
                     final boolean isControlValueChanged = InstanceData.isValueChanged(currentNodeInfo);

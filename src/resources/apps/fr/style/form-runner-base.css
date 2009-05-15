@@ -66,9 +66,14 @@
     background-image: none;/* override xforms.css */
     white-space: normal;/* override xforms.css to allow for multiline alert messages */
 }
+
 .xforms-alert-active-visited {
     display: block;
     clear: both;
+}
+
+.xforms-alert-inactive {
+    display: none;/* Otherwise inactive alerts take vertical space because of defaults in xforms.css */
 }
 
 /* Display hints under each control */
@@ -107,8 +112,8 @@ button.xforms-trigger img { margin-right: 10px }
 .xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Checkboxes */
-.fr-grid .xforms-select-appearance-full span { display: block; clear: both }
-.fr-grid .xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
+.xforms-select-appearance-full span { display: block; clear: both }
+.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Upload control information */
 .xforms-upload-info {

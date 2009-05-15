@@ -28,7 +28,8 @@
 
 .fr-summary-table tbody tr.fr-summary-row-not-selected:hover { background-image: url(logo-bg.gif) }
 
-.fr-summary-row-selected { background: #e8e8ff }
+.fr-summary-row-selected { background-color: #e8e8ff }
+.fr-summary-row-selected .xforms-repeat-selected-item-2 { background-color: #e8e8ff }/* HACK for IE 7 only otherwise cell has different background color */
 
 .fr-summary-table .xforms-label { display: none }
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }

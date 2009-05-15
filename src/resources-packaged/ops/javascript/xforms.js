@@ -3757,7 +3757,8 @@ ORBEON.xforms.Init = {
             var repeatElement = YAHOO.util.Dom.getNextSibling(repeatDelimiter[i]);
             if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd")) {
                 //Right now, we support Drag n Drop of following elements
-                if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td") {
+                if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td" ||
+	    		        repeatElement.tagName.toLowerCase() == "li") {
                     ORBEON.xforms.Init.registerDraggableListenersOnRepeatElement(repeatElement, previousSiblingId);
                 }
             }
@@ -5242,8 +5243,8 @@ ORBEON.xforms.Server = {
                                         // IE when an element is cloned, the clone has the same event listeners as the original.
                                         if (ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
                                             ORBEON.xforms.Init.registerChangeListenerOnFormElements();
-                                            ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                         }
+                                        ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                     }
 
                                     var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "delete-repeat-elements", xmlNamespace);
@@ -6186,7 +6187,9 @@ ORBEON.xforms.Server = {
 };
 
 YAHOO.util.DDM.mode = YAHOO.util.DDM.INTERSECT;
-YAHOO.util.DragDropMgr.preventDefault = false;
+// Commented so text doesn't get selected as we D&D on the page. But this causes an issue as we can't select
+// text anymore in a form control which is a D&D area.
+//YAHOO.util.DragDropMgr.preventDefault = false;
 
 ORBEON.xforms.DnD = {
 
@@ -6196,22 +6199,20 @@ ORBEON.xforms.DnD = {
     },
 
     getClosestMatch: function(id) {
-        var bestMatchId = YAHOO.util.DDM.getBestMatch(id);
-        var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1), XFORMS_SEPARATOR_2);
-        for(var i = 0 ; i < id.length; i++) {
-            var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1), XFORMS_SEPARATOR_2);
-            if(count > bestMatchCount) { //We get a more specific match
-                bestMatchId = id[i];
-                bestMatchCount = count;
-            }
-            else if(count == bestMatchCount) { //Both are specific to the same level, let's check the level of overlap
-                if(bestMatchId.getEl().overlap && (bestMatchId.getEl().overlap.getArea() < id[i].overlap.getArea())) {
-                    bestMatchId = id[i];
-                    bestMatchCount = count;
+        var bestMatchEl = YAHOO.util.DDM.getBestMatch(id).getEl();
+        var el = ORBEON.util.Dom.getElementById(bestMatchEl.id);
+
+        if(el.id.indexOf(XFORMS_SEPARATOR_1)==-1) {
+            for(var i = 0; i < el.childNodes.length; i++ ) {
+                var child = el.childNodes[i];
+                if (ORBEON.util.Dom.isElement(child) && child.id != null && child.id != "undefined" && child.id.indexOf(XFORMS_SEPARATOR_1)!=-1 ) {
+                    el = child;
+                    bestMatchEl = child;
+                    break;
                 }
             }
         }
-        return bestMatchId.getEl();
+        return bestMatchEl;
     }
 };
 
@@ -6221,11 +6222,16 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         var dragElement = this.getDragEl();
         var srcElement = this.getEl();
-        var sourceControlElement = ORBEON.util.Dom.getChildElementByClass(srcElement.parentNode, "xforms-repeat-begin-end");
-        this.sourceControlID = sourceControlElement.id.substr(13);//we are interested in part after repeat-begin- in id
 
-        var index = srcElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
-        this.startPosition = (index != -1) ? srcElement.id.substr(index+1) : srcElement.position.substr(srcElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+        for(var i = 0; i < srcElement.childNodes.length; i++ ) {
+            var child = srcElement.childNodes[i];
+            if (ORBEON.util.Dom.isElement(child) && child.id != null && child.id != "undefined" && child.id.indexOf(XFORMS_SEPARATOR_1)!=-1 ) {
+                this.startPosition = child.id.substr(child.id.indexOf(XFORMS_SEPARATOR_1)+1);//we are interested in part after repeat-begin- in id
+                this.sourceControlID = srcElement.id;
+                break;
+            }
+        }
+
         YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
         dragElement.innerHTML = srcElement.innerHTML;
         dragElement.className = srcElement.className;
@@ -6233,14 +6239,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
     },
 
     onDragDrop: function(e, id) {
-        var overElement;
-
-        if ("string" == typeof id) {
-            overElement = YAHOO.util.DDM.getElement(id);
-        }
-        else {
-            overElement = ORBEON.xforms.DnD.getClosestMatch(id);
-        }
+        var overElement = ORBEON.xforms.DnD.getClosestMatch(id);
         var srcElement = this.getEl();
         var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
         this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
@@ -6253,14 +6252,14 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         YAHOO.util.Dom.setStyle(proxy, "visibility", "");
         var motion = new YAHOO.util.Motion(
-            proxy, {
-                points: {
-                    to: YAHOO.util.Dom.getXY(srcElement)
-                }
-            },
-            0.2,
-            YAHOO.util.Easing.easeOut
-        );
+                proxy, {
+            points: {
+                to: YAHOO.util.Dom.getXY(srcElement)
+            }
+        },
+                0.2,
+                YAHOO.util.Easing.easeOut
+                );
         var proxyid = proxy.id;
         var thisid = this.id;
 

@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
@@ -56,6 +57,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
     private String staticId;
     // Effective id of the control containing this container, e.g. my-stuff$my-foo-bar.1-2
     private String effectiveId;
+    // Prefixed id of the control containing this container, e.g. my-stuff$my-foo-bar
+    private String prefixedId;
     // Prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
     private String fullPrefix;
 
@@ -85,12 +88,14 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
     }
 
     protected XFormsContainer(String effectiveId, XFormsContainer parentContainer) {
-        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentContainer);
+        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getEffectiveIdNoSuffix(effectiveId),
+                XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentContainer);
     }
 
-    protected XFormsContainer(String staticId, String effectiveId, String fullPrefix, XFormsContainer parentContainer) {
+    protected XFormsContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XFormsContainer parentContainer) {
         this.staticId = staticId;
         this.effectiveId = effectiveId;
+        this.prefixedId = prefixedId;
         this.fullPrefix = fullPrefix;
         this.parentContainer = parentContainer;
 
@@ -127,7 +132,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
         // Update all ids
         this.staticId = XFormsUtils.getStaticIdFromId(effectiveId);
         this.effectiveId = effectiveId;
-        this.fullPrefix = XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR;
+        this.prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+        this.fullPrefix = this.prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
         // Add back to parent after updating id
         if (parentContainer != null) {
@@ -246,8 +252,15 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
         // 1. Dispatch xforms-model-construct to all models
         // 2. Dispatch xforms-model-construct-done to all models
         // 3. Dispatch xforms-ready to all models
+        initializeModels(pipelineContext, new String[] {
+                XFormsEvents.XFORMS_MODEL_CONSTRUCT,
+                XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE,
+                XFormsEvents.XFORMS_READY,
+                XFormsEvents.XXFORMS_READY  // custom initialization event
+        });
+    }
 
-        final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY, XFormsEvents.XXFORMS_READY };
+    public void initializeModels(PipelineContext pipelineContext, String[] eventsToDispatch) {
         for (int i = 0; i < eventsToDispatch.length; i++) {
             if (i == 2) {
                 // Initialize controls after all the xforms-model-construct-done events have been sent
@@ -362,7 +375,14 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
         if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
             throw new OXFException("Target id must be static id: " + targetStaticId);
 
+        // Check if requesting the binding id. If so, we interpret this as requesting the bound element
+        // and return the control associated with the bound element.    
+        final String bindingId = containingDocument.getStaticState().getBindingId(prefixedId);
+        if (targetStaticId.equals(bindingId))
+            return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
+
         // Check this id
+        // TODO: Use case for this? We can probably remove this.
         if (targetStaticId.equals(getId()))
             return this;
 
@@ -561,7 +581,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
     }
 
     public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
-        return parentContainer;
+        // There is no point for events to propagate beyond the container
+        return null;
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -607,12 +628,11 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
                 XFormsEventObserver eventObserver
                         = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
                 while (eventObserver != null) {
-                    if (!(eventObserver instanceof XFormsRepeatControl)) {
-                        // Add container except if it is a repeat, as we use repeat iterations instead
-                        eventObservers.add(eventObserver);
+                    if (!(eventObserver instanceof XFormsRepeatControl || eventObserver instanceof XXFormsRootControl)) {
+                        // Repeat is not an observer (repeat iterations are)
 
-                        if (eventObserver instanceof XFormsContainer && !(eventObserver instanceof XFormsContainingDocument)
-                                || eventObserver instanceof XFormsComponentControl) {
+                        if (eventObserver instanceof XFormsComponentControl && targetObject != eventObserver) {
+                            // Either retarget, or stop propagation if the event is trying to go through the component boundary
                             if (originalEvent instanceof XFormsUIEvent) {
                                 // UI events need to be retargetted
                                 boundaries.add(eventObserver);
@@ -622,6 +642,8 @@ public class XFormsContainer implements XFormsEventTarget, XFormsEventObserver, 
                                 break;
                             }
                         }
+                        // Add the observer
+                        eventObservers.add(eventObserver);
                     }
 
                     // Find parent

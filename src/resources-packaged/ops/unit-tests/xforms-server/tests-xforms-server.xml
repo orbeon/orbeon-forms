@@ -4342,5 +4342,133 @@
         </output>
     </test>
 
+    <test description="Test event retargetting and dispatch to bound node" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+
+                                </xforms:model>
+
+                                <xbl:xbl>
+                                    <xbl:binding id="foobar-component" element="fr|foobar">
+                                        <xbl:template>
+                                            <!-- Local model -->
+                                            <xforms:model id="internal-model">
+                                                <!-- React upon xforms-ready so that the controls exist -->
+                                                <xforms:action ev:event="xforms-ready">
+                                                    <!-- Simulate user click on all triggers -->
+                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-1"/>
+                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-2"/>
+                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-3"/>
+                                                </xforms:action>
+                                            </xforms:model>
+                                            <!-- Local controls -->
+                                            <xforms:group id="internal-group">
+                                                <xforms:trigger id="internal-trigger-1">
+                                                    <xforms:label>Dispatch outside</xforms:label>
+                                                    <!-- Dispatch to bound node -->
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="foobar-component">
+                                                        <xxforms:context name="fr:my-context" select="42"/>
+                                                    </xforms:dispatch>
+                                                </xforms:trigger>
+                                                <xforms:trigger id="internal-trigger-2">
+                                                    <xforms:label>Dispatch inside group</xforms:label>
+                                                    <!-- Dispatch to local group -->
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-group">
+                                                        <xxforms:context name="fr:my-context" select="43"/>
+                                                    </xforms:dispatch>
+                                                </xforms:trigger>
+                                                <xforms:trigger id="internal-trigger-3">
+                                                    <xforms:label>Dispatch inside model</xforms:label>
+                                                    <!-- Dispatch to local model -->
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-model">
+                                                        <xxforms:context name="fr:my-context" select="44"/>
+                                                    </xforms:dispatch>
+                                                </xforms:trigger>
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:group id="external-group">
+                                    <!-- Record all events -->
+                                    <xforms:insert ev:event="#all"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
+                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                                    <xforms:insert ev:event="#all" ev:phase="capture"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('phase', 'capture'),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
+                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                                    <fr:foobar id="my-foobar">
+                                        <xforms:message ev:event="fr:my-event"><xforms:output value="concat('Got it: ', event('fr:my-context'))"/></xforms:message>
+                                    </fr:foobar>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
+                                    <event type="fr:my-event" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
+                                    <event type="fr:my-event" target="my-foobar" phase="bubbling" original-target="my-foobar" indexes="" original-indexes=""/>
+                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-1" indexes="" original-indexes=""/>
+                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-2" indexes="" original-indexes=""/>
+                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-2" indexes="" original-indexes=""/>
+                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-3" indexes="" original-indexes=""/>
+                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-3" indexes="" original-indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foobar$internal-trigger-1" label="Dispatch outside"/>
+                        <xxf:control id="my-foobar$internal-trigger-2" label="Dispatch inside group"/>
+                        <xxf:control id="my-foobar$internal-trigger-3" label="Dispatch inside model"/>
+                    </xxf:control-values>
+                    <xxf:message level="modal">Got it: 42</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

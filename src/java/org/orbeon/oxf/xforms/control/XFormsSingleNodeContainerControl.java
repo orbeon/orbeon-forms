@@ -80,7 +80,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         return cloned;
     }
 
-    public void childrenAdded() {
+    public void childrenAdded(PipelineContext pipelineContext) {
         // For subclasses
     }
 

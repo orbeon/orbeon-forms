@@ -120,6 +120,7 @@ public class XFormsStaticState {
     private Map xblComponentBindings;          // Map<QName, Element> of QNames to bindings
     private Map xblFullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
     private Map xblCompactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
+    private Map xblBindingIds;                 // Map<String treePrefixedId, String bindingId>
     private List xblScripts;                   // List<Element xblScriptElements>
     private List xblStyles;                    // List<Element xblStyleElements>
 
@@ -428,6 +429,7 @@ public class XFormsStaticState {
                 xblComponentBindings = new HashMap();
                 xblFullShadowTrees = new HashMap();
                 xblCompactShadowTrees = new HashMap();
+                xblBindingIds = new HashMap();
 
                 int xblCount = 0;
                 int xblBindingCount = 0;
@@ -867,7 +869,7 @@ public class XFormsStaticState {
     }
 
     /**
-     * Return the expanded shadow tree for the given static control id.
+     * Return the expanded shadow tree for the given prefixed control id.
      *
      * @param controlPrefixedId     prefixed control id
      * @return                      full expanded shadow tree, or null
@@ -877,13 +879,23 @@ public class XFormsStaticState {
     }
 
     /**
-     * Return the expanded shadow tree for the given static control id, with only XForms controls and no markup.
+     * Return the expanded shadow tree for the given prefixed control id, with only XForms controls and no markup.
      *
      * @param controlPrefixedId     prefixed control id
      * @return                      compact expanded shadow tree, or null
      */
     public Element getCompactShadowTree(String controlPrefixedId) {
         return (xblCompactShadowTrees == null) ? null : ((Document) xblCompactShadowTrees.get(controlPrefixedId)).getRootElement();
+    }
+
+    /**
+     * Return the id of the <xbl:binding> element associated with the given  prefixed control id.
+     *
+     * @param controlPrefixedId     prefixed control id
+     * @return                      binding id or null if not found
+     */
+    public String getBindingId(String controlPrefixedId) {
+        return (xblBindingIds == null) ? null : (String) xblBindingIds.get(controlPrefixedId);
     }
 
     /**
@@ -1080,6 +1092,9 @@ public class XFormsStaticState {
                             // Generate compact shadow tree for this static id
                             final Document compactShadowTreeDocument = XBLUtils.filterShadowTree(fullShadowTreeDocument, controlElement);
                             xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
+
+                            // Remember id of binding
+                            xblBindingIds.put(controlPrefixedId, bindingElement.attributeValue("id"));
 
                             // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
                             // TODO: should do this here, in order to include only the scripts and resources actually used

@@ -1,0 +1,100 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance>
+                </instance>
+            </xforms:instance>
+
+            <!-- TEST: Events to gather -->
+            <xforms:instance id="events">
+                <events/>
+            </xforms:instance>
+
+        </xforms:model>
+
+        <xbl:xbl>
+            <xbl:binding id="foobar-component" element="fr|foobar">
+                <xbl:template>
+                    <!-- Local model -->
+                    <xforms:model id="internal-model">
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:dispatch name="DOMActivate" target="internal-trigger-1"/>
+                            <xforms:dispatch name="DOMActivate" target="internal-trigger-2"/>
+                            <xforms:dispatch name="DOMActivate" target="internal-trigger-3"/>
+                        </xforms:action>
+                    </xforms:model>
+                    <!-- Local controls -->
+                    <xforms:group id="internal-group">
+                        <xforms:trigger id="internal-trigger-1">
+                            <xforms:label>Dispatch outside</xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="foobar-component">
+                                <xxforms:context name="fr:my-context" select="42"/>
+                            </xforms:dispatch>
+                        </xforms:trigger>
+                        <xforms:trigger id="internal-trigger-2">
+                            <xforms:label>Dispatch inside group</xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-group">
+                                <xxforms:context name="fr:my-context" select="43"/>
+                            </xforms:dispatch>
+                        </xforms:trigger>
+                        <xforms:trigger id="internal-trigger-3">
+                            <xforms:label>Dispatch inside model</xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-model">
+                                <xxforms:context name="fr:my-context" select="44"/>
+                            </xforms:dispatch>
+                        </xforms:trigger>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:group id="external-group">
+            <!-- Record all events -->
+            <xforms:insert ev:event="#all"
+                           context="instance('events')" nodeset="*"
+                           origin="xxforms:element('event',
+                                    (xxforms:attribute('type', event('xxforms:type')),
+                                     xxforms:attribute('target', event('xxforms:target')),
+                                     xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                     xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
+                                     xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+            <fr:foobar id="my-foobar">
+                <xforms:message ev:event="fr:my-event"><xforms:output value="concat('Got it: ', event('fr:my-context'))"/></xforms:message>
+            </fr:foobar>
+        </xforms:group>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+    </xhtml:body>
+</xhtml:html>

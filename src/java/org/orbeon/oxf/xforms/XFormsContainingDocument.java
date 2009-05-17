@@ -162,7 +162,7 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, XFormsURIResolver uriResolver) {
 
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
         setLocationData(xformsStaticState.getLocationData());
 
         logDebug("containing document", "creating new ContainingDocument (static state object provided).");
@@ -196,7 +196,7 @@ public class XFormsContainingDocument extends XFormsContainer {
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
 
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
 
         if (xformsStaticState != null) {
             // Use passed static state object

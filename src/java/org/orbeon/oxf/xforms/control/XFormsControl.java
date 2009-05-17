@@ -509,7 +509,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public List getEventHandlers(XFormsContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return containingDocument.getStaticState().getEventHandlers(getPrefixedId());
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

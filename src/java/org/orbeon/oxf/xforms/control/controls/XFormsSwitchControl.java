@@ -56,7 +56,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         setLocal(new XFormsSwitchControlLocal());
     }
 
-    public void childrenAdded() {
+    public void childrenAdded(PipelineContext pipelineContext) {
 
         if (getSize() == 0) {
             throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control;
 
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+
 import java.util.List;
 
 /**
@@ -43,7 +45,7 @@ public interface XFormsContainerControl {
     /**
      * Notify container control that all its children have been added.
      */
-    public void childrenAdded();
+    public void childrenAdded(PipelineContext pipelineContext);
 
     /**
      * Update this container control's effective id, e.g. after a change of repeat iteration.

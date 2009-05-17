@@ -1687,6 +1687,24 @@ public class XFormsUtils {
     }
 
     /**
+     * Return the prefix of an effective id, e.g. "" or "foo$bar". The prefix returned does NOT end with a separator.
+     *
+     * @param effectiveId   effective id to check
+     * @return              prefix if any, "" if none, null if effectiveId was null
+     */
+    public static String getEffectiveIdPrefixNoSeparator(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int prefixIndex = effectiveId.lastIndexOf(XFormsConstants.COMPONENT_SEPARATOR);
+        if (prefixIndex != -1) {
+            return effectiveId.substring(0, prefixIndex);
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned does not start with a separator.
      *
      * @param effectiveId   effective id to check

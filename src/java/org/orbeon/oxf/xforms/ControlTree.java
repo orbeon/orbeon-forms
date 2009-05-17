@@ -410,9 +410,21 @@ public class ControlTree implements Cloneable {
 
             // Start from source control
             XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceEffectiveId);
-            // Go down parents until component is found
-            while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
-                componentControl =  componentControl.getParent();
+            if (componentControl != null) {
+                // Source is an existing control, go down parents until component is found
+                while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
+                    componentControl =  componentControl.getParent();
+                }
+            } else {
+                // Source is not a control, it is likely a model or nested model element
+
+                // NOTE: This is kind of hacky due to the fact that we handle models differently from controls. In the
+                // future this should be changed, see:
+                // http://www.orbeon.com/forms/projects/xforms-model-scoping-rules
+                // Also, this manipulation of prefix/suffix has the potential to be wrong with repeat iterations, e.g.
+                // if the component is within repeats, and the control is within repeats within the component.
+                final String componentEffectiveId = XFormsUtils.getEffectiveIdPrefixNoSeparator(sourceEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(sourceEffectiveId);
+                componentControl = (XFormsControl) effectiveIdsToControls.get(componentEffectiveId);
             }
 
             // Can't keep going if the source control or one of its ancestors is not found
@@ -550,7 +562,7 @@ public class ControlTree implements Cloneable {
             if (control instanceof XFormsContainerControl) {
                 // Notify container controls that all children have been added
                 final XFormsContainerControl containerControl = (XFormsContainerControl) control;
-                containerControl.childrenAdded();
+                containerControl.childrenAdded(pipelineContext);
 
                 // Go back up to parent
                 currentControlsContainer = currentControlsContainer.getParent();

@@ -79,7 +79,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
                 new String[] {
                         // Get prefixed id without suffix as templates are global 
-                        "id", XFormsUtils.getEffectiveIdNoSuffix(repeatControlInfo.getEffectiveId()),
+                        "id", repeatControlInfo.getPrefixedId(),
                         "parent-indexes", parentIndexes,
                         "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
                 });

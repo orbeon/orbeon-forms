@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
  * Control that represents a custom components.
@@ -31,6 +32,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
     private XFormsContainer nestedContainer;
+    private transient boolean isInitializeModels;
 
     public XFormsComponentControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -61,12 +63,29 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
                 // Restore models
                 nestedContainer.restoreModelsState(pipelineContext);
             } else {
-                // Initialize models
-                nestedContainer.initializeModels(pipelineContext);
+                // Start models initialization
+                nestedContainer.initializeModels(pipelineContext, new String[] {
+                        XFormsEvents.XFORMS_MODEL_CONSTRUCT,
+                        XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
+                });
+                isInitializeModels = true;
             }
         } else if (isNodesetChange) {
             // Control's binding changed
-            
+
+        }
+    }
+
+    public void childrenAdded(PipelineContext pipelineContext) {
+        super.childrenAdded(pipelineContext);
+
+        if (isInitializeModels) {
+            // End models initialization
+            nestedContainer.initializeModels(pipelineContext, new String[] {
+                    XFormsEvents.XFORMS_READY,
+                    XFormsEvents.XXFORMS_READY  // custom initialization event
+            });
+            isInitializeModels = false;
         }
     }
 

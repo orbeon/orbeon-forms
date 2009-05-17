@@ -62,7 +62,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         this.startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
     }
 
-    public void childrenAdded() {
+    public void childrenAdded(PipelineContext pipelineContext) {
         // This is called once all children have been added
 
         // Ensure that the initial index is set, unless the state was already restored. In that case, the index was

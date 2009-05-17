@@ -1168,7 +1168,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
-        return this.container;
+        // There is no point for events to propagate beyond the model
+        // TODO: This could change in the future once models are more integrated in the components hierarchy
+        return null;
     }
 
     /**

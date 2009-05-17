@@ -243,10 +243,12 @@
                     <td class="form-td">
                         <xforms:input ref="title">
                             <xforms:label class="books-label">Title</xforms:label>
+                            <xforms:alert>The title is required</xforms:alert>
                         </xforms:input>
                         <br/>
                         <xforms:input ref="author">
                             <xforms:label class="books-label">Author</xforms:label>
+                            <xforms:alert>The author is required</xforms:alert>
                         </xforms:input>
                         <br/>
                         <xforms:select1 ref="language">
@@ -263,6 +265,7 @@
                         <br/>
                         <xforms:input ref="link">
                             <xforms:label class="books-label">Link</xforms:label>
+                            <xforms:alert>The link is incorrect</xforms:alert>
                         </xforms:input>
                         <br/>
                         <xforms:select1 ref="rating" appearance="full">

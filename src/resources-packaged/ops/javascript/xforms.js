@@ -585,10 +585,11 @@ ORBEON.util.String = {
     },
 
     normalizeSerializedHTML: function(text) {
-        if (text == null) {
-            return null;
-        } else {
+        // Mmmh, the caller might pass an integer, e.g. for the slider. Not sure if fixing this here is the best way.
+        if (typeof text == "string") {
             return text.replace(XFORMS_REGEXP_CR, "");
+        } else {
+            return text;
         }
     }
 };

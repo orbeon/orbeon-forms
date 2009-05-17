@@ -2222,6 +2222,37 @@
                     </xforms:model>
                 </xml-source>
                 <p>
+                    Alternatively, you can place the schema inline within the XForms model:
+                </p>
+                <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <xforms:model>
+                        <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+                            <comment> Rest of the schema </comment>
+                        </xs:schema>
+                        <comment> Rest of the XForms model </comment>
+                    </xforms:model>
+                </xml-source>
+                <p>
+                    Also add <code>&lt;xforms:alert></code> elements to the controls which might be invalid. This allows
+                    you to specify a meaningful validation message:
+                </p>
+                <xml-source xmlns:xforms="http://www.w3.org/2002/xforms">
+                    <xforms:input ref="title">
+                        <xforms:label class="books-label">Title</xforms:label>
+                        <xforms:alert>The title is required</xforms:alert>
+                    </xforms:input>
+                    ...
+                    <xforms:input ref="author">
+                        <xforms:label class="books-label">Author</xforms:label>
+                        <xforms:alert>The author is required</xforms:alert>
+                    </xforms:input>
+                    ...
+                    <xforms:input ref="link">
+                        <xforms:label class="books-label">Link</xforms:label>
+                        <xforms:alert>The link is incorrect</xforms:alert>
+                    </xforms:input>
+                </xml-source>
+                <p>
                     Reload the page, and try to enter an invalid link, for example "ftp://ftp.example.com/". An alert
                     icon will show up as you leave the link field with your cursor.
                 </p>

@@ -59,6 +59,7 @@ var OFFLINE_SUPPORT_PROPERTY = "offline";
 var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
 var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
 var DATE_PICKER_PROPERTY = "datepicker";
+var DATE_PICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
 var HTML_EDITOR_PROPERTY = "htmleditor";
 var SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
 var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
@@ -89,6 +90,7 @@ var XFORMS_OFFLINE_SUPPORT = false;
 var XFORMS_FORMAT_INPUT_TIME = "[h]:[m]:[s] [P]";
 var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
 var XFORMS_DATEPICKER = "yui";
+var XFORMS_DATEPICKER_NAVIGATOR = false;
 var XFORMS_HTMLEDITOR = "yui";
 var XFORMS_CLIENT_EVENTS_MODE = "default";
 var XFORMS_CLIENT_EVENTS_FILTER = "";
@@ -663,6 +665,11 @@ ORBEON.util.DateTime = {
             return jsDate.getDate()
                    + '.' + (jsDate.getMonth() + 1)
                    + '.' + jsDate.getFullYear();
+        } else if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
+            // EU date
+            return jsDate.getDate()
+                   + '/' + (jsDate.getMonth() + 1)
+                   + '/' + jsDate.getFullYear();
         } else {
             // Default: [M]/[D]/[Y]
             // US date
@@ -858,22 +865,32 @@ ORBEON.util.DateTime = {
                 throw new Error("Not yet implemented");
             }
         },
-        // mm/dd/yyyy (American style)
+        // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
         {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
-                d.setDate(parseInt(bits[2], 10));
+                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
+                    d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
+                    d.setDate(parseInt(bits[1], 10));
+                } else {
+                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                    d.setDate(parseInt(bits[2], 10));
+                }
                 return d;
             }
         },
-        // mm/dd (American style without year)
+        // mm/dd (American style without year) or dd/mm (European style without year)
         {   re: /^(\d{1,2})\/(\d{1,2})$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setDate(parseInt(bits[2], 10));
-                d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
+                    d.setDate(parseInt(bits[2], 10));
+                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                } else {
+                    d.setDate(parseInt(bits[2], 10));
+                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                }
                 return d;
             }
         },
@@ -1007,6 +1024,7 @@ ORBEON.util.Utils = {
             case FORMAT_INPUT_TIME_PROPERTY: { return XFORMS_FORMAT_INPUT_TIME; }
             case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
             case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
+            case DATE_PICKER_NAVIGATOR_PROPERTY: { return XFORMS_DATEPICKER_NAVIGATOR; }
             case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
             case SHOW_ERROR_DIALOG_PROPERTY: { return "true"; }
             case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
@@ -3294,8 +3312,13 @@ ORBEON.widgets.YUICalendar = function() {
      */
 
     // Keep track of whether the mouse pointer is inside or outside the calendar area
-    function mouseover() { mouseOverCalendar = true;  }
-    function mouseout() { mouseOverCalendar = false; }
+    function mouseover() {
+        mouseOverCalendar = true;
+    }
+
+    function mouseout() {
+        mouseOverCalendar = false;
+    }
 
     // After the calendar is rendered, setup listeners on mouseover/mouseout
     function setupListeners() {
@@ -3365,7 +3388,9 @@ ORBEON.widgets.YUICalendar = function() {
 
             if (yuiCalendar == null) {
                 // Create YUI calendar
-                yuiCalendar = new YAHOO.widget.Calendar(calendarDiv.id);
+                yuiCalendar = ORBEON.util.Utils.getProperty(DATE_PICKER_NAVIGATOR_PROPERTY)
+                    ? new YAHOO.widget.CalendarGroup(calendarDiv.id, { navigator:true })
+                    : new YAHOO.widget.Calendar(calendarDiv.id);
 
                 // Listeners on calendar events
                 yuiCalendar.renderEvent.subscribe(setupListeners, yuiCalendar, true);
@@ -3423,13 +3448,9 @@ ORBEON.widgets.YUICalendar = function() {
         },
 
         blur: function(event, target) {
-            if (mouseOverCalendar) {
-                window.setTimeout(function() {
-                    // With IE it turns out we can get to this point with inputField == null in some cases
-                    if (inputField != null)
-                        inputField.focus();
-                }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
-            } else {
+            // Close the calendar when the input is loosing the focus, and the mouse is not inside the calendar (i.e.
+            // when users click somewhere else on the page, or on another field).
+            if (! mouseOverCalendar) {
                 closeCalendar();
             }
         },

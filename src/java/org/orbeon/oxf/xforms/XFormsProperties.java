@@ -83,6 +83,7 @@ public class XFormsProperties {
     private static final String TIME_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "time";
 
     private static final String DATEPICKER_PROPERTY = "datepicker";
+    private static final String DATEPICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
     private static final String XHTML_EDITOR_PROPERTY = "htmleditor";
     private static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
 
@@ -232,6 +233,7 @@ public class XFormsProperties {
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
             new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true),
+            new PropertyDefinition(DATEPICKER_NAVIGATOR_PROPERTY, false, true),
             new PropertyDefinition(XHTML_EDITOR_PROPERTY, "yui", true),
             new PropertyDefinition(SHOW_ERROR_DIALOG_PROPERTY, true, true),
             new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),

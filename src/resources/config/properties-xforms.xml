@@ -44,7 +44,7 @@
     <property as="xs:string"  name="oxf.xforms.format.output.double"                    value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
 
 
-    <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or  [D].[M].[Y]-->
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
     <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [H]:[m]:[s] -->
 
     <!-- XForms cache configuration -->
@@ -80,6 +80,7 @@
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                    value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                         value="1"/>
     <property as="xs:string"  name="oxf.xforms.datepicker"                              value="yui"/>  <!-- jcalendar or yui -->
+    <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                    value="false"/>
     <property as="xs:string"  name="oxf.xforms.htmleditor"                              value="yui"/>  <!-- fck or yui -->
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                       value="true"/>
 

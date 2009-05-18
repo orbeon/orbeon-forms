@@ -13,10 +13,31 @@
  */
 package org.orbeon.oxf.servlet;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-import java.util.*;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
@@ -95,8 +116,11 @@ public class OrbeonXFormsFilter implements Filter {
             // Set base URI
             httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
-            // Forward to Orbeon Forms for rendering
-            getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
+            // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
+            // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
+            // available in the response object
+            if (!StringUtils.isBlank(responseWrapper.getContent()))
+                getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
         }
     }
 
@@ -271,7 +295,7 @@ public class OrbeonXFormsFilter implements Filter {
         }
 
         public void sendRedirect(String string) throws IOException {
-            // TODO
+            super.sendRedirect(string); 
         }
 
         public void setDateHeader(String string, long l) {

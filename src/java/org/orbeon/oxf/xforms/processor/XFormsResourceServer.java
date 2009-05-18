@@ -201,7 +201,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             OutputStream os = null;
             try {
                 os = response.getOutputStream();
-                response.setContentType(isCSS ? "text/css" : "application/javascript");
+                response.setContentType(isCSS ? "text/css" : "application/x-javascript");
                 {
                     final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {

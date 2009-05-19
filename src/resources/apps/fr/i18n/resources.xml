@@ -241,10 +241,11 @@
                 <form-validation-error>Document non enregistré: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
                 <database-error>Erreur de base de données: veuillez contacter votre administrateur système.</database-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
-                <submit-dialog-title>[Form Submitted]</submit-dialog-title>
-                <submit-dialog-message>[Your information has been submitted, thank you.]</submit-dialog-message>
+                <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
+                <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>[Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.]</saved-locally-open>
+                <!-- TODO: check translation -->
+                <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
             </messages>
             <labels>
                 <save-document>Enregistrer</save-document>
@@ -276,9 +277,9 @@
                 <alert>Valeur manquante ou incorrecte</alert>
                 <email>Email</email>
                 <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
-                <submit-dialog-keep>[Keep values and close]</submit-dialog-keep>
+                <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>[Close window]</submit-dialog-close-window>
+                <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
                 <collapse-all>Fermer sections</collapse-all>
                 <expand-all>Ouvrir sections</expand-all>
             </labels>
@@ -292,6 +293,7 @@
             <dialog-title>[Save]</dialog-title>
             <dialog-body>
                 <div>
+                    <!-- TODO: i18n -->
                     <p>
                         [To save the data you entered; click on the link below and save the document on your machine.
                     </p>

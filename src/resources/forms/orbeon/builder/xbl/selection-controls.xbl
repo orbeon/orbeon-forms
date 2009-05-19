@@ -44,7 +44,7 @@
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
             <datatype>xforms:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:select1 id="" appearance="minimal" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -72,7 +72,7 @@
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:select1 id="" appearance="full" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -96,7 +96,7 @@
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:select id="" appearance="full" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -120,7 +120,7 @@
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:select1 id="" appearance="compact" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -144,7 +144,7 @@
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:select id="" appearance="compact" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>

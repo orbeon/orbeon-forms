@@ -44,7 +44,7 @@
                 <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
             </icon>
             <datatype>xforms:date</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -64,7 +64,7 @@
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
             </icon>
             <datatype>xforms:time</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -84,7 +84,7 @@
                 <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
             </icon>
             <datatype>xforms:dateTime</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -104,7 +104,7 @@
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
             </icon>
             <datatype>xforms:email</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -124,7 +124,7 @@
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
             </icon>
             <datatype>xforms:anyURI</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment" value=".">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>

@@ -44,7 +44,7 @@
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:input id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -64,7 +64,7 @@
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:textarea id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -87,7 +87,7 @@
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:textarea id="" ref="" appearance="xxforms:autosize">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -108,7 +108,7 @@
                 <large-icon>/forms/orbeon/builder/images/html.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:textarea id="" ref="" mediatype="text/html">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -128,7 +128,7 @@
                 <large-icon>/apps/fr/style/images/silk/text_align_left.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template>
+            <template xmlns="">
                 <xforms:output id="" ref="">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>

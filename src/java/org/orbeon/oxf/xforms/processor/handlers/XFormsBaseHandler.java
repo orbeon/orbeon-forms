@@ -71,7 +71,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     /**
-     * Whether the control is disabled. Occurs whenL
+     * Whether the control is disabled. Occurs when:
      *
      * o control is not null and is non-relevant
      * o control is null and is not in a repeat template

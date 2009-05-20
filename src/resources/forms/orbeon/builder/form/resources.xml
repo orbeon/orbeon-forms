@@ -114,7 +114,7 @@
             <label>Edit Source</label>
         </edit-source>
         <reload-components>
-            <label>Reload Components</label>
+            <label>Reload Controls</label>
         </reload-components>
         <enter-label>
             <label>click to enter a label</label>
@@ -810,7 +810,7 @@
             <label>Editer source</label>
         </edit-source>
         <reload-components>
-            <label>Recharger les composants</label>
+            <label>Recharger les contrôles</label>
         </reload-components>
         <enter-label>
             <label>cliquez pour entrer un libellé</label>

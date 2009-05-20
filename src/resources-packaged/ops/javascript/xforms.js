@@ -6249,11 +6249,12 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         for(var i = 0; i < srcElement.childNodes.length; i++ ) {
             var child = srcElement.childNodes[i];
             if (ORBEON.util.Dom.isElement(child) && child.id != null && child.id != "undefined" && child.id.indexOf(XFORMS_SEPARATOR_1)!=-1 ) {
-                this.startPosition = child.id.substr(child.id.indexOf(XFORMS_SEPARATOR_1)+1);//we are interested in part after repeat-begin- in id
-                this.sourceControlID = srcElement.id;
+                this.startPosition = child.id.substr(child.id.indexOf(XFORMS_SEPARATOR_1)+1);
                 break;
             }
         }
+		var repeatId = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-begin-end", null, srcElement.parentNode)[0].id;
+		this.sourceControlID = repeatId.substring(13);
 
         YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
         dragElement.innerHTML = srcElement.innerHTML;

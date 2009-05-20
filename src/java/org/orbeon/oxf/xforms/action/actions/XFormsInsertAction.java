@@ -164,11 +164,11 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(pipelineContext, containingDocument, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex);
+        doInsert(pipelineContext, containingDocument, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex, true, true);
     }
 
-    public static void doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute,
-                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex) {
+    public static List doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute,
+                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -188,12 +188,13 @@ public class XFormsInsertAction extends XFormsAction {
                 if (isEmptyNodesetBinding) {
                     if (XFormsServer.logger.isDebugEnabled())
                         containingDocument.logDebug("xforms:insert", "origin node-set from node-set binding is empty, terminating");
-                    return;
+                    return Collections.EMPTY_LIST;
                 }
 
                 // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
                 // node of the Node Set Binding node-set."
                 final Node singleSourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
+                // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
                 final Node singleClonedNode = Dom4jUtils.createCopy(singleSourceNode);
 
                 sourceNodes = Collections.singletonList(singleSourceNode);
@@ -207,7 +208,7 @@ public class XFormsInsertAction extends XFormsAction {
                 if (originItems.size() == 0) {
                     if (XFormsServer.logger.isDebugEnabled())
                         containingDocument.logDebug("xforms:insert", "origin node-set is empty, terminating");
-                    return;
+                    return Collections.EMPTY_LIST;
                 }
 
                 // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
@@ -221,8 +222,9 @@ public class XFormsInsertAction extends XFormsAction {
                     if (currentObject instanceof NodeInfo) {
                         // This is the regular case covered by XForms 1.1 / XPath 1.0
 
+                        // NOTE: Don't clone nodes if doClone == false
                         final Node sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject, CANNOT_INSERT_READONLY_MESSAGE);
-                        final Node clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+                        final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone() : sourceNode;
 
                         sourceNodes.add(sourceNode);
                         clonedNodesTemp.add(clonedNode);
@@ -416,7 +418,7 @@ public class XFormsInsertAction extends XFormsAction {
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         // XFormsInstance handles index and repeat items updates 
-        if (modifiedInstance  != null) {
+        if (doDispatch && modifiedInstance != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             final List insertedNodeInfos;
             if (didInsertNodes) {
@@ -440,6 +442,10 @@ public class XFormsInsertAction extends XFormsAction {
             modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext,
                     new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
                             positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
+
+            return insertedNodeInfos;
+        } else {
+            return Collections.EMPTY_LIST;
         }
     }
 

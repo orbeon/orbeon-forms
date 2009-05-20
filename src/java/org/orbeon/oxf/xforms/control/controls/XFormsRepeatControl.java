@@ -161,15 +161,16 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
 
             // Delete node from source
-            final List deletedNodes = XFormsDeleteAction.doDelete(pipelineContext, containingDocument, sourceNodeset, requestedSourceIndex);
+            // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
+            final List deletedNodes = XFormsDeleteAction.doDelete(pipelineContext, containingDocument, sourceNodeset, requestedSourceIndex, false);
+            final NodeInfo deletedNodeInfo = (NodeInfo) deletedNodes.get(0);
 
             // Adjust destination collection to reflect new state
-            final int deletedNodePosition = destinationNodeset.indexOf(deletedNodes.get(0));
+            final int deletedNodePosition = destinationNodeset.indexOf(deletedNodeInfo);
             final int actualDestinationIndex;
             final String destinationPosition;
             if (deletedNodePosition != -1) {
                 // Deleted node was part of the destination nodeset
-                destinationNodeset.remove(deletedNodePosition);
                 // If the insertion position is after the delete node, must adjust it
                 if (requestedDestinationIndex <= deletedNodePosition + 1) {
                     // Insertion point is before or on (degenerate case) deleted node
@@ -194,8 +195,14 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
 
             // Insert nodes into destination
-            final NodeInfo insertContextNodeInfo = ((NodeInfo) deletedNodes.get(0)).getParent();
-            XFormsInsertAction.doInsert(pipelineContext, containingDocument, destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex);
+            final NodeInfo insertContextNodeInfo = deletedNodeInfo.getParent();
+            // NOTE: Tell insert to not clone the node, as we know it is ready for insertion
+            XFormsInsertAction.doInsert(pipelineContext, containingDocument, destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
+
+            // TODO: should dispatch xxforms-move instead of xforms-insert?
+//            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(deletedNodeInfo);
+//            final XFormsControls controls = containingDocument.getControls();
+//            modifiedInstance.updateRepeatNodeset(pipelineContext, controls, deletedNodes);
 
         }
         super.performDefaultAction(pipelineContext, event);

@@ -110,11 +110,11 @@ public class XFormsDeleteAction extends XFormsAction {
                 }
             }
 
-            doDelete(pipelineContext, containingDocument, collectionToUpdate, deleteIndex);
+            doDelete(pipelineContext, containingDocument, collectionToUpdate, deleteIndex, true);
         }
     }
 
-    public static List doDelete(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex) {
+    public static List doDelete(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
@@ -155,7 +155,7 @@ public class XFormsDeleteAction extends XFormsAction {
                         new String[] { "count", Integer.toString(deletedNodeInfos.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null });
 
-            if (modifiedInstance  != null) {
+            if (modifiedInstance != null) {
                 // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
                 
                 // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
@@ -163,7 +163,8 @@ public class XFormsDeleteAction extends XFormsAction {
                 containingDocument.getControls().markDirtySinceLastRequest(true);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
-                modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+                if (doDispatch)
+                    modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
             }
         }
 

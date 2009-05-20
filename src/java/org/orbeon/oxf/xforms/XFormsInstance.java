@@ -574,6 +574,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             for (Iterator i = repeatControls.iterator(); i.hasNext();) {
                 final XFormsRepeatControl repeatControl = (XFormsRepeatControl) i.next();
                 // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
+                // TODO: is this needed with new clone/update mechanism?
                 final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
                 // Update node-set
                 if (newRepeatControl != null) {
@@ -583,7 +584,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
                     if (instancePrefix.equals(repeatControlPrefix)) {
                         // Only update controls within the same container as the instance
-                        // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is not needed
+                        // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is no longer needed
                         newRepeatControl.updateNodeset(pipelineContext, insertedNodeInfos);
                     }
                 }

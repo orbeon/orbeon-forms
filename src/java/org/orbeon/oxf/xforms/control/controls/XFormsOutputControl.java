@@ -105,7 +105,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
                 value = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
-                        valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), bindingContext.getInScopeVariables(),
+                        valueAttribute, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                         XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
             } else {
                 value = "";

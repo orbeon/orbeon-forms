@@ -516,7 +516,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Handle xxforms:variable specifically
 
                 // Create variable object
-                final Variable variable = new Variable(currentContainer.getContainingDocument(), currentContextStack, currentControlElement);
+                final Variable variable = new Variable(currentContainer, currentContextStack, currentControlElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.

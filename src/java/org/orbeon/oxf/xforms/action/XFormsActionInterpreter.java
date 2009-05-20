@@ -100,7 +100,7 @@ public class XFormsActionInterpreter {
                     final String currentElementName = currentElement.getName();
                     if (currentElementName.equals("variable")) {
                         // Create variable object
-                        final Variable variable = new Variable(containingDocument, contextStack, currentElement);
+                        final Variable variable = new Variable(container, contextStack, currentElement);
 
                         // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                         // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
@@ -138,6 +138,16 @@ public class XFormsActionInterpreter {
 
     public XFormsFunction.Context getFunctionContext() {
         return contextStack.getFunctionContext();
+    }
+
+    /**
+     * Return the namespace mappings for the given action element.
+     *
+     * @param actionElement Element to get namsepace mapping for
+     * @return              Map<String prefix, String uri>
+     */
+    public Map getNamespaceMappings(Element actionElement) {
+        return container.getNamespaceMappings(actionElement);
     }
 
     /**
@@ -198,7 +208,7 @@ public class XFormsActionInterpreter {
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here
                 final XFormsContextStack.BindingContext actionBindingContext = contextStack.popBinding();
-                final Map namespaceContext = containingDocument.getNamespaceMappings(actionElement);
+                final Map namespaceContext = container.getNamespaceMappings(actionElement);
                 {
                     final String contextAttribute = actionElement.attributeValue("context");
                     final String modelAttribute = actionElement.attributeValue("model");
@@ -323,7 +333,7 @@ public class XFormsActionInterpreter {
 
         final List conditionResult = XPathCache.evaluate(pipelineContext,
                 contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
-            containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+            container.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
             contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {

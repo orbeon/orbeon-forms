@@ -109,7 +109,7 @@ public class XFormsStaticState {
     private Map controlClasses;             // Map<String controlPrefixedId, String classes>
     private boolean hasOfflineSupport;      // whether the document requires offline support
     private List offlineInsertTriggerIds;   // List<String triggerPrefixedId> of triggers can do inserts
-
+    
     private Map labelsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
     private Map helpsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
     private Map hintsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
@@ -455,8 +455,9 @@ public class XFormsStaticState {
                         if (currentElementAttribute != null) {
 
                             // For now, only handle "prefix|name" selectors
+                            // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
                             final QName currentQNameMatch
-                                    = Dom4jUtils.extractTextValueQName(getNamespaceMappings(currentBindingElement), currentElementAttribute.replace('|', ':'), false);
+                                    = Dom4jUtils.extractTextValueQName(getNamespaceMappings("", currentBindingElement), currentElementAttribute.replace('|', ':'), false);
 
                             // Create and remember factory for this QName
                             xblComponentsFactories.put(currentQNameMatch,
@@ -768,24 +769,6 @@ public class XFormsStaticState {
      * @param element       Element to get namsepace mapping for
      * @return              Map<String prefix, String uri>
      */
-    public Map getNamespaceMappings(Element element) {
-        final String id = element.attributeValue("id");
-        if (id != null) {
-            // There is an id attribute
-            final Map cachedMap = (Map) namespacesMap.get(id);
-            if (cachedMap != null) {
-                return cachedMap;
-            } else {
-                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
-                return Dom4jUtils.getNamespaceContextNoDefault(element);
-            }
-        } else {
-            // No id attribute
-            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
-            return Dom4jUtils.getNamespaceContextNoDefault(element);
-        }
-    }
-
     public Map getNamespaceMappings(String prefix, Element element) {
         final String id = element.attributeValue("id");
         if (id != null) {
@@ -795,12 +778,14 @@ public class XFormsStaticState {
             if (cachedMap != null) {
                 return cachedMap;
             } else {
-                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached",
+                        new String[] { "prefix", prefix, "element", Dom4jUtils.elementToString(element) });
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
-            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not available because element doesn't have an id attribute",
+                    new String[] { "prefix", prefix, "element", Dom4jUtils.elementToString(element) });
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }

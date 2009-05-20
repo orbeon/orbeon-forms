@@ -67,7 +67,7 @@ public abstract class XFormsAction {
             // Evaluate context parameter
             final SequenceExtent value = XPathCache.evaluateAsExtent(pipelineContext,
                 actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                select, containingDocument.getNamespaceMappings(actionElement),
+                select, actionInterpreter.getNamespaceMappings(actionElement),
                 contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                 contextStack.getFunctionContext(), null,
                 (LocationData) actionElement.getData());
@@ -144,7 +144,7 @@ public abstract class XFormsAction {
             if (bindingContext.getSingleNode() == null)
                 return null;
 
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement);
+            final Map prefixToURIMap = actionInterpreter.getNamespaceMappings(actionElement);
             final LocationData locationData = (LocationData) actionElement.getData();
 
             resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(),

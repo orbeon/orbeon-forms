@@ -119,7 +119,7 @@ public class XFormsContextStack {
 
             // All variables in the model are in scope for the nested binds and actions.
             // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-            final Variable variable = new Variable(containingDocument, this, currentVariableElement);
+            final Variable variable = new Variable(container, this, currentVariableElement);
 
             // NOTE: We used to simply add variables to the current bindingContext, but this could cause issues
             // because getVariableValue() can itself use variables declared previously. This would work at first, but
@@ -244,30 +244,20 @@ public class XFormsContextStack {
 
         contextStack.push(bindingContext);
     }
-
-    /**
-     * Push an element containing either single-node or nodeset binding attributes.
-     */
-    public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
-        pushBinding(pipelineContext, bindingElement, null);
-    }
-
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      *
      * @param pipelineContext   current PipelineContext
      * @param bindingElement    current element containing node binding attributes
-     * @param model             if specified, overrides a potential @model attribute on the element
      */
-    private void pushBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
+    public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
-        if (model == null)
-            model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
+        final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        final Map bindingElementNamespaceContext = containingDocument.getNamespaceMappings(bindingElement);
+        final Map bindingElementNamespaceContext = container.getNamespaceMappings(bindingElement);
         pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
     }
 

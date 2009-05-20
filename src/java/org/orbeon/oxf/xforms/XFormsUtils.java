@@ -16,11 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.ccil.cowan.tagsoup.HTMLSchema;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.Text;
+import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -28,23 +24,14 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.SoftReferenceObjectPool;
-import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.HTMLBodyContentHandler;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -52,19 +39,8 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.Axis;
-import org.orbeon.saxon.om.AxisIterator;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.FastStringBuffer;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ValueRepresentation;
-import org.orbeon.saxon.value.AnyURIValue;
-import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.value.DoubleValue;
-import org.orbeon.saxon.value.FloatValue;
-import org.orbeon.saxon.value.IntegerValue;
-import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.value.*;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -79,25 +55,11 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -458,8 +420,7 @@ public class XFormsUtils {
     public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XFormsContainer container,
                                                     XFormsControl control, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
-        final XFormsContainingDocument containingDocument = container.getContainingDocument();
-        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
+        final XFormsContextStack contextStack = container.getContextStack();
         final String value;
         if (lhhaElement == null) {
             // No LHHA at all
@@ -482,7 +443,7 @@ public class XFormsUtils {
                 contextStack.resetBindingContext(pipelineContext);
             } else {
                 // Not at top-level, find containing object
-                final Object contextObject = containingDocument.resolveObjectById(control.getEffectiveId(), parentStaticId);
+                final Object contextObject = container.resolveObjectById(control.getEffectiveId(), parentStaticId);
                 if (contextObject instanceof XFormsControl) {
                     // Found context, evaluate relative to that
                     contextStack.setBinding((XFormsControl) contextObject);
@@ -505,13 +466,13 @@ public class XFormsUtils {
      * calling getElementValue() and finally popping the binding context.
      *
      * @param pipelineContext       current PipelineContext
-     * @param containingDocument    current XFormsContainingDocument
+     * @param container             current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainer container,
                                               final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
@@ -519,9 +480,9 @@ public class XFormsUtils {
             return null;
 
         // Child element becomes the new binding
-        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
+        final XFormsContextStack contextStack = container.getContextStack();
         contextStack.pushBinding(pipelineContext, childElement);
-        final String result = getElementValue(pipelineContext, containingDocument, contextStack, childElement, acceptHTML, containsHTML);
+        final String result = getElementValue(pipelineContext, container, contextStack, childElement, acceptHTML, containsHTML);
         contextStack.popBinding();
         return result;
     }
@@ -575,7 +536,7 @@ public class XFormsUtils {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
-                            valueAttribute, container.getContainingDocument().getStaticState().getNamespaceMappings(childElement),
+                            valueAttribute, container.getNamespaceMappings(childElement),
                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                             contextStack.getFunctionContext(), null,
                             (LocationData) childElement.getData());

@@ -125,14 +125,13 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         } else {
             // Format value according to format attribute
-            final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
 
             final NodeInfo boundNode = getBoundNode();
             if (boundNode == null) {
                 result = null;
             } else {
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        format, prefixToURIMap, getContextStack().getCurrentVariables(),
+                        format, getNamespaceMappings(), getContextStack().getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(),
                         getContextStack().getFunctionContext(), null, getLocationData());
             }

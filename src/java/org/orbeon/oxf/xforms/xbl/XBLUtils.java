@@ -326,12 +326,7 @@ public class XBLUtils {
         TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsDocumentAnnotatorContentHandler(identity, "", false, namespaceMappings) {
             protected void addNamespaces(String id) {
                 // Store prefixed id in order to avoid clashes between top-level controls and shadow trees 
-//                super.addNamespaces(prefix + id);
-
-                // TODO: Implement this once callers of XFormsStaticState.getNamespaceMappings() and
-                // XFormsContainingDocument.getNamespaceMappings() have been modified to provide a prefix.
-
-                super.addNamespaces(id);
+                super.addNamespaces(prefix + id);
             }
         });
 

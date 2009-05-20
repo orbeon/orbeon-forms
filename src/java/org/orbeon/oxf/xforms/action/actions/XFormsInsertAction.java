@@ -111,7 +111,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // origin attribute in the insert context."
 
                 originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
-                        originAttribute, containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                        originAttribute, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(),
                         contextStack.getFunctionContext(),
                         null, (LocationData) actionElement.getData());
@@ -143,7 +143,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "b. The return value is processed according to the rules of the XPath function round()"
                 final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                         collectionToBeUpdated, 1,
-                        "round(" + atAttribute + ")", containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                        "round(" + atAttribute + ")", actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
                         (LocationData) actionElement.getData());
 

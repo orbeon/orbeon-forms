@@ -763,12 +763,20 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 // TODO: in the future we should be able to try evaluating anyway
                 return null;
             } else {
-                final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
                 return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNodeset,
                             bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                            contextStack.getFunctionContext(), prefixToURIMap, getLocationData(), avt);
+                            contextStack.getFunctionContext(), getNamespaceMappings(), getLocationData(), avt);
             }
         }
+    }
+
+    /**
+     * Return the namespace mappings for this control.
+     *
+     * @return              Map<String prefix, String uri>
+     */
+    public Map getNamespaceMappings() {
+        return container.getNamespaceMappings(controlElement);
     }
 
     protected String getExtensionAttributeValue(QName attributeName) {

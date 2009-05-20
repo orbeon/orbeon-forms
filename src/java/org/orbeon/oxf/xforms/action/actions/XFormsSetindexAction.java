@@ -48,7 +48,7 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final String indexString = XPathCache.evaluateAsString(pipelineContext,
                 actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                "number(" + indexXPath + ")", containingDocument.getNamespaceMappings(actionElement),
+                "number(" + indexXPath + ")", actionInterpreter.getNamespaceMappings(actionElement),
                 contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                 contextStack.getFunctionContext(), null,
                 (LocationData) actionElement.getData());

@@ -32,7 +32,6 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 10.1.9 The setvalue Element
@@ -51,7 +50,6 @@ public class XFormsSetvalueAction extends XFormsAction {
         final String valueToSet;
         if (value != null) {
             // Value to set is computed with an XPath expression
-            final Map namespaceContext = containingDocument.getNamespaceMappings(actionElement);
 
             final List currentNodeset;
             {
@@ -73,8 +71,8 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             valueToSet = XPathCache.evaluateAsString(pipelineContext,
                     currentNodeset, contextStack.getCurrentPosition(),
-                    value, namespaceContext, contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                    contextStack.getFunctionContext(), null,
+                    value, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
                     (LocationData) actionElement.getData());
         } else {
             // Value to set is static content

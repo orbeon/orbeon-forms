@@ -89,7 +89,7 @@ public class XFormsDeleteAction extends XFormsAction {
                     final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                             collectionToUpdate, 1,
                             "round(" + atAttribute + ")",
-                            containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                            actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
                             (LocationData) actionElement.getData());
 

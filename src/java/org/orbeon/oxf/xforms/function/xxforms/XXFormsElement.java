@@ -73,7 +73,7 @@ public class XXFormsElement extends XFormsFunction {
                     final String prefix = qNameString.substring(0, colonIndex);
 
                     final XFormsContextStack contextStack = getContextStack(xpathContext);
-                    final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+                    final Map namespaceMappings = getContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
 
                     // Get QName URI
                     qNameURI = (String) namespaceMappings.get(prefix);
@@ -122,6 +122,7 @@ public class XXFormsElement extends XFormsFunction {
                         // Copy node before using it
                         final Node newNode; {
                         final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
+                            // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
                             newNode = Dom4jUtils.createCopy(currentNode);
                         }
 

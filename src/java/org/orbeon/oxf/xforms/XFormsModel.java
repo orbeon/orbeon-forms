@@ -51,6 +51,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Model attributes
     private String modelId;
     private String modelEffectiveId;
+    private String fullPrefix;
 
     // Instances
     private List instanceIds;
@@ -75,7 +76,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Containing document
     private XFormsContainingDocument containingDocument;
 
-    public XFormsModel(XFormsContainer container, String prefixedId, Document modelDocument) {
+    public XFormsModel(XFormsContainer container, String effectiveId, Document modelDocument) {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
@@ -88,7 +89,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     (LocationData) modelElement.getData());
 
         modelId = modelElement.attributeValue("id");
-        modelEffectiveId = prefixedId;
+        modelEffectiveId = effectiveId;
+        fullPrefix = XFormsUtils.getEffectiveIdPrefix(effectiveId);
 
         // Extract list of instances ids
         {
@@ -130,6 +132,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void updateEffectiveId(String effectiveId) {
         this.modelEffectiveId = effectiveId;
+        this.fullPrefix = XFormsUtils.getEffectiveIdPrefix(effectiveId);
 
         // Update effective ids of all nested instances
         if (instances != null) {
@@ -331,6 +334,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public String getEffectiveId() {
         return modelEffectiveId;
+    }
+
+    public String getFullPrefix() {
+        return fullPrefix;
     }
 
     public LocationData getLocationData() {

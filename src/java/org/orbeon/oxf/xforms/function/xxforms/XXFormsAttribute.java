@@ -65,7 +65,7 @@ public class XXFormsAttribute extends XFormsFunction {
                     final String prefix = qNameString.substring(0, colonIndex);
 
                     final XFormsContextStack contextStack = getContextStack(xpathContext);
-                    final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+                    final Map namespaceMappings = getContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
 
                     // Get QName URI
                     qNameURI = (String) namespaceMappings.get(prefix);

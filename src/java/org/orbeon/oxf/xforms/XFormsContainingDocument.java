@@ -316,10 +316,6 @@ public class XFormsContainingDocument extends XFormsContainer {
         return xformsStaticState.getContainerNamespace();
     }
 
-    public Map getNamespaceMappings(Element element) {
-        return xformsStaticState.getNamespaceMappings(element);
-    }
-
     /**
      * Return external-events configuration attribute.
      */

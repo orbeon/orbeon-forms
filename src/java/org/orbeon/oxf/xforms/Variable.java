@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class Variable {
 
-    private XFormsContainingDocument containingDocument;
+    private XFormsContainer container;
     private XFormsContextStack contextStack;
     private Element variableElement;
 
@@ -34,8 +34,8 @@ public class Variable {
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    public Variable(XFormsContainingDocument containingDocument, XFormsContextStack contextStack, Element variableElement) {
-        this.containingDocument = containingDocument;
+    public Variable(XFormsContainer container, XFormsContextStack contextStack, Element variableElement) {
+        this.container = container;
         this.contextStack = contextStack;
         this.variableElement = variableElement;
 
@@ -65,7 +65,7 @@ public class Variable {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
                     variableValue = XPathCache.evaluateAsExtent(pipelineContext,
                             currentNodeset, bindingContext.getPosition(),
-                            selectAttribute, containingDocument.getNamespaceMappings(variableElement), bindingContext.getInScopeVariables(useCache),
+                            selectAttribute, container.getNamespaceMappings(variableElement), bindingContext.getInScopeVariables(useCache),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
                 } else {
                     variableValue = EmptySequence.getInstance();

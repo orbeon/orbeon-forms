@@ -67,7 +67,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
 
             rawValue = XPathCache.evaluateAsAvt(pipelineContext,
                     currentNodeset, bindingContext.getPosition(),
-                    valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), bindingContext.getInScopeVariables(),
+                    valueAttribute, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                     XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
 
         } else {

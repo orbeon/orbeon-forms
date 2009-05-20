@@ -128,14 +128,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 // Items are not automatically refreshed and stored globally
                 List items =  containingDocument.getControls().getConstantItems(getId());
                 if (items == null) {
-                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, containingDocument, XFormsSelect1Control.this, setBinding);
+                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, XFormsSelect1Control.this, setBinding);
                     containingDocument.getControls().setConstantItems(getId(), items);
                 }
                 return items;
             } else {
                 // Items are stored in the control
                 if (items == null) {
-                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, containingDocument, XFormsSelect1Control.this, setBinding);
+                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, XFormsSelect1Control.this, setBinding);
                 }
                 return items;
             }

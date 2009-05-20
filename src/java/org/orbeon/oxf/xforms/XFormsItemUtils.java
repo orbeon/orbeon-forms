@@ -204,28 +204,29 @@ public class XFormsItemUtils {
      * Evaluate the itemset for a given xforms:select or xforms:select1 control.
      *
      * @param pipelineContext       current pipeline context
-     * @param containingDocument    current containing document
      * @param select1Control        control to evaluate
      * @param setBinding            whether this method must set the evaluation binding (false if it is already set)
      * @return                      List of Item
      */
-    public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final XFormsSelect1Control select1Control, boolean setBinding) {
+    public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsSelect1Control select1Control, boolean setBinding) {
+
+        final XFormsContainer container = select1Control.getContainer();
 
         // Optimize static itemsets
         {
             final boolean isStaticItemset; {
-            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(select1Control.getPrefixedId());
+            final XFormsStaticState.ItemsInfo itemsInfo = container.getContainingDocument().getStaticState().getItemsInfo(select1Control.getPrefixedId());
                 isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
             }
 
             if (isStaticItemset)
-                return evaluateStaticItemsets(containingDocument, select1Control.getPrefixedId());
+                return evaluateStaticItemsets(container.getContainingDocument(), select1Control.getPrefixedId());
         }
 
         final List newItems = new ArrayList();
-        final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
 
         // Set binding on this control if required
+        final XFormsContextStack contextStack = container.getContextStack();
         if (setBinding)
             contextStack.setBinding(select1Control);
 
@@ -248,12 +249,12 @@ public class XFormsItemUtils {
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:label element.", select1Control.getLocationData());
-                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, labelElement, false, null);
+                    final String label = XFormsUtils.getChildElementValue(pipelineContext, container, labelElement, false, null);
 
                     final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                     if (valueElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
-                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, valueElement, false, null);
+                    final String value = XFormsUtils.getChildElementValue(pipelineContext, container, valueElement, false, null);
 
                     newItems.add(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
@@ -289,7 +290,7 @@ public class XFormsItemUtils {
                                             if (labelElement == null)
                                                 throw new ValidationException("xforms:itemset element must contain one xforms:label element.", select1Control.getLocationData());
 
-                                            label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                                            label = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                                         }
 
 
@@ -320,7 +321,7 @@ public class XFormsItemUtils {
                                         if (valueCopyElement.getName().equals("value")) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
-                                            final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
+                                            final String value = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
                                             newItems.add(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                         } else {
                                             // TODO: handle xforms:copy
@@ -343,7 +344,7 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                        final String label = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                         hierarchyLevel++;
                         newItems.add(new Item(isEncryptItemValues, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }

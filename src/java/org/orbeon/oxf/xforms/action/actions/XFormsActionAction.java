@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.Variable;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Iterator;
@@ -34,7 +34,7 @@ public class XFormsActionAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainer container = actionInterpreter.getContainer();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         // Iterate over child actions
@@ -45,7 +45,7 @@ public class XFormsActionAction extends XFormsAction {
 
             if (currentActionName.equals("variable")) {
                 // Create variable object
-                final Variable variable = new Variable(containingDocument, contextStack, currentActionElement);
+                final Variable variable = new Variable(container, contextStack, currentActionElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
@@ -67,7 +67,7 @@ public class XFormsActionAction extends XFormsAction {
         }
 
         if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("action", "evaluated variables within action",
+            actionInterpreter.getContainingDocument().logDebug("action", "evaluated variables within action",
                     new String[] { "count", Integer.toString(variablesCount) });
 
         // Unscope all variables

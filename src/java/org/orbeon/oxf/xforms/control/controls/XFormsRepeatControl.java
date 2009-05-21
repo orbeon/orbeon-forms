@@ -291,7 +291,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
                     if (isRemoved) {
                         if (isDebugEnabled)
-                            containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
+                            containingDocument.logDebug("repeat", "removing iteration", new String[] { "id", getEffectiveId(), "index", Integer.toString(i + 1) });
 
                         // Indicate to iteration that it is being removed
                         removedIteration.iterationRemoved(pipelineContext);
@@ -314,7 +314,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // This new node was not in the old nodeset so create a new one
 
                     if (isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "creating new iteration", new String[] { "index", Integer.toString(repeatIndex) });
+                        containingDocument.logDebug("repeat", "creating new iteration", new String[] { "id", getEffectiveId(), "index", Integer.toString(repeatIndex) });
                     }
 
                     final XFormsContextStack contextStack = getXBLContainer().getContextStack();
@@ -332,7 +332,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                         if (isDebugEnabled) {
                             containingDocument.logDebug("repeat", "moving iteration",
-                                    new String[] { "old index", Integer.toString(newIteration.getIterationIndex()),
+                                    new String[] { "id", getEffectiveId(),
+                                                   "old index", Integer.toString(newIteration.getIterationIndex()),
                                                    "new index", Integer.toString(repeatIndex) });
                         }
 
@@ -368,7 +369,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                         if (isDebugEnabled) {
                             containingDocument.logDebug("repeat", "setting index to new node",
-                                    new String[] { "new index", Integer.toString(newRepeatIndex)});
+                                    new String[] { "id", getEffectiveId(), "new index", Integer.toString(newRepeatIndex)});
                         }
 
                         setIndex(newRepeatIndex);
@@ -389,7 +390,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     if (newRepeatIndex != oldRepeatIndex) {
                         if (isDebugEnabled) {
                             containingDocument.logDebug("repeat", "adjusting index for existing node",
-                                    new String[] { "old index", Integer.toString(oldRepeatIndex),
+                                    new String[] { "id", getEffectiveId(),
+                                                   "old index", Integer.toString(oldRepeatIndex),
                                                    "new index", Integer.toString(newRepeatIndex)});
                         }
 
@@ -405,7 +407,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                         if (isDebugEnabled) {
                             containingDocument.logDebug("repeat", "setting index to the size of the new nodeset",
-                                    new String[] { "new index", Integer.toString(newRepeatNodeset.size())});
+                                    new String[] { "id", getEffectiveId(), "new index", Integer.toString(newRepeatNodeset.size())});
                         }
 
                         setIndex(newRepeatNodeset.size());
@@ -421,7 +423,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                     if (isDebugEnabled) {
                         containingDocument.logDebug("repeat", "resetting index",
-                                new String[] { "new index", Integer.toString(getIndex())});
+                                new String[] { "id", getEffectiveId(), "new index", Integer.toString(getIndex())});
                     }
                 }
             }
@@ -438,7 +440,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 for (int i = 0; i < oldChildren.size(); i++) {
 
                     if (isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "removing iteration", new String[] { "index", Integer.toString(i + 1) });
+                        containingDocument.logDebug("repeat", "removing iteration", new String[] { "id", getEffectiveId(), "index", Integer.toString(i + 1) });
                     }
 
                     // Deindex old iteration
@@ -448,7 +450,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
             if (isDebugEnabled) {
                 if (getIndex() != 0)
-                    containingDocument.logDebug("repeat", "setting index to 0");
+                    containingDocument.logDebug("repeat", "setting index to 0", new String[] { "id", getEffectiveId() });
             }
 
             setChildren(null);

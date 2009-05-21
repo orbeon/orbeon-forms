@@ -75,21 +75,22 @@
                     <columns xmlns="">
                         <xsl:for-each select="$columns/*">
                             <xsl:copy>
+                                <xsl:attribute name="nbColumns"/>
+                                <xsl:attribute name="index"/>
                                 <xsl:copy-of select="@*"/>
-                                <xsl:attribute name="nbColumns">
-                                    <xsl:if test="self::column">1</xsl:if>
-                                </xsl:attribute>
                             </xsl:copy>
                         </xsl:for-each>
                     </columns>
                 </xforms:instance>
+                <xforms:bind nodeset="column/@nbColumns" calculate="1"/>
+                <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
+                <xforms:bind nodeset="*/@index" calculate="count(preceding::column) + 1"/>
             </xforms:model>
-
 
             <xhtml:div style="border:thin solid black">
                 <xhtml:h3>Local instance:</xhtml:h3>
                 <xforms:group model="datatable-model" instance="datatable-instance">
-                    <xforms:repeat nodeset="*">
+                    <xforms:repeat nodeset="*|//column">
                         <xhtml:p>
                             <xforms:output value="name()"/>
                         </xhtml:p>
@@ -125,12 +126,11 @@
                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
                 <xhtml:thead id="{$id}-thead">
                     <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-                        <xsl:apply-templates select="$columns/header"/>
+                        <xsl:apply-templates select="$columns/*"/>
                     </xhtml:tr>
                 </xhtml:thead>
                 <xsl:apply-templates select="xhtml:tbody"/>
             </xhtml:table>
-
         </xhtml:div>
         <!-- End of template on the bound element -->
     </xsl:template>
@@ -199,16 +199,62 @@
         </xhtml:div>
     </xsl:template>
 
-    <xsl:template match="header/xhtml:th|header/xforms:repeat/xhtml:th">
-        <xxforms:variable name="colGroupIndex">
-            <xsl:value-of select="count(ancestor::header/parent::*/preceding-sibling::*) + 1"/>
-        </xxforms:variable>
+    <xsl:template match="column|columnSet" priority="1">
+        <xsl:apply-templates select="header"/>
+    </xsl:template>
+
+    <xsl:template match="header">
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="header/xhtml:th">
         <xhtml:th
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
              {@class}
             ">
+            <xsl:apply-templates select="@*[name() != 'class']"/>
+            <xhtml:div class="yui-dt-resizerliner">
+                <xsl:call-template name="yui-dt-liner"/>
+                <xsl:if test="@fr:resizeable = 'true'">
+                    <xhtml:div id="{generate-id()}" class="yui-dt-resizer"
+                        style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
+                </xsl:if>
+            </xhtml:div>
+        </xhtml:th>
+    </xsl:template>
+
+    <xsl:template match="header/xforms:repeat/xhtml:th">
+        <xhtml:th
+            class="
+            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
+            {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
+            {@class}
+            ">
+            <xxforms:variable name="position" select="position()"/>
+            <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"/>
+            <xforms:group model="datatable-model" instance="datatable-instance">
+                <xxforms:variable name="columnSet" select="*[position() = $index]"/>
+                <xforms:group ref=".">
+                    <xforms:action ev:event="xforms-enabled">
+                        <xforms:delete nodeset="$columnSet/column[@position = $position]"/>
+                        <xforms:insert context="$columnSet"
+                            origin="xxforms:element('column', (
+                                xxforms:attribute('position', $position),
+                                xxforms:attribute('nbColumns', 1),
+                                xxforms:attribute('index', $columnSet/@index + $position - 1),
+                                xxforms:attribute('sortKey', concat( '(',  $columnSet/@nodeset, ')[', $position , ']/', $columnSet/@sortKey)),
+                                $columnSet/@fr:sortable,
+                                $columnSet/@fr:resizeable
+                                ))"
+                        />
+                    </xforms:action>
+                </xforms:group>
+
+            </xforms:group>
+
+
             <xsl:apply-templates select="@*[name() != 'class']"/>
             <xhtml:div class="yui-dt-resizerliner">
                 <xsl:call-template name="yui-dt-liner"/>

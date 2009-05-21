@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
@@ -46,7 +47,7 @@ public class ControlTree implements Cloneable {
      * @param pipelineContext   pipeline context
      * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
      */
-    public void initialize(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContainer rootContainer, boolean evaluateItemsets) {
+    public void initialize(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean evaluateItemsets) {
         // Create temporary root control
         final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
             public void addChild(XFormsControl XFormsControl) {
@@ -111,7 +112,7 @@ public class ControlTree implements Cloneable {
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
         // Create iteration and set its binding context
-        final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getContainer(), repeatControl, iterationIndex);
+        final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
         repeatIterationControl.setBindingContext(pipelineContext, bindingContext);
 
         // Index this control
@@ -507,7 +508,7 @@ public class ControlTree implements Cloneable {
             this.registerEvents = registerEvents;
         }
 
-        public XFormsControl startVisitControl(XFormsContainer container, Element controlElement, String effectiveControlId) {
+        public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
 
             // Create XFormsControl with basic information
             final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
@@ -569,7 +570,7 @@ public class ControlTree implements Cloneable {
             }
         }
 
-        public boolean startRepeatIteration(XFormsContainer container, int iteration, String effectiveIterationId) {
+        public boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId) {
 
             final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(container, (XFormsRepeatControl) currentControlsContainer, iteration);
 

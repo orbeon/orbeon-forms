@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -30,7 +30,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     private String end;
     private String step;
 
-    public XFormsRangeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsRangeControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         this.start = element.attributeValue("start");
         this.end = element.attributeValue("end");

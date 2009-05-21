@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -51,7 +52,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Model attributes
     private String modelId;
     private String modelEffectiveId;
-    private String fullPrefix;
 
     // Instances
     private List instanceIds;
@@ -70,13 +70,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private boolean mustSchemaValidate;
 
     // Container
-    private XFormsContainer container;
+    private XBLContainer container;
     private XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
 
     // Containing document
     private XFormsContainingDocument containingDocument;
 
-    public XFormsModel(XFormsContainer container, String effectiveId, Document modelDocument) {
+    public XFormsModel(XBLContainer container, String effectiveId, Document modelDocument) {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
@@ -90,7 +90,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         modelId = modelElement.attributeValue("id");
         modelEffectiveId = effectiveId;
-        fullPrefix = XFormsUtils.getEffectiveIdPrefix(effectiveId);
 
         // Extract list of instances ids
         {
@@ -132,7 +131,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void updateEffectiveId(String effectiveId) {
         this.modelEffectiveId = effectiveId;
-        this.fullPrefix = XFormsUtils.getEffectiveIdPrefix(effectiveId);
 
         // Update effective ids of all nested instances
         if (instances != null) {
@@ -148,12 +146,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return contextStack;
     }
 
-    public XFormsContainer getContainer() {
+    public XBLContainer getXBLContainer() {
         return container;
     }
 
-    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
-        return getContainer();
+    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
+        return getXBLContainer();
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -170,8 +168,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public Object getObjectByEffectiveId(String effectiveId) {
 
         // If prefixes or suffixes don't match, object can't be found here
-        if (!getContainer().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
-                || !XFormsUtils.getEffectiveIdSuffix(getContainer().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
+        if (!getXBLContainer().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
+                || !XFormsUtils.getEffectiveIdSuffix(getXBLContainer().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
             return null;
         }
 
@@ -336,10 +334,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return modelEffectiveId;
     }
 
-    public String getFullPrefix() {
-        return fullPrefix;
-    }
-
     public LocationData getLocationData() {
         return (LocationData) modelDocument.getRootElement().getData();
     }
@@ -399,7 +393,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private void restoreInstances(PipelineContext pipelineContext) {
 
         // Find serialized instances from context
-        final Element instancesElement = (Element) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
+        final Element instancesElement = (Element) pipelineContext.getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
 
         // Get instances from dynamic state first
         if (instancesElement != null) {
@@ -920,7 +914,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
@@ -1174,7 +1168,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
         // There is no point for events to propagate beyond the model
         // TODO: This could change in the future once models are more integrated in the components hierarchy
         return null;
@@ -1183,7 +1177,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Return the List of XFormsEventHandler objects within this object.
      */
-    public List getEventHandlers(XFormsContainer container) {
+    public List getEventHandlers(XBLContainer container) {
         return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 }

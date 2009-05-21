@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
@@ -51,7 +52,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XFormsRepeatControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
 
         // Initial local state
@@ -223,7 +224,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         {
             // Set new binding context on the repeat control
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
-            final XFormsContextStack contextStack = getContainer().getContextStack();
+            final XFormsContextStack contextStack = getXBLContainer().getContextStack();
             final XFormsControl parentControl = getParent();
             if (parentControl == null) {
                 // TODO: does this prevent preceding top-level variables from working?
@@ -316,7 +317,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         containingDocument.logDebug("repeat", "creating new iteration", new String[] { "index", Integer.toString(repeatIndex) });
                     }
 
-                    final XFormsContextStack contextStack = getContainer().getContextStack();
+                    final XFormsContextStack contextStack = getXBLContainer().getContextStack();
                     contextStack.pushIteration(repeatIndex);
                     newIteration = controls.createRepeatIterationTree(pipelineContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
                     contextStack.popBinding();

@@ -40,7 +40,7 @@ public class Index extends XFormsFunction {
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
-        final int index = getControls(xpathContext).getRepeatIndex(getContainer(xpathContext), repeatStaticId);
+        final int index = getControls(xpathContext).getRepeatIndex(getXBLContainer(xpathContext), repeatStaticId);
 
         if (index == -1) {
             // Dispatch exception event
@@ -52,7 +52,7 @@ public class Index extends XFormsFunction {
             final PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
             final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
-            currentModel.getContainer().dispatchEvent(pipelineContext,
+            currentModel.getXBLContainer().dispatchEvent(pipelineContext,
                     new XFormsComputeExceptionEvent(currentModel, message, exception));
 
             // TODO: stop processing!

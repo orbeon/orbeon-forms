@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
 
     private List children;
 
-    public XFormsSingleNodeContainerControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsSingleNodeContainerControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
     }
 

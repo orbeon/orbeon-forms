@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -38,13 +39,13 @@ import java.util.Iterator;
  */
 public class XFormsActionInterpreter {
 
-    private final XFormsContainer container;
+    private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
 
     private final XFormsControls xformsControls;
     private final XFormsContextStack contextStack;
 
-    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainer container,
+    public XFormsActionInterpreter(PipelineContext pipelineContext, XBLContainer container,
                                    XFormsEventObserver eventObserver, Element actionElement, String ancestorObserverStaticId) {
 
         this.container = container;
@@ -120,7 +121,7 @@ public class XFormsActionInterpreter {
         contextStack.pushBinding(pipelineContext, actionElement);
     }
 
-    public XFormsContainer getContainer() {
+    public XBLContainer getXBLContainer() {
         return container;
     }
 

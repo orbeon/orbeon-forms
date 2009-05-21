@@ -29,7 +29,7 @@ public class XXFormsComponentContext extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         // Get container binding context
-        final XFormsContextStack.BindingContext bindingContext = getContainer(xpathContext).getBindingContext();
+        final XFormsContextStack.BindingContext bindingContext = getXBLContainer(xpathContext).getBindingContext();
         if (bindingContext == null)
             return EmptyIterator.getInstance();
 

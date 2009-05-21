@@ -18,7 +18,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -40,7 +40,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_ROWS_QNAME
     };
 
-    public XFormsTextareaControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
     }
 

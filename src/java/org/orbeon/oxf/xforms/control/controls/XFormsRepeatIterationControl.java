@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -32,7 +32,7 @@ import java.util.Iterator;
  */
 public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerControl implements XFormsPseudoControl {
     private int iterationIndex;
-    public XFormsRepeatIterationControl(XFormsContainer container, XFormsRepeatControl parent, int iterationIndex) {
+    public XFormsRepeatIterationControl(XBLContainer container, XFormsRepeatControl parent, int iterationIndex) {
         // NOTE: Associate this control with the repeat element. This is so that even targets get a proper id
         // NOTE: Effective id of an iteration is parentRepeatId·iteration
         super(container, parent, parent.getControlElement(), "xxforms-repeat-iteration", XFormsUtils.getIterationEffectiveId(parent.getEffectiveId(), iterationIndex));

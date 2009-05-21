@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -196,7 +197,7 @@ public abstract class XFormsAction {
      */
     protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, XFormsEventObserver eventObserver, String objectStaticId, Element actionElement) {
         // First try controls as we want to check on explicit repeat indexes first
-        final XFormsContainer container = actionInterpreter.getContainer();
+        final XBLContainer container = actionInterpreter.getXBLContainer();
         final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), objectStaticId, actionElement);
         if (tempXFormsEventTarget != null) {
             // Object with this id exists

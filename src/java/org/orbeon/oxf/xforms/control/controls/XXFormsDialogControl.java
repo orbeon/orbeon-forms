@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -59,7 +59,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XXFormsDialogControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
         this.level = element.attributeValue("level");
         if (this.level == null) {

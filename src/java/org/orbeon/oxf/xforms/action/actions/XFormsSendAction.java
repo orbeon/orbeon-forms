@@ -18,8 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -37,7 +36,7 @@ public class XFormsSendAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContextt) {
 
-        final XFormsContainer container = actionInterpreter.getContainer();
+        final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Find submission object

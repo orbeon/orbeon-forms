@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -63,9 +64,9 @@ abstract public class XFormsFunction extends SystemFunction {
         return null;
     }
 
-    public XFormsContainer getContainer(XPathContext xpathContext) {
+    public XBLContainer getXBLContainer(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
-        return functionContext.getContainer();
+        return functionContext.getXBLContainer();
     }
 
     public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
@@ -108,11 +109,11 @@ abstract public class XFormsFunction extends SystemFunction {
 
     public static class Context implements XPathCache.FunctionContext {
 
-        private XFormsContainer container;
+        private XBLContainer container;
         private XFormsModel containingModel;
         private XFormsContextStack contextStack;
 
-        public Context(XFormsContainer container, XFormsContextStack contextStack) {
+        public Context(XBLContainer container, XFormsContextStack contextStack) {
             this.container = container;
             this.contextStack = contextStack;
         }
@@ -122,8 +123,8 @@ abstract public class XFormsFunction extends SystemFunction {
             this.contextStack = contextStack;
         }
 
-        public XFormsContainer getContainer() {
-            return (container != null) ? container : containingModel.getContainer();
+        public XBLContainer getXBLContainer() {
+            return (container != null) ? container : containingModel.getXBLContainer();
         }
 
         public XFormsContainingDocument getContainingDocument() {

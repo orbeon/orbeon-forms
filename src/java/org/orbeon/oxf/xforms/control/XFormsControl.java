@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -50,7 +51,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsBaseHandler
     };
 
-    private XFormsContainer container;
+    private XBLContainer container;
     protected XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
@@ -107,7 +108,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public XFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         this.container = container;
         this.containingDocument = (container != null) ? container.getContainingDocument() : null;// some special cases pass null (bad, we know...)
         this.parent = parent;
@@ -120,12 +121,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public XFormsContainer getContainer() {
+    public XBLContainer getXBLContainer() {
         return container;
     }
 
-    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
-        return getContainer();
+    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
+        return getXBLContainer();
     }
 
     protected XFormsContextStack getContextStack() {
@@ -504,11 +505,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return null;
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
         return parent;
     }
 
-    public List getEventHandlers(XFormsContainer container) {
+    public List getEventHandlers(XBLContainer container) {
         return containingDocument.getStaticState().getEventHandlers(getPrefixedId());
     }
 
@@ -571,7 +572,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }
 

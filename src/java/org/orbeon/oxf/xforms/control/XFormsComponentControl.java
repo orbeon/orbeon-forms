@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -31,10 +31,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
-    private XFormsContainer nestedContainer;
+    private XBLContainer nestedContainer;
     private transient boolean isInitializeModels;
 
-    public XFormsComponentControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
 
         // Create container and nested models if any
@@ -89,7 +89,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XFormsContainer getNestedContainer() {
+    public XBLContainer getNestedContainer() {
         return nestedContainer;
     }
 

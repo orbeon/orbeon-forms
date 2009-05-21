@@ -6,6 +6,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public class Variable {
 
-    private XFormsContainer container;
+    private XBLContainer container;
     private XFormsContextStack contextStack;
     private Element variableElement;
 
@@ -34,7 +35,7 @@ public class Variable {
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    public Variable(XFormsContainer container, XFormsContextStack contextStack, Element variableElement) {
+    public Variable(XBLContainer container, XFormsContextStack contextStack, Element variableElement) {
         this.container = container;
         this.contextStack = contextStack;
         this.variableElement = variableElement;

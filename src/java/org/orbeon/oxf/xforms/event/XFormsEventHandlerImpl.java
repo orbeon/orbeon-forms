@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 
@@ -152,7 +152,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
     }
 
-    public void handleEvent(PipelineContext pipelineContext, XFormsContainer container,
+    public void handleEvent(PipelineContext pipelineContext, XBLContainer container,
                             XFormsEventObserver eventObserver, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
         new XFormsActionInterpreter(pipelineContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)

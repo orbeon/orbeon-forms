@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.Variable;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -34,7 +34,7 @@ public class XFormsActionAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainer container = actionInterpreter.getContainer();
+        final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         // Iterate over child actions

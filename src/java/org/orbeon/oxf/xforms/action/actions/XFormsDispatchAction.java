@@ -95,7 +95,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-                actionInterpreter.getContainer().dispatchEvent(pipelineContext, newEvent);
+                actionInterpreter.getXBLContainer().dispatchEvent(pipelineContext, newEvent);
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

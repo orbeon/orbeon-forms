@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -45,7 +46,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private FileInfo fileInfo;
 
-    public XFormsUploadControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
 
         fileInfo = new FileInfo(this, getContextStack(), element);
@@ -154,7 +155,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
-            getContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+            getXBLContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
         }
 
         try {
@@ -443,7 +444,7 @@ class FileInfo implements Cloneable {
         contextStack.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(pipelineContext, control.getContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
+            XFormsSetvalueAction.doSetValue(pipelineContext, control.getXBLContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
             contextStack.popBinding();
         }
     }

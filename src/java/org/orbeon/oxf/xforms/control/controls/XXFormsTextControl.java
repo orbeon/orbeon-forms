@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 
@@ -26,7 +26,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
 
     private String forAttribute;
 
-    public XXFormsTextControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsTextControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
 
         // Remember attributes

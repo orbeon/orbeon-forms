@@ -439,7 +439,7 @@ public class XFormsInsertAction extends XFormsAction {
                 insertedNodeInfos = Collections.EMPTY_LIST;
             }
 
-            modifiedInstance.getContainer(containingDocument).dispatchEvent(pipelineContext,
+            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
                     new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
                             positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
 

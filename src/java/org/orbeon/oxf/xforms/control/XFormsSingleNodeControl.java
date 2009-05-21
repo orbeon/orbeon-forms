@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
@@ -49,7 +50,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     // Type
     private String type;
 
-    public XFormsSingleNodeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsSingleNodeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
     }
 

@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -36,14 +37,14 @@ import java.util.*;
  */
 public class XFormsContextStack {
 
-    private XFormsContainer container;
+    private XBLContainer container;
     private XFormsContainingDocument containingDocument;
     private XFormsFunction.Context functionContext;
     private BindingContext parentBindingContext;
 
     private Stack contextStack = new Stack();
 
-    public XFormsContextStack(XFormsContainer container) {
+    public XFormsContextStack(XBLContainer container) {
         this.container = container;
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(container, this);
@@ -51,7 +52,7 @@ public class XFormsContextStack {
 
     // Constructor for binds and submissions
     public XFormsContextStack(XFormsModel containingModel) {
-        this.container = containingModel.getContainer();
+        this.container = containingModel.getXBLContainer();
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(containingModel, this);
     }

@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -48,7 +48,7 @@ public class XFormsInputControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME 
     };
 
-    public XFormsInputControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
     }
 

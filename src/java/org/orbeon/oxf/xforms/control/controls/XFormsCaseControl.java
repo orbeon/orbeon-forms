@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -29,7 +29,7 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
 
     private boolean defaultSelected;
 
-    public XFormsCaseControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsCaseControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
 
         // Just keep the value

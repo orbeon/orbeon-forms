@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -410,14 +411,14 @@ public class XFormsUtils {
      * Get the value of a label, help, hint or alert related to a particular control.
      *
      * @param pipelineContext       current PipelineContext
-     * @param container             current XFormsContainer
+     * @param container             current XBLContainer
      * @param control               control
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XFormsContainer container,
+    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XBLContainer container,
                                                     XFormsControl control, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
         final XFormsContextStack contextStack = container.getContextStack();
@@ -472,7 +473,7 @@ public class XFormsUtils {
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainer container,
+    public static String getChildElementValue(final PipelineContext pipelineContext, final XBLContainer container,
                                               final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
@@ -494,14 +495,14 @@ public class XFormsUtils {
      * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
      *
      * @param pipelineContext       current PipelineContext
-     * @param container             current XFormsContainer
+     * @param container             current XBLContainer
      * @param contextStack          context stack for XPath evaluation
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainer container,
+    public static String getElementValue(final PipelineContext pipelineContext, final XBLContainer container,
                                          final XFormsContextStack contextStack,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
@@ -564,7 +565,7 @@ public class XFormsUtils {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    currentModel.getContainer(null).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                    currentModel.getXBLContainer(null).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
                     return null;
                 }
             }
@@ -1485,7 +1486,7 @@ public class XFormsUtils {
 
     private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
         private final PipelineContext pipelineContext;
-        private final XFormsContainer container;
+        private final XBLContainer container;
         private final XFormsContextStack contextStack;
         private final boolean acceptHTML;
         private final boolean[] containsHTML;
@@ -1506,7 +1507,7 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public LHHAElementVisitorListener(PipelineContext pipelineContext, XFormsContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PipelineContext pipelineContext, XBLContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = pipelineContext;
             this.container = container;
             this.contextStack = contextStack;

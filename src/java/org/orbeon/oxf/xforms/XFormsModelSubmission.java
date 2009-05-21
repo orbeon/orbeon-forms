@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.ErrorType;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -60,7 +61,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
-    private final XFormsContainer container;
+    private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
     private final String id;
     private final XFormsModel model;
@@ -108,7 +109,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     private boolean fURLNorewrite;
 
-    public XFormsModelSubmission(XFormsContainer container, String id, Element submissionElement, XFormsModel model) {
+    public XFormsModelSubmission(XBLContainer container, String id, Element submissionElement, XFormsModel model) {
         this.container = container;
         this.containingDocument = container.getContainingDocument();
         this.id = id;
@@ -217,15 +218,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), getId());
     }
 
-    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
-        return getModel().getContainer();
+    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
+        return getModel().getXBLContainer();
     }
 
     public LocationData getLocationData() {
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
         return model;
     }
 
@@ -233,7 +234,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return model;
     }
 
-    public List getEventHandlers(XFormsContainer container) {
+    public List getEventHandlers(XBLContainer container) {
         return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
@@ -1263,7 +1264,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         NetUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
+    public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }
 

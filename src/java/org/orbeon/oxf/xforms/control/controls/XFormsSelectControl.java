@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class XFormsSelectControl extends XFormsSelect1Control {
 
-    public XFormsSelectControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsSelectControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
     }
 
@@ -94,7 +94,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             if (deselectEvents.size() > 0) {
                 for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
                     final XFormsEvent currentEvent = (XFormsEvent) i.next();
-                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
@@ -102,7 +102,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             if (hasSelectedItem) {
                 for (Iterator i = selectEvents.iterator(); i.hasNext();) {
                     final XFormsEvent currentEvent = (XFormsEvent) i.next();
-                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
 

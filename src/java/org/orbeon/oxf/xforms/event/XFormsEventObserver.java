@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.List;
 
@@ -23,6 +23,6 @@ import java.util.List;
 public interface XFormsEventObserver extends XFormsEventTarget {
     public String getId();
     public String getEffectiveId();
-    public List getEventHandlers(XFormsContainer container);
-    public XFormsEventObserver getParentEventObserver(XFormsContainer container);
+    public List getEventHandlers(XBLContainer container);
+    public XFormsEventObserver getParentEventObserver(XBLContainer container);
 }

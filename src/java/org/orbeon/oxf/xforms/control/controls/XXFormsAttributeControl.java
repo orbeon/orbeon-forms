@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -35,7 +35,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String nameAttribute;
     private String valueAttribute;
 
-    public XXFormsAttributeControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
 
         // Remember attributes
@@ -51,7 +51,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
      * @param element               control element (should not be used here)
      * @param avtExpression         attribute template expression
      */
-    public XXFormsAttributeControl(XFormsContainer container, Element element, String avtExpression) {
+    public XXFormsAttributeControl(XBLContainer container, Element element, String avtExpression) {
         super(container, null, element, element.getName(), null);
         this.valueAttribute = avtExpression;
     }
@@ -79,7 +79,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         // Rewrite URI attribute if needed
-        return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue(pipelineContext));
+        return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getXBLContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue(pipelineContext));
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {

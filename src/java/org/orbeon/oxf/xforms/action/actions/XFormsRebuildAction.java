@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -35,7 +35,7 @@ public class XFormsRebuildAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainer container = actionInterpreter.getContainer();
+        final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));

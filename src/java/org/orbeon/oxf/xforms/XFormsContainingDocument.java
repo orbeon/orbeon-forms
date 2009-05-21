@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
@@ -53,7 +54,7 @@ import java.util.*;
  * o Contains XForms controls
  * o Handles event handlers hierarchy
  */
-public class XFormsContainingDocument extends XFormsContainer {
+public class XFormsContainingDocument extends XBLContainer {
 
     // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
@@ -1025,7 +1026,7 @@ public class XFormsContainingDocument extends XFormsContainer {
 
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
         // Ensure that the event uses the proper container to dispatch the event
-        final XFormsContainer targetContainer = event.getTargetObject().getContainer(this);
+        final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);
         if (targetContainer == this) {
             super.dispatchEvent(pipelineContext, event);
         } else {
@@ -1504,7 +1505,7 @@ public class XFormsContainingDocument extends XFormsContainer {
         return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
     }
           
-    public List getEventHandlers(XFormsContainer container) {
+    public List getEventHandlers(XBLContainer container) {
         return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 }

@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -53,7 +54,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     private final boolean xxformsEncryptItemValues;
     private List items;
 
-    public XFormsSelect1Control(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         // TODO: part of static state?
         this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
@@ -222,7 +223,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (deselectEvents.size() > 0) {
                 for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
                     final XFormsEvent currentEvent = (XFormsEvent) i.next();
-                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
@@ -230,7 +231,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (hasSelectedItem) {
                 for (Iterator i = selectEvents.iterator(); i.hasNext();) {
                     final XFormsEvent currentEvent = (XFormsEvent) i.next();
-                    currentEvent.getTargetObject().getContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
 

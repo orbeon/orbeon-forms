@@ -54,13 +54,13 @@ public class XXFormsShowAction extends XFormsAction {
 
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-open event to dialog
-            // TODO: use container.getObjectByEffectiveId() once XFormsContainer is able to have local controls
+            // TODO: use container.getObjectByEffectiveId() once XBLContainer is able to have local controls
             final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventTarget, effectiveNeighborId, constrainToViewport);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-                eventTarget.getContainer(containingDocument).dispatchEvent(pipelineContext, newEvent);
+                eventTarget.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, newEvent);
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",

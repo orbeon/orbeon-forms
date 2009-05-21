@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.xbl.XBLUtils;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -462,7 +463,7 @@ public class XFormsStaticState {
                             // Create and remember factory for this QName
                             xblComponentsFactories.put(currentQNameMatch,
                                 new XFormsControlFactory.Factory() {
-                                    public XFormsControl createXFormsControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                                    public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
                                         return new XFormsComponentControl(container, parent, element, name, effectiveId);
                                     }
                                 });

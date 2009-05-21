@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -60,7 +61,7 @@ public class XFormsModelBinds {
 
     private final XFormsModel model;                            // model to which we belong
 
-    private final XFormsContainer container;
+    private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;  // current containing document
     private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
 
@@ -100,7 +101,7 @@ public class XFormsModelBinds {
     private XFormsModelBinds(XFormsModel model, List bindElements) {
         this.model = model;
 
-        this.container = model.getContainer();
+        this.container = model.getXBLContainer();
         this.containingDocument = model.getContainingDocument();
         this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
 
@@ -376,7 +377,7 @@ public class XFormsModelBinds {
                                 // Output type MIP as an exploded QName
                                 final String typeMip = currentBind.getType();
                                 if (typeMip != null) {
-                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(currentModel.getContainer().getNamespaceMappings(currentBind.getBindElement()), typeMip, false);
+                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(currentModel.getXBLContainer().getNamespaceMappings(currentBind.getBindElement()), typeMip, false);
                                     mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToExplodedQName(typeMipQName), null);
                                 }
 

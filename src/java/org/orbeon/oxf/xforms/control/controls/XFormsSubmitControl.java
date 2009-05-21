@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
  * Represents an xforms:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
-    public XFormsSubmitControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
     }
 
@@ -43,10 +43,10 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
-            final Object object = getContainer().getObjectByEffectiveId(submissionId);// xxx fix not effective
+            final Object object = getXBLContainer().getObjectByEffectiveId(submissionId);// xxx fix not effective
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                submission.getContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
+                submission.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

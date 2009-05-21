@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
@@ -35,7 +36,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
-    protected XFormsValueControl(XFormsContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    protected XFormsValueControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
     }
 

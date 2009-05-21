@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -258,8 +259,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return XFormsUtils.getRelatedEffectiveId(modelEffectiveId, getId());
     }
 
-    public XFormsContainer getContainer(XFormsContainingDocument containingDocument) {
-        return getModel(containingDocument).getContainer();
+    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
+        return getModel(containingDocument).getXBLContainer();
     }
 
     public String getEffectiveModelId() {
@@ -507,7 +508,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainer container) {
+    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
         return getModel(container.getContainingDocument());
     }
 
@@ -530,7 +531,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @param container             container
      * @param event                 event being dispatched
      */
-    public void performTargetAction(final PipelineContext pipelineContext, XFormsContainer container, XFormsEvent event) {
+    public void performTargetAction(final PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // New nodes were just inserted
@@ -658,7 +659,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return (timeToLiveValue != null) ? Long.parseLong(timeToLiveValue) : -1;
     }
 
-    public List getEventHandlers(XFormsContainer container) {
+    public List getEventHandlers(XBLContainer container) {
         return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 

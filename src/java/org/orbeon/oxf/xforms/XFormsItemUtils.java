@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -210,7 +211,7 @@ public class XFormsItemUtils {
      */
     public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsSelect1Control select1Control, boolean setBinding) {
 
-        final XFormsContainer container = select1Control.getContainer();
+        final XBLContainer container = select1Control.getXBLContainer();
 
         // Optimize static itemsets
         {

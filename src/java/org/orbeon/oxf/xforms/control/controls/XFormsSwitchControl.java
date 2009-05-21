@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -49,7 +49,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
-    public XFormsSwitchControl(XFormsContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
 
         // Initial local state
@@ -106,10 +106,10 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
+            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
 
             // "2. Dispatching an xform-select event to the case to be selected."
-            caseControl.getContainer().dispatchEvent(pipelineContext, new XFormsSelectEvent(caseControl));
+            caseControl.getXBLContainer().dispatchEvent(pipelineContext, new XFormsSelectEvent(caseControl));
         }
     }
 

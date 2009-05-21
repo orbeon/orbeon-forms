@@ -13,8 +13,6 @@
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
-            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
             xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
@@ -24,7 +22,18 @@
                 <value>Hello, world!</value>
             </xforms:instance>
         </xforms:model>
-        <xi:include href="bug-ns-clash.xbl" xxi:omit-xml-base="true"/>
+        <!-- First component -->
+        <xbl:xbl xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xbl:binding id="foo-component" element="fr|foo">
+                <xbl:template>
+                    <!-- Use prefix exf declared only in this XBL binding, and use on element with id "clash" -->
+                    <xforms:output id="clash" value="exf:readonly()">
+                        <xforms:label>Read-only: </xforms:label>
+                    </xforms:output>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+        <!-- Second component -->
         <xbl:xbl>
             <xbl:binding id="bar-component" element="fr|bar">
                 <xbl:template>
@@ -38,8 +47,9 @@
     </xhtml:head>
     <xhtml:body>
 
-        <!-- Use XBL component -->
+        <!-- Use XBL components -->
         <fr:foo/>
         <fr:bar/>
+
     </xhtml:body>
 </xhtml:html>

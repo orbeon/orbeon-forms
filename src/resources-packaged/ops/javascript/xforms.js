@@ -6245,6 +6245,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         var dragElement = this.getDragEl();
         var srcElement = this.getEl();
+		this.srcSibling = srcElement.nextSibling;
 
         for(var i = 0; i < srcElement.childNodes.length; i++ ) {
             var child = srcElement.childNodes[i];
@@ -6257,14 +6258,33 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 		this.sourceControlID = repeatId.substring(13);
 
         YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
+		YAHOO.util.Dom.setStyle(dragElement, "width", parseInt(dragElement.style.width)+10 +"px");
         dragElement.innerHTML = srcElement.innerHTML;
         dragElement.className = srcElement.className;
         YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
     },
 
+	//SAN: Callback method implementation added for showing preview
+	onDragOver: function(e, id) {
+
+        var srcElement = this.getEl();
+        var destElement = YAHOO.util.Dom.get(id)[0];
+
+        if (ORBEON.util.Dom.hasClass(srcElement, "xforms-dnd") && srcElement.nodeName.toLowerCase() == destElement.getEl().nodeName.toLowerCase()) {
+            var parent = destElement.getEl().parentNode;
+            parent.insertBefore(srcElement, destElement.getEl().nextSibling);
+            YAHOO.util.DragDropMgr.refreshCache();
+        }
+    },
+
     onDragDrop: function(e, id) {
         var overElement = ORBEON.xforms.DnD.getClosestMatch(id);
         var srcElement = this.getEl();
+
+		var parent = this.srcSibling.parentNode;
+		parent.insertBefore(srcElement, this.srcSibling);
+		YAHOO.util.DragDropMgr.refreshCache();
+
         var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
         this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
     },
@@ -6273,26 +6293,11 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         var srcElement = this.getEl();
         var proxy = this.getDragEl();
-
-        YAHOO.util.Dom.setStyle(proxy, "visibility", "");
-        var motion = new YAHOO.util.Motion(
-                proxy, {
-            points: {
-                to: YAHOO.util.Dom.getXY(srcElement)
-            }
-        },
-                0.2,
-                YAHOO.util.Easing.easeOut
-                );
         var proxyid = proxy.id;
         var thisid = this.id;
 
-        // Hide the proxy and show the source element when finished with the animation
-        motion.onComplete.subscribe(function() {
             YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
             YAHOO.util.Dom.setStyle(thisid, "visibility", "");
-        });
-        motion.animate();
 
         if(this.startPosition == null || this.endPosition == null)
             return;

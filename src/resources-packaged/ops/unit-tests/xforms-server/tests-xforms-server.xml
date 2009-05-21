@@ -4470,5 +4470,78 @@
         </output>
     </test>
 
+    <test description="Test namespace mapping clashes" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <value>Hello, world!</value>
+                                    </xforms:instance>
+                                </xforms:model>
+                                <!-- First component -->
+                                <xbl:xbl xmlns:exf="http://www.exforms.org/exf/1-0">
+                                    <xbl:binding id="foo-component" element="fr|foo">
+                                        <xbl:template>
+                                            <!-- Use prefix exf declared only in this XBL binding, and use on element with id "clash" -->
+                                            <xforms:output id="clash" value="exf:readonly()">
+                                                <xforms:label>Read-only: </xforms:label>
+                                            </xforms:output>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                                <!-- Second component -->
+                                <xbl:xbl>
+                                    <xbl:binding id="bar-component" element="fr|bar">
+                                        <xbl:template>
+                                            <!-- Element with id "clash" doesn't have the exf prefix used by the other component -->
+                                            <xforms:output id="clash" ref=".">
+                                                <xforms:label>Message: </xforms:label>
+                                            </xforms:output>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <!-- Use the XBL components: this must not cause an exception! -->
+                                <fr:foo id="my-foo"/>
+                                <fr:bar id="my-bar"/>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <value>Hello, world!</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$clash" label="Read-only: ">false</xxf:control>
+                        <xxf:control id="my-bar$clash" label="Message: ">Hello, world!</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

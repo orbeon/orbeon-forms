@@ -15,6 +15,7 @@
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
@@ -24,13 +25,21 @@
             </xforms:instance>
         </xforms:model>
         <xi:include href="bug-ns-clash.xbl" xxi:omit-xml-base="true"/>
+        <xbl:xbl>
+            <xbl:binding id="bar-component" element="fr|bar">
+                <xbl:template>
+                    <!-- Element with id "clash" doesn't have the exf prefix used by the other component -->
+                    <xforms:output id="clash" ref=".">
+                        <xforms:label>Message: </xforms:label>
+                    </xforms:output>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
     </xhtml:head>
     <xhtml:body>
-        <!-- Element with id "clash" doesn't have the exf prefix used by XBL -->
-        <xforms:output id="clash" ref=".">
-            <xforms:label>Message: </xforms:label>
-        </xforms:output>
+
         <!-- Use XBL component -->
-        <fr:foobar/>
+        <fr:foo/>
+        <fr:bar/>
     </xhtml:body>
 </xhtml:html>

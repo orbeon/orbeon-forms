@@ -583,8 +583,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     final String instancePrefix = XFormsUtils.getEffectiveIdPrefix(getEffectiveId());
                     final String repeatControlPrefix = XFormsUtils.getEffectiveIdPrefix(newRepeatControl.getEffectiveId());
 
+                    // Only update controls within the same container as the instance OR in descendant containers
                     if (repeatControlPrefix.startsWith(instancePrefix)) {
-                        // Only update controls within the same container as the instance OR in descendant containers
                         // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is no longer needed
                         newRepeatControl.updateNodeset(pipelineContext, insertedNodeInfos);
                     }

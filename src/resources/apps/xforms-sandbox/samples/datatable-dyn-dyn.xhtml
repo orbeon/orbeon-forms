@@ -1,0 +1,168 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <set>Second set</set>
+                        <measure>5</measure>
+                        <measure>4.5</measure>
+                        <measure>4.6</measure>
+                    </record>
+                    <record>
+                        <set>First set</set>
+                        <measure>10.1</measure>
+                        <measure>10.2</measure>
+                        <measure>9.8</measure>
+                    </record>
+                    <record>
+                        <set>Third set</set>
+                        <measure>20</measure>
+                        <measure>2</measure>
+                        <measure>10</measure>
+                    </record>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('instance')/record/measure" type="xs:decimal"/>
+        </xforms:model>
+    </head>
+    <body>
+
+        <h1>Using the datatable widget (dynamic)</h1>
+
+        <h2>Static table</h2>
+        <fr:datatable-dyn>
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true">set</th>
+                    <th fr:sortable="true" fr:resizeable="true">measure 1</th>
+                    <th fr:sortable="true" fr:resizeable="true">measure 2</th>
+                    <th fr:sortable="true" fr:resizeable="true">measure 3</th>
+                    <th fr:sortable="true" fr:resizeable="true">average</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="record">
+                    <tr>
+                        <td>
+                            <xforms:output ref="set"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="measure[1]"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="measure[2]"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="measure[3]"/>
+                        </td>
+                        <td>
+                            <xforms:output value="avg(measure)"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:datatable-dyn>
+
+        <h2>Dynamic table</h2>
+        <fr:datatable-dyn>
+            <thead>
+                <tr>
+                    <xforms:repeat nodeset="record[1]/*">
+                        <th fr:sortable="true" fr:resizeable="true">
+                            <xforms:output value="name()"/>
+                        </th>
+                    </xforms:repeat>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="record">
+                    <tr>
+                        <xforms:repeat nodeset="*">
+                            <td>
+                                <xforms:output ref="."/>
+                            </td>
+                        </xforms:repeat>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:datatable-dyn>
+
+       <!-- <p>The same as a "normal" table</p>
+        <table>
+            <thead>
+                <tr>
+                    <xforms:repeat nodeset="record[1]/*">
+                        <th fr:sortable="true" fr:resizeable="true">
+                            <xforms:output value="name()"/>
+                        </th>
+                    </xforms:repeat>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="record">
+                    <tr>
+                        <xforms:repeat nodeset="*">
+                            <td>
+                                <xforms:output ref="."/>
+                            </td>
+                        </xforms:repeat>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </table>-->
+
+        <h2>Mixed (static/dynamic) table</h2>
+        <fr:datatable-dyn>
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true">set</th>
+                    <xforms:repeat nodeset="record[1]/measure">
+                        <th fr:sortable="true" fr:resizeable="true">
+                            <xforms:output value="concat(name(), ' ', position())"/>
+                        </th>
+                    </xforms:repeat>
+                    <th fr:sortable="true" fr:resizeable="true">average</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="record">
+                    <tr>
+                        <td>
+                            <xforms:output ref="set"/>
+                        </td>
+                        <xforms:repeat nodeset="measure">
+                            <td>
+                                <xforms:output ref="."/>
+                            </td>
+                        </xforms:repeat>
+                        <td>
+                            <xforms:output value="avg(measure)"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:datatable-dyn>
+
+
+    </body>
+</html>

@@ -113,7 +113,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 containingDocument = (XFormsContainingDocument) tempContainer;
                 break;
             }
-            tempContainer = tempContainer.getParentXBLContext();
+            tempContainer = tempContainer.getParentXBLContainer();
         }
 
         this.contextStack = new XFormsContextStack(this);
@@ -181,7 +181,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return fullPrefix;
     }
 
-    public XBLContainer getParentXBLContext() {
+    public XBLContainer getParentXBLContainer() {
         return parentXBLContainer;
     }
 
@@ -491,7 +491,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     private boolean isRootXBLContainer() {
         // Only the root container doesn't have a parent
-        return getParentXBLContext() == null;
+        return getParentXBLContainer() == null;
     }
 
     private boolean isEffectiveIdWithinThisContainer(String effectiveId) {

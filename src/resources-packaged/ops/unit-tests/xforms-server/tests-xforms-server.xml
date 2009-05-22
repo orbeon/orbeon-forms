@@ -4936,5 +4936,101 @@
         </output>
     </test>
 
+    <test description="xxforms:intance() scoping" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="global-instance-1">
+                                        <global-instance-1/>
+                                    </xforms:instance>
+                                    <xforms:instance id="global-instance-2">
+                                        <global-instance-2/>
+                                    </xforms:instance>
+                                </xforms:model>
+
+                                <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:binding id="fr-foobar" element="fr|foobar">
+                                        <xbl:template>
+                                            <xforms:model id="local-model">
+                                                <xforms:instance id="local-instance">
+                                                    <local-instance/>
+                                                </xforms:instance>
+                                            </xforms:model>
+
+                                            <xforms:output id="output-1" value="name()"/>
+                                            <xforms:group model="local-model">
+                                                <xforms:output id="output-2" value="name()"/>
+                                            </xforms:group>
+                                            <xforms:output id="output-3" model="local-model" value="name(instance('local-instance'))"/>
+                                            <xforms:output id="output-4" value="name(xxforms:instance('local-instance'))"/>
+                                            <xforms:output id="output-5" value="name(xxforms:instance('global-instance-1'))"/>
+                                            <xforms:output id="output-6" value="name(xxforms:instance('global-instance-2'))"/>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <fr:foobar/>
+
+                                <xforms:group id="my-group" context="instance('global-instance-2')">
+                                    <fr:foobar/>
+                                </xforms:group>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="global-instance-1" model-id="model">
+                                <global-instance-1/>
+                            </instance>
+                            <instance id="global-instance-2" model-id="model">
+                                <global-instance-2/>
+                            </instance>
+                            <instance id="local-instance" model-id="xf-5$local-model">
+                                <local-instance/>
+                            </instance>
+                            <instance id="local-instance" model-id="xf-7$local-model">
+                                <local-instance/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-5$output-1">global-instance-1</xxf:control>
+                        <xxf:control id="xf-5$output-2">local-instance</xxf:control>
+                        <xxf:control id="xf-5$output-3">local-instance</xxf:control>
+                        <xxf:control id="xf-5$output-4">local-instance</xxf:control>
+                        <xxf:control id="xf-5$output-5">global-instance-1</xxf:control>
+                        <xxf:control id="xf-5$output-6">global-instance-2</xxf:control>
+                        <xxf:control id="xf-7$output-1">global-instance-2</xxf:control>
+                        <xxf:control id="xf-7$output-2">local-instance</xxf:control>
+                        <xxf:control id="xf-7$output-3">local-instance</xxf:control>
+                        <xxf:control id="xf-7$output-4">local-instance</xxf:control>
+                        <xxf:control id="xf-7$output-5">global-instance-1</xxf:control>
+                        <xxf:control id="xf-7$output-6">global-instance-2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

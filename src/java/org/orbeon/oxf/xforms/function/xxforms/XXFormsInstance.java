@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.PathMap;
@@ -41,8 +42,17 @@ public class XXFormsInstance extends XFormsFunction {
         final Expression instanceIdExpression = argument[0];
         final String instanceId = XFormsUtils.namespaceId(containingDocument, instanceIdExpression.evaluateAsString(xpathContext));
 
-        // TODO: implement search through parent containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
-        final XFormsInstance instance = containingDocument.findInstance(instanceId);
+        // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
+        XFormsInstance instance = null;
+        {
+            XBLContainer currentContainer = getXBLContainer(xpathContext);
+            while (currentContainer != null) {
+                instance = currentContainer.findInstance(instanceId);
+                if (instance != null)
+                    break;
+                currentContainer = currentContainer.getParentXBLContainer();
+            }
+        }
 
         // Return instance document if found
         if (instance != null) {

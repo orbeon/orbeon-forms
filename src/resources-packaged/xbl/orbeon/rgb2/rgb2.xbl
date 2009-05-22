@@ -58,7 +58,7 @@
             </xforms:model>
 
             <!-- Local controls -->
-            <xforms:group xbl:attr="ref bind">
+            <xforms:group xbl:attr="model context ref bind">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
                 <xforms:group model="rgb-model">

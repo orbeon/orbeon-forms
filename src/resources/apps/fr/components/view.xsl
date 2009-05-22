@@ -238,58 +238,19 @@
         <xhtml:div class="fr-language-choice">
             <xxforms:variable name="default-language" select="xxforms:instance('fr-default-language-instance')"/>
             <!-- Put default language first, then other languages -->
-            <xxforms:variable name="available-languages"
+            <xxforms:variable name="available-languages" as="xs:string*"
                               select="(xxforms:instance('fr-form-resources')/resource[@xml:lang = $default-language]/@xml:lang,
                                         xxforms:instance('fr-form-resources')/resource[not(@xml:lang = $default-language)]/@xml:lang)"/>
 
-            <!-- Group below implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized, e.g.: -->
-
-            <!--<fb:select1 ref="instance('fr-language-instance')">-->
-                <!--<xforms:itemset nodeset="$available-languages">-->
-                    <!--<xforms:label ref="(xxforms:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>-->
-                    <!--<xforms:value ref="."/>-->
-                <!--</xforms:itemset>-->
-            <!--</fb:select1>-->
-
-            <!--<xbl:template xxbl:transform="oxf:xslt">-->
-                <!--<xforms:group xbl:attr="ref bind" appearance="xxforms:internal">-->
-                    <!--<xxforms:variable name="result" select="." as="node()"/>-->
-                    <!--<xforms:repeat model="fr-resources-model" nodeset="{/*/xforms:itemset/@nodeset}">-->
-                        <!--<xxforms:variable name="position" select="position()" as="xs:integer"/>-->
-                        <!--<xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/@ref}" as="xs:string"/>-->
-                        <!--<xxforms:variable name="value" select="{/*/xforms:itemset/xforms:value/@ref}" as="xs:string"/>-->
-                        <!---->
-                        <!--<xforms:group ref=".[$position > 1]"> | </xforms:group>-->
-                        <!--<xforms:group ref=".[$value != $result]">-->
-                            <!--<xforms:trigger appearance="minimal">-->
-                                <!--<xforms:label value="$label"/>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!--<xforms:setvalue ref="$result" value="$value"/>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xforms:group>-->
-                        <!--<xforms:output ref=".[$value = $result]" value="$label"/>-->
-                    <!--</xforms:repeat>-->
-                <!--</xforms:group>-->
-            <!--</xbl:template>-->
-
             <!-- Don't display language selector if there is only one language -->
-            <xforms:group id="fr-language-selector" ref=".[count($available-languages) gt 1]">
-                <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
-                    <xxforms:variable name="position" select="position()"/>
-                    <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                    <xxforms:variable name="value" select="context()"/>
-                    <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                    <xforms:group ref=".[$value != instance('fr-language-instance')]">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label value="$label"/>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-language-instance')" value="$value"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xforms:group>
-                    <xforms:output ref=".[$value = instance('fr-language-instance')]" value="$label"/>
-                </xforms:repeat>
+            <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
+            <xforms:group id="fr-language-selector" model="fr-resources-model" ref=".[count($available-languages) gt 1]">
+                <fr:link-select1 ref="instance('fr-language-instance')">
+                    <xforms:itemset nodeset="$available-languages">
+                        <xforms:label ref="(xxforms:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                        <xforms:value ref="context()"/>
+                    </xforms:itemset>
+                </fr:link-select1>
             </xforms:group>
         </xhtml:div>
     </xsl:template>

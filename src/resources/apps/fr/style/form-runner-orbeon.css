@@ -174,7 +174,7 @@ p, fieldset, table { margin-bottom: 1em }
 /* Metadata */
 .fr-header { margin-top: .5em }
 .fr-logo { display: block; float: left }
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .2em }
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .2em; text-align: right }
 .fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a { color: #6E6E6E }
 .fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
 

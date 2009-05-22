@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:exf="http://www.exforms.org/exf/1-0" >
+
+    <!--
+        Inplace input field.
+     -->
+    <xbl:binding id="fr-link-select1-binding" element="fr|link-select1">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Link Selector</display-name>
+            <display-name lang="fr">Sélection avec liens</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
+            </icon>
+            <template>
+                 <fr:link-select1>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                     <xforms:itemset nodeset="">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
+                    </xforms:itemset>
+                </fr:link-select1>
+            </template>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style>
+                <!--.xbl-fr-inplace-input { display: -moz-inline-box; display: inline-block; *zoom: 1; *display: inline } /* IE 7 hacks */-->
+                <!--.xbl-fr-inplace-input .fr-inplace-content:hover .xforms-output { background-color: #FFFF88 }-->
+                <!--.xbl-fr-inplace-input .xforms-input input { background-color: #FFFF88; background-image: none; border: none }-->
+                <!--.xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }-->
+                <!--.xbl-fr-inplace-input .fr-inplace-buttons .xforms-control { display: inline }-->
+            </xbl:style>
+        </xbl:resources>
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xforms:group xbl:attr="model context ref bind" appearance="xxforms:internal" xsl:version="2.0">
+                <xxforms:variable name="result" select="." as="node()"/>
+                <xforms:repeat nodeset="{/*/xforms:itemset/@nodeset}">
+                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                    <xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/(@ref | @value)}" as="xs:string"/>
+                    <xxforms:variable name="value" select="{/*/xforms:itemset/xforms:value/(@ref | @value)}" as="xs:string"/>
+
+                    <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                    <xforms:group ref=".[$value != $result]">
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label value="$label"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="$result" value="$value"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xforms:group>
+                    <xforms:output ref=".[$value = $result]" value="$label"/>
+                </xforms:repeat>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

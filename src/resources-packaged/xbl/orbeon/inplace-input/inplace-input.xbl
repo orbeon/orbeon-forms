@@ -74,7 +74,7 @@
                         </xforms:model>
 
                         <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
-                        <xforms:switch xbl:attr="ref bind context">
+                        <xforms:switch xbl:attr="model context ref bind">
                             <xsl:attribute name="class" select="string-join(('fr-component-group', @class), ' ')"/>
                             <!-- We handle validity at the switch level so we have only one alert in use for view/edit -->
                             <xbl:content includes="xforms|label, xforms|alert, xforms|help"/>

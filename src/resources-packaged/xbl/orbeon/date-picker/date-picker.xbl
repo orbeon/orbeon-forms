@@ -48,7 +48,7 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:group xbl:attr="ref bind" class="fr-component-group">
+            <xforms:group xbl:attr="model context ref bind" class="fr-component-group">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint"/><xforms:output ref="."/><xforms:input ref="." appearance="minimal"/>
             </xforms:group>
         </xbl:template>

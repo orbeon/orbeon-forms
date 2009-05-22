@@ -425,6 +425,12 @@
             <new-language>
                 <label>Add the following language:</label>
             </new-language>
+            <add-language>
+                <label>Add language</label>
+            </add-language>
+            <remove-language>
+                <label>Remove language</label>
+            </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
             <dialog-title>XML Schema Upload</dialog-title>
@@ -1121,6 +1127,12 @@
             <new-language>
                 <label>Ajouter la langue suivante :</label>
             </new-language>
+            <add-language>
+                <label>Ajouter une langue</label>
+            </add-language>
+            <remove-language>
+                <label>Supprimer la langue</label>
+            </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
             <dialog-title>Insertion de schéma XML</dialog-title>

@@ -32,7 +32,7 @@
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
         </xbl:resources>
         <xbl:template>
-            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" xbl:attr="context ref bind">
+            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" xbl:attr="model context ref bind">
                 <xbl:content includes="> xforms|label, > xforms|help, > xforms|hint"/>
 
                 <!-- Variables for attributes on the control -->

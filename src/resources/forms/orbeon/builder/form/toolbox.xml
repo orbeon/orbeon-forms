@@ -355,67 +355,6 @@
                     </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>
-            <xhtml:dt id="fb-toolbox-i18n-dt" class="a-m-t"><xforms:output value="$form-resources/i18n/label"/></xhtml:dt>
-            <xhtml:dd class="a-m-d">
-                <xhtml:div class="bd">
-                    <!-- Languages toolbox -->
-                    <xhtml:div class="fb-tools">
-                        <xforms:group class="fb-language-choice fb-hide-alert">
-                            <xforms:select1 appearance="minimal" ref="$fb-lang" id="fb-resources-language-select">
-                                <xforms:label ref="$form-resources/language/label"/>
-                                <xforms:itemset nodeset="$resources/resource">
-                                    <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
-                                    <xforms:value ref="@xml:lang"/>
-                                </xforms:itemset>
-                                <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
-                                <xforms:action ev:event="xforms-value-changed">
-                                    <xforms:rebuild model="fr-form-model"/>
-                                    <xforms:recalculate model="fr-form-model"/>
-                                    <xforms:revalidate model="fr-form-model"/>
-                                    <xforms:refresh model="fr-form-model"/>
-                                </xforms:action>
-                            </xforms:select1>
-                            <xforms:group class="fb-language-triggers">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
-                                        <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/delete.png" alt=""/>
-                                        <xhtml:span><xforms:output value="$form-resources/remove/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Ask confirmation -->
-                                        <xxforms:show dialog="fb-confirmation-dialog">
-                                            <xxforms:context name="fr:message"
-                                                             select="concat($form-resources/messages/delete-resources, ' ''',
-                                                                         xxforms:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                                                         '''?')"/>
-                                            <xxforms:context name="fr:confirmation-target" select="'fb-language-remove'"/>
-                                        </xxforms:show>
-                                    </xforms:action>
-                                    <xforms:action ev:event="fb-confirmation-yes">
-                                        <!-- Delete resources for this language -->
-                                        <xforms:delete nodeset="$resources/resource[@xml:lang = $fb-lang]"/>
-                                        <xforms:delete nodeset="$metadata-instance/title[@xml:lang = $fb-lang]"/>
-                                        <xforms:delete nodeset="$metadata-instance/description[@xml:lang = $fb-lang]"/>
-                                        <xforms:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
-
-                                        <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
-                                        <xforms:rebuild model="fr-form-model"/>
-                                        <xforms:recalculate model="fr-form-model"/>
-                                        <xforms:revalidate model="fr-form-model"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xforms:group>
-                        </xforms:group>
-                    </xhtml:div>
-                </xhtml:div>
-            </xhtml:dd>
             <xhtml:dt class="a-m-t"><xforms:output value="$form-resources/advanced/label"/></xhtml:dt>
             <xhtml:dd class="a-m-d">
                 <xhtml:div class="bd">

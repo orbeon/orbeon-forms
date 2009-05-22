@@ -64,7 +64,7 @@
                 <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
             <!-- Local controls -->
-            <xforms:group xbl:attr="ref bind">
+            <xforms:group xbl:attr="model context ref bind">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
                 <xxforms:variable name="result" select="." as="node()?"/>

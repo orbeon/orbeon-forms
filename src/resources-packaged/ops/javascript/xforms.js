@@ -1996,11 +1996,19 @@ ORBEON.xforms.Controls = {
 
     setHintMessage: function(control, message) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
-            control.title = message;
+            // For triggers, the value is stored in the title for the control
+            if (ORBEON.xforms.Globals.hintTooltipForControl[control.id] == null) {
+                // We only update the title if we don't have already a YUI hint widget.
+                // If we do, updating the value in the YUI widget is enough. The YUI widget empties the content of the
+                // title attribute to avoid the text in the title from showing. If we set the title, we might have
+                // both the title shown by the browser and the YUI hint widget.
+                control.title = message;
+            }
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-hint", message);
-            ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.hintTooltipForControl);
         }
+        // If there is already a YUI hint created for that control, update the message for the YUI widget
+        ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.hintTooltipForControl);
     },
 
     _setTooltipMessage: function(control, message, tooltipForControl) {

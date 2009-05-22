@@ -17,7 +17,6 @@ import org.apache.commons.pool.ObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;

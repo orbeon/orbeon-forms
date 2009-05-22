@@ -507,10 +507,12 @@
                                                                     <!-- Find grid/repeat to display -->
 
                                                                     <xxforms:variable name="readwrite-grid" select="not($is-component)" as="xs:boolean"/>
-                                                                    <!-- TODO: search for fr:repeat/fr:body in component too! -->
+                                                                    <!-- TODO: search for fr:repeat/fr:body in component too -->
                                                                     <xxforms:variable name="grid" as="element()"
                                                                                       select="if ($is-component) then $component-template//fr:grid[1]
                                                                                               else if ($is-repeat) then fr:body[1] else ."/>
+                                                                    <!-- Columns are either on fr:grid or fr:repeat parent of fr:grid -->
+                                                                    <xxforms:variable name="columns" select="($grid/@columns, $grid/../@columns)[1]" as="attribute(columns)"/>
 
                                                                     <!-- Use AVTs to set the style on the div depending on the number of columns in first row -->
                                                                     <xhtml:div class="fb-grid fb-grid-{count($grid/*:tr[1]/*:td)}-columns">
@@ -565,11 +567,11 @@
                                                                                         <xhtml:td class="fb-grid-column-toolbar-td">
                                                                                             <!-- Insert column to the left -->
                                                                                             <xhtml:div class="fb-insert-left">
-                                                                                                <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) lt 4]" id="fb-insert-column-left-trigger">
+                                                                                                <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt 4]" id="fb-insert-column-left-trigger">
                                                                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{$form-resources/insert-column-left-icon/label}" title="{$form-resources/insert-column-left-icon/label}"/></xforms:label>
                                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                                         <!-- Increment number of columns -->
-                                                                                                        <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
+                                                                                                        <xforms:setvalue ref="$columns" value=". + 1"/>
 
                                                                                                         <!-- Prepare span grid -->
                                                                                                         <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
@@ -591,11 +593,11 @@
                                                                                             </xhtml:div>
                                                                                             <!-- Insert column to the right -->
                                                                                             <xhtml:div class="fb-insert-right">
-                                                                                                <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) lt 4]" id="fb-insert-column-right-trigger">
+                                                                                                <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt 4]" id="fb-insert-column-right-trigger">
                                                                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{$form-resources/insert-column-right-icon/label}" title="{$form-resources/insert-column-right-icon/label}"/></xforms:label>
                                                                                                     <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                                         <!-- Increment number of columns -->
-                                                                                                        <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
+                                                                                                        <xforms:setvalue ref="$columns" value=". + 1"/>
 
                                                                                                         <!-- Prepare span grid -->
                                                                                                         <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
@@ -616,7 +618,7 @@
                                                                                                 </xforms:trigger>
                                                                                             </xhtml:div>
                                                                                             <!-- Delete column -->
-                                                                                            <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($grid/@columns) gt 1]" id="fb-delete-column-trigger">
+                                                                                            <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) gt 1]" id="fb-delete-column-trigger">
                                                                                                 <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-column-icon/label}" title="{$form-resources/delete-column-icon/label}"/></xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
 
@@ -649,7 +651,7 @@
                                                                                                     </xforms:action>
                                                                                                 </xforms:action>
                                                                                                 <xforms:action ev:event="fb-confirmation-yes">
-                                                                                                    <xforms:setvalue ref="$grid/@columns" value=". - 1"/>
+                                                                                                    <xforms:setvalue ref="$columns" value=". - 1"/>
 
                                                                                                     <xxforms:variable name="delete-tds"
                                                                                                                       select="for $c in for $r in instance('fb-span-grid-instance')/r
@@ -809,7 +811,7 @@
                                                                                                             <xxforms:variable name="new-td-count"
                                                                                                                               select="if ($tr/following-sibling::*:tr)
                                                                                                                                       then count(instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. != 'x'])
-                                                                                                                                      else xs:integer($grid/@columns)"/>
+                                                                                                                                      else xs:integer($columns)"/>
 
                                                                                                             <!-- Insert new row -->
                                                                                                             <!-- TODO: should insert fr:tr/fr:td instead? -->

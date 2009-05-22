@@ -203,18 +203,21 @@
     <xforms:action ev:event="fb-prepare-span-grid">
         <xxforms:variable name="grid" select="event('grid')"/>
 
+        <!-- Columns are either on fr:grid or fr:repeat parent of fr:grid -->
+        <xxforms:variable name="columns" select="($grid/@columns, $grid/../@columns)[1]" as="attribute(columns)"/>
+
         <!-- Prepare span grid -->
         <xxforms:variable name="tmp" select="instance('fb-span-grid-instance')"/>
         <xforms:delete nodeset="instance('fb-span-grid-instance')/*"/>
         <xforms:insert context="instance('fb-span-grid-instance')" nodeset="*"
-                       origin="for $r in $grid/xhtml:tr return xxforms:element('r', for $c in (1 to $grid/@columns) return xxforms:element('c'))"/>
+                       origin="for $r in $grid/*:tr return xxforms:element('r', for $c in (1 to $columns) return xxforms:element('c'))"/>
 
         <!-- Fill-out table with rowspan / colspan data -->
         <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/*"><!-- Iterating over rows -->
             <xxforms:variable name="r" select="."/>
             <xxforms:variable name="y" select="position()"/>
 
-            <xforms:action xxforms:iterate="$grid/xhtml:tr[$y]/xhtml:td"><!-- Iterating over actual tds -->
+            <xforms:action xxforms:iterate="$grid/*:tr[$y]/*:td"><!-- Iterating over actual tds -->
                 <xxforms:variable name="td" select="."/>
                 <xxforms:variable name="td-x" select="position()"/>
                 <xxforms:variable name="rowspan" select="if (@rowspan) then xs:integer(@rowspan) else 1"/>
@@ -295,9 +298,9 @@
     <xforms:bind nodeset="instance('fb-variables')">
         <!-- When are toolbar controls triggers enabled -->
         <xforms:bind nodeset="controls-triggers"
-                     readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]
-                                                                        or not($current-td/following-sibling::xhtml:td)
-                                                                            and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/*)))))"/>
+                     readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::*:td[1][not(*)]
+                                                                        or not($current-td/following-sibling::*:td)
+                                                                            and (not(exists($current-td/../following-sibling::*:tr[1]/*:td[1]/*)))))"/>
         <!-- When are grids triggers enabled -->
         <xforms:bind nodeset="grids-triggers" readonly="$current-td/ancestor::xbl:binding"/>
     </xforms:bind>
@@ -316,17 +319,17 @@
             </xforms:action>
             <xforms:action if="exists(*)">
                 <!-- There is an element in the current td, figure out what to do -->
-                <xxforms:variable name="is-next-td-available" select="following-sibling::xhtml:td[1][not(*)]"/>
+                <xxforms:variable name="is-next-td-available" select="following-sibling::*:td[1][not(*)]"/>
                 <xforms:action if="$is-next-td-available">
                     <!-- Next cell is empty, move to that one -->
                     <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="index('fb-section-content-grid-td-repeat') + 1"/>
                 </xforms:action>
-                <xforms:action if="not($is-next-td-available) and following-sibling::xhtml:td">
+                <xforms:action if="not($is-next-td-available) and following-sibling::*:td">
                     <!-- TODO: Not sure we have a plan here -->
                 </xforms:action>
-                <xforms:action if="not($is-next-td-available) and not(following-sibling::xhtml:td)">
+                <xforms:action if="not($is-next-td-available) and not(following-sibling::*:td)">
                     <xxforms:variable name="is-insert-new-row"
-                                      select="exists(../following-sibling::xhtml:tr[1]/xhtml:td[1]/*) or not(exists(../following-sibling::xhtml:tr[1]))"/>
+                                      select="exists(../following-sibling::*:tr[1]/*:td[1]/*) or not(exists(../following-sibling::*:tr[1]))"/>
                     <!-- We are the last cell of the row -->
                     <xforms:action if="$is-insert-new-row">
                         <!-- The first cell of the next row is occupied, or there is no next row: insert new row -->
@@ -370,7 +373,7 @@
         <xxforms:variable name="resource-holders" select="event('resource-holders')"/>
 
         <!-- All the xhtml:td elements up to and including the current one -->
-        <xxforms:variable name="tds" select="($current-td/../preceding-sibling::xhtml:tr/xhtml:td, $current-td/preceding-sibling::xhtml:td)"/>
+        <xxforms:variable name="tds" select="($current-td/../preceding-sibling::*:tr/*:td, $current-td/preceding-sibling::*:td)"/>
 
         <!-- Name of the preceding control id -->
         <xxforms:variable name="preceding-control-id" select="substring-before(($tds/*)[last()]/@id, '-control')"/>

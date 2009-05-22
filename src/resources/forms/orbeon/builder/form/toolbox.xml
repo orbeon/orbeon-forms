@@ -196,7 +196,7 @@
                                                     <!-- Is the current section empty (i.e. no children non-XForms elements, or an empty grid)? -->
                                                     <xxforms:variable name="is-current-section-empty" as="xs:boolean"
                                                                       select="not(exists($current-section/*[namespace-uri() != 'http://www.w3.org/2002/xforms']))
-                                                                              or exists($current-section/fr:grid) and not(exists($current-section/fr:grid//(fr:td | xhtml:td)/*))"/>
+                                                                              or exists($current-section/fr:grid) and not(exists($current-section/fr:grid//*:td/*))"/>
 
                                                     <!--<xforms:message>-->
                                                         <!--xxx <xforms:output value="$is-current-section-empty"/> xxx-->

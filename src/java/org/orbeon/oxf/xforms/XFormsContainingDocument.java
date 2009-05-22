@@ -364,37 +364,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
-     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
-     * repeat or a component.
-     *
-     * @param sourceEffectiveId  effective id of the source, or null
-     * @param targetStaticId     static id of the target
-     * @return                   object, or null if not found
-     */
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
-
-        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
-            throw new OXFException("Target id must be static id: " + targetStaticId);
-
-        // Search in controls
-        // NOTE: we do this first now, because resolution of ids within components has priority
-        {
-            final Object resultObject = xformsControls.resolveObjectById(sourceEffectiveId, targetStaticId);
-            if (resultObject != null)
-                return resultObject;
-        }
-
-        // Search in parent (models and this)
-        {
-            final Object resultObject = super.resolveObjectById(sourceEffectiveId, targetStaticId);
-            if (resultObject != null)
-                return resultObject;
-        }
-
-        return null;
-    }
-
-    /**
      * Return the active submission if any or null.
      */
     public XFormsModelSubmission getClientActiveSubmission() {

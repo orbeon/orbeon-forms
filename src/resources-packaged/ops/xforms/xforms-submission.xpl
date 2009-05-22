@@ -58,7 +58,7 @@
                                 <xsl:document>
                                     <static-state>
                                         <xforms:trigger id="trigger">
-                                            <xforms:send submission="default-submission" ev:event="DOMActivate"/>
+                                            <xforms:send id="send" submission="default-submission" ev:event="DOMActivate"/>
                                         </xforms:trigger>
                                         <xforms:model id="default-model">
                                             <xforms:instance id="default-instance">
@@ -75,7 +75,7 @@
                                                 <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
                                                 <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
                                                 <xsl:if test="$is-shared-result">
-                                                    <xforms:insert ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
+                                                    <xforms:insert id="insert-done" ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
                                                 </xsl:if>
                                             </xforms:submission>
                                         </xforms:model>

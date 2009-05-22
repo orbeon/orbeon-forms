@@ -537,8 +537,13 @@ ORBEON.util.Dom = {
      */
     nudgeAferDelay: function(element) {
         if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
+            var tables = element.getElementsByTagName("table");
             window.setTimeout(function() {
                 element.className = element.className;
+                for (var tableIndex = 0; tableIndex < tables.length; tableIndex++) {
+                    var table = tables[tableIndex];
+                    table.className = table.className;
+                }
             }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
         }
     }
@@ -4142,9 +4147,9 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
-        // YUI event.jsÕs call to this.subscribers.length in fire method hangs. 
+        // YUI event.jsÕs call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
-            ORBEON.xforms.Events.orbeonLoadedEvent.fire(); 
+            ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
     },
 

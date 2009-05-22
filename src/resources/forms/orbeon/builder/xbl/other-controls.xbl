@@ -43,8 +43,8 @@
                 <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
             </icon>
-            <template xmlns="">
-                <xforms:trigger id="">
+            <template>
+                <xforms:trigger id="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>
                     <!-- No hint? -->

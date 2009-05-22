@@ -44,8 +44,8 @@
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:input id="" ref="">
+            <template>
+                <xforms:input id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -64,8 +64,8 @@
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:textarea id="" ref="">
+            <template>
+                <xforms:textarea id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -87,8 +87,8 @@
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:textarea id="" ref="" appearance="xxforms:autosize">
+            <template>
+                <xforms:textarea id="" ref="" appearance="xxforms:autosize" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -108,8 +108,8 @@
                 <large-icon>/forms/orbeon/builder/images/html.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:textarea id="" ref="" mediatype="text/html">
+            <template>
+                <xforms:textarea id="" ref="" mediatype="text/html" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -128,8 +128,8 @@
                 <large-icon>/apps/fr/style/images/silk/text_align_left.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:output id="" ref="">
+            <template>
+                <xforms:output id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>
                     <!-- No hint? -->

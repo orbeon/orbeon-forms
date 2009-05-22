@@ -44,8 +44,8 @@
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
             <datatype>xforms:string</datatype>
-            <template xmlns="">
-                <xforms:select1 id="" appearance="minimal" ref="">
+            <template>
+                <xforms:select1 id="" appearance="minimal" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -72,8 +72,8 @@
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:select1 id="" appearance="full" ref="">
+            <template>
+                <xforms:select1 id="" appearance="full" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -96,8 +96,8 @@
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:select id="" appearance="full" ref="">
+            <template>
+                <xforms:select id="" appearance="full" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -120,8 +120,8 @@
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:select1 id="" appearance="compact" ref="">
+            <template>
+                <xforms:select1 id="" appearance="compact" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -144,8 +144,8 @@
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
-            <template xmlns="">
-                <xforms:select id="" appearance="compact" ref="">
+            <template>
+                <xforms:select id="" appearance="compact" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>

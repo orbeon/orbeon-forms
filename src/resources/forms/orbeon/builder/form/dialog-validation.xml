@@ -50,7 +50,7 @@
                     <xforms:select1 ref="schema-type[$model/xs:schema]">
                         <xforms:label>
                             <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
-                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/Schema Type/label"/></xhtml:span>
+                            <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/schema-type/label"/></xhtml:span>
                         </xforms:label>
                         <xforms:hint ref="$form-resources/dialog-validation-details/types/hint"/>
                         <xforms:item>

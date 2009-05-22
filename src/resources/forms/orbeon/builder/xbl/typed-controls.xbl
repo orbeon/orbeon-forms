@@ -44,8 +44,8 @@
                 <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
             </icon>
             <datatype>xforms:date</datatype>
-            <template xmlns="">
-                <xforms:input id="" ref="">
+            <template>
+                <xforms:input id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -64,8 +64,8 @@
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
             </icon>
             <datatype>xforms:time</datatype>
-            <template xmlns="">
-                <xforms:input id="" ref="">
+            <template>
+                <xforms:input id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -84,8 +84,8 @@
                 <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
             </icon>
             <datatype>xforms:dateTime</datatype>
-            <template xmlns="">
-                <xforms:input id="" ref="">
+            <template>
+                <xforms:input id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -104,8 +104,8 @@
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
             </icon>
             <datatype>xforms:email</datatype>
-            <template xmlns="">
-                <xforms:input id="" ref="">
+            <template>
+                <xforms:input id="" ref="" xmlns="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -124,8 +124,8 @@
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
             </icon>
             <datatype>xforms:anyURI</datatype>
-            <template xmlns="">
-                <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment" value=".">
+            <template>
+                <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment" value="." xmlns="">
                     <xforms:label ref=""/>
                     <xforms:help ref=""/>
                     <!-- No hint? -->

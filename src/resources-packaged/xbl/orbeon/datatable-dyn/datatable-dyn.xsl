@@ -84,7 +84,7 @@
                 </xforms:instance>
                 <xforms:bind nodeset="column/@nbColumns" calculate="1"/>
                 <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
-                <xforms:bind nodeset="*/@index" calculate="count(preceding::column) + 1"/>
+                <xforms:bind nodeset="*/@index" calculate="count(../preceding::column) + 1"/>
             </xforms:model>
 
             <xhtml:div style="border:thin solid black">
@@ -148,55 +148,69 @@
         </xhtml:thead>
     </xsl:template>-->
 
-    <xsl:template name="yui-dt-liner">
-        <xsl:param name="position"/>
-        <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
-            <xhtml:span class="yui-dt-label">
-                <xsl:choose>
-                    <xsl:when test="@fr:sortable = 'true' and false()">
-                        <xforms:group model="datatable" instance="sort">
-                            <xxforms:variable name="nextSortOrder">ascending</xxforms:variable>
-                            <xforms:group ref=".[$nextSortOrder = 'ascending']">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="node()"/>
-                                    </xforms:label>
-                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"
-                                        /></xforms:hint>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                        <xforms:setvalue ref="@currentId">
-                                            <xsl:value-of select="$position"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue ref="instance('page')" value="1"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xforms:group>
+    <xsl:template name="header-cell">
 
-                            <xforms:group ref=".[$nextSortOrder != 'ascending']">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="node()"/>
-                                    </xforms:label>
-                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"
-                                        /></xforms:hint>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                        <xforms:setvalue ref="@currentId">
-                                            <xsl:value-of select="$position"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue ref="instance('page')" value="1"/>
-                                    </xforms:action>
-                                </xforms:trigger>
+        <xsl:param name="position"/>
+        
+        <xforms:output value="$columnDesc/@index"/>
+        
+        
+        <xhtml:div class="yui-dt-resizerliner">
+            <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
+                <xhtml:span class="yui-dt-label">
+                    <xsl:choose>
+                        <xsl:when test="@fr:sortable = 'true' and false()">
+                            <xforms:group model="datatable" instance="sort">
+                                <xxforms:variable name="nextSortOrder">ascending</xxforms:variable>
+                                <xforms:group ref=".[$nextSortOrder = 'ascending']">
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xsl:apply-templates select="node()"/>
+                                        </xforms:label>
+                                        <xforms:hint>Click to sort <xforms:output
+                                                value="$nextSortOrder"/></xforms:hint>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="@currentOrder"
+                                                value="$nextSortOrder"/>
+                                            <xforms:setvalue ref="@currentId">
+                                                <xsl:value-of select="$position"/>
+                                            </xforms:setvalue>
+                                            <xforms:setvalue ref="instance('page')" value="1"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xforms:group>
+
+                                <xforms:group ref=".[$nextSortOrder != 'ascending']">
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xsl:apply-templates select="node()"/>
+                                        </xforms:label>
+                                        <xforms:hint>Click to sort <xforms:output
+                                                value="$nextSortOrder"/></xforms:hint>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="@currentOrder"
+                                                value="$nextSortOrder"/>
+                                            <xforms:setvalue ref="@currentId">
+                                                <xsl:value-of select="$position"/>
+                                            </xforms:setvalue>
+                                            <xforms:setvalue ref="instance('page')" value="1"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </xforms:group>
-                        </xforms:group>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:apply-templates select="node()"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xhtml:span>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="node()"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xhtml:span>
+            </xhtml:div>
+            <xsl:if test="@fr:resizeable = 'true'">
+                <xhtml:div id="{generate-id()}" class="yui-dt-resizer"
+                    style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
+            </xsl:if>
         </xhtml:div>
+
     </xsl:template>
 
     <xsl:template match="column|columnSet" priority="1">
@@ -215,13 +229,11 @@
              {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']"/>
-            <xhtml:div class="yui-dt-resizerliner">
-                <xsl:call-template name="yui-dt-liner"/>
-                <xsl:if test="@fr:resizeable = 'true'">
-                    <xhtml:div id="{generate-id()}" class="yui-dt-resizer"
-                        style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
-                </xsl:if>
-            </xhtml:div>
+            <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"/>
+            <xxforms:variable name="columnDesc" model="datatable-model"
+                select="instance('datatable-instance')/*[position() = $index]"/>
+            <xsl:call-template name="header-cell"/>
+
         </xhtml:th>
     </xsl:template>
 
@@ -232,15 +244,16 @@
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
             {@class}
             ">
+            <xsl:apply-templates select="@*[name() != 'class']"/>
             <xxforms:variable name="position" select="position()"/>
             <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"/>
-            <xforms:group model="datatable-model" instance="datatable-instance">
-                <xxforms:variable name="columnSet" select="*[position() = $index]"/>
-                <xforms:group ref=".">
-                    <xforms:action ev:event="xforms-enabled">
-                        <xforms:delete nodeset="$columnSet/column[@position = $position]"/>
-                        <xforms:insert context="$columnSet"
-                            origin="xxforms:element('column', (
+            <xxforms:variable name="columnSet" model="datatable-model"
+                select="instance('datatable-instance')/*[position() = $index]"/>
+            <xforms:group ref=".">
+                <xforms:action ev:event="xforms-enabled">
+                    <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
+                    <xforms:insert context="$columnSet" nodeset="column"
+                        origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
                                 xxforms:attribute('nbColumns', 1),
                                 xxforms:attribute('index', $columnSet/@index + $position - 1),
@@ -248,21 +261,16 @@
                                 $columnSet/@fr:sortable,
                                 $columnSet/@fr:resizeable
                                 ))"
-                        />
-                    </xforms:action>
-                </xforms:group>
-
+                        if="not($columnSet/column[@position = $position])
+                           "
+                    />
+                </xforms:action>
             </xforms:group>
 
+            <xxforms:variable name="columnDesc" select="$columnSet/column[@position = $position]"/>
 
-            <xsl:apply-templates select="@*[name() != 'class']"/>
-            <xhtml:div class="yui-dt-resizerliner">
-                <xsl:call-template name="yui-dt-liner"/>
-                <xsl:if test="@fr:resizeable = 'true'">
-                    <xhtml:div id="{generate-id()}" class="yui-dt-resizer"
-                        style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"/>
-                </xsl:if>
-            </xhtml:div>
+            <xsl:call-template name="header-cell"/>
+
         </xhtml:th>
     </xsl:template>
 

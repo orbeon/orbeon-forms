@@ -4796,5 +4796,74 @@
         </output>
     </test>
 
+    <test description="Id clash between repeat in XBL with same id as non-repeat control outside XBL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <values>
+                                            <value/><value/>
+                                        </values>
+                                    </xforms:instance>
+                                </xforms:model>
+                                <xbl:xbl>
+                                    <xbl:binding id="foobar-component" element="fr|foobar">
+                                        <xbl:template>
+                                            <xforms:repeat nodeset="value" id="clash">
+                                                <xforms:output value="xxforms:index()"/>
+                                            </xforms:repeat>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:trigger id="clash">
+                                    <xforms:label>NOP</xforms:label>
+                                </xforms:trigger>
+                                <fr:foobar id="my-foobar" ref="."/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value/>
+                                    <value/>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-foobar$clash" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="clash" label="NOP"/>
+                        <xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-foobar$xf-2·1">1</xxf:control>
+                        <xxf:control id="my-foobar$xf-2·2">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

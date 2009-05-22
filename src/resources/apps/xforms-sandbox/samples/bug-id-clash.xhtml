@@ -22,15 +22,17 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
-        <xforms:model>
-            <xforms:instance>
-                <value/>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <values>
+                    <value/><value/>
+                </values>
             </xforms:instance>
         </xforms:model>
         <xbl:xbl>
             <xbl:binding id="foobar-component" element="fr|foobar">
                 <xbl:template>
-                    <xforms:repeat nodeset="." id="clash">
+                    <xforms:repeat nodeset="value" id="clash">
                         <xhtml:div>
                             <xforms:output value="xxforms:index()"/>
                         </xhtml:div>
@@ -43,6 +45,6 @@
         <xforms:trigger id="clash">
             <xforms:label>NOP</xforms:label>
         </xforms:trigger>
-        <fr:foobar ref="."/>
+        <fr:foobar id="my-foobar" ref="."/>
     </xhtml:body>
 </xhtml:html>

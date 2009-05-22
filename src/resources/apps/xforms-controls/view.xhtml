@@ -22,7 +22,7 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
 	xmlns:xbl="http://www.w3.org/ns/xbl"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     lang="en">
 
     <xhtml:head>
@@ -36,8 +36,30 @@
                 <xforms:send submission="countries-submission"/>
                 <xforms:setfocus control="age-input-control"/>
             </xforms:action>
-            <!-- Here we illustrate how XForms instances can be included with the @src attribute -->
-            <xforms:instance id="instance" src="oxf:/apps/xforms-controls/main-xforms-instance.xml"/>
+            <xforms:instance id="instance">
+                <instance>
+                    <age>35</age>
+                    <name/>
+                    <secret>42</secret>
+                    <textarea>The world is but a canvas for the imagination.</textarea>
+                    <label>Hello, World!</label>
+                    <date/>
+                    <time/>
+                    <date-time/>
+                    <flavor>v c</flavor>
+                    <carrier>fedex</carrier>
+                    <country-name/>
+                    <new-item>
+                        <label>Key lime</label>
+                        <value>lime</value>
+                    </new-item>
+                    <range>
+                        <value>1</value>
+                        <letter>A</letter>
+                    </range>
+                    <country/>
+                </instance>
+            </xforms:instance>
             <xforms:instance id="resources-instance" src="oxf:/apps/xforms-controls/resources.xml"/>
             <xforms:instance id="flavors-instance">
                 <flavors>
@@ -107,11 +129,12 @@
                 method="post" action="services/countries" replace="instance" instance="countries-names-instance"/>
         </xforms:model>
         <xhtml:style type="text/css">
-            .input input { width: 20em; }
+            .input input, .inplace-input input { width: 20em; }
             .password { width: 20em; }
             .textarea { height: 6em; width: 20em; }
             .widget-tab-panel { padding-top: 1em; }
             .widget-tabs { width: 50em; }
+            .xbl-fr-inplace-input .fr-inplace-buttons { display: inline-box; display: -moz-inline-box; *zoom: 1}
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -122,16 +145,16 @@
                     <xforms:input id="age-input-control" ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
                         <xforms:label class="fixed-width">Age:</xforms:label>
                         <xforms:hint>Positive number</xforms:hint>
-                    <xforms:alert>Invalid age</xforms:alert>
-                    <xforms:help ref="instance('resources-instance')/help/age"/>
+                        <xforms:alert>Invalid age</xforms:alert>
+                        <xforms:help ref="instance('resources-instance')/help/age"/>
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:secret ref="secret" incremental="true" class="password" navindex="2">
+                    <xforms:secret ref="secret[false()]" incremental="true" class="password" navindex="2">
                         <xforms:label class="fixed-width">Password:</xforms:label>
                         <xforms:hint>The password is 42 ;)</xforms:hint>
                         <xforms:alert>Invalid password</xforms:alert>
-                    <xforms:help><xforms:output value="instance('resources-instance')/help/secret"/></xforms:help>
+                        <xforms:help><xforms:output value="instance('resources-instance')/help/secret"/></xforms:help>
                     </xforms:secret>
                 </xhtml:p>
                 <xhtml:p>
@@ -139,8 +162,16 @@
                         <xforms:label class="fixed-width">Text area:</xforms:label>
                         <xforms:hint>Enter at least 11 characters</xforms:hint>
                         <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
-                    <xforms:help><xforms:output mediatype="text/html" value="instance('resources-instance')/help/textarea"/></xforms:help>
+                        <xforms:help><xforms:output mediatype="text/html" value="instance('resources-instance')/help/textarea"/></xforms:help>
                     </xforms:textarea>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:inplace-input id="inplace-input-control" class="inplace-input" ref="name" navindex="4">
+                        <xforms:label class="fixed-width">Name:</xforms:label>
+                        <xforms:hint>Click here to enter your name</xforms:hint>
+                        <xforms:alert>Invalid name</xforms:alert>
+                        <xforms:help>This control is an in-place input: when you click on the text, it morphs into an input field which allows you to edit the value.</xforms:help>
+                    </fr:inplace-input>
                 </xhtml:p>
                 <xhtml:p>
                     <xforms:input ref="date" navindex="4" class="datafield">
@@ -202,7 +233,7 @@
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Single Value Selection</xforms:label>
                     <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="full" navindex="5">
+                        <xforms:select1 ref="carrier" appearance="full" navindex="5" xxforms:encrypt-item-values="false">
                             <xforms:label class="fixed-width">Carrier:</xforms:label>
                             <xforms:itemset nodeset="instance('carriers-instance')/carrier">
                                 <xforms:label ref="label"/>

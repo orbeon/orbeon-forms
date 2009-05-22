@@ -239,7 +239,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
         // Make sure the MIPs are up to date before comparing them
         getMIPsIfNeeded();
-        other.getMIPsIfNeeded();;
+        other.getMIPsIfNeeded();
 
         // Stanard MIPs
         if (readonly != other.readonly)
@@ -272,5 +272,13 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return isReadonly()
                 && (XFormsProperties.isStaticReadonlyAppearance(containingDocument)
                     || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+    }
+
+    public static boolean isStaticReadonlyNoEvaluate(XFormsSingleNodeControl control) {
+        // Static read-only if we are read-only and static (global or local setting)
+        // NOTE: This method does not evaluate the control but checks the current bound node
+        return InstanceData.getInheritedReadonly(control.getBoundNode())
+                && (XFormsProperties.isStaticReadonlyAppearance(control.getXBLContainer().getContainingDocument())
+                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(control.getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
     }
 }

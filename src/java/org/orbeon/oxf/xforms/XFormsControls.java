@@ -802,8 +802,12 @@ public class XFormsControls implements XFormsObjectResolver {
 //                                && (isControlValueChanged
 //                                    || isFirstRefresh && (!isContainerControl || Dom4jUtils.isSimpleContent((Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode())));
 
+                    // NOTE: In the whole refresh process, no control evaluation takes place. This is needed at this
+                    // point because with multiple models, a refresh might occur before all models have been RRR. This
+                    // means that evaluating here might incorrect values for MIPs and control values.
+
                     // Don't dispatch events to static readonly triggers, as they in fact behave as if they were not relevant!
-                    if (control instanceof XFormsTriggerControl && control.isStaticReadonly()) {
+                    if (control instanceof XFormsTriggerControl && XFormsSingleNodeControl.isStaticReadonlyNoEvaluate((XFormsSingleNodeControl) control)) {
                         return;
                     }
 

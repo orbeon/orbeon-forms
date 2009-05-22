@@ -177,11 +177,10 @@ public abstract class XFormsAction {
         final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
         if (repeatindexes != null && !"".equals(repeatindexes.trim())) {
             // Effective id is provided, modify appropriately
-            // TODO: this is broken within components: need to use prefixed id!
-            return controls.getObjectByEffectiveId(targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+            return controls.getObjectByEffectiveId(actionInterpreter.getXBLContainer().getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         } else {
             // Figure out effective id
-            return controls.resolveObjectById(sourceEffectiveId, targetStaticId);
+            return actionInterpreter.getXBLContainer().resolveObjectById(sourceEffectiveId, targetStaticId);
         }
     }
 
@@ -197,14 +196,14 @@ public abstract class XFormsAction {
      */
     protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, XFormsEventObserver eventObserver, String objectStaticId, Element actionElement) {
         // First try controls as we want to check on explicit repeat indexes first
-        final XBLContainer container = actionInterpreter.getXBLContainer();
         final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), objectStaticId, actionElement);
         if (tempXFormsEventTarget != null) {
             // Object with this id exists
             return tempXFormsEventTarget;
         } else {
             // Otherwise, try container
-            return (XFormsEventTarget) container.resolveObjectById(eventObserver.getEffectiveId(), objectStaticId);
+            final XBLContainer container = actionInterpreter.getXBLContainer();
+            return (XFormsEventTarget) container.resolveObjectById(null, objectStaticId);
         }
     }
 }

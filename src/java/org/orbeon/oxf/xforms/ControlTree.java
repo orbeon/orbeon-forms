@@ -401,16 +401,16 @@ public class ControlTree implements Cloneable {
      * Find an effective control id based on a control id, following the branches of the
      * current indexes of the repeat elements. age$age.1 - xforms-element-10
      */
-    public String findEffectiveControlId(String sourceEffectiveId, String targetId) {
+    public String findEffectiveControlId(String sourceControlEffectiveId, String targetId) {
         // Don't iterate if we don't have controls
         if (this.children == null)
             return null;
 
-        if (sourceEffectiveId != null && XFormsUtils.getEffectiveIdPrefix(sourceEffectiveId).length() > 0) {
+        if (sourceControlEffectiveId != null && XFormsUtils.getEffectiveIdPrefix(sourceControlEffectiveId).length() > 0) {
             // The source is within a particular component, so search only within that component
 
             // Start from source control
-            XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceEffectiveId);
+            XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceControlEffectiveId);
             if (componentControl != null) {
                 // Source is an existing control, go down parents until component is found
                 while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
@@ -424,7 +424,7 @@ public class ControlTree implements Cloneable {
                 // http://www.orbeon.com/forms/projects/xforms-model-scoping-rules
                 // Also, this manipulation of prefix/suffix has the potential to be wrong with repeat iterations, e.g.
                 // if the component is within repeats, and the control is within repeats within the component.
-                final String componentEffectiveId = XFormsUtils.getEffectiveIdPrefixNoSeparator(sourceEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(sourceEffectiveId);
+                final String componentEffectiveId = XFormsUtils.getEffectiveIdPrefixNoSeparator(sourceControlEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(sourceControlEffectiveId);
                 componentControl = (XFormsControl) effectiveIdsToControls.get(componentEffectiveId);
             }
 
@@ -433,14 +433,14 @@ public class ControlTree implements Cloneable {
                 return null;
 
             // Search from the root of the component
-            return findEffectiveControlId(sourceEffectiveId, targetId, ((XFormsComponentControl) componentControl).getChildren());
+            return findEffectiveControlId(sourceControlEffectiveId, targetId, ((XFormsComponentControl) componentControl).getChildren());
         } else {
             // Search from the root
-            return findEffectiveControlId(sourceEffectiveId, targetId, this.children);
+            return findEffectiveControlId(sourceControlEffectiveId, targetId, this.children);
         }
     }
 
-    private String findEffectiveControlId(String sourceEffectiveId, String targetId, List children) {
+    private String findEffectiveControlId(String sourceControlEffectiveId, String targetId, List children) {
         // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
         if (children != null && children.size() > 0) {
             for (Iterator i = children.iterator(); i.hasNext();) {
@@ -459,7 +459,7 @@ public class ControlTree implements Cloneable {
                     if (index > 0) {
                         final List newChildren = currentRepeatControl.getChildren();
                         if (newChildren != null && newChildren.size() > 0) {
-                            final String result = findEffectiveControlId(sourceEffectiveId, targetId, Collections.singletonList(newChildren.get(index - 1)));
+                            final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, Collections.singletonList(newChildren.get(index - 1)));
                             if (result != null)
                                 return result;
                         }
@@ -469,7 +469,7 @@ public class ControlTree implements Cloneable {
                     // Handle container control
                     final List newChildren = ((XFormsContainerControl) currentControl).getChildren();
                     if (newChildren != null && newChildren.size() > 0) {
-                        final String result = findEffectiveControlId(sourceEffectiveId, targetId, newChildren);
+                        final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, newChildren);
                         if (result != null)
                             return result;
                     }

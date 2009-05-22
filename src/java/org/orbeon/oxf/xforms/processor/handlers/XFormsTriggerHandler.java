@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -31,8 +30,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.util.Map;
 
 /**
  * Handle xforms:trigger.
@@ -128,48 +125,46 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
             // Minimal (AKA "link") appearance
 
             // TODO: probably needs f:url-norewrite="true"
-            if (true) {
-                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-            } else {
-                // TODO: Complete experimenting with outputting href value
-                String hrefValue = "#";
-                {
-                    // Try to compute an href value right away if we detect just a nested xforms:load
-                    // TODO: Need to tell the client not to handle clicks on hyperlink
-                    // TODO: This should probably be done at the control level
-                    // TODO: This duplicates code in XFormsLoadAction
-                    if (triggerControl != null && triggerControl.getControlElement() != null) {
-                        final Element controlElement = triggerControl.getControlElement();
-                        final Element loadElement = controlElement.element(XFormsConstants.XFORMS_LOAD_QNAME);
-                        if (loadElement != null && XFormsEvents.XFORMS_DOM_ACTIVATE.equals(loadElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME))) {
-                            final String resource = loadElement.attributeValue("resource");
-                            if (resource != null && resource.indexOf('{') == -1) {
-                                // Static resource URL
-                                hrefValue = resource;
-                            } else if (resource != null) {
-                                // Computed resource URL
-                                final XFormsContextStack.BindingContext currentBindingContext = triggerControl.getBindingContext();
-                                if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
-                                    final Map prefixToURIMap = triggerControl.getNamespaceMappings();
-                                    final XFormsContextStack contextStack = containingDocument.getControls().getContextStack();
-                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext,
-                                            currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
-                                            contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                            contextStack.getFunctionContext(), prefixToURIMap, triggerControl.getLocationData(), resource);
-                                }
-                            } else {
-                                // Assume single-node binding
-                                final XFormsContextStack.BindingContext curBindingContext = triggerControl.getBindingContext();
-                                if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
-                                    hrefValue = XFormsInstance.getValueForNodeInfo(curBindingContext.getSingleNode());
-                                }
-                            }
-                        }
-                    }
-                }
+            newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
 
-                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
-            }
+//                // TODO: Complete experimenting with outputting href value
+//                String hrefValue = "#";
+//                {
+//                    // Try to compute an href value right away if we detect just a nested xforms:load
+//                    // TODO: Need to tell the client not to handle clicks on hyperlink
+//                    // TODO: This should probably be done at the control level
+//                    // TODO: This duplicates code in XFormsLoadAction
+//                    if (triggerControl != null && triggerControl.getControlElement() != null) {
+//                        final Element controlElement = triggerControl.getControlElement();
+//                        final Element loadElement = controlElement.element(XFormsConstants.XFORMS_LOAD_QNAME);
+//                        if (loadElement != null && XFormsEvents.XFORMS_DOM_ACTIVATE.equals(loadElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME))) {
+//                            final String resource = loadElement.attributeValue("resource");
+//                            if (resource != null && resource.indexOf('{') == -1) {
+//                                // Static resource URL
+//                                hrefValue = resource;
+//                            } else if (resource != null) {
+//                                // Computed resource URL
+//                                final XFormsContextStack.BindingContext currentBindingContext = triggerControl.getBindingContext();
+//                                if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
+//                                    final Map prefixToURIMap = triggerControl.getNamespaceMappings();
+//                                    final XFormsContextStack contextStack = triggerControl.getContextStack();
+//                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext,
+//                                            currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
+//                                            contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+//                                            contextStack.getFunctionContext(), prefixToURIMap, triggerControl.getLocationData(), resource);
+//                                }
+//                            } else {
+//                                // Assume single-node binding
+//                                final XFormsContextStack.BindingContext curBindingContext = triggerControl.getBindingContext();
+//                                if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
+//                                    hrefValue = XFormsInstance.getValueForNodeInfo(curBindingContext.getSingleNode());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
 
             // xhtml:a
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

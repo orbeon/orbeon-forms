@@ -324,26 +324,6 @@ public class XFormsControls implements XFormsObjectResolver {
         }
     }
 
-    /**
-     * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
-     */
-    public int getRepeatIndex(XBLContainer container, String repeatStaticId) {
-        // TODO: pass sourceId
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(null, repeatStaticId);
-        if (repeatControl != null) {
-            // Found
-            return repeatControl.getIndex();
-        } else if (containingDocument.getStaticState().getControlInfoMap().get(container.getFullPrefix() + repeatStaticId) != null) {
-            // A repeat element does exist for this id, but it has zero iterations
-
-            // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
-            return 0;
-        } else {
-            // No repeat element exists
-            return -1;
-        }
-    }
-
     public Locator getLocator() {
         return locator;
     }
@@ -368,12 +348,12 @@ public class XFormsControls implements XFormsObjectResolver {
      * Resolve an object. This optionally depends on a source control, and involves resolving whether the source is within a
      * repeat or a component.
      *
-     * @param effectiveSourceId  effective id of the source control, or null
-     * @param targetId           id of the target
-     * @return                   object, or null if not found
+     * @param sourceControlEffectiveId  effective id of the source control, or null
+     * @param targetId                  id of the target
+     * @return                          object, or null if not found
      */
-    public Object resolveObjectById(String effectiveSourceId, String targetId) {
-        final String effectiveControlId = getCurrentControlTree().findEffectiveControlId(effectiveSourceId, targetId);
+    public Object resolveObjectById(String sourceControlEffectiveId, String targetId) {
+        final String effectiveControlId = getCurrentControlTree().findEffectiveControlId(sourceControlEffectiveId, targetId);
         return (effectiveControlId != null) ? getObjectByEffectiveId(effectiveControlId) : null;
     }
 

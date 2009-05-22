@@ -17,22 +17,24 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetindexAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -130,8 +132,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     protected XFormsContextStack getContextStack() {
-        // TODO: Once each container has its own subtree of controls, use container's context stack
-        return containingDocument.getControls().getContextStack();
+        return container.getContextStack();
     }
 
     public void iterationRemoved(PipelineContext pipelineContext) {
@@ -180,7 +181,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isAlertEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
-                alert = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, true, tempContainsHTML);
+                alert = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, true, tempContainsHTML);
                 isHTMLAlert = alert != null && tempContainsHTML[0];
             }
             isAlertEvaluated = true;
@@ -202,7 +203,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isHelpEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
-                help = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, true, tempContainsHTML);
+                help = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, true, tempContainsHTML);
                 isHTMLHelp = help != null && tempContainsHTML[0];
             }
             isHelpEvaluated = true;
@@ -224,7 +225,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isHintEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
-                hint = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
+                hint = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
 
                 isHTMLHint = hint != null && tempContainsHTML[0];
             }
@@ -247,7 +248,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isLabelEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
-                label = XFormsUtils.getLabelHelpHintAlertValue(pipelineContext, container, this, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
+                label = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
 
                 isHTMLLabel = label != null && tempContainsHTML[0];
             }
@@ -264,6 +265,60 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public boolean isHTMLLabel(PipelineContext pipelineContext) {
         getLabel(pipelineContext);
         return isHTMLLabel;
+    }
+
+    /**
+     * Get the value of a label, help, hint or alert related to this control.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param lhhaElement           element associated to the control (either as child or using @for)
+     * @param acceptHTML            whether the result may contain HTML
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
+     * @return                      string containing the result of the evaluation, null if evaluation failed
+     */
+    private String getLabelHelpHintAlertValue(PipelineContext pipelineContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
+
+        final XFormsContextStack contextStack = getContextStack();
+        final String value;
+        if (lhhaElement == null) {
+            // No LHHA at all
+            value = null;
+        } else if (lhhaElement.getParent() == getControlElement()) {
+            // LHHA is direct child of control, evaluate within context
+            contextStack.setBinding(this);
+            contextStack.pushBinding(pipelineContext, lhhaElement);
+            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.popBinding();
+        } else {
+            // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
+
+            // Find context object for XPath evaluation
+            final Element parentElement = lhhaElement.getParent();
+
+            final String parentStaticId = parentElement.attributeValue("id");
+            if (parentStaticId == null) {
+                // Assume we are at the top-level
+                contextStack.resetBindingContext(pipelineContext);
+            } else {
+                // Not at top-level, find containing object
+
+                // TODO: this resolution doesn't look right!
+                final Object contextObject = container.resolveObjectById(getEffectiveId(), parentStaticId);
+                if (contextObject instanceof XFormsControl) {
+                    // Found context, evaluate relative to that
+                    contextStack.setBinding((XFormsControl) contextObject);
+                } else {
+                    // No context, don't evaluate (not sure why this should happen!)
+                    contextStack.resetBindingContext(pipelineContext);
+                }
+            }
+
+            // Push binding relative to context established above and evaluate
+            contextStack.pushBinding(pipelineContext, lhhaElement);
+            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.popBinding();
+        }
+        return value;
     }
 
     /**
@@ -470,6 +525,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final String attributeValue = controlElement.attributeValue(avtAttributeQName);
 
             if (attributeValue != null) {
+                // NOTE: This can return null if there is no context
                 final String resolvedValue = evaluateAvt(pipelineContext, attributeValue);
 
                 if (extensionAttributesValues == null)
@@ -556,10 +612,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         }
 
                         repeatControl.setIndex(newRepeatIndex);
+
+                        // NOTE: Affected controls might be in different XBL containers. All XBL containers touched must be flagged.
+                        repeatControl.getXBLContainer().setDeferredFlagsForSetindex();
                     }
                     
                     controls.markDirtySinceLastRequest(true);
-                    XFormsSetindexAction.setDeferredFlagsForSetindex(containingDocument);
                 }
 
                 // Store new focus information for client
@@ -741,34 +799,131 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an attribute of the control as an AVT.
      *
-     * @param pipelineContext   current pipeline contextStack
-     * @param avt               value of the attribute
+     * @param pipelineContext   current pipeline context
+     * @param attributeValue    value of the attribute
      * @return                  value of the AVT or null if cannot be computed
      */
-    protected String evaluateAvt(PipelineContext pipelineContext, String avt) {
+    protected String evaluateAvt(PipelineContext pipelineContext, String attributeValue) {
 
+        if (attributeValue.indexOf('{') == -1) {
+            // Definitely not an AVT
 
-        if (avt.indexOf('{') == -1) {
-            // Not an AVT
-
-            return avt;
+            return attributeValue;
         } else {
             // Possible AVT
-
-            final XFormsContextStack contextStack = getContextStack();
-            contextStack.setBinding(this);
     
             // NOTE: the control may or may not be bound, so don't use getBoundNode()
             final List contextNodeset = bindingContext.getNodeset();
-            if (contextNodeset.size() == 0) {
+            if (contextNodeset == null || contextNodeset.size() == 0) {
                 // TODO: in the future we should be able to try evaluating anyway
                 return null;
             } else {
-                return XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNodeset,
-                            bindingContext.getPosition(), bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                            contextStack.getFunctionContext(), getNamespaceMappings(), getLocationData(), avt);
+
+                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+                // Reason is that XPath functions might use the context stack to get the current model, etc.
+                final XFormsContextStack contextStack = getContextStack();
+                contextStack.setBinding(this);
+
+                // Get function context
+                final XFormsFunction.Context functionContext = getFunctionContext();
+
+                // Evaluate
+                final String result = XPathCache.evaluateAsAvt(pipelineContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
+                        bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
+
+                // Restore function context to prevent leaks caused by context pointing to removed controls
+                restoreFunctionContext(functionContext);
+
+                return result;
             }
         }
+    }
+
+    /**
+     * Evaluate an XPath expression as a string in the context of this control.
+     *
+     * @param pipelineContext   current pipeline context
+     * @param xpathString       XPath expression
+     * @return                  value, or null if cannot be computed
+     */
+    protected String evaluateAsString(PipelineContext pipelineContext, String xpathString) {
+
+        // NOTE: the control may or may not be bound, so don't use getBoundNode()
+        final List contextNodeset = bindingContext.getNodeset();
+        if (contextNodeset == null || contextNodeset.size() == 0) {
+            // TODO: in the future we should be able to try evaluating anyway
+            return null;
+        } else {
+            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+            // Reason is that XPath functions might use the context stack to get the current model, etc.
+            final XFormsContextStack contextStack = getContextStack();
+            contextStack.setBinding(this);
+
+            // Get function context
+            final XFormsFunction.Context functionContext = getFunctionContext();
+
+            final String result = XPathCache.evaluateAsString(pipelineContext, contextNodeset, bindingContext.getPosition(),
+                                xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
+                                XFormsContainingDocument.getFunctionLibrary(),
+                                getFunctionContext(), null, getLocationData());
+
+            // Restore function context to prevent leaks caused by context pointing to removed controls
+            restoreFunctionContext(functionContext);
+
+            return result;
+        }
+    }
+
+    /**
+     * Evaluate an XPath expression as a string in the context of this control.
+     *
+     * @param pipelineContext       current pipeline context
+     * @param contextItem           context item
+     * @param xpathString           XPath expression
+     * @param prefixToURIMap        namespace mappings to use
+     * @param variableToValueMap    variables to use
+     * @return                      value, or null if cannot be computed
+     */
+    protected String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString, Map prefixToURIMap, Map variableToValueMap) {
+
+        if (contextItem == null) {
+            // TODO: in the future we should be able to try evaluating anyway
+            return null;
+        } else {
+            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+            // Reason is that XPath functions might use the context stack to get the current model, etc.
+            final XFormsContextStack contextStack = getContextStack();
+            contextStack.setBinding(this);
+
+            // Get function context
+            final XFormsFunction.Context functionContext = getFunctionContext();
+
+            // Evaluate
+            final String result = XPathCache.evaluateAsString(pipelineContext, contextItem,
+                                xpathString, prefixToURIMap, variableToValueMap,
+                                XFormsContainingDocument.getFunctionLibrary(),
+                                getFunctionContext(), null, getLocationData());
+
+            // Restore function context to prevent leaks caused by context pointing to removed controls
+            restoreFunctionContext(functionContext);
+
+            return result;
+        }
+    }
+
+    /**
+     * Return an XPath function context having this control as source control.
+     *
+     * @return XPath function context
+     */
+    private XFormsFunction.Context getFunctionContext() {
+        final XFormsFunction.Context context = getContextStack().getFunctionContext();
+        context.setSourceEffectiveId(getEffectiveId());
+        return context;
+    }
+
+    private void restoreFunctionContext(XFormsFunction.Context functionContext) {
+        functionContext.setSourceEffectiveId(null);
     }
 
     /**

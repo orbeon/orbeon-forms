@@ -16,17 +16,19 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
-
-import java.util.Iterator;
 
 /**
  * 9.3.7 The setindex Element
@@ -55,19 +57,17 @@ public class XFormsSetindexAction extends XFormsAction {
 
         containingDocument.logDebug("xforms:setindex", "setting index", new String[] { "index", indexString });
 
-        executeSetindexAction(containingDocument, repeatId, indexString);
+        executeSetindexAction(containingDocument, actionInterpreter.getXBLContainer(), repeatId, indexString);
     }
 
-    protected static void executeSetindexAction(XFormsContainingDocument containingDocument, String repeatId, String indexString) {
+    protected static void executeSetindexAction(XFormsContainingDocument containingDocument, XBLContainer container, String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;
         }
 
-        final XFormsControls controls = containingDocument.getControls();
-
         // Find repeat control
-        final Object control = controls.resolveObjectById(null, repeatId);// TODO: pass sourceId
+        final Object control = container.resolveObjectById(null, repeatStaticId);// TODO: pass sourceId
         if (control instanceof XFormsRepeatControl) {
             // Set its new index
             final int newRepeatIndex = Integer.parseInt(indexString);
@@ -80,33 +80,17 @@ public class XFormsSetindexAction extends XFormsAction {
                 }
 
                 repeatControl.setIndex(newRepeatIndex);
-                
-                controls.markDirtySinceLastRequest(true);// NOTE: currently, bindings are not really supposed to contain index() anymore, but control values may change still
-                setDeferredFlagsForSetindex(containingDocument);
+
+                final XFormsControls controls = containingDocument.getControls();
+                controls.markDirtySinceLastRequest(true);
+                container.setDeferredFlagsForSetindex();
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action",
-                        new String[] { "repeat id", repeatId } );
-        }
-    }
-
-    public static void setDeferredFlagsForSetindex(XFormsContainingDocument containingDocument) {
-        // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by
-        // setting the deferred update flags for recalculate, revalidate and refresh."
-        // TODO: Nested containers?
-        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-
-            // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
-            //currentModel.getBinds().rebuild(pipelineContext);
-
-            final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
-            deferredActionContext.recalculate = true;
-            deferredActionContext.revalidate = true;
-            deferredActionContext.refresh = true;
+                        new String[] { "repeat id", repeatStaticId } );
         }
     }
 }

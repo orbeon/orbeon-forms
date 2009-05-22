@@ -15,16 +15,12 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-
-import java.util.List;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
  * Represents an extension xxforms:attribute control.
@@ -57,24 +53,9 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     protected void evaluateValue(final PipelineContext pipelineContext) {
-        final String rawValue;
         // Value comes from the AVT value attribute
-        final List currentNodeset = bindingContext.getNodeset();
-        if (currentNodeset != null && currentNodeset.size() > 0) {
-
-            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-            getContextStack().setBinding(this);
-
-            rawValue = XPathCache.evaluateAsAvt(pipelineContext,
-                    currentNodeset, bindingContext.getPosition(),
-                    valueAttribute, getNamespaceMappings(), bindingContext.getInScopeVariables(),
-                    XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
-
-        } else {
-            rawValue = "";
-        }
-
-        super.setValue(rawValue);
+        final String rawValue = evaluateAvt(pipelineContext, valueAttribute);
+        super.setValue((rawValue != null) ? rawValue : "");
     }
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {

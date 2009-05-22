@@ -18,21 +18,21 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  * Execute a top-level XForms action and the included nested actions if any.
@@ -62,11 +62,9 @@ public class XFormsActionInterpreter {
         } else {
             // Observer is not parent of action, try to find effective id of parent
 
-            // Get source id to resolve against if we are within a nested container
-            final String fullPrefix = container instanceof XFormsContainingDocument ? null : container.getFullPrefix();
-
             // Try to find effective parent object
-            final Object o = container.resolveObjectById(fullPrefix, ancestorObserverStaticId);
+            // TODO: this resolution doesn't look right!
+            final Object o = container.resolveObjectById(null, ancestorObserverStaticId);
             eventContainerEffectiveId = (o != null) ? ((XFormsEventObserver) o).getEffectiveId() : ancestorObserverStaticId;
 
             // TODO: The logic above is not quite right at the moment because the parent might be in a repeat.

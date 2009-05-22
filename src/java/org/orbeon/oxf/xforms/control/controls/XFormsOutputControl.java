@@ -98,21 +98,10 @@ public class XFormsOutputControl extends XFormsValueControl {
                 value = "";
         } else {
             // Value comes from the XPath expression within the value attribute
-            final List currentNodeset = bindingContext.getNodeset();
-            if (currentNodeset != null && currentNodeset.size() > 0) {
 
-                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-                getContextStack().setBinding(this);
-
-                value = XPathCache.evaluateAsString(pipelineContext,
-                        currentNodeset, bindingContext.getPosition(),
-                        valueAttribute, getNamespaceMappings(), bindingContext.getInScopeVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
-            } else {
-                value = "";
-            }
+            value = evaluateAsString(pipelineContext, valueAttribute);
         }
-        setValue(value);
+        setValue((value != null) ? value : "");
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {

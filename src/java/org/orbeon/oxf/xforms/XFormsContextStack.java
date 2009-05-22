@@ -44,13 +44,14 @@ public class XFormsContextStack {
 
     private Stack contextStack = new Stack();
 
+    // COnstructor for XBLContainer and XFormsActionInterpreter
     public XFormsContextStack(XBLContainer container) {
         this.container = container;
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(container, this);
     }
 
-    // Constructor for binds and submissions
+    // Constructor for XFormsModel
     public XFormsContextStack(XFormsModel containingModel) {
         this.container = containingModel.getXBLContainer();
         this.containingDocument = this.container.getContainingDocument();

@@ -408,61 +408,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Get the value of a label, help, hint or alert related to a particular control.
-     *
-     * @param pipelineContext       current PipelineContext
-     * @param container             current XBLContainer
-     * @param control               control
-     * @param lhhaElement           element associated to the control (either as child or using @for)
-     * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
-     */
-    public static String getLabelHelpHintAlertValue(PipelineContext pipelineContext, XBLContainer container,
-                                                    XFormsControl control, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
-
-        final XFormsContextStack contextStack = container.getContextStack();
-        final String value;
-        if (lhhaElement == null) {
-            // No LHHA at all
-            value = null;
-        } else if (lhhaElement.getParent() == control.getControlElement()) {
-            // LHHA is direct child of control, evaluate within context
-            contextStack.setBinding(control);
-            contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
-            contextStack.popBinding();
-        } else {
-            // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
-
-            // Find context object for XPath evaluation
-            final Element parentElement = lhhaElement.getParent();
-
-            final String parentStaticId = parentElement.attributeValue("id");
-            if (parentStaticId == null) {
-                // Assume we are at the top-level
-                contextStack.resetBindingContext(pipelineContext);
-            } else {
-                // Not at top-level, find containing object
-                final Object contextObject = container.resolveObjectById(control.getEffectiveId(), parentStaticId);
-                if (contextObject instanceof XFormsControl) {
-                    // Found context, evaluate relative to that
-                    contextStack.setBinding((XFormsControl) contextObject);
-                } else {
-                    // No context, don't evaluate (not sure why this should happen!)
-                    contextStack.resetBindingContext(pipelineContext);
-                }
-            }
-
-            // Push binding relative to context established above and evaluate
-            contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
-            contextStack.popBinding();
-        }
-        return value;
-    }
-
-    /**
      * Get the value of a child element by pushing the context of the child element on the binding stack first, then
      * calling getElementValue() and finally popping the binding context.
      *

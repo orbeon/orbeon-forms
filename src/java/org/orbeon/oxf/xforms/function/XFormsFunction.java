@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -69,6 +72,11 @@ abstract public class XFormsFunction extends SystemFunction {
         return functionContext.getXBLContainer();
     }
 
+    public String getSourceEffectiveId(XPathContext xpathContext) {
+        final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
+        return functionContext.getSourceEffectiveId();
+    }
+
     public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
         final XFormsModel xformsModel = getContainingModel(xpathContext);
         if (xformsModel != null && xformsModel.getContainingDocument() != null)
@@ -109,26 +117,30 @@ abstract public class XFormsFunction extends SystemFunction {
 
     public static class Context implements XPathCache.FunctionContext {
 
-        private XBLContainer container;
-        private XFormsModel containingModel;
-        private XFormsContextStack contextStack;
+        private final XBLContainer container;
+        private final XFormsModel containingModel;
+        private final XFormsContextStack contextStack;
+
+        private String sourceEffectiveId;
 
         public Context(XBLContainer container, XFormsContextStack contextStack) {
             this.container = container;
+            this.containingModel = null;
             this.contextStack = contextStack;
         }
 
         public Context(XFormsModel containingModel, XFormsContextStack contextStack) {
+            this.container = containingModel.getXBLContainer();
             this.containingModel = containingModel;
             this.contextStack = contextStack;
         }
 
         public XBLContainer getXBLContainer() {
-            return (container != null) ? container : containingModel.getXBLContainer();
+            return container;
         }
 
         public XFormsContainingDocument getContainingDocument() {
-            return (container != null) ? container.getContainingDocument() : containingModel.getContainingDocument();
+            return container.getContainingDocument();
         }
 
         public XFormsControls getControls() {
@@ -141,6 +153,14 @@ abstract public class XFormsFunction extends SystemFunction {
 
         public XFormsContextStack getContextStack() {
             return contextStack;
+        }
+
+        public String getSourceEffectiveId() {
+            return sourceEffectiveId;
+        }
+
+        public void setSourceEffectiveId(String sourceEffectiveId) {
+            this.sourceEffectiveId = sourceEffectiveId;
         }
     }
 }

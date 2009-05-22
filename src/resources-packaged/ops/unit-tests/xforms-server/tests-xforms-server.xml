@@ -4664,5 +4664,137 @@
         </output>
     </test>
 
+    <test description="Repeat index updates through user interaction inside and outside XBL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <instance xmlns="">
+                                            <record/>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <!-- Insert one element, this takes index to 2 -->
+                                        <xforms:insert nodeset="instance('instance')/record" at="1"/>
+                                        <xforms:refresh/>
+                                        <!-- Dispatch repeat focus to change the index back to 1 -->
+                                        <xforms:dispatch name="xxforms-repeat-focus" target="my-output" xxforms:repeat-indexes="1"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+
+                                <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:binding id="fr-foo" element="fr|foo">
+                                        <xbl:template>
+                                            <xbl:content/>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+
+                                <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:binding id="fr-bar" element="fr|bar">
+                                        <xbl:template>
+                                            <xforms:model id="model">
+                                                <xforms:instance id="instance">
+                                                    <instance xmlns="">
+                                                        <record/>
+                                                    </instance>
+                                                </xforms:instance>
+                                                <xforms:action ev:event="xforms-model-construct-done">
+                                                    <!-- Insert two element, this takes index to 3 -->
+                                                    <xforms:insert nodeset="instance('instance')/record"/>
+                                                    <xforms:insert nodeset="instance('instance')/record"/>
+                                                </xforms:action>
+                                                <xforms:action ev:event="xforms-ready">
+                                                    <!-- Dispatch repeat focus to change the index back to 2 -->
+                                                    <xforms:dispatch name="xxforms-repeat-focus" target="my-output" xxforms:repeat-indexes="2"/>
+                                                </xforms:action>
+                                            </xforms:model>
+                                            <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
+                                                <xbl:content/>
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Without XBL (update to global instance) -->
+                                <xforms:repeat nodeset="record" id="repeat-no-xbl">
+                                    <xforms:output id="my-output" value="index('repeat-no-xbl')"/>
+                                </xforms:repeat>
+
+                                <!-- With XBL (update to global instance) -->
+                                <fr:foo id="my-foo">
+                                    <xforms:repeat nodeset="record" id="repeat-xbl">
+                                        <xforms:output id="my-output" value="index('repeat-xbl')"/>
+                                    </xforms:repeat>
+                                </fr:foo>
+
+                                <!-- With XBL (update to local instance) -->
+                                <fr:bar id="my-bar">
+                                    <xforms:repeat nodeset="record" id="repeat-xbl">
+                                        <xforms:output id="my-output" value="index('repeat-xbl')"/>
+                                    </xforms:repeat>
+                                </fr:bar>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <record/>
+                                    <record/>
+                                </instance>
+                            </instance>
+                            <instance id="instance" model-id="my-bar$model">
+                                <instance>
+                                    <record/>
+                                    <record/>
+                                    <record/>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat-no-xbl" index="1"/>
+                            <control effective-id="my-foo$repeat-xbl" index="2"/>
+                            <control effective-id="my-bar$repeat-xbl" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="repeat-no-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-output·1">1</xxf:control>
+                        <xxf:control id="my-output·2">1</xxf:control>
+                        <xxf:copy-repeat-template id="my-foo$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-foo$my-output·1">2</xxf:control>
+                        <xxf:control id="my-foo$my-output·2">2</xxf:control>
+                        <xxf:copy-repeat-template id="my-bar$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="my-bar$my-output·1">2</xxf:control>
+                        <xxf:control id="my-bar$my-output·2">2</xxf:control>
+                        <xxf:control id="my-bar$my-output·3">2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

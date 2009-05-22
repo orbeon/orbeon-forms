@@ -454,20 +454,12 @@ public class XFormsInputControl extends XFormsValueControl {
             return null;
         } else {
             // Format
-
-            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-            getContextStack().setBinding(this);
-
             final String xpathExpression =
                     "if ($v castable as xs:" + valueType + ") then format-" + valueType + "(xs:" + valueType + "($v), '"
                             + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
                             + "', 'en', (), ()) else $v";
 
-            return XPathCache.evaluateAsString(pipelineContext, boundNode,
-                    xpathExpression,
-                    prefixToURIMap, variables,
-                    XFormsContainingDocument.getFunctionLibrary(),
-                    getContextStack().getFunctionContext(), null, getLocationData());
+            return evaluateAsString(pipelineContext, boundNode, xpathExpression,prefixToURIMap, variables);
         }
     }
 

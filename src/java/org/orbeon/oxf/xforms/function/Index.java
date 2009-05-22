@@ -40,7 +40,8 @@ public class Index extends XFormsFunction {
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
-        final int index = getControls(xpathContext).getRepeatIndex(getXBLContainer(xpathContext), repeatStaticId);
+        // NOTE: getSourceEffectiveId() might be null
+        final int index = getXBLContainer(xpathContext).getRepeatIndex(getSourceEffectiveId(xpathContext), repeatStaticId);
 
         if (index == -1) {
             // Dispatch exception event

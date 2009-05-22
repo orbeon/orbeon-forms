@@ -16,10 +16,11 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -91,9 +92,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     protected String getValueUseFormat(PipelineContext pipelineContext, String format) {
 
-        // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-        getContextStack().setBinding(this);
-
         final String result;
         if (format == null) {
             // Try default format for known types
@@ -111,31 +109,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             }
 
             if (format != null) {
-                final NodeInfo boundNode = getBoundNode();
-                if (boundNode == null) {
-                    result = null;
-                } else {
-                    result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                            format, prefixToURIMap, getContextStack().getCurrentVariables(),
-                            XFormsContainingDocument.getFunctionLibrary(),
-                            getContextStack().getFunctionContext(), null, getLocationData());
-                }
+                result = evaluateAsString(pipelineContext, getBoundNode(), format,
+                        prefixToURIMap, getContextStack().getCurrentVariables());
             } else {
                 result = null;
             }
 
         } else {
             // Format value according to format attribute
-
-            final NodeInfo boundNode = getBoundNode();
-            if (boundNode == null) {
-                result = null;
-            } else {
-                result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        format, getNamespaceMappings(), getContextStack().getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(),
-                        getContextStack().getFunctionContext(), null, getLocationData());
-            }
+            result = evaluateAsString(pipelineContext, format);
         }
         return result;
     }

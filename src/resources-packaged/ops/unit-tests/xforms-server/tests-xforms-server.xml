@@ -4865,5 +4865,76 @@
         </output>
     </test>
 
+    <test description="Incorrect evaluation of trigger in refresh processing with multiple models" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model1" xxforms:state-handling="client">
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:dispatch name="xxforms-repeat-focus" target="my-trigger" xxforms:repeat-indexes="2"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                                <xforms:model id="model2">
+                                    <xforms:instance id="instance2">
+                                        <instance xmlns="">
+                                            <record/>
+                                            <record/>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat model="model2" nodeset="record" id="my-repeat">
+                                     <xforms:trigger id="my-trigger" ref=".">
+                                        <xforms:label>Do Stuff</xforms:label>
+                                         <!-- Add event handler so that refresh goes through event dispatching -->
+                                         <xforms:action ev:event="#all"/>
+                                    </xforms:trigger>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance2" model-id="model2">
+                                <instance>
+                                    <record/>
+                                    <record/>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-trigger·1" label="Do Stuff"/>
+                        <xxf:control id="my-trigger·2" readonly="true" label="Do Stuff"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

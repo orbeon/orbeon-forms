@@ -20,11 +20,12 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
@@ -133,6 +134,19 @@ public abstract class XFormsEvent implements Cloneable {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
             return EmptyIterator.getInstance();
+        }
+    }
+
+    protected void setAttributeAsString(String name, String value) {
+        setAttribute(name, new SequenceExtent(new Item[] { new StringValue(value) } ));
+    }
+
+    protected String getAttributeAsString(String name) {
+        try {
+            final Item item = (Item) getAttribute(name).next();
+            return (item != null) ? item.getStringValue() : null;
+        } catch (XPathException e) {
+            throw new OXFException(e);
         }
     }
 

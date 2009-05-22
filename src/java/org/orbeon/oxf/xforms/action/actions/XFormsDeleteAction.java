@@ -197,7 +197,7 @@ public class XFormsDeleteAction extends XFormsAction {
             // is terminated with no effect."
 
             if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "attempt to delete document node, terminating");
+                containingDocument.logDebug("xforms:delete", "ignoring attempt to delete document node");
 
             return null;
         } else {
@@ -207,6 +207,7 @@ public class XFormsDeleteAction extends XFormsAction {
         // Actually perform the deletion
         // "The node at the delete location in the Node Set Binding node-set is deleted"
         parentContent.remove(actualIndexInParentContentCollection);
+//        nodeToRemove.detach(); // not sure if we should detach or not!
 
         return nodeInfoToRemove;
     }

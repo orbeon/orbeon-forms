@@ -22,20 +22,22 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XXFormsDndEvent extends XFormsEvent {
 
-    private String dndStart;
-    private String dndEnd;
+    private static final String DND_START_ATTRIBUTE = "dnd-start";
+    private static final String DND_END_ATTRIBUTE = "dnd-end";
 
     public XXFormsDndEvent(XFormsEventTarget targetObject, String dndStart, String dndEnd) {
         super(XFormsEvents.XXFORMS_DND, targetObject, false, false);
-        this.dndStart = dndStart;
-        this.dndEnd = dndEnd;
+
+        // Store as attributes so we can test for this event by using xxforms:context
+        setAttributeAsString(DND_START_ATTRIBUTE, dndStart);
+        setAttributeAsString(DND_END_ATTRIBUTE, dndEnd);
     }
 
     public String getDndStart() {
-        return dndStart;
+        return getAttributeAsString(DND_START_ATTRIBUTE);
     }
 
     public String getDndEnd() {
-        return dndEnd;
+        return getAttributeAsString(DND_END_ATTRIBUTE);
     }
 }

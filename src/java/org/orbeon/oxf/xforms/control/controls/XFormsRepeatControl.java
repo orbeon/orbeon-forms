@@ -155,7 +155,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
 
                 final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
-                destinationNodeset = destinationControl.getBindingContext().getNodeset();
+                destinationNodeset = new ArrayList(destinationControl.getBindingContext().getNodeset());
                 requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
             }
 
@@ -172,6 +172,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final String destinationPosition;
             if (deletedNodePosition != -1) {
                 // Deleted node was part of the destination nodeset
+                // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be touched until control bindings are updated
+                destinationNodeset.remove(deletedNodePosition);
                 // If the insertion position is after the delete node, must adjust it
                 if (requestedDestinationIndex <= deletedNodePosition + 1) {
                     // Insertion point is before or on (degenerate case) deleted node
@@ -201,9 +203,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             XFormsInsertAction.doInsert(pipelineContext, containingDocument, destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
 
             // TODO: should dispatch xxforms-move instead of xforms-insert?
-//            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(deletedNodeInfo);
-//            final XFormsControls controls = containingDocument.getControls();
-//            modifiedInstance.updateRepeatNodeset(pipelineContext, controls, deletedNodes);
 
         }
         super.performDefaultAction(pipelineContext, event);

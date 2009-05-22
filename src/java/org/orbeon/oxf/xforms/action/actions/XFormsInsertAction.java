@@ -320,79 +320,80 @@ public class XFormsInsertAction extends XFormsAction {
 //                    doInsert(insertLocationNode, clonedNode);
 //                } else {
 
-                if (insertLocationNode.getDocument().getRootElement() == insertLocationNode) {
+            final Document insertLocationNodeDocument = insertLocationNode.getDocument();
+            if (insertLocationNodeDocument != null && insertLocationNodeDocument.getRootElement() == insertLocationNode) {
 
-                    // "c. if insert location node is the root element of an instance, then that instance root element
-                    // location is the target location. If there is more than one cloned node to insert, only the
-                    // first node that does not cause a conflict is considered."
+                // "c. if insert location node is the root element of an instance, then that instance root element
+                // location is the target location. If there is more than one cloned node to insert, only the
+                // first node that does not cause a conflict is considered."
 
-                    insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes);
+                insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes);
 
-                    // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
+                // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
+            } else {
+                // "d. Otherwise, the target location is immediately before or after the insert location
+                // node, based on the position attribute setting or its default."
+
+                if (insertLocationNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                    // Special case for attributes
+
+                    // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
+                    // the XForms spec shouldn't rely on attribute order. We could try to keep the order, but it
+                    // is harder as we have to deal with removing duplicate attributes and find a reasonable
+                    // insertion strategy.
+
+                    // TODO: Don't think we should even do this now in XForms 1.1
+                    insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes);
+
                 } else {
-                    // "d. Otherwise, the target location is immediately before or after the insert location
-                    // node, based on the position attribute setting or its default."
+                    // Other node types
+                    final Element parentNode = insertLocationNode.getParent();
+                    final List siblingElements = parentNode.content();
+                    final int actualIndex = siblingElements.indexOf(insertLocationNode);
 
-                    if (insertLocationNode.getNodeType() == Node.ATTRIBUTE_NODE) {
-                        // Special case for attributes
-
-                        // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
-                        // the XForms spec shouldn't rely on attribute order. We could try to keep the order, but it
-                        // is harder as we have to deal with removing duplicate attributes and find a reasonable
-                        // insertion strategy.
-
-                        // TODO: Don't think we should even do this now in XForms 1.1
-                        insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes);
-
+                    // Prepare insertion of new element
+                    final int actualInsertionIndex;
+                    if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
+                        actualInsertionIndex = actualIndex + 1;
+                    } else if ("before".equals(positionAttribute)) {
+                        actualInsertionIndex = actualIndex;
                     } else {
-                        // Other node types
-                        final Element parentNode = insertLocationNode.getParent();
-                        final List siblingElements = parentNode.content();
-                        final int actualIndex = siblingElements.indexOf(insertLocationNode);
+                        throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
+                    }
 
-                        // Prepare insertion of new element
-                        final int actualInsertionIndex;
-                        if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
-                            actualInsertionIndex = actualIndex + 1;
-                        } else if ("before".equals(positionAttribute)) {
-                            actualInsertionIndex = actualIndex;
-                        } else {
-                            throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
-                        }
+                    // "7. The cloned node or nodes are inserted in the order they were cloned at their target
+                    // location depending on their node type."
 
-                        // "7. The cloned node or nodes are inserted in the order they were cloned at their target
-                        // location depending on their node type."
+                    boolean hasTextNode = false;
+                    int addIndex = 0;
+                    insertedNodes = new ArrayList(clonedNodes.size());
+                    for (int i = 0; i < clonedNodes.size(); i++) {
+                        final Node clonedNode = (Node) clonedNodes.get(i);
 
-                        boolean hasTextNode = false;
-                        int addIndex = 0;
-                        insertedNodes = new ArrayList(clonedNodes.size());
-                        for (int i = 0; i < clonedNodes.size(); i++) {
-                            final Node clonedNode = (Node) clonedNodes.get(i);
-
-                            if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
-                                if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
-                                    // Element, text, comment, processing instruction node
-                                    siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
-                                    insertedNodes.add(clonedNode);
-                                    hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
-                                    addIndex++;
-                                } else {
-                                    // We never insert attributes or namespace nodes as siblings
-                                    if (XFormsServer.logger.isDebugEnabled())
-                                        containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
-                                                new String[] {
-                                                        "type", clonedNode.getNodeTypeName(),
-                                                        "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
-                                                } );
-                                }
+                        if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
+                            if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
+                                // Element, text, comment, processing instruction node
+                                siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
+                                insertedNodes.add(clonedNode);
+                                hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
+                                addIndex++;
+                            } else {
+                                // We never insert attributes or namespace nodes as siblings
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
+                                            new String[] {
+                                                    "type", clonedNode.getNodeTypeName(),
+                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
+                                            } );
                             }
                         }
-
-                        // Normalize text nodes if needed to respect XPath 1.0 constraint
-                        if (hasTextNode)
-                            Dom4jUtils.normalizeTextNodes(parentNode);
                     }
+
+                    // Normalize text nodes if needed to respect XPath 1.0 constraint
+                    if (hasTextNode)
+                        Dom4jUtils.normalizeTextNodes(parentNode);
                 }
+            }
 //                }
         }
 

@@ -271,7 +271,8 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_DND, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
-                return new XXFormsDndEvent(targetObject, parameters[0], parameters[1]);
+                // NOTE: Allow null parameters so we can dynamically create this event with xforms:dispatch, especially for testing
+                return new XXFormsDndEvent(targetObject, parameters != null ? parameters[0] : null, parameters != null ? parameters[1] : null);
             }
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_VALID, new Factory() {

@@ -338,7 +338,7 @@ public class XBLUtils {
      * Poor man's CSS selector parser:
      *
      * o input: foo|a foo|b, bar|a bar|b
-     * o output: .//foo:a//foo:b|.//bar:a//bar:b
+     * o output: descendant-or-self::foo:a//foo:b|descendant-or-self:://bar:a//bar:b
      *
      * Also support the ">" combinator.
      *
@@ -348,7 +348,7 @@ public class XBLUtils {
      * @param cssSelector   CSS selector
      * @return              XPath expression
      */
-    private static String cssToXPath(String cssSelector) {
+    public static String cssToXPath(String cssSelector) {
 
         final FastStringBuffer sb = new FastStringBuffer(cssSelector.length());
         final String[] selectors = StringUtils.split(cssSelector, ',');
@@ -368,8 +368,8 @@ public class XBLUtils {
                         sb.append("./");
                         previousIsChild = true;
                         continue;
-                    } else if (!previousIsChild) {
-                        sb.append(".//");
+                    } else {
+                        sb.append("descendant-or-self::");
                     }
                 } else {
                     // Subsequent path element

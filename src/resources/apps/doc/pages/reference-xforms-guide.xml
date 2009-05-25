@@ -1811,7 +1811,7 @@
                             <comment> Child instance </comment>
                             <xforms:instance id="child-instance" src="my-instance.xml"/>
                             <comment> Register the event handler on the child instance </comment>
-                            <xforms:dispatch ev:observer="child-instance" ev:event="xforms-insert" target="main-model" name="update-after-insert"/>
+                            <xforms:dispatch ev:observer="child-instance" ev:event="xforms-insert" targetid="main-model" name="update-after-insert"/>
                         </xforms:model>
                     </xml-source>
                     <p>
@@ -1841,7 +1841,7 @@
                                     </xforms:input>
                                     <comment> Event handler located in the view but observing an element in the model </comment>
                                     <xforms:action ev:observer="my-model" ev:event="xforms-ready">
-                                        <xforms:dispatch name="DOMFocusIn" target="my-input"/>
+                                        <xforms:dispatch name="DOMFocusIn" targetid="my-input"/>
                                     </xforms:action>
                                 </xforms:group>
                             </xhtml:body>
@@ -3070,7 +3070,7 @@
                     is <code>true</code> and the indicator is used.
                 </p>
                 <xml-source>
-                    <xforms:dispatch name="my-event" target="my-model" delay="2000" xxforms:show-progress="false"/>
+                    <xforms:dispatch name="my-event" targetid="my-model" delay="2000" xxforms:show-progress="false"/>
                 </xml-source>
                 <p>
                     The <code>xxforms:progress-message</code> attribute allows specifying a custom progress message when
@@ -3078,7 +3078,7 @@
                     used.
                 </p>
                 <xml-source>
-                    <xforms:dispatch name="my-event" target="my-model" delay="2000" xxforms:show-progress="true" xxforms:progress-message="Autosave..."/>
+                    <xforms:dispatch name="my-event" targetid="my-model" delay="2000" xxforms:show-progress="true" xxforms:progress-message="Autosave..."/>
                 </xml-source>
                 <p>
                     For more information, please visit the <a
@@ -3092,6 +3092,15 @@
                     Orbeon Forms supports the XForms 1.1 <code>if</code> and <code>while</code> attributes on XForms
                     action elements. For more information, please visit the <a
                     href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
+                </p>
+            </section>
+            <a name="xforms11-dispatch-targetid"/>
+            <section>
+                <title><code>targetid</code> attribute on <code>xforms:dispatch</code></title>
+                <p>
+                    As of May 2009, in order to prevent attribute clashes with other specifications, the
+                    <code>targetid</code> attribute supercedes the <code>target</code> on
+                    <code>&lt;xforms:dispatch</code>. <code>target</code> is still supported for backward compatibility.
                 </p>
             </section>
             <a name="xforms11-types"/>

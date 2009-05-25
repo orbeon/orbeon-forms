@@ -31,8 +31,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
-import org.orbeon.oxf.xforms.xbl.XBLUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.xbl.XBLUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -117,13 +117,15 @@ public class XFormsStaticState {
     private Map alertsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
 
     // Components
-    private Map xblComponentsFactories;        // Map<QName, Factory> of QNames to component factory
-    private Map xblComponentBindings;          // Map<QName, Element> of QNames to bindings
+    private Map xblComponentsFactories;        // Map<QName bindingQName, Factory> of QNames to component factory
+    private Map xblComponentBindings;          // Map<QName bindingQName, Element bindingElement> of QNames to bindings
     private Map xblFullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
     private Map xblCompactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
     private Map xblBindingIds;                 // Map<String treePrefixedId, String bindingId>
     private List xblScripts;                   // List<Element xblScriptElements>
     private List xblStyles;                    // List<Element xblStyleElements>
+    private Map xblHandlers;                   // Map<QName bindingQName, List<Element handlerElement>>
+    private Map xblImplementations;            // Map<QName bindingQName, List<Element modelElement>>
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -423,6 +425,7 @@ public class XFormsStaticState {
         }
 
         // Extract components
+        // TODO: move this to separate class
         {
             final List xblElements = staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME);
             if (xblElements.size() > 0) {
@@ -470,18 +473,49 @@ public class XFormsStaticState {
 
                             xblComponentBindings.put(currentQNameMatch, currentBindingElement);
 
+                            // Extract xbl:handlers/xbl:handler
+                            {
+                                final Element handlersElement = currentBindingElement.element(XFormsConstants.XBL_HANDLERS_QNAME);
+                                if (handlersElement != null) {
+                                    final List handlerElements = handlersElement.elements(XFormsConstants.XBL_HANDLER_QNAME);
+
+                                    if (xblHandlers == null) {
+                                        xblHandlers = new LinkedHashMap();
+                                    }
+
+                                    xblHandlers.put(currentQNameMatch, handlerElements);
+                                }
+                            }
+
+                            // Extract xbl:implementation/xforms:model
+                            {
+                                final Element implementationElement = currentBindingElement.element(XFormsConstants.XBL_IMPLEMENTATION_QNAME);
+                                if (implementationElement != null) {
+                                    // TODO: check if really need to pass detach == true
+                                    final List modelElements = extractChildrenModels(implementationElement, true);
+
+                                    if (xblImplementations == null) {
+                                        xblImplementations = new LinkedHashMap();
+                                    }
+
+                                    xblImplementations.put(currentQNameMatch, modelElements);
+                                }
+                            }
+
                             // Extract xbl:binding/xbl:resources/xbl:style
                             // TODO: should do this differently, in order to include only the scripts and resources actually used
-                            final List resourcesElements = currentBindingElement.elements(XFormsConstants.XBL_RESOURCES_QNAME);
-                            if (resourcesElements != null) {
-                                for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
-                                    final Element currentResourcesElement = (Element) k.next();
-                                    final List styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
-                                    if (styleElements != null && styleElements.size() > 0) {
-                                        if (xblStyles == null) {
-                                            xblStyles = new ArrayList(styleElements);
-                                        } else {
-                                            xblStyles.addAll(styleElements);
+                            {
+                                final List resourcesElements = currentBindingElement.elements(XFormsConstants.XBL_RESOURCES_QNAME);
+                                if (resourcesElements != null) {
+                                    for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
+                                        final Element currentResourcesElement = (Element) k.next();
+                                        final List styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
+                                        if (styleElements != null && styleElements.size() > 0) {
+                                            if (xblStyles == null) {
+                                                xblStyles = new ArrayList(styleElements);
+                                            } else {
+                                                xblStyles.addAll(styleElements);
+                                            }
                                         }
                                     }
                                 }
@@ -975,7 +1009,11 @@ public class XFormsStaticState {
                     final Element ancestorObserver = findAncestorObserver(currentElement);
                     final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
 
-                    XFormsEventHandlerImpl.addActionHandler(eventNamesMap, eventHandlersMap, currentElement, prefix, ancestorObserverStaticId);
+
+                    final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentElement, ancestorObserverStaticId);
+                    registerActionHandler(eventHandler, prefix);
+
+                    // TODO: Ensure that there are ids for handlers within XBL bound nodes
                 }
             }
         }
@@ -1061,16 +1099,27 @@ public class XFormsStaticState {
 
                             final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
 
-                            // Extract models from components instances
-                            final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
-
-                            for (Iterator i = extractedModels.iterator(); i.hasNext();) {
-                                final Document currentModelDocument = (Document) i.next();
-                                // Store models by "prefixed id"
-                                modelDocuments.put(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                            // Register models placed under xbl:implementation
+                            if (xblImplementations != null) {
+                                final List implementationModelDocuments = (List) xblImplementations.get(controlElement.getQName());
+                                for (Iterator iterator = implementationModelDocuments.iterator(); iterator.hasNext();) {
+                                    final Document currentModelDocument = (Document) iterator.next();
+                                    // Store models by "prefixed id"
+                                    modelDocuments.put(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                                }
+                                XFormsContainingDocument.logDebugStatic("static state", "registered XBL implementation model documents", new String[] { "count", Integer.toString(implementationModelDocuments.size()) });
                             }
 
-                            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
+                            // Extract and register models from within the template
+                            {
+                                final List extractedModels = extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
+                                for (Iterator i = extractedModels.iterator(); i.hasNext();) {
+                                    final Document currentModelDocument = (Document) i.next();
+                                    // Store models by "prefixed id"
+                                    modelDocuments.put(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                                }
+                                XFormsContainingDocument.logDebugStatic("static state", "created and registered XBL template model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
+                            }
 
                             // Remember full shadow tree for this prefixed id
                             xblFullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
@@ -1084,6 +1133,29 @@ public class XFormsStaticState {
 
                             // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
                             // TODO: should do this here, in order to include only the scripts and resources actually used
+
+                            // Gather xbl:handlers/xbl:handler attached to bound node
+                            if (xblHandlers != null) {
+                                final List handlerElements = (List) xblHandlers.get(controlElement.getQName());
+
+                                if (handlerElements != null) {
+                                    for (Iterator k = handlerElements.iterator(); k.hasNext();) {
+                                        final Element currentHandlerElement = (Element) k.next();
+
+                                        // Register xbl:handler as an action handler
+                                        // NOTE: xbl:handler has similar attributes as XForms actions, in particular @event, @phase, etc.
+                                        final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentHandlerElement, controlPrefixedId, true,
+                                                controlPrefixedId,
+                                                currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME),
+                                                null, // no target attribute allowed in XBL
+                                                currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME),
+                                                currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME),
+                                                currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME));
+
+                                        registerActionHandler(eventHandler, prefix);
+                                    }
+                                }
+                            }
 
                             // NOTE: Say we don't want to exclude gathering event handlers within nested models
                             analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer, false);
@@ -1359,6 +1431,23 @@ public class XFormsStaticState {
         return result;
     }
 
+    private static List extractChildrenModels(Element parentElement, boolean detach) {
+
+        final List result = new ArrayList();
+        final List modelElements = parentElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
+
+        if (modelElements.size() > 0) {
+            for (Iterator i = modelElements.iterator(); i.hasNext();) {
+                final Element currentModelElement = (Element) i.next();
+
+                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement, detach);
+                result.add(modelDocument);
+            }
+        }
+
+        return result;
+    }
+
     public boolean isHasOfflineSupport() {
         return hasOfflineSupport;
     }
@@ -1390,6 +1479,54 @@ public class XFormsStaticState {
 
     public List getOfflineInsertTriggerIds() {
         return offlineInsertTriggerIds;
+    }
+
+    /**
+     * Statically create and register an event handler.
+     *
+     * @param newEventHandlerImpl           event handler implementation
+     * @param prefix                        depending on XBL context, e.g. "" or "foo$bar$"
+     */
+    private void registerActionHandler(XFormsEventHandlerImpl newEventHandlerImpl, String prefix) {
+
+        // Register event handler
+        final String[] observersStaticIds = newEventHandlerImpl.getObserversStaticIds();
+        if (observersStaticIds.length > 0) {
+            // There is at least one observer
+            for (int j = 0; j < observersStaticIds.length; j++) {
+                final String currentObserverStaticId = observersStaticIds[j];
+
+                // NOTE: Handle special case of global id on containing document
+                final String currentObserverPrefixedId
+                        = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID.equals(currentObserverStaticId)
+                        ? currentObserverStaticId : prefix + currentObserverStaticId;
+
+                // Get handlers for observer
+                final List eventHandlersForObserver;
+                {
+                    final Object currentList = eventHandlersMap.get(currentObserverPrefixedId);
+                    if (currentList == null) {
+                        eventHandlersForObserver = new ArrayList();
+                        eventHandlersMap.put(currentObserverPrefixedId, eventHandlersForObserver);
+                    } else {
+                        eventHandlersForObserver = (List) currentList;
+                    }
+                }
+
+                // Add event handler
+                eventHandlersForObserver.add(newEventHandlerImpl);
+            }
+
+            // Remember all event names
+            if (newEventHandlerImpl.isAllEvents()) {
+                eventNamesMap.put(XFormsConstants.XXFORMS_ALL_EVENTS, "");
+            } else {
+                for (Iterator i = newEventHandlerImpl.getEventNames().keySet().iterator(); i.hasNext();) {
+                    final String eventName = (String) i.next();
+                    eventNamesMap.put(eventName, "");
+                }
+            }
+        }
     }
 
     /**

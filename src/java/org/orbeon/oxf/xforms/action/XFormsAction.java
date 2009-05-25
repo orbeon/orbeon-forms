@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext,
-                                 String targetId, XFormsEventObserver eventObserver, Element actionElement,
+                                 String targetEffectiveId, XFormsEventObserver eventObserver, Element actionElement,
                                  boolean hasOverriddenContext, Item overriddenContext);
 
     /**
@@ -51,7 +51,6 @@ public abstract class XFormsAction {
     protected void addContextAttributes(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, Element actionElement, XFormsEvent event) {
         // Check if there are parameters specified
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         for (Iterator i = actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME).iterator(); i.hasNext();) {

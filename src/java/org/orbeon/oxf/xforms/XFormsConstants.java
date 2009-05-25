@@ -118,6 +118,9 @@ public class XFormsConstants {
     public static final QName XBL_TEMPLATE_QNAME = new QName("template", XBL_NAMESPACE);
     public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
     public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);
+    public static final QName XBL_HANDLERS_QNAME = new QName("handlers", XBL_NAMESPACE);
+    public static final QName XBL_HANDLER_QNAME = new QName("handler", XBL_NAMESPACE);
+    public static final QName XBL_IMPLEMENTATION_QNAME = new QName("implementation", XBL_NAMESPACE);
 
     // XBL extensions
     public static final String XXBL_PREFIX = "xxbl";
@@ -132,13 +135,21 @@ public class XFormsConstants {
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";
     public static final Namespace XML_EVENTS_NAMESPACE = new Namespace(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI);
 
-    public static final QName XML_EVENTS_EVENT_ATTRIBUTE_QNAME = new QName("event", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = new QName("observer", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_TARGET_ATTRIBUTE_QNAME = new QName("target", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_HANDLER_ATTRIBUTE_QNAME = new QName("handler", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_PHASE_ATTRIBUTE_QNAME = new QName("phase", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
-    public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME = new QName("event", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME = new QName("observer", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME = new QName("target", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_HANDLER_ATTRIBUTE_QNAME = new QName("handler", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME = new QName("phase", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
+
+    public static final QName XML_EVENTS_EVENT_ATTRIBUTE_QNAME = new QName("event");
+    public static final QName XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = new QName("observer");
+    public static final QName XML_EVENTS_TARGET_ATTRIBUTE_QNAME = new QName("target");
+    public static final QName XML_EVENTS_HANDLER_ATTRIBUTE_QNAME = new QName("handler");
+    public static final QName XML_EVENTS_PHASE_ATTRIBUTE_QNAME = new QName("phase");
+    public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate");
+    public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction");
 
     public static final String XXFORMS_ALL_EVENTS = "#all";
 

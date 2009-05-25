@@ -252,7 +252,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void runSingleIteration(PipelineContext pipelineContext, String targetId, XFormsEventObserver eventObserver,
+    private void runSingleIteration(PipelineContext pipelineContext, String targetEffectiveId, XFormsEventObserver eventObserver,
                                     Element actionElement, String actionNamespaceURI, String actionName, String ifConditionAttribute,
                                     String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
@@ -283,7 +283,7 @@ public class XFormsActionInterpreter {
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
             containingDocument.startHandleOperation();
-            xformsAction.execute(this, pipelineContext, targetId, eventObserver, actionElement, hasOverriddenContext, contextItem);
+            xformsAction.execute(this, pipelineContext, targetEffectiveId, eventObserver, actionElement, hasOverriddenContext, contextItem);
             containingDocument.endHandleOperation();
 
             // Stop if there is no iteration

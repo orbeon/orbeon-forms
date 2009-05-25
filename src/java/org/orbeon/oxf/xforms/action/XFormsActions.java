@@ -80,6 +80,9 @@ public class XFormsActions {
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ONLINE_ACTION), new XXFormsOnlineAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_ACTION), new XXFormsOfflineAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_SAVE_ACTION), new XXFormsOfflineSaveAction());
+
+        // Also support xbl:handler
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XBL_NAMESPACE_URI, XFormsConstants.XBL_HANDLER_QNAME.getName()), new XFormsActionAction());
     }
 
     /**

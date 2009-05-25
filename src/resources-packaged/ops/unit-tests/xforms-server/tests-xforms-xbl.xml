@@ -1376,5 +1376,99 @@
         </output>
     </test>
 
+    <test description="XBL xbl:implementation and xbl:handler" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="instance">
+                                        <instance xmlns=""/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:dispatch name="my-event" target="my-bar">
+                                            <xxforms:context name="one" select="'Red'"/>
+                                            <xxforms:context name="two" select="'Blue'"/>
+                                        </xforms:dispatch>
+                                    </xforms:action>
+
+                                </xforms:model>
+
+                                <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:binding id="fr-bar" element="fr|bar">
+
+                                        <xbl:handlers>
+                                            <!-- Handlers are attached to the bound node -->
+                                            <xbl:handler event="my-event" phase="target">
+                                                <xforms:setvalue model="model" ref="value1" value="event('one')"/>
+                                                <xforms:setvalue model="model" ref="value2" value="event('two')"/>
+                                            </xbl:handler>
+                                        </xbl:handlers>
+
+                                        <!-- Test model placement within xbl:implementation -->
+                                        <xbl:implementation>
+                                            <xforms:model id="model">
+                                                <xforms:instance id="instance">
+                                                    <instance xmlns="">
+                                                        <value1/>
+                                                        <value2/>
+                                                    </instance>
+                                                </xforms:instance>
+                                            </xforms:model>
+                                        </xbl:implementation>
+
+                                        <!-- Template with just the controls -->
+                                        <xbl:template>
+                                            <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
+                                                <xforms:input id="input1" ref="value1"/>
+                                                <xforms:input id="input2" ref="value2"/>
+                                            </xforms:group>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <fr:bar id="my-bar"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                            <instance id="instance" model-id="my-bar$model">
+                                <instance>
+                                    <value1>Red</value1>
+                                    <value2>Blue</value2>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-bar$input1">Red</xxf:control>
+                        <xxf:control id="my-bar$input2">Blue</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

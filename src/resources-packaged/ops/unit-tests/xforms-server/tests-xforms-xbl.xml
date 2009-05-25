@@ -1392,9 +1392,13 @@
                                     </xforms:instance>
 
                                     <xforms:action ev:event="xforms-ready">
-                                        <xforms:dispatch name="my-event" target="my-bar">
+                                        <xforms:dispatch name="my-event" targetid="my-bar-1">
                                             <xxforms:context name="one" select="'Red'"/>
                                             <xxforms:context name="two" select="'Blue'"/>
+                                        </xforms:dispatch>
+                                        <xforms:dispatch name="my-event" targetid="my-bar-2">
+                                            <xxforms:context name="one" select="'Cat'"/>
+                                            <xxforms:context name="two" select="'Mouse'"/>
                                         </xforms:dispatch>
                                     </xforms:action>
 
@@ -1434,7 +1438,8 @@
                                 </xbl:xbl>
                             </xhtml:head>
                             <xhtml:body>
-                                <fr:bar id="my-bar"/>
+                                <fr:bar id="my-bar-1"/>
+                                <fr:bar id="my-bar-2"/>
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
@@ -1451,10 +1456,16 @@
                             <instance id="instance" model-id="model">
                                 <instance/>
                             </instance>
-                            <instance id="instance" model-id="my-bar$model">
+                            <instance id="instance" model-id="my-bar-1$model">
                                 <instance>
                                     <value1>Red</value1>
                                     <value2>Blue</value2>
+                                </instance>
+                            </instance>
+                            <instance id="instance" model-id="my-bar-2$model">
+                                <instance>
+                                    <value1>Cat</value1>
+                                    <value2>Mouse</value2>
                                 </instance>
                             </instance>
                         </instances>
@@ -1462,8 +1473,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-bar$input1">Red</xxf:control>
-                        <xxf:control id="my-bar$input2">Blue</xxf:control>
+                        <xxf:control id="my-bar-1$input1">Red</xxf:control>
+                        <xxf:control id="my-bar-1$input2">Blue</xxf:control>
+                        <xxf:control id="my-bar-2$input1">Cat</xxf:control>
+                        <xxf:control id="my-bar-2$input2">Mouse</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

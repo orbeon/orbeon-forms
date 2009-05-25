@@ -291,7 +291,6 @@
                                     <!-- Represent as links -->
                                     <fr:link-select1 id="fb-resources-language-select" ref="$fb-lang">
                                         <xforms:itemset nodeset="$resources/resource">
-                                            <!--<xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>-->
                                             <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
                                             <xforms:value ref="@xml:lang"/>
                                         </xforms:itemset>

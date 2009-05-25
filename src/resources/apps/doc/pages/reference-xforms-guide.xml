@@ -3100,7 +3100,7 @@
                 <p>
                     As of May 2009, in order to prevent attribute clashes with other specifications, the
                     <code>targetid</code> attribute supercedes the <code>target</code> on
-                    <code>&lt;xforms:dispatch</code>. <code>target</code> is still supported for backward compatibility.
+                    <code>&lt;xforms:dispatch></code>. <code>target</code> is still supported for backward compatibility.
                 </p>
             </section>
             <a name="xforms11-types"/>

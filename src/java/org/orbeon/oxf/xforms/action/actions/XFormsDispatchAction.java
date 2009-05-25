@@ -41,7 +41,11 @@ public class XFormsDispatchAction extends XFormsAction {
         final String newEventNameAttributeValue = actionElement.attributeValue("name");
         if (newEventNameAttributeValue == null)
             throw new OXFException("Missing mandatory name attribute on xforms:dispatch element.");
-        final String newEventTargetIdValue = actionElement.attributeValue("target");
+
+        // NOTE: As of 2009-05, XForms 1.1 gives @targetid priority over @target
+        String newEventTargetIdValue = actionElement.attributeValue("targetid");
+        if (newEventTargetIdValue == null)
+            newEventTargetIdValue = actionElement.attributeValue("target");
         if (newEventTargetIdValue == null)
             throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
 

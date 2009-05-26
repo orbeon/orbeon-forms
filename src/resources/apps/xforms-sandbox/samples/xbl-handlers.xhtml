@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xhtml:head>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns=""/>
+            </xforms:instance>
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:dispatch name="my-event" targetid="my-bar-1">
+                    <xxforms:context name="fr:one" select="'Red'"/>
+                    <xxforms:context name="fr:two" select="'Blue'"/>
+                </xforms:dispatch>
+                <xforms:dispatch name="my-event" targetid="my-bar-2">
+                    <xxforms:context name="fr:one" select="'Cat'"/>
+                    <xxforms:context name="fr:two" select="'Mouse'"/>
+                </xforms:dispatch>
+            </xforms:action>
+
+        </xforms:model>
+
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="fr-bar" element="fr|bar">
+
+                <xbl:handlers>
+                    <!-- Handlers are attached to the bound node -->
+                    <xbl:handler event="my-event" phase="target">
+                        <xforms:setvalue model="model" ref="value1" value="event('fr:one')"/>
+                        <xforms:setvalue model="model" ref="value2" value="event('fr:two')"/>
+                    </xbl:handler>
+
+                    <!-- TEST: Record all events -->
+                    <xbl:handler event="#all" phase="target">
+                        <xforms:insert model="model"
+                           context="instance('events')" nodeset="*"
+                           origin="xxforms:element('event',
+                                    (xxforms:attribute('type', event('xxforms:type')),
+                                     xxforms:attribute('target', event('xxforms:target')),
+                                     xxforms:attribute('phase', 'bubbling'),
+                                     xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                     xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
+                                     xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                    </xbl:handler>
+                </xbl:handlers>
+
+                <!-- Test model placement within xbl:implementation -->
+                <xbl:implementation>
+                    <!-- Local model with local data -->
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <value1/>
+                                <value2/>
+                            </instance>
+                        </xforms:instance>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xbl:implementation>
+
+                <!-- Template with just the controls -->
+                <xbl:template>
+                    <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
+                        <xforms:input id="input1" ref="value1"/>
+                        <xforms:input id="input2" ref="value2"/>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:bar id="my-bar-1"/>
+        <fr:bar id="my-bar-2"/>
+
+        <xforms:trigger>
+            <xforms:label>Update</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch name="my-event" targetid="my-bar-1">
+                    <xxforms:context name="fr:one" select="'Sun'"/>
+                    <xxforms:context name="fr:two" select="'Moon'"/>
+                </xforms:dispatch>
+                <xforms:dispatch name="my-event" targetid="my-bar-2">
+                    <xxforms:context name="fr:one" select="'Yin'"/>
+                    <xxforms:context name="fr:two" select="'Yang'"/>
+                </xforms:dispatch>
+            </xforms:action>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

@@ -1393,12 +1393,12 @@
 
                                     <xforms:action ev:event="xforms-ready">
                                         <xforms:dispatch name="my-event" targetid="my-bar-1">
-                                            <xxforms:context name="one" select="'Red'"/>
-                                            <xxforms:context name="two" select="'Blue'"/>
+                                            <xxforms:context name="fr:one" select="'Red'"/>
+                                            <xxforms:context name="fr:two" select="'Blue'"/>
                                         </xforms:dispatch>
                                         <xforms:dispatch name="my-event" targetid="my-bar-2">
-                                            <xxforms:context name="one" select="'Cat'"/>
-                                            <xxforms:context name="two" select="'Mouse'"/>
+                                            <xxforms:context name="fr:one" select="'Cat'"/>
+                                            <xxforms:context name="fr:two" select="'Mouse'"/>
                                         </xforms:dispatch>
                                     </xforms:action>
 
@@ -1410,19 +1410,37 @@
                                         <xbl:handlers>
                                             <!-- Handlers are attached to the bound node -->
                                             <xbl:handler event="my-event" phase="target">
-                                                <xforms:setvalue model="model" ref="value1" value="event('one')"/>
-                                                <xforms:setvalue model="model" ref="value2" value="event('two')"/>
+                                                <xforms:setvalue model="model" ref="value1" value="event('fr:one')"/>
+                                                <xforms:setvalue model="model" ref="value2" value="event('fr:two')"/>
+                                            </xbl:handler>
+
+                                            <!-- TEST: Record all events -->
+                                            <xbl:handler event="#all" phase="target">
+                                                <xforms:insert model="model"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
+                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                         </xbl:handlers>
 
                                         <!-- Test model placement within xbl:implementation -->
                                         <xbl:implementation>
+                                            <!-- Local model with local data -->
                                             <xforms:model id="model">
                                                 <xforms:instance id="instance">
                                                     <instance xmlns="">
                                                         <value1/>
                                                         <value2/>
                                                     </instance>
+                                                </xforms:instance>
+                                                <!-- TEST: Events to gather -->
+                                                <xforms:instance id="events">
+                                                    <events/>
                                                 </xforms:instance>
                                             </xforms:model>
                                         </xbl:implementation>
@@ -1462,11 +1480,41 @@
                                     <value2>Blue</value2>
                                 </instance>
                             </instance>
+                            <instance id="events" model-id="my-bar-1$model">
+                                <events>
+                                    <event type="my-event" target="my-bar-1" phase="bubbling" original-target="my-bar-1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-optional" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-readwrite" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-valid" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-optional" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-readwrite" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-valid" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                </events>
+                            </instance>
                             <instance id="instance" model-id="my-bar-2$model">
                                 <instance>
                                     <value1>Cat</value1>
                                     <value2>Mouse</value2>
                                 </instance>
+                            </instance>
+                            <instance id="events" model-id="my-bar-2$model">
+                                <events>
+                                    <event type="my-event" target="my-bar-2" phase="bubbling" original-target="my-bar-2" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-optional" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-readwrite" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-valid" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-optional" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-readwrite" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="xforms-valid" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                </events>
                             </instance>
                         </instances>
                     </dynamic-state>

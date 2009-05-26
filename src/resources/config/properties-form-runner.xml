@@ -17,9 +17,6 @@
 
     <!-- Form Runner properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookshelf.form"           value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.provinces.form"           value="/fr/service/resource"/>
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db"/>
     <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
@@ -87,5 +84,14 @@
     <property as="xs:string"  name="oxf.fr.alfresco.path.*.*"                                   value="/app:company_home"/>
     <property as="xs:boolean" name="oxf.fr.alfresco.send-pdf.*.*"                               value="false"/>
     <property as="xs:boolean" name="oxf.fr.alfresco.send-xml.*.*"                               value="false"/>
+
+    <!-- Configuration of demo forms -->
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookshelf.form"           value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.provinces.form"           value="/fr/service/resource"/>
+
+    <!-- The following shows how you can use the "Submit" button instead of the "Save" button -->
+    <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh back clear pdf email submit collapse-all expand-all"/>-->
+    <!--<property as="xs:string"  name="oxf.fr.detail.submit.buttons.orbeon.bookshelf"              value="clear"/>-->
 
 </properties>

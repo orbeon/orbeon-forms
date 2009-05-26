@@ -36,7 +36,9 @@
                 <xforms:trigger class="fr-inplace-rename">
                     <xforms:label ref="$form-resources/apply/label"/>
                     <!-- Close and save upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog"/>
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog">
+                        <xxforms:context name="fb:save" select="true()"/>
+                    </xforms:dispatch>
                 </xforms:trigger>
                 <xforms:output value="$form-resources/or/label"/>
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
@@ -50,8 +52,10 @@
         </xforms:group>
     </xhtml:div>
 
-    <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+    <!-- Save data upon close -->
+    <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
+         an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+    <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save')">
         <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
         <xforms:setvalue ref="$form-instance/root()/saxon:evaluate($instance/result-path)" value="$instance/help-text"/>
     </xforms:action>

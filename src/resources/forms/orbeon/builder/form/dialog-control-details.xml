@@ -42,7 +42,9 @@
                          of the button, make it read-only -->
                     <xforms:dispatch ev:event="DOMActivate"
                                      if="xxforms:valid(instance('fb-details-editor-instance'), true())"
-                                     name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
+                                     name="xxforms-dialog-close" target="fb-edit-details-dialog">
+                        <xxforms:context name="fb:save" select="true()"/>
+                    </xforms:dispatch>
                 </xforms:input>
                 <xforms:select ref="classes" appearance="full">
                     <xforms:label ref="$form-resources/dialog-control-details/classes/label"/>
@@ -58,7 +60,9 @@
             <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
-                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog">
+                    <xxforms:context name="fb:save" select="true()"/>
+                </xforms:dispatch>
             </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
@@ -71,8 +75,10 @@
         </xhtml:div>
     </xhtml:div>
 
-    <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false()) and instance('fb-details-editor-instance')/save-trigger = 'enabled'">
+    <!-- Save data upon close -->
+    <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
+         an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+    <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and instance('fb-details-editor-instance')/save-trigger = 'enabled'">
 
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 

@@ -147,7 +147,9 @@
             <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
-                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog"/>
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog">
+                    <xxforms:context name="fb:save" select="true()"/>
+                </xforms:dispatch>
             </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
@@ -160,8 +162,10 @@
         </xhtml:div>
     </xhtml:div>
 
-    <!-- Save data upon close, unless explicitly prevented or unless the sub-form is not valid -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false()) and instance('fb-validation-editor-instance')/save-trigger = 'enabled'">
+    <!-- Save data upon close unless the sub-form is not valid -->
+    <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
+         an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+    <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and instance('fb-validation-editor-instance')/save-trigger = 'enabled'">
         <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
         <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//*[@id = concat($current-control-name, '-control')] else ()"/>
         <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>

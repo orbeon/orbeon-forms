@@ -776,7 +776,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         // Process event handlers
                         for (Iterator j = currentEventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
-
+                            // TODO: handler isTargetPhase()
                             if (!eventHandler.isBubblingPhase()
                                     && eventHandler.isMatchEventName(retargettedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
@@ -868,7 +868,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     if (currentEventHandlers != null) {
                         for (Iterator j = currentEventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
-
+                            // TODO: handler isTargetPhase()
                             if (eventHandler.isBubblingPhase()
                                     && eventHandler.isMatchEventName(retargettedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {

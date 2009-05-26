@@ -576,41 +576,44 @@
 
     <!-- Create the bind element for the current control or section if it does not exist yet -->
     <xforms:action ev:event="fb-ensure-bind">
-        <!-- Control name -->
-        <xxforms:variable name="control-name" select="event('control-name')"/>
-        <!-- Use this if you don't pass a control name and just want to create the bind for the section -->
-        <xxforms:variable name="section-name" select="event('section-name')"/>
+        <!-- Control name: use this if you want to create the bind for the section and the control -->
+        <xxforms:variable name="control-name" select="event('control-name')" as="xs:string?"/>
+        <!-- Section name: use this if you don't pass a control name and just want to create the bind for the section -->
+        <xxforms:variable name="section-name" select="event('section-name')" as="xs:string?"/>
 
-        <!-- Insert bind container if needed -->
-        <xforms:insert context="$model"
-                       if="not(xforms:bind[@id = 'fr-form-binds'])"
-                       nodeset="xforms:instance[@id = 'fr-form-instance']"
-                       origin="instance('fb-bind-template')"/>
+        <!-- Proceed only if a control name or section name is provided -->
+        <xforms:action if="$control-name or $section-name">
+            <!-- Insert bind container if needed -->
+            <xforms:insert context="$model"
+                           if="not(xforms:bind[@id = 'fr-form-binds'])"
+                           nodeset="xforms:instance[@id = 'fr-form-instance']"
+                           origin="instance('fb-bind-template')"/>
 
-        <!-- Insert bind for section if needed -->
-        <xxforms:variable name="current-control"
-                          select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
-        <xxforms:variable name="current-section-name"
-                          select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
-        <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
-            <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
-                <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
-                <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>
-                <xforms:setvalue ref="$bind/@nodeset" value="$current-section-name"/>
-            </xforms:action>
-        </xforms:action>
-
-        <xforms:action if="$control-name">
-            <!-- Insert bind for control if needed -->
-            <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
-            <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
-                <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
+            <!-- Insert bind for section if needed -->
+            <xxforms:variable name="current-control"
+                              select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
+            <xxforms:variable name="current-section-name"
+                              select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
+            <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
+                <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
                     <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
                     <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
-                    <xforms:setvalue ref="$bind/@id" value="$current-bind-id"/>
-                    <xforms:insert context="$bind" origin="xxforms:attribute('name', $control-name)"/>
-                    <xforms:setvalue ref="$bind/@nodeset" value="$control-name"/>
+                    <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>
+                    <xforms:setvalue ref="$bind/@nodeset" value="$current-section-name"/>
+                </xforms:action>
+            </xforms:action>
+
+            <xforms:action if="$control-name">
+                <!-- Insert bind for control if needed -->
+                <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
+                <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
+                    <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
+                        <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
+                        <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
+                        <xforms:setvalue ref="$bind/@id" value="$current-bind-id"/>
+                        <xforms:insert context="$bind" origin="xxforms:attribute('name', $control-name)"/>
+                        <xforms:setvalue ref="$bind/@nodeset" value="$control-name"/>
+                    </xforms:action>
                 </xforms:action>
             </xforms:action>
         </xforms:action>

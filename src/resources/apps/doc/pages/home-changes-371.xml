@@ -1,0 +1,3238 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2007-2008 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
+    <header>
+        <title>Changes in Version 3.7.1 (Developer Release)</title>
+    </header>
+    <body>
+        <a name="introduction"/>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Orbeon Forms 3.7.1 (Developer Release) features over <a href="#changes-371-full">400 improvements</a>
+                since <a href="home-changes-36">Orbeon Forms 3.6</a>, including the new Form Builder authoring tool, the
+                new Form Runner environment, and enhancements in the areas of performance, core XForms engine features,
+                schema validation, session handling, caching, and application server support.
+            </p>
+            <p>
+                This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.1.
+            </p>
+            <p>
+                <b>Please also make sure to check all releases on the <a
+                href="http://www.orbeon.com/forms/download">downloads page</a>.</b>
+            </p>
+        </section>
+        <a name="changes-371"/>
+        <section>
+            <title>Changes in Version 3.7.1 (Developer Release)</title>
+            <section>
+                <title>Noteworthy Changes</title>
+                <img src="../apps/doc/images/form-builder-400.png" class="ops-doc-image"/>
+                <ul>
+                    <li>
+                        <p>
+                            <b>New version numbering scheme.</b> Starting with Orbeon Forms 3.7.1, Orbeon Forms adopts a
+                            new numbering scheme:
+                        </p>
+                        <ul>
+                            <li><p>Even-numbered releases (3.6, 3.8, etc.) are considered "stable" releases</p></li>
+                            <li><p>Odd-numbered releases (3.7, 3.9, etc.) are considered "developer" releases</p></li>
+                        </ul>
+                        <p>
+                            <a
+                            href="http://en.wikipedia.org/wiki/Software_versioning#Odd-numbered_versions_for_development_releases">This
+                            scheme </a> follows the practice of a number of other open source projects.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Form Builder editor.</b> Orbeon Form Builder is a visual form designer which allows you
+                            to build and deploy forms in minutes right from your web browser.
+                        </p>
+                        <p>
+                            For more information see the <a href="http://www.orbeon.com/forms/builder">Form Builder
+                            product page</a>.
+                        </p>
+                        <p>
+                            Try <a href="/fr/orbeon/builder/summary/">Form Builder</a> right from this Orbeon Forms
+                            installation!
+                        </p>
+                    </li>
+                    <li>
+                        <img src="../apps/doc/images/form-runner-400.png" class="ops-doc-image"/>
+                        <p>
+                            <b>Form Runner environment.</b> Orbeon Form Runner is the Orbeon Forms runtime environment.
+                            Form Runner manages form definitions and form data, handles search, validation, and takes
+                            care of the plumbing necessary to capture, save, import and export form data. Features
+                            include:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Customizable, extensible persistence layer (eXist and Oracle support out of the box)
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Summary page with built-in search
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Standard page layout and look and feel
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    As-you-type validation with error summary
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Customizable submission process
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Printable HTML output
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    PDF output
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Send form data, PDF and attachments by email
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Fully internationalized UI
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Built-in accessible "noscript" mode
+                                </p>
+                            </li>
+                        </ul>
+                        <p>
+                            Form Runner is built on top of core Orbeon Forms technologies, including the XForms and XPL
+                            engines.
+                        </p>
+                        <p>
+                            For an example running on top of Form Runner, see the <a
+                            href="/fr/orbeon/bookshelf/summary/">Bookshelf</a> form.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Noscript mode.</b> The "noscript mode" in Orbeon Forms allows you to use a single
+                            XHTML+XForms description of a page and to target browser that have JavaScript disabled. This
+                            is integrated into Form Runner, which means you don’t need JavaScript on the client to
+                            fill-out forms created by Form Builder. This is also the basis for the accessibility
+                            features we are working on (including WCAG AA compliance).
+                        </p>
+                        <p>
+                            More documentation is available in the <a
+                            href="http://wiki.orbeon.com/forms/doc/developer-guide/noscript-mode-guide">Noscript
+                            (Accessible) Mode Guide</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Firefox 3 support.</b> Orbeon Forms version 3.6 had a known bug with Firefox 3. This
+                            issue is now resolved.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Performance improvements.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
+                                    <a href="reference-xforms-extensions#session-heartbeat">Session Heartbeat</a> feature. This allows
+                                    sessions associated with live pages in a user's browser to stay active, therefore
+                                    preventing situations where the user gets back to a form and gets session expiration errors.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-extensions#session-heartbeat">Session Heartbeat</a>.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Versioned resources.</b> Orbeon Forms now supports versioning of resources such as CSS,
+                                    JavaScript, and images. This allows more aggressive client-side caching, thereby reducing
+                                    page loading times as well as server load.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#versioned-resources">Versioned Resources</a> for the full
+                                    documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Enhanced user interface controls.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Reusable user interface components.</b> Orbeon Forms now implements a complete
+                                    system of reusable components, based on the <a href="http://www.w3.org/TR/xbl/">XBL
+                                    2 specification</a>. This allows you to define and reuse UI components in your
+                                    forms. There is no limit to the types of components you can build: examples include
+                                    special date selectors, color pickers, reusable address blocks, etc.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Improved date and time controls.</b> You can now type in dates, and the date
+                                    picker is by default the YUI date picker. We have also added controls for
+                                    <code>xs:time</code> and <code>xs:dateTime</code> types. The date picker is
+                                    localized in English, French and Spanish.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>New YUI controls.</b> Orbeon Forms now use the YUI date picker as well as the YUI
+                                    Rich Text Editor (RTE). The older JSCalendar and FCKeditor implementations are
+                                    still available through properties.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Modal triggers.</b> Usually, activating a trigger on the client doesn't prevent
+                                    further actions in the user interface. Sometimes, it is however useful to block such
+                                    further actions until some processing is complete, for example calling a submission
+                                    that saves a document.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#modal-trigger">Modal Trigger Behavior</a> for documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Improved handling of alerts.</b> In XForms the behavior of
+                                    <code>xforms:alert</code> is not built-in. Instead, the behavior was initially
+                                    planned to be controlled through CSS. Previous versions of Orbeon Forms displayed
+                                    an alert icon and message (if provided) only if the value associated with the
+                                    control was invalid. Orbeon Forms now by default shows the control in alert state
+                                    when the value is invalid, but also when it is required but empty.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Enhanced XForms 1.1 support.</b> In particular:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Much improved repeat handling, especially in conjunction with
+                                    <code>&lt;xforms:insert></code>, <code>&lt;xforms:delete></code>, index updates, and
+                                    event dispatching.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#output-mediatype">Media Type for
+                                    <code>&lt;xforms:output></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#insert-origin-attribute"><code>origin</code> Attribute
+                                    on <code>&lt;xforms:insert></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#insert-context-attribute"><code>context</code>
+                                    Attribute on <code>&lt;xforms:insert></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#validate-relevant-attributes"><code>validate</code> and
+                                    <code>relevant</code> Attributes on <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#serialization-attribute"><code>serialization</code>
+                                    Attribute on <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#asynchronous-submissions">Preliminary Support for
+                                    Asynchronous Handling of <code>&lt;xforms:submission></code></a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <a href="reference-xforms-extensions#dispatch-delay">Preliminary Support for delay Attribute
+                                    on <code>&lt;xforms:dispatch></code> Action</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    New <a href="reference-xforms-extensions#xforms11-types">XForms 1.1 Types</a>, in particular the very useful
+                                    <code>xforms:email</code> type.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    New <a href="reference-xforms-extensions#xforms11-functions">XForms 1.1 Functions</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Core XForms support improvements.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Inline XML Schema support with XForms.</b> XForms supports using XML Schemas which are
+                                    embedded within the <code>&lt;xforms:model></code> element. Orbeon Forms now supports this
+                                    feature. This is particularly useful when you create a new schema which is just used within
+                                    an XForms document, or to define a series of simple types used for validation.
+                                </p>
+                                <xml-source>
+                                    <xforms:model>
+                                        <comment> A simple inline XML Schema </comment>
+                                        <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+                                            <xs:simpleType name="link">
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(https?\://([^/?#]+)/([^?#]*)(\?([^?#]+))?(#(.*))?)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:schema>
+                                        <comment> More XForms model constructs below </comment>
+                                        ...
+                                    </xforms:model>
+                                </xml-source>
+                                <p>
+                                    The XML Schema definitions are directly available to the model, in particular to binds:
+                                </p>
+                                <xml-source>
+                                    <xforms:bind nodeset="my-link" type="link"/>
+                                </xml-source>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Event handling improvements.</b> The XML Events <code>ev:observer</code>
+                                    attribute used to be only supported within a model to refer to a nested instance. It
+                                    is now globally supported. Support for the more rarely needed
+                                    <code>ev:target</code> attribute has been added as well.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-guide#events-observer-target">Using the
+                                    <code>ev:observer</code> and <code>ev:target</code> Attributes</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XPath functions additions and improvements.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Access request and session directly from XForms.</b> In the past, accessing
+                                    request and session information from XForms required using the page flow controller
+                                    or possibly a page model written in XPL. Now, you can use <a
+                                    href="reference-xforms-functions#orbeon-extensions">XPath
+                                    functions</a> to do so.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>More utility XPath functions.</b> Additional utility functions have been added,
+                                    notably <code>xxforms:element()</code>, <code>xxforms:attribute()</code>,
+                                    <code>xxforms:bind()</code>, <code>xxforms:case()</code>,
+                                    <code>xxforms:property()</code>, and enhancements to the standard
+                                    <code>property()</code> function.
+                                </p>
+                                <p>
+                                    See also <a
+                                    href="reference-xforms-functions#orbeon-extensions">XPath
+                                    functions</a> for more information.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>More freedom with XForms constructs.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Free positioning of label, help, hint and alert elements.</b>
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#lhha-for">Standalone Label, Hint, Help and
+                                    Alert Elements</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>XForms models can be positioned in more places, including within dialogs.</b>
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#controls-models-placement">Placement of
+                                    Controls and Models</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Support for AVTs on XHTML elements outside HTML body.</b> This in particular
+                                    allows dynamically setting, from XForms, a document's language, with the
+                                    <code>lang</code> and/or <code>xml:lang</code> attributes on the
+                                    <code>&lt;html></code> element.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#controls-models-placement">Placement of
+                                    Controls and Models</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Support for <code>&lt;xforms:output></code> within
+                                    <code>&lt;xhtml:title></code>.</b> This allows dynamically controlling, from XForms,
+                                    the title of the page. For example, the title can be updated to report the current
+                                    number of errors on a form.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#controls-models-placement">Placement of
+                                    Controls and Models</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Attribute Value Templates (AVTs) on XHTML elements.</b> AVTs were already supported on <a
+                                    href="reference-xforms-extensions#avts-xforms">some XForms elements</a>. You can now use AVTs on
+                                    XHTML elements as well. This allows you to use XForms to influence aspects of XHTML such as
+                                    <code>class</code>, <code>style</code> or <code>colspan</code> attributes.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
+                                </p>
+                                <p>
+                                    This feature is kindly sponsored by Teleflex.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Other extensions to XForms constructs.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Variables within controls, models and actions.</b> You can now declare variables usable
+                                    from any XPath expression in an XForms document, using the <code>xxforms:variable</code> (or
+                                    <code>exforms:variable</code>) element. Variables are extremely useful, for example to avoid
+                                    repeating long XPath expressions, or to give an XPath expression unambiguous access to data
+                                    computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
+                                    elements.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#variables">Variables</a> for documentation.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Generalized <code>context</code> attribute on XForms elements.</b> XForms 1.1
+                                    introduces the <code>context</code> attribute on <code>&lt;xforms:insert></code>
+                                    and <code>&lt;xforms:delete></code>. Orbeon Forms now supports this convenient
+                                    attribute on all elements changing the XPath evaluation context, including controls,
+                                    actions, binds, and submissions. Further versions of XForms are likely to extend
+                                    support this way.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#context-attribute">Generalized <code>context</code>
+                                    attribute</a> for the documentation.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <code>ev:event</code>, <code>ev:observer</code> and <code>ev:target</code> all
+                                    support multiple space-separated event names and identifiers. This is an extension
+                                    to XML Events 1, which is planned for XML Events 2.
+                                </p>
+                                <p>
+                                    See also <a href="reference-xforms-extensions#events-multiple">Multiple Event Names,
+                                    Observers and Targets on Event Handlers</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Custom Model Item Properties.</b> You can place user-defined Model Item
+                                    Properties on the <code>&lt;xforms:bind></code> element.
+                                </p>
+                                <p>
+
+                                    See also <a href="reference-xforms-extensions#xxforms-custom-mips">Custom Model
+                                    Item Properties</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b><code>exforms:iterate</code> attribute on actions.</b> In particular, these
+                                    additions make it much easier to iterate over nodes within actions.
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#exforms-iterate">Iteration of XForms Actions over
+                                    Sequences</a> for documentation and a complete example.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Declarative dynamic default instance values.</b>
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#xxforms-default-mip">Extension Model Item
+                                    Property to Specify default instance values</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Dataypes to validate XML and XPath 2 expressions.</b>
+                                </p>
+                                <p>
+                                    See <a href="reference-xforms-extensions#validation-extensions-types">Extension
+                                    Types</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Outputting server log messages with <code>xforms:message</code>.</b>
+                                    <code>xforms:message</code> supports new level values:
+                                    <code>xxforms:log-debug</code>, <code>xxforms:log-info</code>,
+                                    <code>xxforms:log-warn</code> and <code>xxforms:log-error</code>. These cause the
+                                    message to be logged on the server using the levels "debug", "info", "warn" and
+                                    "error" as per the log4j terminology. Messages output with these levels appear in
+                                    the Orbeon Forms logs depending on the configuration of <code>log4j.xml</code>. For
+                                    example:
+                                </p>
+                                <xml-source show-namespaces="false">
+                                    <xforms:submission>
+                                        ...
+                                        <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error">
+                                            A submission error occurred:
+                                            <xforms:output value="event('error-type')"/>
+                                        </xforms:message>
+                                    </xforms:submission>
+                                </xml-source>
+                                <p>
+                                    See also <a href="reference-xforms-guide#xforms-message">Displaying Messages with the
+                                    <code>xforms:message</code> Action</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Local configuration properties.</b> You can create a local property file,
+                            <code>config/properties-local.xml</code>, for your own Orbeon Forms configuration
+                            properties. These add to and override existing properties. This new mechanism facilitates
+                            upgrades of Orbeon Forms, as property files no longer have to be merged.
+                        </p>
+                        <p>
+                            See also <a href="reference-properties">Properties File</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Upgrades to core libraries.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>New Yahoo User Interface library.</b> Orbeon Forms now uses YUI 2.6.0.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>New eXist database.</b> Orbeon Forms now uses eXist 1.2.4.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XML pipelines improvements.</b>
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Inline transformations in XPL.</b> Often, processor configurations must be
+                                    determined dynamicaly. XSLT is typically used for that purpose, but this can lead to
+                                    heavier code. Inline transformations simplify the syntax by allowing
+                                    transformations directly embedded within processor inputs:
+                                </p>
+                                <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                    <p:processor name="oxf:url-generator">
+                                        <p:input name="config" transform="oxf:xslt" href="#instance">
+                                            <comment> This is an inline transformation </comment>
+                                            <config xsl:version="2.0">
+                                                <url>http://www.example.org/</url>
+                                                <mode>
+                                                    <xsl:value-of select="/instance/mode"/>
+                                                </mode>
+                                            </config>
+                                        </p:input>
+                                        <p:output name="data" id="example-document"/>
+                                    </p:processor>
+                                </xml-source>
+                                <p>
+                                    See also <a href="reference-xpl-pipelines#inline-transformations">Embedding
+                                    Transformations within Inputs</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Temporary files in the file serializer.</b> The file serializer can now
+                                    automatically create temporary files and write to those temporary files. It will
+                                    also delete temporary files, based on a "scope" parameter you specify in the
+                                    configuration. As with the Scope generator and Scope serializer, you can set the
+                                    scope to either "request", "session", or "application".
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Epilogue pipeline configurable with properties.</b> These <a
+                                    href="reference-properties#epilogue">properties</a> in particular allow you to pick
+                                    the theme stylesheet, enable XHTML output, etc.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Chart Processor enhancements.</b> The chart processor now support two new types
+                                    of chart: XY charts and time series. For charts that show a lot of data points, you
+                                    can also limit the number of labels shown in the categories axis with the new
+                                    <code>max-number-of-labels</code> option.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Zip and unzip processors.</b>
+                                </p>
+                                <p>
+                                    See <a
+                                    href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-zip-unzip">Processors
+                                    - Zip and Unzip</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Orbeon Forms version.</b> You can know the exact version number of the Orbeon Forms you
+                            are running by running <code>java -jar orbeon-cli.jar -v</code> from the command line. The
+                            FAQ has more on how to know <a href="/doc/home-faq#orbeon-version">which version of Orbeon
+                            Forms</a> you are running.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="changes-371-full"/>
+            <section>
+                <title>Complete List of Issues Addressed in this Release</title>
+                <p>
+                    Orbeon Forms 3.7.1 addresses the following bugs and features:
+                </p>
+                <!--
+Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
+
+http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=350207&set=custom&_assigned_to=0&_status=2&_category=100&_group=100&_sort_col=close_date&_sort_ord=DESC
+
+<ul>
+    {
+        for $table in //table[tr/td/span/strong[. = 'ID']]
+            let $latest-id := '308864'
+            let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
+            return
+                for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
+                <li>
+                    <a href="http://forge.objectweb.org/{$row/td[2]/a/@href}">#{string($row/td[1])}: {string($row/td[2]/a)}</a>
+                </li>
+    }
+</ul>
+-->
+                <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313787&amp;group_id=168&amp;atid=350207">
+                            #313787: RFE: Implement xbl:handler
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313786&amp;group_id=168&amp;atid=350207">
+                            #313786: RFE: Implement xforms:dispatch/@targetid
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313783&amp;group_id=168&amp;atid=350207">
+                            #313783: Hint for trigger does not update when the server sends a new value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313770&amp;group_id=168&amp;atid=350207">
+                            #313770: Cell content remains hidden on IE – Inner tables
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313779&amp;group_id=168&amp;atid=350207">
+                            #313779: RFE: Implement new xxforms:instance() scoping rules
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313772&amp;group_id=168&amp;atid=350207">
+                            #313772: Uploading a schema does not inline the schema
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313777&amp;group_id=168&amp;atid=350207">
+                            #313777: FB: Regression: After clicking on last grid cell, it is no longer possible to
+                            insert a new control
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313776&amp;group_id=168&amp;atid=350207">
+                            #313776: FB: Inserting HTML text doesn't insert the right template
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313628&amp;group_id=168&amp;atid=350207">
+                            #313628: Id clash when using xxforms:index() function in XBL component
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313773&amp;group_id=168&amp;atid=350207">
+                            #313773: XBL: Changing repeat index through user interaction updates non-related indexes
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313769&amp;group_id=168&amp;atid=350207">
+                            #313769: Insert of new node affecting repeat within XBL yields wrong repeat id
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313732&amp;group_id=168&amp;atid=350207">
+                            #313732: Regression: instance inspector causes exception on To-Do Lists example
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313549&amp;group_id=168&amp;atid=350207">
+                            #313549: Namespaces are not properly copied when using xxbl:transform
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313722&amp;group_id=168&amp;atid=350207">
+                            #313722: RFE: support mindate and maxdate for calendar widget
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313749&amp;group_id=168&amp;atid=350207">
+                            #313749: Separate deployment: filter not to forward content Orbeon Forms if the content is
+                            empty, and implement sendsendRedirect
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313748&amp;group_id=168&amp;atid=350207">
+                            #313748: RFE: support "european" date format in date picker
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313747&amp;group_id=168&amp;atid=350207">
+                            #313747: RFE: support for navigator in YUI calendar
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313711&amp;group_id=168&amp;atid=350207">
+                            #313711: FB: Test form asks for confirmation when closing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313647&amp;group_id=168&amp;atid=350207">
+                            #313647: Regression: xforms:range throws JS error in XForms Controls example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313746&amp;group_id=168&amp;atid=350207">
+                            #313746: RFE: Ability from XBL to dispatch event to bound node using xforms:dispatch
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313709&amp;group_id=168&amp;atid=350207">
+                            #313709: IE 6/7: Selecting file in upload control no longer dispatches xforms-select event
+                            from client
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313702&amp;group_id=168&amp;atid=350207">
+                            #313702: Map component: support getting a Google Maps API key from a property
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313698&amp;group_id=168&amp;atid=350207">
+                            #313698: Incorrect checkbox selection when both itemset and value are updated
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313700&amp;group_id=168&amp;atid=350207">
+                            #313700: Issue with selection of input type="boolean"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313697&amp;group_id=168&amp;atid=350207">
+                            #313697: FR: Summary page: navigate to second page of results and search causes incorrect
+                            paging situation
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313642&amp;group_id=168&amp;atid=350207">
+                            #313642: FR: make changes, press Close, then Cancel browser confirmation: loading indicator
+                            remains stuck
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313653&amp;group_id=168&amp;atid=350207">
+                            #313653: Autocomplete: suggestion list shows below other form controls on IE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313696&amp;group_id=168&amp;atid=350207">
+                            #313696: RFE: Support ev:event="#all" extension to match on all events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313695&amp;group_id=168&amp;atid=350207">
+                            #313695: RFE: Instance replacement with shared="application" must support XInclude
+                            configuration
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313691&amp;group_id=168&amp;atid=350207">
+                            #313691: xbl:content does not properly copy namespaces of source element
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313689&amp;group_id=168&amp;atid=350207">
+                            #313689: IE6/7: Content not showing when non-relevant section becomes relevant
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313685&amp;group_id=168&amp;atid=350207">
+                            #313685: Autocomplete: no xforms-value-changed event is dispatched if a value is selected
+                            from the list with the mouse
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313648&amp;group_id=168&amp;atid=350207">
+                            #313648: Enabling XForms Inspector in FR summary page leads to NPE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313650&amp;group_id=168&amp;atid=350207">
+                            #313650: XBL: IDs in XHTML elements are not prefixed
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313683&amp;group_id=168&amp;atid=350207">
+                            #313683: Client-side unit-tests hanging on test-error-ajax on IE6
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313668&amp;group_id=168&amp;atid=350207">
+                            #313668: Static context lost in exforms:sort
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313682&amp;group_id=168&amp;atid=350207">
+                            #313682: Input type="boolean" creating ghost on IE6 when has focus
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313674&amp;group_id=168&amp;atid=350207">
+                            #313674: RFE: Support xxforms:encrypt-item-values attribute on selection controls
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313672&amp;group_id=168&amp;atid=350207">
+                            #313672: IE hang using 100% CPU when autosize text area is disabled
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313671&amp;group_id=168&amp;atid=350207">
+                            #313671: Versioned resources: a/@href is rewritten as resource URL instead of render URL in
+                            Ajax response
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313664&amp;group_id=168&amp;atid=350207">
+                            #313664: Date field: convert 2-digit year to 4-digit year taking the closest century
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313663&amp;group_id=168&amp;atid=350207">
+                            #313663: Regression: disabled content is hidden but still takes the space on the page it
+                            would take if not disabled
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313659&amp;group_id=168&amp;atid=350207">
+                            #313659: XForms dynamic state deserialization restores repeat indexes too late
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313643&amp;group_id=168&amp;atid=350207">
+                            #313643: FB: Itemset editor's last value may not be set if the dialog is closed too fast
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313583&amp;group_id=168&amp;atid=350207">
+                            #313583: Incremental autocomplete field replaces data with data coming from server
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313641&amp;group_id=168&amp;atid=350207">
+                            #313641: Controls are empty when recreating items in a repeat for the second time
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313637&amp;group_id=168&amp;atid=350207">
+                            #313637: oxf:sql might not properly extract namespaces when creating document with
+                            odt:xmlFragment type
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313634&amp;group_id=168&amp;atid=350207">
+                            #313634: Regression: HTML editor: "String index out of range" exception when the control
+                            becomes empty
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313613&amp;group_id=168&amp;atid=350207">
+                            #313613: RFE: Pass information about the error to listeners on
+                            ORBEON.xforms.Events.orbeonLoadedEvent
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313609&amp;group_id=168&amp;atid=350207">
+                            #313609: Incremental input is broken
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313612&amp;group_id=168&amp;atid=350207">
+                            #313612: RFE: Add HTML area control to Form Builder
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313611&amp;group_id=168&amp;atid=350207">
+                            #313611: RFE: HTML Area: remove titlebar
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313600&amp;group_id=168&amp;atid=350207">
+                            #313600: Exception when using AVT in XBL component: Missing mandatory id for element:
+                            xxforms:attribute
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313605&amp;group_id=168&amp;atid=350207">
+                            #313605: RFE: New property to disable default error dialog
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313604&amp;group_id=168&amp;atid=350207">
+                            #313604: RFE: Support custom event event in case of error intecepted by JavaScript code
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313603&amp;group_id=168&amp;atid=350207">
+                            #313603: RFE: HTML Area: clean-up pasted HTML and prevent injections
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313591&amp;group_id=168&amp;atid=350207">
+                            #313591: XForms tutorial is referencing xforms-bookcast instead of my-bookcast
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313560&amp;group_id=168&amp;atid=350207">
+                            #313560: Versioned resources: dynamic images don't update in XForms Controls example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313582&amp;group_id=168&amp;atid=350207">
+                            #313582: Versioned resources: incorrect rewriting of URLs returned in Ajax response
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313578&amp;group_id=168&amp;atid=350207">
+                            #313578: XForms Sandbox "Run XForms" buttons are always grayed out in noscript mode
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313576&amp;group_id=168&amp;atid=350207">
+                            #313576: RFE: Map XBL: don't set lat/long based on address unless marker is moved
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311396&amp;group_id=168&amp;atid=350207">
+                            #311396: Issue registering nested event handlers without ev:observer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313567&amp;group_id=168&amp;atid=350207">
+                            #313567: Setting RTE value to blank sometimes does not update on Firefox
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313561&amp;group_id=168&amp;atid=350207">
+                            #313561: RFE: Custom MIPs must update classes on client on Ajax response
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313545&amp;group_id=168&amp;atid=350207">
+                            #313545: Resources versioned: when app version number set to empty string, Orbeon fails to
+                            load app resources
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313430&amp;group_id=168&amp;atid=350207">
+                            #313430: RFE: Support for xxforms:target="..." attribute on &lt;xforms:output
+                            appearance="xxforms:download"&gt;</a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313551&amp;group_id=168&amp;atid=350207">
+                            #313551: #313548 is breaking existing applications
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313550&amp;group_id=168&amp;atid=350207">
+                            #313550: With YUI RTE under IE 6, sometimes a new value is not set
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313548&amp;group_id=168&amp;atid=350207">
+                            #313548: RFE: Add support to exf:sort() for literal sort expression
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313541&amp;group_id=168&amp;atid=350207">
+                            #313541: Regression: when versioned resources enabled, calling XForms Server with path
+                            including version
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313538&amp;group_id=168&amp;atid=350207">
+                            #313538: Creating of boolean inputs in repeats yields to JavaScript error (shown in dialog
+                            to the user)
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313523&amp;group_id=168&amp;atid=350207">
+                            #313523: Namespaces are not properly copied when using xxbl:transform
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313525&amp;group_id=168&amp;atid=350207">
+                            #313525: FR: Sending text/* attachments by email produces junk
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313520&amp;group_id=168&amp;atid=350207">
+                            #313520: When recreating multiple series of radio buttons they are incorectly all made part
+                            of the same group
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313519&amp;group_id=168&amp;atid=350207">
+                            #313519: FR: Noscript: Encoding issue with accented characters
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313518&amp;group_id=168&amp;atid=350207">
+                            #313518: FR: XSLT error in i18n service when properties override resources more than once
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313517&amp;group_id=168&amp;atid=350207">
+                            #313517: RFE: Add xxbl:transform attribute on xbl:template to support more elaborate
+                            transformations
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313516&amp;group_id=168&amp;atid=350207">
+                            #313516: Error in form run by XForms Sandbox doesn't show regular error page
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313515&amp;group_id=168&amp;atid=350207">
+                            #313515: With IE 6, YUI RTE may not detect value changes when focus changes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313505&amp;group_id=168&amp;atid=350207">
+                            #313505: XBL: namespace visibility issue
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313504&amp;group_id=168&amp;atid=350207">
+                            #313504: XBL: dispatching events to targets inside XBL component fails
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313474&amp;group_id=168&amp;atid=350207">
+                            #313474: RFE: Move Form Runner and Form Builder to separate JARs to facilitate
+                            upgrade/deployment
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313464&amp;group_id=168&amp;atid=350207">
+                            #313464: JavaScript error on browser back when page has static readonly selection controls
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313232&amp;group_id=168&amp;atid=350207">
+                            #313232: Regression: one test in build causes a StackOverflowError
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313440&amp;group_id=168&amp;atid=350207">
+                            #313440: Regression: replacing a read-only instance does not cause UI to refresh properly
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313427&amp;group_id=168&amp;atid=350207">
+                            #313427: Regression: dateTime field is always invalid when "p.m." is entered
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313410&amp;group_id=168&amp;atid=350207">
+                            #313410: Exception when using oxf:xforms-submission with global property oxf.xforms.noscript
+                            set to true
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311463&amp;group_id=168&amp;atid=350207">
+                            #311463: Read-only date field allows changing date with calendar with IE 7
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313369&amp;group_id=168&amp;atid=350207">
+                            #313369: Output appearance download: when iteration is recreated, label is not reset and
+                            link is invisible
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313352&amp;group_id=168&amp;atid=350207">
+                            #313352: On IE, click on read-only input field bound to xs:date node: shows date picker
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313332&amp;group_id=168&amp;atid=350207">
+                            #313332: Typing enter in text area can cause content to be replaced by old value from server
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313258&amp;group_id=168&amp;atid=350207">
+                            #313258: RFE: Support grouping of multiple radio buttons
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313127&amp;group_id=168&amp;atid=350207">
+                            #313127: Regression: NPE when running example in sandbox
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313059&amp;group_id=168&amp;atid=350207">
+                            #313059: Style attribute not copied on &lt;xforms:input&gt;</a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313184&amp;group_id=168&amp;atid=350207">
+                            #313184: FR: When using components as section templates, fields do not populate with
+                            existing data
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311054&amp;group_id=168&amp;atid=350207">
+                            #311054: XBL components: NPE when calling a component from within another component
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313143&amp;group_id=168&amp;atid=350207">
+                            #313143: Cursor in text area is moved at the end of the field while typing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313101&amp;group_id=168&amp;atid=350207">
+                            #313101: XBL components with local models/instances don't work in repeats
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313099&amp;group_id=168&amp;atid=350207">
+                            #313099: RFE: Unzip processor to provide size and date-time for the files
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=313037&amp;group_id=168&amp;atid=350207">
+                            #313037: RFE: submission with multipart/form-data must set file name and mediatype if
+                            available
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312972&amp;group_id=168&amp;atid=350207">
+                            #312972: IE hung when going to the source code viewer in the examples
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312923&amp;group_id=168&amp;atid=350207">
+                            #312923: Trigger modal: sometimes progress panel is shown, then hidden immediately before
+                            the Ajax response arrives
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312927&amp;group_id=168&amp;atid=350207">
+                            #312927: Ajax events inefficiency: focus and activate events sent in separate requests
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312926&amp;group_id=168&amp;atid=350207">
+                            #312926: DOMFocusOut sent twice
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312105&amp;group_id=168&amp;atid=350207">
+                            #312105: Non-intuitive autocompletion of time fields when incorrect data is entered
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312893&amp;group_id=168&amp;atid=350207">
+                            #312893: RFE: Implement support for multipart/form-data submission serialization
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312864&amp;group_id=168&amp;atid=350207">
+                            #312864: Ajax portlet: when including form with Dojo, on IE a request for initial event is
+                            sent to server upon page load
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311112&amp;group_id=168&amp;atid=350207">
+                            #311112: Portlets: Unable to navigate between pages in Liferay portlet (Orbeon Forms
+                            3.6/3.7beta1)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312834&amp;group_id=168&amp;atid=350207">
+                            #312834: Bookcast example leads to JavaScript error when clicking on Load Sample Data
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312796&amp;group_id=168&amp;atid=350207">
+                            #312796: Regression: URL generator not passing headers when there is no request in external
+                            context
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309693&amp;group_id=168&amp;atid=350207">
+                            #309693: xforms:message called upon initialization doesn't show
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312725&amp;group_id=168&amp;atid=350207">
+                            #312725: RFE: Copy on container created by RTE classes on the textarea
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312610&amp;group_id=168&amp;atid=350207">
+                            #312610: Support for dynamic change of the type of an &lt;xforms:input&gt;, and support for
+                            &lt;xforms:input&gt; type="xs:boolean" in repeat
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312630&amp;group_id=168&amp;atid=350207">
+                            #312630: RFE: Ability to filter events sent by client to server
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312629&amp;group_id=168&amp;atid=350207">
+                            #312629: RFE: Ability to limit the number of Ajax requests
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312533&amp;group_id=168&amp;atid=350207">
+                            #312533: Noscript: upload control doesn't update instance
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312522&amp;group_id=168&amp;atid=350207">
+                            #312522: xforms:load upon initialization fails when the URL passed is not an absolute URL
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312519&amp;group_id=168&amp;atid=350207">
+                            #312519: RFE: Upgrade web.xml to reference Servlet 2.4 schema
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312507&amp;group_id=168&amp;atid=350207">
+                            #312507: When using the US format, it is more usual to show noon as 12 pm rather than 0 pm
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312495&amp;group_id=168&amp;atid=350207">
+                            #312495: RFE: FR summary page and eXist persistence API to support forms that work on
+                            instances using namespaces
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312492&amp;group_id=168&amp;atid=350207">
+                            #312492: Noscript: non-relevant group around table row is not hidden
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312482&amp;group_id=168&amp;atid=350207">
+                            #312482: RFE: Support optimized submission using servlet includes
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312480&amp;group_id=168&amp;atid=350207">
+                            #312480: RFE: Optimized local submission must support reaching another servlet context
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312479&amp;group_id=168&amp;atid=350207">
+                            #312479: Repeat in dialog: click on white space does not select current iteration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311072&amp;group_id=168&amp;atid=350207">
+                            #311072: FB: When changing control name to name which is already used, no warning is given
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312448&amp;group_id=168&amp;atid=350207">
+                            #312448: FB: Control Details dialog: quickly typing control name then pressing "enter" loses
+                            characters
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312447&amp;group_id=168&amp;atid=350207">
+                            #312447: RTE in dialog on IE6: when dialog opened the second time, RTE is only partially
+                            displayed
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307370&amp;group_id=168&amp;atid=350207">
+                            #307370: RFE: Integrate the YUI rich text editor (RTE)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312406&amp;group_id=168&amp;atid=350207">
+                            #312406: Initial build of controls may use out of date binds
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312393&amp;group_id=168&amp;atid=350207">
+                            #312393: Noscript: date, time and dateTime input contros don't work properly
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312366&amp;group_id=168&amp;atid=350207">
+                            #312366: RFE: Support AVTs for xforms:input/@xxforms:* attributes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312209&amp;group_id=168&amp;atid=350207">
+                            #312209: Server was not sending current application version to client
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312126&amp;group_id=168&amp;atid=350207">
+                            #312126: Regression: display issues on IE with xforms:switch/xforms:case
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310442&amp;group_id=168&amp;atid=350207">
+                            #310442: Regression: HTML area does not send value change events anymore with IE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311540&amp;group_id=168&amp;atid=350207">
+                            #311540: Regression: When a node is set as required, type=xs:date has no effect
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311554&amp;group_id=168&amp;atid=350207">
+                            #311554: Regression: XForms Controls example: autocomplete list no longer display country
+                            flag
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311719&amp;group_id=168&amp;atid=350207">
+                            #311719: Regression: Alert doesn't update properly within repeat
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311622&amp;group_id=168&amp;atid=350207">
+                            #311622: FR: Summary page for a form shows the Orbeon logo instead of the selected logo for
+                            the form
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312094&amp;group_id=168&amp;atid=350207">
+                            #312094: RFE: Upgrade to eXist 1.2.4
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311608&amp;group_id=168&amp;atid=350207">
+                            #311608: Date field canot be blanked in XForms Controls example
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312080&amp;group_id=168&amp;atid=350207">
+                            #312080: Removing the last iteration of a repeat does not dispatch xforms-disabled events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312026&amp;group_id=168&amp;atid=350207">
+                            #312026: RFE: XPath extension function to read a binary file as Base64
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=312025&amp;group_id=168&amp;atid=350207">
+                            #312025: RFE: XPath extension functions to encode/decode ISO 9075-14:2003
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311971&amp;group_id=168&amp;atid=350207">
+                            #311971: NPE if xforms:insert is passed origin node which is a document node without a root
+                            element
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311909&amp;group_id=168&amp;atid=350207">
+                            #311909: RFE: Must be able to do xforms:load during initialization
+                            (xforms-ready/xforms-model-construct-done)
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311927&amp;group_id=168&amp;atid=350207">
+                            #311927: RFE: Implement xxforms:invalid-bind() function to return ids of binds causing
+                            invalidity
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311169&amp;group_id=168&amp;atid=350207">
+                            #311169: RFE: xxforms:dialog[@appearance = 'minimal'] should support level="modal"
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311314&amp;group_id=168&amp;atid=350207">
+                            #311314: RFE: Offline: Improve performance of "save to Gears" on IE
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310455&amp;group_id=168&amp;atid=350207">
+                            #310455: Exception upon startup with Java 6 on OS X
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311878&amp;group_id=168&amp;atid=350207">
+                            #311878: RFE: Support extension MIP to specify dynamic initial values
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311870&amp;group_id=168&amp;atid=350207">
+                            #311870: Support XForms 1.1 xforms:dayTimeDuration, xforms:yearMonthDuration, xforms:email,
+                            xforms:card-number
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310392&amp;group_id=168&amp;atid=350207">
+                            #310392: Minimized JS files appear under WEB-INF/resources/ops/javascript
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311842&amp;group_id=168&amp;atid=350207">
+                            #311842: September is spelled Septembre on the calendar widget
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311822&amp;group_id=168&amp;atid=350207">
+                            #311822: RFE: Make sure we always have a class yui-skin-sam on body, even when the body is
+                            not generated by Orbeon Forms
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311799&amp;group_id=168&amp;atid=350207">
+                            #311799: Form Builder: JS exception when adding section template
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311792&amp;group_id=168&amp;atid=350207">
+                            #311792: RFE: Upgrade YUI from 2.5.2 to 2.6.0
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311786&amp;group_id=168&amp;atid=350207">
+                            #311786: RFE: 2 additional attributes: xxforms:show-progress and xxforms:progress-message on
+                            xforms:dispatch with delay specified.
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311766&amp;group_id=168&amp;atid=350207">
+                            #311766: RFE: Offline support: allow for taking form online to be canceled
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311756&amp;group_id=168&amp;atid=350207">
+                            #311756: RFE: Allow processor to run outside of servlet context
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309149&amp;group_id=168&amp;atid=350207">
+                            #309149: Cookie forwarding may behave incorrectly in submissions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311726&amp;group_id=168&amp;atid=350207">
+                            #311726: Email: XML attachments do not have proper encoding
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311721&amp;group_id=168&amp;atid=350207">
+                            #311721: Spaces are added in encoded values for select(1) controls when the value length
+                            exceeds a certain limit
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311697&amp;group_id=168&amp;atid=350207">
+                            #311697: xforms:output with image mediatype or xhtml:img/@src may return blank value to
+                            client causing load of current page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311055&amp;group_id=168&amp;atid=350207">
+                            #311055: XBL components: binding a component to foo:select1 doesn't work
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311347&amp;group_id=168&amp;atid=350207">
+                            #311347: Entering 2/28/2008 in date field changes to 3/28/2008
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311554&amp;group_id=168&amp;atid=350207">
+                            #311554: Regression: XForms Controls example: autocomplete list no longer display country flag
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311540&amp;group_id=168&amp;atid=350207">
+                            #311540: Regression: When a node is set as required, type=xs:date has no effect
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311605&amp;group_id=168&amp;atid=350207">
+                            #311605: xforms:upload doesn't support xforms:anyURI and xforms:base64Binary types
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311507&amp;group_id=168&amp;atid=350207">
+                            #311507: Regression: repeats not working on IE
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311487&amp;group_id=168&amp;atid=350207">
+                            #311487: AVT on img/@src does not get properly rewritten in Ajax response
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311468&amp;group_id=168&amp;atid=350207">
+                            #311468: RFE: @lang attribute on HTML element to control date format should support e.g.
+                            fr_FR format
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311346&amp;group_id=168&amp;atid=350207">
+                            #311346: RFE: Support for xforms:dispatch/@delay
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">
+                            #306628: RFE: Support xforms:input bound to xs:boolean value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311416&amp;group_id=168&amp;atid=350207">
+                            #311416: Ajax submission: client incorrectly believing that the server already has some
+                            values
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311404&amp;group_id=168&amp;atid=350207">
+                            #311404: Regression: repeat iterations no longer send relevance information to client
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311395&amp;group_id=168&amp;atid=350207">
+                            #311395: Offline: click on Save twice when offline creates invalid events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311394&amp;group_id=168&amp;atid=350207">
+                            #311394: Exception thrown when attempting to insert attribute next to element content
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311388&amp;group_id=168&amp;atid=350207">
+                            #311388: RFE: Email processor should support comma-separated list of addresses on to, cc,
+                            bcc
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311359&amp;group_id=168&amp;atid=350207">
+                            #311359: RFE: FR: Support for getting initial instance from service
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311330&amp;group_id=168&amp;atid=350207">
+                            #311330: Regression: boolean input no longer send value change events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311316&amp;group_id=168&amp;atid=350207">
+                            #311316: RFE: FR: Provide way to override existing Form Runner resources
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311314&amp;group_id=168&amp;atid=350207">
+                            #311314: RFE: Offline: Improve performance of "save to Gears" on IE
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311305&amp;group_id=168&amp;atid=350207">
+                            #311305: RFE: Support for proxy configuration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311276&amp;group_id=168&amp;atid=350207">
+                            #311276: RFE: Offline: display loading indicator when offline, when saving data
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311273&amp;group_id=168&amp;atid=350207">
+                            #311273: FR: Oracle persistence layer: total count of document incorrect in summary page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311272&amp;group_id=168&amp;atid=350207">
+                            #311272: YUI Calendar: switching to English keeps calendar in language it was set to
+                            previously
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311139&amp;group_id=168&amp;atid=350207">
+                            #311139: FR: RFE: Make Summary paging size a property
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311073&amp;group_id=168&amp;atid=350207">
+                            #311073: FB: Click on Test from the summary page opens a page with an error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311101&amp;group_id=168&amp;atid=350207">
+                            #311101: FR: persistence REST API is not called when attaching a file
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308952&amp;group_id=168&amp;atid=350207">
+                            #308952: Regression: ClassCastException:
+                            org.orbeon.oxf.xforms.control.controls.XFormsInputControl
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311179&amp;group_id=168&amp;atid=350207">
+                            #311179: Properties must reload if XIncluded file changes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311177&amp;group_id=168&amp;atid=350207">
+                            #311177: RFE: Modularize properties.xml
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311169&amp;group_id=168&amp;atid=350207">
+                            #311169: RFE: xxforms:dialog[@appearance = 'minimal'] should support level="modal"
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311121&amp;group_id=168&amp;atid=350207">
+                            #311121: Versioned resources: error page doesn't use right URLs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311120&amp;group_id=168&amp;atid=350207">
+                            #311120: Versioned resources: AVT on HTML element within repeat fails
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311142&amp;group_id=168&amp;atid=350207">
+                            #311142: Date on the 31st sometimes displayed as the 1st of the month
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311074&amp;group_id=168&amp;atid=350207">
+                            #311074: FB: MIPs for controls are not saved
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311094&amp;group_id=168&amp;atid=350207">
+                            #311094: FR: values missing in print and PDF view
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311080&amp;group_id=168&amp;atid=350207">
+                            #311080: Likely bug with variable scoping and actions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311044&amp;group_id=168&amp;atid=350207">
+                            #311044: Form Runner home page: Message: newItemDelimiter is null
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308698&amp;group_id=168&amp;atid=350207">
+                            #308698: New dialog shows below existing dialog
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308913&amp;group_id=168&amp;atid=350207">
+                            #308913: RFE: Allow specifying of the order of label, control, help, alert, and hint
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311079&amp;group_id=168&amp;atid=350207">
+                            #311079: Regression: loading instances through @src does not forward HTTP headers
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311078&amp;group_id=168&amp;atid=350207">
+                            #311078: xxforms:variable does not support @context and @model
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311065&amp;group_id=168&amp;atid=350207">
+                            #311065: RFE: FR: support for audit-level versioning in Oracle
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311063&amp;group_id=168&amp;atid=350207">
+                            #311063: RFE: new XForms function: xxforms:get-remote-user()
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311064&amp;group_id=168&amp;atid=350207">
+                            #311064: RFE: new XForms function: xxforms:is-user-in-role()
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311062&amp;group_id=168&amp;atid=350207">
+                            #311062: XForms 1.1 xforms:header element: handle node-set binding and @value attribute
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=311028&amp;group_id=168&amp;atid=350207">
+                            #311028: ClassCastException with iterate on atomic values
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310988&amp;group_id=168&amp;atid=350207">
+                            #310988: xforms:input doesn't format date, time and dateTime in static read-only mode
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310987&amp;group_id=168&amp;atid=350207">
+                            #310987: RFE: xxforms:variable/@select should be optional
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310975&amp;group_id=168&amp;atid=350207">
+                            #310975: RFE: Implement XPath function returning the currently selected case id for a given
+                            switch
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310974&amp;group_id=168&amp;atid=350207">
+                            #310974: RFE: Provide new zip and unzip processors
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310963&amp;group_id=168&amp;atid=350207">
+                            #310963: Regression: listener using oxf:url-generator now throws an exception
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309859&amp;group_id=168&amp;atid=350207">
+                            #309859: Regression: source viewer no longer switches files
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310956&amp;group_id=168&amp;atid=350207">
+                            #310956: Upload control does not contain unselectable="on" anymore after being cleared
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309922&amp;group_id=168&amp;atid=350207">
+                            #309922: Regression: JS error when adding items to nested repeats which have no nesting in
+                            the HTML
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308324&amp;group_id=168&amp;atid=350207">
+                            #308324: Date picker stops working after insert/change/delete/insert sequence
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308076&amp;group_id=168&amp;atid=350207">
+                            #308076: xforms:delete causes unnecessary xforms-value-change events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306670&amp;group_id=168&amp;atid=350207">
+                            #306670: xforms:delete: remove all the nodes pointed by nodeset
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309840&amp;group_id=168&amp;atid=350207">
+                            #309840: RFE: Review xforms:delete index update strategy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310927&amp;group_id=168&amp;atid=350207">
+                            #310927: Implement XForms 1.1 index update logic for xforms:insert and xforms:delete
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310868&amp;group_id=168&amp;atid=350207">
+                            #310868: Regression: in XForms Controls example, slider sends NaN to server
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310939&amp;group_id=168&amp;atid=350207">
+                            #310939: In repeat, when adding iteration help icon shows for item in new iteration even if
+                            help is empty
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306575&amp;group_id=168&amp;atid=350207">
+                            #306575: XForms error: repeatChildren and newNodeset have different sizes
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310908&amp;group_id=168&amp;atid=350207">
+                            #310908: Namespace not correctly in submissions with ref="instance('gaga')/foo"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310869&amp;group_id=168&amp;atid=350207">
+                            #310869: Regression: In XForms Controls example, instance inspector's "Evaluate XPath" causes JS error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309637&amp;group_id=168&amp;atid=350207">
+                            #309637: Regression: Flickr Resize example no longer sets images' style attribute with
+                            Firefox and Safari
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310855&amp;group_id=168&amp;atid=350207">
+                            #310855: Regression: To-Do Lists example: add new list and get a JS exception
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310908&amp;group_id=168&amp;atid=350207">
+                            #310908: Namespace not correctly in submissions with ref="instance('gaga')/foo"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310894&amp;group_id=168&amp;atid=350207">
+                            #310894: RFE: Implement minimal support for asynchronous submissions
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308781&amp;group_id=168&amp;atid=350207">
+                            #308781: Check excludes in build.xml and remove obsolete source files
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310856&amp;group_id=168&amp;atid=350207">
+                            #310856: xforms:group does not use xxforms:order property
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310831&amp;group_id=168&amp;atid=350207">
+                            #310831: Regression: HTML area (FCKeditor) fails within a YUI dialog
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304973&amp;group_id=168&amp;atid=350207">
+                            #304973: Hints are ignored with triggers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305672&amp;group_id=168&amp;atid=350207">
+                            #305672: RFE: Investigate using YUI to implement tooltips
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306172&amp;group_id=168&amp;atid=350207">
+                            #306172: RFE: Improve date selector
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306385&amp;group_id=168&amp;atid=350207">
+                            #306385: Calendar widget should allow the date to be removed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304558&amp;group_id=168&amp;atid=350207">
+                            #304558: Empty date field with mapped xs:date type only displays calendar icon
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306952&amp;group_id=168&amp;atid=350207">
+                            #306952: RFE: Need widgets for xs:time and xs:dateTime
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310569&amp;group_id=168&amp;atid=350207">
+                            #310569: RFE: xforms:input should not generate span and img for date for non-date fields
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310826&amp;group_id=168&amp;atid=350207">
+                            #310826: Regression: oxf:url-generator may not recognize modes based on content-type anymore
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310825&amp;group_id=168&amp;atid=350207">
+                            #310825: RFE: Make portlet theme configurable through properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310778&amp;group_id=168&amp;atid=350207">
+                            #310778: Namespace prefix not in space for QName: xml:lang
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310779&amp;group_id=168&amp;atid=350207">
+                            #310779: Prefix xbl has not been declared
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310797&amp;group_id=168&amp;atid=350207">
+                            #310797: RFE: Provide XForms extension type to validate XPath 2.0 expressions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310795&amp;group_id=168&amp;atid=350207">
+                            #310795: ORBEON.xforms.Globals.requestForm has no properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310764&amp;group_id=168&amp;atid=350207">
+                            #310764: RFE: Add ability to natively handle hierarchical properties in properties.xml
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308408&amp;group_id=168&amp;atid=350207">
+                            #308408: Upgrade to YUI 2.5.2 or later
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310675&amp;group_id=168&amp;atid=350207">
+                            #310675: Log4j configurations still being clobbered...
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310674&amp;group_id=168&amp;atid=350207">
+                            #310674: RFE: oxf:url-generator should support forward-headers property like
+                            xforms:submission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308758&amp;group_id=168&amp;atid=350207">
+                            #308758: RFE: Support for AVT in HTML in xforms:label (i18n issue)
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310640&amp;group_id=168&amp;atid=350207">
+                            #310640: RFE: Support for xforms:output within xhtml:title
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310616&amp;group_id=168&amp;atid=350207">
+                            #310616: RFE: Support xforms:model outside xhtml:head, especially within xxforms:dialog
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310611&amp;group_id=168&amp;atid=350207">
+                            #310611: RFE: Ability to use AVTs on XHTML elements outside HTML body
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310550&amp;group_id=168&amp;atid=350207">
+                            #310550: Regression: xforms:input bound to xs:boolean stores encrypted value instead of
+                            decrypted value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310557&amp;group_id=168&amp;atid=350207">
+                            #310557: Reserved HTML characters like opening bracket and quotes don't work in trigger
+                            label
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310544&amp;group_id=168&amp;atid=350207">
+                            #310544: RFE: property() function should support XForms engine properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310542&amp;group_id=168&amp;atid=350207">
+                            #310542: RFE: xforms-server-submit URLs are ugly
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310541&amp;group_id=168&amp;atid=350207">
+                            #310541: xforms:upload control does not display mediatype after a file is uploaded
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310457&amp;group_id=168&amp;atid=350207">
+                            #310457: Regression: Form Builder: Clicking on a label just after page load no longer works
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310496&amp;group_id=168&amp;atid=350207">
+                            #310496: RFE: Present noscript content in JavaScript-enabled mode then the client has
+                            JavaScript disabled
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310456&amp;group_id=168&amp;atid=350207">
+                            #310456: Selecting a non-existing file for upload causes a JS exception with IE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310442&amp;group_id=168&amp;atid=350207">
+                            #310442: Regression: HTML area does not send value change events anymore with IE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310439&amp;group_id=168&amp;atid=350207">
+                            #310439: RFE: Configurable automatic header forwarding for xforms:submission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310429&amp;group_id=168&amp;atid=350207">
+                            #310429: xxforms:attribute element shows in resulting HTML page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310428&amp;group_id=168&amp;atid=350207">
+                            #310428: XForms server incorrectly caches its output based on its input
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310274&amp;group_id=168&amp;atid=350207">
+                            #310274: select1 full (radio list) in repeat cause JS error on insert
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309390&amp;group_id=168&amp;atid=350207">
+                            #309390: New PNG images for XForms don't look nice with IE 6
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310170&amp;group_id=168&amp;atid=350207">
+                            #310170: Regression: static itemset shows as blank when adding a new repeat iteration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310383&amp;group_id=168&amp;atid=350207">
+                            #310383: RFE: Support for category-label-angle in charts of type time-series
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310352&amp;group_id=168&amp;atid=350207">
+                            #310352: RFE: Closed selection controls must encrypt the values sent to the client
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309369&amp;group_id=168&amp;atid=350207">
+                            #309369: Regression: Govt Forms example: DMV-14 form no longer shows license number upon
+                            loading
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310034&amp;group_id=168&amp;atid=350207">
+                            #310034: ORBEON.xforms.Document.getValue() fails with static readonly input
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309733&amp;group_id=168&amp;atid=350207">
+                            #309733: Regression: rewrite issue with XForms filter
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309865&amp;group_id=168&amp;atid=350207">
+                            #309865: Regression: help icon for control not hidden or shown when relevance is changing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309860&amp;group_id=168&amp;atid=350207">
+                            #309860: Support XForms 1.1 serialization attribute and related behavior
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306595&amp;group_id=168&amp;atid=350207">
+                            #306595: RFE: Support AVTs on more xforms:submission attributes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309736&amp;group_id=168&amp;atid=350207">
+                            #309736: doc-available() thowing exception instead of returning false
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309518&amp;group_id=168&amp;atid=350207">
+                            #309518: xforms:toggle throw an exception if a non-existing case is provided
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309481&amp;group_id=168&amp;atid=350207">
+                            #309481: RFE: Ability to limit the number labels on the X axis
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309482&amp;group_id=168&amp;atid=350207">
+                            #309482: RFE: New type of chart: XY and time series
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309475&amp;group_id=168&amp;atid=350207">
+                            #309475: Setting log4j.configuration property in Orbeon Forms causes other applications
+                            using log4j to fail
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305992&amp;group_id=168&amp;atid=350207">
+                            #305992: Create a "minimal" version of xforms.js
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306741&amp;group_id=168&amp;atid=350207">
+                            #306741: Some YUI tree widget JS files don't have min versions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309389&amp;group_id=168&amp;atid=350207">
+                            #309389: Changing the index in a repeat should do a recalculate
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309404&amp;group_id=168&amp;atid=350207">
+                            #309404: RFE: Dispatch events when an instance becomes valid/invalid
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309366&amp;group_id=168&amp;atid=350207">
+                            #309366: RFE: Need a built-in schema type to validate well-formed XML
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309348&amp;group_id=168&amp;atid=350207">
+                            #309348: RFE: Implement way of enabling button based on instance validity
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309341&amp;group_id=168&amp;atid=350207">
+                            #309341: Click on xforms:output dispaches DOMActivate but not DOMFocusIn
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309290&amp;group_id=168&amp;atid=350207">
+                            #309290: RFE: Implement XForms 1.1 replace="text" for submissions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309265&amp;group_id=168&amp;atid=350207">
+                            #309265: Bug with preceding-sibling after insertion
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309210&amp;group_id=168&amp;atid=350207">
+                            #309210: As per XForms 1.1, do not apply the @type MIP to instance nodes that contain child
+                            elements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308956&amp;group_id=168&amp;atid=350207">
+                            #308956: Regression: To-Do Lists example is broken
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309165&amp;group_id=168&amp;atid=350207">
+                            #309165: xforms:submission throws an NPE when submissing content not located in an instance
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309163&amp;group_id=168&amp;atid=350207">
+                            #309163: Implement support for event('response-headers') as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309164&amp;group_id=168&amp;atid=350207">
+                            #309164: Implement event('response-status-code') on xforms-submit-done as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309162&amp;group_id=168&amp;atid=350207">
+                            #309162: RFE: Optimization for IE, to avoid registering events for focus and blur on every
+                            form control
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308915&amp;group_id=168&amp;atid=350207">
+                            #308915: Occasional dom4j serialization error when restoring static state
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309090&amp;group_id=168&amp;atid=350207">
+                            #309090: RFE: Support xxforms:xinclude on xforms:submission
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309003&amp;group_id=168&amp;atid=350207">
+                            #309003: RFE: Custom event attributes should use xxforms prefix
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309021&amp;group_id=168&amp;atid=350207">
+                            #309021: NPE upon deleting row containing xforms-valid event handler
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306367&amp;group_id=168&amp;atid=350207">
+                            #306367: Text missing in PDF Documentation
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304697&amp;group_id=168&amp;atid=350207">
+                            #304697: Source Code Viewer: issue downloading .txt, .java, and .xsd
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308995&amp;group_id=168&amp;atid=350207">
+                            #308995: RFE: Support relevance in itemsets
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308994&amp;group_id=168&amp;atid=350207">
+                            #308994: RFE: Upgrade commons-fileupload to version 1.2.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308993&amp;group_id=168&amp;atid=350207">
+                            #308993: RFE: Support item-value property in xforms-selected event
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308825&amp;group_id=168&amp;atid=350207">
+                            #308825: RFE: Set media="all" on external CSS stylesheet
+                        </a>
+                    </li>                    
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308936&amp;group_id=168&amp;atid=350207">
+                            #308936: exf:sort(): namespaces not supported in second argument
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308954&amp;group_id=168&amp;atid=350207">
+                            #308954: RFE: Documentation on how to setup a data source on JBoss
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308952&amp;group_id=168&amp;atid=350207">
+                            #308952: Regression: ClassCastException:
+                            org.orbeon.oxf.xforms.control.controls.XFormsInputControl
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306602&amp;group_id=168&amp;atid=350207">
+                            #306602: Implement URL rewriting in Ajax responses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308380&amp;group_id=168&amp;atid=350207">
+                            #308380: xforms:trigger/xforms:output don't rewrite URLs in the same way
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308953&amp;group_id=168&amp;atid=350207">
+                            #308953: Non-fatal FileNotFound exceptions on JBoss
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308944&amp;group_id=168&amp;atid=350207">
+                            #308944: RFE: Allow inline transformations within processor inputs
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308946&amp;group_id=168&amp;atid=350207">
+                            #308946: RFE: Binary and text formats must support embedded last-modified to facilitate
+                            serialization
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308945&amp;group_id=168&amp;atid=350207">
+                            #308945: oxf:to-xml-converter must support validation and XInclude configuration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306168&amp;group_id=168&amp;atid=350207">
+                            #306168: Issue with ancestor-or-self:: axis when using XSLT view
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308937&amp;group_id=168&amp;atid=350207">
+                            #308937: Date picker for input field of type date is shown
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308921&amp;group_id=168&amp;atid=350207">
+                            #308921: RFE: xxforms:bind() function to access a bind nodeset within another expression
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308897&amp;group_id=168&amp;atid=350207">
+                            #308897: RFE: XPath functions to access request and session attributes directly from XForms
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308896&amp;group_id=168&amp;atid=350207">
+                            #308896: Support xforms-select and xforms-deselect on selection controls upon user
+                            interaction
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308893&amp;group_id=168&amp;atid=350207">
+                            #308893: RFE: Support AVTs on xxforms:show and xxforms:hide attributes
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308895&amp;group_id=168&amp;atid=350207">
+                            #308895: RFE: Support AVTs on all attributes of xforms:dispatch
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308894&amp;group_id=168&amp;atid=350207">
+                            #308894: RFE: Support AVTs on all attributes of xxforms:load
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308846&amp;group_id=168&amp;atid=350207">
+                            #308846: PFC must not serve files if HTTP method is not GET
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308864&amp;group_id=168&amp;atid=350207">
+                            #308864: RFE: Support xforms:output[@mediatype = 'image/*'] and xs:base64Binary datatype
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308878&amp;group_id=168&amp;atid=350207">
+                            #308878: Document xforms-model-construct-done vs. xforms-ready
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308618&amp;group_id=168&amp;atid=350207">
+                            #308618: RFE: XPath functions to access request parameters directly from XForms
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308877&amp;group_id=168&amp;atid=350207">
+                            #308877: RFE: Allow oxf:url-generator to always produce output in binary mode
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308863&amp;group_id=168&amp;atid=350207">
+                            #308863: RFE: Support xforms:output[@mediatype = 'image/*'] and xs:anyURI datatype
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308850&amp;group_id=168&amp;atid=350207">
+                            #308850: xforms:upload initiallly containing data does not display properly
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308846&amp;group_id=168&amp;atid=350207">
+                            #308846: PFC must not serve files if HTTP method is not GET
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307714&amp;group_id=168&amp;atid=350207">
+                            #307714: Submission with @ref does not always validate properly
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308844&amp;group_id=168&amp;atid=350207">
+                            #308844: Click on newly added control after dialog was displayed causes JS error on IE
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=303986&amp;group_id=168&amp;atid=350207">
+                            #303986: XML Schema validation: xsi:type not supported in XForms instances
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308833&amp;group_id=168&amp;atid=350207">
+                            #308833: RFE: Submission to allow PUT and POST of binary content
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308832&amp;group_id=168&amp;atid=350207">
+                            #308832: xforms:load misbehaves when the resource resolves to an anchor
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308817&amp;group_id=168&amp;atid=350207">
+                            #308817: RFE: Support passing context information to custom events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308803&amp;group_id=168&amp;atid=350207">
+                            #308803: RFE: xforms:alert message should be displayed if the value is required but empty
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308683&amp;group_id=168&amp;atid=350207">
+                            #308683: Regression: XPath expressions with local variable (for $i in ...) sometimes do not
+                            return correct results
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308780&amp;group_id=168&amp;atid=350207">
+                            #308780: RFE: Support XML Events extension to allows for lists of event names, observers,
+                            and targets
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308771&amp;group_id=168&amp;atid=350207">
+                            #308771: RFE: Dispatch xforms-deselect on xforms:upload when user clears file in the UI
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308770&amp;group_id=168&amp;atid=350207">
+                            #308770: RFE: Performance: page can't be used until all the images and CSS are loaded
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308710&amp;group_id=168&amp;atid=350207">
+                            #308710: RFE: Click on iteration should send DOMFocusIn
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308768&amp;group_id=168&amp;atid=350207">
+                            #308768: Support inline XML Schema within xforms:model
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308261&amp;group_id=168&amp;atid=350207">
+                            #308261: NPE after deploying war file in Liferay
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308759&amp;group_id=168&amp;atid=350207">
+                            #308759: RFE: Support more than one observer per event handler
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308672&amp;group_id=168&amp;atid=350207">
+                            #308672: RFE: Implement exforms:variable and xxforms:variable in actions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308747&amp;group_id=168&amp;atid=350207">
+                            #308747: CSS: Too much space taken by alert on all browsers except Firefox 2
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308621&amp;group_id=168&amp;atid=350207">
+                            #308621: Rename ops.log to orbeon.log in config/log4j.xml
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308227&amp;group_id=168&amp;atid=350207">
+                            #308227: RFE: Support versioned resources to improve caching
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308087&amp;group_id=168&amp;atid=350207">
+                            #308087: RFE: Implement session heartbeat feature to keep open pages alive
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305753&amp;group_id=168&amp;atid=350207">
+                            #305753: Document xxforms:script's support for this and event
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306666&amp;group_id=168&amp;atid=350207">
+                            #306666: Add documentation for dialog actions and events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308708&amp;group_id=168&amp;atid=350207">
+                            #308708: RFE: Upgrade to eXist 1.2
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308462&amp;group_id=168&amp;atid=350207">
+                            #308462: Tooltips on mouse over only show only show the second and subsequent times the mouse
+                            goes over the icon or control
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308694&amp;group_id=168&amp;atid=350207">
+                            #308694: xxforms:show/@neighbor doesn't work
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308695&amp;group_id=168&amp;atid=350207">
+                            #308695: xxforms:show/@neighbor doesn't work correctly when the neighbor is within a repeat
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306407&amp;group_id=168&amp;atid=350207">
+                            #306407: Needs ability to show dialog when page loads
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308039&amp;group_id=168&amp;atid=350207">
+                            #308039: Upgrade setvalue and related to the XForms 1.1 semantics
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308447&amp;group_id=168&amp;atid=350207">
+                            #308447: Dialogs are no longer draggable
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308674&amp;group_id=168&amp;atid=350207">
+                            #308674: RFE: Implement exforms:variable and xxforms:variable in models
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305571&amp;group_id=168&amp;atid=350207">
+                            #305571: RFE: Implement exforms:variable and xxforms:variable in controls
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306972&amp;group_id=168&amp;atid=350207">
+                            #306972: RFE: Generalized support for @context attribute on controls, actions and bindings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308660&amp;group_id=168&amp;atid=350207">
+                            #308660: RFE: Extension functions to create elements and attributes by name
+                            (xxforms:element() and xxforms:attribute())
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307876&amp;group_id=168&amp;atid=350207">
+                            #307876: xforms:group without nested xforms:label element may generate xhtml:label element
+                            in output
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=303954&amp;group_id=168&amp;atid=350207">
+                            #303954: XML Events: support ev:observer and ev:target attributes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308634&amp;group_id=168&amp;atid=350207">
+                            #308634: RFE: Support DOMActivate on xforms:output
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308608&amp;group_id=168&amp;atid=350207">
+                            #308608: RFE: New modal trigger
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308569&amp;group_id=168&amp;atid=350207">
+                            #308569: RFE: Use indentation for XForms event and action logging
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308544&amp;group_id=168&amp;atid=350207">
+                            #308544: Default log file is orbeon.log instead of ops.log
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308545&amp;group_id=168&amp;atid=350207">
+                            #308545: Can't deploy Orbeon Forms in Liferay 4.3.3 because of descriptors incompatibility
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308546&amp;group_id=168&amp;atid=350207">
+                            #308546: RFE: Reorganize WEB-INF descriptors
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308527&amp;group_id=168&amp;atid=350207">
+                            #308527: RFE: Add more context information to DOM* events
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308525&amp;group_id=168&amp;atid=350207">
+                            #308525: RFE: Implement XForms 1.1 context() function
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308526&amp;group_id=168&amp;atid=350207">
+                            #308526: RFE: Implement eXorms @exforms:iterate attribute on actions
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308524&amp;group_id=168&amp;atid=350207">
+                            #308524: XForms schema: allow "style" attribute on xforms:output
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308494&amp;group_id=168&amp;atid=350207">
+                            #308494: Handle reference to nested xforms:bind from xforms:repeat as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308486&amp;group_id=168&amp;atid=350207">
+                            #308486: RFE: xforms:toggle/@case should support AVTs
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308391&amp;group_id=168&amp;atid=350207">
+                            #308391: RFE: Support xforms-help event
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308461&amp;group_id=168&amp;atid=350207">
+                            #308461: RFE: Help displayed as a tooltip
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308419&amp;group_id=168&amp;atid=350207">
+                            #308419: JavaScript error in IE when clicking around in the tab with the slider in the
+                            XForms controls example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308446&amp;group_id=168&amp;atid=350207">
+                            #308446: RFE: Action to output log messages
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308444&amp;group_id=168&amp;atid=350207">
+                            #308444: Integrate patch for error-type context information on xforms-submit-error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308443&amp;group_id=168&amp;atid=350207">
+                            #308443: URL generator's &lt;url&gt; element shouldn't be forced to appear first in the
+                            configuration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308410&amp;group_id=168&amp;atid=350207">
+                            #308410: When the session expires on IE, a JavaScript exception occurs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308406&amp;group_id=168&amp;atid=350207">
+                            #308406: oxf:scope-generator produces incorrect null document
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308404&amp;group_id=168&amp;atid=350207">
+                            #308404: Increase default session duration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308403&amp;group_id=168&amp;atid=350207">
+                            #308403: Document oxf:sql processor's sql:param/@null attribute
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308392&amp;group_id=168&amp;atid=350207">
+                            #308392: RFE: XForms upload control: show unit next to file size
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308390&amp;group_id=168&amp;atid=350207">
+                            #308390: RFE: Show tooltip with text "Delete file" for the "x" image displayed for the
+                            upload control
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308389&amp;group_id=168&amp;atid=350207">
+                            #308389: oxf:xml-converter does not output correct SAX events for namespace declarations
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308387&amp;group_id=168&amp;atid=350207">
+                            #308387: Also display summary error message in error page
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307705&amp;group_id=168&amp;atid=350207">
+                            #307705: Upgrade to YUI 2.3.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308347&amp;group_id=168&amp;atid=350207">
+                            #308347: Cache-Control header with must-revalidate="true" causes IE to lose form values
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308308&amp;group_id=168&amp;atid=350207">
+                            #308308: RFE: Implement of setfocus action: always select first checked radio button or
+                            check box, if any
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308335&amp;group_id=168&amp;atid=350207">
+                            #308335: Exception when xforms:item is within unbound xforms:select1 control
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308325&amp;group_id=168&amp;atid=350207">
+                            #308325: Error "The processor output must be connected" when "data" output is not connected
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308323&amp;group_id=168&amp;atid=350207">
+                            #308323: Avoid repeated use of form.elements.length when iterating over elements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308292&amp;group_id=168&amp;atid=350207">
+                            #308292: RFE: Support p:property() XPath function accessible from XPL
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308291&amp;group_id=168&amp;atid=350207">
+                            #308291: RFE: Support xxforms:property() XPath function accessible from XForms
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308287&amp;group_id=168&amp;atid=350207">
+                            #308287: Separate deployment: conditional get produces &lt;null&gt; XML document in the
+                            browser
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308277&amp;group_id=168&amp;atid=350207">
+                            #308277: Span with class xforms-loading-none is taking some space on top of the form with IE
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308266&amp;group_id=168&amp;atid=350207">
+                            #308266: Exception when deploying on JBoss 4.2
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308240&amp;group_id=168&amp;atid=350207">
+                            #308240: xforms:setfocus has no effect on xforms:select1[@appearance = 'full']
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308223&amp;group_id=168&amp;atid=350207">
+                            #308223: RFE: XForms extension action to remove all shared instances from the cache
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308218&amp;group_id=168&amp;atid=350207">
+                            #308218: RFE: Support -v option to just display the Orbeon Forms version from the command
+                            line
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308217&amp;group_id=168&amp;atid=350207">
+                            #308217: xxforms:refresh-items="false" is broken
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308215&amp;group_id=168&amp;atid=350207">
+                            #308215: Potential deadlock on XFormsServerSharedInstancesCache
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308192&amp;group_id=168&amp;atid=350207">
+                            #308192: Pre-Check and Post-Check headers in epilogue are likely useless
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308204&amp;group_id=168&amp;atid=350207">
+                            #308204: oxf:xforms-submission does not work with xxforms:shared="application" attribute
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308193&amp;group_id=168&amp;atid=350207">
+                            #308193: RFE: Option to reload XForms page on back/forward
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307813&amp;group_id=168&amp;atid=350207">
+                            #307813: Can get a "state not found error" when clicking while HTML submission is in
+                            progress and then doing a browser back
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307867&amp;group_id=168&amp;atid=350207">
+                            #307867: Activating an HTML link containing an xforms:output may cause later browser back to
+                            fail
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307874&amp;group_id=168&amp;atid=350207">
+                            #307874: Orbeon Forms example apps have many issues with Firefox 3.0b1 and 3.0b2
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308086&amp;group_id=168&amp;atid=350207">
+                            #308086: RFE: Improve XForms properties to be configurable in properties.xml and overridable
+                            in individual pages
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308080&amp;group_id=168&amp;atid=350207">
+                            #308080: Upgrade embedded eXist to post-1.1.1 version
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308078&amp;group_id=168&amp;atid=350207">
+                            #308078: Getting "Unable to retrieve XForms engine state" error when combining submission
+                            and xxforms:script
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308023&amp;group_id=168&amp;atid=350207">
+                            #308023: HTTP session is not available when submitting upon xforms-ready in separate
+                            deployment mode
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308051&amp;group_id=168&amp;atid=350207">
+                            #308051: Provide a way to disable hint shown as a tooltip
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308050&amp;group_id=168&amp;atid=350207">
+                            #308050: Support XForms 1.1 serialization="none" instead of serialize="false" on
+                            xforms:submission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308049&amp;group_id=168&amp;atid=350207">
+                            #308049: Support models without instances
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308040&amp;group_id=168&amp;atid=350207">
+                            #308040: Allow displaying inline HTML hints with CSS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307776&amp;group_id=168&amp;atid=350207">
+                            #307776: RFE: When session expires on Ajax requests, display different error dialog title
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <a name="compatibility"/>
+        <section>
+            <title>Compatibility Notes</title>
+            <section>
+                <title>Legacy Classic XForms Engine</title>
+                <p>
+                    The <a href="home-faq#xforms-classic-ng">legacy Classic XForms engine</a> has been deprecated for
+                    several releases now, and should not be expected to work in Orbeon 3.7.1 and later.
+                </p>
+                <p>
+                    This is particularly appropriate now that the XForms engine support the <i>noscript</i> mode, an
+                    accessible, JavaScript-free rendering mode.
+                </p>
+            </section>
+            <section>
+                <title><code>&lt;xforms:delete></code> Action</title>
+                <p>
+                    The <code>&lt;xforms:delete></code> action, when omitting the <code>at</code> attribute, now
+                    deletes all the nodes referred to by the <code>nodeset</code> attribute. This is as per the <a
+                    href="http://www.w3.org/TR/xforms11/#action-delete">XForms 1.1 specification</a>. Previously, this
+                    would only delete the first node of the node-set.
+                </p>
+                <xml-source>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete nodeset="employee"/>
+                </xml-source>
+                <p>
+                    You may have to modify your code if you relied on the older behavior. You can easily delete only the
+                    first node by writing:
+                </p>
+                <xml-source>
+                    <comment> Delete the first employee element under the current context node </comment>
+                    <xforms:delete nodeset="employee[1]"/>
+                </xml-source>
+                <p>
+                    Previous workarounds still work, but they are no longer needed:
+                </p>
+                <xml-source>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete xxforms:iterate="employee" nodeset="."/>
+                    <comment> Delete all employee elements under the current context node </comment>
+                    <xforms:delete while="employee" nodeset="employee"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>Binds Evaluation</title>
+                <p>
+                    With Orbeon Forms 3.6 and earlier, <code>&lt;xforms:bind></code> node-sets were re-evaluated
+                    everytime an XForms recalculation or revalidation was performed. In this version, this is no longer
+                    the case: <code>&lt;xforms:bind></code> node-sets are re-evaluated during the XForms rebuild
+                    operation only, as per the XForms specification. This is meant to improve performance, but it also
+                    has a side-effect: in certain circumstances, an explicit <code>&lt;xforms:rebuild></code> action may
+                    be necessary.
+                </p>
+                <xml-source>
+                    <xforms:instance>
+                        <instance>
+                            <date>2002-08-02</date>
+                            <is-date-type>false</is-date-type>
+                        </instance>
+                    </xforms:instance>
+                    <comment> This expression sets the xs:date type to the date element depending on another instance value </comment>
+                    <xforms:bind nodeset="/instance/date[../is-date-type = 'true']" type="xs:date"/>
+                    <comment> Input bound to the date element </comment>
+                    <xforms:input ref="date">
+                        <xforms:label>Value</xforms:label>
+                    </xforms:input>
+                    <comment> This trigger allows changing the type back and forth </comment>
+                    <xforms:trigger>
+                        <xforms:label>Change Type</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                            <comment> We need to do a rebuild as the XPath expressions in the bind nodeset are only reevaluated upon
+                                 insert, delete, instance replacement, but not when a value is set</comment>
+                            <xforms:rebuild/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xml-source>
+            </section>
+            <section>
+                <title>The <code>index()</code> Function</title>
+                <p>
+                    Due to the way repeat processing was implemented in Orbeon Forms 3.6 and earlier, the
+                    <code>index()</code> function could be reliably used in more places than in the current version.
+                </p>
+                <p>
+                    XForms 1.1 does not explicitly limit in what type of XPath expressions <code>index()</code>
+                    can be used. However, in Orbeon Forms, it is strongly advised at the moment to only use
+                    <code>index()</code> within actions, and to avoid using it in control bindings and binds, as
+                    doing so may yield unpredictable results.
+                </p>
+                <p>
+                    We hope to remove this limitation in the future.
+                </p>
+            </section>
+            <section>
+                <title>Image Triggers</title>
+                <p>
+                    Orbeon Forms 3.6 and earlier allowed using images within <code>xforms:trigger</code> and
+                    <code>xforms:submit</code> using a special appearance, <code>xxforms:image</code>, and a nested element,
+                    <code>xxforms:img</code>. This has long been deprecated and is now no longer supported. Use instead the
+                    <code>minimal</code> appearance. For example, replace the following:
+                </p>
+                <xml-source>
+                    <xforms:trigger appearance="xxforms:image">
+                        <xforms:label>Save</xforms:label>
+                        <xxforms:img src="save.png" alt="Save"/>
+                    </xforms:trigger>
+                </xml-source>
+                <p>
+                    with:
+                </p>
+                <xml-source>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="save.png" alt="Save"/>
+                            Save
+                        </xforms:label>
+                    </xforms:trigger>
+                </xml-source>
+                <p>
+                    Notice how the image is now in the XHTML namespace, and placed within the label of the trigger.
+                </p>
+            </section>
+            <section>
+                <title>Default HTML DOCTYPE</title>
+                <p>
+                    The default HTML DOCTYPE produced by the epilogue has changed from <code>-//W3C//DTD HTML 4.01
+                    Transitional//EN</code> (HTML 4.01 transitional) to <code>-//W3C//DTD HTML 4.01//EN</code> (HTML
+                    4.01 strict). This may have an impact on how your web browser interpets CSS rules.
+                </p>
+            </section>
+            <section>
+                <title>Date Picker Using YUI Widget</title>
+                <p>
+                    Input fields bound to node of type <code>xs:date</code> are now using the YUI date picker widget
+                    instead of the jscalendar widget. If your code depends on the jscalendar (or you prefer the
+                    jscalendar for whatever reason), you can instruct Orbeon Forms to use the jscalendar by setting the
+                    <code>oxf.xforms.datepicker</code> property to <code>jscalendar</code>.
+                </p>
+                <p>
+                    Note that there is a chance that the jscalendar widget might be deprecated in the future, so you
+                    should try to use or switch to the YUI when possible.
+                </p>
+            </section>
+            <section>
+                <title>Deprecation and removal of Java classes</title>
+                <p>
+                    The following classes, usually referenced from <code>web.xml</code> and <code>portlet.xml</code>,
+                    are still available but deprecated:
+                </p>
+                <ul>
+                    <li>
+                        <code>OPSServlet</code> and <code>OPSServletDelegate</code>: use <code>OrbeonServlet</code> and
+                        <code>OrbeonServletDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSPortlet</code> and <code>OPSPortletDelegate</code>: use <code>OrbeonPortlet</code> and
+                        <code>OrbeonPortletDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSXFormsFilter</code> and <code>OPSServletFilterDelegate</code>: use
+                        <code>OrbeonXFormsFilter</code> and <code>OrbeonServletFilterDelegate</code> instead.
+                    </li>
+                    <li>
+                        <code>OPSServletFilter</code> and <code>OPSServletFilterDelegate</code>: use
+                        <code>OrbeonServletFilter</code> and <code>ServletFilterDelegate</code> instead.
+                    </li>
+                </ul>
+                <p>
+                    The following classes have been deprecated for a long time and are now removed:
+                </p>
+                <ul>
+                    <li>
+                        <code>ProcessorServlet</code>: use <code>OrbeonServlet</code> instead.
+                    </li>
+                    <li>
+                        <code>ProcessorFilter</code>: use <code>OrbeonServletFilter</code> instead.
+                    </li>
+                    <li>
+                        <code>ProcessorServletContextListener</code>: use <code>OrbeonServletContextListener</code>
+                        instead.
+                    </li>
+                </ul>
+            </section>
+        </section>
+    </body>
+</document>

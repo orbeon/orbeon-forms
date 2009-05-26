@@ -21,7 +21,7 @@
     <body>
         <section>
             <title>Introduction to the Page Flow Controller</title>
-            <img print-format="pdf" src="../apps/doc/images/reference-controller-oxf-app.png" style="float: right; margin-left: 1em"/>
+            <img print-format="pdf" src="../apps/doc/images/reference-controller-oxf-app.png" class="ops-doc-image"/>
             <p>
                 The Orbeon Forms Page Flow Controller (PFC) is the heart of your Orbeon Forms web application. It
                 dispatches incoming user requests to individual pages built out of models and views,
@@ -234,7 +234,7 @@
             <a name="page-model-page-view"/>
             <section>
                 <title>Page Model and Page View</title>
-                <img print-format="pdf" src="../apps/doc/images/reference-controller-mvc.png" style="float: right; margin-left: 1em"/>
+                <img print-format="pdf" src="../apps/doc/images/reference-controller-mvc.png" class="ops-doc-image"/>
                 <p>
                     In the MVC architecture, the page logic is implemented by a <i>page model</i>, and
                     the page layout by a <i>page view</i>. The MVC architecture promotes the separation
@@ -714,8 +714,7 @@
             <title>Navigating Between Pages</title>
             <section>
                 <title>Page Flow</title>
-                <img print-format="pdf" src="../apps/doc/images/reference-controller-navigation.png"
-                    style="float: right; margin-left: 1em"/>
+                <img print-format="pdf" src="../apps/doc/images/reference-controller-navigation.png" class="ops-doc-image"/>
                 <p>
                     The site logic or page flow describes the conditions that trigger the navigation from one page to
                     the other. It also describes how arguments are passed from one page to the other. In a simple web

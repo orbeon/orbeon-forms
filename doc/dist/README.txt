@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.7 beta 1, August 2008
+Last updated for Orbeon Forms 3.7.1 (Developer Release), May 2009
 
 This README.TXT file covers the following topics:
 
@@ -81,11 +81,11 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-37
+  http://www.orbeon.com/ops/doc/home-changes-371
 
 or in this distribution under:
 
-  doc/home-changes-37.html
+  doc/home-changes-371.html
 
 
 ****************************************
@@ -200,6 +200,6 @@ Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Copyright 1999-2008 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2009 (C) Orbeon, Inc. All rights reserved.
 
 --

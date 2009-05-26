@@ -1155,15 +1155,14 @@ ORBEON.xforms.Document = {
      * @param {String} newValue     New value for the control
      */
     setValue: function(controlId, newValue) {
-        if (YAHOO.lang.isNumber(newValue)) {
-             newValue = newValue.toString();
-        }
+        // User might pass non-string values, so make sure the result is a string
+        var stringValue = "" + newValue;
         var control = ORBEON.util.Dom.getElementById(controlId);
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
         // Directly change the value of the control in the UI without waiting for a response from the server
-        ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+        ORBEON.xforms.Controls.setCurrentValue(control, stringValue);
         // And also fire server event
-        var event = new ORBEON.xforms.Server.Event(null, control.id, null, newValue, "xxforms-value-change-with-focus-change");
+        var event = new ORBEON.xforms.Server.Event(null, control.id, null, stringValue, "xxforms-value-change-with-focus-change");
         ORBEON.xforms.Server.fireEvents([event], false);
     },
 

@@ -21,7 +21,7 @@
     <body>
         <section>
             <title>Orbeon Forms in a Nutshell</title>
-            <img src="../apps/doc/images/form-builder-400.png" class="ops-doc-image"/>
+            <img src="../apps/doc/images/form-builder-400.png" class="ops-doc-image" alt="Screenshot of Orbeon Form Builder"/>
             <p>
                 Welcome to the reference documentation for the Orbeon Forms platform!
             </p>

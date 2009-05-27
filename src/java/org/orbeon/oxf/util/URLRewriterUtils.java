@@ -273,8 +273,8 @@ public class URLRewriterUtils {
      * @return                      true iif path is a platform path
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
-        // TODO: add test for /xbl/orbeon and /forms/orbeon
-        return absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
+        // TODO: add test for /forms/orbeon
+        return absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/") || absolutePathNoContext.startsWith("/xbl/orbeon/");
     }
 
     public static boolean isResourcesVersioned() {

@@ -92,15 +92,16 @@
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                      value="default"/>  <!-- default or deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                    value=""/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.map."                             value=""/>
-
+    <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                  value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"              value=""/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                        value="true"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                    value="oxf:/config/xforms-widgets.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"                        value="true"/>
-    <property as="xs:string" name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"                        
+    <property as="xs:string" name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"
                     value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                      value="false"/>
 

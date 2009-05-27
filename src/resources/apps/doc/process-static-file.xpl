@@ -107,13 +107,6 @@
                         <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>
-                <xsl:template match="xhtml:a[contains(@href, 'OPS Tutorial.pdf')]" priority="100">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <xsl:attribute name="href" select="'OPS Tutorial.pdf'"/>
-                        <xsl:apply-templates/>
-                    </xsl:copy>
-                </xsl:template>
                 <xsl:template match="xhtml:a[starts-with(@href, '/goto-example/')]" priority="100">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
@@ -139,7 +132,7 @@
                 </replace>
             </config>
         </p:input>
-        <p:input name="data" href="#rewritten-data"/>
+        <p:input name="data" href="#more-rewritten-data"/>
         <p:output name="data" ref="html"/>
     </p:processor>
 

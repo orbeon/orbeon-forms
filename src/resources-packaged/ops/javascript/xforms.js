@@ -6257,7 +6257,8 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         var dragElement = this.getDragEl();
         var srcElement = this.getEl();
-		this.srcSibling = srcElement.nextSibling;
+		this.srcNextSibling = srcElement.nextSibling;
+		this.srcPrevSibling = srcElement.previousSibling;
 
         for(var i = 0; i < srcElement.childNodes.length; i++ ) {
             var child = srcElement.childNodes[i];
@@ -6276,15 +6277,37 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
     },
 
+	onDrag: function(e) {
+        // Keep track of the direction of the drag for use during onDragOver
+        var y = YAHOO.util.Event.getPageY(e);
+
+        if (y < this.lastY) {
+            this.goingUp = true;
+        }
+		else if (y > this.lastY) {
+            this.goingUp = false;
+        }
+        this.lastY = y;
+    },
+
 	//SAN: Callback method implementation added for showing preview
 	onDragOver: function(e, id) {
 
         var srcElement = this.getEl();
         var destElement = YAHOO.util.Dom.get(id)[0];
+		this.overId = id;
 
         if (ORBEON.util.Dom.hasClass(srcElement, "xforms-dnd") && srcElement.nodeName.toLowerCase() == destElement.getEl().nodeName.toLowerCase()) {
             var parent = destElement.getEl().parentNode;
-            parent.insertBefore(srcElement, destElement.getEl().nextSibling);
+			var overElement = destElement.getEl();
+			var elementHeight = parseInt(YAHOO.util.Dom.getStyle(overElement, 'height'));
+            var overElementMiddle = YAHOO.util.Dom.getY(overElement) + (Math.floor(elementHeight / 2));
+			if(this.goingUp) {
+				parent.insertBefore(srcElement, overElement.previousSibling); //Moving up
+			}
+			else {
+				parent.insertBefore(srcElement, overElement.nextSibling);//Drag down
+			}
             YAHOO.util.DragDropMgr.refreshCache();
         }
     },
@@ -6292,13 +6315,18 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
     onDragDrop: function(e, id) {
         var overElement = ORBEON.xforms.DnD.getClosestMatch(id);
         var srcElement = this.getEl();
-
-		var parent = this.srcSibling.parentNode;
-		parent.insertBefore(srcElement, this.srcSibling);
-		YAHOO.util.DragDropMgr.refreshCache();
-
         var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
         this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+
+		var parent = this.srcNextSibling.parentNode;
+		if(this.goingUp) {
+			parent.insertBefore(srcElement, this.srcNextSibling);
+		}
+		else {
+			parent.insertBefore(srcElement, this.srcPrevSibling);
+		}
+		YAHOO.util.DragDropMgr.refreshCache();
+
     },
 
     endDrag: function(e) {
@@ -6310,6 +6338,10 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
             YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
             YAHOO.util.Dom.setStyle(thisid, "visibility", "");
+
+        if(this.endPosition == null && this.overId != null) {
+			this.onDragDrop(e, this.overId);
+		}
 
         if(this.startPosition == null || this.endPosition == null)
             return;

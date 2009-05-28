@@ -656,7 +656,7 @@
                             You can also use this function to show bind-specific errors:
                         </p>
                         <xml-source>
-                            <xforms:alert value="if (invalid-binds(event('xxforms:binding')) = 'age-limit') then ... else ..."/>
+                            <xforms:alert value="if (xxforms:invalid-binds(.) = 'age-limit') then ... else ..."/>
                         </xml-source>
                         <p>
                             Note however that the function actually only returns the first invalid bind at the moment,

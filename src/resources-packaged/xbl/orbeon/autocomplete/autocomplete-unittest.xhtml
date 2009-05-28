@@ -75,34 +75,31 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xhtml:h2>Static itemset</xhtml:h2>
-
         <fr:autocomplete ref="instance('instance-static')/country-name" id="country-name-static"
                          incremental="false" dynamic-itemset="false"
+                         max-results-displayed="100"
                          style="width: 15em">
-            <xforms:label>Enter a country name: </xforms:label>
             <xforms:itemset nodeset="instance('all-countries')/country">
                 <xforms:label ref="name"/>
                 <xforms:value ref="name"/>
             </xforms:itemset>
+            <fr:max-results-displayed>2</fr:max-results-displayed>
         </fr:autocomplete>
 
-        <xhtml:h2>Dynamic itemset</xhtml:h2>
-
-        <fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"
-                         incremental="true" dynamic-itemset="true"
-                         style="width: 15em">
-            <xforms:label>Enter a country name: </xforms:label>
-            <xforms:itemset nodeset="instance('selected-countries')/country">
-                <xforms:label ref="name"/>
-                <xforms:value ref="name"/>
-            </xforms:itemset>
-            <xforms:action ev:event="xforms-value-changed">
-                <xxforms:variable name="make-suggestion" select="string-length(instance('instance-dynamic')/country-name) >= 3"/>
-                <xforms:send if="$make-suggestion" submission="update-countries"/>
-                <xforms:delete if="not($make-suggestion)" nodeset="instance('selected-countries')/country"/>
-            </xforms:action>
-        </fr:autocomplete>
+        <!--<fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"-->
+                         <!--incremental="true" dynamic-itemset="true"-->
+                         <!--style="width: 15em">-->
+            <!--<xforms:label>Dynamic itemset: </xforms:label>-->
+            <!--<xforms:itemset nodeset="instance('selected-countries')/country">-->
+                <!--<xforms:label ref="name"/>-->
+                <!--<xforms:value ref="name"/>-->
+            <!--</xforms:itemset>-->
+            <!--<xforms:action ev:event="xforms-value-changed">-->
+                <!--<xxforms:variable name="make-suggestion" select="string-length(instance('instance-dynamic')/country-name) >= 3"/>-->
+                <!--<xforms:send if="$make-suggestion" submission="update-countries"/>-->
+                <!--<xforms:delete if="not($make-suggestion)" nodeset="instance('selected-countries')/country"/>-->
+            <!--</xforms:action>-->
+        <!--</fr:autocomplete>-->
 
     </xhtml:body>
 </xhtml:html>

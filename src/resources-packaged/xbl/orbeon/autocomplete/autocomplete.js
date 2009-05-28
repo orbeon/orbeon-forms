@@ -40,7 +40,7 @@
          */
         init: function(element) {
             var autoComplete = this;
-            
+
             autoComplete.element = element;
 
             var inputSpan = Dom.getElementsByClassName("fr-autocomplete-input", null, element)[0];
@@ -79,6 +79,13 @@
             if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7)
                 autoComplete.yuiAutoComplete.useIFrame = true;
             autoComplete.yuiAutoComplete.animVert = false;
+
+            // Set maximum number of items displayed
+            var maxResultsDisplayedOutput = Dom.getElementsByClassName("fr-max-results-displayed", null, autoComplete.element)[0];
+            var maxResultsDisplayed = Document.getValue(maxResultsDisplayedOutput.id);
+            if (maxResultsDisplayed == "") maxResultsDisplayed = 10;
+            autoComplete.yuiAutoComplete.maxResultsDisplayed = parseInt(maxResultsDisplayed);
+
             // When a new value is selected, set the value of the XForms input control
             // We are doing this because when a value is set by clicking on it with the mouse, a change event is
             // dispatched to the input, but when it arrives the value of the input hasn't changed yet.

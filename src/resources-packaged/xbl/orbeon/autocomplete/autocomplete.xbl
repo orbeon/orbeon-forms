@@ -20,7 +20,8 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
     <xbl:script src="/ops/yui/datasource/datasource.js"/>
@@ -37,13 +38,17 @@
 
                 <!-- Variables for attributes on the control -->
                 <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
-                <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
 
                 <!-- Event listeners -->
                 <xforms:action ev:event="xforms-enabled" ev:observer="autocomplete-container"><xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script></xforms:action>
 
-                <!-- Controls -->
+                <!-- Configuration -->
+                <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
                 <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                <xxforms:variable name="max-results-displayed" xbl:attr="xbl:text=max-results-displayed"/>
+                <xforms:output class="fr-max-results-displayed" xxbl:attr="fr:max-results-displayed/@*" style="display: none"
+                        value="if ($max-results-displayed != '') then $max-results-displayed else xxforms:property('oxf.xforms.xbl.fr.autocomplete.max-results-displayed')"/>
+                <!-- Controls -->
                 <xforms:select1 id="select1" ref="." class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
                     <xbl:content includes="xforms|itemset, xforms|item"/>
                 </xforms:select1>

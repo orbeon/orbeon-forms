@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Google Map</xhtml:title>
+        <!--<xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2" type="text/javascript"/>-->
+        <xforms:model id="main-model" xxforms:external-events="my-show-candidates">
+            <xforms:instance id="main-instance">
+                <instance>
+                    <street>2000 Howard Avenue</street>
+                    <city/>
+                    <state/>
+                    <zip/>
+                    <address>USA</address>
+                    <candidates text=""/>
+                    <show-map>false</show-map>
+                </instance>
+            </xforms:instance>
+
+            <!-- Call Google geocoding API, and pass back result to XForms -->
+            <xforms:action ev:event="DOMActivate" ev:observer="validate-trigger">
+                <xxforms:script>
+                    <![CDATA[
+                        var geocoder = new GClientGeocoder();
+                        var address = ORBEON.xforms.Document.getValue("address");
+                        geocoder.getLocations(address, function(r) {
+                            var addressesXML = [];
+                            addressesXML.push("<addresses>");
+                            for (var addressIndex = 0; addressIndex < r.Placemark.length; addressIndex++) {
+                                var current = r.Placemark[addressIndex];
+                                addressesXML.push("<address>");
+                                addressesXML.push("<full>" + current.address + "</full>");
+                                addressesXML.push("<street>" + current.AddressDetails.Country.AdministrativeArea.Locality.Thoroughfare.ThoroughfareName + "</street>");
+                                addressesXML.push("<city>" + current.AddressDetails.Country.AdministrativeArea.Locality.LocalityName + "</city>");
+                                addressesXML.push("<state>" + current.AddressDetails.Country.AdministrativeArea.AdministrativeAreaName + "</state>");
+                                addressesXML.push("<zip>" + current.AddressDetails.Country.AdministrativeArea.Locality.PostalCode.PostalCodeNumber + "</zip>");
+                                addressesXML.push("</address>");
+                            }
+                            addressesXML.push("</addresses>");
+                            addressesXML = addressesXML.join("");
+                            ORBEON.xforms.Document.setValue("candidates", addressesXML);
+                            ORBEON.xforms.Document.dispatchEvent("main-model", "my-show-candidates");
+                        });
+                    ]]>
+                </xxforms:script>
+            </xforms:action>
+
+            <!-- Parse XML we got from the client -->
+            <xforms:action ev:event="my-show-candidates">
+                <xforms:delete nodeset="candidates/*"/>
+                <xforms:insert context="candidates" origin="saxon:parse(@text)"/>
+                <xforms:setvalue ref="candidates/@text"/>
+                <xxforms:show dialog="candidates-dialog" neighbor="validate-trigger"/>
+            </xforms:action>
+
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1  { background: transparent }
+            .xforms-label                   { display: -moz-inline-box; display: inline-block; width: expression('9em');  min-width: 9em; }
+            .xforms-form div                { padding-bottom: .5em; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xxforms:dialog id="candidates-dialog" level="modal" close="true" draggable="false" appearance="full">
+            <xforms:label>Choose address</xforms:label>
+            <xhtml:ul>
+                <xforms:repeat nodeset="candidates/addresses/address">
+                    <xhtml:li>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label ref="full"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xxforms:variable name="address" select="."/>
+                                <xforms:setvalue ref="/instance/street" value="$address/street"/>
+                                <xforms:setvalue ref="/instance/city" value="$address/city"/>
+                                <xforms:setvalue ref="/instance/state" value="upper-case($address/state)"/>
+                                <xforms:setvalue ref="/instance/zip" value="$address/zip"/>
+                                <xforms:setvalue ref="/instance/address" value="$address/full"/>
+                                <xxforms:hide dialog="candidates-dialog"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:li>
+                </xforms:repeat>
+            </xhtml:ul>
+        </xxforms:dialog>
+
+        <!-- Address fields -->
+        <xhtml:div>
+            <xforms:input ref="street">
+                <xforms:label>Street: </xforms:label>
+            </xforms:input>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:input ref="city">
+                <xforms:label>City: </xforms:label>
+            </xforms:input>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:data-bound-select1 ref="state"
+                    appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"
+                    nodeset="/states/state" label="@name" value="@abbreviation">
+                <xforms:label>State: </xforms:label>
+            </fr:data-bound-select1>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:input ref="zip">
+                <xforms:label>Zip: </xforms:label>
+            </xforms:input>
+        </xhtml:div>
+
+        <!-- Validate address -->
+        <xhtml:div>
+            <xforms:output value="normalize-space(string-join((street, city, state, zip), ' '))" id="address" style="display: none"/>
+            <xforms:input ref="candidates/@text" id="candidates"/>
+            <xforms:trigger appearance="minimal" id="validate-trigger">
+                <xforms:label>Validate and show on map</xforms:label>
+            </xforms:trigger>
+        </xhtml:div>
+
+        <!-- Map component -->
+        <xhtml:div>
+            <fr:map address-ref="address" id="unittest-map"
+                    longitude-ref="longitude" latitude-ref="latitude"
+                    style="width: 500px; height: 300px"/>
+        </xhtml:div>
+
+    </xhtml:body>
+</xhtml:html>

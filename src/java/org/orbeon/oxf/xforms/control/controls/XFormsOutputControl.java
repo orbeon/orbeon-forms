@@ -18,17 +18,16 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.util.List;
 
 /**
  * Represents an xforms:output control.
@@ -169,18 +168,21 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
-            // We just need to prepend the context because the URL is proxied
             final String externalValue = getExternalValue(pipelineContext);
             if (externalValue != null && !externalValue.trim().equals("")) {
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                return externalContext.getRequest().getContextPath() + externalValue;
+                // External value is not blank, rewrite as absolute path. Two cases:
+                // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
+                // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
+                return XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
+                // Empty value, return as is
                 return externalValue;
             }
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
-            // Rewrite the HTML value
+            // Rewrite the HTML value with resolved @href and @src attributes
             return getEscapedHTMLValue(pipelineContext, getExternalValue(pipelineContext));
         } else {
+            // Return external value as is
             return getExternalValue(pipelineContext);
         }
     }

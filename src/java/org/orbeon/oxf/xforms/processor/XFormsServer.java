@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -44,10 +45,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -251,18 +249,29 @@ public class XFormsServer extends ProcessorImpl {
                         // If a response is written, it will be through a conversion to XML first
                         final ContentHandlerOutputStream outputStream = new ContentHandlerOutputStream(contentHandler);
                         response = new ResponseAdapter() {
+
+                            private String charset;
+                            private PrintWriter printWriter;
+
                             public OutputStream getOutputStream() throws IOException {
+                                logger.debug("XXX TEMP: getOutputStream() called");
                                 return outputStream;
                             }
 
                             public PrintWriter getWriter() throws IOException {
                                 // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
-                                return new PrintWriter(outputStream);
+                                logger.debug("XXX TEMP: getWriter() called");
+                                if (printWriter == null) {
+                                    printWriter = new PrintWriter(new OutputStreamWriter(outputStream, charset != null ? charset : CachedSerializer.DEFAULT_ENCODING));
+                                }
+                                return printWriter;
                             }
 
                             public void setContentType(String contentType) {
                                 try {
                                     // Assume that content type is always set, otherwise this won't work
+                                    logger.debug("XXX TEMP: setContentType() called: " + contentType);
+                                    charset = NetUtils.getContentTypeCharset(contentType);
                                     outputStream.startDocument(contentType);
                                 } catch (SAXException e) {
                                     throw new OXFException(e);
@@ -270,12 +279,14 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             public Object getNativeResponse() {
+                                logger.debug("XXX TEMP: getNativeResponse() called");
                                 return externalContext.getNativeResponse();
                             }
 
                             public void setHeader(String name, String value) {
                                 // TODO: It is not sound that we output headers here as they should be passed to the
                                 // binary document in the pipeline instead.
+                                logger.debug("XXX TEMP: setHeader() called: " + name + ", " + value);
                                 externalContext.getResponse().setHeader(name, value);
                             }
                         };

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.lang.StringUtils;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -119,9 +117,24 @@ public class OrbeonXFormsFilter implements Filter {
             // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
-            if (!StringUtils.isBlank(responseWrapper.getContent()))
+            if (!isBlank(responseWrapper.getContent()))
                 getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
         }
+    }
+
+    // NOTE: this method copied from Apache StringUtils 2.3 as we don't want a dependency on the JAR
+    // http://www.apache.org/licenses/LICENSE-2.0
+    public static boolean isBlank(String str) {
+        int strLen;
+        if (str == null || (strLen = str.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if ((Character.isWhitespace(str.charAt(i)) == false)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void destroy() {

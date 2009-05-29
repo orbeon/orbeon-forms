@@ -1405,8 +1405,8 @@ public class NetUtils {
                     // Log message mody for debugging purposes
                     if (indentedLogger.isDebugEnabled())
                         logRequestBody(indentedLogger, contentType, messageBody);
-                    // Set request body on connection
                     
+                    // Set request body on connection
                     httpURLConnection.setRequestBody(messageBody);
                 }
 
@@ -1430,11 +1430,20 @@ public class NetUtils {
 
                 // Get response information that needs to be forwarded
                 connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
-                final String responseContentType = urlConnection.getContentType();
-                connectionResult.setResponseContentType(responseContentType != null ? responseContentType : "application/xml");
+                final String receivedContentType = urlConnection.getContentType();
+
+                connectionResult.setResponseContentType(receivedContentType != null ? receivedContentType : "application/xml");
                 connectionResult.responseHeaders = urlConnection.getHeaderFields();
                 connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection));
                 connectionResult.setResponseInputStream(urlConnection.getInputStream());
+
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug("connection", "results", new String[] {
+                            "status", Integer.toString(connectionResult.statusCode),
+                            "content-type", receivedContentType,
+                            "used content-type", connectionResult.getResponseContentType()
+                        });
+                }
 
                 return connectionResult;
 

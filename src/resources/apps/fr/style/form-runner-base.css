@@ -383,6 +383,9 @@ button.xforms-trigger img { margin-right: 10px }
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
+/* Make HTML editor shorter by default */
+.fr-grid textarea.xforms-mediatype-text-html { height: 10em }
+
 /* Set this again as default is 100% above */
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input.xforms-type-date,

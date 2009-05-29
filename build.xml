@@ -122,12 +122,12 @@
         <tstamp/>
         <!-- E.g.:
             dev-3.7.1       => released dev version
-            dev-3.7.1+      => post-release nightly build
+            dev-post-3.7.1  => post-release nightly build
             beta1-3.8.0     => beta for 3.8.0
             rc1-3.8.0       => release candidate for 3.8.0
             stable-3.8.0    => released stable version
          -->
-        <property name="version.number" value="dev-3.7.1+"/>
+        <property name="version.number" value="dev-post-3.7.1"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>

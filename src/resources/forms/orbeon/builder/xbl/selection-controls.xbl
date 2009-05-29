@@ -113,7 +113,7 @@
 
     <xbl:binding id="fb-input-select1-compact" element="xforms|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Single list box</display-name>
+            <display-name lang="en">Single List Box</display-name>
             <display-name lang="fr">Liste simple</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
@@ -137,7 +137,7 @@
 
     <xbl:binding id="fb-input-select-compact" element="xforms|select">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Multi list box</display-name>
+            <display-name lang="en">Multi List Box</display-name>
             <display-name lang="fr">Liste multiple</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>

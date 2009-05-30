@@ -867,6 +867,11 @@ RewriteEngine on
 # Rewrite CSS and JavaScript resources served by the XForms Server
 # -> make sure "oxf.xforms.cache-combined-resources" is set to "true" in properties.xml
 RewriteRule ^/orbeon/xforms-server/[^/]+/(.*\.(css|js))$ /home/orbeon/war/WEB-INF/resources/xforms-server/$1 [L]
+# Set far expiration date
+&lt;LocationMatch "^/orbeon/xforms-server/([^/]+/.*\.(css|js))$">
+Header set Expires "Wed, 1 Jan 2020 12:00:00 GMT"
+&lt;/LocationMatch>
+
 # Special handling of PNG images for IE 6
 RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
 # Make sure the corresponding GIF image exists
@@ -876,6 +881,11 @@ RewriteRule ^/orbeon/[^/]+/((ops|config/theme|xbl/orbeon)/.*)\.png$ /home/orbeon
 # Serve /ops resources
 # -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
 RewriteRule ^/orbeon/[^/]+/((ops|config/theme|xbl/orbeon)/.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Set far expiration date
+&lt;LocationMatch "^/orbeon/[^/]+/((ops|config/theme|xbl/orbeon)/.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$">
+Header set Expires "Wed, 1 Jan 2020 12:00:00 GMT"
+&lt;/LocationMatch>
+
 # Special handling of PNG images for IE 6
 RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
 # Make sure the corresponding GIF image exists
@@ -883,7 +893,11 @@ RewriteCond /home/orbeon/war/WEB-INF/resources/$1.gif -f
 # Match on PNG images only and rewrite to GIF
 RewriteRule ^/orbeon/[^/]+/(.*)\.png$ /home/orbeon/war/WEB-INF/resources/$1.gif [L]
 # Serve remaining resources
-RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
+RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/resources/$1 [L]
+# Set far expiration date
+&lt;LocationMatch "^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$">
+Header set Expires "Wed, 1 Jan 2020 12:00:00 GMT"
+&lt;/LocationMatch></pre>
                 <note>
                     <p>
                         The rewriting rules above have special handling of PNG images for IE 6: when that browser
@@ -902,6 +916,7 @@ RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ 
                     <li>Serving of other  <code>/ops</code> resources originally in <code>orbeon-resources-public.jar</code></li>
                     <li>Special handling of PNG images for IE 6 for resources under  <code>RESOURCES</code></li>
                     <li>Serving of other resources under  <code>RESOURCES</code></li>
+                    <li>Marking all versioned resources with an expiration date in the far future</li>
                 </ul>
             </section>
         </section>

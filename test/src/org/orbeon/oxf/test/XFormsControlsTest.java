@@ -84,4 +84,22 @@ public class XFormsControlsTest extends TestCase {
         OldControlsComparator.diffCustomMIPs(atts, null, control2, false, false);
         assertEquals("name1-value1 name2-value2 name3-value3 name4-value4", atts.getValue("class"));
     }
+
+    // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!
+//    public void testOutputControlRewrite() {
+//
+//        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
+//        final DocumentWrapper documentWrapper = new DocumentWrapper(document, null, new Configuration());
+//        final Element outputElement = (Element) ((NodeWrapper) XPathCache.evaluateSingle(new PipelineContext(), documentWrapper, "(//xhtml:body//xforms:output)[1]", XFormsDocumentAnnotatorContentHandlerTest.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null)).getUnderlyingNode();
+//
+//        final PipelineContext pipelineContext = new PipelineContext();
+//
+//        final XBLContainer container = new XBLContainer("", null) {};
+//        final XFormsOutputControl control1 = new XFormsOutputControl(container, null, outputElement, "output", "output-1");
+//        control1.setBindingContext(pipelineContext, new XFormsContextStack.BindingContext(null, null, Collections.singletonList(documentWrapper.wrap(outputElement)), 1, "output-1", true, outputElement, null, false, null));
+//
+//        control1.evaluateIfNeeded(pipelineContext);
+//
+//        assertEquals("", control1.getExternalValue(pipelineContext));
+//    }
 }

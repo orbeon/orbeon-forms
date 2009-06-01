@@ -3185,7 +3185,8 @@ ORBEON.xforms.Events = {
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
     clickEvent: new YAHOO.util.CustomEvent("clickEvent"),
-    errorEvent: new YAHOO.util.CustomEvent("errorEvent")
+    errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
+    yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
 };
 
 ORBEON.widgets.Base = function() {
@@ -3448,6 +3449,7 @@ ORBEON.widgets.YUICalendar = function() {
                 ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(maxdateControl)));
 
             // Show calendar
+            ORBEON.xforms.Events.yuiCalendarCreated.fire({ yuiCalendar: yuiCalendar, control: control });
             yuiCalendar.cfg.applyConfig();
             yuiCalendar.render();
             YAHOO.util.Dom.setStyle(calendarDiv, "display", "block");
@@ -5810,7 +5812,8 @@ ORBEON.xforms.Server = {
 
                                         // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")
+                                                && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "fck") {
                                             ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
                                         }
                                     }

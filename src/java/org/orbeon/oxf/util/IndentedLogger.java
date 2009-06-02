@@ -92,6 +92,22 @@ public class IndentedLogger {
         }
     }
 
+    public void endHandleOperation(String[] parameters) {
+        logIndentLevel--;
+        if (logger.isDebugEnabled()) {
+            final Operation operation = (Operation) stack.pop();
+            if (operation != null) {
+
+                final String[] newParameters = new String[parameters.length + 2];
+                newParameters[0] = "time (ms)";
+                newParameters[1] = Long.toString(operation.getTimeElapsed());
+                System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
+
+                logDebug(operation.type, "end " + operation.message, newParameters);
+            }
+        }
+    }
+
     private static String getLogIndentSpaces(int level) {
         final StringBuffer sb = new StringBuffer();
         for (int i = 0; i < level; i++)

@@ -1278,6 +1278,10 @@ public class XFormsContainingDocument extends XBLContainer {
         indentedLogger.endHandleOperation();
     }
 
+    public void endHandleOperation(String[] parameters) {
+        indentedLogger.endHandleOperation(parameters);
+    }
+
     public void logDebug(String type, String message) {
         indentedLogger.logDebug(type, message);
     }

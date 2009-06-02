@@ -137,9 +137,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentControlTree = initialControlTree = new ControlTree();
 
                 // Initialize new control tree
-                containingDocument.startHandleOperation("controls", "building");
                 currentControlTree.initialize(pipelineContext, containingDocument, rootContainer, evaluateItemsets);
-                containingDocument.endHandleOperation();
             }
 
             // We are now clean
@@ -309,12 +307,15 @@ public class XFormsControls implements XFormsObjectResolver {
             cloneInitialStateIfNeeded();
 
             containingDocument.startHandleOperation("controls", "updating bindings");
+            final UpdateBindingsListener listener = new UpdateBindingsListener(pipelineContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch());
             {
                 // Visit all controls and update their bindings
-                visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer,
-                        new UpdateBindingsListener(pipelineContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch()));
+                visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
             }
-            containingDocument.endHandleOperation();
+            containingDocument.endHandleOperation(new String[] {
+                    "controls updated", Integer.toString(listener.getUpdateCount()),
+                    "repeat iterations", Integer.toString(listener.getIterationCount())
+            });
 
             // Controls are clean
             initialControlTree.markBindingsClean();
@@ -582,6 +583,9 @@ public class XFormsControls implements XFormsObjectResolver {
         private final Map effectiveIdsToControls;
         private final Map eventsToDispatch;
 
+        private transient int updateCount;
+        private transient int iterationCount;
+
         private UpdateBindingsListener(PipelineContext pipelineContext, Map effectiveIdsToControls, Map eventsToDispatch) {
             this.pipelineContext = pipelineContext;
             this.effectiveIdsToControls = effectiveIdsToControls;
@@ -591,6 +595,9 @@ public class XFormsControls implements XFormsObjectResolver {
         private Map newIterationsMap = new HashMap();
 
         public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
+
+            updateCount++;
+
             final XFormsControl control = (XFormsControl) effectiveIdsToControls.get(effectiveControlId);
 
             final XFormsContextStack.BindingContext oldBindingContext = control.getBindingContext();
@@ -680,6 +687,8 @@ public class XFormsControls implements XFormsObjectResolver {
 
         public boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId) {
 
+            iterationCount++;
+
             // Get reference to iteration control
             final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) effectiveIdsToControls.get(effectiveIterationId);
 
@@ -695,6 +704,14 @@ public class XFormsControls implements XFormsObjectResolver {
         }
 
         public void endRepeatIteration(int iteration) {
+        }
+
+        public int getUpdateCount() {
+            return updateCount;
+        }
+
+        public int getIterationCount() {
+            return iterationCount;
         }
     }
     

@@ -216,6 +216,7 @@ public class ProcessorService {
             writer = response.getWriter();
         } catch (IllegalStateException e) {
             // Try an OutputStream if getting the writer failed
+            // TODO: This uses the platform's default encoding, which is not good
             writer = new PrintWriter(response.getOutputStream());
         }
         writer.print(sb.toString());

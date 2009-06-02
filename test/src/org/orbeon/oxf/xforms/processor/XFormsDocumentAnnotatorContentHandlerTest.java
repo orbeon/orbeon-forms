@@ -15,27 +15,25 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Attribute;
-import org.orbeon.oxf.test.ResourceManagerTestBase;
-import org.orbeon.oxf.xforms.xbl.XBLUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.xbl.XBLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.Configuration;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTestBase {
 
-    private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
+    public static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);

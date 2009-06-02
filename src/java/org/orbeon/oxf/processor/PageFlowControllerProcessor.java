@@ -124,7 +124,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 //                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
 //                }
 
-                final List versionedFilesInfo = new ArrayList();
+                final List pathMatchers = new ArrayList();
 
                 // XForms Submission page
                 {
@@ -252,15 +252,18 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final String pathInfo = element.attributeValue("path-info");
 
                             final boolean currentIsFile = "files".equals(element.getName());
-                            final boolean currentFileIsVersioned; {
+                            final boolean currentFileIsVersioned;
+                            if (currentIsFile) {
                                 // If this is a file, then check "versioned" property, local and then global
-                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(VERSIONED_ATTRIBUTE) : null;
+                                final String currentIsVersionedAttribute = element.attributeValue(VERSIONED_ATTRIBUTE);
                                 currentFileIsVersioned = (currentIsVersionedAttribute != null) ? "true".equals(currentIsVersionedAttribute) : globalIsVersioned;
+                            } else {
+                                currentFileIsVersioned = false;
                             }
 
                             // Remember this FilesInfo if needed
                             if (currentFileIsVersioned) {
-                                versionedFilesInfo.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
+                                pathMatchers.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
                             }
 
                             // Can we just add this condition to the previous "when" statement?
@@ -464,7 +467,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
 
-                return new PageFlow(new PipelineProcessor(astPipeline), versionedFilesInfo);
+                return new PageFlow(new PipelineProcessor(astPipeline), pathMatchers);
             }
         });
 

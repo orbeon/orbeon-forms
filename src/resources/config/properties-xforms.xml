@@ -95,6 +95,8 @@
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                  value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"              value=""/>
@@ -105,7 +107,7 @@
          See: http://forge.ow2.org/tracker/index.php?func=detail&aid=313798&group_id=168&atid=350207 -->
     <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"    value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
                                                                                                fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
-                                                                                               fr:max-results-displayed"/>
+                                                                                               fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                      value="false"/>
 
 </properties>

@@ -1,0 +1,67 @@
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+
+    <xbl:script src="/xbl/orbeon/currency/currency.js"/>
+
+    <xbl:binding id="fr-currency" element="fr|currency">
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/currency/currency.css"/>
+        </xbl:resources>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:template match="/*">
+                    <xforms:group xbl:attr="ref bind">
+                        <xbl:content includes="xforms|label"/>
+                        <!-- Init event -->
+                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
+                        <!-- Access to XForms value, and xforms-value-changed event -->
+                        <xforms:input ref="." class="xbl-fr-currency-xforms-input">
+                            <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.valueChanged(this);</xxforms:script>
+                        </xforms:input>
+                        <!-- Access to prefix -->
+                        <xsl:choose>
+                            <xsl:when test="exists(fr:prefix)">
+                                <xforms:output class="xbl-fr-currency-prefix" xxbl:attr="fr:prefix/@*" style="display: none">
+                                    <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.prefixChanged(this);</xxforms:script>
+                                </xforms:output>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xxforms:variable name="prefix" xbl:attr="xbl:text=prefix"/>
+                                <xforms:output class="xbl-fr-currency-prefix" style="display: none"
+                                    value="if ($prefix) then $prefix else xxforms:property('oxf.xforms.xbl.fr.currency.prefix')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <!-- Access to digits-after-decimal -->
+                        <xsl:choose>
+                            <xsl:when test="exists(fr:digits-after-decimal)">
+                                <xforms:output class="xbl-fr-currency-digits-after-decimal" xxbl:attr="fr:digits-after-decimal/@*" style="display: none">
+                                    <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.digitsAfterDecimalChanged(this);</xxforms:script>
+                                </xforms:output>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xxforms:variable name="digits-after-decimal" xbl:attr="xbl:text=digits-after-decimal"/>
+                                <xforms:output class="xbl-fr-currency-digits-after-decimal" style="display: none"
+                                    value="if ($digits-after-decimal) then $digits-after-decimal else xxforms:property('oxf.xforms.xbl.fr.currency.digits-after-decimal')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <!-- The visible input -->
+                        <xhtml:input class="xbl-fr-currency-visible-input"/>
+                        <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
+                    </xforms:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

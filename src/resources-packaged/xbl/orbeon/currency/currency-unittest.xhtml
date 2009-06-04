@@ -1,0 +1,211 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Currency</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <empty/>
+                    <value>1234</value>
+                    <double/>
+                    <prefix>£</prefix>
+                    <currency>4567</currency>
+                    <digits-after-decimal>3</digits-after-decimal>
+                    <float>123.456</float>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="double" calculate="../value * 2"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
+            .xbl-fr-currency { line-height: 2.5em; }
+        </xhtml:style>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+
+                    var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "empty")[0];
+                    var valueInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "value")[0];
+                    var doubleInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "double")[0];
+                    var prefixStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-static")[0];
+                    var prefixDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-dynamic")[0];
+                    var floatStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-static")[0];
+                    var floatDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-dynamic")[0];
+                    var floatNoDigitsInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-no-digits")[0];
+
+                    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                        name: "Currency",
+
+                        // Field should be empty when the page loaded if the instance is empty
+                        testEmptyInitial: function() {
+                            YAHOO.util.Assert.areEqual("", emptyInput.value);
+                        },
+
+                        // If we just enter and leave the field, the value must stay empty
+                        testEmptyNoChange: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                emptyInput.focus();
+                                emptyInput.blur();
+                                doubleInput.focus();
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("", emptyInput.value);
+                            });
+                        },
+
+                        testBeforeFocus: function() {
+                            YAHOO.util.Assert.areEqual("$ 1,234.00", valueInput.value);
+                        },
+
+                        testAfterFocus: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                valueInput.focus();
+                                YAHOO.util.Assert.areEqual("1234.00", valueInput.value);
+                            }, function() {
+                            });
+                        },
+
+                        testChangeSimple: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                valueInput.value = 42;
+                                valueInput.blur();
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("$ 42.00", valueInput.value);
+                                YAHOO.util.Assert.areEqual("$ 84.00", doubleInput.value);
+                            });
+                        },
+
+                        testChangeWhileFocus: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                valueInput.focus();
+                                valueInput.value = 43;
+                                valueInput.blur();
+                                doubleInput.focus();
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("$ 43.00", valueInput.value);
+                                YAHOO.util.Assert.areEqual("86.00", doubleInput.value);
+                            });
+                        },
+
+                        testStaticCurrency: function() {
+                            YAHOO.util.Assert.areEqual("£ 4,567.00", prefixStaticInput.value);
+                        },
+
+                        testDynamicCurrency: function() {
+                            YAHOO.util.Assert.areEqual("£ 4,567.00", prefixDynamicInput.value);
+                        },
+
+                        testChangeCurrency: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("change-prefix"));
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("CHF 4,567.00", prefixDynamicInput.value);
+                            });
+                        },
+                        testStaticDigits: function() {
+                            YAHOO.util.Assert.areEqual("$ 123.456", floatStaticInput.value);
+                        },
+                        testDynamicDigits: function() {
+                            YAHOO.util.Assert.areEqual("$ 123.456", floatDynamicInput.value);
+                        },
+                        testChangeDigits: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("change-digits"));
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("$ 123.46", floatDynamicInput.value);
+                            });
+                        },
+                        testNoDigits: function() {
+                            YAHOO.util.Assert.areEqual("$ 123", floatNoDigitsInput.value);
+                        }
+                    }));
+
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <fr:currency ref="empty" id="empty">
+                <xforms:label>Empty</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="value" id="value">
+                <xforms:label>Value</xforms:label>
+                <xforms:help>Help</xforms:help>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="double" id="double">
+                <xforms:label>Double</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="currency" id="prefix-static" prefix="£">
+                <xforms:label>Static prefix</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="currency" id="prefix-dynamic">
+                <fr:prefix ref="../prefix"/>
+                <xforms:label>Dynamic prefix</xforms:label>
+            </fr:currency>
+            <xforms:trigger id="change-prefix" appearance="minimal">
+                <xforms:label>Switch to CHF</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="prefix">CHF</xforms:setvalue>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="float" id="float-static" digits-after-decimal="3">
+                <xforms:label>Static digits count</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="float" id="float-dynamic">
+                <fr:digits-after-decimal ref="../digits-after-decimal"/>
+                <xforms:label>Dynamic digits count</xforms:label>
+            </fr:currency>
+            <xforms:trigger id="change-digits" appearance="minimal">
+                <xforms:label>Switch to 2</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="digits-after-decimal">2</xforms:setvalue>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="float" id="float-no-digits" digits-after-decimal="0">
+                <xforms:label>No digits after dec.</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

@@ -724,13 +724,29 @@ public class Dom4jUtils {
      * @param visitorListener   listener to call back
      */
     public static void visitSubtree(Element container, VisitorListener visitorListener) {
-        for (Iterator i = container.content().iterator(); i.hasNext();) {
+        visitSubtree(container, visitorListener, false);
+    }
+
+    /**
+     * Visit a subtree of a dom4j document.
+     *
+     * @param container         element containing the elements to visit
+     * @param visitorListener   listener to call back
+     * @param mutable           whether the source tree can mutate while being visited
+     */
+    public static void visitSubtree(Element container, VisitorListener visitorListener, boolean mutable) {
+
+        // If the source tree can mutate, copy the list first, otherwise dom4j might throw exceptions
+        final List content = mutable ? new ArrayList(container.content()) : container.content() ;
+
+        // Iterate over the content
+        for (Iterator i = content.iterator(); i.hasNext();) {
             final Node childNode = (Node) i.next();
 
             if (childNode instanceof Element) {
                 final Element childElement = (Element) childNode;
                 visitorListener.startElement(childElement);
-                visitSubtree(childElement, visitorListener);
+                visitSubtree(childElement, visitorListener, mutable);
                 visitorListener.endElement(childElement);
             } else if (childNode instanceof Text) {
                 visitorListener.text((Text) childNode);

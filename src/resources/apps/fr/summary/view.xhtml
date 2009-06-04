@@ -122,15 +122,15 @@
             <!--</xforms:action>-->
 
             <xforms:action ev:event="fr-summary-view" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-pdf" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{normalize-space(instance('fr-selection-instance'))}/?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{normalize-space(instance('fr-selection-instance'))}?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-test">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-xml">
@@ -665,7 +665,7 @@
                                         <!-- Document name and href for edition -->
                                         <xxforms:variable name="document-name" select="@name" as="xs:string"/>
                                         <xxforms:variable name="document-href" select="concat('/fr/', $parameters/app, '/', $parameters/form, '/edit/',
-                                                $document-name, '/', if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
+                                                $document-name, if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
 
                                         <!-- Don't open a document on click in the checkbox or when the trigger gets the focus (e.g. by the user tabbing to it). -->
                                         <xforms:action ev:event="DOMActivate DOMFocusIn">

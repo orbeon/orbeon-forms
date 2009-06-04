@@ -394,7 +394,7 @@
     <xforms:submission id="fr-workflow-review-submission"
             validate="true" relevant="false" method="post"
             ref="xxforms:instance('fr-form-instance')" xxforms:ensure-uploads="false"
-            resource="/fr/{$app}/{$form}/view/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+            resource="/fr/{$app}/{$form}/view/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all">
         <!-- Set data-safe-override -->
         <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
@@ -407,7 +407,7 @@
     <xforms:submission id="fr-workflow-edit-submission"
             validate="true" relevant="false" method="post"
             ref="xxforms:instance('fr-form-instance')"
-            resource="/fr/{$app}/{$form}/edit/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+            resource="/fr/{$app}/{$form}/edit/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all">
         <!-- Set data-safe-override -->
         <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
@@ -633,7 +633,7 @@
         the final submission/load.
     -->
     <xforms:submission id="fr-email-service-submission"
-        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/email/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="none" xxforms:ensure-uploads="false"/>
 
     <!-- Call PDF service -->
@@ -643,7 +643,7 @@
         the final submission/load.
     -->
     <xforms:submission id="fr-pdf-service-submission"
-        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/pdf/{$document}/?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')"
         replace="instance" instance="fr-workflow-confirmation-instance" xxforms:ensure-uploads="false"/>
 

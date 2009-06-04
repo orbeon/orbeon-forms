@@ -12,27 +12,32 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        instance-passing="forward">
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" instance-passing="forward">
 
     <page path-info="/xforms-sandbox/" view="upload-view.xhtml"/>
     <page path-info="/xforms-sandbox/run" view="upload-action.xpl"/>
-    <page path-info="/xforms-sandbox/sample/xbl/(.+)" matcher="oxf:perl5-matcher" view="/xbl/${1}.xhtml"/>
-    <page path-info="/xforms-sandbox/sample/(.+)" matcher="oxf:perl5-matcher" view="samples/${1}.xhtml"/>
+    <page path-info="/xforms-sandbox/sample/xbl/(.+)" matcher="oxf:perl5-matcher"
+        view="/xbl/${1}.xhtml"/>
+    <page path-info="/xforms-sandbox/sample/(.+)" matcher="oxf:perl5-matcher"
+        view="samples/${1}.xhtml"/>
     <page path-info="/xforms-sandbox/service/get-files" model="get-files.xpl"/>
-    <page path-info="/xforms-sandbox/service/css-after-5-seconds" model="services/css-after-5-seconds.xpl"/>
-    
-    <page path-info="/xforms-sandbox/service/twitter" model="services/twitter.xpl" 
-        default-submission="services/twitter.xsl" xmlns:twit="http://www.orbeon.com/sandbox/tritter">
-        <setvalue ref="/xsl:stylesheet/twit:query" parameter="q"/>
+    <page path-info="/xforms-sandbox/service/css-after-5-seconds"
+        model="services/css-after-5-seconds.xpl"/>
+
+    <page path-info="/xforms-sandbox/service/twitter" model="services/twitter.xpl"
+        default-submission="services/twitter.xsl">
+        <setvalue ref="/xsl:stylesheet/xsl:variable[@name='q']/q" parameter="q"/>
         <setvalue ref="/xsl:stylesheet/xsl:variable[@name='page']/@select" parameter="page"/>
         <setvalue ref="/xsl:stylesheet/xsl:variable[@name='rpp']/@select" parameter="rpp"/>
-        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@select" parameter="sortBy"/>
-        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@order" parameter="sortOrder"/>
+        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@select"
+            parameter="sortBy"/>
+        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@order"
+            parameter="sortOrder"/>
     </page>
-    
-    <page path-info="/xforms-sandbox/service/(.+)" matcher="oxf:perl5-matcher" view="services/${1}.xpl"/>
+
+    <page path-info="/xforms-sandbox/service/(.+)" matcher="oxf:perl5-matcher"
+        view="services/${1}.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

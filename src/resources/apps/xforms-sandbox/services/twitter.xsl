@@ -20,10 +20,12 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:twit="http://www.orbeon.com/sandbox/tritter"
-    exclude-result-prefixes="xs" version="2.0">
+    xmlns:twit="http://www.orbeon.com/sandbox/twitter" exclude-result-prefixes="xs atom" version="2.0"
+    xpath-default-namespace="http://www.w3.org/2005/Atom">
     <xsl:variable name="rpp" select="10"/>
-    <twit:query>xforms</twit:query>
+    <xsl:variable name="q">
+        <q xmlns="">xforms</q>
+    </xsl:variable>
     <xsl:variable name="page" select="1"/>
     <xsl:template match="@*|node()" name="identity">
         <xsl:copy>
@@ -32,6 +34,30 @@
     </xsl:template>
     <xsl:template match="atom:entry"/>
     <xsl:template match="atom:entry[1]">
+        <twit:nbResults>
+            <xsl:value-of select="count(../atom:entry)"/>
+        </twit:nbResults>
+        <twit:q>
+            <xsl:value-of select="$q"/>
+        </twit:q>
+        <twit:rpp>
+            <xsl:value-of select="$rpp"/>
+        </twit:rpp>
+        <twit:page>
+            <xsl:value-of select="$page"/>
+        </twit:page>
+        <twit:sort>
+            <twit:by>
+                <xsl:value-of
+                    select="doc('input:instance')/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@select"
+                />
+            </twit:by>
+            <twit:order>
+                <xsl:value-of
+                    select="doc('input:instance')/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@order"
+                />
+            </twit:order>
+        </twit:sort>
         <xsl:apply-templates select="../atom:entry" mode="paginate">
             <xsl:sort select="position()" order="ascending"/>
         </xsl:apply-templates>

@@ -25,18 +25,18 @@
     xmlns:o="urn:schemas-microsoft-com:office:office"
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xdb="http://orbeon.org/oxf/xml/xmldb" xmlns:snapshot="ccm.job.snapshot.Snapshot"
-    xmlns:f="http://www.orbeon.com/oxf/function" xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:twit="http://www.orbeon.com/sandbox/tritter">
+    xmlns:f="http://www.orbeon.com/oxf/function" xmlns:atom="http://www.w3.org/2005/Atom">
 
     <p:param name="instance" type="input"/>
 
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance" debug="instance"/>
+        <p:input name="data" href="#instance"/>
         <p:input name="config">
             <config xsl:version="2.0">
                 <url>
                     <xsl:text>http://search.twitter.com/search.atom?rpp=100&amp;q=</xsl:text>
-                    <xsl:value-of select="encode-for-uri(/xsl:stylesheet/twit:query)"/>
+                    <xsl:value-of select="encode-for-uri(/xsl:stylesheet/xsl:variable[@name='q']/q)"
+                    />
                 </url>
                 <content-type>application/xml</content-type>
             </config>
@@ -51,6 +51,7 @@
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#twitter"/>
+        <p:input name="instance" href="#instance"/>
         <p:input name="config" href="#instance"/>
         <p:output name="data" id="twitter-filtered"/>
     </p:processor>

@@ -1,0 +1,79 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:twit="http://www.orbeon.com/sandbox/twitter">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xforms:model id="model">
+            <xforms:instance id="twitter" src="/xforms-sandbox/service/twitter"/>
+            <xforms:bind nodeset="instance('twitter')/atom:entry/atom:published"
+                type="xforms:dateTime"/>
+            <xforms:instance id="params">
+                <params xmlns="">
+                    <page>1</page>
+                </params>
+            </xforms:instance>
+            <xxforms:variable name="params" select="instance('params')"/>
+            <xforms:submission id="load" ref="instance('params')" instance="twitter"
+                replace="instance" method="get" resource="/xforms-sandbox/service/twitter"/>
+        </xforms:model>
+
+    </head>
+    <body>
+
+        <h1>Paginated data table widgets</h1>
+
+        <p>This sample demonstratres the pagination feature of the datatable widget with sort and
+            pagination handled server side.</p>
+
+        <xxforms:variable name="params" select="instance('params')"/>
+        <fr:datatable paginated="true" sortAndPaginationMode="external"
+            nbPages="ceiling(/atom:feed/twit:nbResults div /atom:feed/twit:rpp)" page="$params/page">
+            <xforms:action ev:event="gotoPage">
+                <xforms:setvalue ref="$params/page" value="event('newPage')"/>
+                <xforms:send submission="load"/>
+            </xforms:action>
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true">Date</th>
+                    <th fr:sortable="true" fr:resizeable="true">Author</th>
+                    <th fr:sortable="true" fr:resizeable="true">Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr repeat-nodeset="/atom:feed/atom:entry">
+                    <td>
+                        <xforms:output ref="atom:published"
+                            xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                        />
+                    </td>
+                    <td>
+                        <a href="{atom:author/atom:uri}">
+                            <xforms:output value="atom:author/atom:name"/>
+                        </a>
+                    </td>
+                    <td>
+                        <xforms:output value="atom:title"/>
+                    </td>
+                </tr>
+            </tbody>
+        </fr:datatable>
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+    </body>
+</html>

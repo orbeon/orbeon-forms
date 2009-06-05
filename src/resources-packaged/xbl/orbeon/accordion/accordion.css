@@ -1,0 +1,51 @@
+dl.accordion-menu { margin: 0; padding: 0; width: 100% }
+dl.accordion-menu dt.a-m-t {
+
+    margin: 0;
+	padding: 0.3em 1em;
+
+    background-color: #F8F8F8;
+    background-image: url( ../../../apps/fr/style/logo-bg.gif );
+    color: #333333;
+    font-weight: bold;
+
+    border-style: solid;
+    border-width: 1px;
+    border-color: #CCCCCC gray gray #CCCCCC
+}
+
+dl.accordion-menu dt.a-m-t-hover { background: white }
+html.accordion-menu-js dt.a-m-t-expand {}
+
+dl.accordion-menu dd.a-m-d .bd {
+	border: solid 1px gray;
+    border-top-width: 0;
+    border-left-color: #CCCCCC
+}
+
+dl.accordion-menu dt.a-m-t { border-right: none; border-left: none }
+dl.accordion-menu dd.a-m-d .bd { border-right: none; border-left: none }
+
+html.accordion-menu-js dt.a-m-t{
+	cursor: pointer;
+	zoom: 1;
+}
+
+dl.accordion-menu dd.a-m-d { margin: 0; padding: 0 }
+html.accordion-menu-js dd.a-m-d { display: none }
+html.accordion-menu-js dd.a-m-d-expand { display: block }
+
+html.accordion-menu-js dd.a-m-d-before-expand {
+	display: block;
+	position: relative;
+	z-index: -1;
+	opacity: 0;
+	height: auto !important;
+	visibility: hidden;
+	overflow: visible;
+}
+
+html.accordion-menu-js dd.a-m-d-anim {
+	overflow: hidden;
+	display: block;
+}

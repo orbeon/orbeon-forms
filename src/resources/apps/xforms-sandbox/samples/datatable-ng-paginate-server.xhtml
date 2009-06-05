@@ -45,8 +45,8 @@
         <xxforms:variable name="params" select="instance('params')"/>
         <fr:datatable paginated="true" sortAndPaginationMode="external"
             nbPages="ceiling(/atom:feed/twit:nbResults div /atom:feed/twit:rpp)" page="$params/page">
-            <xforms:action ev:event="gotoPage">
-                <xforms:setvalue ref="$params/page" value="event('newPage')"/>
+            <xforms:action ev:event="fr-goto-page">
+                <xforms:setvalue ref="$params/page" value="event('fr-new-page')"/>
                 <xforms:send submission="load"/>
             </xforms:action>
             <thead>

@@ -265,8 +265,8 @@
                         <xforms:group ref=".[$page != 1]">
                             <xforms:trigger class="yui-pg-first" appearance="minimal">
                                 <xforms:label>&lt;&lt; first</xforms:label>
-                                <xsl:call-template name="gotoPage">
-                                    <xsl:with-param name="newPage">1</xsl:with-param>
+                                <xsl:call-template name="fr-goto-page">
+                                    <xsl:with-param name="fr-new-page">1</xsl:with-param>
                                 </xsl:call-template>
                             </xforms:trigger>
                         </xforms:group>
@@ -277,8 +277,8 @@
                         <xforms:group ref=".[$page != 1]">
                             <xforms:trigger class="yui-pg-previous" appearance="minimal">
                                 <xforms:label>&lt; prev</xforms:label>
-                                <xsl:call-template name="gotoPage">
-                                    <xsl:with-param name="newPage">$page - 1</xsl:with-param>
+                                <xsl:call-template name="fr-goto-page">
+                                    <xsl:with-param name="fr-new-page">$page - 1</xsl:with-param>
                                 </xsl:call-template>
                             </xforms:trigger>
                         </xforms:group>
@@ -294,8 +294,8 @@
                                         <xforms:label>
                                             <xforms:output value="."/>
                                         </xforms:label>
-                                        <xsl:call-template name="gotoPage">
-                                            <xsl:with-param name="newPage"
+                                        <xsl:call-template name="fr-goto-page">
+                                            <xsl:with-param name="fr-new-page"
                                                 >$targetPage</xsl:with-param>
                                         </xsl:call-template>
                                     </xforms:trigger>
@@ -309,8 +309,8 @@
                         <xforms:group ref=".[$page != $nbPages]">
                             <xforms:trigger class="yui-pg-next" appearance="minimal">
                                 <xforms:label>next ></xforms:label>
-                                <xsl:call-template name="gotoPage">
-                                    <xsl:with-param name="newPage">$page + 1</xsl:with-param>
+                                <xsl:call-template name="fr-goto-page">
+                                    <xsl:with-param name="fr-new-page">$page + 1</xsl:with-param>
                                 </xsl:call-template>
                             </xforms:trigger>
                         </xforms:group>
@@ -321,8 +321,8 @@
                         <xforms:group ref=".[$page != $nbPages]">
                             <xforms:trigger class="yui-pg-last" appearance="minimal">
                                 <xforms:label>last >></xforms:label>
-                                <xsl:call-template name="gotoPage">
-                                    <xsl:with-param name="newPage">$nbPages</xsl:with-param>
+                                <xsl:call-template name="fr-goto-page">
+                                    <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
                                 </xsl:call-template>
                             </xforms:trigger>
                         </xforms:group>
@@ -361,17 +361,17 @@
         <!-- End of template on the bound element -->
     </xsl:template>
 
-    <xsl:template name="gotoPage">
-        <xsl:param name="newPage"/>
+    <xsl:template name="fr-goto-page">
+        <xsl:param name="fr-new-page"/>
         <xsl:choose>
             <xsl:when test="$sortAndPaginationMode='external'">
-                <xforms:dispatch ev:event="DOMActivate" name="gotoPage" target="fr.datatable">
-                    <xxforms:context name="newPage" select="{$newPage}"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-goto-page" target="fr.datatable">
+                    <xxforms:context name="fr-new-page" select="{$fr-new-page}"/>
                 </xforms:dispatch>
             </xsl:when>
             <xsl:otherwise>
                 <xforms:setvalue ev:event="DOMActivate" model="datatable" ref="instance('page')"
-                    value="{$newPage}"/>
+                    value="{$fr-new-page}"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

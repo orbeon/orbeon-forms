@@ -13,7 +13,10 @@ dl.fr-accordion-lnf dt.a-m-t {
     border-bottom: 1px solid gray;
 }
 
-dl.fr-accordion-lnf dt.a-m-t-hover { background-position: 0 -1300px }
+dl.fr-accordion-lnf dt.a-m-t-hover {
+    background-position: 0 -1300px;
+    cursor: pointer;
+}
 html.accordion-menu-js dt.a-m-t-expand {}
 
 dl.fr-accordion-lnf dd.a-m-d .bd {

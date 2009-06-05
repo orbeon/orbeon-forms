@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -84,6 +83,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private boolean mustOutputFirstElement = true;
 
     private final ExternalContext externalContext;
+    private final boolean ignoreRootElement;
+
     private Stack xmlBaseStack = new Stack();
     private boolean isSeparateDeployment;
     private String requestContextPath;
@@ -93,10 +94,16 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private boolean inPreserve;     // whether we are in a label, etc., schema or instance
     private int preserveLevel;
 
-    public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
+    /**
+     * Constructor for top-level document.
+     *
+     * @param externalContext   external context to obtain request path, properties, etc.
+     * @param contentHandler    resulting static state document
+     */
+    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler) {
         super(contentHandler);
-
-        this.externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
+        this.externalContext = externalContext;
+        this.ignoreRootElement = false;
 
         final ExternalContext.Request request = externalContext.getRequest();
 
@@ -130,6 +137,24 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         }
     }
 
+    /**
+     * Constructor for nested document (XBL templates).
+     *
+     * @param contentHandler    resulting static state document
+     */
+    public XFormsExtractorContentHandler(ContentHandler contentHandler) {
+        super(contentHandler);
+        this.externalContext = null;
+        this.ignoreRootElement = true;
+
+        // TODO: handle xml:base correctly for XBL components
+        try {
+            xmlBaseStack.push(new URI(null, null, "/", null));
+        } catch (URISyntaxException e) {
+            throw new ValidationException(e, new LocationData(locator));
+        }
+    }
+
     public void startDocument() throws SAXException {
         super.startDocument();
     }
@@ -138,16 +163,18 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         if (mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
 
-            // Add xml:base attribute
-            attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
-            // Add deployment attribute
-            attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, isSeparateDeployment ? "separate" : "integrated");
-            // Add context path attribute
-            attributesImpl.addAttribute(XMLConstants.XML_URI, "context-path", "context-path", ContentHandlerHelper.CDATA, requestContextPath);
-            // Add container-type attribute
-            attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
-            // Add container-namespace attribute
-            attributesImpl.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
+            if (externalContext != null) {// case of nested document (XBL templates)
+                // Add xml:base attribute
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
+                // Add deployment attribute
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, isSeparateDeployment ? "separate" : "integrated");
+                // Add context path attribute
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "context-path", "context-path", ContentHandlerHelper.CDATA, requestContextPath);
+                // Add container-type attribute
+                attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
+                // Add container-namespace attribute
+                attributesImpl.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
+            }
 
             // Add location information
             if (locationData != null) {
@@ -207,7 +234,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         // NOTE: Here we have an issue identifying which elements must have content preserved. For example, an element
         // to which an XBL binding is applied should be preserved, because XBL template processing take place during
         // static state analysis. In XFormsDocumentAnnotatorContentHandler, we detect XBL bindings. Should we do the
-        // same here again? Et is wasteful to do it twice. Possibly, XFDACH could pass this information here since
+        // same here again? It is wasteful to do it twice. Possibly, XFDACH could pass this information here since
         // it already does all the work to detect content preservation. E.g. custom attribute.
 
 //        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
@@ -245,50 +272,58 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
         }
 
-        // Start extracting model or controls
-        if (!inXForms && isXFormsOrExtension) {
+        if (level > 0 || !ignoreRootElement) {
 
-            inXForms = true;
-            xformsLevel = level;
+            // Start extracting model or controls
+            if (!inXForms && isXFormsOrExtension) {
 
+                inXForms = true;
+                xformsLevel = level;
+
+                outputFirstElementIfNeeded();
+
+                // Add xml:base on element
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
+
+                sendStartPrefixMappings();
+            }
+
+            // Check for preserved content
+            if (inXForms && !inPreserve) {
+
+                if (isXXForms) {
+                    // Check that we are getting a valid xxforms:* element
+                    if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
+                        throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
+                } else if (isEXForms) {
+                    // Check that we are getting a valid exforms:* element
+                    if (XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
+                        throw new ValidationException("Invalid eXForms element in XForms document: " + qName, new LocationData(locator));
+                } else if (isXBL) {
+                    // Check that we are getting a valid xbl:* element
+                    if (XFormsConstants.ALLOWED_XBL_ELEMENTS.get(localname) == null)
+                        throw new ValidationException("Invalid XBL element in XForms document: " + qName, new LocationData(locator));
+                }
+
+                // Preserve as is the content of labels, etc., instances, and schemas
+                if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null // labels, etc. may contain XHTML
+                        || "instance".equals(localname)) && isXForms // XForms instances
+                        || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri) // XML schemas
+                        || "xbl".equals(localname) && isXBL // preserve everything under xbl:xbl so that templates may be processed by static state
+                        || isExtension) {
+                    inPreserve = true;
+                    preserveLevel = level;
+                }
+            }
+
+            // We are within preserved content or we output regular XForms content
+            if (inXForms && (inPreserve || isXFormsOrExtension)) {
+                super.startElement(uri, localname, qName, attributes);
+            }
+        } else {
+            // Just open the root element
             outputFirstElementIfNeeded();
-
-            // Add xml:base on element
-            attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
-
             sendStartPrefixMappings();
-        }
-
-        // Check for preserved content
-        if (inXForms && !inPreserve) {
-
-            if (isXXForms) {
-                // Check that we are getting a valid xxforms:* element
-                if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
-                    throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
-            } else if (isEXForms) {
-                // Check that we are getting a valid exforms:* element
-                if (XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
-                    throw new ValidationException("Invalid eXForms element in XForms document: " + qName, new LocationData(locator));
-            } else if (isXBL) {
-                // Check that we are getting a valid xbl:* element
-                if (XFormsConstants.ALLOWED_XBL_ELEMENTS.get(localname) == null)
-                    throw new ValidationException("Invalid XBL element in XForms document: " + qName, new LocationData(locator));
-            }
-
-            // Preserve as is the content of labels, etc., instances, and schemas
-            if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null // labels, etc. may contain XHTML
-                    || "instance".equals(localname)) && isXForms // XForms instances
-                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri) // XML schemas
-                    || "xbl".equals(localname) && isXBL // preserve everything under xbl:xbl so that templates may be processed by static state
-                    || isExtension) {
-                inPreserve = true;
-                preserveLevel = level;
-            }
-        }
-
-        // We are within preserved content or we output regular XForms content
-        if (inXForms && (inPreserve || isXFormsOrExtension)) {
             super.startElement(uri, localname, qName, attributes);
         }
 
@@ -330,17 +365,23 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 //        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
         final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
 
-        // We are within preserved content or we output regular XForms content
-        if (inXForms && (inPreserve || isXFormsOrExtension)) {
-            super.endElement(uri, localname, qName);
-        }
+        if (level > 0 || !ignoreRootElement) {
+            // We are within preserved content or we output regular XForms content
+            if (inXForms && (inPreserve || isXFormsOrExtension)) {
+                super.endElement(uri, localname, qName);
+            }
 
-        if (inPreserve && level == preserveLevel) {
-            // Leaving preserved content
-            inPreserve = false;
-        } if (inXForms && level == xformsLevel) {
-            // Leaving model or controls
-            inXForms = false;
+            if (inPreserve && level == preserveLevel) {
+                // Leaving preserved content
+                inPreserve = false;
+            } if (inXForms && level == xformsLevel) {
+                // Leaving model or controls
+                inXForms = false;
+                sendEndPrefixMappings();
+            }
+        } else {
+            // Just close the root element
+            super.endElement(uri, localname, qName);
             sendEndPrefixMappings();
         }
 

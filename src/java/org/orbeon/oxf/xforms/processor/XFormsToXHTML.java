@@ -131,7 +131,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         identity.setResult(documentResult);
 
                         annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                                new XFormsExtractorContentHandler(pipelineContext, identity)
+                                new XFormsExtractorContentHandler(externalContext, identity)
     //                            ,new SAXLoggerProcessor.DebugContentHandler()
                         }));
 
@@ -274,7 +274,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Set caching dependencies if the input was actually read
-        // TODO: Nested containers
+        // WIP INSTANCE INSPECTOR: for (Iterator i = containingDocument.getAllModels().iterator(); i.hasNext();) {
         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
 

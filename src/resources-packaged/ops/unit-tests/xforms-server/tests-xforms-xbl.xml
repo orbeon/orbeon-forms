@@ -1531,5 +1531,87 @@
         </output>
     </test>
 
-</group>
+    <test description="XBL nested XBL references" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
 
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                            <instance xmlns="">42</instance>
+                                        </xforms:instance>
+                                    </xforms:model>
+
+                                    <xbl:xbl script-type="application/xhtml+xml">
+                                        <xbl:binding id="fr-foo" element="fr|foo">
+                                            <xbl:template>
+                                                <xhtml:fieldset>
+                                                    <xhtml:legend>Foo 1</xhtml:legend>
+                                                    <xbl:content/>
+                                                </xhtml:fieldset>
+                                                <xhtml:h2>Foo 2</xhtml:h2>
+                                                <xbl:content/>
+                                            </xbl:template>
+                                        </xbl:binding>
+                                    </xbl:xbl>
+
+                                    <xbl:xbl script-type="application/xhtml+xml">
+                                        <xbl:binding id="fr-bar" element="fr|bar">
+                                            <xbl:template>
+                                                <xhtml:fieldset>
+                                                    <xhtml:legend>Bar 1</xhtml:legend>
+                                                    <xbl:content/>
+                                                </xhtml:fieldset>
+                                                <xhtml:h2>Bar 2</xhtml:h2>
+                                                <xbl:content/>
+                                            </xbl:template>
+                                        </xbl:binding>
+                                    </xbl:xbl>
+                                </xhtml:head>
+                                <xhtml:body xmlns:foobar="http://orbeon.org/oxf/xml/foobar">
+
+                                    <fr:foo id="my-foo">
+                                        <fr:bar>
+                                            <xforms:output value=".">
+                                                <xforms:label>Life, etc.: </xforms:label>
+                                            </xforms:output>
+                                        </fr:bar>
+                                    </fr:foo>
+
+                                </xhtml:body>
+                            </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="model">
+                                <instance>42</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$xf-1$xf-1" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-1$xf-3" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-2$xf-1" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-2$xf-3" label="Life, etc.: ">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+</group>

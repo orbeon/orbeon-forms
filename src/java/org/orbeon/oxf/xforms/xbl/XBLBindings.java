@@ -13,35 +13,36 @@
  */
 package org.orbeon.oxf.xforms.xbl;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsExtractorContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
-import org.apache.commons.lang.StringUtils;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
@@ -622,12 +623,14 @@ public class XBLBindings {
     private static Document filterShadowTree(Document fullShadowTree, Element boundElement) {
 
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-
         final LocationDocumentResult result= new LocationDocumentResult();
         identity.setResult(result);
 
-        TransformerUtils.writeDom4j(fullShadowTree, new XFormsFilterContentHandler(identity));
-        final Document compactShadowTree = result.getDocument();
+        // Run transformation
+        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(identity));
+
+        // Extractor produces /static-state/xbl:template, so extract the nested element
+        final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
 
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsContainingDocument.logDebugStatic("static state", "compact shadow tree",

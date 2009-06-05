@@ -1,37 +1,37 @@
-dl.accordion-menu { margin: 0; padding: 0; width: 100% }
-dl.accordion-menu dt.a-m-t {
-
+dl.fr-accordion-lnf {
+    margin: 0; padding: 0;
+    border-top: 1px solid gray;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
+}
+dl.fr-accordion-lnf dt.a-m-t {
     margin: 0;
 	padding: 0.3em 1em;
-
-    background-color: #F8F8F8;
-    background-image: url( ../../../apps/fr/style/logo-bg.gif );
+    background: transparent url(../../../ops/yui/assets/skins/sam/sprite.png) repeat-x scroll 0 -1500px;
     color: #333333;
     font-weight: bold;
-
-    border-style: solid;
-    border-width: 1px;
-    border-color: #CCCCCC gray gray #CCCCCC
+    border-bottom: 1px solid gray;
 }
 
-dl.accordion-menu dt.a-m-t-hover { background: white }
+dl.fr-accordion-lnf dt.a-m-t-hover { background-position: 0 -1300px }
 html.accordion-menu-js dt.a-m-t-expand {}
 
-dl.accordion-menu dd.a-m-d .bd {
+dl.fr-accordion-lnf dd.a-m-d .bd {
 	border: solid 1px gray;
     border-top-width: 0;
-    border-left-color: #CCCCCC
+    border-left-color: #CCCCCC;
+    padding: .5em 1em .5em 1em;
 }
 
-dl.accordion-menu dt.a-m-t { border-right: none; border-left: none }
-dl.accordion-menu dd.a-m-d .bd { border-right: none; border-left: none }
+dl.fr-accordion-lnf dt.a-m-t { border-right: none; border-left: none }
+dl.fr-accordion-lnf dd.a-m-d .bd { border-right: none; border-left: none }
 
-html.accordion-menu-js dt.a-m-t{
+html.fr-accordion-lnf-js dt.a-m-t{
 	cursor: pointer;
 	zoom: 1;
 }
 
-dl.accordion-menu dd.a-m-d { margin: 0; padding: 0 }
+dl.fr-accordion-lnf dd.a-m-d { margin: 0; padding: 0 }
 html.accordion-menu-js dd.a-m-d { display: none }
 html.accordion-menu-js dd.a-m-d-expand { display: block }
 

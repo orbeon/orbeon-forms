@@ -26,58 +26,82 @@
             <xforms:instance id="instance">
                 <instance>
                     <cost>123.45</cost>
-                    <record>
-                        <AAA>1</AAA>
-                        <BBB>foo</BBB>
-                        <CCC>bar</CCC>
-                    </record>
-                    <record>
-                        <AAA>100</AAA>
-                        <BBB>bat</BBB>
-                        <CCC>baz</CCC>
-                    </record>
-                    <record>
-                        <AAA>2</AAA>
-                        <BBB>bbb</BBB>
-                        <CCC>ccc</CCC>
-                    </record>
+                    <states>
+                        <state>
+                            <abbreviation>CA</abbreviation>
+                            <name>California</name>
+                            <population>36553215</population>
+                        </state>
+                        <state>
+                            <abbreviation>GA</abbreviation>
+                            <name>Georgia</name>
+                            <population>9544750</population>
+                        </state>
+                        <state>
+                            <abbreviation>HI</abbreviation>
+                            <name>Hawaii</name>
+                            <population>1283388</population>
+                        </state>
+                    </states>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="double" calculate="../value * 2"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <fr:accordion id="accordion">
+        <fr:accordion class="fr-accordion-lnf">
             <fr:case>
-                <fr:label>Table</fr:label>
-                <fr:currency ref="cost"/>
+                <fr:label>First section (lorem ipsum)</fr:label>
+                <xhtml:div>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eget nunc at felis pellentesque
+                    consectetur malesuada mollis est. Sed ac dui a dui ultrices bibendum. In id nunc tortor, in porta
+                    orci. Cras et eros odio, at fringilla neque. Mauris tincidunt pharetra tellus, eget molestie nisl
+                    commodo vitae. Ut vel lectus nibh. Ut imperdiet ipsum interdum sem aliquet malesuada. Proin
+                    tincidunt rhoncus dolor ut pulvinar. Pellentesque id libero massa. Fusce commodo volutpat felis.
+                    Aliquam sit amet quam dolor, sit amet commodo sapien. Donec orci eros, sagittis id sodales in,
+                    facilisis ac erat. Integer a odio sit amet dui pharetra posuere. Suspendisse placerat ornare
+                    fermentum. Mauris eu nibh auctor velit imperdiet sagittis. Integer vel ornare tellus. Nulla
+                    facilisi. Nullam eleifend dapibus enim a condimentum. Vestibulum porta lectus at enim iaculis
+                    vehicula.
+                </xhtml:div>
             </fr:case>
             <fr:case>
-                <fr:label>Table</fr:label>
-                Body
+                <fr:label>Second section (XForms input)</fr:label>
+                <xforms:input ref="cost">
+                    <xforms:label>Cost</xforms:label>
+                </xforms:input>
+            </fr:case>
+            <fr:case>
+                <fr:label>Third section (currency)</fr:label>
+                <fr:currency ref="cost" id="cost">
+                    <xforms:label>Cost</xforms:label>
+                </fr:currency>
+            </fr:case>
+            <!--<fr:case>-->
+                <!--<fr:label>Datatable</fr:label>-->
                 <!--<fr:datatable id="datatable">-->
-                    <!--<thead>-->
-                        <!--<tr>-->
-                            <!--<th fr:sortable="true" fr:resizeable="true">AAA (s)</th>-->
-                            <!--<th fr:sortable="true" fr:resizeable="true">BBB (s)</th>-->
-                            <!--<th>CCC</th>-->
-                        <!--</tr>-->
-                    <!--</thead>-->
-                    <!--<tbody>-->
-                        <!--<tr repeat-nodeset="record">-->
-                            <!--<td>-->
-                                <!--<xforms:output ref="AAA"/>-->
-                            <!--</td>-->
-                            <!--<td>-->
-                                <!--<xforms:output ref="BBB"/>-->
-                            <!--</td>-->
-                            <!--<td>-->
-                                <!--<xforms:output ref="CCC"/>-->
-                            <!--</td>-->
-                        <!--</tr>-->
-                    <!--</tbody>-->
+                    <!--<xhtml:thead>-->
+                        <!--<xhtml:tr>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Abbreviation</xhtml:th>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Name</xhtml:th>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Population</xhtml:th>-->
+                        <!--</xhtml:tr>-->
+                    <!--</xhtml:thead>-->
+                    <!--<xhtml:tbody>-->
+                        <!--<xhtml:tr repeat-nodeset="states/state">-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="abbreviation"/>-->
+                            <!--</xhtml:td>-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="name"/>-->
+                            <!--</xhtml:td>-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="population"/>-->
+                            <!--</xhtml:td>-->
+                        <!--</xhtml:tr>-->
+                    <!--</xhtml:tbody>-->
                 <!--</fr:datatable>-->
-            </fr:case>
+            <!--</fr:case>-->
         </fr:accordion>
+
     </xhtml:body>
 </xhtml:html>

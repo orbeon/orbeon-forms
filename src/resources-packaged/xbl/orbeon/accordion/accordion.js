@@ -5,20 +5,18 @@ YAHOO.xbl.fr.Accordion = {
     init: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-accordion");
         if (! YAHOO.xbl.fr.Accordion.instances[container.id]) {
-            console.log("Called");
-
-            var fbAccordionMenuOptions = {
+            var dlElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-dl", null, container)[0];
+            var firstDtElement = YAHOO.util.Dom.getFirstChild(dlElement);
+            YAHOO.util.Dom.generateId(firstDtElement);
+            console.log("firstDtElement.id", firstDtElement.id);
+            new AccordionMenu.setting(dlElement, {
                 dependent: false,
-                openedIds: [],
-                seconds: 0.2,
+                openedIds: [ firstDtElement ],
+                seconds: 0.1,
                 easeOut: false,
                 animation:true
-            };
-            var a = new AccordionMenu.setting('xf-7$gaga-dl', fbAccordionMenuOptions);
-            console.log("a", a);
-
-//            YAHOO.xbl.fr.Accordion.instances[container.id] = instance;
+            });
+            YAHOO.xbl.fr.Accordion.instances[container.id] = true;
         }
     }
 };
-    

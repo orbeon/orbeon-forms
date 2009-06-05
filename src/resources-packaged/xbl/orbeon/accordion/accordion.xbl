@@ -27,11 +27,12 @@
                     <xforms:group ref="." id="fr-accordion-group">
                         <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
 
-                        <xhtml:dl id="gaga-dl" class="accordion-menu">
+                        <xhtml:dl id="dl" class="xbl-fr-accordion-dl">
+                            <xsl:attribute name="class" select="concat('xbl-fr-accordion-dl', if (@class) then concat(' ', @class) else '')"/>
                             <xsl:for-each select="fr:case">
                                 <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
                                 <!-- Section title -->
-                                <xhtml:dt class="a-m-t a-m-d-expand fb-toolbox-section-title">
+                                <xhtml:dt class="a-m-t">
                                     <xsl:choose>
                                         <!-- Static label, just copy content -->
                                         <xsl:when test="empty(($label/@ref, $label/@bind))">
@@ -46,7 +47,7 @@
                                     </xsl:choose>
                                 </xhtml:dt>
                                 <!-- Section body -->
-                                <xhtml:dd class="a-m-d a-m-d-expand fb-toolbox-controls-section">
+                                <xhtml:dd class="a-m-d">
                                     <xhtml:div class="bd">
                                         <xsl:copy-of select="node() except $label"/>
                                     </xhtml:div>

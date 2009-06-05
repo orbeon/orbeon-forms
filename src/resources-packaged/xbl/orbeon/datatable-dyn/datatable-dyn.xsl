@@ -54,11 +54,11 @@
         <!-- Matches the bound element -->
 
         <xsl:if test="not(xhtml:thead)">
-            <xsl:message terminate="yes">Datatable components should include a thead
+            <xsl:message terminate="yes">Datatable components must include a thead
                 element.</xsl:message>
         </xsl:if>
         <xsl:if test="not(xhtml:tbody)">
-            <xsl:message terminate="yes">Datatable components should include a tbody
+            <xsl:message terminate="yes">Datatable components must include a tbody
                 element.</xsl:message>
         </xsl:if>
 

@@ -505,14 +505,14 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
                 variablesCount++;
-            } else if (staticState.isComponent(currentControlElement.getQName())) {
+            } else if (staticState.getXblBindings().isComponent(currentControlElement.getQName())) {
                 // Handle components
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
                 final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
 
                 // Recurse into the shadow component tree
-                final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
+                final Element shadowTreeDocumentElement = staticState.getXblBindings().getCompactShadowTree(idPrefix + staticControlId);
                 visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                         staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 

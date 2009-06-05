@@ -362,7 +362,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
     }
 
-    private final boolean isXBLBinding(String uri, String localname) {
+    protected boolean isXBLBinding(String uri, String localname) {
         if (xblBindings == null)
             return false;
 

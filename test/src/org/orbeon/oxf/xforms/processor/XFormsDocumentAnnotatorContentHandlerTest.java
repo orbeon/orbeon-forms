@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.xbl.XBLUtils;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -104,7 +104,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
         final Map mappings = new HashMap();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final Document annotatedDocument = XBLUtils.annotateShadowTree(document, mappings, "");
+        final Document annotatedDocument = new XBLBindings(null, null, null).annotateShadowTree(document, mappings, "");
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

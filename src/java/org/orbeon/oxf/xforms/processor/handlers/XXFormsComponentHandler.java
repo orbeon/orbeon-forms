@@ -52,7 +52,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         handlerContext.pushComponentContext(prefixedId);
 
         // Process shadow content if present
-        final Element shadowTree = containingDocument.getStaticState().getFullShadowTree(prefixedId);
+        final Element shadowTree = containingDocument.getStaticState().getXblBindings().getFullShadowTree(prefixedId);
         if (shadowTree != null) {
             // Tell the controller we are providing a new body
             controller.startBody();

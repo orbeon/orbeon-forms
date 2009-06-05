@@ -24,8 +24,8 @@
             <xsl:transform version="2.0">
                 <xsl:template match="/*">
                     <!-- Init event -->
-                    <xforms:group ref=".">
-                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
+                    <xforms:group ref="." id="fr-accordion-group">
+                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
 
                         <xhtml:dl id="gaga-dl" class="accordion-menu">
                             <xsl:for-each select="fr:case">

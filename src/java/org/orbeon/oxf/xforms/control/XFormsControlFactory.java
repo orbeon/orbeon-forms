@@ -221,7 +221,7 @@ public class XFormsControlFactory {
 
         // Then try custom components
         if (factory == null)
-            factory = container.getContainingDocument().getStaticState().getComponentFactory(element.getQName());
+            factory = container.getContainingDocument().getStaticState().getXblBindings().getComponentFactory(element.getQName());
 
         if (factory == null)
             throw new OXFException("Invalid control name: " + Dom4jUtils.qNameToExplodedQName(element.getQName()));

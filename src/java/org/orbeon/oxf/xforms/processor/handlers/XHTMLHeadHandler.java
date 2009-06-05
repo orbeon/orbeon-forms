@@ -148,7 +148,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             }
 
             // XBL resources
-            final List xblStyles = containingDocument.getStaticState().getXBLStyles();
+            final List xblStyles = containingDocument.getStaticState().getXblBindings().getXBLStyles();
             if (xblStyles != null) {
                 for (Iterator i = xblStyles.iterator(); i.hasNext();) {
                     final Element styleElement = (Element) i.next();
@@ -204,7 +204,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             }
 
             // XBL scripts
-            final List xblScripts = containingDocument.getStaticState().getXBLScripts();
+            final List xblScripts = containingDocument.getStaticState().getXblBindings().getXBLScripts();
             if (xblScripts != null) {
                 for (Iterator i = xblScripts.iterator(); i.hasNext();) {
                     final Element scriptElement = (Element) i.next();

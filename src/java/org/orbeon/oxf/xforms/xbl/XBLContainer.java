@@ -446,7 +446,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
         //    and return the control associated with the bound element.
-        final String bindingId = containingDocument.getStaticState().getBindingId(prefixedId);
+        final String bindingId = containingDocument.getStaticState().getXblBindings().getBindingId(prefixedId);
         if (targetStaticId.equals(bindingId))
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 

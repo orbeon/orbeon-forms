@@ -74,7 +74,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             }
 
             // Add handlers for custom components
-            final Map componentBindings = staticState.getComponentBindings();
+            final Map componentBindings = staticState.getXblBindings().getComponentBindings();
             if (componentBindings != null) {
                 for (Iterator i = componentBindings.keySet().iterator(); i.hasNext();) {
                     final QName currentQName = (QName) i.next();

@@ -425,7 +425,23 @@
         <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
             <xhtml:span class="yui-dt-label">
                 <xsl:choose>
-                    <xsl:when test="@fr:sortable = 'true'">
+                    <xsl:when test="@fr:sortable = 'true' and $sortAndPaginationMode='external'">
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>
+                                <xsl:apply-templates select="node()" mode="YUI"/>
+                            </xforms:label>
+                            <xforms:hint>
+                                <xforms:output value="{@fr:sortMessage}"/>
+                            </xforms:hint>
+                            <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort"
+                                target="fr.datatable">
+                                <xxforms:context name="fr-column"
+                                    select="{count(preceding-sibling::xhtml:th) + 1}"/>
+                            </xforms:dispatch>
+                        </xforms:trigger>
+                    </xsl:when>
+                    <xsl:when
+                        test="@fr:sortable = 'true' and not($sortAndPaginationMode='external')">
                         <xforms:group model="datatable" instance="sort">
                             <xforms:group ref=".[$nextSortOrder = 'ascending']">
                                 <xforms:trigger appearance="minimal">

@@ -278,7 +278,9 @@ ORBEON.widgets.datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
         var a = YAHOO.util.Selector.query('a.xforms-trigger:not(.xforms-disabled)', liner, true);
-        ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+        if (YAHOO.util.Event.getTarget(ev) != a) {
+            ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+        }
     });
 }
 

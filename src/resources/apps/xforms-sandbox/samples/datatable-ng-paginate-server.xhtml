@@ -21,12 +21,15 @@
     <head>
         <title>Using YUI's datatable</title>
         <xforms:model id="model">
-            <xforms:instance id="twitter" src="/xforms-sandbox/service/twitter"/>
+            <xforms:instance id="twitter"
+                src="/xforms-sandbox/service/twitter?sortBy=published&amp;sortOrder=descending"/>
             <xforms:bind nodeset="instance('twitter')/atom:entry/atom:published"
                 type="xforms:dateTime"/>
             <xforms:instance id="params">
                 <params xmlns="">
                     <page>1</page>
+                    <sortBy>published</sortBy>
+                    <sortOrder>descending</sortOrder>
                 </params>
             </xforms:instance>
             <xxforms:variable name="params" select="instance('params')"/>
@@ -49,11 +52,43 @@
                 <xforms:setvalue ref="$params/page" value="event('fr-new-page')"/>
                 <xforms:send submission="load"/>
             </xforms:action>
+            <xforms:action ev:event="fr-update-sort">
+                <xxforms:variable name="column" select="event('fr-column')"/>
+                <xxforms:variable name="nextSort"
+                    select="('published', 'author/name', 'title')[$column]"/>
+                <xforms:setvalue ref="$params/sortOrder"
+                    value="if ($params/sortBy = $nextSort)
+                        then if ($params/sortOrder = 'ascending')
+                            then 'descending'
+                            else 'ascending'
+                        else 'ascending'"/>
+                <xforms:setvalue ref="$params/sortBy" value="$nextSort"/>
+                <xforms:setvalue ref="$params/page" value="1"/>
+                <xforms:send submission="load"/>
+            </xforms:action>
             <thead>
                 <tr>
-                    <th fr:sortable="true" fr:resizeable="true">Date</th>
-                    <th fr:sortable="true" fr:resizeable="true">Author</th>
-                    <th fr:sortable="true" fr:resizeable="true">Title</th>
+                    <th fr:sortable="true"
+                        fr:sortMessage="if ($params/sortBy='published' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
+                        fr:resizeable="true"
+                        class=" {if ($params/sortBy='published') 
+                        then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
+                        else ''}"
+                        >Date</th>
+                    <th fr:sortable="true"
+                        fr:sortMessage="if ($params/sortBy='author/name' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
+                        fr:resizeable="true"
+                        class=" {if ($params/sortBy='author/name') 
+                        then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
+                        else ''}"
+                        >Author</th>
+                    <th fr:sortable="true"
+                        fr:sortMessage="if ($params/sortBy='title' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
+                        fr:resizeable="true"
+                        class=" {if ($params/sortBy='title') 
+                        then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
+                        else ''}"
+                        >Title</th>
                 </tr>
             </thead>
             <tbody>

@@ -89,7 +89,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private boolean isSeparateDeployment;
     private String requestContextPath;
 
-    private boolean inXForms;       // whether we are in a model
+    private boolean inXFormsOrExtension;       // whether we are in a model
     private int xformsLevel;
     private boolean inPreserve;     // whether we are in a label, etc., schema or instance
     private int preserveLevel;
@@ -242,7 +242,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final boolean isExtension = isXFormsOrExtension && !isXForms && !isXXForms && !isEXForms && !isXBL; // see NOTE above
 
         // Handle xml:base
-        if (!inXForms) {
+        if (!inXFormsOrExtension) {
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
             if (xmlBaseAttribute == null) {
                 xmlBaseStack.push(xmlBaseStack.peek());
@@ -257,7 +257,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         }
 
         // Handle properties of the form @xxforms:* when outside of models or controls
-        if (!inXForms && !isXFormsOrExtension) {
+        if (!inXFormsOrExtension && !isXFormsOrExtension) {
             final int attributesCount = attributes.getLength();
             for (int i = 0; i < attributesCount; i++) {
                 final String attributeURI = attributes.getURI(i);
@@ -275,9 +275,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         if (level > 0 || !ignoreRootElement) {
 
             // Start extracting model or controls
-            if (!inXForms && isXFormsOrExtension) {
+            if (!inXFormsOrExtension && isXFormsOrExtension) {
 
-                inXForms = true;
+                inXFormsOrExtension = true;
                 xformsLevel = level;
 
                 outputFirstElementIfNeeded();
@@ -289,7 +289,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
 
             // Check for preserved content
-            if (inXForms && !inPreserve) {
+            if (inXFormsOrExtension && !inPreserve) {
 
                 if (isXXForms) {
                     // Check that we are getting a valid xxforms:* element
@@ -317,7 +317,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
 
             // We are within preserved content or we output regular XForms content
-            if (inXForms && (inPreserve || isXFormsOrExtension)) {
+            if (inXFormsOrExtension && (inPreserve || isXFormsOrExtension)) {
                 super.startElement(uri, localname, qName, attributes);
             }
         } else {
@@ -367,16 +367,18 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         if (level > 0 || !ignoreRootElement) {
             // We are within preserved content or we output regular XForms content
-            if (inXForms && (inPreserve || isXFormsOrExtension)) {
+            if (inXFormsOrExtension && (inPreserve || isXFormsOrExtension)) {
                 super.endElement(uri, localname, qName);
             }
 
             if (inPreserve && level == preserveLevel) {
                 // Leaving preserved content
                 inPreserve = false;
-            } if (inXForms && level == xformsLevel) {
+            }
+
+            if (inXFormsOrExtension && level == xformsLevel) {
                 // Leaving model or controls
-                inXForms = false;
+                inXFormsOrExtension = false;
                 sendEndPrefixMappings();
             }
         } else {
@@ -385,7 +387,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             sendEndPrefixMappings();
         }
 
-        if (!inXForms) {
+        if (!inXFormsOrExtension) {
             xmlBaseStack.pop();
         }
 
@@ -399,19 +401,19 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
             // TODO: we must not output characters here if we are not directly within an XForms element
             // See: http://forge.objectweb.org/tracker/index.php?func=detail&aid=310835&group_id=168&atid=350207
-            if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
+            if (inXFormsOrExtension) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
                 super.characters(chars, start, length);
         }
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         namespaceSupport.startPrefixMapping(prefix, uri);
-        if (inXForms)
+        if (inXFormsOrExtension)
             super.startPrefixMapping(prefix, uri);
     }
 
     public void endPrefixMapping(String s) throws SAXException {
-        if (inXForms)
+        if (inXFormsOrExtension)
             super.endPrefixMapping(s);
     }
 

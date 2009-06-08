@@ -25,7 +25,7 @@
 *        Currently not used, but might be useful to generate IDs.
 */
 ORBEON.widgets.datatable = function (element, index) {
-    
+
     YAHOO.log("Creating datatable index " + index, "info")
     // Store useful stuff as properties
     this.table = element;
@@ -49,21 +49,21 @@ ORBEON.widgets.datatable = function (element, index) {
     this.headBodySplit = this.scroll;
     this.hasFixedWidthContainer = width != 'auto';
     this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
-    
+
     // Create a global container
     this.container = document.createElement('div');
     YAHOO.util.Dom.addClass(this.container, 'yui-dt');
     YAHOO.util.Dom.addClass(this.container, 'yui-dt-scrollable');
-    
+
     // Create a container for the header (or the whole table if there is no scrolling)
     this.headerContainer = document.createElement('div');
     YAHOO.util.Dom.addClass(this.headerContainer, 'yui-dt-hd');
-    
+
     // Assemble all that stuff
     this.table.parentNode.replaceChild(this.container, this.table);
     this.container.appendChild(this.headerContainer);
     this.headerContainer.appendChild(this.header);
-    
+
     // See how big the table would be without its size restriction
     if (this.scrollH) {
         YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
@@ -71,7 +71,7 @@ ORBEON.widgets.datatable = function (element, index) {
     if (this.scrollV) {
         YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
     }
-    
+
     region = YAHOO.util.Dom.getRegion(this.table);
     this.tableWidth = (region.right - region.left);
     this.tableHeight = (region.bottom - region.top);
@@ -102,20 +102,20 @@ ORBEON.widgets.datatable = function (element, index) {
         width = this.tableWidth + 'px';
     }
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
-    
+
     if (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0) {
         this.height = (this.tableHeight + 22) + 'px';
     }
-    
+
     this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', this.table, true));
     this.bodyRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('tbody', this.table, true));
-    
+
     // Resize the container
     YAHOO.util.Dom.setStyle(this.container, 'width', width);
     if (this.height != 'auto') {
         YAHOO.util.Dom.setStyle(this.container, 'height', this.height);
     }
-    
+
     // Resize the header container
     YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
     if (this.height != 'auto' && this.headBodySplit) {
@@ -123,50 +123,50 @@ ORBEON.widgets.datatable = function (element, index) {
     } else if (! this.headBodySplit && this.height == 'auto') {
         YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
-    
+
     if (this.headBodySplit) {
-        
+
         // Create a container for the body
         this.bodyContainer = document.createElement('div');
         YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
         YAHOO.util.Dom.addClass(this.bodyContainer, 'yui-dt-bd');
-        
+
         // Duplicate the table to populate the body
-        
+
         this.table = this.header.cloneNode(true);
         ORBEON.widgets.datatable.removeIdAttributes(this.table);
-        
+
         // Move the tbody elements to keep event handler bindings in the visible tbody
         var tBody = YAHOO.util.Selector.query('tbody', this.header, true);
         this.header.removeChild(tBody);
         this.table.replaceChild(tBody, YAHOO.util.Selector.query('tbody', this.table, true));
-        
-        
-        
+
+
+
         // Do more resizing
         this.containerRegion = YAHOO.util.Dom.getRegion(this.container);
         if (this.height != 'auto') {
             YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', ((this.containerRegion.bottom - this.containerRegion.top) - (this.headerRegion.bottom - this.headerRegion.top) - 5) + 'px');
         }
-        
+
         // And more assembly
         this.container.appendChild(this.bodyContainer);
         this.bodyContainer.appendChild(this.table);
-        
-        
+
+
         for (var i = 0; i < this.bodyColumns.length; i++) {
             var r = YAHOO.util.Dom.getRegion(this.bodyColumns[i]);
             YAHOO.util.Dom.setStyle(this.headerColumns[i], 'width', (r.right - r.left - 1) + 'px');
         }
     }
-    
+
     region = YAHOO.util.Dom.getRegion(this.container);
     this.width = region.right - region.left;
-    
+
     if (this.scrollH) {
         YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
     }
-    
+
     this.colResizers =[];
     this.colSorters =[];
     for (var j = 0; j < this.headerColumns.length; j++) {
@@ -182,7 +182,7 @@ ORBEON.widgets.datatable = function (element, index) {
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0) {
             // This is a hack! We need to remove the prefix to match classes added in XSLT!
-            var className = '.dt-' + this.id.substring(this.id.indexOf('$') + 1) + '-col-' + (j + 1);
+            var className = '.dt-' + this.id.substring(this.id.lastIndexOf('$') + 1) + '-col-' + (j + 1);
             if (! this.styleElt) {
                 this.styleElt = document.createElement('style');
                 this.styleElt.type = 'text/css';
@@ -217,15 +217,15 @@ ORBEON.widgets.datatable = function (element, index) {
                 colResizer.setStyleArray(styles);
             }
         }
-        
+
         if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
             this.colSorters[ this.colSorters.length] = new ORBEON.widgets.datatable.colSorter(this.headerColumns[j]);
         }
     }
 
-    // Now that the table has been properly sized, reconsider its 
+    // Now that the table has been properly sized, reconsider its
     // "resizeability"
-    
+
     if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
         // These are fixed width tables without horizontal scroll bars
         // and as we don't know how to resize their columns properly,
@@ -233,7 +233,7 @@ ORBEON.widgets.datatable = function (element, index) {
         this.hasFixedWidthContainer = false;
         this.hasFixedWidthTable = false;
     }
-    
+
 }
 
 
@@ -296,16 +296,16 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
     this.datatable = datatable;
     this.rule = null;
     this.styles = null;
-    
+
     this.resizerliner = document.createElement('div');
     YAHOO.util.Dom.addClass(this.resizerliner, 'yui-dt-resizerliner');
-    
+
     this.liner = YAHOO.util.Selector.query('div', this.th, true);
-    
+
     this.th.replaceChild(this.resizerliner, this.liner);
-    
+
     this.resizerliner.appendChild(this.liner);
-    
+
     this.resizer = document.createElement('div');
     YAHOO.util.Dom.addClass(this.resizer, 'yui-dt-resizer');
     this.resizer.style.left = 'auto';
@@ -314,14 +314,14 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
     this.resizer.style.bottom = '0pt';
     this.resizer.style.height = '25px';
     this.resizerliner.appendChild(this.resizer);
-    
-    
+
+
     this.init(this.resizer, this.resizer, {
         dragOnly: true, dragElId: this.resizer.id
     });
     this.setYConstraint(0, 0);
     this.initFrame();
-    
+
     var colRegion = YAHOO.util.Dom.getRegion(this.th);
     var X = YAHOO.util.Dom.getX(this.resizer);
     this.delta = colRegion.right - X;
@@ -334,22 +334,22 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
     // Public methods
     //
     /////////////////////////////////////////////////////////////////////////////
-    
+
     setStyleArray: function (styles) {
         this.styles = styles;
     },
-    
+
     setRule: function (rule) {
         this.rule = rule;
     },
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     // Public DOM event handlers
     //
     /////////////////////////////////////////////////////////////////////////////
-    
-    
+
+
     /**
     * Handles mousedown events on the Column resizer.
     *
@@ -363,8 +363,8 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
         //this.resizerX = YAHOO.util.Dom.getX(this.resizer);
         this.resizerX = YAHOO.util.Event.getXY(ev)[0];
     },
-    
-    
+
+
     /**
     * Handles drag events on the Column resizer.
     *

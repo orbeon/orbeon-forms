@@ -406,11 +406,13 @@ ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
 }
 
 
-ORBEON.widgets.datatable.init = function (klass) {
+ORBEON.widgets.datatable.init = function (target) {
     // Initializes a datatable (called by xforms-enabled events)
-    if (ORBEON.widgets.datatable.datatables[klass] == undefined) {
-        var tables = YAHOO.util.Dom.getElementsByClassName(klass, 'table');
-        ORBEON.widgets.datatable.datatables[klass] = new ORBEON.widgets.datatable(tables[0], klass);
+    var container = target.parentNode.parentNode;
+    var id = container.id;
+    if (ORBEON.widgets.datatable.datatables[id] == undefined) {
+        var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+        ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id);
     }
 }
 

@@ -229,8 +229,7 @@
             <xforms:group ref="xxforms:component-context()">
                 <xforms:action ev:event="xforms-enabled">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                        />","info"); ORBEON.widgets.datatable.init('datatable-<xsl:value-of
-                            select="$id"/>'); </xxforms:script>
+                        />","info"); ORBEON.widgets.datatable.init(this); </xxforms:script>
                 </xforms:action>
             </xforms:group>
 

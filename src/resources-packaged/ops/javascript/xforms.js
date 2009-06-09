@@ -5984,10 +5984,10 @@ ORBEON.xforms.Server = {
                                                 if (oldItemDelimiter != null) {
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
-                                                           (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                                   && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                                           (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                                   && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                         if (cursor.nodeType == ELEMENT_TYPE)
-                                                            ORBEON.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                            YAHOO.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
                                                         cursor = cursor.nextSibling;
                                                     }
                                                 }
@@ -6007,10 +6007,10 @@ ORBEON.xforms.Server = {
                                                 var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                                 var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
-                                                       (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                               && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                                       (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                               && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                     if (cursor.nodeType == ELEMENT_TYPE)
-                                                        ORBEON.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                        YAHOO.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
                                                     cursor = cursor.nextSibling;
                                                 }
                                             }

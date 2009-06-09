@@ -101,6 +101,21 @@
                     </xhtml:tbody>
                 </fr:datatable>
             </fr:case>
+            <xforms:repeat nodeset="states/state">
+                <fr:case>
+                    <fr:label value="name"/>
+                    <xhtml:ul>
+                        <xhtml:li>
+                            Abbreviation:
+                            <xforms:output value="abbreviation"/>
+                        </xhtml:li>
+                        <xhtml:li>
+                            Population:
+                            <xforms:output value="population"/>
+                        </xhtml:li>
+                    </xhtml:ul>
+                </fr:case>
+            </xforms:repeat>
         </fr:accordion>
 
     </xhtml:body>

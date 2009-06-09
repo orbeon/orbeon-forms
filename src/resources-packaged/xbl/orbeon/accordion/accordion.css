@@ -62,3 +62,8 @@ html.accordion-menu-js dd.a-m-d-anim {
     visibility: visible;
     position: static;
 }
+
+/* Do not highlight the "current" case of an accordion when cases are generated with an <xforms:repeat>. */
+.xbl-fr-accordion-dl .xforms-repeat-selected-item-1 {
+    background-color: transparent;
+}

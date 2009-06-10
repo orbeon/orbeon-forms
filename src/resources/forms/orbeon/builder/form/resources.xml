@@ -650,7 +650,7 @@
                 <label>Source Control</label>
             </source-control>
             <destination-xpath>
-                <label>Destination XPath expression</label>
+                <label>Destination XPath Expression</label>
             </destination-xpath>
             <request-database-parameter>
                 <label>Set Database Service Parameters</label>

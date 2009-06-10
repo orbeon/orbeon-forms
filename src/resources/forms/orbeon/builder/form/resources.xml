@@ -513,7 +513,7 @@
                 <hint>Whether this is a SOAP service</hint>
             </soap-submission>
             <soap-action>
-                <label>Action SOAP</label>
+                <label>SOAP Action</label>
                 <hint>Optional SOAPAction header</hint>
             </soap-action>
             <http-authentication>
@@ -1215,7 +1215,7 @@
                 <hint>Sélectionner si le service est un service SOAP</hint>
             </soap-submission>
             <soap-action>
-                <label>SOAP Action</label>
+                <label>Action SOAP</label>
                 <hint>Header SOAPAction optionnel</hint>
             </soap-action>
             <http-authentication>

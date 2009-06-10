@@ -671,7 +671,7 @@
                 <label>Set Response Selection Control Items</label>
             </response-itemset>
             <destination-selection-control>
-                <label>Destination selection control</label>
+                <label>Destination Selection Control</label>
             </destination-selection-control>
             <itemset>
                 <label>Itemset</label>

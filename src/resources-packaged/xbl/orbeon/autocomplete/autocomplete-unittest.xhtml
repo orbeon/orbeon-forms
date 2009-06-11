@@ -30,6 +30,8 @@
             <xforms:instance id="instance-static">
                 <instance><country-name/></instance>
             </xforms:instance>
+            <xforms:bind nodeset="instance('instance-static')/country-name" constraint="starts-with(., 'S')"/>
+
             <xforms:instance id="instance-dynamic">
                 <instance><country-name/></instance>
             </xforms:instance>
@@ -78,12 +80,14 @@
         <fr:autocomplete ref="instance('instance-static')/country-name" id="country-name-static"
                          incremental="false" dynamic-itemset="false"
                          max-results-displayed="100"
-                         style="width: 15em">
+                         style="width: 15em; float: left">
             <xforms:itemset nodeset="instance('all-countries')/country">
                 <xforms:label ref="name"/>
                 <xforms:value ref="name"/>
             </xforms:itemset>
             <fr:max-results-displayed>2</fr:max-results-displayed>
+            <xforms:help>Country name</xforms:help>
+            <xforms:alert>Invalid!</xforms:alert>
         </fr:autocomplete>
 
         <!--<fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"-->

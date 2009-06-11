@@ -34,7 +34,7 @@
         </xbl:resources>
         <xbl:template>
             <xforms:group id="autocomplete-container" class="fr-autocomplete-container" xbl:attr="model context ref bind">
-                <xbl:content includes="fr|autocomplete > xforms|label, fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint"/>
+                <xbl:content includes="fr|autocomplete > xforms|label"/>
 
                 <!-- Variables for attributes on the control -->
                 <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
@@ -57,6 +57,7 @@
                     <xhtml:div class="fr-autocomplete-yui-div"/>
                 </xhtml:div>
 
+                <xbl:content includes="fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

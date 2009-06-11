@@ -40,7 +40,10 @@
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
-            <xforms:setindex ev:event="xforms-ready" repeat="dt-repeat" index="2"/>
+            <xforms:dispatch ev:event="xforms-ready" name="fr-datatable-set-index-in-current-page"
+                target="dt">
+                <xxforms:context name="index" select="2"/>
+            </xforms:dispatch>
         </xforms:model>
     </head>
     <body>
@@ -48,7 +51,7 @@
         <h1>Using the datatable widget (new generation)</h1>
 
         <p>The 2nd row of this datatable is selected</p>
-        <fr:datatable>
+        <fr:datatable id="dt">
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">AAA (s)</th>
@@ -57,7 +60,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat nodeset="record" id="dt-repeat">
+                <xforms:repeat nodeset="record">
                     <tr>
                         <td>
                             <xforms:output ref="AAA"/>

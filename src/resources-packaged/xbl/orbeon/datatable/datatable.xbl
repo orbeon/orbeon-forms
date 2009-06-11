@@ -53,7 +53,11 @@
             <!--<xbl:style src="/ops/yui/logger/assets/skins/sam/logger.css"/>-->
 
         </xbl:resources>
-
+        <xbl:handlers>
+            <xbl:handler event="fr-datatable-set-index-in-current-page" phase="target">
+                <xforms:setindex repeat="fr:datatable-repeat" index="event('index')"/>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:xslt">
             <xsl:transform version="2.0">
 

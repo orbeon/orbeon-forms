@@ -217,7 +217,7 @@ ORBEON.widgets.datatable = function (element, index) {
         this.hasFixedWidthContainer = false;
         this.hasFixedWidthTable = false;
     }
-    
+        
 }
 
 ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {

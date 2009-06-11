@@ -390,7 +390,7 @@
         <!-- The ID is added here as a work-around to a bug in Orbeon Forms that happens when the same ID is used
              (here generated if this is missing) inside an XBL control and outside.
              http://forge.ow2.org/tracker/index.php?func=detail&aid=313628&group_id=168&atid=350207 -->
-        <xforms:repeat nodeset="{@repeat-nodeset}" id="fr-dt-{generate-id()}">
+        <xforms:repeat nodeset="{@repeat-nodeset}">
             <xhtml:tr>
                 <xsl:apply-templates select="@*|node()"/>
             </xhtml:tr>
@@ -528,7 +528,7 @@
     <xsl:template match="xforms:repeat" mode="YUI">
         <xxforms:variable name="sort" model="datatable" select="."/>
         <xxforms:variable name="key" model="datatable" select="key[position() = $sort/@currentId]"/>
-        <xforms:repeat>
+        <xforms:repeat id="fr:datatable-repeat">
             <xsl:attribute name="nodeset">
                 <xsl:choose>
                     <xsl:when test="$sortAndPaginationMode='external'">

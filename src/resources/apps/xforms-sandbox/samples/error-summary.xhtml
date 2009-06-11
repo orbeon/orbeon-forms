@@ -117,8 +117,8 @@
             <xforms:action ev:event="xforms-invalid" if="normalize-space(event('xxforms:alert')) != ''">
                 <xforms:action if="not(instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')])">
                     <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
-                    <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('xxforms:target')"/>
-                    <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
+                    <xforms:setvalue ref="instance('errors-instance')/error[last()]/@id" value="event('xxforms:target')"/>
+                    <xforms:setvalue ref="instance('errors-instance')/error[last()]/@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
                 </xforms:action>
                 <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@alert" value="event('xxforms:alert')"/>
                 <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:target') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@label" value="event('xxforms:label')"/>

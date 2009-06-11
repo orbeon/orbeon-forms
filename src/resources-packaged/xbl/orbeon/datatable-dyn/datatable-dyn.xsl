@@ -54,11 +54,11 @@
         <!-- Matches the bound element -->
 
         <xsl:if test="not(xhtml:thead)">
-            <xsl:message terminate="yes">Datatable components must include a thead
+            <xsl:message terminate="yes">Datatable components should include a thead
                 element.</xsl:message>
         </xsl:if>
         <xsl:if test="not(xhtml:tbody)">
-            <xsl:message terminate="yes">Datatable components must include a tbody
+            <xsl:message terminate="yes">Datatable components should include a tbody
                 element.</xsl:message>
         </xsl:if>
 
@@ -72,11 +72,13 @@
 
             <xforms:model id="datatable-model">
                 <xforms:instance id="datatable-instance">
-                    <columns xmlns="">
+                    <columns xmlns="" currentSortColumn="-1">
                         <xsl:for-each select="$columns/*">
                             <xsl:copy>
                                 <xsl:attribute name="nbColumns"/>
                                 <xsl:attribute name="index"/>
+                                <xsl:attribute name="currentSortOrder"/>
+                                <xsl:attribute name="nextSortOrder"/>
                                 <xsl:copy-of select="@*"/>
                             </xsl:copy>
                         </xsl:for-each>
@@ -85,11 +87,34 @@
                 <xforms:bind nodeset="column/@nbColumns" calculate="1"/>
                 <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
                 <xforms:bind nodeset="*/@index" calculate="count(../preceding::column) + 1"/>
+                <xforms:bind nodeset="//column/@currentSortOrder"
+                    calculate="if (../@index = /*/@currentSortColumn) then . else 'none'"/>
+                <xforms:bind nodeset="//column/@nextSortOrder"
+                    calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"
+                />
             </xforms:model>
+
+            <xxforms:variable name="currentSortOrder" model="datatable-model"
+                select="instance('datatable-instance')/@currentSortOrder"/>
+            <xxforms:variable name="currentSortColumn" model="datatable-model"
+                select="instance('datatable-instance')/@currentSortColumn"/>
+
 
             <xhtml:div style="border:thin solid black">
                 <xhtml:h3>Local instance:</xhtml:h3>
                 <xforms:group model="datatable-model" instance="datatable-instance">
+                    <xhtml:p>columns</xhtml:p>
+                    <xhtml:ul>
+                        <xforms:repeat nodeset="@*">
+                            <xhtml:li>
+                                <xforms:output ref=".">
+                                    <xforms:label>
+                                        <xforms:output value="concat(name(), ': ')"/>
+                                    </xforms:label>
+                                </xforms:output>
+                            </xhtml:li>
+                        </xforms:repeat>
+                    </xhtml:ul>
                     <xforms:repeat nodeset="*|//column">
                         <xhtml:p>
                             <xforms:output value="name()"/>
@@ -109,16 +134,13 @@
                 </xforms:group>
             </xhtml:div>
 
-
-
             <xforms:group ref="xxforms:component-context()">
                 <xforms:action ev:event="xforms-enabled">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                        />","info"); ORBEON.widgets.datatable.init('datatable-<xsl:value-of
-                            select="$id"/>'); </xxforms:script>
+                    />","info"); ORBEON.widgets.datatable.init(this); </xxforms:script>
                 </xforms:action>
             </xforms:group>
-
+            
             <xhtml:table id="{$id}-table"
                 class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
                 style="{$height} {$width}">
@@ -150,54 +172,34 @@
 
     <xsl:template name="header-cell">
 
-        <xsl:param name="position"/>
-        
-        <xforms:output value="$columnDesc/@index"/>
-        
-        
+        <!-- XXForms variable "columnDesc" is the current column description when we enter here -->
+
+        <!-- <xforms:output value="$columnDesc/@index"/>-->
+
         <xhtml:div class="yui-dt-resizerliner">
             <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
                 <xhtml:span class="yui-dt-label">
                     <xsl:choose>
-                        <xsl:when test="@fr:sortable = 'true' and false()">
-                            <xforms:group model="datatable" instance="sort">
-                                <xxforms:variable name="nextSortOrder">ascending</xxforms:variable>
-                                <xforms:group ref=".[$nextSortOrder = 'ascending']">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="node()"/>
-                                        </xforms:label>
-                                        <xforms:hint>Click to sort <xforms:output
-                                                value="$nextSortOrder"/></xforms:hint>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="@currentOrder"
-                                                value="$nextSortOrder"/>
-                                            <xforms:setvalue ref="@currentId">
-                                                <xsl:value-of select="$position"/>
-                                            </xforms:setvalue>
-                                            <xforms:setvalue ref="instance('page')" value="1"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xforms:group>
-
-                                <xforms:group ref=".[$nextSortOrder != 'ascending']">
-                                    <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="node()"/>
-                                        </xforms:label>
-                                        <xforms:hint>Click to sort <xforms:output
-                                                value="$nextSortOrder"/></xforms:hint>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="@currentOrder"
-                                                value="$nextSortOrder"/>
-                                            <xforms:setvalue ref="@currentId">
-                                                <xsl:value-of select="$position"/>
-                                            </xforms:setvalue>
-                                            <xforms:setvalue ref="instance('page')" value="1"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xforms:group>
-                            </xforms:group>
+                        <xsl:when test="@fr:sortable = 'true'">
+                           <!-- <xxforms:variable name="myCurrentSortOrder"
+                                select="if ($currentSortColumn = $columnDesc/@index) then $currentSortOrder else 'none'"/>
+                            <xxforms:variable name="myNextSortOrder"
+                                select="if ($myCurrentSortOrder = 'ascending') then 'descending' else 'ascending'"/>-->
+                            <!--<xforms:output value="$myCurrentSortOrder"/>/<xforms:output value="$myNextSortOrder"/>-->
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xsl:apply-templates select="node()"/>
+                                </xforms:label>
+                                <xforms:hint>Click to sort <xforms:output value="$columnDesc/@nextSortOrder"
+                                    /></xforms:hint>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- <xxforms:script> alert('ping');</xxforms:script>-->
+                                    <xforms:setvalue ref="$columnDesc/@currentSortOrder"
+                                        value="$columnDesc/@nextSortOrder"/>
+                                    <xforms:setvalue ref="$currentSortColumn"
+                                        value="$columnDesc/@index"/>
+                                </xforms:action>
+                            </xforms:trigger>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:apply-templates select="node()"/>
@@ -258,6 +260,8 @@
                                 xxforms:attribute('nbColumns', 1),
                                 xxforms:attribute('index', $columnSet/@index + $position - 1),
                                 xxforms:attribute('sortKey', concat( '(',  $columnSet/@nodeset, ')[', $position , ']/', $columnSet/@sortKey)),
+                                xxforms:attribute('currentSortOrder', ''),
+                                xxforms:attribute('nextSortOrder', ''),
                                 $columnSet/@fr:sortable,
                                 $columnSet/@fr:resizeable
                                 ))"

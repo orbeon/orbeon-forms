@@ -36,8 +36,7 @@ ORBEON.widgets.datatable = function (element, index) {
     var plainId = this.table.getAttribute('id');
     this.id = plainId.substring(0, plainId.length - '-table'.length);
     var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
-    var region = YAHOO.util.Dom.getRegion(this.table);
-    var pxWidth = region.right - region.left;
+    var pxWidth = this.table.clientWidth;
     if (width.indexOf('%') != - 1) {
         // Convert % into px...
         width = pxWidth + 'px';
@@ -72,25 +71,14 @@ ORBEON.widgets.datatable = function (element, index) {
         YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
     }
     
-    region = YAHOO.util.Dom.getRegion(this.table);
-    this.tableWidth = (region.right - region.left);
-    this.tableHeight = (region.bottom - region.top);
+    this.tableWidth = this.table.clientWidth;
+    this.tableHeight = this.table.clientHeight;
     if (this.scrollH) {
         if (pxWidth > this.tableWidth) {
             // Can be the case if table width was expressed as %
             this.tableWidth = pxWidth;
         }
-        for (var i = this.tableWidth; i < 2000; i += 50) {
-            YAHOO.util.Dom.setStyle(this.table, 'width', i + 'px');
-            region = YAHOO.util.Dom.getRegion(this.table);
-            var tableWidth = (region.right - region.left);
-            var tableHeight = (region.bottom - region.top);
-            if (tableHeight < this.tableHeight) {
-                this.tableWidth = tableWidth;
-                this.tableHeight = tableHeight;
-            }
-        }
-        this.tableWidth = this.tableWidth + 19;
+        this.tableWidth = this.optimizeWidth(this.table.clientWidth, this.table.clientHeight, 2500, this.getTableHeightForWidth(2500)) + 50;
     } else if (this.scrollV) {
         if (this.hasFixedWidthTable) {
             width = this.tableWidth + 'px';
@@ -107,8 +95,8 @@ ORBEON.widgets.datatable = function (element, index) {
         this.height = (this.tableHeight + 22) + 'px';
     }
     
-    this.headerRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('thead', this.table, true));
-    this.bodyRegion = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('tbody', this.table, true));
+    this.thead = YAHOO.util.Selector.query('thead', this.table, true);
+    this.tbody = YAHOO.util.Selector.query('tbody', this.table, true);
     
     // Resize the container
     YAHOO.util.Dom.setStyle(this.container, 'width', width);
@@ -119,7 +107,7 @@ ORBEON.widgets.datatable = function (element, index) {
     // Resize the header container
     YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
     if (this.height != 'auto' && this.headBodySplit) {
-        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', (this.headerRegion.bottom - this.headerRegion.top) + 'px');
+        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.thead.clientHeight + 'px');
     } else if (! this.headBodySplit && this.height == 'auto') {
         YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
@@ -144,9 +132,8 @@ ORBEON.widgets.datatable = function (element, index) {
         
         
         // Do more resizing
-        this.containerRegion = YAHOO.util.Dom.getRegion(this.container);
         if (this.height != 'auto') {
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', ((this.containerRegion.bottom - this.containerRegion.top) - (this.headerRegion.bottom - this.headerRegion.top) - 5) + 'px');
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.thead.clientHeight - 5) + 'px');
         }
         
         // And more assembly
@@ -155,13 +142,11 @@ ORBEON.widgets.datatable = function (element, index) {
         
         
         for (var i = 0; i < this.bodyColumns.length; i++) {
-            var r = YAHOO.util.Dom.getRegion(this.bodyColumns[i]);
-            YAHOO.util.Dom.setStyle(this.headerColumns[i], 'width', (r.right - r.left - 1) + 'px');
+            YAHOO.util.Dom.setStyle(this.headerColumns[i], 'width', (this.bodyColumns[i].clientWidth - 1) + 'px');
         }
     }
     
-    region = YAHOO.util.Dom.getRegion(this.container);
-    this.width = region.right - region.left;
+     this.width = this.container.clientWidth;
     
     if (this.scrollH) {
         YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
@@ -176,13 +161,12 @@ ORBEON.widgets.datatable = function (element, index) {
             colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
             this.colResizers[ this.colResizers.length] = colResizer;
         }
-        var region = YAHOO.util.Dom.getRegion(this.headerColumns[j]);
-        var width = (region.right - region.left - 20) + 'px';
+        var width = (this.headerColumns[j].clientWidth - 20) + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0) {
             // This is a hack! We need to remove the prefix to match classes added in XSLT!
-            var className = '.dt-' + this.id.substring(this.id.indexOf('$') + 1) + '-col-' + (j + 1);
+            var className = '.dt-' + this.id.substring(this.id.lastIndexOf('$') + 1) + '-col-' + (j + 1);
             if (! this.styleElt) {
                 this.styleElt = document.createElement('style');
                 this.styleElt.type = 'text/css';
@@ -233,9 +217,26 @@ ORBEON.widgets.datatable = function (element, index) {
         this.hasFixedWidthContainer = false;
         this.hasFixedWidthTable = false;
     }
-    
+        
 }
 
+ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
+    this.table.style.width = width + 'px';
+    return this.table.clientHeight;
+}
+
+ORBEON.widgets.datatable.prototype.optimizeWidth = function (w1, h1, w2, h2) {
+    if (h1 == h2 || (w2 - w1 < 50)) {
+        return w1;
+    }
+    var w = Math.round((w1 + w2) / 2);
+    var h = this.getTableHeightForWidth(w);
+    if (h == h2) {
+        return this.optimizeWidth(w1, h1, w, h);
+    } else {
+        return this.optimizeWidth(w, h, w2, h2);
+    }
+}
 
 ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
     if (! this.hasFixedWidthContainer) {
@@ -270,15 +271,16 @@ ORBEON.widgets.datatable.utils.getStyle = function (elt, property, defolt) {
 }
 
 ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
-    region = YAHOO.util.Dom.getRegion(elt);
-    YAHOO.util.Dom.setStyle(elt, 'width', (region.right - region.left) + 'px');
+    YAHOO.util.Dom.setStyle(elt, 'width', elt.clientWidth + 'px');
 }
 
 ORBEON.widgets.datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
         var a = YAHOO.util.Selector.query('a.xforms-trigger:not(.xforms-disabled)', liner, true);
-        ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+        if (YAHOO.util.Event.getTarget(ev) != a) {
+            ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+        }
     });
 }
 
@@ -356,8 +358,7 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
     */
     onMouseDown: function (ev) {
         this.resetConstraints();
-        var region = YAHOO.util.Dom.getRegion(this.liner);
-        this.width = region.right - region.left;
+        this.width = this.liner.clientWidth;
         //this.resizerX = YAHOO.util.Dom.getX(this.resizer);
         this.resizerX = YAHOO.util.Event.getXY(ev)[0];
     },
@@ -405,11 +406,13 @@ ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
 }
 
 
-ORBEON.widgets.datatable.init = function (klass) {
+ORBEON.widgets.datatable.init = function (target) {
     // Initializes a datatable (called by xforms-enabled events)
-    if (ORBEON.widgets.datatable.datatables[klass] == undefined) {
-        var tables = YAHOO.util.Dom.getElementsByClassName(klass, 'table');
-        ORBEON.widgets.datatable.datatables[klass] = new ORBEON.widgets.datatable(tables[0], klass);
+    var container = target.parentNode.parentNode;
+    var id = container.id;
+    if (ORBEON.widgets.datatable.datatables[id] == undefined) {
+        var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+        ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id);
     }
 }
 

@@ -12,13 +12,13 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<!-- 
+<!--
 
     This is a new implementation of the datatable widget (still under construction).
-    
+
     Its goal is to rely on XForms much more than that was the case in the previous
     implementation and limit the use of JavaScript as much as possible.
-    
+
     See also the samples (datatable-ng*.xhtml) in the XForms sandbox.
 
 -->
@@ -55,7 +55,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-datatable-set-index-in-current-page" phase="target">
-                <xforms:setindex repeat="fr:datatable-repeat" index="event('index')"/>
+                <xforms:setindex repeat="fr-datatable-repeat" index="event('index')"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:xslt">

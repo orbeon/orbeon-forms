@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2009 Orbeon, Inc.
-    
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-    
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-    
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xsl:transform xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -88,10 +88,10 @@
 
 
             <xsl:variable name="pass1">
-                <!-- 
+                <!--
                 This pass generates the XHTML structure .
                 and uses the default mode.
-                
+
                 -->
 
 
@@ -138,7 +138,7 @@
                 </xhtml:table>
             </xsl:variable>
 
-            <!-- 
+            <!--
 
             Now it's time to assemble all that stuff
 
@@ -375,10 +375,10 @@
         </xsl:choose>
     </xsl:template>
 
-    <!-- 
-        
+    <!--
+
         Default mode (pass1)
-        
+
     -->
 
     <xsl:template match="xhtml:tr/@repeat-nodeset">
@@ -401,10 +401,10 @@
         <!-- Remove xforms:label since they are used as headers -->
     </xsl:template>
 
-    <!-- 
-        
+    <!--
+
         YUI mode (YUI decorations)
-        
+
     -->
 
     <xsl:template match="xhtml:thead/xhtml:tr" mode="YUI">
@@ -492,9 +492,9 @@
         <xxforms:variable name="currentOrder" model="datatable" select="@currentOrder"/>
         <xhtml:th
             class="
-            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
-            {{if ({$position} = $currentId) 
+            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''}
+            {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''}
+            {{if ({$position} = $currentId)
             then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
             else ''}}
             {@class}
@@ -528,7 +528,7 @@
     <xsl:template match="xforms:repeat" mode="YUI">
         <xxforms:variable name="sort" model="datatable" select="."/>
         <xxforms:variable name="key" model="datatable" select="key[position() = $sort/@currentId]"/>
-        <xforms:repeat id="fr:datatable-repeat">
+        <xforms:repeat id="fr-datatable-repeat">
             <xsl:attribute name="nodeset">
                 <xsl:choose>
                     <xsl:when test="$sortAndPaginationMode='external'">
@@ -547,7 +547,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
-            <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="YUI"/>
+            <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
         </xforms:repeat>
     </xsl:template>
 
@@ -570,11 +570,11 @@
         <xxforms:variable name="currentOrder" model="datatable" select="@currentOrder"/>
         <xhtml:td
             class="
-            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {{if ({$position} = $currentId) 
+            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''}
+            {{if ({$position} = $currentId)
                 then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
                 else ''}}
-            {@class}            
+            {@class}
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
@@ -586,13 +586,13 @@
 
     <xsl:template match="@fr:*" mode="YUI"/>
 
-    <!-- 
-        
-        sortKey mode builds a list of sort keys from a cell content 
-        
+    <!--
+
+        sortKey mode builds a list of sort keys from a cell content
+
         Note that we don't bother to take text nodes into account, assuming that
         they are constant and should not influence the sort order...
-        
+
     -->
 
     <xsl:template match="*" mode="sortKey">

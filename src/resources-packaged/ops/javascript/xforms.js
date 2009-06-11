@@ -2430,15 +2430,6 @@ ORBEON.xforms.Events = {
                     } else if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
                             || ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
                         changeValue = true;
-                    } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
-                            && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-control")
-                            && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
-                            && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-trigger")) {
-                        // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
-                        // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
-                        // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
-                        // that had the focus when we get the focus event for another control.
-                        changeValue = true;
                     }
                     // Send value change if needed
                     if (changeValue) {
@@ -2559,8 +2550,8 @@ ORBEON.xforms.Events = {
                 }
 
                 // Fire change event
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null,
-                        ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
+                var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
+                var event = new ORBEON.xforms.Server.Event(null, target.id, null, controlCurrentValue, "xxforms-value-change-with-focus-change");
                 ORBEON.xforms.Server.fireEvents([event], false);
             }
         }
@@ -4652,9 +4643,6 @@ ORBEON.xforms.Server = {
     executeNextRequest: function(bypassRequestQueue) {
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
 
-        // For debug only
-        //ORBEON.xforms.Server._debugEventQueue();
-
         ORBEON.xforms.Globals.executeEventFunctionQueued--;
         var executedRequest = false;
         if (!ORBEON.xforms.Globals.requestInProgress
@@ -5337,6 +5325,10 @@ ORBEON.xforms.Server = {
                                                     YAHOO.util.Dom.getElementsByClassName("xforms-control", null, lastElementToDelete, function(control) {
                                                         ORBEON.xforms.Globals.serverValue[control.id] = null;
                                                     });
+                                                    // We also need to check this on the "root", as the getElementsByClassName() function only returns sub-elements
+                                                    // of the specified root and doesn't include the root in its search.
+                                                    if (YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-control"))
+                                                        ORBEON.xforms.Globals.serverValue[lastElementToDelete.id] = null;
                                                 }
                                                 lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                 lastElementToDelete = previous;

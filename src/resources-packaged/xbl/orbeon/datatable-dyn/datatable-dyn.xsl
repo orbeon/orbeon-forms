@@ -177,7 +177,7 @@
         <!-- <xforms:output value="$columnDesc/@index"/>-->
 
         <xhtml:div class="yui-dt-resizerliner">
-            <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
+            <xhtml:div class="yui-dt-liner">
                 <xhtml:span class="yui-dt-label">
                     <xsl:choose>
                         <xsl:when test="@fr:sortable = 'true'">
@@ -284,9 +284,9 @@
         </xhtml:tbody>
     </xsl:template>
 
-    <xsl:template match="/*/xhtml:body/xforms:repeat">
-        <xxforms:variable name="sort" model="datatable" select="."/>
-        <xxforms:variable name="key" model="datatable" select="key[position() = $sort/@currentId]"/>
+    <xsl:template match="/*/xhtml:tbody/xforms:repeat">
+        <xxforms:variable name="sort" model="datatable-model" select="."/>
+        <xxforms:variable name="key" model="datatable-model" select="key[position() = $sort/@currentId]"/>
         <xforms:repeat nodeset="{@nodeset}">
             <!-- <xsl:attribute name="nodeset">
                 <xsl:if test="$paginated">(</xsl:if>
@@ -303,7 +303,7 @@
         </xforms:repeat>
     </xsl:template>
 
-    <xsl:template match="/*/xhtml:body/xforms:repeat/xhtml:tr">
+    <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr">
         <xhtml:tr
             class="
             {{if (position() = 1) then 'yui-dt-first' else '' }}
@@ -316,10 +316,10 @@
         </xhtml:tr>
     </xsl:template>
 
-    <xsl:template match="/*/xhtml:body/xforms:repeat/xhtml:tr/xhtml:td">
+    <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td">
         <xsl:variable name="position" select="count(preceding-sibling::xhtml:td) + 1"/>
-        <xxforms:variable name="currentId" model="datatable" select="@currentId"/>
-        <xxforms:variable name="currentOrder" model="datatable" select="@currentOrder"/>
+        <xxforms:variable name="currentId" model="datatable-model" select="@currentId"/>
+        <xxforms:variable name="currentOrder" model="datatable-model" select="@currentOrder"/>
         <xhtml:td
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
@@ -330,7 +330,7 @@
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']"/>
-            <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:td) + 1}">
+            <xhtml:div class="yui-dt-liner">
                 <xsl:apply-templates select="node()"/>
             </xhtml:div>
         </xhtml:td>

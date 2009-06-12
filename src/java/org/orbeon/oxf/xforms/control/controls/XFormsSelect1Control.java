@@ -63,7 +63,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     protected QName[] getExtensionAttributes() {
-        if (!(this instanceof XFormsSelectControl) && FULL_APPEARANCE.equals(getAppearance()))
+        if (!(this instanceof XFormsSelectControl) && isFullAppearance())
             return EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL;
         else
             return super.getExtensionAttributes();
@@ -85,6 +85,15 @@ public class XFormsSelect1Control extends XFormsValueControl {
         super.markDirty();
         // Force recalculation of items here
         items = null;
+    }
+
+    /**
+     * Convenience method to test for the "full" appearance.
+     *
+     * @return true iif appearance is "full"
+     */
+    public boolean isFullAppearance() {
+        return FULL_APPEARANCE.equals(getAppearance());
     }
 
     /**

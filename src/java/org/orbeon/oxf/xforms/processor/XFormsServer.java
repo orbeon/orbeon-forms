@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -296,7 +297,10 @@ public class XFormsServer extends ProcessorImpl {
                     boolean hasXXFormsOnline = false;
                     {
                         final XFormsStaticState staticState = containingDocument.getStaticState();
-                        List activateEvents = null;
+
+                        List noscriptActivateEvents = null;
+                        Map noscriptValueIds = null;
+
                         for (Iterator i = eventElements.iterator(); i.hasNext();) {
                             final Element eventElement = (Element) i.next();
                             final String eventName = eventElement.attributeValue("name");
@@ -314,14 +318,50 @@ public class XFormsServer extends ProcessorImpl {
                                     // so we move it to the end so that value change events are committed to the
                                     // instance before that.
                                     i.remove();
-                                    if (activateEvents == null)
-                                        activateEvents = new ArrayList();
-                                    activateEvents.add(eventElement);
+                                    if (noscriptActivateEvents == null)
+                                        noscriptActivateEvents = new ArrayList();
+                                    noscriptActivateEvents.add(eventElement);
+                                } else {
+                                    // This is a value event, just remember the id
+                                    if (noscriptValueIds == null)
+                                        noscriptValueIds = new HashMap();
+                                    noscriptValueIds.put(sourceControlId, "");
                                 }
                             }
                         }
-                        if (isNoscript && activateEvents != null)
-                            eventElements.addAll(activateEvents);
+
+                        // Special handling of checkboxes blanking in noscript mode
+                        if (isNoscript) {
+                            // LinkedHashMap<String effectiveId, XFormsSelectControl control>
+                            final Map selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
+
+                            if (selectFullControls != null) {
+
+                                for (Iterator j = selectFullControls.entrySet().iterator(); j.hasNext();) {
+                                    final Map.Entry currentEntry = (Map.Entry) j.next();
+                                    final String currentEffectiveId = (String) currentEntry.getKey();
+                                    final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
+
+                                    if (currentControl != null
+                                            && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
+                                            && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
+
+                                        // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
+                                        final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
+                                        newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
+                                        newEventElement.addAttribute("source-control-id", currentEffectiveId);
+
+                                        // Appen the blanking event
+                                        eventElements.add(newEventElement);
+                                    }
+                                }
+                            }
+
+                            // Append all noscript activation events
+                            if (noscriptActivateEvents != null) {
+                                eventElements.addAll(noscriptActivateEvents);
+                            }
+                        }
 
                         if (hasXXFormsOnline)
                             containingDocument.logDebug("XForms server", "got xxforms-online event, enabling optimized handling of event sequence");

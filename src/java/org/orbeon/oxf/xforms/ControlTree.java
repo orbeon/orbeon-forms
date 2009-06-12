@@ -27,6 +27,8 @@ import java.util.*;
  */
 public class ControlTree implements Cloneable {
 
+    private final boolean isNoscript;   // whether we are in noscript mode
+
     // Top-level controls
     private List children;              // List<XFormsControl control>
 
@@ -38,7 +40,8 @@ public class ControlTree implements Cloneable {
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
-    public ControlTree() {
+    public ControlTree(boolean isNoscript) {
+        this.isNoscript = isNoscript;
     }
 
     /**
@@ -157,7 +160,7 @@ public class ControlTree implements Cloneable {
         effectiveIdsToControls.put(control.getEffectiveId(), control);
 
         // Remember by control type (for certain controls we know we need)
-        if (control instanceof XFormsUploadControl || control instanceof XFormsRepeatControl) {
+        if (mustMapControl(control)) {
             if (controlTypes == null)
                 controlTypes = new HashMap();// no need for order here
 
@@ -196,9 +199,9 @@ public class ControlTree implements Cloneable {
         }
 
         // Remove by control type (for certain controls we know we need)
-        if (control instanceof XFormsUploadControl || control instanceof XFormsRepeatControl) {
+        if (mustMapControl(control)) {
             if (controlTypes != null) {
-                Map controlsMap = (Map) controlTypes.get(control.getName());
+                final Map controlsMap = (Map) controlTypes.get(control.getName());
                 if (controlsMap != null) {
                     controlsMap.remove(control.getEffectiveId());
                 }
@@ -215,6 +218,17 @@ public class ControlTree implements Cloneable {
                         new XFormsControls.EventSchedule(control.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, control));
             }
         }
+    }
+
+    private final boolean mustMapControl(XFormsControl control) {
+
+        // Remember:
+        // xforms:upload
+        // xforms:repeat
+        // xforms:select[@appearance = 'full'] in noscript mode
+        return control instanceof XFormsUploadControl
+                || control instanceof XFormsRepeatControl
+                || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
     /**
@@ -370,6 +384,15 @@ public class ControlTree implements Cloneable {
 
     public Map getRepeatControls() {
         return (Map) ((controlTypes != null) ? controlTypes.get("repeat") : null);
+    }
+
+    /**
+     * Return the list of xforms:select[@appearance = 'full'] in noscript mode.
+     *
+     * @return LinkedHashMap<String effectiveId, XFormsSelectControl control>
+     */
+    public Map getSelectFullControls() {
+        return (Map) ((controlTypes != null) ? controlTypes.get("select") : null);
     }
 
     /**

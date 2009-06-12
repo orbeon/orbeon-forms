@@ -60,7 +60,7 @@ public class XFormsControls implements XFormsObjectResolver {
         this.rootContainer = this.containingDocument;
 
         // Create minimal tree
-        initialControlTree = new ControlTree();
+        initialControlTree = new ControlTree(XFormsProperties.isNoscript(containingDocument));
         currentControlTree = initialControlTree;
 
         // Get properties
@@ -134,7 +134,7 @@ public class XFormsControls implements XFormsObjectResolver {
             } else {
                 // Create new controls tree
                 // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case() 
-                currentControlTree = initialControlTree = new ControlTree();
+                currentControlTree = initialControlTree = new ControlTree(XFormsProperties.isNoscript(containingDocument));
 
                 // Initialize new control tree
                 currentControlTree.initialize(pipelineContext, containingDocument, rootContainer, evaluateItemsets);

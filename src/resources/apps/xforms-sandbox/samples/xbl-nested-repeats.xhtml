@@ -1,0 +1,73 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <head>
+        <xforms:model>
+            <xforms:instance id="sortedSections" xmlns="">
+                <fruits>
+                    <fruit>
+                        <color>green</color>
+                        <color>red</color>
+                        <color>orange</color>
+                    </fruit>
+                    <fruit>
+                        <color>blue</color>
+                        <color>pink</color>
+                        <color>yellow</color>
+                    </fruit>
+                </fruits>
+            </xforms:instance>
+        </xforms:model>
+
+        <xbl:xbl>
+            <xbl:binding id="foo-component" element="fr|foo">
+                <xbl:template>
+                    <xforms:repeat nodeset="fruit" id="fruit-repeat">
+                        <xhtml:div>
+                            <fr:bar id="my-bar"/>
+                        </xhtml:div>
+                    </xforms:repeat>
+                </xbl:template>
+            </xbl:binding>
+            <xbl:binding id="bar-component" element="fr|bar">
+                <xbl:template>
+                    <xforms:repeat nodeset="color" id="color-repeat">
+                        <xhtml:div>
+                            <xforms:output value="."/>
+                        </xhtml:div>
+                    </xforms:repeat>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </head>
+    <body>
+
+        <p>
+            This example must not cause JavaScript exceptions when clicking on the items.
+        </p>
+
+        <fr:foo id="my-foo"/>
+
+    </body>
+</html>

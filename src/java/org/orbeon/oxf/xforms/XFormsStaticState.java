@@ -773,8 +773,9 @@ public class XFormsStaticState {
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
+            final Stack repeatAncestorsStack = new Stack();
             // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
-            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, true);
+            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
                 XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(xxformsScripts.size()) });
@@ -878,7 +879,8 @@ public class XFormsStaticState {
     }
 
     public void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,
-                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer, boolean excludeModelEventHandlers) {
+                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
+                                      final Stack repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
@@ -890,8 +892,6 @@ public class XFormsStaticState {
 
         // Visit tree
         visitAllControlStatic(startElement, new XFormsStaticState.ControlElementVisitorListener() {
-
-            private Stack repeatAncestorsStack = new Stack();
 
             public void startVisitControl(Element controlElement, String controlStaticId) {
 
@@ -909,7 +909,8 @@ public class XFormsStaticState {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                xblBindings.processElement(controlElement, controlPrefixedId, locationData, pipelineContext, controlsDocumentInfo, xpathConfiguration, prefix, repeatHierarchyStringBuffer);
+                xblBindings.processElementIfNeeded(controlElement, controlPrefixedId, locationData, pipelineContext, controlsDocumentInfo,
+                        xpathConfiguration, prefix, repeatHierarchyStringBuffer, repeatAncestorsStack);
 
                 // Check for mandatory and optional bindings
                 final boolean hasBinding;

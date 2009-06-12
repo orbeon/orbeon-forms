@@ -183,7 +183,9 @@ public class XBLBindings {
         return result;
     }
 
-    public void processElement(Element controlElement, String controlPrefixedId, LocationData locationData, PipelineContext pipelineContext, DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix, FastStringBuffer repeatHierarchyStringBuffer) {
+    public void processElementIfNeeded(Element controlElement, String controlPrefixedId, LocationData locationData, PipelineContext pipelineContext,
+                                       DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
+                                       FastStringBuffer repeatHierarchyStringBuffer, Stack repeatAncestorsStack) {
         if (xblComponentBindings != null) {
             final Element bindingElement = (Element) xblComponentBindings.get(controlElement.getQName());
             if (bindingElement != null) {
@@ -261,7 +263,8 @@ public class XBLBindings {
                     }
 
                     // NOTE: Say we don't want to exclude gathering event handlers within nested models
-                    staticState.analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer, false);
+                    staticState.analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
+                            repeatHierarchyStringBuffer, repeatAncestorsStack, false);
                 }
             }
         }

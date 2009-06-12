@@ -10,7 +10,6 @@ YAHOO.xbl.fr.Accordion = {
             new AccordionMenu.setting(dlElement, {
                 dependent: false,
                 openedIds: [ ],
-                seconds: 0.1,
                 easeOut: false,
                 animation:true
             });

@@ -98,7 +98,7 @@ var AccordionMenu =(function()
             dl.hasAnimation -=1;
         };
         var oEaseType = YAHOO.util.Easing.easeOut;
-        var seconds = 0.5;
+        var seconds = .2;
         if(oMenuCache[ dl.id ] )
         {
             oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
@@ -132,7 +132,6 @@ var AccordionMenu =(function()
         {
             oAnim.onComplete.unsubscribe(onComplete);
             YUD.removeClass(dd,'a-m-d-anim');
-            YUD.removeClass(dd,'a-m-d-expand');
             dd.style.height = '';
             dd.oAnim = null;
             onComplete = null;
@@ -146,6 +145,17 @@ var AccordionMenu =(function()
 
         };
 
+        var onTween = function()
+        {
+            if(dd.style.height)
+            {
+                YUD.removeClass(dd,'a-m-d-anim'); // Getting around IE6/7 bugs
+                YUD.addClass(dd,'a-m-d-anim');
+                oAnim.onTween.unsubscribe(onTween);
+                onTween = null;
+            };
+        };
+
         if(dd.oAnim)
         {
             dd.oAnim.stop();
@@ -154,7 +164,7 @@ var AccordionMenu =(function()
         };
 
         var oEaseType = YAHOO.util.Easing.easeOut;
-        var seconds = 0.5;
+        var seconds = .2;
         if(oMenuCache[ dl.id ] )
         {
             oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
@@ -167,8 +177,10 @@ var AccordionMenu =(function()
             };
         };
 
+        YUD.removeClass(dd,'a-m-d-expand');
         var oAnim = new YAHOO.util.Anim(dd,oAttr,seconds ,oEaseType);
         oAnim.onComplete.subscribe(onComplete);
+        oAnim.onTween.subscribe(onTween);
         oAnim.animate();
         dd.oAnim = oAnim ;
     };

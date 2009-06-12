@@ -46,20 +46,12 @@ html.accordion-menu-js dd.a-m-d-expand {
     position: static;
 }
 
-html.accordion-menu-js dd.a-m-d-before-expand {
-	display: block;
-	position: relative;
-	z-index: -1;
-	opacity: 0;
-	height: auto !important;
-	visibility: hidden;
-	overflow: visible;
-}
-
 html.accordion-menu-js dd.a-m-d-anim {
 	overflow: hidden;
     visibility: visible;
-    position: static;
+    position: relative;
+    top: 0;
+    left: 0;
 }
 
 /* Do not highlight the "current" case of an accordion when cases are generated with an <xforms:repeat>. */

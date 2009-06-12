@@ -119,7 +119,8 @@ public class XFormsUploadControl extends XFormsValueControl {
                 // No file was selected in the UI
             } else {
                 // A file was selected in the UI (note that the file may be empty)
-                final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
+                // TODO: should pass true?
+                final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));
 
                 // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
                 uploadControl.setExternalValue(pipelineContext, value, paramValueType, handleTemporaryFiles);

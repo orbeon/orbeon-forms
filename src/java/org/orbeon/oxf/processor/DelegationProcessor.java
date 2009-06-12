@@ -351,7 +351,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         for (Iterator i = XPathUtils.selectIterator(parametersDocument, "/*/*"); i.hasNext();) {
                                             final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
-                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME);
+                                            // TODO: should pass true?
+                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME, false);
 
                                             if (type == null || XMLConstants.XS_STRING_QNAME.equals(type)) {
                                                 parameterTypes.add(String.class);

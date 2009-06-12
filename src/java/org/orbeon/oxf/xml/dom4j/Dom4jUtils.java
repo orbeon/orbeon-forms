@@ -433,7 +433,7 @@ public class Dom4jUtils {
      * scope. Return null if the attribute is not found.
      */
     public static QName extractAttributeValueQName(Element element, String attributeName) {
-        return extractTextValueQName(element, element.attributeValue(attributeName), false);
+        return extractTextValueQName(element, element.attributeValue(attributeName), true);
     }
 
     /**
@@ -441,15 +441,19 @@ public class Dom4jUtils {
      * scope. Return null if the attribute is not found.
      */
     public static QName extractAttributeValueQName(Element element, QName attributeQName) {
-        return extractTextValueQName(element, element.attributeValue(attributeQName), false);
+        return extractTextValueQName(element, element.attributeValue(attributeQName), true);
+    }
+
+    public static QName extractAttributeValueQName(Element element, QName attributeQName, boolean unprefixedIsNoNamespace) {
+        return extractTextValueQName(element, element.attributeValue(attributeQName), unprefixedIsNoNamespace);
     }
 
     /**
      * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
      * Return null if the text is empty.
      */
-    public static QName extractTextValueQName(Element element) {
-        return extractTextValueQName(element, element.getStringValue(), false);
+    public static QName extractTextValueQName(Element element, boolean unprefixedIsNoNamespace) {
+        return extractTextValueQName(element, element.getStringValue(), unprefixedIsNoNamespace);
     }
 
     /**

@@ -17,10 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.XPathCache;
@@ -101,7 +98,7 @@ public class XBLBindings {
                         // For now, only handle "prefix|name" selectors
                         // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
                         final QName currentQNameMatch
-                                = Dom4jUtils.extractTextValueQName(staticState.getNamespaceMappings("", currentBindingElement), currentElementAttribute.replace('|', ':'), false);
+                                = Dom4jUtils.extractTextValueQName(staticState.getNamespaceMappings("", currentBindingElement), currentElementAttribute.replace('|', ':'), true);
 
                         // Create and remember factory for this QName
                         xblComponentsFactories.put(currentQNameMatch,
@@ -627,7 +624,7 @@ public class XBLBindings {
         identity.setResult(result);
 
         // Run transformation
-        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(identity));
+        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(new SAXLoggerProcessor.DebugContentHandler(identity)));
 
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);

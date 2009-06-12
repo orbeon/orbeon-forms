@@ -294,7 +294,8 @@ public class InstanceData {
             if (node instanceof Element) {
                 // Check for xsi:type attribute
                 final Element element = (Element) node;
-                final QName typeQName = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME);
+                // TODO: should pass true?
+                final QName typeQName = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false);
                 if (typeQName != null)
                     return Dom4jUtils.qNameToExplodedQName(typeQName);
             }

@@ -409,7 +409,8 @@ public class XFormsModelSchemaValidator {
         // NOTE: We do some special processing for xsi:type to find if there is a type declared for it. If not, we do
         // lax processing. However, it is not clear whether we should apply lax processing in this case or not. Maybe if
         // an xsi:type is specified and not found, the element should just be invalid.
-        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME);
+        // TODO: should pass true?
+        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false);
         if (xsiType != null) {
             // Honor xsi:type
             elementURI = xsiType.getNamespaceURI();

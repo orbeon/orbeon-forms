@@ -44,10 +44,9 @@
                         <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
                              http://forge.ow2.org/tracker/index.php?func=detail&aid=313850&group_id=168&atid=350207 -->
                         <xsl:copy-of select="namespace::*"/>
-
+                        <xsl:copy-of select="@class"/>
                         <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
                         <xhtml:dl id="dl" class="xbl-fr-accordion-dl">
-                            <xsl:attribute name="class" select="concat('xbl-fr-accordion-dl', if (@class) then concat(' ', @class) else '')"/>
                             <xsl:apply-templates/>
                         </xhtml:dl>
                     </xforms:group>

@@ -1,40 +1,39 @@
-dl.fr-accordion-lnf {
-    margin: 0; padding: 0;
-    border-top: 1px solid gray;
+.fr-accordion-lnf {
+    display: block;
     border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
     border-right: 1px solid gray;
 }
-dl.fr-accordion-lnf dt.a-m-t {
+
+.fr-accordion-lnf dl {
+    margin: 0; padding: 0;
+}
+
+.fr-accordion-lnf dt.a-m-t {
     margin: 0;
 	padding: 0.3em 1em;
     background: transparent url(../../../ops/yui/assets/skins/sam/sprite.png) repeat-x scroll 0 -1500px;
     color: #333333;
     font-weight: bold;
-    border-bottom: 1px solid gray;
+    border-top: 1px solid gray;
 }
 
-dl.fr-accordion-lnf dt.a-m-t-hover {
+.fr-accordion-lnf dt.a-m-t-hover {
     background-position: 0 -1300px;
     cursor: pointer;
 }
-html.accordion-menu-js dt.a-m-t-expand {}
 
-dl.fr-accordion-lnf dd.a-m-d .bd {
-	border: solid 1px gray;
-    border-top-width: 0;
-    border-left-color: #CCCCCC;
+.fr-accordion-lnf dd.a-m-d .bd {
     padding: .5em 1em .5em 1em;
+	border-top: solid 1px gray;
 }
-
-dl.fr-accordion-lnf dt.a-m-t { border-right: none; border-left: none }
-dl.fr-accordion-lnf dd.a-m-d .bd { border-right: none; border-left: none }
 
 html.fr-accordion-lnf-js dt.a-m-t{
 	cursor: pointer;
 	zoom: 1;
 }
 
-dl.fr-accordion-lnf dd.a-m-d { margin: 0; padding: 0 }
+.fr-accordion-lnf dd.a-m-d { margin: 0; padding: 0 }
 
 html.accordion-menu-js dd.a-m-d {
     top: -10000px;

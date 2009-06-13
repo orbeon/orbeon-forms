@@ -141,7 +141,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Actual value to return is the intersection of values in the instance and values in the itemset
             final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
             int index = 0;
-            for (Iterator i = items.iterator(); i.hasNext(); index++) {
+            for (Iterator i = items.iterator(); i.hasNext(); ) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentValue = currentItem.getValue();
                 if (instanceValues.get(currentValue) != null) {
@@ -149,6 +149,8 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                         sb.append(' ');
 
                     sb.append(currentItem.getExternalValue(pipelineContext));
+
+                    index++;
                 }
             }
             updatedValue = sb.toString();

@@ -1377,7 +1377,7 @@
             </destination-selection-control>
             <itemset>
                 <label>Choix</label>
-                <hint>Expressions XPath pour construire une nouvelle liste de choix</hint>
+                <hint>Expressions XPath pour liste de choix</hint>
             </itemset>
             <items>
                 <label>Noeuds</label>

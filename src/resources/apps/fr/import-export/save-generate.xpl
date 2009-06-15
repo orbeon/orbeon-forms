@@ -53,7 +53,7 @@
                                         <xsl:value-of select="$resource/detail/messages/saved-locally-open"/>
                                     </p>
                             <!-- Form we produce -->
-                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/new/" id="form">
+                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/new" id="form">
                                 <input type="hidden" name="fr-form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
                                 <input type="submit" value="Open"/>
                             </form>

@@ -32,7 +32,7 @@
 .fr-summary-row-selected .xforms-repeat-selected-item-2 { background-color: #e8e8ff }/* HACK for IE 7 only otherwise cell has different background color */
 
 .fr-summary-table .xforms-label { display: none }
-.fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
+.fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #6E6E6E }
 .fr-summary-table th { background-color: #f8f8f8 }
 .fr-summary-table td, .fr-summary-table th { padding: 4px }
 

@@ -395,6 +395,7 @@ public class EmailProcessor extends ProcessorImpl {
      * @throws IOException
      * @throws TransformerException
      */
+    // NOTE: Method is public for unit tests
     public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source)
             throws IOException, TransformerException {
 

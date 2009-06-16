@@ -71,9 +71,9 @@
         </xbl:xbl>
     </xsl:if>
 
-    <!-- Global section components -->
+    <!-- Global section templates -->
     <xsl:copy-of select="/xbl:xbl"/>
-    <!-- Custom section components (if different from "orbeon" as we don't want to copy components twice) -->
+    <!-- Custom section templates (if different from "orbeon" as we don't want to copy components twice) -->
     <xsl:if test="$app != 'orbeon'">
         <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
     </xsl:if>

@@ -89,13 +89,13 @@
                     <xhtml:div class="fb-publish-message">
                         <xhtml:ol>
                             <xhtml:li>
-                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary/" target="_blank">
+                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary" target="_blank">
                                     <xforms:output value="$form-resources/dialog-publish/messages/open-summary"/>
                                 </xhtml:a>
                             </xhtml:li>
                             <xhtml:li>
                                 <!-- TODO: i18n -->
-                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/new/" target="_blank">
+                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/new" target="_blank">
                                     <xforms:output value="$form-resources/dialog-publish/messages/open-new"/>
                                 </xhtml:a>
                             </xhtml:li>

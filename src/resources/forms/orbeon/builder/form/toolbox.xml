@@ -184,9 +184,8 @@
                                         <xforms:group ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)" appearance="xxforms:internal">
                                             <fr:button id="fb-add-component-trigger">
                                                 <xforms:label>
-                                                    <!-- TODO: put dummy ids on these elements to prevent ns conflict -->
-                                                    <xhtml:img id="foobar-1" src="{if ($binding/fb:metadata/fb:icon/fb:small-icon) then $binding/fb:metadata/fb:icon/fb:small-icon else '/apps/fr/style/images/silk/plugin.png'}" alt="" width="16" height="16"/>
-                                                    <xhtml:span><xforms:output id="foobar-2" value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
+                                                    <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
+                                                    <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
                                                 </xforms:label>
                                                 <xforms:action ev:event="DOMActivate" if="$is-section-component">
                                                     <!-- Insert a new section component -->

@@ -346,10 +346,9 @@
                     <part src="input:image-content" content-type="image/jpeg"/>
                 </xml-source>
                 <p>
-                    In this case, the content of the image is obtained by reading the
-                    <code>image-content</code> input of the Email processor. You can choose an
-                    arbitray name for the input, as long as it is not <code>data</code>. Then,
-                    connect a processor to the input, for example:
+                    In this case, the content of the image is obtained by reading the <code>image-content</code> input
+                    of the Email processor. You can choose an arbitray name for the input, as long as it is not
+                    <code>data</code> or <code>config</code>. Then, connect a processor to the input, for example:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
@@ -371,14 +370,16 @@
                     </p:processor>
                 </xml-source>
                 <p>
-                    When the content type of the input read is text (starts with
-                    <code>text/</code>) or XML (<code>text/xml</code>,
-                    <code>application/xml</code>, or ends with <code>+xml</code>), the input
-                    document is expected to be in the text format specified by the <a
-                    href="reference-formats#text-documents">text document format</a>. When the
-                    content type of the input read is binary (all the other cases), the input
-                    document is expected to be in the binary format specified by the <a
-                    href="reference-formats#binary-documents">binary document format</a>.
+                    The custom input must be as specified by the <a href="reference-formats#text-documents">text
+                    document format</a> or <a href="reference-formats#binary-documents">binary document format</a>. The
+                    <code>content-type</code> specified on the <code>&lt;part></code> element is then used to decode the
+                    data and attach it to the email.
+                </p>
+                <p>
+                    Note that some combinations might produce errors, for example providing a JPEG image on the input
+                    and specifying a <code>text/plain</code> content type on the <code>&lt;part></code> element. You
+                    must ensure that the content type specified to the mail processor is appropriate for the attachment
+                    provided.
                 </p>
             </section>
         </section>
@@ -386,8 +387,7 @@
             <title>Properties</title>
             <p>
                 Several global properties are relevant to the Email processor. Refer to the <a
-                href="reference-properties#email-processor">Properties</a> section for more
-                information.
+                href="reference-properties#email-processor">Properties</a> section for more information.
             </p>
         </section>
         <section>
@@ -438,8 +438,8 @@
             <section>
                 <title>Related Parts and Attachments</title>
                 <p>
-                    This example shows how to send related parts with HTML, as well as
-                    dynamically generated attachements.
+                    This example shows how to send related parts with HTML, as well as dynamically generated
+                    attachements.
                 </p>
                 <xml-source>
                     <p:processor name="oxf:email">
@@ -490,8 +490,8 @@
                                 </body>
                             </message>
                         </p:input>
-                        <p:input name="png-document"/>
-                        <p:input name="pdf-document"/>
+                        <p:input name="png-document" href="#my-png"/>
+                        <p:input name="pdf-document" href="#my-pdf"/>
                     </p:processor>
                 </xml-source>
             </section>

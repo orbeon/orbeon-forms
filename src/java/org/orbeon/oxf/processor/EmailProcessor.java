@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -21,14 +20,11 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SystemUtils;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -38,16 +34,12 @@ import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ContentHandler;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.mail.Message;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.*;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -291,21 +283,21 @@ public class EmailProcessor extends ProcessorImpl {
         if (src != null) {
             // Content of the part is not inline
 
-            // Generate a Document from the source
-            SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType);
-            content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
+            // Generate a FileItem from the source
+            final SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType);
+            content = handleStreamedPartContent(pipelineContext, source);
         } else {
             // Content of the part is inline
 
             // In the cases of text/html and XML, there must be exactly one root element
-            boolean needsRootElement = "text/html".equals(contentType);// || ProcessorUtils.isXMLContentType(contentType);
+            final boolean needsRootElement = "text/html".equals(contentType);// || ProcessorUtils.isXMLContentType(contentType);
             if (needsRootElement && partOrBodyElement.elements().size() != 1)
                 throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html",
                         (LocationData) partOrBodyElement.getData());
 
             // Create Document and convert it into a String
-            Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
-            Document partDocument = new NonLazyUserDataDocument();
+            final Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
+            final Document partDocument = new NonLazyUserDataDocument();
             partDocument.setRootElement((Element) rootElement.clone());
             content = handleInlinePartContent(partDocument, contentType);
         }
@@ -394,60 +386,22 @@ public class EmailProcessor extends ProcessorImpl {
         }
     }
 
-    public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source, String contentType, String encoding)
+    /**
+     * Read a text or binary document and return it as a FileItem
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param source            SAX source
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source)
             throws IOException, TransformerException {
 
-        final FileItem fileItem = new DiskFileItemFactory(RequestGenerator.getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory())
-                .createItem("dummy", "dummy", false, null);
-        // Make sure the file is deleted when the context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-            public void contextDestroyed(boolean success) {
-                fileItem.delete();
-            }
-        });
-        // Write character content to the FileItem instance
-        Writer writer = null;
-        OutputStream os = null;
-
-        final boolean useWriter = XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType);
-
-        try {
-            os = fileItem.getOutputStream();
-            if (useWriter)
-                writer = new BufferedWriter(new OutputStreamWriter(os, encoding));
-            final OutputStream _os = os;
-            final Writer _writer = writer;
-            Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(source, new SAXResult(new ForwardingContentHandler() {
-                public void characters(char[] chars, int start, int length) {
-                    try {
-                        if (useWriter)
-                            _writer.write(chars, start, length);
-                        else
-                            _os.write(Base64.decode(new String(chars, start, length)));
-
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            }));
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
-
+        final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
+        final ContentHandler ch = new BinaryTextContentHandler(fileItem.getOutputStream());
+        final Transformer identity = TransformerUtils.getIdentityTransformer();
+        identity.transform(source, new SAXResult(ch));
         return fileItem;
     }
 
@@ -560,7 +514,7 @@ public class EmailProcessor extends ProcessorImpl {
     	public SMTPAuthenticator(String user, String pass){
     		username = user;
     		password = pass;
-}
+        }
 
     	public PasswordAuthentication getPasswordAuthentication() {
     		return new PasswordAuthentication(username,password);

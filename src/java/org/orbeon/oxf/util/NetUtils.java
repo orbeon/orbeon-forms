@@ -290,8 +290,8 @@ public class NetUtils {
             return null;
 
         // Check whether there may be parameters
-        final int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
+        final int semicolonIndex = contentType.indexOf(";");
+        if (semicolonIndex == -1)
             return null;
 
         // Tokenize
@@ -323,12 +323,12 @@ public class NetUtils {
     public static Map getCharsetHeaderCharsets(String header) {
         if (header == null)
             return null;
-        int semicolumnIndex = header.indexOf(";");
+        int semicolonIndex = header.indexOf(";");
         final String charsets;
-        if (semicolumnIndex == -1)
+        if (semicolonIndex == -1)
             charsets = header.trim();
         else
-            charsets = header.substring(0, semicolumnIndex).trim();
+            charsets = header.substring(0, semicolonIndex).trim();
 
         final StringTokenizer st = new StringTokenizer(charsets, ",");
         final Map charsetsMap = new HashMap();
@@ -342,10 +342,10 @@ public class NetUtils {
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;
-        int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
+        int semicolonIndex = contentType.indexOf(";");
+        if (semicolonIndex == -1)
             return contentType;
-        return contentType.substring(0, semicolumnIndex).trim();
+        return contentType.substring(0, semicolonIndex).trim();
     }
 
     /**

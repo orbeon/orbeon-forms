@@ -281,8 +281,8 @@
                         <p:input name="config">
                             <config>
                                 <url><xsl:value-of select="$uri"/></url>
-                                <!-- Set content-type so that email processor can properly read in the data -->
-                                <content-type><xsl:value-of select="@mediatype"/></content-type>
+                                <!-- Force binary content type, as the data is stored that way -->
+                                <content-type>application/octet-stream</content-type>
                                 <force-content-type>true</force-content-type>
                                 <!-- Forward the same headers that the XForms engine forwards -->
                                 <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

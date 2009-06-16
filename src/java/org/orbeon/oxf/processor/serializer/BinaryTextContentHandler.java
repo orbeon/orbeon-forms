@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Base64ContentHandler;
 import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.TextContentHandler;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -26,6 +27,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.Result;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +59,16 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
     private Map prefixMappings;
 
     /**
-     * Contructor.
+     * Simple constructor to write to a stream and close it.
+     *
+     * @param outputStream  OutputStream to write to
+     */
+    public BinaryTextContentHandler(OutputStream outputStream) {
+        this(null, outputStream, true, false, null, false, false, null, false);
+    }
+
+    /**
+     * Constructor with all the options.
      *
      * @param response                      optional ExternalContext.Response used to set content-type
      * @param outputStream                  where the resulting data is written
@@ -194,6 +205,45 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         }
     }
 
+    public void processingInstruction(String target, String data) throws SAXException {
+        // CHECK: STATUS CODE
+        // Handle special Orbeon Forms processing instructions
+        if ("oxf-serializer".equals(target)) {
+            try {
+                if (data != null && data.startsWith("status-code=\"")) {
+                    // Output status code
+                    final int endIndex = data.indexOf('"', 13);
+                    if (endIndex != -1) {
+                        final String codeString = data.substring(13, endIndex);
+                        response.setStatus(Integer.parseInt(codeString));
+                    }
+                // NOTE: Code below is also in SerializerContentHandler
+                } else if ("flush".equals(data)) {
+                    if (writer != null)
+                        writer.flush();
+                    if (outputStream != null)
+                        outputStream.flush();
+                } else if ("start-comment".equals(data)) {
+                    super.processingInstruction(Result.PI_DISABLE_OUTPUT_ESCAPING, "");
+                    super.characters("<!--".toCharArray(), 0, 4);
+//                    if (writer != null) {
+//                        writer.write("<!--");
+//                    }
+                } else if ("end-comment".equals(data)) {
+                    super.characters("-->".toCharArray(), 0, 3);
+                    super.processingInstruction(Result.PI_ENABLE_OUTPUT_ESCAPING, "");
+//                    if (writer != null) {
+//                        writer.write("-->");
+//                    }
+                }
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        } else {
+            super.processingInstruction(target, data);
+        }
+    }
+
     /**
      * Implement the content type determination algorithm.
      */
@@ -201,7 +251,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         if (forceContentType)
             return requestedContentType;
 
-        String documentContentType = getContentTypeMediaType(contentTypeAttribute);
+        String documentContentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
         if (!ignoreDocumentContentType && documentContentType != null)
             return documentContentType;
 
@@ -218,7 +268,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         if (forceEncoding)
             return requestedEncoding;
 
-        final String documentEncoding = getContentTypeCharset(contentTypeAttribute);
+        final String documentEncoding = NetUtils.getContentTypeCharset(contentTypeAttribute);
         if (!ignoreDocumentEncoding && documentEncoding != null)
             return documentEncoding;
 
@@ -226,31 +276,5 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
             return requestedEncoding;
 
         return defaultEncoding;
-    }
-
-    // TODO: Use NetUtils once 2.8 compatibility is no longer required.
-    public static String getContentTypeCharset(String contentType) {
-        if (contentType == null)
-            return null;
-        int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
-            return null;
-        int charsetIndex = contentType.indexOf("charset=", semicolumnIndex);
-        if (charsetIndex == -1)
-            return null;
-        // FIXME: There may be other attributes after charset, right?
-        String afterCharset = contentType.substring(charsetIndex + 8);
-        afterCharset = afterCharset.replace('"', ' ');
-        return afterCharset.trim();
-    }
-
-    // TODO: Use NetUtils once 2.8 compatibility is no longer required.
-    public static String getContentTypeMediaType(String contentType) {
-        if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
-            return null;
-        int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
-            return contentType;
-        return contentType.substring(0, semicolumnIndex).trim();
     }
 }

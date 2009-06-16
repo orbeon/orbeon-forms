@@ -106,6 +106,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 }
 
                 // Set status code
+                // STATUS CODE: Processing instruction can override this when the input is being read
                 response.setStatus(config.statusCode);
 
                 // Set custom headers
@@ -177,7 +178,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     }
 
     protected Config readConfig(PipelineContext context) {
-        final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+        return (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
                 new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         Element configElement = readInputAsDOM4J(context, input).getRootElement();
@@ -236,7 +237,6 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         }
                     }
                 });
-        return config;
     }
 
     /**

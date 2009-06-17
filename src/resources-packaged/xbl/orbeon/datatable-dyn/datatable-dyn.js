@@ -30,26 +30,42 @@ ORBEON.widgets.datatable = function (element, index) {
     // Store useful stuff as properties
     this.table = element;
     this.header = this.table;
-    this.headerColumns = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByTagName('th');
-    this.bodyRows = this.table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    this.bodyColumns = this.bodyRows[2].getElementsByTagName('td');
-    var plainId = this.table.getAttribute('id');
+    this.headerColumns = this.header.tHead.rows[0].cells;
+    this.bodyRows = this.table.tBodies[0].rows;
+    this.bodyColumns = this.table.tBodies[0].rows[2].cells;
+    var plainId = this.table.id;
     this.id = plainId.substring(0, plainId.length - '-table'.length);
-    var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
-    var pxWidth = this.table.clientWidth;
-    if (width.indexOf('%') != - 1) {
-        // Convert % into px...
-        width = pxWidth + 'px';
-    }
     this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
     this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
     this.scroll = this.scrollV || this.scrollH;
     this.headBodySplit = this.scroll;
+    var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
     this.hasFixedWidthContainer = width != 'auto';
     this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
     
-    // Create a global container
+    this.restructure();
+    
+    this.resize();
+    
+    this.createColResizers();
+     
+
+    // Now that the table has been properly sized, reconsider its 
+    // "resizeability"
+    
+    if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
+        // These are fixed width tables without horizontal scroll bars
+        // and as we don't know how to resize their columns properly,
+        // we'd better consider that as variable width
+        this.hasFixedWidthContainer = false;
+        this.hasFixedWidthTable = false;
+    }
+        
+}
+
+ORBEON.widgets.datatable.prototype.restructure = function () {
+	// Create a global container
     this.container = document.createElement('div');
     YAHOO.util.Dom.addClass(this.container, 'yui-dt');
     YAHOO.util.Dom.addClass(this.container, 'yui-dt-scrollable');
@@ -62,7 +78,17 @@ ORBEON.widgets.datatable = function (element, index) {
     this.table.parentNode.replaceChild(this.container, this.table);
     this.container.appendChild(this.headerContainer);
     this.headerContainer.appendChild(this.header);
-    
+}
+
+ORBEON.widgets.datatable.prototype.resize = function () {
+	
+    var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
+    var pxWidth = this.table.clientWidth;
+    if (width.equals != 'auto') {
+        // Convert % and other units into px...
+        width = pxWidth + 'px';
+    }
+
     // See how big the table would be without its size restriction
     if (this.scrollH) {
         YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
@@ -152,6 +178,9 @@ ORBEON.widgets.datatable = function (element, index) {
         YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
     }
     
+}
+
+ORBEON.widgets.datatable.prototype.createColResizers = function () {
     this.colResizers =[];
     this.colSorters =[];
     for (var j = 0; j < this.headerColumns.length; j++) {
@@ -207,17 +236,6 @@ ORBEON.widgets.datatable = function (element, index) {
         }
     }
 
-    // Now that the table has been properly sized, reconsider its 
-    // "resizeability"
-    
-    if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
-        // These are fixed width tables without horizontal scroll bars
-        // and as we don't know how to resize their columns properly,
-        // we'd better consider that as variable width
-        this.hasFixedWidthContainer = false;
-        this.hasFixedWidthTable = false;
-    }
-        
 }
 
 ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {

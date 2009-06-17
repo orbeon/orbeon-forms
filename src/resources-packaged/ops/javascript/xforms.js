@@ -7503,7 +7503,7 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
                 if (currentElement.className == "dijitContentPane") {
                     foundDojoContentPane = true;
                     break;
-                } 
+                }
                 currentElement = currentElement.parentNode;
             }
         }

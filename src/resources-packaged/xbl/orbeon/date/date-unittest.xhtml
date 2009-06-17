@@ -28,37 +28,81 @@
 
             <xforms:instance id="main-instance">
                 <instance>
-                    <date>2009-04-15</date>
-                    <mindate>2009-04-05</mindate>
-                    <maxdate>2009-04-25</maxdate>
-                    <gaga/>
+                    <date>2009-05-15</date>
+                    <mindate>2009-05-05</mindate>
+                    <maxdate>2009-05-25</maxdate>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/*" type="xs:date"/>
 
         </xforms:model>
+        <xhtml:style type="text/css">
+            fieldset  { float: left; clear: both; }
+            label { display: inline-block; width: 10em; }
+            .xbl-fr-date { float: left; margin-right: 1em;}
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-
         <xhtml:div>
-            <xforms:input ref="mindate">
-                <xforms:label>Min:</xforms:label>
-            </xforms:input>
-            <xforms:input ref="maxdate">
-                <xforms:label>Max:</xforms:label>
-            </xforms:input>
+            <xhtml:fieldset>
+                <xhtml:legend>Min/max dates</xhtml:legend>
+                <xhtml:div>
+                    <xforms:input ref="mindate">
+                        <xforms:label>Min:</xforms:label>
+                    </xforms:input>
+                </xhtml:div>
+                <xhtml:div>
+                    <xforms:input ref="maxdate">
+                        <xforms:label>Max:</xforms:label>
+                    </xforms:input>
+                </xhtml:div>
+            </xhtml:fieldset>
+            <xhtml:fieldset>
+                <xhtml:legend>fr:date with textfield appearance</xhtml:legend>
+                <xhtml:div>
+                    <fr:date ref="date">
+                        <xforms:label>Dynamic min/max:</xforms:label>
+                        <fr:mindate ref="../mindate"/>
+                        <fr:maxdate ref="../maxdate"/>
+                    </fr:date>
+                </xhtml:div>
+                <xhtml:div>
+                    <fr:date ref="date">
+                        <xforms:label>Dynamic min:</xforms:label>
+                        <fr:mindate ref="../mindate"/>
+                    </fr:date>
+                </xhtml:div>
+                <xhtml:div>
+                    <fr:date ref="date">
+                        <xforms:label>Dynamic max:</xforms:label>
+                        <fr:maxdate ref="../maxdate"/>
+                    </fr:date>
+                </xhtml:div>
+                <xhtml:div>
+                    <fr:date ref="date" mindate="2009-05-06" maxdate="2009-05-24">
+                        <xforms:label>Static min/max:</xforms:label>
+                    </fr:date>
+                </xhtml:div>
+            </xhtml:fieldset>
         </xhtml:div>
-
-        <xhtml:div>
-            <fr:date ref="date" mindate="mindate" maxdate="maxdate">
-                <xforms:label>Date with min/max:</xforms:label>
+        <xhtml:fieldset>
+            <xhtml:legend>fr:date with inline appearance</xhtml:legend>
+            <fr:date ref="date" appearance="fr:inline">
+                <xforms:label>Dynamic min/max:</xforms:label>
+                <fr:mindate ref="../mindate"/>
+                <fr:maxdate ref="../maxdate"/>
             </fr:date>
-            <fr:date ref="date" mindate="mindate">
-                <xforms:label>Date with min:</xforms:label>
+            <fr:date ref="date" appearance="fr:inline">
+                <xforms:label>Dynamic min:</xforms:label>
+                <fr:mindate ref="../mindate"/>
             </fr:date>
-            <fr:date ref="date" maxdate="maxdate">
-                <xforms:label>Date with max:</xforms:label>
+            <fr:date ref="date" appearance="fr:inline">
+                <xforms:label>Dynamic max:</xforms:label>
+                <fr:maxdate ref="../maxdate"/>
             </fr:date>
-        </xhtml:div>
+            <fr:date ref="date" mindate="2009-05-06" maxdate="2009-05-24" appearance="fr:inline">
+                <xforms:label>Static min/max:</xforms:label>
+            </fr:date>
+        </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

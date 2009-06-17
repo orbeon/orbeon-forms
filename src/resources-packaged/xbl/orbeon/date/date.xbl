@@ -26,30 +26,42 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xbl:script src="/xbl/orbeon/date/date.js"/>
     <xbl:binding id="fr-date" element="fr|date">
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-date { display: inline }
-                .xbl-fr-date-mindate, .xbl-fr-date-maxdate { display: none }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/date/date.css"/>
         </xbl:resources>
-        <xbl:template xxbl:transform="oxf:xslt">
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
-                <xsl:template match="fr:date">
-                    <xhtml:span>
-                        <xsl:if test="@mindate">
-                            <xforms:output id="mindate" class="xbl-fr-date-mindate" value="{@mindate}"/>
-                        </xsl:if>
-                        <xsl:if test="@maxdate">
-                            <xforms:output id="maxdate" class="xbl-fr-date-maxdate" value="{@maxdate}"/>
-                        </xsl:if>
-                        <xforms:input id="input">
-                            <xsl:copy-of select="@ref|node()"/>
-                        </xforms:input>
-                    </xhtml:span>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+                <xsl:template match="/*">
+                    <xforms:group id="outer" appearance="xxforms:internal">
+                        <xforms:group xbl:attr="model context ref bind">
+                            <xbl:content includes="xforms|label"/>
+                            <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
+                            <!-- Properties -->
+                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'mindate')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'maxdate')"/>
+                            <xsl:choose>
+                                <!-- Inline data picker-->
+                                <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
+                                    <!-- Init event -->
+                                    <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.init(this);</xxforms:script>
+                                    <xhtml:div class="xbl-fr-date-calendar-div"/>
+                                    <xforms:input ref="." class="xbl-fr-date-input">
+                                        <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.valueChanged(this);</xxforms:script>
+                                    </xforms:input>
+                                </xsl:when>
+                                <!-- Standard case with text field-->
+                                <xsl:otherwise>
+                                    <xforms:input ref="."/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
+                        </xforms:group>
+                    </xforms:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>
     </xbl:binding>
-
 </xbl:xbl>

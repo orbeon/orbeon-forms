@@ -107,7 +107,8 @@
          See: http://forge.ow2.org/tracker/index.php?func=detail&aid=313798&group_id=168&atid=350207 -->
     <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"    value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
                                                                                                fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
-                                                                                               fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label"/>
+                                                                                               fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
+                                                                                               fr:mindate fr:maxdate"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                      value="false"/>
 
 </properties>

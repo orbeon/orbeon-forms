@@ -206,7 +206,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
     }
 
     public void processingInstruction(String target, String data) throws SAXException {
-        // CHECK: STATUS CODE
+        // STATUS CODE
         // Handle special Orbeon Forms processing instructions
         if ("oxf-serializer".equals(target)) {
             try {

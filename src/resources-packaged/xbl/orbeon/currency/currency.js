@@ -65,11 +65,11 @@ YAHOO.xbl.fr.Currency = {
                     var currencyFormattedValue = this.numberToCurrency(xformsValue);
                     visibleInputElement.value = hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
                 },
-                prefixChanged: function() {
+                propertyPrefixChanged: function() {
                     prefix = ORBEON.xforms.Document.getValue(symbolElement.id) + " ";
                     instance.xformsToVisible();
                 },
-                digitsAfterDecimalChanged: function() {
+                propertyDigitsAfterDecimalChanged: function() {
                     digitsAfterDecimal = ORBEON.xforms.Document.getValue(digitsAfterDecimalElement.id);
                     instance.xformsToVisible();
                 }
@@ -84,22 +84,19 @@ YAHOO.xbl.fr.Currency = {
             YAHOO.xbl.fr.Currency.instances[container.id] = instance;
         }
     },
-
     valueChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
         var instance = YAHOO.xbl.fr.Currency.instances[container.id];
         instance.xformsToVisible();
     },
-
-    prefixChanged: function(target) {
+    propertyPrefixChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
         var instance = YAHOO.xbl.fr.Currency.instances[container.id];
-        instance.prefixChanged();
+        instance.propertyPrefixChanged();
     },
-
-    digitsAfterDecimalChanged: function(target) {
+    propertyDigitsAfterDecimalChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
         var instance = YAHOO.xbl.fr.Currency.instances[container.id];
-        instance.digitsAfterDecimalChanged();
+        instance.propertyDigitsAfterDecimalChanged();
     }
 };

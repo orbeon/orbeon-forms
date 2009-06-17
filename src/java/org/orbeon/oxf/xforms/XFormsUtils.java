@@ -25,7 +25,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;

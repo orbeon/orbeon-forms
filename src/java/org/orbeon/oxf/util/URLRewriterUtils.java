@@ -13,18 +13,23 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.processor.MatchProcessor;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.properties.Properties;
-import org.dom4j.QName;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Iterator;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility class to rewrite URLs.
@@ -312,11 +317,48 @@ public class URLRewriterUtils {
         public String mimeType;
         public boolean versioned;
 
+        /**
+         * Construct from parameters.
+         *
+         * @param pathInfo      path to match on
+         * @param matcher       type of matcher
+         * @param mimeType      mediatype
+         * @param versioned     whether the resource is versioned
+         */
         public PathMatcher(String pathInfo, QName matcher, String mimeType, boolean versioned) {
             this.pathInfo = pathInfo;
             this.matcher = matcher;
             this.mimeType = mimeType;
             this.versioned = versioned;
+        }
+
+        /**
+         * Construct from a serialized element.
+         *
+         * @param element   element containing serialized parameters
+         */
+        public PathMatcher(Element element) {
+            this.pathInfo = element.attributeValue("path");
+            this.matcher = Dom4jUtils.explodedQNameToQName(element.attributeValue("matcher"));
+            this.mimeType = element.attributeValue("type");
+            this.versioned = "true".equals(element.attributeValue("versioned"));
+        }
+
+        /**
+         * Serialize to an element.
+         *
+         * @return  element containing serialized parameters
+         */
+        public Element serialize() {
+            final Element matcherElement = Dom4jUtils.createElement("matcher");
+
+            matcherElement.addAttribute("path", pathInfo);
+            matcherElement.addAttribute("matcher", Dom4jUtils.qNameToExplodedQName(matcher));
+            matcherElement.addAttribute("type", mimeType);
+            if (versioned)
+                matcherElement.addAttribute("versioned", Boolean.toString(versioned));
+
+            return matcherElement;
         }
     }
 }

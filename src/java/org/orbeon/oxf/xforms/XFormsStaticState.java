@@ -25,6 +25,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
@@ -93,6 +94,8 @@ public class XFormsStaticState {
     private String containerNamespace;
     private LocationData locationData;
 
+    private List versionedPathMatchers;     // List<PathMatcher>
+
     // Static analysis
     private boolean isAnalyzed;             // whether this document has been analyzed already
     private Map controlTypes;               // Map<String type, LinkedHashMap<String prefixedId, ControlInfo info>>
@@ -153,6 +156,15 @@ public class XFormsStaticState {
     }
 
     /**
+     * Return path matchers for versioned resources mode.
+     *
+     * @return  List of PathMatcher
+     */
+    public List getVersionedPathMatchers() {
+        return versionedPathMatchers;
+    }
+
+    /**
      * Initialize. Either there is:
      *
      * o staticStateDocument, namespaceMap, and optional xhtmlDocument
@@ -168,8 +180,6 @@ public class XFormsStaticState {
         XFormsContainingDocument.logDebugStatic("static state", "initializing", null);
 
         final Element staticStateElement = staticStateDocument.getRootElement();
-
-//        System.out.println(Dom4jUtils.domToString(staticStateDocument));
 
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
@@ -253,6 +263,21 @@ public class XFormsStaticState {
                 final XFormsInstance newInstance = new SharedXFormsInstance(currentInstanceElement);
                 instancesMap.put(newInstance.getEffectiveId(), newInstance);
             }
+        }
+
+        // Extract versioned paths matchers if present
+        final Element matchersElement = staticStateElement.element("matchers");
+        if (matchersElement != null) {
+            final List matchersElements = instancesElement.elements("matcher");
+            this.versionedPathMatchers = new ArrayList(matchersElements.size());
+            for (Iterator matcherIterator = matchersElements.iterator(); matcherIterator.hasNext();) {
+                final Element currentMatcherElement = (Element) matcherIterator.next();
+
+                versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
+            }
+        } else {
+            // Otherwise use matchers from the pipeline context
+            this.versionedPathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
         }
 
         if (encodedStaticState != null) {
@@ -528,6 +553,16 @@ public class XFormsStaticState {
                 // Add document
                 final Document document = TransformerUtils.saxStoreToDom4jDocument(xhtmlDocument);
                 staticStateDocument.getRootElement().add(document.getRootElement().detach());
+            }
+
+            // Remember versioned paths
+            if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
+                final Element matchersElement = rootElement.addElement("matchers");
+                for (Iterator i = versionedPathMatchers.iterator(); i.hasNext();) {
+                    final URLRewriterUtils.PathMatcher pathMatcher = (URLRewriterUtils.PathMatcher) i.next();
+
+                    matchersElement.add(pathMatcher.serialize());
+                }
             }
 
             // Remember encoded state and discard Document

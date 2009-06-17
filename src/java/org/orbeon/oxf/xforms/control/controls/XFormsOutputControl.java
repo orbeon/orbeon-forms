@@ -60,6 +60,8 @@ public class XFormsOutputControl extends XFormsValueControl {
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
         this.mediatypeAttribute = element.attributeValue("mediatype");
         this.valueAttribute = element.attributeValue("value");
+
+        // TODO: must be resolved statically
         this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);
 
         fileInfo = new FileInfo(this, getContextStack(), element);

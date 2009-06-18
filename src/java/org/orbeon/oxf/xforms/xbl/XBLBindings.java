@@ -627,7 +627,8 @@ public class XBLBindings {
         identity.setResult(result);
 
         // Run transformation
-        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(new SAXLoggerProcessor.DebugContentHandler(identity)));
+        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(identity));
+//        TransformerUtils.writeDom4j(fullShadowTree, new XFormsExtractorContentHandler(new SAXLoggerProcessor.DebugContentHandler(identity)));
 
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);

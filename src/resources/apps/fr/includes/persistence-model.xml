@@ -274,13 +274,13 @@
                             NOTE: Finally as of 20090617 the "ancestor-or-self" bug is fixed
                             http://forge.ow2.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
                         -->
-                        <xxforms:variable name="binds" select="($bind/ancestor-or-self::xforms:bind)[position() gt 1]" as="element(xforms:bind)+"/>
 
                         <xxforms:variable name="expression" as="xs:string"
                                           select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
 
                         <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
 
+                        <!--<xxforms:variable name="binds" select="($bind/ancestor-or-self::xforms:bind)[position() gt 1]" as="element(xforms:bind)+"/>-->
                         <!--<xforms:message level="xxforms:log-debug">-->
                             <!--xxx Expression: <xforms:output value="$expression"/> xxx-->
                             <!--xxx Straight: <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->

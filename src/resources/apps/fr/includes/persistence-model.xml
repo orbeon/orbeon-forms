@@ -308,10 +308,10 @@
                                                             $document, '/', $new-filename)"/>
 
                                 <!--<xforms:message level="xxforms:log-debug">-->
-                                    <!--<xforms:output value="$upload-extension"/> --->
-                                    <!--<xforms:output value="$upload-has-extension"/> --->
-                                    <!--<xforms:output value="$new-id"/> --->
-                                    <!--<xforms:output value="$new-filename"/> --->
+                                    <!--<xforms:output value="$upload-extension"/> - -->
+                                    <!--<xforms:output value="$upload-has-extension"/> - -->
+                                    <!--<xforms:output value="$new-id"/> - -->
+                                    <!--<xforms:output value="$new-filename"/> - -->
                                     <!--<xforms:output value="$resource"/>-->
                                 <!--</xforms:message>-->
 

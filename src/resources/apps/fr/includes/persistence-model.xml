@@ -255,8 +255,7 @@
                                             or @id = $attachment-controls/@bind]"/>
 
                 <!--<xforms:message level="xxforms:log-debug">-->
-                    <!--xxx 0-->
-                    <!--<xforms:output value="count($attachment-controls)"/>-->
+                    <!--xxx <xforms:output value="count($attachment-controls)"/> xxx-->
                 <!--</xforms:message>-->
 
                 <!-- Use a global variable to determine whether we must continue -->
@@ -272,33 +271,24 @@
                                                     or @id = $attachment-controls/@bind])[number(context())]"/>
 
                         <!--
-                            Argh: why does the sequence below suddenly does not contain nodes in document order? This
-                            doesn't work properly:
-
-                              string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')
-
-                            But it does work if split between:
-
-                              o $bind/ancestor-or-self::xforms:bind and
-                              o string-join($binds/@nodeset, '/')
-
-                            This sounds like an issue similar to the one we had with preceding-sibling:: a while ago, and
-                            was fixed in NodeWrapper. See:
-
-                              http://forge.objectweb.org/tracker/?group_id=168&atid=350207&func=detail&aid=306836
-                              http://forge.objectweb.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
-
+                            NOTE: Finally as of 20090617 the "ancestor-or-self" bug is fixed
+                            http://forge.ow2.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
                         -->
-                        <xxforms:variable name="binds" select="$bind/ancestor-or-self::xforms:bind" as="element(xforms:bind)+"/>
-                        <xxforms:variable name="expression" select="string-join($binds/@nodeset, '/')" as="xs:string"/>
+                        <xxforms:variable name="binds" select="($bind/ancestor-or-self::xforms:bind)[position() gt 1]" as="element(xforms:bind)+"/>
 
-                        <!--<xforms:message level="xxforms:log-debug">-->
-                            <!--xxx <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
-                            <!--xxx <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
-                            <!--xxx <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
-                        <!--</xforms:message>-->
+                        <xxforms:variable name="expression" as="xs:string"
+                                          select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
 
                         <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
+
+                        <!--<xforms:message level="xxforms:log-debug">-->
+                            <!--xxx Expression: <xforms:output value="$expression"/> xxx-->
+                            <!--xxx Straight: <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
+                            <!--xxx Combined straight: <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
+                            <!--xxx Combined reversed: <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
+                            <!--xxx Count holders: <xforms:output value="count($holders)"/> xxx-->
+                            <!--xxx Holders content: <xforms:output value="string-join($holders, ' - ')"/> xxx-->
+                        <!--</xforms:message>-->
 
                         <xforms:action xxforms:iterate="$holders">
                             <xxforms:variable name="holder" select="." as="node()"/>
@@ -317,12 +307,11 @@
                                                             $app, '/', $form, '/data/',
                                                             $document, '/', $new-filename)"/>
 
-
                                 <!--<xforms:message level="xxforms:log-debug">-->
-                                    <!--<xforms:output value="$upload-extension"/> - -->
-                                    <!--<xforms:output value="$upload-has-extension"/> - -->
-                                    <!--<xforms:output value="$new-id"/> - -->
-                                    <!--<xforms:output value="$new-filename"/> - -->
+                                    <!--<xforms:output value="$upload-extension"/> --->
+                                    <!--<xforms:output value="$upload-has-extension"/> --->
+                                    <!--<xforms:output value="$new-id"/> --->
+                                    <!--<xforms:output value="$new-filename"/> --->
                                     <!--<xforms:output value="$resource"/>-->
                                 <!--</xforms:message>-->
 

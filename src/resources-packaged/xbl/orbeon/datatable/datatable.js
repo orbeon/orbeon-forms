@@ -112,6 +112,15 @@ ORBEON.widgets.datatable = function (element, index) {
         YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
     
+	// Store the column widths before any split
+	
+	var columnWidths = [];
+	for (var j = 0; j < this.headerColumns.length; j++) {
+		columnWidths[j] = this.headerColumns[j].clientWidth;
+	}
+
+	// Split when needed
+	
     if (this.headBodySplit) {
         
         // Create a container for the body
@@ -161,7 +170,7 @@ ORBEON.widgets.datatable = function (element, index) {
             colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
             this.colResizers[ this.colResizers.length] = colResizer;
         }
-        var width = (this.headerColumns[j].clientWidth - 20) + 'px';
+		var width = columnWidths[j] + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0) {

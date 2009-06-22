@@ -989,11 +989,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                             // delete action"
 
                                             if (isDestinationRootElement) {
-                                                // Optimized insertion
+                                                // Optimized insertion for instance root element replacement
 
                                                 // Handle new instance and associated event markings
                                                 final XFormsModel replaceModel = newInstance.getModel(containingDocument);
                                                 replaceModel.handleUpdatedInstance(pipelineContext, newInstance, newDocumentRootElement);
+                                                
+                                                // Dispatch xforms-delete event
+                                                // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
+                                                // (see below). In the future, we might want to dispatch this, especially if
+                                                // XFormsInsertAction dispatches xforms-delete when removing the root element
+                                                //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
 
                                                 // Dispatch xforms-insert event
                                                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
@@ -1007,10 +1013,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                 final List destinationCollection = Collections.singletonList(destinationNodeInfo);
 
                                                 // Perform the insertion
-
-                                                // NOTE: no xforms-delete is dispatched if the root element is replaced,
-                                                // only xforms-insert is dispatched. XForms 1.1 does not seem to say
-                                                // xforms-delete must be dispatched in this case.
 
                                                 // Insert before the target node, so that the position of the inserted node
                                                 // wrt its parent does not change after the target node is removed

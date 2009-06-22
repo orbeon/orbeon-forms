@@ -3803,13 +3803,6 @@ ORBEON.xforms.Init = {
 
     registerDraggableListenersOnRepeatElement: function(repeatElement, previousSiblingId) {
         var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
-
-        if(previousSiblingId.indexOf(XFORMS_SEPARATOR_1) == -1)
-            repeatElement.position = XFORMS_SEPARATOR_1 + "1";
-        else
-            repeatElement.position = XFORMS_SEPARATOR_1 + previousSiblingId.substring(previousSiblingId.indexOf(XFORMS_SEPARATOR_1)+1) + XFORMS_SEPARATOR_2 + "1";
-
-
         if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
             draggableItem.setXConstraint(0, 0);
         else if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
@@ -6235,102 +6228,76 @@ ORBEON.xforms.DnD = {
     DraggableItem: function(element, sGroup, config) {
         ORBEON.xforms.DnD.DraggableItem.superclass.constructor.call(this, element, element.tagName, config);
         YAHOO.util.Dom.setStyle(element, "cursor", "move");
-    },
-
-    getClosestMatch: function(id) {
-        var bestMatchEl = YAHOO.util.DDM.getBestMatch(id).getEl();
-        var el = ORBEON.util.Dom.getElementById(bestMatchEl.id);
-
-        if(el.id.indexOf(XFORMS_SEPARATOR_1)==-1) {
-            for(var i = 0; i < el.childNodes.length; i++ ) {
-                var child = el.childNodes[i];
-                if (ORBEON.util.Dom.isElement(child) && child.id != null && child.id != "undefined" && child.id.indexOf(XFORMS_SEPARATOR_1)!=-1 ) {
-                    el = child;
-                    bestMatchEl = child;
-                    break;
-                }
-            }
-        }
-        return bestMatchEl;
     }
 };
 
 YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
+    _startPosition: -1,
+
+    _getPosition: function(element) {
+        var previousSibling = element;
+        var position = 0;
+        while (true) {
+            if (YAHOO.util.Dom.hasClass(previousSibling, "xforms-repeat-begin-end")) break;
+            if (YAHOO.util.Dom.hasClass(previousSibling, "xforms-repeat-delimiter")) position++;
+            previousSibling = YAHOO.util.Dom.getPreviousSibling(previousSibling);
+        }
+        return position;
+    },
+
     startDrag: function(x, y) {
 
         var dragElement = this.getDragEl();
         var srcElement = this.getEl();
-		this.srcNextSibling = srcElement.nextSibling;
-		this.srcPrevSibling = srcElement.previousSibling;
 
-        for(var i = 0; i < srcElement.childNodes.length; i++ ) {
-            var child = srcElement.childNodes[i];
-            if (ORBEON.util.Dom.isElement(child) && child.id != null && child.id != "undefined" && child.id.indexOf(XFORMS_SEPARATOR_1)!=-1 ) {
-                this.startPosition = child.id.substr(child.id.indexOf(XFORMS_SEPARATOR_1)+1);
-                break;
-            }
-        }
-		var repeatId = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-begin-end", null, srcElement.parentNode)[0].id;
-		this.sourceControlID = repeatId.substring(13);
+        this._startPosition = this._getPosition(srcElement);
+        var repeatId = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-begin-end", null, srcElement.parentNode)[0].id;
+        this.sourceControlID = repeatId.substring(13);
 
         YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
-		YAHOO.util.Dom.setStyle(dragElement, "width", parseInt(dragElement.style.width)+10 +"px");
+        YAHOO.util.Dom.setStyle(dragElement, "width", parseInt(dragElement.style.width)+10 +"px");
         dragElement.innerHTML = srcElement.innerHTML;
         dragElement.className = srcElement.className;
         YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
     },
 
-	onDrag: function(e) {
+    onDrag: function(e) {
         // Keep track of the direction of the drag for use during onDragOver
         var y = YAHOO.util.Event.getPageY(e);
 
         if (y < this.lastY) {
             this.goingUp = true;
         }
-		else if (y > this.lastY) {
+        else if (y > this.lastY) {
             this.goingUp = false;
         }
         this.lastY = y;
     },
 
-	//SAN: Callback method implementation added for showing preview
-	onDragOver: function(e, id) {
+    //Callback method implementation added for showing preview
+    onDragOver: function(e, id) {
 
         var srcElement = this.getEl();
+        var srcDelimiter = YAHOO.util.Dom.getPreviousSibling(srcElement);
         var destElement = YAHOO.util.Dom.get(id)[0];
-		this.overId = id;
 
         if (ORBEON.util.Dom.hasClass(srcElement, "xforms-dnd") && srcElement.nodeName.toLowerCase() == destElement.getEl().nodeName.toLowerCase()) {
             var parent = destElement.getEl().parentNode;
-			var overElement = destElement.getEl();
-			var elementHeight = parseInt(YAHOO.util.Dom.getStyle(overElement, 'height'));
-            var overElementMiddle = YAHOO.util.Dom.getY(overElement) + (Math.floor(elementHeight / 2));
-			if(this.goingUp) {
-				parent.insertBefore(srcElement, overElement.previousSibling); //Moving up
-			}
-			else {
-				parent.insertBefore(srcElement, overElement.nextSibling);//Drag down
-			}
+            this.overElement = destElement.getEl();
+            parent.removeChild(srcDelimiter);
+            parent.removeChild(srcElement);
+            if (this.goingUp) {
+                var insertionReferenceElement = this.overElement;
+                parent.insertBefore(srcElement, insertionReferenceElement);
+                parent.insertBefore(srcDelimiter, insertionReferenceElement);
+            } else {
+                var insertionReferenceElement = YAHOO.util.Dom.getNextSibling(this.overElement);
+                parent.insertBefore(srcDelimiter, insertionReferenceElement);
+                parent.insertBefore(srcElement, insertionReferenceElement);
+            }
             YAHOO.util.DragDropMgr.refreshCache();
         }
-    },
-
-    onDragDrop: function(e, id) {
-        var overElement = ORBEON.xforms.DnD.getClosestMatch(id);
-        var srcElement = this.getEl();
-        var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
-        this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
-
-		var parent = this.srcNextSibling.parentNode;
-		if(this.goingUp) {
-			parent.insertBefore(srcElement, this.srcNextSibling);
-		}
-		else {
-			parent.insertBefore(srcElement, this.srcPrevSibling);
-		}
-		YAHOO.util.DragDropMgr.refreshCache();
-
     },
 
     endDrag: function(e) {
@@ -6340,38 +6307,17 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         var proxyid = proxy.id;
         var thisid = this.id;
 
-            YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
-            YAHOO.util.Dom.setStyle(thisid, "visibility", "");
+        YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
+        YAHOO.util.Dom.setStyle(thisid, "visibility", "");
 
-        if(this.endPosition == null && this.overId != null) {
-			this.onDragDrop(e, this.overId);
-		}
-
-        if(this.startPosition == null || this.endPosition == null)
-            return;
-        var draggableRepeatDiv = YAHOO.util.Dom.getElementsByClassName("xforms-draggableRepeat")[0];
-        if (draggableRepeatDiv == null) {
-            var form;
-            for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
-                var candidateForm = document.forms[formIndex];
-                if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
-                    form = candidateForm;
-                    break;
-                }
-            }
-            var draggableRepeatDiv = document.createElement("div");
-            draggableRepeatDiv.className = "xforms-draggableRepeat";
-            draggableRepeatDiv.id = this.sourceControlID;
-            form.appendChild(draggableRepeatDiv);
-        }
-        else {
-            draggableRepeatDiv.id = this.sourceControlID;
-        }
-        var event = new ORBEON.xforms.Server.Event(null, draggableRepeatDiv.id, null, null, "xxforms-dnd", null, null, null, null, null,
-                ["dnd-start", this.startPosition, "dnd-end", this.endPosition]);
+        // Find end position in repeat
+        var endPosition = this._getPosition(srcElement);
+        var form = ORBEON.xforms.Controls.getForm(srcElement);
+        var event = new ORBEON.xforms.Server.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
+                ["dnd-start", this._startPosition, "dnd-end", endPosition]);
         ORBEON.xforms.Server.fireEvents([event], false);
-
     }
+
 });
 
 ORBEON.xforms.Offline = {

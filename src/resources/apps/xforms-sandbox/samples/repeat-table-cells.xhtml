@@ -23,7 +23,7 @@
         <xhtml:title>Repeat Table Cells</xhtml:title>
         <xforms:model>
             <xforms:instance id="main-instance">
-                <table xmlns="">
+                <table>
                     <tr>
                         <td>1</td>
                         <td>2</td>
@@ -48,6 +48,7 @@
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }
             .xforms-repeat-selected-item-2 { background: transparent }
+            .xforms-repeat-selected-item-3 { background: transparent }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -110,7 +111,7 @@
                 <xforms:action while="instance('variable')/iteration-count != 0">
                     <!-- Set number of cols to add  -->
                     <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
-                    
+
                     <xforms:action xxforms:iterate="tr">
                         <xforms:insert nodeset="td"/>
                         <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
@@ -123,7 +124,7 @@
         </xforms:trigger>
 
         <xhtml:h2>Table D&amp;D of Rows</xhtml:h2>
-        
+
         <xhtml:table>
             <xforms:repeat nodeset="tr" xxforms:dnd="true" id="row-repeat-dd-row">
                 <xhtml:tr>
@@ -161,6 +162,23 @@
                 </xhtml:li>
             </xforms:repeat>
         </xhtml:ol>
+
+        <xhtml:h2>Nested</xhtml:h2>
+
+        <xforms:repeat nodeset="tr" id="outer">
+            <xhtml:div style="border: 1px solid grey; margin: 5px; float: left">
+                <xforms:repeat nodeset="td" xxforms:dnd="true" id="middle">
+                    <xhtml:div style="border: 1px solid grey; margin: 5px; padding: 3px">
+                        <xforms:output ref="."/>
+                        <xforms:repeat nodeset="../td" xxforms:dnd="true" id="inner">
+                            <xhtml:span style="border: 1px solid grey; margin: 5px">
+                                <xforms:output ref="."/>
+                            </xhtml:span>
+                        </xforms:repeat>
+                    </xhtml:div>
+                </xforms:repeat>
+            </xhtml:div>
+        </xforms:repeat>
 
         <!--<widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 

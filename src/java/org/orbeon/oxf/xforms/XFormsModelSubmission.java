@@ -273,7 +273,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
                 // Get current node for xforms:submission and instance containing the node to submit
-                final NodeInfo refdNodeInfo;
+                final NodeInfo refNodeInfo;
                 final XFormsInstance refInstance;
                 // Get and reset context stack
                 final XFormsContextStack contextStack = model.getContextStack();
@@ -284,16 +284,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 {
                     contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
 
-                    refdNodeInfo = contextStack.getCurrentSingleNode();
+                    refNodeInfo = contextStack.getCurrentSingleNode();
                     functionContext = contextStack.getFunctionContext();
                     submissionElementContextItem = contextStack.getContextItem();
 
                     // Check that we have a current node and that it is pointing to a document or an element
-                    if (refdNodeInfo == null)
+                    if (refNodeInfo == null)
                         throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
                         		 XFormsSubmitErrorEvent.ErrorType.NO_DATA);
 
-                    if (!(refdNodeInfo instanceof DocumentInfo || refdNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+                    if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                         throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         		XFormsSubmitErrorEvent.ErrorType.NO_DATA);
                     }
@@ -330,20 +330,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean resolvedRelevant;
                 {
                     // Resolved method AVT
-                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
+                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
                     resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, true));
 
                     // Get actual method based on the method attribute
                     actualHttpMethod = getActualHttpMethod(resolvedMethod);
 
                     // Get mediatype
-                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
 
                     // Resolve validate and relevant AVTs
-                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
+                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
                     resolvedValidate = !"false".equals(resolvedValidateString);
 
-                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtRelevant);
+                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtRelevant);
                     resolvedRelevant = !"false".equals(resolvedRelevantString);
                 }
 
@@ -394,14 +394,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
+                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
                     // Create document to submit here because in case of error, an Ajax response will still be produced
                     if (serialize) {
-                        createDocumentToSubmit(pipelineContext, refdNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
+                        createDocumentToSubmit(pipelineContext, refNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
                     }
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -426,7 +426,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String resolvedXXFormsShared;
                 final boolean resolvedXXFormsHandleXInclude;
                 {
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
 
                     if (tempActionOrResource == null) {
                         // This can be null if, e.g. you have an AVT like resource="{()}"
@@ -436,28 +436,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
-                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
-                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
-                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
-                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
+                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
+                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
+                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
+                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
+                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
 
-                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
+                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
                     resolvedIndent = Boolean.valueOf(tempIndent).booleanValue();
 
-                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
+                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
                     resolvedOmitxmldeclaration = Boolean.valueOf(tempAvtOmitxmldeclaration).booleanValue();
 
-                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
+                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
                     resolvedStandalone = (tempStandalone != null) ? Boolean.valueOf(tempStandalone) : null;
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
 
                     // Default is "false" for security reasons
-                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
+                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
                     resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude).booleanValue();
                 }
 
@@ -501,7 +501,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(pipelineContext, refdNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
+                    documentToSubmit = createDocumentToSubmit(pipelineContext, refNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
 
                 } else {
                     // Don't recreate document
@@ -518,7 +518,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, refdNodeInfo, requestedSerialization);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, refNodeInfo, requestedSerialization);
                     container.dispatchEvent(pipelineContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -1104,7 +1104,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                     if (targetref != null) {
                                         // Evaluate destination node
                                         final Object destinationObject
-                                                = XPathCache.evaluateSingle(pipelineContext, refdNodeInfo, targetref, prefixToURIMap,
+                                                = XPathCache.evaluateSingle(pipelineContext, refNodeInfo, targetref, prefixToURIMap,
                                                 contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
 
                                         if (destinationObject instanceof NodeInfo) {

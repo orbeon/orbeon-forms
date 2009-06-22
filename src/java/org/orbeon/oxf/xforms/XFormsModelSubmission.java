@@ -747,14 +747,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                 // then submission processing ends after dispatching the event
                                 // xforms-submit-error with an error-type of target-error."
 
-                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                submitErrorEvent = createErrorEvent(pipelineContext, null, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
                                 throw new XFormsSubmissionException("targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute");
                             }
 
                             final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
                             if (updatedInstance == null || !updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo)) {
                                 // Only support replacing the root element of an instance when using a shared instance
-                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                submitErrorEvent = createErrorEvent(pipelineContext, null, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
                                 throw new XFormsSubmissionException("targetref attribute must point to an instance root element when using shared instance replacement.", "processing targetref attribute");
                             }
 
@@ -932,6 +932,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                                             // Whether the destination node is the root element of an instance
                                             final boolean isDestinationRootElement = updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo);
+                                            if (isReadonlyHint && !isDestinationRootElement) {
+                                                // Only support replacing the root element of an instance when using a shared instance
+                                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                                throw new XFormsSubmissionException("targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute");
+                                            }
 
                                             // Obtain root element to insert
                                             final NodeInfo newDocumentRootElement;
@@ -956,12 +961,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                             false, -1, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
                                                 } else {
                                                     // Resulting instance must be read-only
-
-                                                    if (!isDestinationRootElement) {
-                                                        // Only support replacing the root element of an instance when using a shared instance
-                                                        submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
-                                                        throw new XFormsSubmissionException("targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute");
-                                                    }
 
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.

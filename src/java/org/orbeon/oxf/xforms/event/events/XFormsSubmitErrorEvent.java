@@ -61,7 +61,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         this.errorType = errorType;
 
         // Try to add body information
-        if (connectionResult.hasContent()) {
+        if (connectionResult != null && connectionResult.hasContent()) {
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
             // parsed into an XML document and the root element of the document is returned. If the parse fails, or if

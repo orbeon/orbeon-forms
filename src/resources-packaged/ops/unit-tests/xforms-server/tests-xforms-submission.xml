@@ -1004,9 +1004,11 @@
                                         <dummy xmlns="" foo="bar"/>
                                     </xforms:instance>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance-1"/>
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance-2"/>
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance-3"/>
+                                    <xforms:action ev:event="xforms-model-construct-done">
+                                        <xforms:send submission="replace-instance-1"/>
+                                        <xforms:send submission="replace-instance-2"/>
+                                        <xforms:send submission="replace-instance-3"/>
+                                    </xforms:action>
                                     <!-- Attribute node -->
                                     <xforms:submission id="replace-instance-1" method="get" serialization="none"
                                             resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
@@ -1270,6 +1272,106 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-submit-done" target="replace-instance"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Instance replacement: errors when using xxforms:readonly and/or xxforms:shared" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+
+                                    <xforms:instance id="source-instance">
+                                        <dummy xmlns="">
+                                            <nested-element/>
+                                        </dummy>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-model-construct-done">
+                                        <xforms:send submission="replace-instance-1"/>
+                                        <xforms:send submission="replace-instance-2"/>
+                                        <xforms:send submission="replace-instance-3"/>
+                                    </xforms:action>
+                                    <!-- xxforms:readonly -->
+                                    <xforms:submission id="replace-instance-1" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                            replace="instance" targetref="/*/nested-element" xxforms:readonly="true"/>
+                                    <!-- xxforms:shared -->
+                                    <xforms:submission id="replace-instance-2" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                            replace="instance" targetref="/*/nested-element" xxforms:readonly="true" xxforms:shared="application"/>
+                                    <!-- Regular case -->
+                                    <xforms:submission id="replace-instance-3" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                            replace="instance" targetref="/*/nested-element" />
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                             ))"/>
+                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             for $c in event('error-type') return xxforms:attribute('error-type', $c)
+                                                             ))"/>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="source-instance" model-id="model" replaced="true">
+                                <dummy>
+                                    <book>
+                                        <title lang="en">Pale Blue Dot</title>
+                                        <author>Carl Sagan</author>
+                                    </book>
+                                </dummy>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-submit-error" target="replace-instance-1" error-type="target-error"/>
+                                    <event type="xforms-submit-error" target="replace-instance-2" error-type="target-error"/>
+                                    <event type="xforms-insert" target="source-instance" inserted-nodes="book"/>
+                                    <event type="xforms-delete" target="source-instance" deleted-nodes="nested-element"/>
+                                    <event type="xforms-submit-done" target="replace-instance-3"/>
                                 </events>
                             </instance>
                         </instances>

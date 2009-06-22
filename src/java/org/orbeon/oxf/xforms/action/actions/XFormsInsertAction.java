@@ -247,11 +247,16 @@ public class XFormsInsertAction extends XFormsAction {
             for (int i = 0; i < clonedNodesTemp.size(); i++) {
                 final Node clonedNodeTemp = (Node) clonedNodesTemp.get(i);
 
-                if (clonedNodeTemp instanceof Element)
+                if (clonedNodeTemp instanceof Element) {
+                    // Element node
                     InstanceData.remove(clonedNodeTemp);
-                else if (clonedNodeTemp instanceof Attribute)
+                    clonedNodeTemp.detach();
+                } else if (clonedNodeTemp instanceof Attribute) {
+                    // Attribute node
                     InstanceData.remove(clonedNodeTemp);
-                else if (clonedNodeTemp instanceof Document) {
+                    clonedNodeTemp.detach();
+                } else if (clonedNodeTemp instanceof Document) {
+                    // Document node
                     final Element clonedNodeTempRootElement = clonedNodeTemp.getDocument().getRootElement();
 
                     if (clonedNodeTempRootElement == null) {
@@ -262,6 +267,9 @@ public class XFormsInsertAction extends XFormsAction {
                         // We can never really insert a document into anything at this point, but we assume that this means the root element
                         clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
                     }
+                } else {
+                    // Other nodes
+                    clonedNodeTemp.detach();
                 }
             }
             clonedNodes = clonedNodesTemp;

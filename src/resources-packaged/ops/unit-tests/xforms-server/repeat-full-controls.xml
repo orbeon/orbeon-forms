@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xxforms:controls xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
     <table>
         <xforms:repeat nodeset="/form/departments/department" id="id123">

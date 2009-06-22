@@ -64,9 +64,9 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static List evaluate(PipelineContext pipelineContext, Item contextNode, String xpathString,
+    public static List evaluate(PipelineContext pipelineContext, Item contextItem, String xpathString,
                          Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
-        return evaluate(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
+        return evaluate(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
@@ -126,9 +126,9 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static Object evaluateSingle(PipelineContext pipelineContext, Item contextNode, String xpathString,
+    public static Object evaluateSingle(PipelineContext pipelineContext, Item contextItem, String xpathString,
                                  Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
-        return evaluateSingle(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
+        return evaluateSingle(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
@@ -152,8 +152,8 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
      */
-    public static String evaluateAsAvt(PipelineContext pipelineContext, Item contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
-        return evaluateAsAvt(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
+    public static String evaluateAsAvt(PipelineContext pipelineContext, Item contextItem, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+        return evaluateAsAvt(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
@@ -175,8 +175,8 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression and return its string value.
      */
-    public static String evaluateAsString(PipelineContext pipelineContext, Item contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
-        return evaluateAsString(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
+    public static String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+        return evaluateAsString(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
@@ -211,29 +211,29 @@ public class XPathCache {
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           Item contextNode,
+                                                           Item contextItem,
                                                            String xpathString,
                                                            LocationData locationData) {
-        return getXPathExpression(pipelineContext, contextNode, xpathString, null, null, null, null, locationData);
+        return getXPathExpression(pipelineContext, contextItem, xpathString, null, null, null, null, locationData);
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           Item contextNode,
+                                                           Item contextItem,
                                                            String xpathString,
                                                            Map prefixToURIMap,
                                                            LocationData locationData) {
-        return getXPathExpression(pipelineContext, contextNode, xpathString, prefixToURIMap, null, null, null, locationData);
+        return getXPathExpression(pipelineContext, contextItem, xpathString, prefixToURIMap, null, null, null, locationData);
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           Item contextNode,
+                                                           Item contextItem,
                                                            String xpathString,
                                                            Map prefixToURIMap,
                                                            Map variableToValueMap,
                                                            FunctionLibrary functionLibrary,
                                                            String baseURI,
                                                            LocationData locationData) {
-        final List contextItems = Collections.singletonList(contextNode);
+        final List contextItems = Collections.singletonList(contextItem);
         return getXPathExpression(pipelineContext, contextItems, 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
     }
 

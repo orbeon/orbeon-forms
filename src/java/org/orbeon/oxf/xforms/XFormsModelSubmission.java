@@ -23,6 +23,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -43,6 +45,7 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -78,7 +81,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtSerialization;
     private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
 
-    private String target;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
+    private String targetref;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
     private String avtMode;
 
     private String avtVersion;
@@ -162,7 +165,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 serialize = !"false".equals(submissionElement.attributeValue("serialize"));
             }
 
-            target = submissionElement.attributeValue("target");
+            // @targetref is the new name as of May 2009, and @target is still supported for backward compatibility
+            targetref = submissionElement.attributeValue("targetref");
+            if (targetref == null)
+                targetref = submissionElement.attributeValue("target");
 
             avtMode = submissionElement.attributeValue("mode");
 
@@ -267,31 +273,33 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
                 // Get current node for xforms:submission and instance containing the node to submit
-                final NodeInfo boundNodeInfo;
-                final XFormsInstance currentInstance;
+                final NodeInfo refdNodeInfo;
+                final XFormsInstance refInstance;
                 // Get and reset context stack
                 final XFormsContextStack contextStack = model.getContextStack();
                 contextStack.resetBindingContext(pipelineContext);
+                final Item submissionElementContextItem;
 
                 final XFormsFunction.Context functionContext;
                 {
                     contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
 
-                    boundNodeInfo = contextStack.getCurrentSingleNode();
+                    refdNodeInfo = contextStack.getCurrentSingleNode();
                     functionContext = contextStack.getFunctionContext();
+                    submissionElementContextItem = contextStack.getContextItem();
 
                     // Check that we have a current node and that it is pointing to a document or an element
-                    if (boundNodeInfo == null)
+                    if (refdNodeInfo == null)
                         throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
                         		 XFormsSubmitErrorEvent.ErrorType.NO_DATA);
 
-                    if (!(boundNodeInfo instanceof DocumentInfo || boundNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+                    if (!(refdNodeInfo instanceof DocumentInfo || refdNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                         throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         		XFormsSubmitErrorEvent.ErrorType.NO_DATA);
                     }
 
                     // Current instance may be null if the document submitted is not part of an instance
-                    currentInstance = contextStack.getCurrentInstance();
+                    refInstance = contextStack.getCurrentInstance();
                 }
 
                 // Determine if the instance to submit has one or more bound and relevant upload controls
@@ -307,8 +315,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // o we only check for replace="instance|none" and if serialization must take place
 
                 final boolean hasBoundRelevantUploadControl;
-                if (currentInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
-                    hasBoundRelevantUploadControl = XFormsUtils.hasBoundRelevantUploadControls(containingDocument, currentInstance);
+                if (refInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
+                    hasBoundRelevantUploadControl = XFormsUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
                 } else {
                     hasBoundRelevantUploadControl = false;
                 }
@@ -322,20 +330,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean resolvedRelevant;
                 {
                     // Resolved method AVT
-                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
+                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
                     resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, true));
 
                     // Get actual method based on the method attribute
                     actualHttpMethod = getActualHttpMethod(resolvedMethod);
 
                     // Get mediatype
-                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
 
                     // Resolve validate and relevant AVTs
-                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
+                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
                     resolvedValidate = !"false".equals(resolvedValidateString);
 
-                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtRelevant);
+                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtRelevant);
                     resolvedRelevant = !"false".equals(resolvedRelevantString);
                 }
 
@@ -370,8 +378,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // "The data model is updated"
                 final XFormsModel modelForInstance;
-                if (currentInstance != null) {
-                    modelForInstance = currentInstance.getModel(containingDocument);
+                if (refInstance != null) {
+                    modelForInstance = refInstance.getModel(containingDocument);
                     {
                         // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
                         // the instance is not serialized and if no instance data is otherwise used for the submission,
@@ -386,14 +394,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
+                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
                     // Create document to submit here because in case of error, an Ajax response will still be produced
                     if (serialize) {
-                        createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
+                        createDocumentToSubmit(pipelineContext, refdNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
                     }
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -418,7 +426,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String resolvedXXFormsShared;
                 final boolean resolvedXXFormsHandleXInclude;
                 {
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
 
                     if (tempActionOrResource == null) {
                         // This can be null if, e.g. you have an AVT like resource="{()}"
@@ -428,28 +436,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
-                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
-                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
-                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
-                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
+                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
+                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
+                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
+                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
+                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
 
-                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
+                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
                     resolvedIndent = Boolean.valueOf(tempIndent).booleanValue();
 
-                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
+                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
                     resolvedOmitxmldeclaration = Boolean.valueOf(tempAvtOmitxmldeclaration).booleanValue();
 
-                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
+                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
                     resolvedStandalone = (tempStandalone != null) ? Boolean.valueOf(tempStandalone) : null;
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
 
                     // Default is "false" for security reasons
-                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
+                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refdNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
                     resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude).booleanValue();
                 }
 
@@ -489,11 +497,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Check if a submission requires file upload information
                     if (requestedSerialization.startsWith("multipart/")) {
                         // Annotate before re-rooting/pruning
-                        XFormsUtils.annotateBoundRelevantUploadControls(pipelineContext, containingDocument, currentInstance);
+                        XFormsUtils.annotateBoundRelevantUploadControls(pipelineContext, containingDocument, refInstance);
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
+                    documentToSubmit = createDocumentToSubmit(pipelineContext, refdNodeInfo, refInstance, modelForInstance, resolvedValidate, resolvedRelevant);
 
                 } else {
                     // Don't recreate document
@@ -510,7 +518,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, boundNodeInfo, requestedSerialization);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, refdNodeInfo, requestedSerialization);
                     container.dispatchEvent(pipelineContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -621,21 +629,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String urlType = submissionElement.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME);
                 final ExternalContext.Request request = externalContext.getRequest();
 
-                // Find instance to update
-                final XFormsInstance replaceInstance;
-                if (isReplaceInstance) {
-                    if (xxfReplaceInstanceId != null)
-                        replaceInstance = containingDocument.findInstance(xxfReplaceInstanceId);
-                    else if (replaceInstanceId != null)
-                        replaceInstance = model.getInstance(replaceInstanceId);
-                    else if (currentInstance == null)
-                        replaceInstance = model.getDefaultInstance();
-                    else
-                        replaceInstance = currentInstance;
-                } else {
-                    replaceInstance = null;
-                }
-
                 // Actual request mediatype
                 final String actualRequestMediatype = (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype;
 
@@ -744,24 +737,59 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             // Get the instance from shared instance cache
                             // This can only happen is method="get" and replace="instance" and xxforms:readonly="true" and xxforms:shared="application"
 
+                            final NodeInfo destinationNodeInfo = evaluateTargetRef(pipelineContext, findReplaceInstanceNoTargetref(refInstance), submissionElementContextItem,
+                                                        prefixToURIMap, contextStack, functionLibrary, functionContext);
+
+                            if (destinationNodeInfo == null) {
+                                // Throw target-error
+
+                                // XForms 1.1: "If the processing of the targetref attribute fails,
+                                // then submission processing ends after dispatching the event
+                                // xforms-submit-error with an error-type of target-error."
+
+                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                throw new XFormsSubmissionException("targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute");
+                            }
+
+                            final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
+                            if (updatedInstance == null || !updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo)) {
+                                // Only support replacing the root element of an instance when using a shared instance
+                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                throw new XFormsSubmissionException("targetref attribute must point to an instance root element when using shared instance replacement.", "processing targetref attribute");
+                            }
+
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "using instance from application shared instance cache",
-                                        new String[] { "instance", replaceInstance.getEffectiveId() });
+                                        new String[] { "instance", updatedInstance.getEffectiveId() });
 
                             final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getId(), replaceInstance.getEffectiveModelId(),
-                                        absoluteResolvedURLString, timeToLive, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, updatedInstance.getId(), updatedInstance.getEffectiveModelId(),
+                                        absoluteResolvedURLString, timeToLive, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
 
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "replacing instance with read-only instance",
                                         new String[] { "instance", sharedInstance.getEffectiveId() });
 
-                            // Handle new instance and associated events
                             final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
-                            replaceModel.handleNewInstanceDocument(pipelineContext, sharedInstance);
+
+                            // Dispatch xforms-delete event
+                            // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
+                            // (see below). In the future, we might want to dispatch this, especially if
+                            // XFormsInsertAction dispatches xforms-delete when removing the root element
+                            //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
+
+                            // Handle new instance and associated event markings
+                            final NodeInfo newRootElementInfo = sharedInstance.getInstanceRootElementInfo();
+                            replaceModel.handleUpdatedInstance(pipelineContext, sharedInstance, newRootElementInfo);
+
+                            // Dispatch xforms-insert event
+                            // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
+                            sharedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
+                                new XFormsInsertEvent(sharedInstance, Collections.singletonList(newRootElementInfo), null, newRootElementInfo.getDocumentRoot(),
+                                        "after", null, null, true));
 
                             connectionResult = null;
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString, 200);
@@ -867,51 +895,145 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                         // Handling of XML media type
                                         // Set new instance document to replace the one submitted
 
-                                        if (replaceInstance == null) {
-                                            // Replacement instance was specified but not found TODO: XForms 1.1 won't
-                                            // dispatch xforms-binding-exception here Not sure what's the right thing to
-                                            // do with 1.1, but this could be done as part of the model's static
-                                            // analysis if the instance value is not obtained through AVT, and
-                                            // dynamically otherwise. However, in the dynamic case, I think that this
-                                            // should be a (currently non-specified by XForms) xforms-binding-error.
+                                        final XFormsInstance replaceInstanceNoTargetref = findReplaceInstanceNoTargetref(refInstance);
+                                        if (replaceInstanceNoTargetref == null) {
+
+                                            // Replacement instance or node was specified but not found
+                                            //
+                                            // Not sure what's the right thing to do with 1.1, but this could be done
+                                            // as part of the model's static analysis if the instance value is not
+                                            // obtained through AVT, and dynamically otherwise. However, in the dynamic
+                                            // case, I think that this should be a (currently non-specified by XForms)
+                                            // xforms-binding-error.
                                             container.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                         } else {
+
+                                            final NodeInfo destinationNodeInfo = evaluateTargetRef(pipelineContext,
+                                                    replaceInstanceNoTargetref, submissionElementContextItem,
+                                                    prefixToURIMap, contextStack, functionLibrary, functionContext);
+
+                                            if (destinationNodeInfo == null) {
+                                                // Throw target-error
+
+                                                // XForms 1.1: "If the processing of the targetref attribute fails,
+                                                // then submission processing ends after dispatching the event
+                                                // xforms-submit-error with an error-type of target-error."
+
+                                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                                throw new XFormsSubmissionException("targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute");
+                                            }
+
+                                            // This is the instance which is effectively going to be updated
+                                            final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
+                                            if (updatedInstance == null) {
+                                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                                throw new XFormsSubmissionException("targetref attribute doesn't point to an element in an existing instance for replace=\"instance\".", "processing targetref attribute");
+                                            }
+
+                                            // Whether the destination node is the root element of an instance
+                                            final boolean isDestinationRootElement = updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo);
+
+                                            // Obtain root element to insert
+                                            final NodeInfo newDocumentRootElement;
                                             final XFormsInstance newInstance;
                                             try {
-                                                // Read stream into Document
+                                                // Create resulting instance whether entire instance is replaced or not, because this:
+                                                // 1. Wraps a Document within a DocumentInfo if needed
+                                                // 2. Performs text nodes adjustments if needed
                                                 if (!isReadonlyHint) {
-                                                    // Resulting instance is not read-only
-
-                                                    if (XFormsServer.logger.isDebugEnabled())
-                                                        containingDocument.logDebug("submission", "replacing instance with mutable instance",
-                                                            new String[] { "instance", replaceInstance.getEffectiveId() });
+                                                    // Resulting instance must not be read-only
 
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     final Document resultingInstanceDocument
                                                             = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new XFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
-                                                } else {
-                                                    // Resulting instance is read-only
 
                                                     if (XFormsServer.logger.isDebugEnabled())
-                                                        containingDocument.logDebug("submission", "replacing instance with read-only instance",
-                                                            new String[] { "instance", replaceInstance.getEffectiveId() });
+                                                        containingDocument.logDebug("submission", "replacing instance with mutable instance",
+                                                            new String[] { "instance", updatedInstance.getEffectiveId() });
+
+                                                    newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
+                                                            resultingInstanceDocument, connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                                            false, -1, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
+                                                } else {
+                                                    // Resulting instance must be read-only
+
+                                                    if (!isDestinationRootElement) {
+                                                        // Only support replacing the root element of an instance when using a shared instance
+                                                        submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                                        throw new XFormsSubmissionException("targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute");
+                                                    }
 
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                                                    final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new SharedXFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation(), resolvedXXFormsHandleXInclude);
-                                                }    
+                                                    final DocumentInfo resultingInstanceDocument
+                                                            = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
+
+                                                    if (XFormsServer.logger.isDebugEnabled())
+                                                        containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                                                            new String[] { "instance", updatedInstance.getEffectiveId() });
+
+                                                    newInstance = new SharedXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
+                                                            resultingInstanceDocument, connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                                            false, -1, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
+                                                }
+                                                newDocumentRootElement = newInstance.getInstanceRootElementInfo();
                                             } catch (Exception e) {
                                                 submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR);
-                                                throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing XML to instance.", "processing instance replacement");
+                                                throw new XFormsSubmissionException(e, "xforms:submission: exception while reading XML response.", "processing instance replacement");
                                             }
 
-                                            // Handle new instance and associated events
-                                            final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                                            replaceModel.handleNewInstanceDocument(pipelineContext, newInstance);
+                                            // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
+                                            // "the replacement is performed by an XForms action that performs some
+                                            // combination of node insertion and deletion operations that are
+                                            // performed by the insert action (10.3 The insert Element) and the
+                                            // delete action"
+
+                                            if (isDestinationRootElement) {
+                                                // Optimized insertion
+
+                                                // Handle new instance and associated event markings
+                                                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
+                                                replaceModel.handleUpdatedInstance(pipelineContext, newInstance, newDocumentRootElement);
+
+                                                // Dispatch xforms-insert event
+                                                // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
+                                                newInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
+                                                    new XFormsInsertEvent(newInstance, Collections.singletonList(newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
+                                                            "after", null, null, true));
+
+                                            } else {
+                                                // Generic insertion
+
+                                                final List destinationCollection = Collections.singletonList(destinationNodeInfo);
+
+                                                // Perform the insertion
+
+                                                // NOTE: no xforms-delete is dispatched if the root element is replaced,
+                                                // only xforms-insert is dispatched. XForms 1.1 does not seem to say
+                                                // xforms-delete must be dispatched in this case.
+
+                                                // Insert before the target node, so that the position of the inserted node
+                                                // wrt its parent does not change after the target node is removed
+                                                final List insertedNode = XFormsInsertAction.doInsert(pipelineContext, containingDocument, "before",
+                                                        destinationCollection, destinationNodeInfo.getParent(),
+                                                        Collections.singletonList(newDocumentRootElement), 1, false, true);
+
+                                                if (!destinationNodeInfo.getParent().isSameNodeInfo(destinationNodeInfo.getDocumentRoot())) {
+                                                    // The node to replace is NOT a root element
+
+                                                    // Perform the deletion of the selected node
+                                                    XFormsDeleteAction.doDelete(pipelineContext, containingDocument, destinationCollection, 1, true);
+                                                }
+
+                                                // Perform model instance update
+                                                // Handle new instance and associated event markings
+                                                // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
+                                                // * doInsert() dispatches an event which might itself change the instance
+                                                // * doDelete() does as well
+                                                // Does this mean that we should check that the node is still where it should be?
+                                                final XFormsModel updatedModel = updatedInstance.getModel(containingDocument);
+                                                updatedModel.handleUpdatedInstance(pipelineContext, updatedInstance, (NodeInfo) insertedNode.get(0));
+                                            }
 
                                             // Notify that submission is done
                                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult);
@@ -979,10 +1101,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                                     // Find target location
                                     final NodeInfo destinationNodeInfo;
-                                    if (target != null) {
+                                    if (targetref != null) {
                                         // Evaluate destination node
                                         final Object destinationObject
-                                                = XPathCache.evaluateSingle(pipelineContext, boundNodeInfo, target, prefixToURIMap,
+                                                = XPathCache.evaluateSingle(pipelineContext, refdNodeInfo, targetref, prefixToURIMap,
                                                 contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
 
                                         if (destinationObject instanceof NodeInfo) {
@@ -990,24 +1112,25 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                             if (destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ATTRIBUTE_NODE) {
                                                 // Throw target-error
 
-                                                // XForms 1.1: "If the processing of the target attribute fails, then
-                                                // submission processing ends after dispatching the event
+                                                // XForms 1.1: "If the processing of the targetref attribute fails,
+                                                // then submission processing ends after dispatching the event
                                                 // xforms-submit-error with an error-type of target-error."
                                                 submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
-                                                throw new XFormsSubmissionException("target attribute doesn't point to an element or attribute for replace=\"text\".", "processing target attribute");
+                                                throw new XFormsSubmissionException("targetref attribute doesn't point to an element or attribute for replace=\"text\".", "processing targetref attribute");
                                             }
                                         } else {
                                             // Throw target-error
+                                            // TODO: also do this for readonly situation
 
-                                            // XForms 1.1: "If the processing of the target attribute fails, then
+                                            // XForms 1.1: "If the processing of the targetref attribute fails, then
                                             // submission processing ends after dispatching the event
                                             // xforms-submit-error with an error-type of target-error."
                                             submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
-                                            throw new XFormsSubmissionException("target attribute doesn't point to a node for replace=\"text\".", "processing target attribute");
+                                            throw new XFormsSubmissionException("targetref attribute doesn't point to a node for replace=\"text\".", "processing targetref attribute");
                                         }
                                     } else {
                                         // Handle default destination
-                                        destinationNodeInfo = replaceInstance.getInstanceRootElementInfo();
+                                        destinationNodeInfo = findReplaceInstanceNoTargetref(refInstance).getInstanceRootElementInfo();
                                     }
 
                                     // Set value into the instance
@@ -1097,6 +1220,52 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
+    }
+
+    private XFormsInstance findReplaceInstanceNoTargetref(XFormsInstance refInstance) {
+        final XFormsInstance replaceInstance;
+        if (xxfReplaceInstanceId != null)
+            replaceInstance = containingDocument.findInstance(xxfReplaceInstanceId);
+        else if (replaceInstanceId != null)
+            replaceInstance = model.getInstance(replaceInstanceId);
+        else if (refInstance == null)
+            replaceInstance = model.getDefaultInstance();
+        else
+            replaceInstance = refInstance;
+        return replaceInstance;
+    }
+
+    private NodeInfo evaluateTargetRef(PipelineContext pipelineContext, XFormsInstance defaultReplaceInstance, Item submissionElementContextItem,
+                                       Map prefixToURIMap, XFormsContextStack contextStack, FunctionLibrary functionLibrary,
+                                       XPathCache.FunctionContext functionContext) {
+        final Object destinationObject;
+        if (targetref == null) {
+            // There is no explicit @targetref, so the target is implicity the root element of either the instance
+            // pointed to by @ref, or the instance specified by @instance or @xxforms:instance.
+            destinationObject = defaultReplaceInstance.getInstanceRootElementInfo();
+        } else {
+            // There is an explicit @targetref, which must be evaluated.
+
+            // "The in-scope evaluation context of the submission element is used to evaluate the expression." BUT ALSO "The
+            // evaluation context for this attribute is the in-scope evaluation context for the submission element, except
+            // the context node is modified to be the document element of the instance identified by the instance attribute
+            // if it is specified."
+            final boolean hasInstanceAttribute = xxfReplaceInstanceId != null || replaceInstanceId != null;
+            final Item targetRefContextItem = hasInstanceAttribute
+                    ? defaultReplaceInstance.getInstanceRootElementInfo() : submissionElementContextItem;
+
+            // Evaluate destination node
+            // "This attribute is evaluated only once a successful submission response has been received and if the replace
+            // attribute value is "instance" or "text". The first node rule is applied to the result."
+            destinationObject = XPathCache.evaluateSingle(pipelineContext, targetRefContextItem, targetref, prefixToURIMap,
+                    contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
+        }
+
+        // TODO: Also detect readonly node/ancestor situation
+        if (destinationObject instanceof NodeInfo && ((NodeInfo) destinationObject).getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)
+            return (NodeInfo) destinationObject;
+        else
+            return null;
     }
 
     /**

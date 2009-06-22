@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Navigator;
 
 import java.net.URI;
 import java.net.URL;
@@ -1015,12 +1016,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     /**
-     * Handle events related to externally updating one or more instance documents.
+     * Handle an updated instance after a submission with instance replacement/update.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param updatedInstance   instance to replace or update (can be new instance object or existing one)
+     * @param updatedTreeRoot   root of the tree which was updated (can be root element or another element)
      */
-    public void handleNewInstanceDocument(PipelineContext pipelineContext, final XFormsInstance newInstance) {
+    public void handleUpdatedInstance(PipelineContext pipelineContext, final XFormsInstance updatedInstance, final NodeInfo updatedTreeRoot) {
 
         // Set the instance on this model
-        setInstance(newInstance, true);
+        // Instance object might already be there, or might be a new one. In any case, instance needs to be marked as updated.
+        setInstance(updatedInstance, true);
 
         // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
         {
@@ -1041,7 +1047,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // performing RRRR directly
             deferredActionContext.setAllDeferredFlags(true);
 
-            if (newInstance.isReadOnly()) {
+            if (updatedInstance.isReadOnly()) {
                 // Read-only instance: replacing does not cause value change events at the moment, so we just set the
                 // flags but do not mark values as changed. Anyway, that event logic is broken, see below.
 
@@ -1066,7 +1072,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("model", "marking nodes for value change following instance replacement",
-                            new String[] { "instance id", newInstance.getEffectiveId() });
+                            new String[] { "instance id", updatedInstance.getEffectiveId() });
 
                 // Mark all nodes to which single-node controls are bound
                 xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
@@ -1078,20 +1084,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                             return;
 
                         // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
-                        final NodeInfo currentNodeInfo = control.getBoundNode();
-                        if (currentNodeInfo == null)
+                        final NodeInfo boundNodeInfo = control.getBoundNode();
+                        if (boundNodeInfo == null)
                             return;
 
                         // We only mark nodes in mutable documents
-                        if (!(currentNodeInfo instanceof NodeWrapper))
+                        if (!(boundNodeInfo instanceof NodeWrapper))
                             return;
 
-                        // We only mark nodes in the replaced instance
-                        if (getInstanceForNode(currentNodeInfo) != newInstance)
+                        // Mark node only if it is within the updated tree
+                        if (!Navigator.isAncestorOrSelf(updatedTreeRoot, boundNodeInfo))
                             return;
 
                         // Finally, mark node
-                        InstanceData.markValueChanged(currentNodeInfo);
+                        InstanceData.markValueChanged(boundNodeInfo);
                     }
                 });
             }

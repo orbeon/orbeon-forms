@@ -1933,7 +1933,7 @@
                     </li>
                     <li>
                         <p>
-                            When using client-side state handling, less data may be transmitted between server and
+                            When using client-side state handling, less data might be transmitted between server and
                             client.
                         </p>
                     </li>
@@ -1952,6 +1952,11 @@
                     <code>&lt;xforms:instance></code>. When the instance is replaced, the replaced instance is
                     read-only if and only if the <code>&lt;xforms:submission></code> that does the replacement has a
                     attribute <code>xxforms:readonly="true"</code>.
+                </p>
+                <p>
+                    When this attribute is set to <code>true</code> on <code>&lt;xforms:submission></code> and if the
+                    <code>targetref</code> attribute is specifed, the replacement target must be an instance's root
+                    element.
                 </p>
             </section>
             <a name="xxforms-shared"/>

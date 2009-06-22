@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2009 Orbeon, Inc.
 
@@ -235,84 +235,84 @@
                                     <event type="xforms-enabled" target="day-select" indexes="2"/>
                                 </events>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-modelÂ·1">
                                 <date>
                                     <year>2009</year>
                                     <month>1</month>
                                     <day>2</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-modelÂ·1">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-modelÂ·1">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-modelÂ·1">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
                                     <day>3</day>
                                 </days>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-modelÂ·2">
                                 <date>
                                     <year>2008</year>
                                     <month>2</month>
                                     <day>1</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-modelÂ·2">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-modelÂ·2">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-modelÂ·2">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
                                     <day>3</day>
                                 </days>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="date-instance" model-id="fr-dropdown-date$date-modelÂ·3">
                                 <date>
                                     <year>2008</year>
                                     <month>2</month>
                                     <day>1</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="years-itemset" model-id="fr-dropdown-date$date-modelÂ·3">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="months-itemset" model-id="fr-dropdown-date$date-modelÂ·3">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="days-itemset" model-id="fr-dropdown-date$date-modelÂ·3">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
@@ -328,31 +328,31 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="date-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="fr-dropdown-date$component-group·1" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
-                        <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
-                        <xxf:control id="fr-dropdown-date$day-select·1">2</xxf:control>
-                        <xxf:control id="fr-dropdown-date$component-group·2" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·2">2008</xxf:control>
-                        <xxf:control id="fr-dropdown-date$month-select·2">2</xxf:control>
-                        <xxf:control id="fr-dropdown-date$day-select·2">1</xxf:control>
-                        <xxf:control id="fr-dropdown-date$component-group·3" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·3">2008</xxf:control>
-                        <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
-                        <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
+                        <xxf:control id="fr-dropdown-date$component-groupÂ·1" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-selectÂ·1">2009</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-selectÂ·1">1</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-selectÂ·1">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$component-groupÂ·2" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-selectÂ·2">2008</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-selectÂ·2">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-selectÂ·2">1</xxf:control>
+                        <xxf:control id="fr-dropdown-date$component-groupÂ·3" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$year-selectÂ·3">2008</xxf:control>
+                        <xxf:control id="fr-dropdown-date$month-selectÂ·3">2</xxf:control>
+                        <xxf:control id="fr-dropdown-date$day-selectÂ·3">1</xxf:control>
                         <xxf:control id="add-row-trigger" label="Add"/>
                         <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
                     <xxf:itemsets>
-                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-selectÂ·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-selectÂ·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-selectÂ·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-selectÂ·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-selectÂ·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-selectÂ·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-selectÂ·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-selectÂ·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-selectÂ·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                     </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
@@ -389,8 +389,8 @@
                                                     </instance>
                                                 </xforms:instance>
                                                 <!-- TEST: The variable below must be found and not cause an error -->
-                                                <xxforms:variable name="ctx" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
-                                                <xforms:bind nodeset="value" readonly="exforms:readonly($ctx)"/>
+                                               Â <xxforms:variable name="ctx" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                                       Â  Â  Â  Â  Â <xforms:bind nodeset="value" readonly="exforms:readonly($ctx)"/>
                                                 <!-- TEST: The variable must point to the outer element -->
                                                 <xforms:bind nodeset="name" calculate="name($ctx[1])"/>
                                             </xforms:model>
@@ -749,8 +749,8 @@
                         <xxf:attribute id="fr-super-control-1$xf-3" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
                         <xxf:attribute id="fr-super-control-2$xf-3" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
                         <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:attribute id="fr-super-control-3$xf-3·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-3$xf-3·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-3Â·1" for="fr-super-control-3$my-divÂ·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-3Â·2" for="fr-super-control-3$my-divÂ·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1065,14 +1065,14 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="repeat-no-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-output·1">2</xxf:control>
-                        <xxf:control id="my-output·2">2</xxf:control>
+                        <xxf:control id="my-outputÂ·1">2</xxf:control>
+                        <xxf:control id="my-outputÂ·2">2</xxf:control>
                         <xxf:copy-repeat-template id="my-foo$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-foo$my-output·1">2</xxf:control>
-                        <xxf:control id="my-foo$my-output·2">2</xxf:control>
+                        <xxf:control id="my-foo$my-outputÂ·1">2</xxf:control>
+                        <xxf:control id="my-foo$my-outputÂ·2">2</xxf:control>
                         <xxf:copy-repeat-template id="my-bar$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-bar$my-output·1">2</xxf:control>
-                        <xxf:control id="my-bar$my-output·2">2</xxf:control>
+                        <xxf:control id="my-bar$my-outputÂ·1">2</xxf:control>
+                        <xxf:control id="my-bar$my-outputÂ·2">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1196,15 +1196,15 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="repeat-no-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-output·1">1</xxf:control>
-                        <xxf:control id="my-output·2">1</xxf:control>
+                        <xxf:control id="my-outputÂ·1">1</xxf:control>
+                        <xxf:control id="my-outputÂ·2">1</xxf:control>
                         <xxf:copy-repeat-template id="my-foo$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-foo$my-output·1">2</xxf:control>
-                        <xxf:control id="my-foo$my-output·2">2</xxf:control>
+                        <xxf:control id="my-foo$my-outputÂ·1">2</xxf:control>
+                        <xxf:control id="my-foo$my-outputÂ·2">2</xxf:control>
                         <xxf:copy-repeat-template id="my-bar$repeat-xbl" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="my-bar$my-output·1">2</xxf:control>
-                        <xxf:control id="my-bar$my-output·2">2</xxf:control>
-                        <xxf:control id="my-bar$my-output·3">2</xxf:control>
+                        <xxf:control id="my-bar$my-outputÂ·1">2</xxf:control>
+                        <xxf:control id="my-bar$my-outputÂ·2">2</xxf:control>
+                        <xxf:control id="my-bar$my-outputÂ·3">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1272,8 +1272,8 @@
                     <xxf:control-values>
                         <xxf:control id="clash" label="NOP"/>
                         <xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-foobar$xf-2·1">1</xxf:control>
-                        <xxf:control id="my-foobar$xf-2·2">1</xxf:control>
+                        <xxf:control id="my-foobar$xf-2Â·1">1</xxf:control>
+                        <xxf:control id="my-foobar$xf-2Â·2">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

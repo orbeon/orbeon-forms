@@ -139,6 +139,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             }
         } else {
             // Old serialization (instance is directly in the DOM)
+            // TODO: Do we still need this?
             final Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) containerElement.elements().get(0));
             documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
         }

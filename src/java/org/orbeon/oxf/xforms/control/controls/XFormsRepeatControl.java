@@ -144,17 +144,19 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final List destinationNodeset;
             final int requestedDestinationIndex;
             {
-                final String containingRepeatEffectiveId;
+                final XFormsRepeatControl destinationControl;
                 if (dndEnd.length > 1) {
-                    containingRepeatEffectiveId
-                            = getId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
+                    // DnD destination is a different repeat control
+                    final String containingRepeatEffectiveId
+                            = getPrefixedId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
                                 + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
+
+                    destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
                 } else {
-                    containingRepeatEffectiveId = getId();
+                    // DnD destination is the current repeat control
+                    destinationControl = this;
                 }
 
-
-                final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
                 destinationNodeset = new ArrayList(destinationControl.getBindingContext().getNodeset());
                 requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
             }

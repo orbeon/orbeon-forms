@@ -107,7 +107,7 @@ ORBEON.widgets.datatable = function (element, index) {
     // Resize the header container
     YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
     if (this.height != 'auto' && this.headBodySplit) {
-        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.thead.clientHeight + 'px');
+        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.thead.rows[0].clientHeight + 'px');
     } else if (! this.headBodySplit && this.height == 'auto') {
         YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
@@ -142,7 +142,7 @@ ORBEON.widgets.datatable = function (element, index) {
         
         // Do more resizing
         if (this.height != 'auto') {
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.thead.clientHeight - 5) + 'px');
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.thead.rows[0].clientHeight - 5) + 'px');
         }
         
         // And more assembly

@@ -209,7 +209,8 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                     final String name = (String) entry.getKey();
                     final String value = (String) entry.getValue();
 
-                    final String newValue = (String) customMIPs2.get(name);
+                    // customMIPs2 may be null if the control becomes no longer bound
+                    final String newValue = (customMIPs2 == null) ? null : (String) customMIPs2.get(name);
                     if (newValue == null || !value.equals(newValue)) {
 
                         if (sb.length() > 0)
@@ -224,22 +225,25 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 }
 
                 // Classes to add
-                for (Iterator k = customMIPs2.entrySet().iterator(); k.hasNext();) {
-                    final Map.Entry entry = (Map.Entry) k.next();
-                    final String name = (String) entry.getKey();
-                    final String value = (String) entry.getValue();
+                // customMIPs2 may be null if the control becomes no longer bound
+                if (customMIPs2 != null) {
+                    for (Iterator k = customMIPs2.entrySet().iterator(); k.hasNext();) {
+                        final Map.Entry entry = (Map.Entry) k.next();
+                        final String name = (String) entry.getKey();
+                        final String value = (String) entry.getValue();
 
-                    final String oldValue = (String) customMIPs1.get(name);
-                    if (oldValue == null || !value.equals(oldValue)) {
+                        final String oldValue = (String) customMIPs1.get(name);
+                        if (oldValue == null || !value.equals(oldValue)) {
 
-                        if (sb.length() > 0)
-                            sb.append(' ');
+                            if (sb.length() > 0)
+                                sb.append(' ');
 
-                        sb.append('+');
-                        // TODO: encode so that there are no spaces
-                        sb.append(name);
-                        sb.append('-');
-                        sb.append(value);
+                            sb.append('+');
+                            // TODO: encode so that there are no spaces
+                            sb.append(name);
+                            sb.append('-');
+                            sb.append(value);
+                        }
                     }
                 }
 

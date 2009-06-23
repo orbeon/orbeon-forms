@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -33,10 +34,7 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utilities for XForms submission processing.
@@ -470,6 +468,64 @@ public class XFormsSubmissionUtils {
         } catch (FileNotFoundException e) {
             throw new OXFException(e);
         }
+    }
+
+    /**
+     * Annotate the DOM with information about file name and mediatype provided by uploads if available.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param containingDocument    current XFormsContainingDocument
+     * @param currentInstance       instance containing the nodes to check
+     */
+    public static void annotateBoundRelevantUploadControls(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
+        final XFormsControls xformsControls = containingDocument.getControls();
+        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
+        if (uploadControls != null) {
+            for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
+                final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
+                if (currentControl.isRelevant()) {
+                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
+                    if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                        // Found one relevant upload control bound to the instance we are submitting
+                        // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
+                        // will be removed during the next recalculate.
+                        final String fileName = currentControl.getFileName(pipelineContext);
+                        if (fileName != null) {
+                            InstanceData.setCustom(controlBoundNodeInfo, "xxforms-filename", fileName);
+                        }
+                        final String mediatype = currentControl.getFileMediatype(pipelineContext);
+                        if (mediatype != null) {
+                            InstanceData.setCustom(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns whether there are relevant upload controls bound to any node of the given instance.
+     *
+     * @param containingDocument    current XFormsContainingDocument
+     * @param currentInstance       instance to check
+     * @return                      true iif there are relevant upload controls bound
+     */
+    public static boolean hasBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
+        final XFormsControls xformsControls = containingDocument.getControls();
+        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
+        if (uploadControls != null) {
+            for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
+                final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
+                if (currentControl.isRelevant()) {
+                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
+                    if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                        // Found one relevant upload control bound to the instance we are submitting
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
 

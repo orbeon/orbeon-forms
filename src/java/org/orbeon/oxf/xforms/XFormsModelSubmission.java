@@ -316,7 +316,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 final boolean hasBoundRelevantUploadControl;
                 if (refInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
-                    hasBoundRelevantUploadControl = XFormsUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
+                    hasBoundRelevantUploadControl = XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
                 } else {
                     hasBoundRelevantUploadControl = false;
                 }
@@ -497,7 +497,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Check if a submission requires file upload information
                     if (requestedSerialization.startsWith("multipart/")) {
                         // Annotate before re-rooting/pruning
-                        XFormsUtils.annotateBoundRelevantUploadControls(pipelineContext, containingDocument, refInstance);
+                        XFormsSubmissionUtils.annotateBoundRelevantUploadControls(pipelineContext, containingDocument, refInstance);
                     }
 
                     // Create document to submit

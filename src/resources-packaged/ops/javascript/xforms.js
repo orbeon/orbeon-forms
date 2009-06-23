@@ -2625,14 +2625,7 @@ ORBEON.xforms.Events = {
             if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
-            if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")
-                    // We don't support incremental mode for HTML area.
-                    // See: http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Limitations
-                    // The reason for this limitation is that as HTML clean-up happens on the server, so when we get a new
-                    // new value from the server we can't know if the value has changed because it has been cleaned up, or because
-                    // it really is a new value. Now we just update the field with the value we get from the server, but if done
-                    // when the user types, this leads to the cursor moving back to the beginning of the HTML area while typing.
-                    && !(ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html") && ORBEON.util.Dom.hasClass(target, "xforms-textarea"))) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
                 ORBEON.xforms.Server.fireEvents([event], false);
             }
@@ -3673,8 +3666,15 @@ ORBEON.widgets.RTE = function() {
          * Called to set the value of the RTE
          */
         setValue: function(control, newValue) {
-            var yuiRTE = rteEditors[control.id];
-            yuiRTE.setEditorHTML(newValue);
+            // Don't update the textarea with HTML from the server while the user is typing, otherwise the user
+            // loses their cursor position. This lets us have a certain level of support for incremental rich text areas,
+            // however, ignoring server values means that the visual state of the RTE can become out of sync
+            // with the server value (for example, the result of a calculation wouldn't be visible until focus moved
+            // out of the field).
+            if(ORBEON.util.Dom.hasClass(control, "xforms-incremental") && ORBEON.xforms.Globals.currentFocusControlId != control.id) {
+                var yuiRTE = rteEditors[control.id];
+                yuiRTE.setEditorHTML(newValue);
+            }
         },
 
         getValue: function(control) {

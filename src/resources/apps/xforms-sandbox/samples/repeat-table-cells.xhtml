@@ -37,6 +37,12 @@
                 </table>
             </xforms:instance>
 
+            <xforms:action ev:event="xforms-ready">
+                <xforms:setindex repeat="row-repeat" index="2"/>
+                <xforms:setindex repeat="cell-repeat" index="3"/>
+                <xforms:setfocus control=""/>
+            </xforms:action>
+
             <xforms:instance id="variable">
                 <variable xmlns="">
                     <iteration-count/>
@@ -130,13 +136,50 @@
                 <xhtml:tr>
                     <xforms:repeat nodeset="td">
                         <xhtml:td>
-                            (<xforms:output value="count(xxforms:context('row-repeat-dd-row')/preceding-sibling::*) + 1"/>,
-                            <xforms:output value="position()"/>)
+                            (<xforms:output id="output-1" value="position()"/>)
                         </xhtml:td>
                     </xforms:repeat>
                 </xhtml:tr>
             </xforms:repeat>
         </xhtml:table>
+        
+        <!--<xhtml:table>-->
+            <!--<xforms:repeat nodeset="tr" xxforms:dnd="true" id="row-repeat-dd-row">-->
+                <!--<xhtml:tr>-->
+                    <!--<xforms:repeat nodeset="td">-->
+                        <!--<xhtml:td>-->
+                            <!--(<xforms:output value="count(xxforms:context('row-repeat-dd-row')/preceding-sibling::*) + 1"/>,-->
+                            <!--<xforms:output value="position()"/>)-->
+                        <!--</xhtml:td>-->
+                    <!--</xforms:repeat>-->
+                <!--</xhtml:tr>-->
+            <!--</xforms:repeat>-->
+        <!--</xhtml:table>-->
+
+        <!--<xhtml:h2>Table D&amp;D of Cells</xhtml:h2>-->
+
+        <!--<xhtml:table>-->
+            <!--<xforms:repeat nodeset="tr" id="row-repeat-dd-cell">-->
+                <!--<xhtml:tr>-->
+                    <!--<xforms:repeat nodeset="td" xxforms:dnd="true">-->
+                        <!--<xhtml:td>-->
+                            <!--(<xforms:output value="count(xxforms:context('row-repeat-dd-cell')/preceding-sibling::*) + 1"/>,-->
+                            <!--<xforms:output value="position()"/>)-->
+                        <!--</xhtml:td>-->
+                    <!--</xforms:repeat>-->
+                <!--</xhtml:tr>-->
+            <!--</xforms:repeat>-->
+        <!--</xhtml:table>-->
+
+        <!--<xhtml:h2>List</xhtml:h2>-->
+
+        <!--<xhtml:ol>-->
+            <!--<xforms:repeat nodeset="tr" xxforms:dnd="true">-->
+                <!--<xhtml:li>-->
+                    <!--Item number <xforms:output value="position()"/>-->
+                <!--</xhtml:li>-->
+            <!--</xforms:repeat>-->
+        <!--</xhtml:ol>-->
 
         <xhtml:h2>Table D&amp;D of Cells</xhtml:h2>
 
@@ -145,8 +188,8 @@
                 <xhtml:tr>
                     <xforms:repeat nodeset="td" xxforms:dnd="true">
                         <xhtml:td>
-                            (<xforms:output value="count(xxforms:context('row-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
-                            <xforms:output value="position()"/>)
+                            (<xforms:output id="output-2-1" value="count(xxforms:context('row-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
+                            <xforms:output id="output-2-2" value="position()"/>)
                         </xhtml:td>
                     </xforms:repeat>
                 </xhtml:tr>
@@ -158,7 +201,7 @@
         <xhtml:ol>
             <xforms:repeat nodeset="tr" xxforms:dnd="true">
                 <xhtml:li>
-                    Item number <xforms:output value="position()"/>
+                    Item number <xforms:output id="output-3" value="position()"/>
                 </xhtml:li>
             </xforms:repeat>
         </xhtml:ol>
@@ -169,10 +212,10 @@
             <xhtml:div style="border: 1px solid grey; margin: 5px; float: left">
                 <xforms:repeat nodeset="td" xxforms:dnd="true" id="middle">
                     <xhtml:div style="border: 1px solid grey; margin: 5px; padding: 3px">
-                        <xforms:output ref="."/>
+                        <xforms:output id="output-4-1" ref="."/>
                         <xforms:repeat nodeset="../td" xxforms:dnd="true" id="inner">
                             <xhtml:span style="border: 1px solid grey; margin: 5px">
-                                <xforms:output ref="."/>
+                                <xforms:output id="output-4-2" ref="."/>
                             </xhtml:span>
                         </xforms:repeat>
                     </xhtml:div>

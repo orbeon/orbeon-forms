@@ -415,13 +415,45 @@ public class InstanceData {
     }
 
     public static boolean getPreviousInheritedRelevantState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_RELEVANT : existingInstanceData.previousInheritedRelevantState;
+        if (nodeInfo instanceof NodeWrapper) {
+            return getPreviousInheritedRelevantState(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
+        } else if (nodeInfo != null) {
+            return DEFAULT_RELEVANT;
+        } else {
+            throw new OXFException("Cannot get relevant Model Item Property on null object.");
+        }
+    }
+
+    private static boolean getPreviousInheritedRelevantState(Node node) {
+        // Iterate this node and its parents. The node is non-relevant if it or any ancestor is non-relevant.
+        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
+            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
+            final boolean currentInheritedRelevant = (currentInstanceData == null) ? DEFAULT_RELEVANT : currentInstanceData.previousInheritedRelevantState;
+            if (!currentInheritedRelevant)
+                return false;
+        }
+        return true;
     }
 
     public static boolean getPreviousInheritedReadonlyState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_READONLY : existingInstanceData.previousInheritedReadonlyState;
+        if (nodeInfo instanceof NodeWrapper) {
+            return getPreviousInheritedReadonlyState(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
+        } else if (nodeInfo != null) {
+            return true;// Default for non-mutable nodes is to be read-only
+        } else {
+            throw new OXFException("Cannot get readonly Model Item Property on null object.");
+        }
+    }
+
+    private static boolean getPreviousInheritedReadonlyState(Node node) {
+        // Iterate this node and its parents. The node is readonly if it or any ancestor is readonly.
+        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
+            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
+            final boolean currentInheritedReadonly = (currentInstanceData == null) ? DEFAULT_READONLY : currentInstanceData.previousInheritedReadonlyState;
+            if (currentInheritedReadonly)
+                return true;
+        }
+        return false;
     }
 
     public static boolean getPreviousRequiredState(NodeInfo nodeInfo) {
@@ -571,3 +603,4 @@ public class InstanceData {
         }
     }
 }
+

@@ -3793,6 +3793,7 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElements: function(form) {
+        return;
         var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
         for (var dnElementIndex = 0; dnElementIndex < dndElements.length; dnElementIndex++) {
             var dndElement = dndElements[dnElementIndex];

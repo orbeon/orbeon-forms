@@ -166,11 +166,12 @@ ORBEON.widgets.datatable = function (element, index) {
     for (var j = 0; j < this.headerColumns.length; j++) {
         var childDiv = YAHOO.util.Selector.query('div', this.headerColumns[j], true);
         var colResizer = null;
-        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+         if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
             colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
             this.colResizers[ this.colResizers.length] = colResizer;
-        }
-		var width = columnWidths[j] + 'px';
+        } 
+         
+        var width = (columnWidths[j] - 20) + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0) {

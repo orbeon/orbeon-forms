@@ -2282,6 +2282,13 @@ ORBEON.xforms.Controls = {
     showDialog: function(controlId, neighbor) {
         var divElement = ORBEON.util.Dom.getElementById(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+
+        // Render the dialog if needed
+        if (YAHOO.util.Dom.hasClass(divElement, "xforms-initially-hidden")) {
+            ORBEON.util.Dom.removeClass(divElement, "xforms-initially-hidden");
+            yuiDialog.render();
+        }
+
         // Reapply those classes. Those are classes added by YUI when creating the dialog, but they are then removed
         // by YUI if you close the dialog using the "X". So when opening the dialog, we add those again, just to make sure.
         // A better way to handle this would be to create the YUI dialog every time when we open it, instead of doing this
@@ -3785,27 +3792,23 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.removeListener(element, "change", ORBEON.xforms.Events.change);
     },
 
-    registerDraggableListenersOnRepeatElements: function() {
-        var repeatDelimiter = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter");
-
-        for (var i = 0; i < repeatDelimiter.length; i++) {
-            var previousSiblingId = YAHOO.util.Dom.getPreviousSibling(repeatDelimiter[i]).id;
-            var repeatElement = YAHOO.util.Dom.getNextSibling(repeatDelimiter[i]);
-            if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd")) {
-                //Right now, we support Drag n Drop of following elements
-                if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td" ||
-	    		        repeatElement.tagName.toLowerCase() == "li") {
-                    ORBEON.xforms.Init.registerDraggableListenersOnRepeatElement(repeatElement, previousSiblingId);
-                }
+    registerDraggableListenersOnRepeatElements: function(form) {
+        var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
+        for (var dnElementIndex = 0; dnElementIndex < dndElements.length; dnElementIndex++) {
+            var dndElement = dndElements[dnElementIndex];
+            // Right now, we support D&D of following elements
+            var tagName = dndElement.tagName.toLowerCase();
+            if (tagName == "div" || tagName == "tr" || tagName == "td" || tagName == "li") {
+                ORBEON.xforms.Init.registerDraggableListenersOnRepeatElement(dndElement);
             }
         }
     },
 
-    registerDraggableListenersOnRepeatElement: function(repeatElement, previousSiblingId) {
+    registerDraggableListenersOnRepeatElement: function(repeatElement) {
         var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
-        if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
+        if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
             draggableItem.setXConstraint(0, 0);
-        else if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
+        else if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
             draggableItem.setYConstraint(0, 0);
     },
 
@@ -3923,7 +3926,6 @@ ORBEON.xforms.Init = {
             }
         }
 
-        ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
         // Register events that bubble on document for all browsers
         if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
             YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
@@ -3961,6 +3963,9 @@ ORBEON.xforms.Init = {
                 // interaction with the form before it is initialized
                 ORBEON.util.Dom.removeClass(form, "xforms-initially-hidden");
 
+                // Initialize D&D
+                ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements(form);
+
                 // Initialize loading and error indicator
                 ORBEON.xforms.Globals.formErrorPanel[formID] = null;
                 ORBEON.xforms.Globals.formLoadingNone[formID] = null;
@@ -3971,8 +3976,7 @@ ORBEON.xforms.Init = {
                     var formChild = form.childNodes[formChildIndex];
                     if (formChild.className == "xforms-loading-loading") {
                         formChild.style.display = "block";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false });
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].render(document.body);
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false, monitorresize: true });
                         ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
                             YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
                             YAHOO.util.Dom.getY(formChild)
@@ -3993,8 +3997,6 @@ ORBEON.xforms.Init = {
                             constraintoviewport: true,
                             draggable: true
                         });
-                        errorPanel.render();
-                        errorPanel.element.style.display = "none";
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
                         ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
@@ -4475,7 +4477,6 @@ ORBEON.xforms.Init = {
         var isVisible = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
         var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
         // Make the dialog "visible", otherwise it doesn't initialize correctly
-        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
 
         // Create dialog object
         var yuiDialog;
@@ -4506,13 +4507,8 @@ ORBEON.xforms.Init = {
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         }
-        yuiDialog.render();
 
-        // We hide the dialog as it otherwise interfers with other dialogs, preventing
-        // the cursor from showing in input fields of other dialogs
-        yuiDialog.element.style.display = "none";
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
-
         if (isVisible)
             ORBEON.xforms.Controls.showDialog(dialog.id, null);
     }
@@ -4558,12 +4554,18 @@ ORBEON.xforms.Server = {
     showError: function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
         if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Utils.getProperty(SHOW_ERROR_DIALOG_PROPERTY) == "true") {
-            if (ORBEON.xforms.Globals.formErrorPanel[formID]) {
-                ORBEON.xforms.Globals.formErrorPanel[formID].element.style.display = "block";
-                ORBEON.xforms.Globals.formErrorPanel[formID].errorTitleDiv.innerHTML = title;
-                ORBEON.xforms.Globals.formErrorPanel[formID].errorDetailsDiv.innerHTML = details;
-                ORBEON.xforms.Globals.formErrorPanel[formID].show();
-                ORBEON.xforms.Globals.formErrorPanel[formID].center();
+            var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
+            if (formErrorPanel) {
+                // Render the dialog if needed
+                if (YAHOO.util.Dom.hasClass(formErrorPanel.element, "xforms-initially-hidden")) {
+                    ORBEON.util.Dom.removeClass(formErrorPanel.element, "xforms-initially-hidden");
+                    formErrorPanel.render();
+                }
+                formErrorPanel.element.style.display = "block";
+                formErrorPanel.errorTitleDiv.innerHTML = title;
+                formErrorPanel.errorDetailsDiv.innerHTML = details;
+                formErrorPanel.show();
+                formErrorPanel.center();
             }
         }
     },
@@ -7182,8 +7184,10 @@ function xformsDisplayIndicator(state, progressMessage) {
                 break;
             case "none":
                 if (!ORBEON.xforms.Globals.loadingOtherPage) {
-                    if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null)
+                    if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].render(document.body);
                         ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
+                    }
                     if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
                         ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
                 }

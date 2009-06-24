@@ -49,6 +49,7 @@ public class XFormsControls implements XFormsObjectResolver {
     
     private Map constantItems;
 
+    // Options configured by properties
     private boolean isPlainValueChange;
     private boolean isInitialRefreshEvents;
 
@@ -316,6 +317,23 @@ public class XFormsControls implements XFormsObjectResolver {
                     "controls updated", Integer.toString(listener.getUpdateCount()),
                     "repeat iterations", Integer.toString(listener.getIterationCount())
             });
+
+//            final int ITERATIONS = 1;
+//            for (int k = 0; k < ITERATIONS; k++) {
+//
+//                final UpdateBindingsListener listener = new UpdateBindingsListener(pipelineContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch());
+//                {
+//                    // Visit all controls and update their bindings
+//                    visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
+//                }
+//                if (k == ITERATIONS - 1) {
+//                    containingDocument.endHandleOperation(new String[] {
+//                            "controls updated", Integer.toString(listener.getUpdateCount()),
+//                            "repeat iterations", Integer.toString(listener.getIterationCount())
+//                    });
+//                } else {
+//                }
+//            }
 
             // Controls are clean
             initialControlTree.markBindingsClean();
@@ -833,95 +851,110 @@ public class XFormsControls implements XFormsObjectResolver {
                     // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
                     final boolean isShouldSendValueChangeEvent = newRelevantState && isControlValueChanged;
 
-                    if (isShouldSendValueChangeEvent) {
-                        if (isAllowSendingValueChangedEvents) {
-                            // Dispatch value change and...
+                    if (isFirstRefresh) {
+                        // Special processing for first refresh
 
-                            if (!isPlainValueChange) {
-                                // ... all MIP events
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.ALL);
-                            } else {
-                                // ... nothing else
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALUE);
+                        // Don't dispatch any value change
+                        // NOP
+
+                        // Display events only if the control is relevant
+                        if (newRelevantState) {
+
+                            // Dispatch xforms-enabled if needed
+                            if (isAllowSendingRelevantEvents) {
+                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.RELEVANT);
                             }
-                        } else {
-                            if (!isPlainValueChange) {
-                                // Dispatch all the allowed MIP events
 
-                                if (isAllowSendingRequiredEvents)
-                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.REQUIRED);
-                                if (isAllowSendingRelevantEvents)
-                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.RELEVANT);
-                                if (isAllowSendingReadonlyEvents)
-                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.READONLY);
-                                if (isAllowSendingValidEvents)
-                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALID);
+                            // Dispatch events only if the MIP value is different from the default
+
+                            // Dispatch xforms-required if needed
+                            if (isAllowSendingRequiredEvents && InstanceData.getRequired(currentNodeInfo)) {
+                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.REQUIRED);
+                            }
+
+                            // Dispatch xforms-readonly if needed
+                            if (isAllowSendingReadonlyEvents && InstanceData.getInheritedReadonly(currentNodeInfo)) {
+                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.READONLY);
+                            }
+
+                            // Dispatch xforms-invalid if needed
+                            if (isAllowSendingValidEvents && !InstanceData.getValid(currentNodeInfo)) {
+                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALID);
                             }
                         }
-                    }
 
-                    if (!isShouldSendValueChangeEvent || isPlainValueChange) {
-                        // Send individual MIP events
-                        // Come here if MIP events are not already handled above
+                    } else {
+                        // Subsequent refreshes
 
-                        // Dispatch xforms-optional/xforms-required if needed
-                        if (isAllowSendingRequiredEvents) {
-                            if (isFirstRefresh) {
-                                // Send in all cases
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.REQUIRED);
+                        if (isShouldSendValueChangeEvent) {
+                            if (isAllowSendingValueChangedEvents) {
+                                // Dispatch value change and...
+
+                                if (!isPlainValueChange) {
+                                    // ... all MIP events
+                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.ALL);
+                                } else {
+                                    // ... nothing else
+                                    addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALUE);
+                                }
                             } else {
+                                if (!isPlainValueChange) {
+                                    // Dispatch all the allowed MIP events
+
+                                    if (isAllowSendingRequiredEvents)
+                                        addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.REQUIRED);
+                                    if (isAllowSendingRelevantEvents)
+                                        addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.RELEVANT);
+                                    if (isAllowSendingReadonlyEvents)
+                                        addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.READONLY);
+                                    if (isAllowSendingValidEvents)
+                                        addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALID);
+                                }
+                            }
+                        }
+
+                        if (!isShouldSendValueChangeEvent || isPlainValueChange) {
+                            // Send individual MIP events
+                            // Come here if MIP events are not already handled above
+
+                            // Dispatch xforms-optional/xforms-required if needed
+                            if (isAllowSendingRequiredEvents) {
                                 // Send only when value has changed
                                 final boolean previousRequiredState = InstanceData.getPreviousRequiredState(currentNodeInfo);
                                 final boolean newRequiredState = InstanceData.getRequired(currentNodeInfo);
 
-                                if ((previousRequiredState && !newRequiredState) || (!previousRequiredState && newRequiredState)) {
+                                if (previousRequiredState != newRequiredState) {
                                     addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.REQUIRED);
                                 }
                             }
-                        }
-                        // Dispatch xforms-enabled/xforms-disabled if needed
-                        if (isAllowSendingRelevantEvents) {
-
-                            if (isFirstRefresh) {
-                                // Send in all cases
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.RELEVANT);
-                            } else {
+                            // Dispatch xforms-enabled/xforms-disabled if needed
+                            if (isAllowSendingRelevantEvents) {
                                 // Send only when value has changed
                                 final boolean previousRelevantState = InstanceData.getPreviousInheritedRelevantState(currentNodeInfo);
 
-                                if ((previousRelevantState && !newRelevantState) || (!previousRelevantState && newRelevantState)) {
+                                if (previousRelevantState != newRelevantState) {
                                     addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.RELEVANT);
                                 }
                             }
-                        }
-                        // Dispatch xforms-readonly/xforms-readwrite if needed
-                        if (isAllowSendingReadonlyEvents) {
-                            if (isFirstRefresh) {
-                                // Send in all cases
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.READONLY);
-                            } else {
+                            // Dispatch xforms-readonly/xforms-readwrite if needed
+                            if (isAllowSendingReadonlyEvents) {
                                 final boolean previousReadonlyState = InstanceData.getPreviousInheritedReadonlyState(currentNodeInfo);
                                 final boolean newReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
 
-                                if ((previousReadonlyState && !newReadonlyState) || (!previousReadonlyState && newReadonlyState)) {
+                                if (previousReadonlyState != newReadonlyState) {
                                     addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.READONLY);
                                 }
                             }
-                        }
 
-                        // Dispatch xforms-valid/xforms-invalid if needed
+                            // Dispatch xforms-valid/xforms-invalid if needed
 
-                        // NOTE: There is no mention in the spec that these events should be displatched automatically
-                        // when the value has changed, contrary to the other events above.
-                        if (isAllowSendingValidEvents) {
-                            if (isFirstRefresh) {
-                                // Send in all cases
-                                addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALID);
-                            } else {
+                            // NOTE: There is no mention in the spec that these events should be displatched automatically
+                            // when the value has changed, contrary to the other events above.
+                            if (isAllowSendingValidEvents) {
                                 final boolean previousValidState = InstanceData.getPreviousValidState(currentNodeInfo);
                                 final boolean newValidState = InstanceData.getValid(currentNodeInfo);
 
-                                if ((previousValidState && !newValidState) || (!previousValidState && newValidState)) {
+                                if (previousValidState != newValidState) {
                                     addEventToSchedule(existingEventSchedule, effectiveId, EventSchedule.VALID);
                                 }
                             }

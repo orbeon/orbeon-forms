@@ -377,7 +377,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Restore instances
         restoreInstances(pipelineContext);
 
-        // Refresh binds
+        // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
+        deferredActionContext.rebuild = true;
+        deferredActionContext.revalidate = true;
+
         doRebuild(pipelineContext);
         if (binds != null)
             binds.applyComputedExpressionBinds(pipelineContext);
@@ -629,6 +632,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: a, b, c
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
+            deferredActionContext.rebuild = true;
+            deferredActionContext.recalculate = true;
+            deferredActionContext.revalidate = true;
+
             doRebuild(pipelineContext);
             doRecalculate(pipelineContext);
             doRevalidate(pipelineContext);
@@ -697,7 +704,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            containingDocument.getControls().doRefresh(pipelineContext, this);
+            doRefresh(pipelineContext);
 
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event
@@ -930,8 +937,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRebuild(PipelineContext pipelineContext) {
 
-        // Rebuild bind tree
-        if (binds != null) {
+        // Rebuild bind tree only if needed.
+        if (binds != null && deferredActionContext.rebuild) {
             binds.rebuild(pipelineContext);
             // TODO: rebuild computational dependency data structures
 
@@ -946,7 +953,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRecalculate(PipelineContext pipelineContext) {
 
-        if (instances != null && binds != null) {
+        // Recalculate only if needed
+        if (instances != null && binds != null && deferredActionContext.recalculate) {
             // Apply calculate binds
             binds.applyCalculateBinds(pipelineContext);
         }
@@ -959,7 +967,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRevalidate(final PipelineContext pipelineContext) {
 
-        if (instances != null && (mustBindValidate || mustSchemaValidate)) {
+        // Validate only if needed, including checking the flags, because if validation state is clean, validation
+        // being idempotent, revalidating is not needed.
+        if (instances != null && (mustBindValidate || mustSchemaValidate) && deferredActionContext.revalidate) {
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.startHandleOperation("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
@@ -1013,6 +1023,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         deferredActionContext.revalidate = false;
+    }
+
+    private void doRefresh(PipelineContext pipelineContext) {
+
+        // Only refresh if needed
+        if (deferredActionContext.refresh) {
+            containingDocument.getControls().doRefresh(pipelineContext, this);
+        }
+        // NOTE: deferredActionContext.refresh is set to false in refreshDone()
     }
 
     /**
@@ -1166,12 +1185,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public void rebuildRecalculateIfNeeded(PipelineContext pipelineContext) {
-        if (deferredActionContext.rebuild) {
-            doRebuild(pipelineContext);
-        }
-        if (deferredActionContext.recalculate) {
-            doRecalculate(pipelineContext);
-        }
+        doRebuild(pipelineContext);
+        doRecalculate(pipelineContext);
     }
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {

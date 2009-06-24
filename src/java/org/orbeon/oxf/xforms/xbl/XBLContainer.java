@@ -274,18 +274,20 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void initializeModels(PipelineContext pipelineContext, String[] eventsToDispatch) {
         for (int i = 0; i < eventsToDispatch.length; i++) {
-            if (i == 2) {
+            if (i == 2) {// before dispaching xforms-ready
                 // Initialize controls after all the xforms-model-construct-done events have been sent
-                 initializeNestedControls(pipelineContext);
+                initializeNestedControls(pipelineContext);
+
+                // Make sure there is at least one refresh
+                for (Iterator j = models.iterator(); j.hasNext();) {
+                    final XFormsModel currentModel = (XFormsModel) j.next();
+                    currentModel.getDeferredActionContext().refresh = true;
+                }
             }
 
             // Iterate over all the models
             for (Iterator j = models.iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
-
-                // Make sure there is at least one refresh
-                currentModel.getDeferredActionContext().refresh = true;
-
                 dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
             }
         }

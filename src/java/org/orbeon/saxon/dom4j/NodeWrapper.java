@@ -72,30 +72,29 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     protected NodeWrapper makeWrapper(Object node, DocumentWrapper docWrapper,
                                       NodeWrapper parent, int index) {
+
         NodeWrapper wrapper;
-        if (node instanceof Document) {
-            return docWrapper;
-        } else if (node instanceof Element) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.ELEMENT;
-        } else if (node instanceof Attribute) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.ATTRIBUTE;
-        } else if (node instanceof String || node instanceof Text || node instanceof CDATA) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.TEXT;
-        } else if (node instanceof Comment) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.COMMENT;
-        } else if (node instanceof ProcessingInstruction) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.PROCESSING_INSTRUCTION;
-        } else if (node instanceof Namespace) {
-            wrapper = new NodeWrapper(node, parent, index);
-            wrapper.nodeKind = Type.NAMESPACE;
-        } else {
-            throw new IllegalArgumentException("Bad node type in dom4j! " + node.getClass() + " instance " + node.toString());
+        final Node dom4jNode = (Node) node;
+        switch (dom4jNode.getNodeType()) {
+            case Type.DOCUMENT:
+                return docWrapper;
+            case Type.ELEMENT:
+            case Type.ATTRIBUTE:
+            case Type.COMMENT:
+            case Type.PROCESSING_INSTRUCTION:
+            case Type.NAMESPACE:
+            case Type.TEXT:
+                wrapper = new NodeWrapper(node, parent, index);
+                wrapper.nodeKind = dom4jNode.getNodeType();
+                break;
+            case 4: // dom4j CDATA
+                wrapper = new NodeWrapper(node, parent, index);
+                wrapper.nodeKind = Type.TEXT;
+                break;
+            default :
+               throw new IllegalArgumentException("Bad node type in dom4j: " + node.getClass() + " instance " + node.toString());
         }
+
         wrapper.docWrapper = docWrapper;
         return wrapper;
     }

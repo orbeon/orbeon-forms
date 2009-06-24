@@ -3636,8 +3636,18 @@ ORBEON.widgets.RTE = function() {
             var yuiRTE = new YAHOO.widget.Editor(control, rteConfig);
 
             // Register event listener for user interacting with the control
-            yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
-            yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
+            // RTE fires afterNodeChange right at the end of initialisation, which mistakenly results
+            // in changeEvent being called onload, which has a side-effect of making Orbeon think the RTE
+            // has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
+            // event is received.
+            var registerChangeEvent = function() {
+                console.log("registerChangeEvent", registerChangeEvent);
+                yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
+                yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
+                yuiRTE.removeListener("afterNodeChange", registerChangeEvent);
+            };
+            yuiRTE.on("afterNodeChange", registerChangeEvent); 
+
             // Store information about this RTE
             rteEditors[control.id] = yuiRTE;
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
@@ -3793,7 +3803,7 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElements: function(form) {
-        return;
+        return; // Disabled for now for performance
         var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
         for (var dnElementIndex = 0; dnElementIndex < dndElements.length; dnElementIndex++) {
             var dndElement = dndElements[dnElementIndex];

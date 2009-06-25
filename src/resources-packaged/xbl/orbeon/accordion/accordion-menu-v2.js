@@ -307,6 +307,17 @@ var AccordionMenu =(function()
         collapse(dl,dt,dd);
     },
 
+    // Orbeon change: expose expand() as part of the API.
+    expandCase : function(dl,dt,dd)
+    {
+        expand(dl,dt,dd)
+    },
+
+      // Orbeon change: expose collapse() as part of the API.
+    collapseCase : function(dl,dt,dd)
+    {
+        collapse(dl,dt,dd)
+    },
 
     setting : function(id,oOptions)
     {

@@ -46,14 +46,69 @@
                 </instance>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            fieldset { float: left; margin-bottom: 1em; padding: 0 1em 0 0; }
+            .xbl-fr-accordion { clear: both; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Open all</xforms:label>
-            <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
-                <xxforms:context name="selected" select="'true'"/>
-            </xforms:dispatch>
-        </xforms:trigger>
+        <xhtml:fieldset>
+            <xhtml:legend>Accordion events</xhtml:legend>
+            <xhtml:ol>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Open all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
+                            <xxforms:context name="selected" select="true()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Close all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
+                            <xxforms:context name="selected" select="false()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Open third section (currency)</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                            <xxforms:context name="case-id" select="'my-case-currency'"/>
+                            <xxforms:context name="selected" select="true()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Close third section (currency)</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                            <xxforms:context name="case-id" select="'my-case-currency'"/>
+                            <xxforms:context name="selected" select="false()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Open states</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                            <xxforms:context name="case-id" select="'my-case-repeat'"/>
+                            <xxforms:context name="selected" select="true()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Close states</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                            <xxforms:context name="case-id" select="'my-case-repeat'"/>
+                            <xxforms:context name="selected" select="false()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+            </xhtml:ol>
+        </xhtml:fieldset>
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
             <fr:case>
                 <fr:label>First section (lorem ipsum)</fr:label>
@@ -76,13 +131,13 @@
                     <xforms:label>Cost</xforms:label>
                 </xforms:input>
             </fr:case>
-            <fr:case>
+            <fr:case id="my-case-currency">
                 <fr:label>Third section (currency)</fr:label>
                 <fr:currency ref="cost" id="cost">
                     <xforms:label>Cost</xforms:label>
                 </fr:currency>
             </fr:case>
-            <fr:case selected="true">
+            <fr:case>
                 <fr:label>Datatable</fr:label>
                 <fr:datatable id="my-datatable">
                     <xhtml:thead>
@@ -108,7 +163,7 @@
                 </fr:datatable>
             </fr:case>
             <xforms:repeat nodeset="states/state">
-                <fr:case>
+                <fr:case id="my-case-repeat" selected="true">
                     <fr:label value="name"/>
                     <xhtml:ul>
                         <xhtml:li>

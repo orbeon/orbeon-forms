@@ -67,7 +67,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
         // Gather information about appearances of controls which use Script
         // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
-        // TODO: This would probably be done better, and more correctly, statically, in XFormsStaticState
+        // TODO: This would probably be done better, and more correctly, based on statically-gathered information in XFormsStaticState
         final Map javaScriptControlsAppearancesMap = new HashMap();
         {
             final XFormsControls xformsControls = containingDocument.getControls();

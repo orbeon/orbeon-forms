@@ -63,6 +63,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         this.startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
     }
 
+    public boolean hasJavaScriptInitialization() {
+        // If there is DnD, must tell the client to perform initialization
+        return isDnD();
+    }
+
     public void childrenAdded(PipelineContext pipelineContext) {
         // This is called once all children have been added
 
@@ -212,7 +217,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     public boolean isDnD() {
         final String dndAttribute = getControlElement().attributeValue(XFormsConstants.XXFORMS_DND_QNAME);
-        return !"none".equals(dndAttribute);
+        return dndAttribute != null && !"none".equals(dndAttribute);
     }
 
     public void updateNodeset(PipelineContext pipelineContext, List insertedNodeInfos) {

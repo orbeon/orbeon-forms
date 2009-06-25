@@ -34,12 +34,17 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/accordion/accordion.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-accordion-toggle-all" phase="target">
+                <xxforms:script>console.log(this);</xxforms:script>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
                 <xsl:template match="/*">
-                    <!-- Init event -->
+                    <!-- Initialization event -->
                     <xforms:group ref="." id="fr-accordion-group">
                         <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
                              http://forge.ow2.org/tracker/index.php?func=detail&aid=313850&group_id=168&atid=350207 -->
@@ -55,7 +60,7 @@
                 <xsl:template match="fr:case">
                     <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
                     <!-- Section title -->
-                    <xhtml:dt class="a-m-t">
+                    <xhtml:dt class="a-m-t{ if (@selected = 'true') then ' a-m-t-expand' else ''}">
                         <xsl:choose>
                             <!-- Static label, just copy content -->
                             <xsl:when test="empty(($label/@ref, $label/@bind, $label/@value))">
@@ -70,7 +75,7 @@
                         </xsl:choose>
                     </xhtml:dt>
                     <!-- Section body -->
-                    <xhtml:dd class="a-m-d">
+                    <xhtml:dd class="a-m-d{ if (@selected = 'true') then ' a-m-d-expand' else ''}">
                         <xhtml:div class="bd">
                             <xsl:copy-of select="node() except $label"/>
                         </xhtml:div>

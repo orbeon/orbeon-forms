@@ -48,6 +48,12 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Open all</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
+                <xxforms:context name="selected" select="'true'"/>
+            </xforms:dispatch>
+        </xforms:trigger>
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
             <fr:case>
                 <fr:label>First section (lorem ipsum)</fr:label>
@@ -64,7 +70,7 @@
                     vehicula.
                 </xhtml:div>
             </fr:case>
-            <fr:case>
+            <fr:case selected="true">
                 <fr:label>Second section (XForms input)</fr:label>
                 <xforms:input ref="cost">
                     <xforms:label>Cost</xforms:label>
@@ -76,7 +82,7 @@
                     <xforms:label>Cost</xforms:label>
                 </fr:currency>
             </fr:case>
-            <fr:case>
+            <fr:case selected="true">
                 <fr:label>Datatable</fr:label>
                 <fr:datatable id="my-datatable">
                     <xhtml:thead>

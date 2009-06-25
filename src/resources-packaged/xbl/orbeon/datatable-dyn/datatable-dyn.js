@@ -193,9 +193,16 @@ ORBEON.widgets.datatable.prototype.createColResizers = function () {
         var width = (this.headerColumns[j].clientWidth - 20) + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
-        if (YAHOO.env.ua.ie == 0) {
-            // This is a hack! We need to remove the prefix to match classes added in XSLT!
-            var className = '.dt-' + this.id.substring(this.id.lastIndexOf('$') + 1) + '-col-' + (j + 1);
+        if (YAHOO.env.ua.ie == 0 && false) {
+            var  classNameg = '.dt-' + this.id + '-col-' + (j + 1);
+            className = className.replace('\$', '-', 'g');
+        	YAHOO.util.Dom.addClass(childDiv, className);
+            for (var k = 0; k < this.bodyRows.length; k++) {
+                row = this.bodyRows[k];
+                if (row.cells.length > j && ! YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
+                	YAHOO.util.Dom.addClass(YAHOO.util.Selector.query('div', row.cells[j], true), className);
+                 }
+            }
             if (! this.styleElt) {
                 this.styleElt = document.createElement('style');
                 this.styleElt.type = 'text/css';
@@ -397,7 +404,7 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
         var width = this.width + deltaX;
         var widthStyle = (width - 20) + 'px'; //TODO : determine 20 from padding
         // If different and non null, try to set it
-        if (width > 0 && width != this.width) {
+        if (width > 20 && width != this.width) {
             if (this.rule) {
                 this.rule.style.width = widthStyle;
             } else {

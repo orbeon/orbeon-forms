@@ -19,3 +19,7 @@
 .yui-dt-table th, .yui-dt-table td {
     overflow:hidden;
 }
+
+.fr-datatable-width-control {
+    visibility: hidden;
+}

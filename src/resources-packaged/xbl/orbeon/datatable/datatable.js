@@ -152,6 +152,14 @@ ORBEON.widgets.datatable = function (element, index) {
 		// And more assembly
 		this.container.appendChild(this.bodyContainer);
 		this.bodyContainer.appendChild(this.table);
+		
+		// Add a dummy div with the same width as the table so that the scrollbar appears when the body is empty
+		var widthControlDiv = document.createElement('div');
+		YAHOO.util.Dom.setStyle(widthControlDiv, 'width', this.tableWidth + 'px');
+		widthControlDiv.innerHTML = '&#xa0;';
+		YAHOO.util.Dom.addClass(widthControlDiv, 'fr-datatable-width-control');
+		this.bodyContainer.appendChild(widthControlDiv);
+
 
 	}
 

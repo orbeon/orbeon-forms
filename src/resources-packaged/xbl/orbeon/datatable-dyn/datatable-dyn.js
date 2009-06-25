@@ -166,11 +166,7 @@ ORBEON.widgets.datatable.prototype.resize = function () {
         this.container.appendChild(this.bodyContainer);
         this.bodyContainer.appendChild(this.table);
         
-        
-        for (var i = 0; i < this.bodyColumns.length; i++) {
-            YAHOO.util.Dom.setStyle(this.headerColumns[i], 'width', (this.bodyColumns[i].clientWidth - 1) + 'px');
-        }
-    }
+     }
     
      this.width = this.container.clientWidth;
     

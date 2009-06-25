@@ -60,6 +60,36 @@
                 </xforms:repeat>
             </tbody>
         </fr:datatable>
-
+        
+        <p>Scrollable horinzontally only</p>
+        <fr:datatable scrollable="horizontal" width="150px">
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true">Date</th>
+                    <th fr:sortable="true" fr:resizeable="true">Author</th>
+                    <th fr:sortable="true" fr:resizeable="true">Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xforms:repeat nodeset="/atom:feed/atom:entry">
+                    <tr>
+                        <td>
+                            <xforms:output ref="atom:published"
+                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                            />
+                        </td>
+                        <td>
+                            <a href="{atom:author/atom:uri}">
+                                <xforms:output value="atom:author/atom:name"/>
+                            </a>
+                        </td>
+                        <td>
+                            <xforms:output value="atom:title"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:datatable>
+        
     </body>
 </html>

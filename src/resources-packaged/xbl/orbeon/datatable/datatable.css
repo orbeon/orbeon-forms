@@ -21,5 +21,6 @@
 }
 
 .fr-datatable-width-control {
-    visibility: hidden;
+    height: 20px;
 }
+

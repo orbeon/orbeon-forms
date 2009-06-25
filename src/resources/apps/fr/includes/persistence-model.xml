@@ -45,18 +45,6 @@
         <!-- Initialize new service URI -->
         <xforms:setvalue ref="instance('fr-uris-instance')/new-service-uri"
                          value="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
-        
-        <!-- Add appserver in from of URIs, unless those are already full URIs that start with http:// or https:// -->
-        <xforms:action xxforms:iterate="instance('fr-uris-instance')/*">
-            <xforms:setvalue if="not(starts-with(., 'http://') or starts-with(., 'https://'))"
-                             ref="." value="concat(xxforms:property('oxf.fr.appserver.uri'), .)"/>
-
-            <!--<xforms:message level="xxforms:log-debug">-->
-                <!--xxxxx fr-uris-instance-->
-                <!--<xforms:output value="."/>-->
-                <!--xxxxx-->
-            <!--</xforms:message>-->
-        </xforms:action>
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -622,7 +610,7 @@
         the final submission/load.
     -->
     <xforms:submission id="fr-email-service-submission"
-        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="none" xxforms:ensure-uploads="false"/>
 
     <!-- Call PDF service -->
@@ -632,7 +620,7 @@
         the final submission/load.
     -->
     <xforms:submission id="fr-pdf-service-submission"
-        resource="{xxforms:property('oxf.fr.appserver.uri')}/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')"
         replace="instance" instance="fr-workflow-confirmation-instance" xxforms:ensure-uploads="false"/>
 

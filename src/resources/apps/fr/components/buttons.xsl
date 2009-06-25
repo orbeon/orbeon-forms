@@ -219,7 +219,7 @@
     <xsl:template match="fr:email-button">
         <!-- Don't show this button in noscript mode -->
         <!-- TODO: bind to strict-submit, but maybe fr-email-service-submission should check validity instead -->
-        <xforms:group ref="instance('fr-triggers-instance')/strict-submit" >
+        <xforms:group ref="xxforms:instance('fr-triggers-instance')/strict-submit" >
             <fr:button xxforms:modal="true" id="fr-email-button">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>

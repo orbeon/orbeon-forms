@@ -50,8 +50,8 @@
                 <xforms:send submission="search-submission"/>
             </xforms:action>
 
-            <!-- Model initialization -->
-            <xforms:action ev:event="xforms-model-construct-done-foobar">
+            <!-- Model initialization after we got the source form -->
+            <xforms:action ev:event="get-source-form-submission-done">
                 <!-- Store resources from configuration instance -->
                 <xxforms:variable name="resources-instance" as="element(xforms:instance)"
                                   select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
@@ -229,7 +229,7 @@
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
 
-                <xforms:dispatch name="xforms-model-construct-done-foobar" target="fr-form-model"/>
+                <xforms:dispatch name="get-source-form-submission-done" target="fr-form-model"/>
 
                 <xxforms:variable name="summary-elements" as="element()*"
                                   select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
@@ -709,6 +709,7 @@
                                                         </xhtml:a>
                                                     </td>
                                                 </xforms:group>
+                                                <!-- One column for each detail -->
                                                 <xforms:repeat nodeset="details/detail" id="document-details-repeat">
                                                     <td>
                                                         <!-- control to make data accessible to JavaScript -->
@@ -716,40 +717,45 @@
                                                         <!-- This element must be present only when offline is supported -->
                                                         <!--<xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>-->
 
-                                                        <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
-                                                        <xxforms:variable name="control" select="$query/@control" as="xs:string"/>
-                                                        <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
+                                                        <!--<xxforms:variable name="detail-position" select="position()" as="xs:integer"/>-->
+                                                        <!--<xxforms:variable name="query" select="instance('fr-search-instance')/query[$detail-position + 1]"/>-->
+                                                        <!--<xxforms:variable name="control" select="$query/@control" as="xs:string"/>-->
+                                                        <!--<xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>-->
 
                                                         <xhtml:a href="{$document-href}" target="_blank">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xforms:output value="
-                                                                if ($control = 'textarea') then
-                                                                    if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
-                                                                else if ($control = 'select') then
-                                                                    string-join(for $v in tokenize(., '\s+') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
-                                                                else if ($control = 'select1') then
-                                                                    for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
-                                                                else
-                                                                    if ($type = 'date') then
-                                                                        (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                                    else if ($type = 'time') then
-                                                                        (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                                    else if ($type = 'dateTime') then
-                                                                        (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else .)
-                                                                    else if ($type = 'dayTimeDuration') then
-                                                                        (
-                                                                            if (. castable as xs:dayTimeDuration) then
-                                                                                string-join(
-                                                                                    (
-                                                                                        if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
-                                                                                        if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
-                                                                                        if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
-                                                                                        if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
-                                                                                     ), ' '
-                                                                                )
-                                                                            else .
-                                                                        )
-                                                                    else ."/>
+                                                                for $detail-position in position() return
+                                                                    for $query in instance('fr-search-instance')/query[$detail-position + 1] return
+                                                                        for $control in $query/@control return
+                                                                            if ($control = 'textarea') then
+                                                                                if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
+                                                                            else if ($control = 'select') then
+                                                                                string-join(for $v in tokenize(., '\s+') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                                            else if ($control = 'select1') then
+                                                                                for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
+                                                                            else
+                                                                                for $type in substring-after($query/@type, ':') return
+                                                                                    if ($type = 'date') then
+                                                                                        (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                                    else if ($type = 'time') then
+                                                                                        (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                                    else if ($type = 'dateTime') then
+                                                                                        (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else .)
+                                                                                    else if ($type = 'dayTimeDuration') then
+                                                                                        (
+                                                                                            if (. castable as xs:dayTimeDuration) then
+                                                                                                string-join(
+                                                                                                    (
+                                                                                                        if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
+                                                                                                        if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
+                                                                                                        if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
+                                                                                                        if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
+                                                                                                     ), ' '
+                                                                                                )
+                                                                                            else .
+                                                                                        )
+                                                                                    else ."/>
                                                         </xhtml:a>
                                                     </td>
                                                 </xforms:repeat>

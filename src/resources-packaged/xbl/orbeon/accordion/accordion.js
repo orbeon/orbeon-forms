@@ -17,6 +17,15 @@ YAHOO.xbl.fr.Accordion = {
                 seconds:    0.2
             });
 
+            // Remove the expand class we might have on the repeat template, so when we add a case to an iteration,
+            // the case we add is always closed.
+            YAHOO.util.Dom.getElementsByClassName("xforms-repeat-template", "dt", container, function(dt) {
+                YAHOO.util.Dom.removeClass(dt, "a-m-t-expand");
+            });
+            YAHOO.util.Dom.getElementsByClassName("xforms-repeat-template", "dd", container, function(dd) {
+                YAHOO.util.Dom.removeClass(dd, "a-m-d-expand");
+            });
+
             function expandOrCollapse(dt) {
                 var selected = ORBEON.xforms.Document.getValue(selectedElement.id) == "true";
                 var accordionExpandOrCollapse = selected ? AccordionMenu.expandCase: AccordionMenu.collapseCase;

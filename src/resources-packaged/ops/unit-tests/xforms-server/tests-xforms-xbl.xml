@@ -1483,16 +1483,8 @@
                             <instance id="events" model-id="my-bar-1$model">
                                 <events>
                                     <event type="my-event" target="my-bar-1" phase="bubbling" original-target="my-bar-1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-optional" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-readwrite" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-valid" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-optional" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-readwrite" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-valid" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                             <instance id="instance" model-id="my-bar-2$model">
@@ -1504,16 +1496,8 @@
                             <instance id="events" model-id="my-bar-2$model">
                                 <events>
                                     <event type="my-event" target="my-bar-2" phase="bubbling" original-target="my-bar-2" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-optional" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-readwrite" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-valid" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-optional" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-readwrite" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="xforms-valid" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                         </instances>

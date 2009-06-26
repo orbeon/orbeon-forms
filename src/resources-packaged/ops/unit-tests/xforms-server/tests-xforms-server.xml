@@ -2065,7 +2065,7 @@
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
-                                    <xforms:action ev:event="xforms-value-changed">
+                                    <xforms:action ev:event="xforms-enabled xforms-value-changed">
                                         <!-- Save value of current context -->
                                         <xforms:setvalue ref="instance('results')/result1" value="context()"/>
                                         <!-- Save value of current context relative to ref -->
@@ -3164,11 +3164,7 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xforms-value-changed" target="my-input-1" indexes=""/>
-                                    <event type="xforms-optional" target="my-input-1" indexes=""/>
                                     <event type="xforms-enabled" target="my-input-1" indexes=""/>
-                                    <event type="xforms-readwrite" target="my-input-1" indexes=""/>
-                                    <event type="xforms-valid" target="my-input-1" indexes=""/>
                                 </events>
                             </instance>
                         </instances>

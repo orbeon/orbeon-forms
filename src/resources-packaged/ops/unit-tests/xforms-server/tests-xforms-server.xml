@@ -3415,22 +3415,22 @@
                             </xhtml:head>
                             <xhtml:body>
 
-                                <xforms:repeat id="repeat1" nodeset="instance('instance1')/row">
+                                <xforms:repeat id="repeat1" nodeset="instance('instance1')/row" xxforms:dnd="true">
                                     <xforms:output id="output1" value="."/>
                                 </xforms:repeat>
-                                <xforms:repeat id="repeat2" nodeset="instance('instance2')/row">
+                                <xforms:repeat id="repeat2" nodeset="instance('instance2')/row" xxforms:dnd="true">
                                     <xforms:output id="output2" value="."/>
                                 </xforms:repeat>
-                                <xforms:repeat id="repeat3" nodeset="instance('instance3')/row">
+                                <xforms:repeat id="repeat3" nodeset="instance('instance3')/row" xxforms:dnd="true">
                                     <xforms:output id="output3" value="."/>
                                 </xforms:repeat>
-                                <xforms:repeat id="repeat4" nodeset="instance('instance4')/row">
+                                <xforms:repeat id="repeat4" nodeset="instance('instance4')/row" xxforms:dnd="true">
                                     <xforms:output id="output4" value="."/>
                                 </xforms:repeat>
-                                <xforms:repeat id="repeat5" nodeset="instance('instance5')/row">
+                                <xforms:repeat id="repeat5" nodeset="instance('instance5')/row" xxforms:dnd="true">
                                     <xforms:output id="output5" value="."/>
                                 </xforms:repeat>
-                                <xforms:repeat id="repeat6" nodeset="instance('instance6')/row">
+                                <xforms:repeat id="repeat6" nodeset="instance('instance6')/row" xxforms:dnd="true">
                                     <xforms:output id="output6" value="."/>
                                 </xforms:repeat>
 

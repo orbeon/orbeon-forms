@@ -1345,7 +1345,8 @@ ORBEON.xforms.Controls = {
 
     // Returns MIP for a given control
     isRelevant: function (control) {
-        return !ORBEON.util.Dom.hasClass(control, "xforms-disabled");
+        return !ORBEON.util.Dom.hasClass(control, "xforms-disabled")
+            && !ORBEON.util.Dom.hasClass(control, "xforms-disabled-subsequent");
     },
     isReadonly: function (control) {
         return  ORBEON.util.Dom.hasClass(control, "xforms-readonly");
@@ -1733,17 +1734,20 @@ ORBEON.xforms.Controls = {
             var helpImage = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image");
             if (message == "") {
                 // Hide help, label, hint and alert with empty content
-                ORBEON.util.Dom.addClass(label, "xforms-disabled");
+                ORBEON.util.Dom.addClass(label, "xforms-disabled-subsequent");
                 // If this is the help label, also disable help image
                 if (className == "xforms-help")
-                    ORBEON.util.Dom.addClass(helpImage, "xforms-disabled");
+                    ORBEON.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
             } else {
                 // We show help, label, hint and alert with non-empty content, but ONLY if the control is relevant
                 if (ORBEON.xforms.Controls.isRelevant(control)) {
                     ORBEON.util.Dom.removeClass(label, "xforms-disabled");
+                    ORBEON.util.Dom.removeClass(label, "xforms-disabled-subsequent");
                     // If this is the help label, also enable the help image
-                    if (className == "xforms-help")
+                    if (className == "xforms-help") {
                         ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
+                        ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled-subsequent");
+                    }
                 }
             }
         }
@@ -1863,9 +1867,10 @@ ORBEON.xforms.Controls = {
                     if (current.id == endMarker) break;
                     if (isRelevant) {
                         ORBEON.util.Dom.removeClass(current, "xforms-disabled");
+                        ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
                         ORBEON.util.Dom.nudgeAferDelay(current);
                     } else {
-                        ORBEON.util.Dom.addClass(current, "xforms-disabled");
+                        ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
                     }
                 }
                 current = current.nextSibling;
@@ -1888,9 +1893,10 @@ ORBEON.xforms.Controls = {
                 if (element != null) {
                     if (isRelevant) {
                         ORBEON.util.Dom.removeClass(element, "xforms-disabled");
+                        ORBEON.util.Dom.removeClass(element, "xforms-disabled-subsequent");
                         ORBEON.util.Dom.nudgeAferDelay(element);
                     } else {
-                        ORBEON.util.Dom.addClass(element, "xforms-disabled");
+                        ORBEON.util.Dom.addClass(element, "xforms-disabled-subsequent");
                     }
                 }
             }
@@ -1903,8 +1909,12 @@ ORBEON.xforms.Controls = {
                  (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                          || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
             if (cursor.nodeType == ELEMENT_TYPE) {
-                if (relevant) ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
-                else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
+                if (relevant) {
+                    ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
+                    ORBEON.util.Dom.removeClass(cursor, "xforms-disabled-subsequent");
+                } else {
+                    ORBEON.util.Dom.addClass(cursor, "xforms-disabled-subsequent");
+                }
             }
             cursor = cursor.nextSibling;
         }
@@ -3077,11 +3087,13 @@ ORBEON.xforms.Events = {
         var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
         var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
         if (this.className == "xforms-error-panel-show-details") {
-            ORBEON.util.Dom.addClass(detailsHidden, "xforms-disabled");
+            ORBEON.util.Dom.addClass(detailsHidden, "xforms-disabled-subsequent");
             ORBEON.util.Dom.removeClass(detailsShown, "xforms-disabled");
+            ORBEON.util.Dom.removeClass(detailsShown, "xforms-disabled-subsequent");
         } else {
             ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-            ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
+            ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled-subsequent");
+            ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
         }
     },
 
@@ -3095,7 +3107,8 @@ ORBEON.xforms.Events = {
         var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
         var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
         ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-        ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
+        ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled-subsequent");
+        ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
     },
 
     errorCloseClicked: function(event, errorPanel) {
@@ -3646,7 +3659,7 @@ ORBEON.widgets.RTE = function() {
                 yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
                 yuiRTE.removeListener("afterNodeChange", registerChangeEvent);
             };
-            yuiRTE.on("afterNodeChange", registerChangeEvent); 
+            yuiRTE.on("afterNodeChange", registerChangeEvent);
 
             // Store information about this RTE
             rteEditors[control.id] = yuiRTE;

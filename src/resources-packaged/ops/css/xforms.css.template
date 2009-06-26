@@ -265,6 +265,10 @@ tr.xforms-disabled, .xforms-disabled tr,
     border-style: none ! important;
 }
 
+.xforms-disabled-subsequent {
+    display: none;
+}
+
 /**
  * XForms Switch / Case
  * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case

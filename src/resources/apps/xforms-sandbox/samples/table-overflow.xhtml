@@ -24,14 +24,17 @@
                 <control xmlns="">
                     <text-length>100</text-length>
                     <rows>5</rows>
-                    <container-width>500px</container-width>
-                    <table-width>auto</table-width>
-                    <text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed non
-                        risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec,
-                        ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa,
-                        varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy
-                        molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis
-                        semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim.
+                    <container-style>width: 500px; overflow: auto; border: solid
+                        red;</container-style>
+                    <table-style>width: auto;</table-style>
+                    <td-style/>
+                    <td-style/>
+                    <text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed non risus.
+                        Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies
+                        sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a,
+                        semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie,
+                        enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.
+                        Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim.
                         Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras
                         vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit
                         odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante
@@ -75,26 +78,37 @@
             </xforms:input>
         </p>
         <p>
-            <xforms:input ref="container-width">
-                <xforms:label>Container width: </xforms:label>
-            </xforms:input>
+            <xforms:textarea ref="container-style">
+                <xforms:label>Container style: </xforms:label>
+            </xforms:textarea>
         </p>
         <p>
-            <xforms:input ref="table-width">
-                <xforms:label>Table width: </xforms:label>
-            </xforms:input>
+            <xforms:textarea ref="table-style">
+                <xforms:label>Table style: </xforms:label>
+            </xforms:textarea>
+        </p>
+        <p>
+            <xforms:textarea ref="td-style[1]">
+                <xforms:label>First column style: </xforms:label>
+            </xforms:textarea>
+        </p>
+        <p>
+            <xforms:textarea ref="td-style[2]">
+                <xforms:label>Second column style: </xforms:label>
+            </xforms:textarea>
         </p>
         <hr/>
-        <div style="width: {container-width}; overflow: auto; border: solid red">
-            <table style="width: {table-width};">
+        <div style="{container-style}">
+            <table style="{table-style}">
                 <thead>
                     <tr>
-                        <th>Number</th>
-                        <th>Text</th>
+                        <th style="{td-style[1]}">Number</th>
+                        <th style="{td-style[2]}">Text</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <xforms:repeat nodeset="
+                    <xforms:repeat
+                        nodeset="
                         for $n in 1 to rows return xxforms:element('row', (
                             xxforms:element('number', $n),    
                             xxforms:element('text', substring(normalize-space(text), 1, text-length))
@@ -103,10 +117,10 @@
                         
                         ">
                         <tr>
-                            <td>
+                            <td style="{td-style[1]}">
                                 <xforms:output value="number"/>
                             </td>
-                            <td>
+                            <td style="{td-style[2]}">
                                 <xforms:output value="text"/>
                             </td>
                         </tr>
@@ -115,7 +129,7 @@
             </table>
         </div>
 
-       <!-- <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <!-- <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
 
     </body>

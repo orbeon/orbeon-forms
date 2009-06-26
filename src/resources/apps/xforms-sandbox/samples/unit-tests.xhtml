@@ -34,6 +34,7 @@
                 <xforms:delete nodeset="reports/in-progress"/>
                 <xforms:insert context="reports" nodeset="report" origin="saxon:parse(/instance/report-text)"/>
                 <xforms:insert context="reports/report[last()]" origin="xxforms:attribute('page', /instance/page)"/>
+                <xforms:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
             </xforms:action>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -55,7 +56,10 @@
                     "test-output-update",
                     "test-repeat",
                     "test-error-ajax",
-                    "test-bug-checkbox-update"
+                    "test-bug-checkbox-update",
+                    "xbl/orbeon/accordion/accordion-unittest",
+                    "xbl/orbeon/currency/currency-unittest",
+                    "xbl/orbeon/autocomplete/autocomplete-unittest-max-results-displayed"
                 ]);
 
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
@@ -83,8 +87,7 @@
         </xhtml:script>
         <xhtml:style type="text/css">
             .progress { margin-bottom: 2em; }
-            .progress span { vertical-align: middle;  }
-            .progress img { vertical-align: middle; padding-right: 1em; }
+            .progress img { vertical-align: middle; padding-bottom: 1em; }
             .test-pass { background-color: #efe; }
             .test-fail { background-color: #fee; }
             .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2, .xforms-repeat-selected-item-3 { background-color: transparent; }
@@ -97,15 +100,22 @@
 
         <xhtml:div class="progress">
             <xforms:group ref=".[in-progress = 'true']">
-                <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress"/>
+                <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress" class="progress-bar"/>
                 <xforms:group ref=".[page != '']">
-                    Running test page
-                    <xhtml:b><xforms:output value="page"/></xhtml:b>
+                    <xhtml:div>
+                        Running test page
+                        <xhtml:b><xforms:output value="tokenize(page, '/')[last()]"/></xhtml:b>
+                    </xhtml:div>
                 </xforms:group>
             </xforms:group>
             <xforms:group ref=".[in-progress != 'true']">
-                <xhtml:b>Done</xhtml:b> running all the test cases
+                <xhtml:div>
+                    <xhtml:b>Done</xhtml:b> running all the test cases
+                </xhtml:div>
             </xforms:group>
+            <xhtml:div>
+                Tests ran: <xhtml:b><xforms:output value="count(reports/report/testcase/test)"/></xhtml:b>
+            </xhtml:div>
         </xhtml:div>
 
         <xhtml:table class="gridtable">

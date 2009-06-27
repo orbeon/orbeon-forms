@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 - 2005 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2009 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.pipeline;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -24,14 +23,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -40,7 +38,6 @@ import java.util.*;
 
 public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor {
 
-    static private Logger logger = LoggerFactory.createLogger(ForEachProcessor.class);
     public static final String CURRENT = "$current";
     public static final String FOR_EACH_DATA_INPUT = "$data";
 
@@ -59,21 +56,21 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
 
     public static class ConcreteForEachProcessor extends ProcessorImpl {
 
-        Processor iterationProcessor;
-        private ProcessorOutput iterationOutput;
-        private String select;
-        private Map namespaceContext;
+        private final Processor iterationProcessor;
+        private final ProcessorOutput iterationOutput;
+        private final String select;
+        private final Map namespaceContext;
         private String rootLocalName;
         private String rootQName;
         private String rootNamespaceURI;
 
         public ConcreteForEachProcessor(ASTForEach forEachAST, Object validity) {
-            String[] refsWithNoId = getRefsWithNoId(forEachAST);
-            String idOrRef = forEachAST.getId() != null ? forEachAST.getId() : forEachAST.getRef();
+            final String[] refsWithNoId = getRefsWithNoId(forEachAST);
+            final String idOrRef = forEachAST.getId() != null ? forEachAST.getId() : forEachAST.getRef();
 
             // Create pipeline for content of for-each (the "iteration processor")
             {
-                ASTPipeline astPipeline = new ASTPipeline();
+                final ASTPipeline astPipeline = new ASTPipeline();
                 astPipeline.setValidity(validity);
                 astPipeline.getStatements().addAll(forEachAST.getStatements());
                 astPipeline.setNode(forEachAST.getNode());
@@ -87,7 +84,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     addOutputInfo(new ProcessorInputOutputInfo(idOrRef));
                 }
                 if (logger.isDebugEnabled()) {
-                    ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
+                    final ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                     astPipeline.walk(astDocumentHandler);
                     logger.debug("Iteration pipeline:\n" + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
@@ -97,14 +94,14 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             // Connect processor inputs to inputs of this processor
             for (int i = 0; i < refsWithNoId.length; i++) {
                 if (! refsWithNoId[i].equals(CURRENT)) {
-                    ProcessorInput pipelineInput = iterationProcessor.createInput(refsWithNoId[i]);
+                    final ProcessorInput pipelineInput = iterationProcessor.createInput(refsWithNoId[i]);
                     pipelineInput.setOutput(new ForwardingProcessorOutput(refsWithNoId[i]));
                 }
             }
 
             // Connect processor to the IterationProcessorOutput
-            ProcessorInput iterationInput = iterationProcessor.createInput(CURRENT);
-            ProcessorOutput currentOutput = new IterationProcessorOutput(ForEachProcessor.class, CURRENT);
+            final ProcessorInput iterationInput = iterationProcessor.createInput(CURRENT);
+            final ProcessorOutput currentOutput = new IterationProcessorOutput(ForEachProcessor.class, CURRENT);
             currentOutput.setInput(iterationInput);
             iterationInput.setOutput(currentOutput);
             iterationOutput = iterationProcessor.createOutput(idOrRef);
@@ -120,7 +117,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     rootNamespaceURI = "";
                 } else {
                     // Extract prefix, find namespace URI
-                    String prefix = rootQName.substring(0, columnPosition);
+                    final String prefix = rootQName.substring(0, columnPosition);
                     rootNamespaceURI = (String) namespaceContext.get(prefix);
                     if (rootNamespaceURI == null)
                         throw new ValidationException("Prefix '" + prefix + "' used in root attribute is undefined", forEachAST.getLocationData());
@@ -130,23 +127,44 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
         }
 
         public ProcessorOutput createOutput( final String name ) {
-            ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-                public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+                public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                     try {
-                        State state = (State) getState(context);
-                        initDOMGenerators(context, state);
+                        final State state = (State) getState(pipelineContext);
 
-                        // Read n times from iterationOutput
+                        // Open document
                         contentHandler.startDocument();
                         contentHandler.startElement(rootNamespaceURI, rootLocalName, rootQName, new AttributesImpl());
-                        for (int i = 0; i < state.domGenerators.size(); i++) {
-                            state.currentDOMGenerator = i;
-                            iterationProcessor.reset(context);
-                            iterationOutput.read(context, new ForwardingContentHandler(contentHandler) {
-                                public void startDocument() {}
-                                public void endDocument() {}
-                            });
+
+                        // Read n times from iterationOutput
+                        PooledXPathExpression expression = null;
+                        try {
+                            expression = createExpression(pipelineContext);
+
+                            for (Iterator i = new ElementIterator(expression); i.hasNext();) {
+                                final Element currentElement = (Element) i.next();
+
+                                // Create DOMGenerator
+                                final String systemId = Dom4jUtils.makeSystemId(currentElement);
+                                final DOMGenerator domGenerator = new DOMGenerator
+                                        (currentElement, "for each input", DOMGenerator.ZeroValidity, systemId);
+                                domGenerator.createOutput(OUTPUT_DATA);
+                                state.domGenerator = domGenerator;
+
+                                // Run iteration
+                                iterationProcessor.reset(pipelineContext);
+                                iterationOutput.read(pipelineContext, new EmbeddedDocumentContentHandler(contentHandler));
+                            }
+                        } catch (XPathException e) {
+                            throw new OXFException(e);
+                        } finally {
+                            // Clear state to allow gc as the state might be referenced for a while
+                            if (state != null) state.domGenerator = null;
+                            // Return expression
+                            if (expression != null) expression.returnToPool();
                         }
+
+                        // Close document
                         contentHandler.endElement(rootNamespaceURI, rootLocalName, rootQName);
                         contentHandler.endDocument();
                     } catch (SAXException e) {
@@ -164,14 +182,14 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                  * unexpected. Maybe an an API that combines reading the output and reading the
                  * key/validity would solve this problem.
                  */
-                protected OutputCacheKey getKeyImpl(PipelineContext context) {
+                protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                     return null;
                 }
 
                 /**
                  * For each is not cachable. See comment in getKeyImpl().
                  */
-                protected Object getValidityImpl(PipelineContext context) {
+                protected Object getValidityImpl(PipelineContext pipelineContext) {
                     return null;
                 }
 
@@ -180,90 +198,80 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             return output;
         }
 
-        /**
-         * Create internal key based on $data and select expression.
-         */
-        private InternalCacheKey createInternalKey(PipelineContext context) {
-            OutputCacheKey outputCacheKey = getInputKey(context, getInputByName(FOR_EACH_DATA_INPUT));
-            if (outputCacheKey == null) return null;
-            InputCacheKey inputCacheKey = new InputCacheKey(getInputByName(FOR_EACH_DATA_INPUT), outputCacheKey);
-            InternalCacheKey selectKey = new InternalCacheKey(ConcreteForEachProcessor.this, "select", select);
-            return new InternalCacheKey(ConcreteForEachProcessor.this,
-                    Arrays.asList(new CacheKey[] {inputCacheKey, selectKey}));
-        }
+        private class ElementIterator implements Iterator {
+            private final Iterator iterator;
 
-        private Object createInternalValidity(PipelineContext context) {
-            return getInputValidity(context, getInputByName(FOR_EACH_DATA_INPUT));
-        }
-
-        /**
-         * Try to find domGenerators in cache.
-         */
-        private void updateStateWithDOMGeneratorsFromCache(PipelineContext context, State state,
-                                                           InternalCacheKey internalKey,
-                                                           Object internalValidity) {
-            if (state.domGenerators != null) {
-                Cache cache = ObjectCache.instance();
-                if (internalKey != null && internalValidity != null)
-                    state.domGenerators = (List) cache.findValid(context, internalKey, internalValidity);
+            public ElementIterator(PooledXPathExpression expression) throws XPathException {
+                this.iterator = expression.iterate();
             }
-        }
 
-        private void initDOMGenerators(PipelineContext context, State state) {
-            if (state.domGenerators == null) {
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
 
-                // Try to find domGenerators in cache
-                InternalCacheKey internalKey = createInternalKey(context);
-                Object internalValidity = createInternalValidity(context);
-                updateStateWithDOMGeneratorsFromCache(context, state, internalKey, internalValidity);
-
-                // If we can't find domGenerators in cache, create them
-                if (state.domGenerators == null) {
-                    Document dataInput = readInputAsDOM4J(context, getInputByName(FOR_EACH_DATA_INPUT));
-                    state.domGenerators = new ArrayList();
-                    final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                            new DocumentWrapper(dataInput, null, new Configuration()),
-                            select, namespaceContext, getLocationData());
-                    try {
-                        for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
-                            Node node = (Node) i.next();
-                            if ( node.getNodeType() != org.dom4j.Node.ELEMENT_NODE )
-                                throw new OXFException("Select expression '" + select
-                                        + "' did not return a sequence of elements. One node was a '"
-                                        + node.getNodeTypeName() + "'");
-                            final org.dom4j.Element elt = ( org.dom4j.Element )node;
-                            final String sid = Dom4jUtils.makeSystemId( elt );
-                            final DOMGenerator domGenerator = new DOMGenerator
-                                ( elt, "for each input", DOMGenerator.ZeroValidity, sid );
-                            domGenerator.createOutput(OUTPUT_DATA);
-                            state.domGenerators.add(domGenerator);
-                        }
-                        if (internalKey != null && internalValidity != null)
-                            ObjectCache.instance().add(context,
-                                    internalKey, internalValidity, state.domGenerators);
-                    } catch (XPathException e) {
-                        throw new OXFException(e);
-                    } finally {
-                        if (expr != null) expr.returnToPool();
-                    }
+            public Object next() {
+                final Object nextObject = iterator.next();
+                if (nextObject instanceof Node) {
+                    final Node nextNode = (Node) nextObject;
+                    if (nextNode.getNodeType() != org.dom4j.Node.ELEMENT_NODE)
+                        throw new OXFException("Select expression '" + select
+                                + "' did not return a sequence of elements. One node was a '"
+                                + nextNode.getNodeTypeName() + "'");
+                } else {
+                    throw new OXFException("Select expression '" + select
+                            + "' did not return a sequence of elements. One item was a '"
+                            + nextObject.getClass().getName() + "'");
                 }
+
+                return nextObject;
             }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+
+        private PooledXPathExpression createExpression(PipelineContext pipelineContext) {
+            final Document dataInput = readInputAsDOM4J(pipelineContext, getInputByName(FOR_EACH_DATA_INPUT));
+            return XPathCache.getXPathExpression(pipelineContext,
+                    new DocumentWrapper(dataInput, null, new Configuration()),
+                    select, namespaceContext, getLocationData());
         }
         
-        public void start(PipelineContext context) {
-            State state = (State) getState(context);
-            initDOMGenerators(context, state);
+        public void start(PipelineContext pipelineContext) {
+            final State state = (State) getState(pipelineContext);
 
-            // Run n times from iterationOutput
-            for (int i = 0; i < state.domGenerators.size(); i++) {
-                state.currentDOMGenerator = i;
-                iterationProcessor.reset(context);
-                iterationProcessor.start(context);
+            // Read n times from iterationOutput
+            PooledXPathExpression expression = null;
+            try {
+                expression = createExpression(pipelineContext);
+
+                for (Iterator i = new ElementIterator(expression); i.hasNext();) {
+                    final Element currentElement = (Element) i.next();
+
+                    // Create DOMGenerator
+                    final String systemId = Dom4jUtils.makeSystemId(currentElement);
+                    final DOMGenerator domGenerator = new DOMGenerator
+                            (currentElement, "for each input", DOMGenerator.ZeroValidity, systemId);
+                    domGenerator.createOutput(OUTPUT_DATA);
+                    state.domGenerator = domGenerator;
+
+                    // Run iteration
+                    iterationProcessor.reset(pipelineContext);
+                    iterationProcessor.start(pipelineContext);
+                }
+            } catch (XPathException e) {
+                throw new OXFException(e);
+            } finally {
+                // Clear state to allow gc as the state might be referenced for a while
+                if (state != null) state.domGenerator = null;
+                // Return expression
+                if (expression != null) expression.returnToPool();
             }
         }
 
-        public void reset(PipelineContext context) {
-            setState(context, new State());
+        public void reset(PipelineContext pipelineContext) {
+            setState(pipelineContext, new State());
         }
 
         /**
@@ -278,13 +286,13 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
 
             // Init the 2 sets above
             for (Iterator i = forEachAST.getStatements().iterator(); i.hasNext();) {
-                ASTStatement astStatement = (ASTStatement) i.next();
-                IdInfo idInfo = astStatement.getIdInfo();
+                final ASTStatement astStatement = (ASTStatement) i.next();
+                final IdInfo idInfo = astStatement.getIdInfo();
                 inputRefs.addAll(idInfo.getInputRefs());
                 outputIds.addAll(idInfo.getOutputIds());
             }
 
-            Set refsWithNoId = new HashSet(inputRefs);
+            final Set refsWithNoId = new HashSet(inputRefs);
             refsWithNoId.removeAll(outputIds);
             return (String[]) refsWithNoId.toArray(new String[refsWithNoId.size()]);
         }
@@ -294,13 +302,13 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 super(ConcreteForEachProcessor.class, name);
             }
 
-            protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                readInputAsSAX(context, getName(), contentHandler);
+            protected void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+                readInputAsSAX(pipelineContext, getName(), contentHandler);
             }
         }
 
         /**
-         * Reads from the DOM generators stored in state
+         * Reads from the DOM generator stored in state.
          */
         private class IterationProcessorOutput extends ProcessorOutputImpl {
 
@@ -308,28 +316,24 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 super(clazz, name);
             }
 
-            protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                State state = (State) getState(context);
-                DOMGenerator domGenerator = (DOMGenerator) state.domGenerators.get(state.currentDOMGenerator);
-                domGenerator.getOutputByName(OUTPUT_DATA).read(context, contentHandler);
+            protected void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+                final State state = (State) getState(pipelineContext);
+                state.domGenerator.getOutputByName(OUTPUT_DATA).read(pipelineContext, contentHandler);
             }
 
             protected OutputCacheKey getKeyImpl(PipelineContext context) {
-                State state = (State) getState(context);
-                DOMGenerator domGenerator = (DOMGenerator) state.domGenerators.get(state.currentDOMGenerator);
-                return ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
+                final State state = (State) getState(context);
+                return ((Cacheable) state.domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
             }
 
             protected Object getValidityImpl(PipelineContext context) {
-                State state = (State) getState(context);
-                DOMGenerator domGenerator = (DOMGenerator) state.domGenerators.get(state.currentDOMGenerator);
-                return ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
+                final State state = (State) getState(context);
+                return ((Cacheable) state.domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
             }
         }
 
         private static class State {
-            List domGenerators = null;
-            int currentDOMGenerator;
+            DOMGenerator domGenerator;
         }
     }
 }

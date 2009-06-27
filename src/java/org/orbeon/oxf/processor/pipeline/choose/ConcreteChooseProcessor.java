@@ -208,6 +208,9 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             }
         }
 
+        // In case the document is large, and not cached, make it gc-able quicker (not sure if that makes a big difference!)
+        hrefDocumentInfo = null;
+
         if (selectedBranch == -1) {
             // No branch was selected: this is not acceptable if there are output to the choose
             if (!outputsById.isEmpty() || !outputsByParamRef.isEmpty())
@@ -216,15 +219,15 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         } else {
 
             // Initialize variables depending on selected branch
-            Processor selectedBranchProcessor = (Processor) branchProcessors.get(selectedBranch);
-            Map selectedBranchInputs = (Map) branchInputs.get(selectedBranch);
+            final Processor selectedBranchProcessor = (Processor) branchProcessors.get(selectedBranch);
+            final Map selectedBranchInputs = (Map) branchInputs.get(selectedBranch);
             state.selectedBranchOutputs = (Map) branchOutputs.get(selectedBranch);
 
             // Connect branch inputs
             for (Iterator i = selectedBranchInputs.keySet().iterator(); i.hasNext();) {
-                String branchInputName = (String) i.next();
-                ProcessorInput branchInput = (ProcessorInput) selectedBranchInputs.get(branchInputName);
-                ProcessorInput chooseInput = getInputByName(branchInputName);
+                final String branchInputName = (String) i.next();
+                final ProcessorInput branchInput = (ProcessorInput) selectedBranchInputs.get(branchInputName);
+                final ProcessorInput chooseInput = getInputByName(branchInputName);
                 branchInput.setOutput(chooseInput.getOutput());
             }
 

@@ -26,20 +26,21 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
+import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.properties.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.FeatureKeys;
-import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
+import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
@@ -47,8 +48,8 @@ import org.orbeon.saxon.value.StringValue;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
@@ -73,8 +74,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     public static final String XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-transformer-config";
     public static final String XSLT_PREFERENCES_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-preferences-config";
 
-    private static final String GENERATE_SOURCE_LOCATION_PROPERTY = "generate-source-location";
-    private static final boolean GENERATE_SOURCE_LOCATION_DEFAULT = false;
+    private static final String OUTPUT_LOCATION_MODE_PROPERTY = "location-mode";
+    private static final String OUTPUT_LOCATION_NONE = "none";
+    private static final String OUTPUT_LOCATION_DUMB = "dumb";
+    private static final String OUTPUT_LOCATION_SMART = "smart";
+    private static final String OUTPUT_LOCATION_MODE_DEFAULT = OUTPUT_LOCATION_NONE;
 
     // This input determines the JAXP transformer factory class to use
     private static final String INPUT_TRANSFORMER = "transformer";
@@ -125,9 +129,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
                     }
 
-                    // Whether to obtain source location data whenever possible
-                    final boolean isGenerateSourceLocation = getPropertySet().getBoolean(GENERATE_SOURCE_LOCATION_PROPERTY, GENERATE_SOURCE_LOCATION_DEFAULT).booleanValue();
-                    if (isGenerateSourceLocation) {
+                    // Output location mode
+                    final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
+                    final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
+                    final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
+                    if (isSmartOutputLocation) {
                         // Create new HashMap as we don't want to change the one in cache
                         attributes = (attributes == null) ? new HashMap() : new HashMap(attributes);
                         // Set attributes for Saxon source location
@@ -153,7 +159,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                     transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
-                    if (isGenerateSourceLocation)
+                    if (isSmartOutputLocation)
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
                     final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
@@ -229,11 +235,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         public void setDocumentLocator(final Locator locator) {
                             this.inputLocator = locator;
-                            if (isGenerateSourceLocation) {
+                            if (isSmartOutputLocation) {
                                 this.outputLocator = new OutputLocator();
                                 this.startElementLocationStack = new Stack();
                                 super.setDocumentLocator(this.outputLocator);
-                            } else {
+                            } else if (isDumbOutputLocation) {
                                 super.setDocumentLocator(this.inputLocator);
                             }
                         }
@@ -241,7 +247,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         public void startDocument() throws SAXException {
                             // Try to set fallback Locator
                             if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
-                                    && processorLocationData != null) {
+                                    && isDumbOutputLocation && processorLocationData != null) {
                                 final Locator locator = new ConstantLocator(processorLocationData);
                                 super.setDocumentLocator(locator);
                             }

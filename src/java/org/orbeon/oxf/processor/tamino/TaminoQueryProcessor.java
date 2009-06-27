@@ -49,26 +49,25 @@ public class TaminoQueryProcessor extends TaminoProcessor {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
                     // Read configuration
-                    Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                    final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                         public Object read(PipelineContext context, ProcessorInput input) {
                             return readConfig(readInputAsDOM4J(context, INPUT_CONFIG));
                         }
                     });
 
                     // Read data
-                    Document queryDocument = readCacheInputAsDOM4J(context, INPUT_DATA);
-                    String query = XPathUtils.selectStringValueNormalize(queryDocument, "/query");
-                    String xquery = Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*"));
-                    TConnection connection = getConnection(context, config);
+                    final Document queryDocument = readCacheInputAsDOM4J(context, INPUT_DATA);
+                    final String query = XPathUtils.selectStringValueNormalize(queryDocument, "/query");
+                    final String xquery = Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*"));
+                    final TConnection connection = getConnection(context, config);
 
-                    TaminoElementHandler handler = new TaminoElementHandler(contentHandler);
-                    TSAXObjectModel saxObjectModel = new TSAXObjectModel("SAXObjectModel", null, null,
-                            null, handler );
+                    final TaminoElementHandler handler = new TaminoElementHandler(contentHandler);
+                    final TSAXObjectModel saxObjectModel = new TSAXObjectModel("SAXObjectModel", null, null, null, handler);
                     TXMLObjectModel.register(saxObjectModel);
-                    TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), saxObjectModel);
+                    final TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), saxObjectModel);
 
 
-                    TResponse response;
+                    final TResponse response;
                     if (query != null) {
                         if(logger.isDebugEnabled())
                             logger.debug("Executing X-Query: "+query);

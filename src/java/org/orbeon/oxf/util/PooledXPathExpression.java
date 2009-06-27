@@ -24,6 +24,7 @@ import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.VirtualNode;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
@@ -70,6 +71,51 @@ public class PooledXPathExpression {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    /**
+     * Evaluate and return an iterator over native Java objects, including underlying wrapped nodes.
+     */
+    public Iterator iterate() throws XPathException {
+
+        final Item contextItem = (Item) contextItems.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext, null);
+
+        return new Iterator() {
+
+            private Item currentItem = iter.next();
+
+            public boolean hasNext() {
+                return currentItem != null;
+            }
+
+            public Object next() {
+                final Item itemToReturn = currentItem;
+                // Advance
+                try {
+                    currentItem = iter.next();
+                } catch (XPathException e) {
+                    throw new OXFException(e);
+                }
+                // Convert
+                if (itemToReturn instanceof AtomicValue) {
+                    try {
+                        return ((AtomicValue)itemToReturn).convertToJava(Object.class, xpathContext);
+                    } catch (XPathException e) {
+                        throw new OXFException(e);
+                    }
+                } else if (itemToReturn instanceof VirtualNode) {
+                    return ((VirtualNode)itemToReturn).getUnderlyingNode();
+                } else {
+                    return itemToReturn;
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     /**

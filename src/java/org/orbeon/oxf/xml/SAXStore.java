@@ -32,8 +32,10 @@ import java.util.List;
 /**
  * SAXStore keeps a compact representation of SAX events sent to the ContentHandler interface.
  *
+ * As of June 2009, we increase the size of buffers by 50% instead of 100%. Still not the greatest way. Possibly,
+ * passed a threshold, say 10 MB or 20 MB, we could use a linked list of such big blocks.
+ *
  * TODO: Handling of system IDs is not optimal in memory as system IDs are unlikely to change much within a document.
- * TODO: For "large" documents, growing by doubling the capacity is not optimal.
  */
 public class SAXStore extends ForwardingContentHandler implements Serializable, Externalizable {
 
@@ -48,7 +50,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public static final byte SKIPPED_ENTITY = 0x09;
     public static final byte START_PREFIX_MAPPING = 0x0A;
 
-    private static final int INITIAL_SIZE = 2;
+    private static final int INITIAL_SIZE = 10;
 
     private byte[] eventBuffer;
     private int eventBufferPosition;
@@ -423,7 +425,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (charBuffer.length - charBufferPosition <= length) {
             // double the array
             char[] old = charBuffer;
-            charBuffer = new char[old.length * 2];
+            try{
+                charBuffer = new char[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, charBuffer, 0, charBufferPosition);
             addToCharBuffer(chars, start, length);
         } else {
@@ -436,7 +443,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (intBuffer.length - intBufferPosition == 1) {
             // double the array
             int[] old = intBuffer;
-            intBuffer = new int[old.length * 2];
+            try{
+                intBuffer = new int[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, intBuffer, 0, intBufferPosition);
             addToIntBuffer(i);
         } else {
@@ -448,7 +460,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (lineBuffer.length - lineBufferPosition == 1) {
             // double the array
             int[] old = lineBuffer;
-            lineBuffer = new int[old.length * 2];
+            try {
+                lineBuffer = new int[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, lineBuffer, 0, lineBufferPosition);
             addToLineBuffer(i);
         } else {
@@ -460,7 +477,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (systemIdBuffer.length - systemIdBufferPosition == 1) {
             // double the array
             String[] old = systemIdBuffer;
-            systemIdBuffer = new String[old.length * 2];
+            try {
+                systemIdBuffer = new String[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, systemIdBuffer, 0, systemIdBufferPosition);
             addToSystemIdBuffer(systemId);
         } else {
@@ -472,7 +494,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (eventBuffer.length - eventBufferPosition == 1) {
             // double the array
             byte[] old = eventBuffer;
-            eventBuffer = new byte[old.length * 2];
+            try {
+                eventBuffer = new byte[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, eventBuffer, 0, eventBufferPosition);
             addToEventBuffer(b);
         } else {
@@ -484,7 +511,12 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         if (attributeCountBuffer.length - attributeCountBufferPosition == 1) {
             // double the array
             int[] old = attributeCountBuffer;
-            attributeCountBuffer = new int[old.length * 2];
+            try {
+                attributeCountBuffer = new int[old.length * 3 / 2 + 1];
+            } catch (Error e) {
+                System.out.println("Out of memory: " + old.length);
+                throw e;
+            }
             System.arraycopy(old, 0, attributeCountBuffer, 0, attributeCountBufferPosition);
             addToAttributeBuffer(attributes);
         } else {

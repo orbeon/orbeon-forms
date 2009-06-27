@@ -49,17 +49,24 @@ public class TeeProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
-                    State state = (State) getState(context);
+                    final State state = (State) getState(context);
                     if (state.store == null) {
-                        ProcessorInput input = getInputByName(INPUT_DATA);
+                        final ProcessorInput input = getInputByName(INPUT_DATA);
                         state.store = new SAXStore(contentHandler);
                         readInputAsSAX(context, input, state.store);
                     } else {
                         state.store.replay(contentHandler);
                     }
+
+                    // Free the SAXStore after the last read
+                    state.readCount++;
+                    if (state.readCount == getOutputCount()) {
+                        state.store = null;
+                    }
+
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -79,16 +86,16 @@ public class TeeProcessor extends ProcessorImpl {
                     throw e;
                 }
                 if (state.outputCacheKey == null) {
-                    ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                    final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
                     state.outputCacheKey = (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
                 }
                 return state.outputCacheKey;
             }
 
             public Object getValidityImpl(PipelineContext context) {
-                State state = (State) getState(context);
+                final State state = (State) getState(context);
                 if (state.validity == null) {
-                    ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                    final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
                     state.validity = (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
                 }
                 return state.validity;
@@ -108,6 +115,7 @@ public class TeeProcessor extends ProcessorImpl {
 
     private static class State {
         public SAXStore store;
+        public int readCount;
         public OutputCacheKey outputCacheKey;
         public Object validity;
     }

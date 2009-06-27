@@ -49,7 +49,7 @@ import java.util.*;
  * Helper class that implements default method of the Processor interface.
  */
 public abstract class ProcessorImpl implements Processor {
-
+final
     public static Logger logger = LoggerFactory.createLogger(ProcessorImpl.class);
     public static IndentedLogger indentedLogger = new IndentedLogger(logger, "XPL processor");
 
@@ -67,8 +67,9 @@ public abstract class ProcessorImpl implements Processor {
     private QName name;
     private Map inputMap = new HashMap();
     private Map outputMap = new HashMap();
-    private List inputsInfo = new ArrayList( 0 );
-    private List outputsInfo = new ArrayList( 0 );
+    private int outputCount = 0;
+    private List inputsInfo = new ArrayList(0);
+    private List outputsInfo = new ArrayList(0);
 
     private LocationData locationData;
     public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
@@ -227,21 +228,22 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public void addOutput(String name, ProcessorOutput output) {
-//        ProcessorOutput po = (ProcessorOutput) outputMap.get(name);
-//        if (po != null) {
-//            try {
-//                throw new ValidationException("Exactly one output " + name + " is required", getLocationData());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-        // NOTE: One exception to the rule that we only have one output with a name is the TeeProcessor, which adds multiple data outputs.
+        // NOTE: One exception to the rule that we only have one output with a given name is the TeeProcessor, which
+        // adds multiple outputs called "data".
         outputMap.put(name, output);
+        outputCount++;
     }
 
+    protected int getOutputCount() {
+        return outputCount;
+    }
+
+    // NOTE: As of 2009-06-26, this is never called.
     public void deleteOutput(ProcessorOutput output) {
-        final java.util.Collection outs = outputMap.values();
-        outs.remove( output );
+        final Collection outputs = outputMap.values();
+        outputs.remove(output);
+        // NOTE: This won't be correct with the TeeProcessor.
+        outputCount--;
     }
 
     protected void addInputInfo(ProcessorInputOutputInfo inputInfo) {

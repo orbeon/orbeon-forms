@@ -130,10 +130,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                         final LocationDocumentResult documentResult = new LocationDocumentResult();
                         identity.setResult(documentResult);
 
-                        annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                                new XFormsExtractorContentHandler(externalContext, identity)
-    //                            ,new SAXLoggerProcessor.DebugContentHandler()
-                        }));
+//                        annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
+//                                new XFormsExtractorContentHandler(externalContext, identity)
+//    //                            ,new SAXLoggerProcessor.DebugContentHandler()
+//                        }));
+
+//                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, new SAXLoggerProcessor.DebugContentHandler(identity)));
+
+                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity));
 
                         // Read the input through the annotator and gather namespace mappings
                         final Map namespaceMappings = new HashMap();
@@ -324,13 +328,8 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create containing document and initialize XForms engine
             containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsStaticState, uriResolver);
 
-            // Make sure we have up to date controls before creating state below
-            final XFormsControls xformsControls = containingDocument[0].getControls();
-            xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-
             // This is the state after XForms initialization
-            xformsState[0] = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
-                    containingDocument[0].createEncodedDynamicState(pipelineContext, false));
+            xformsState[0] = containingDocument[0].getXFormsState(pipelineContext);
         }
 
         // Cache ContainingDocument if requested and possible

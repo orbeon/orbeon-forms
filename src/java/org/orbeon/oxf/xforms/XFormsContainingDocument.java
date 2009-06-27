@@ -165,7 +165,7 @@ public class XFormsContainingDocument extends XBLContainer {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
         setLocationData(xformsStaticState.getLocationData());
 
-        logDebug("containing document", "creating new ContainingDocument (static state object provided).");
+        startHandleOperation("containing document", "creating new ContainingDocument (static state object provided).");
 
         // Remember static state
         this.xformsStaticState = xformsStaticState;
@@ -185,6 +185,8 @@ public class XFormsContainingDocument extends XBLContainer {
         this.uriResolver = null;
 
         // NOTE: we clear isInitializing when Ajax requests come in
+
+        endHandleOperation();
     }
 
     /**
@@ -200,12 +202,12 @@ public class XFormsContainingDocument extends XBLContainer {
 
         if (xformsStaticState != null) {
             // Use passed static state object
-            logDebug("containing document", "restoring containing document (static state object provided).");
+            startHandleOperation("containing document", "restoring containing document (static state object provided).");
             this.xformsStaticState = xformsStaticState;
         } else {
             // Create static state object
             // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
-            logDebug("containing document", "restoring containing document (static state object not provided).");
+            startHandleOperation("containing document", "restoring containing document (static state object not provided).");
             this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
         }
 
@@ -227,6 +229,8 @@ public class XFormsContainingDocument extends XBLContainer {
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
+
+        endHandleOperation();
     }
 
     /**
@@ -237,6 +241,20 @@ public class XFormsContainingDocument extends XBLContainer {
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
         this(pipelineContext, xformsState,  null);
+    }
+
+    public XFormsState getXFormsState(PipelineContext pipelineContext) {
+
+        // Make sure we have up to date controls before creating state below
+        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
+
+        // Encode state
+        startHandleOperation("containing document", "encoding state");
+        final XFormsState result = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
+                createEncodedDynamicState(pipelineContext, false));
+        endHandleOperation();
+
+        return result;
     }
 
     public void setSourceObjectPool(ObjectPool sourceObjectPool) {

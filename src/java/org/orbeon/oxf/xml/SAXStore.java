@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * SAXStore keeps a compact representation of SAX events sent to the ContentHandler interface.
@@ -76,6 +77,39 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     private String publicId;
 
     private transient Locator locator; // used only for recording events, MUST be cleared afterwards
+
+    public long getApproximateSize() {
+        long size = eventBufferPosition * 4;
+        size += charBufferPosition;
+        size += intBufferPosition * 4;
+        size += lineBufferPosition * 4;
+
+        {
+            String previousId = null;
+            for (int i = 0; i < systemIdBuffer.length; i++) {
+                final String currentId = systemIdBuffer[i];
+                // This is rough, but entries in the list could point to the same string, so we try to detect this case.
+                if (currentId != null && currentId != previousId)
+                    size += currentId.length() * 2;
+                previousId = currentId;
+            }
+        }
+
+        size += attributeCountBufferPosition * 4;
+
+        {
+            String previousString = null;
+            for (Iterator i = stringBuffer.iterator(); i.hasNext();) {
+                final String currentString = (String) i.next();
+                // This is rough, but entries in the list could point to the same string, so we try to detect this case.
+                if (currentString != null && currentString != previousString)
+                    size += currentString.length() * 2;
+                previousString = currentString;
+            }
+        }
+
+        return size;
+    }
 
     public SAXStore() {
         super.setForward(false);
@@ -474,6 +508,15 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     }
 
     protected void addToSystemIdBuffer(String systemId) {
+
+        // Try to detect contiguous system ids
+        //
+        // NOTE: This native method won't work during replay, will need to store number of contiguous identical strings
+        // as well, and/or use intern().
+//        if (systemIdBufferPosition > 0 && systemIdBuffer[systemIdBufferPosition] == systemId) {
+//            return;
+//        }
+
         if (systemIdBuffer.length - systemIdBufferPosition == 1) {
             // double the array
             String[] old = systemIdBuffer;

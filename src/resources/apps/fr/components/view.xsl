@@ -326,9 +326,9 @@
             </xsl:apply-templates>
 
             <!-- Misc standard dialogs -->
-            <xi:include href="../import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
-            <xi:include href="../includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
-            <xi:include href="../includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
 
             <!-- Error Details dialog -->
             <xxforms:dialog id="fr-error-details-dialog">

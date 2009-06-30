@@ -16,11 +16,11 @@ package org.orbeon.oxf.xml.dom4j;
 import org.xml.sax.Locator;
 
 public class ConstantLocator implements Locator {
-    
+
     private final LocationData locationData;
 
-    public ConstantLocator( final LocationData locDat ) {
-        locationData = locDat;
+    public ConstantLocator(final LocationData locationData) {
+        this.locationData = locationData;
     }
 
     public int getColumnNumber() {

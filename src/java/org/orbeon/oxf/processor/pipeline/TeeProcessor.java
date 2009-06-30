@@ -78,10 +78,9 @@ public class TeeProcessor extends ProcessorImpl {
                 if (state.store == null) {
                     // Tee hasn't been read yet
 
-                    if (state.stateWasClearedDebug) {
+                    if (state.stateWasCleared) {
                         final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
                         logger.error("Tee state was cleared and re-read for output: " + output.getName());
-//                        System.out.println("xxxx Tee state was cleared and re-read: output id: " + output.getName());
                     }
 
                     // Create SAXStore and read input through it
@@ -118,12 +117,15 @@ public class TeeProcessor extends ProcessorImpl {
 
         private void freeSAXStoreIfNeeded(State state) {
             if (state.readCount == getOutputCount()) {
+                final SAXStore freedStore = state.store;
                 state.store = null;
-                state.stateWasClearedDebug = true;
+                state.stateWasCleared = true;
 
                 final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
-                logger.debug("Freed SAXStore for output id: " + output.getId());
-//                System.out.println("xxxx freed SAXStore " + output.getName());
+                if (logger.isDebugEnabled()) {
+                    final long saxStoreSize = freedStore.getApproximateSize();
+                    logger.debug("Freed SAXStore for output id: " + output.getName() + "; approximate size: " + saxStoreSize + " bytes");
+                }
             }
         }
 
@@ -171,6 +173,6 @@ public class TeeProcessor extends ProcessorImpl {
         public OutputCacheKey outputCacheKey;
         public Object validity;
 
-        public boolean stateWasClearedDebug;
+        public boolean stateWasCleared;
     }
 }

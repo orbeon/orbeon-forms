@@ -198,27 +198,27 @@
         <!--</xforms:model>-->
 
         <!-- This model handles roles and permissions -->
-        <xi:include href="../includes/roles-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/roles-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles i18n resources -->
-        <xi:include href="../i18n/resources-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles offline functionality through Google Gears -->
         <!-- NOTE: commenting this out for now as Form Runner does not yet work 100% in offline mode -->
-        <!--<xi:include href="../offline/offline-model.xml" xxi:omit-xml-base="true"/>-->
+        <!--<xi:include href="oxf:/apps/fr/offline/offline-model.xml" xxi:omit-xml-base="true"/>-->
         <!-- This model handles form sections -->
-        <xi:include href="../includes/sections-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/sections-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles error summary -->
-        <xi:include href="../includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles document persistence -->
-        <xi:include href="../includes/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
-        <xi:include href="../includes/navigation-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
         <xsl:if test="$view-buttons = ('save-locally')">
-            <xi:include href="../import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
         <xsl:if test="$has-alfresco">
             <!-- This model handles Alfresco integration -->
-            <xi:include href="../alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
 
         <!-- Copy and annotate existing main model -->
@@ -242,9 +242,9 @@
 
         <xsl:if test="not($is-noscript)">
             <!-- Handle collapsible sections -->
-            <xi:include href="../includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
             <!-- Handle checking dirty status -->
-            <xi:include href="../includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
+            <xi:include href="oxf:/apps/fr/includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
         </xsl:if>
 
     </xsl:template>

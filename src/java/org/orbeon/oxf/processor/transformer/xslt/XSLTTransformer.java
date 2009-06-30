@@ -241,13 +241,15 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                 super.setDocumentLocator(this.outputLocator);
                             } else if (isDumbOutputLocation) {
                                 super.setDocumentLocator(this.inputLocator);
+                            } else {
+                                // NOP: don't set a locator
                             }
                         }
 
                         public void startDocument() throws SAXException {
                             // Try to set fallback Locator
                             if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
-                                    && isDumbOutputLocation && processorLocationData != null) {
+                                    && processorLocationData != null && isDumbOutputLocation) {
                                 final Locator locator = new ConstantLocator(processorLocationData);
                                 super.setDocumentLocator(locator);
                             }

@@ -668,9 +668,9 @@
                                                 $document-name, if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
 
                                         <!-- Don't open a document on click in the checkbox or when the trigger gets the focus (e.g. by the user tabbing to it). -->
-                                        <xforms:action ev:event="DOMActivate DOMFocusIn">
-                                            <xforms:message level="xxforms:log-info" value="concat('xxforms:target: ', event('xxforms:target'))"/>
-                                        </xforms:action>
+                                        <!--<xforms:action ev:event="DOMActivate DOMFocusIn">-->
+                                            <!--<xforms:message level="xxforms:log-info" value="concat('xxforms:target: ', event('xxforms:target'))"/>-->
+                                        <!--</xforms:action>-->
 
                                         <tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                             <xforms:group appearance="xxforms:internal">

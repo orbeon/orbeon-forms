@@ -130,12 +130,24 @@
                     timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
                     timeValueInputId: "time-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
 
+                    workerTimeParsing: function(typedValue, expectedValue) {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            ORBEON.xforms.Document.setValue(this.timeValueId, typedValue);
+                        }, function() {
+                            YAHOO.util.Assert.areEqual(expectedValue, YAHOO.util.Dom.get(this.timeValueInputId).value);
+                        });
+                    },
+
                     // Test for: Regression: dateTime field is always invalid when "p.m." is entered
                     // http://forge.objectweb.org/tracker/?func=detail&atid=350207&aid=313427&group_id=168
                     testParsing: function() {
                         var parsedTime = ORBEON.util.DateTime.magicTimeToJSDate("6:00:00 p");
                         YAHOO.util.Assert.isNotNull(parsedTime);
-                    }
+                    },
+
+                    testFirstHourShort:  function() { this.workerTimeParsing("12 am",       "0:00:00 a.m."); },
+                    testFirstHourMedium: function() { this.workerTimeParsing("12:30 am",    "0:30:00 a.m."); },
+                    testFirstHourLong:   function() { this.workerTimeParsing("12:30:40 am", "0:30:40 a.m."); }
                 }));
 
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

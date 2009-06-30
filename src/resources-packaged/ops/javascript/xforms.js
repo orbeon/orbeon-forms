@@ -739,7 +739,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10));
+                d.setHours(parseInt(bits[1], 10) % 12);
                 d.setMinutes(parseInt(bits[2], 10));
                 d.setSeconds(parseInt(bits[3], 10));
                 return d;
@@ -749,7 +749,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10));
+                d.setHours(parseInt(bits[1], 10) % 12);
                 d.setMinutes(parseInt(bits[2], 10));
                 d.setSeconds(0);
                 return d;
@@ -759,7 +759,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2}) ?(a|am|a\.\m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10));
+                d.setHours(parseInt(bits[1], 10) % 12);
                 d.setMinutes(0);
                 d.setSeconds(0);
                 return d;

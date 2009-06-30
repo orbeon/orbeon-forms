@@ -723,8 +723,8 @@
             </p>
             <xml-source>
                 <xforms:dispatch name="rename-control" target="my-model">
-                    <xxforms:context name="my:control" select="my/control"/>
-                    <xxforms:context name="my:control-name" select="'beverage-selection'"/>
+                    <xxforms:context name="control" select="my/control"/>
+                    <xxforms:context name="control-name" select="'beverage-selection'"/>
                 </xforms:dispatch>
             </xml-source>
             <p>
@@ -735,8 +735,19 @@
                     <th><code>name</code></th>
                     <td>Mandatory</td>
                     <td>
-                        Name of the context attribute. In order to avoid confusion with standard XForms names, we
-                        recommend you use qualified names.
+                        <p>
+                            Name of the context attribute.
+                        </p>
+                        <p>
+                            Note that the context attribute name cannot be a qualified name (QName), because this would
+                            not be compatible with <a href="http://www.w3.org/TR/DOM-Level-2-Events/events.html">DOM 2
+                            Events</a>. However, a QName can be used as custom event name.
+                        </p>
+                        <p>
+                            In order to avoid confusion with standard XForms names, we recommend you use prefixed names
+                            if you use custom context information with standard event names (when supported). However,
+                            with custom event names, prefixing is not necessary.
+                        </p>
                     </td>
                 </tr>
                 <tr>

@@ -145,9 +145,12 @@
                         YAHOO.util.Assert.isNotNull(parsedTime);
                     },
 
-                    testFirstHourShort:  function() { this.workerTimeParsing("12 am",       "0:00:00 a.m."); },
-                    testFirstHourMedium: function() { this.workerTimeParsing("12:30 am",    "0:30:00 a.m."); },
-                    testFirstHourLong:   function() { this.workerTimeParsing("12:30:40 am", "0:30:40 a.m."); }
+                    testFirstHourShort:     function() { this.workerTimeParsing("12 am",        "0:00:00 a.m."); },
+                    testFirstHourMedium:    function() { this.workerTimeParsing("12:30 am",     "0:30:00 a.m."); },
+                    testFirstHourLong:      function() { this.workerTimeParsing("12:30:40 am",  "0:30:40 a.m."); },
+                    testNoAmPmShort:        function() { this.workerTimeParsing("12",           "12:00:00 p.m."); },
+                    testNoAmPmMedium:       function() { this.workerTimeParsing("12:30",        "12:30:00 p.m."); },
+                    testNoAmPmLong:         function() { this.workerTimeParsing("12:30:40",     "12:30:40 p.m."); }
                 }));
 
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

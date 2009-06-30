@@ -700,7 +700,7 @@ ORBEON.util.DateTime = {
             }
         },
         // 12:34:56 p.m.
-        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(p|pm|p\.\m\.)$/,
+        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -712,7 +712,7 @@ ORBEON.util.DateTime = {
             }
         },
         // 12:34 p.m.
-        {   re: /^(\d{1,2}):(\d{1,2}) ?(p|pm|p\.\m\.)$/,
+        {   re: /^(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -724,7 +724,7 @@ ORBEON.util.DateTime = {
             }
         },
         // 12 p.m.
-        {   re: /^(\d{1,2}) ?(p|pm|p\.\m\.)$/,
+        {   re: /^(\d{1,2}) ?(p|pm|p\.m\.)$/,
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -736,30 +736,36 @@ ORBEON.util.DateTime = {
             }
         },
         // 12:34:56 (a.m.)
-        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
+        {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10) % 12);
+                var h = parseInt(bits[1], 10);
+                if (! YAHOO.lang.isUndefined(bits[4]) && bits[4] != "") h = h % 12;
+                d.setHours(h);
                 d.setMinutes(parseInt(bits[2], 10));
                 d.setSeconds(parseInt(bits[3], 10));
                 return d;
             }
         },
         // 12:34 (a.m.)
-        {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.\m\.)?$/,
+        {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10) % 12);
+                var h = parseInt(bits[1], 10);
+                if (! YAHOO.lang.isUndefined(bits[3]) && bits[3] != "") h = h % 12;
+                d.setHours(h);
                 d.setMinutes(parseInt(bits[2], 10));
                 d.setSeconds(0);
                 return d;
             }
         },
         // 12 (a.m.)
-        {   re: /^(\d{1,2}) ?(a|am|a\.\m\.)?$/,
+        {   re: /^(\d{1,2}) ?(a|am|a\.m\.)?$/,
             handler: function(bits) {
                 var d = new Date();
-                d.setHours(parseInt(bits[1], 10) % 12);
+                var h = parseInt(bits[1], 10);
+                if (! YAHOO.lang.isUndefined(bits[2]) && bits[2] != "") h = h % 12;
+                d.setHours(h);
                 d.setMinutes(0);
                 d.setSeconds(0);
                 return d;

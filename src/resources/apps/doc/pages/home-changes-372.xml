@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2007-2009 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
+    <header>
+        <title>Changes in Version 3.7.2 (Developer Release)</title>
+    </header>
+    <body>
+        <a name="introduction"/>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Orbeon Forms 3.7.2 (Developer Release) features over <a href="#changes-372-full">[TODO] improvements</a>
+                since <a href="home-changes-371">Orbeon Forms 3.7.1</a>, including [TODO].
+            </p>
+            <p>
+                This document describes changes made between Orbeon Forms 3.7.1 and Orbeon Forms 3.7.2.
+            </p>
+            <p>
+                <b>Please also make sure to check all releases on the <a
+                href="http://www.orbeon.com/forms/download">downloads page</a>.</b>
+            </p>
+            <p style="color: red">
+                NOTE: Orbeon Forms 3.7.2 is not yet released. These notes are a work in progress.
+            </p>
+        </section>
+        <a name="changes-372"/>
+        <section>
+            <title>Changes in Version 3.7.2 (Developer Release)</title>
+            <section>
+                <title>Noteworthy Changes</title>
+                <ul>
+                    <li>
+                        <p>
+                            <b>TODO.</b>
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="changes-372-full"/>
+            <section>
+                <title>Complete List of Issues Addressed in this Release</title>
+                <p>
+                    Orbeon Forms 3.7.2 addresses the following bugs and features:
+                </p>
+                <!--
+Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
+
+http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=350207&set=custom&_assigned_to=0&_status=2&_category=100&_group=100&_sort_col=close_date&_sort_ord=DESC
+
+<ul>
+    {
+        for $table in //table[tr/td/span/strong[. = 'ID']]
+            let $latest-id := '308864'
+            let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
+            return
+                for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
+                <li>
+                    <a href="http://forge.objectweb.org/{$row/td[2]/a/@href}">#{string($row/td[1])}: {string($row/td[2]/a)}</a>
+                </li>
+    }
+</ul>
+-->
+                <ul>
+
+                </ul>
+            </section>
+        </section>
+        <a name="compatibility"/>
+        <section>
+            <title>Compatibility Notes</title>
+            <section>
+                <title>XSLT output location information</title>
+                <p>
+                    [TODO: describe location-mode]
+                </p>
+                <xml-source>
+                    <property as="xs:string"  processor-name="oxf:saxon8"    name="location-mode"            value="none"/>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

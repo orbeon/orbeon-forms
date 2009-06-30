@@ -22,14 +22,15 @@ public class CounterProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
                     counter++;
                     contentHandler.startDocument();
                     contentHandler.startElement("", "counter", "counter", XMLUtils.EMPTY_ATTRIBUTES);
-                    String counterString = Integer.toString(counter);
+                    final String counterString = Integer.toString(counter);
                     contentHandler.characters(counterString.toCharArray(), 0, counterString.length());
+                    contentHandler.endElement("", "counter", "counter");
                     contentHandler.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);

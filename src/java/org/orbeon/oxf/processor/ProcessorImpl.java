@@ -65,7 +65,7 @@ final
 
     private String id;
     private QName name;
-    private Map inputMap = new HashMap();
+    private Map inputMap = new HashMap();// Map<String name, List<ProcessorInput> inputs>
     private Map outputMap = new HashMap();
     private int outputCount = 0;
     private List inputsInfo = new ArrayList(0);
@@ -563,7 +563,7 @@ final
      * @return        state object set by the caller of setState()
      */
     public Object getState(PipelineContext context) {
-        Object state = context.getAttribute(getProcessorKey(context));
+        final Object state = context.getAttribute(getProcessorKey(context));
         if (state == null) {
             throw new OXFException("No state in context");
         }
@@ -1160,21 +1160,21 @@ final
         public final void read(PipelineContext context, ContentHandler contentHandler) {
             final Trace trc = context.getTrace();
             final TraceInfo tinf;
-            if ( trc == null ) {
+            if (trc == null) {
                 tinf = null;
             } else {
                 final String sysID;
                 final int line;
-                if ( breakpointKey == null ) {
+                if (breakpointKey == null) {
                     final Class cls = getClass();
-                    sysID = cls.getName() + " " + this  + " " + getName() + " " + getId();
+                    sysID = cls.getName() + " " + this + " " + getName() + " " + getId();
                     line = -1;
                 } else {
                     sysID = breakpointKey.getSystemId();
                     line = breakpointKey.getLine();
                 }
-                tinf = new TraceInfo( sysID, line );
-                trc.add( tinf );
+                tinf = new TraceInfo(sysID, line);
+                trc.add(tinf);
             }
             try {
                 getFilter().read(context, contentHandler);
@@ -1183,7 +1183,7 @@ final
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, getLocationData());
             } finally {
-                if ( tinf != null ) tinf.end = System.currentTimeMillis();
+                if (tinf != null) tinf.end = System.currentTimeMillis();
             }
         }
 
@@ -1369,7 +1369,7 @@ final
         protected CacheKey getLocalKey(PipelineContext pipelineContext) {
             for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
                 String key = (String) i.next();
-                if (!isInputInCache(pipelineContext, key))// NOTE: This requires that there is only one input with that name
+                if (!isInputInCache(pipelineContext, key))// NOTE: We don't really support multiple inputs with the same name.
                     return null;
             }
             return getFilledOutState(pipelineContext).key;
@@ -1378,7 +1378,7 @@ final
         protected final Object getLocalValidity(PipelineContext pipelineContext) {
             for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
                 String key = (String) i.next();
-                if (!isInputInCache(pipelineContext, key))// NOTE: This requires that there is only one input with that name
+                if (!isInputInCache(pipelineContext, key))// NOTE: We don't really support multiple inputs with the same name.
                     return null;
             }
             return getFilledOutState(pipelineContext).validity;

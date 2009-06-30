@@ -30,8 +30,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * This internal processor handles the tee-ing functionality of XPL, i.e. sending an XML infoset to
- * multiple readers.
+ * This internal processor handles the tee-ing functionality of XPL, i.e. sending an XML infoset to multiple readers.
  */
 public class TeeProcessor extends ProcessorImpl {
 
@@ -48,61 +47,114 @@ public class TeeProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    /**
+     * Standard createOutput().
+     */
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                try {
-                    final State state = (State) getState(context);
-                    if (state.store == null) {
-                        final ProcessorInput input = getInputByName(INPUT_DATA);
-                        state.store = new SAXStore(contentHandler);
-                        readInputAsSAX(context, input, state.store);
-                    } else {
-                        state.store.replay(contentHandler);
-                    }
+        return createOutput(name, false);
+    }
 
-                    // Free the SAXStore after the last read
-                    state.readCount++;
-                    if (state.readCount == getOutputCount()) {
-                        state.store = null;
-                    }
-
-                } catch (SAXException e) {
-                    throw new OXFException(e);
-                }
-            }
-
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                State state = null;
-                try {
-                    state = (State) getState(context);
-                } catch (OXFException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("creation", creationException);
-                        logger.error("reset", resetException);
-                        logger.error("current processor key: " + getProcessorKey(context));
-                        logger.error("reset processor key: " + resetProcessorKey);
-                    }
-                    throw e;
-                }
-                if (state.outputCacheKey == null) {
-                    final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
-                    state.outputCacheKey = (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
-                }
-                return state.outputCacheKey;
-            }
-
-            public Object getValidityImpl(PipelineContext context) {
-                final State state = (State) getState(context);
-                if (state.validity == null) {
-                    final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
-                    state.validity = (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
-                }
-                return state.validity;
-            }
-        };
+    /**
+     * Tee-specific createOutput().
+     */
+    public ProcessorOutput createOutput(String name, boolean isMultipleReads) {
+        final ProcessorOutput output = new TeeProcessorOutputImpl(getClass(), name, isMultipleReads);
         addOutput(name, output);
         return output;
+    }
+
+    public class TeeProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {
+
+        private boolean isMultipleReads;
+
+        private TeeProcessorOutputImpl(Class clazz, String name, boolean isMultipleReads) {
+            super(clazz, name);
+            this.isMultipleReads = isMultipleReads;
+        }
+
+        public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            try {
+                final State state = (State) getState(context);
+                if (state.store == null) {
+                    // Tee hasn't been read yet
+
+                    if (state.stateWasClearedDebug) {
+                        final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                        logger.error("Tee state was cleared and re-read for output: " + output.getName());
+//                        System.out.println("xxxx Tee state was cleared and re-read: output id: " + output.getName());
+                    }
+
+                    // Create SAXStore and read input through it
+                    final ProcessorInput input = getInputByName(INPUT_DATA);
+                    state.store = new SAXStore(contentHandler);
+                    readInputAsSAX(context, input, state.store);
+                } else {
+                    state.store.replay(contentHandler);
+                }
+
+                // If this output can be read only once, increase read count
+                if (!isMultipleReads) {
+                    state.readCount++;
+                }
+
+                // If possible, free the SAXStore after the last read
+                freeSAXStoreIfNeeded(state);
+
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
+        }
+
+        /**
+         * This is called specifically by p:for-each once an input has been entirely read.
+         */
+        public void doneReading(PipelineContext context) {
+            // This output can be read more than once, so increase read count only when needed
+            final State state = (State) getState(context);
+            state.readCount++;
+            // If possible, free the SAXStore after the last read
+            freeSAXStoreIfNeeded(state);
+        }
+
+        private void freeSAXStoreIfNeeded(State state) {
+            if (state.readCount == getOutputCount()) {
+                state.store = null;
+                state.stateWasClearedDebug = true;
+
+                final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                logger.debug("Freed SAXStore for output id: " + output.getId());
+//                System.out.println("xxxx freed SAXStore " + output.getName());
+            }
+        }
+
+        public OutputCacheKey getKeyImpl(PipelineContext context) {
+            final State state;
+            try {
+                state = (State) getState(context);
+            } catch (OXFException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.error("creation", creationException);
+                    logger.error("reset", resetException);
+                    logger.error("current processor key: " + getProcessorKey(context));
+                    logger.error("reset processor key: " + resetProcessorKey);
+                }
+                throw e;
+            }
+            if (state.outputCacheKey == null) {
+                final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                state.outputCacheKey = (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
+            }
+            return state.outputCacheKey;
+        }
+
+        public Object getValidityImpl(PipelineContext context) {
+            final State state = (State) getState(context);
+            if (state.validity == null) {
+                final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                state.validity = (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
+            }
+            return state.validity;
+        }
     }
 
     public void reset(PipelineContext context) {
@@ -118,5 +170,7 @@ public class TeeProcessor extends ProcessorImpl {
         public int readCount;
         public OutputCacheKey outputCacheKey;
         public Object validity;
+
+        public boolean stateWasClearedDebug;
     }
 }

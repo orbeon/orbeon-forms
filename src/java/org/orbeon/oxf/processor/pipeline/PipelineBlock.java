@@ -61,61 +61,68 @@ public class PipelineBlock {
     }
 
     public ProcessorInput connectProcessorToHref(Node node, Processor processor, String inputName, ASTHref href) {
+        return connectProcessorToHref(node, processor, inputName, href, false);
+    }
 
-        LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
-        ProcessorInput processorInput = processor.createInput(inputName);
+    public ProcessorInput connectProcessorToHref(Node node, Processor processor, String inputName, ASTHref href, boolean isFromInnerforEach) {
+
+        final LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
+        final ProcessorInput processorInput = processor.createInput(inputName);
 
         if (href instanceof ASTHrefId) {
 
-            String referencedId = ((ASTHrefId) href).getId();
+            final String referencedId = ((ASTHrefId) href).getId();
 
             // Nice messsage for current()
-            if (referencedId.equals(ForEachProcessor.CURRENT) && !idToOutputMap.containsKey(ForEachProcessor.CURRENT))
+            if (referencedId.equals(ForEachProcessor.FOR_EACH_CURRENT_INPUT) && !idToOutputMap.containsKey(ForEachProcessor.FOR_EACH_CURRENT_INPUT))
                 throw new ValidationException("Function current() can only be used in a for-each block", locationData);
 
             // Reference to previously defined id
             if (!idToOutputMap.containsKey(referencedId))
                 throw new ValidationException("Reference to undeclared output id \"" + referencedId + "\"", locationData);
-            ProcessorOutput referencedOutput = (ProcessorOutput) idToOutputMap.get(referencedId);
+            final ProcessorOutput referencedOutput = (ProcessorOutput) idToOutputMap.get(referencedId);
 
-            if (referencedOutput.getInput() == null) {
+            if (!isFromInnerforEach && referencedOutput.getInput() == null) {
                 // Output is virgin: just connect it to this processor
                 processorInput.setOutput(referencedOutput);
                 referencedOutput.setInput(processorInput);
             } else if (outputIdToTeeProcessor.containsKey(referencedId)) {
                 // ASTInput already shared: just add ourselves to the tee
-                Processor tee = (TeeProcessor) outputIdToTeeProcessor.get(referencedId);
+                final TeeProcessor tee = (TeeProcessor) outputIdToTeeProcessor.get(referencedId);
                 final LocationData locDat = Dom4jUtils.getLocationData();
-                final BreakpointKey bptKey = new BreakpointKey( locDat );
-                ProcessorOutput teeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
-                teeOutput.setBreakpointKey( bptKey );
+                final BreakpointKey breakpointKey = new BreakpointKey(locDat);
+                final ProcessorOutput teeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, isFromInnerforEach);
+                teeOutput.setBreakpointKey(breakpointKey);
                 teeOutput.setInput(processorInput);
                 processorInput.setOutput(teeOutput);
             } else {
                 // Force menage a trois by introducing a tee
-                Processor tee = new TeeProcessor(locationData);
+                final TeeProcessor tee = new TeeProcessor(locationData);
                 createdProcessors.add(tee);
                 outputIdToTeeProcessor.put(referencedId, tee);
 
-                // Reconnect the "other guy" to the tee output
-                final LocationData frstLocDat = Dom4jUtils.getLocationData();
-                final BreakpointKey frstBptKey = new BreakpointKey( frstLocDat );
-                ProcessorOutput firstTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
-                firstTeeOutput.setBreakpointKey( frstBptKey );
-                ProcessorInput otherGuyInput = referencedOutput.getInput();
-                firstTeeOutput.setInput(otherGuyInput);
-                otherGuyInput.setOutput(firstTeeOutput);
+                final LocationData firstLocationData = Dom4jUtils.getLocationData();
+                final BreakpointKey firstBreakpointKey = new BreakpointKey(firstLocationData);
+
+                if (referencedOutput.getInput() != null) { // can be null if isFromInnerforEach == true
+                    // Reconnect the "other guy" to the tee output
+                    final ProcessorOutput firstTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, false);
+                    firstTeeOutput.setBreakpointKey(firstBreakpointKey);
+                    final ProcessorInput otherGuyInput = referencedOutput.getInput();
+                    firstTeeOutput.setInput(otherGuyInput);
+                    otherGuyInput.setOutput(firstTeeOutput);
+                }
 
                 // Connect tee to processor
-                final LocationData scndLocDat = Dom4jUtils.getLocationData();
-                final BreakpointKey scndBptKey = new BreakpointKey( scndLocDat );
-                ProcessorOutput secondTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
-                secondTeeOutput.setBreakpointKey( scndBptKey );
+                final LocationData secondLocationData = Dom4jUtils.getLocationData();
+                final BreakpointKey secondBreakpointKey  = new BreakpointKey(secondLocationData);
+                final ProcessorOutput secondTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, isFromInnerforEach);
+                secondTeeOutput.setBreakpointKey(secondBreakpointKey );
                 secondTeeOutput.setInput(processorInput);
                 processorInput.setOutput(secondTeeOutput);
 
                 // Connect tee input
-                ProcessorInput teeInput = tee.createInput(ProcessorImpl.INPUT_DATA);
+                final ProcessorInput teeInput = tee.createInput(ProcessorImpl.INPUT_DATA);
                 teeInput.setOutput(referencedOutput);
                 referencedOutput.setInput(teeInput);
             }
@@ -125,9 +132,9 @@ public class PipelineBlock {
             ASTHrefAggregate hrefAggregate = (ASTHrefAggregate) href;
 
             // Connect aggregator to config
-            Processor aggregator = new AggregatorProcessor();
-            Document aggregatorConfig = new NonLazyUserDataDocument();
-            Element configElement = aggregatorConfig.addElement("config");
+            final Processor aggregator = new AggregatorProcessor();
+            final Document aggregatorConfig = new NonLazyUserDataDocument();
+            final Element configElement = aggregatorConfig.addElement("config");
             configElement.addElement("root").addText(hrefAggregate.getRoot());
             addNamespaces(configElement, node);
 
@@ -140,12 +147,12 @@ public class PipelineBlock {
 
             // Connect data input to aggregator
             for (Iterator i = hrefAggregate.getHrefs().iterator(); i.hasNext();) {
-                ASTHref id = (ASTHref) i.next();
+                final ASTHref id = (ASTHref) i.next();
                 connectProcessorToHref(node, aggregator, ProcessorImpl.INPUT_DATA, id);
             }
 
             // Connect aggregator output to current processor
-            ProcessorOutput aggregatorOutput = aggregator.createOutput(ProcessorImpl.OUTPUT_DATA);
+            final ProcessorOutput aggregatorOutput = aggregator.createOutput(ProcessorImpl.OUTPUT_DATA);
             aggregatorOutput.setInput(processorInput);
             processorInput.setOutput(aggregatorOutput);
 
@@ -153,13 +160,13 @@ public class PipelineBlock {
             try {
                 // Get the docbase url from the location data if available
                 // and concatenate it with the current href
-                URL url = URLFactory.createURL(locationData != null && locationData.getSystemID() != null ?
+                final URL url = URLFactory.createURL(locationData != null && locationData.getSystemID() != null ?
                         locationData.getSystemID() : null,
                         ((ASTHrefURL) href).getURL());
 
                 // This is interpreted as a URL, use URL Generator
-                Processor urlGenerator = new URLGenerator(url.toExternalForm());
-                ProcessorOutput referencedOutput = urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA);
+                final Processor urlGenerator = new URLGenerator(url.toExternalForm());
+                final ProcessorOutput referencedOutput = urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA);
                 referencedOutput.setInput(processorInput);
                 processorInput.setOutput(referencedOutput);
             } catch (MalformedURLException e) {
@@ -168,7 +175,7 @@ public class PipelineBlock {
 
         } else if (href instanceof ASTHrefXPointer) {
 
-            ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
+            final ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
 
             // Create config for XPath processor
             final Document xpthCfg = new NonLazyUserDataDocument();
@@ -177,7 +184,7 @@ public class PipelineBlock {
             addNamespaces(configElement, node);
 
             // Connect XPath processor to config
-            Processor xpathProcessor = new XPathProcessor();
+            final Processor xpathProcessor = new XPathProcessor();
             xpathProcessor.setLocationData(locationData); // TODO FIXME: I suspect locationData will always be null here because node is null!
             final String sid = locationData == null 
                              ? DOMGenerator.DefaultContext 
@@ -190,7 +197,7 @@ public class PipelineBlock {
             connectProcessorToHref(node, xpathProcessor, ProcessorImpl.INPUT_DATA, hrefXPointer.getHref());
 
             // Connect XPath processor output to current processor
-            ProcessorOutput xpathOutput = xpathProcessor.createOutput(ProcessorImpl.OUTPUT_DATA);
+            final ProcessorOutput xpathOutput = xpathProcessor.createOutput(ProcessorImpl.OUTPUT_DATA);
             xpathOutput.setInput(processorInput);
             processorInput.setOutput(xpathOutput);
         } else {
@@ -202,11 +209,11 @@ public class PipelineBlock {
 
     private void addNamespaces(Element configElement, Node node) {
         if (node != null) {
-            Map namespaces = Dom4jUtils.getNamespaceContextNoDefault((Element) node);
+            final Map namespaces = Dom4jUtils.getNamespaceContextNoDefault((Element) node);
             for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
-                String prefix = (String) i.next();
-                String uri = (String) namespaces.get(prefix);
-                Element namespaceElement = configElement.addElement("namespace");
+                final String prefix = (String) i.next();
+                final String uri = (String) namespaces.get(prefix);
+                final Element namespaceElement = configElement.addElement("namespace");
                 namespaceElement.addAttribute("prefix", prefix);
                 namespaceElement.addAttribute("uri", uri);
             }
@@ -215,27 +222,27 @@ public class PipelineBlock {
 
     public void declareBottomInput(Node node, String id, ProcessorInput input) {
         if (idToInputMap.containsKey(id)) {
-            LocationData locationData = (LocationData) ((Element) node).getData();
+            final LocationData locationData = (LocationData) ((Element) node).getData();
             throw new ValidationException("There can be only one output parameter with id \"" + id + "\" in a pipeline", locationData);
         }
         idToInputMap.put(id, input);
     }
 
     public boolean isBottomInputConnected(String id) {
-        ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(id);
+        final ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(id);
         return bottomInput.getOutput() != null;
     }
 
     public ProcessorOutput connectProcessorToBottomInput(Node node, String outputName, String referencedId, ProcessorOutput processorOutput) {
         if (!idToInputMap.containsKey(referencedId)) {
-            LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
+            final LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
             throw new ValidationException("Reference to undeclared output parameter id \"" + referencedId + "\"", locationData);
         }
         if (inputIdAlreadyConnected.contains(referencedId)) {
-            LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
+            final LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
             throw new ValidationException("Other processor output is already connected to output parameter id \"" + referencedId + "\"", locationData);
         }
-        ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(referencedId);
+        final ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(referencedId);
         bottomInput.setOutput(processorOutput);
         processorOutput.setInput(bottomInput);
         return processorOutput;

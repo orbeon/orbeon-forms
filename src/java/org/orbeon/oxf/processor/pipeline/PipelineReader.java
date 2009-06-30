@@ -280,7 +280,7 @@ public class PipelineReader extends ProcessorImpl {
                 if (!matcher.contains(href, FUNCTION_END))
                     throw new ValidationException("Expected ')' in current() function call", locationData);
                 ASTHrefId hrefId = new ASTHrefId();
-                hrefId.setId(ForEachProcessor.CURRENT);
+                hrefId.setId(ForEachProcessor.FOR_EACH_CURRENT_INPUT);
                 result.astHref = hrefId;
                 result.rest = href.substring(matcher.getMatch().endOffset(0));
             } else {

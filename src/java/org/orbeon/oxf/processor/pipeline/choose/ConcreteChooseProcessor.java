@@ -48,7 +48,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 
     /**
      * @param branchConditions    List of Strings: XPath expression for each branch
-     *                            (except the optinal last <otherwise>)
+     *                            (except the optimal last <otherwise>)
      * @param branchNamespaces    List of NamespaceContext objects: namespaces declared in
      *                            the context of the given XPath expression
      * @param branchProcessors    List of Processor objects: one for each branch
@@ -95,11 +95,11 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             }
 
             // Create ProcessorOutput for each branch
-            Map currentBranchOuputs = new HashMap();
-            branchOutputs.add(currentBranchOuputs);
+            Map currentBranchOutputs = new HashMap();
+            branchOutputs.add(currentBranchOutputs);
             for (Iterator j = CollectionUtils.union(outputsById, outputsByParamRef).iterator(); j.hasNext();) {
                 String outputName = (String) j.next();
-                currentBranchOuputs.put(outputName, processor.createOutput(outputName));
+                currentBranchOutputs.put(outputName, processor.createOutput(outputName));
             }
         }
     }
@@ -208,7 +208,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             }
         }
 
-        // In case the document is large, and not cached, make it gc-able quicker (not sure if that makes a big difference!)
+        // In case the source document is large, and not cached, make it gc-able quicker (not sure if that makes a big difference!)
         hrefDocumentInfo = null;
 
         if (selectedBranch == -1) {

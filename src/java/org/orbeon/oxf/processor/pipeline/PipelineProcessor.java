@@ -373,15 +373,15 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             } else if (statement instanceof ASTForEach) {
 
                 // Instantiate processor
-                ASTForEach forEach = (ASTForEach) statement;
-                LocationData forEachLocationData = forEach.getLocationData();
-                AbstractProcessor forEachAbstractProcessor = new ForEachProcessor(forEach, astPipeline.getValidity());
-                ForEachProcessor.ConcreteForEachProcessor forEachProcessor =
+                final ASTForEach forEach = (ASTForEach) statement;
+                final LocationData forEachLocationData = forEach.getLocationData();
+                final AbstractProcessor forEachAbstractProcessor = new ForEachProcessor(forEach, astPipeline.getValidity());
+                final ForEachProcessor.ConcreteForEachProcessor forEachProcessor =
                         (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
                 processor = forEachProcessor;
 
                 // Connect special $data input (document on which the decision is made, or iterated on)
-                ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
+                final ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
                         ForEachProcessor.FOR_EACH_DATA_INPUT, forEach.getHref());
                 setDebugAndSchema(pin, forEach, forEachLocationData,
                         forEach.getInputSchemaUri(), forEach.getInputSchemaHref(), forEach.getInputDebug());
@@ -389,19 +389,20 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 // Go through inputs and connect to the rest of the pipeline
                 for (Iterator j = processor.getInputsInfo().iterator(); j.hasNext();) {
                     // We reference a previously declared output
-                    String inputName = ((ProcessorInputOutputInfo) j.next()).getName();
+                    final String inputName = ((ProcessorInputOutputInfo) j.next()).getName();
                     if (!inputName.equals(ForEachProcessor.FOR_EACH_DATA_INPUT)) {
-                        ASTHrefId hrefId = new ASTHrefId();
+                        final ASTHrefId hrefId = new ASTHrefId();
                         hrefId.setId(inputName);
-                        block.connectProcessorToHref(forEach.getNode(), processor, inputName, hrefId);
+                        // NOTE: Force creation of a tee so that inputs of p:for-each are not read multiple times
+                        block.connectProcessorToHref(forEach.getNode(), processor, inputName, hrefId, true);
                     }
                 }
 
                 // Connect output
-                String outputName = forEach.getId() != null ? forEach.getId() : forEach.getRef();
+                final String outputName = forEach.getId() != null ? forEach.getId() : forEach.getRef();
                 if (outputName != null) {
                     foundOutput = true;
-                    ProcessorOutput forEachOutput = processor.createOutput(outputName);
+                    final ProcessorOutput forEachOutput = processor.createOutput(outputName);
                     if (forEach.getId() != null)
                         block.declareOutput(forEach.getNode(), forEach.getId(), forEachOutput);
                     if (forEach.getRef() != null)

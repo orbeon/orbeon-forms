@@ -618,6 +618,54 @@
         </output>
     </test>
 
+    <test description="For-each doesn't read inputs multiple times" name="oxf:pipeline">
+        <input name="data">
+            <x:company xmlns:x="http://localhost/company">
+                <x:department>
+                    <x:employee firstname="John"/>
+                    <x:employee firstname="Peter"/>
+                </x:department>
+                <x:department>
+                    <x:employee firstname="Carl"/>
+                </x:department>
+            </x:company>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:y="http://localhost/company">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:counter">
+                    <p:output name="data" id="counter"/>
+                </p:processor>
+
+                <p:for-each href="#data" select="/y:company/y:department" root="iterations" ref="data">
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('iteration', #counter, current())"/>
+                        <p:output name="data" ref="data"/>
+                    </p:processor>
+                </p:for-each>
+            </p:config>
+        </input>
+        <output name="data">
+            <iterations>
+                <iteration>
+                    <counter>1</counter>
+                    <x:department xmlns:x="http://localhost/company">
+                        <x:employee firstname="John"/>
+                        <x:employee firstname="Peter"/>
+                    </x:department>
+                </iteration>
+                <iteration>
+                    <counter>1</counter>
+                    <x:department xmlns:x="http://localhost/company">
+                        <x:employee firstname="Carl"/>
+                    </x:department>
+                </iteration>
+            </iterations>
+        </output>
+    </test>
+
     <test description="Input and Output validation" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">

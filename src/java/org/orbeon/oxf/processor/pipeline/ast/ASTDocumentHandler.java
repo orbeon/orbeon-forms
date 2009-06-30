@@ -109,7 +109,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void hrefId(ASTHrefId hrefId) {
-        href.push(ForEachProcessor.CURRENT.equals(hrefId.getId())
+        href.push(ForEachProcessor.FOR_EACH_CURRENT_INPUT.equals(hrefId.getId())
             ? "current()"
             : "#" + hrefId.getId());
     }

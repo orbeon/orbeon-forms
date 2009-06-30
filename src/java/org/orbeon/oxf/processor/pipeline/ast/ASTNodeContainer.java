@@ -162,7 +162,7 @@ public abstract class ASTNodeContainer {
                 final IdInfo statementsIdInfo;
                 {
                     IdInfoASTHandler statementsIdInfoASTHandler = new IdInfoASTHandler();
-                    statementsIdInfoASTHandler.getIdInfo().getOutputIds().add(ForEachProcessor.CURRENT);
+                    statementsIdInfoASTHandler.getIdInfo().getOutputIds().add(ForEachProcessor.FOR_EACH_CURRENT_INPUT);
                     for (Iterator i = forEach.getStatements().iterator(); i.hasNext();) {
                         ASTStatement statement = (ASTStatement) i.next();
                         statement.walk(statementsIdInfoASTHandler);

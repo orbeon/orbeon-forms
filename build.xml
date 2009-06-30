@@ -40,9 +40,6 @@
         <include name="xerces-serializer-2_9_orbeon_20070711.jar"/>
         <include name="xerces-xml-apis-2_9_orbeon_20070711.jar"/>
 
-        <include name="xalan-2_5_1_orbeon.jar"/>
-        <include name="xsltc-2_5_1_orbeon.jar"/>
-
         <include name="commons-collections-3_1.jar"/>
         <include name="commons-lang-2_3.jar"/>
         <include name="commons-cli-1_0.jar"/>
@@ -705,6 +702,7 @@
             <arg value='-z'/>
             <arg value='-c'/>
             <arg value='--rsh=/usr/bin/ssh'/>
+            <arg value='--bwlimit=50'/>
             <arg value='build.log'/>
             <arg value='${project.name}.war'/>
             <arg value='${project.name}.zip'/>

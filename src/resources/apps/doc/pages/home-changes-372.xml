@@ -91,7 +91,7 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
             <section>
                 <title>XSLT output location information</title>
                 <p>
-                    [TODO: describe location-mode]
+                    [TODO: describe location-mode, and issue that can be caused by XInclude after XSLT in "none" mode]
                 </p>
                 <xml-source>
                     <property as="xs:string"  processor-name="oxf:saxon8"    name="location-mode"            value="none"/>

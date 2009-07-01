@@ -58,7 +58,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getAttributesMap() {
             if (attributesMap == null) {
-                attributesMap = new HashMap();
+                attributesMap = new LinkedHashMap();
             }
             return attributesMap;
         }
@@ -185,7 +185,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getHeaderMap() {
             if (headerMap == null) {
-                Map map = new HashMap();
+                Map map = new LinkedHashMap();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
                     Element e = (Element) i.next();
                     String name = XPathUtils.selectStringValueNormalize(e, "name");
@@ -199,7 +199,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getHeaderValuesMap() {
             if (headerValuesMap == null) {
-                final Map map = new HashMap();
+                final Map map = new LinkedHashMap();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
@@ -230,7 +230,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getParameterMap() {
             if (parameterMap == null) {
-                final Map map = new HashMap();
+                final Map map = new LinkedHashMap();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
@@ -445,7 +445,7 @@ public class TestExternalContext implements ExternalContext  {
     public ExternalContext.Session getSession(boolean create) {
         if (session == null && create) {
             session = new ExternalContext.Session() {
-                final Map attributes = new HashMap();
+                final Map attributes = new LinkedHashMap();
                 public long getCreationTime() {
                     return System.currentTimeMillis();
                 }
@@ -535,7 +535,7 @@ public class TestExternalContext implements ExternalContext  {
 
     public Map getAttributesMap() {
         if (attributesMap == null) {
-            attributesMap = new HashMap();
+            attributesMap = new LinkedHashMap();
         }
         return attributesMap;
     }

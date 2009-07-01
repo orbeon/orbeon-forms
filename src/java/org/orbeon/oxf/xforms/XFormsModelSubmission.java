@@ -491,6 +491,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
                         // Handle all file elements
+
+                        // NOTE: We used to request handling of temp files only if NOT replace="all". Guessing the
+                        // rationale was that user would be navigating to new page anyway. However, this was not a
+                        // correct assumption: the page might load in another window/tab, result in an file being
+                        // downloaded, or simply the file might be used by the next page.
                         XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, null, true);
                     }
 

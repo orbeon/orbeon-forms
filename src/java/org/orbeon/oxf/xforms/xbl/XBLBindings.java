@@ -214,8 +214,7 @@ public class XBLBindings {
                     {
                         final List<Document> extractedModels = XFormsStaticState.extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
                         if (extractedModels.size() > 0) {
-                            for (Iterator<Document> i = extractedModels.iterator(); i.hasNext();) {
-                                final Document currentModelDocument = i.next();
+                            for (Document currentModelDocument: extractedModels) {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
@@ -239,11 +238,8 @@ public class XBLBindings {
                     // Gather xbl:handlers/xbl:handler attached to bound node
                     if (xblHandlers != null) {
                         final List<Element> handlerElements = (List<Element>) xblHandlers.get(controlElement.getQName());
-
                         if (handlerElements != null) {
-                            for (Iterator<Element> k = handlerElements.iterator(); k.hasNext();) {
-                                final Element currentHandlerElement = k.next();
-
+                            for (Element currentHandlerElement: handlerElements) {
                                 // Register xbl:handler as an action handler
                                 // NOTE: xbl:handler has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentHandlerElement, controlPrefixedId, true,
@@ -301,8 +297,7 @@ public class XBLBindings {
                             // All bound node content must be copied over
                             final List<Node> elementContent = boundElement.content();
                             final List<Node> clonedContent = new ArrayList<Node>();
-                            for (Iterator i = elementContent.iterator(); i.hasNext();) {
-                                final Node node = (Node) i.next();
+                            for (Node node: elementContent) {
                                 if (node instanceof Element) {
                                     clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces((Element) node));
                                 } else if (!(node instanceof Namespace)) {

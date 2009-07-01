@@ -80,7 +80,7 @@ final
      * Return a property set for this processor.
      */
     protected PropertySet getPropertySet() {
-        return org.orbeon.oxf.properties.Properties.instance().getPropertySet(getName());
+        return Properties.instance().getPropertySet(getName());
     }
 
     public LocationData getLocationData() {
@@ -588,13 +588,10 @@ final
     }
 
     /**
-     * <p>Returns a key that should be used to store the state of the
-     * processor in the context.
+     * Returns a key that should be used to store the state of the processor in the context.
      *
-     * <p>This method must be called in ProcessorOutput.readImpl()
-     * or start() of the processors before read/start is called on other
-     * processors. (The key returned by getProcessorKey can be used after
-     * read/start is called.)
+     * This method must be called in ProcessorOutput.readImpl() or start() of the processors before read/start is
+     * called on other processors. (The key returned by getProcessorKey can be used after read/start is called.)
      */
     protected ProcessorKey getProcessorKey(PipelineContext context) {
         final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);

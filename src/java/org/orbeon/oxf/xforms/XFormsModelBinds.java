@@ -461,8 +461,8 @@ public class XFormsModelBinds {
         final Map<NodeInfo, Object> result = new HashMap<NodeInfo, Object>();
 
         // Iterate through controls
-        for (Map.Entry currentEntry: idsToXFormsControls.entrySet()) {
-            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+        for (Map.Entry<String,XFormsControl> currentEntry: idsToXFormsControls.entrySet()) {
+            final XFormsControl currentControl = currentEntry.getValue();
 
             if (currentControl instanceof XFormsSingleNodeControl
                     && (currentControl instanceof XFormsRepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
@@ -1034,10 +1034,10 @@ public class XFormsModelBinds {
         public void applyBinds(PipelineContext pipelineContext, BindRunner bindRunner) {
             if (nodeset != null && nodeset.size() > 0) {
                 // Handle each node in this node-set
-                final Iterator j = (childrenIterations != null) ? childrenIterations.iterator() : null;
+                final Iterator<BindIteration> j = (childrenIterations != null) ? childrenIterations.iterator() : null;
 
                 for (int index = 1; index <= nodeset.size(); index++) {
-                    final BindIteration currentBindIteration = (BindIteration) ((j != null) ? j.next() : null);
+                    final BindIteration currentBindIteration = (j != null) ? j.next() : null;
 
                     // Handle curent node
                     bindRunner.applyBind(pipelineContext, this, nodeset, index);
@@ -1130,15 +1130,15 @@ public class XFormsModelBinds {
         }
 
         public void applyBinds(PipelineContext pipelineContext, BindRunner bindRunner) {
-            for (Iterator i = childrenBinds.iterator(); i.hasNext();) {
-                final Bind currentBind = (Bind) i.next();
+            for (Iterator<Bind> i = childrenBinds.iterator(); i.hasNext();) {
+                final Bind currentBind = i.next();
                 currentBind.applyBinds(pipelineContext, bindRunner);
             }
         }
 
         public Bind getBind(String bindId) {
-            for (Iterator i = childrenBinds.iterator(); i.hasNext();) {
-                final Bind currentBind = (Bind) i.next();
+            for (Iterator<Bind> i = childrenBinds.iterator(); i.hasNext();) {
+                final Bind currentBind = i.next();
                 if (currentBind.getId().equals(bindId))
                     return currentBind;
             }

@@ -319,8 +319,8 @@ public class Dom4jUtils {
             }
         });
         // Detach nodes only in the end so as to not confuse the acceptor above
-        for (Iterator i = nodesToDetatch.iterator(); i.hasNext();) {
-            final Node currentNode = (Node) i.next();
+        for (Iterator<Node> i = nodesToDetatch.iterator(); i.hasNext();) {
+            final Node currentNode = i.next();
             currentNode.detach();
         }
 
@@ -620,15 +620,15 @@ public class Dom4jUtils {
     }
 
     private static void copyParentNamespaces(Element parentElement, Element rootElement) {
-        final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
-        final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
+        final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
+        final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
-        for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-            final String prefix = (String) k.next();
+        for (Iterator<String> k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
+            final String prefix = k.next();
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
             if (rootElementNamespaceContext.get(prefix) == null) {
-                final String uri = (String) parentNamespaceContext.get(prefix);
+                final String uri = parentNamespaceContext.get(prefix);
                 rootElement.addNamespace(prefix, uri);
             }
         }
@@ -645,15 +645,15 @@ public class Dom4jUtils {
         final Element rootElement = document.getRootElement();
 
         final Element parentElement = newRoot.getParent();
-        final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
-        final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
+        final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
+        final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
-        for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-            final String prefix = (String) k.next();
+        for (Iterator<String> k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
+            final String prefix = k.next();
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
             if (rootElementNamespaceContext.get(prefix) == null && prefixesToFilter.get(prefix) == null) {
-                final String uri = (String) parentNamespaceContext.get(prefix);
+                final String uri = parentNamespaceContext.get(prefix);
                 rootElement.addNamespace(prefix, uri);
             }
         }

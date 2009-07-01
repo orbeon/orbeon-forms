@@ -132,8 +132,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Update effective ids of all nested instances
         if (instances != null) {
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+            for (Iterator<XFormsInstance> i = instances.iterator(); i.hasNext();) {
+                final XFormsInstance currentInstance = i.next();
                 // NOTE: we pass the new model id, not the instance id
                 currentInstance.updateModelEffectiveId(effectiveId);
             }
@@ -257,8 +257,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final DocumentInfo documentInfo = nodeInfo.getDocumentRoot();
 
         if (instances != null) {
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+            for (Iterator<XFormsInstance> i = instances.iterator(); i.hasNext();) {
+                final XFormsInstance currentInstance = i.next();
                 if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
@@ -433,8 +433,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Then get instances from static state if necessary
         final Map<String, SharedXFormsInstance> staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
         if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
-            for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+            for (Iterator<SharedXFormsInstance> instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
+                final XFormsInstance currentInstance = instancesIterator.next();
 
                 // Check that the instance belongs to this model
                 if (modelEffectiveId.equals(currentInstance.getEffectiveModelId())) {
@@ -492,9 +492,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
-                    for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
+                    for (Iterator<Element> i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
 
-                        final Element instanceContainerElement = (Element) i.next();
+                        final Element instanceContainerElement = i.next();
                         final LocationData locationData = (LocationData) instanceContainerElement.getData();
                         final String instanceStaticId = XFormsInstance.getInstanceStaticId(instanceContainerElement);
 

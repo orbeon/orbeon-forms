@@ -153,8 +153,8 @@ public class XFormsItemUtils {
             int startItemCount = 0;
             boolean first = true;
             try {
-                for (Iterator j = items.iterator(); j.hasNext();) {
-                    final Item currentItem = (Item) j.next();
+                for (Iterator<Item> j = items.iterator(); j.hasNext();) {
+                    final Item currentItem = j.next();
 
                     final int newLevel = currentItem.getLevel();
 //                    XFormsServer.logger.info(currentItem.toString());

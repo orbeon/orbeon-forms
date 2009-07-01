@@ -26,7 +26,6 @@ import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -70,7 +69,7 @@ public class XFormsUtils {
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
     // Binary types supported for upload, images, etc.
-    private static final Map SUPPORTED_BINARY_TYPES = new HashMap();
+    private static final Map<String, String> SUPPORTED_BINARY_TYPES = new HashMap<String, String>();
     static {
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "anyURI");
@@ -477,7 +476,7 @@ public class XFormsUtils {
             final String valueAttribute = childElement.attributeValue("value");
             final boolean hasValueAttribute = valueAttribute != null;
             if (hasValueAttribute) {
-                final List currentNodeset = currentBindingContext.getNodeset();
+                final List<Item> currentNodeset = currentBindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
@@ -825,10 +824,10 @@ public class XFormsUtils {
      */
     public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
 
-        final String currentTypeLocalName = (String) SUPPORTED_BINARY_TYPES.get(currentType);
+        final String currentTypeLocalName = SUPPORTED_BINARY_TYPES.get(currentType);
         if (currentTypeLocalName == null)
             throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        final String newTypeLocalName = (String) SUPPORTED_BINARY_TYPES.get(newType);
+        final String newTypeLocalName = SUPPORTED_BINARY_TYPES.get(newType);
         if (newTypeLocalName == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
@@ -958,7 +957,7 @@ public class XFormsUtils {
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, List contextItems, int contextPosition, Map variableToValueMap,
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
                                                         FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
                                                         Map prefixToURIMap, LocationData locationData, String attributeValue) {
 
@@ -982,9 +981,9 @@ public class XFormsUtils {
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap,
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map<String, ValueRepresentation> variableToValueMap,
                                                         FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
-                                                        Map prefixToURIMap, LocationData locationData, String attributeValue) {
+                                                        Map<String, String> prefixToURIMap, LocationData locationData, String attributeValue) {
 
         if (attributeValue == null)
             return null;
@@ -1054,7 +1053,7 @@ public class XFormsUtils {
             if (element == null)
                 return new URI(uri);
 
-            final List xmlBaseElements = new ArrayList();
+            final List<String> xmlBaseElements = new ArrayList<String>();
 
             // Collect xml:base values
             Element currentElement = element;
@@ -1071,8 +1070,8 @@ public class XFormsUtils {
 
             // Resolve paths from root to leaf
             URI result = null;
-            for (Iterator i = xmlBaseElements.iterator(); i.hasNext();) {
-                final String currentXMLBase = (String) i.next();
+            for (Iterator<String> i = xmlBaseElements.iterator(); i.hasNext();) {
+                final String currentXMLBase = i.next();
                 final URI currentXMLBaseURI = new URI(currentXMLBase);
                 result = (result == null) ? currentXMLBaseURI : result.resolve(currentXMLBaseURI);
             }
@@ -1345,7 +1344,7 @@ public class XFormsUtils {
      * @param xpathString   string to check
      * @return              true iif the given string contains well-formed XPath 2.0
      */
-    public static boolean isXPath2Expression(String xpathString, Map namespaceMap) {
+    public static boolean isXPath2Expression(String xpathString, Map<String, String> namespaceMap) {
         // Empty string is never well-formed XPath
         if (xpathString.trim().length() == 0)
             return false;

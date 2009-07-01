@@ -53,7 +53,8 @@ public class XFormsSubmissionUtils {
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String resource, boolean isNorewrite, String mediatype,
                                                            byte[] messageBody, String queryString,
-                                                           boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
+                                                           boolean isReplaceAll, String[] headerNames,
+                                                           Map<String, String[]> customHeaderNameValues) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
         // the page was produced through a filter in separate deployment or not.
@@ -90,7 +91,8 @@ public class XFormsSubmissionUtils {
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String resource, boolean isContextRelative, String mediatype,
                                                            byte[] messageBody, String queryString,
-                                                           final boolean isReplaceAll, String[] headerNames, Map customHeaderNameValues) {
+                                                           final boolean isReplaceAll, String[] headerNames,
+                                                           Map<String, String[]> customHeaderNameValues) {
 
         // Action must be an absolute path
         if (!resource.startsWith("/"))
@@ -392,7 +394,7 @@ public class XFormsSubmissionUtils {
      */
     public static MultipartRequestEntity createMultipartFormData(final PipelineContext pipelineContext, final Document document) throws IOException {
 
-        final List params = new ArrayList();
+        final List<PartBase> params = new ArrayList<PartBase>();
 
         // Visit document
         document.accept(new VisitorSupport() {
@@ -450,7 +452,7 @@ public class XFormsSubmissionUtils {
         return new MultipartRequestEntity(partsArray, new HttpMethodParams());
     }
 
-    private static void addFilePart(Element element, DiskFileItem fileItem, List params) {
+    private static void addFilePart(Element element, DiskFileItem fileItem, List<PartBase> params) {
         try {
             // Gather mediatype and filename if known
             // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be

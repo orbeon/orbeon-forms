@@ -146,9 +146,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         modelsMap.clear();
 
         // Update effective ids of all nested models
-        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) iterator.next();
-
+        for (XFormsModel currentModel: models) {
             // E.g. foo$bar$my-model.1-2 => foo$bar$my-model.1-3
             final String newModelEffectiveId = XFormsUtils.getEffectiveIdNoSuffix(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
             currentModel.updateEffectiveId(newModelEffectiveId);
@@ -170,8 +168,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         // Dispatch destruction event to all models
-        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) iterator.next();
+        for (XFormsModel currentModel: models) {
             dispatchEvent(pipelineContext, new XFormsModelDestructEvent(currentModel));
         }
     }
@@ -237,10 +234,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (Iterator i = containingDocument.getStaticState().getModelDocuments().entrySet().iterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final String modelPrefixedId = (String) currentEntry.getKey();
-            final Document modelDocument = (Document) currentEntry.getValue();
+        for (Map.Entry<String,Document> currentEntry: containingDocument.getStaticState().getModelDocuments().entrySet()) {
+            final String modelPrefixedId = currentEntry.getKey();
+            final Document modelDocument = currentEntry.getValue();
 
             final String modelPrefix = XFormsUtils.getEffectiveIdPrefix(modelPrefixedId);
             if (fullPrefix.equals(modelPrefix)) {
@@ -278,15 +274,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 initializeNestedControls(pipelineContext);
 
                 // Make sure there is at least one refresh
-                for (Iterator j = models.iterator(); j.hasNext();) {
-                    final XFormsModel currentModel = (XFormsModel) j.next();
+                for (XFormsModel currentModel: models) {
                     currentModel.getDeferredActionContext().refresh = true;
                 }
             }
 
             // Iterate over all the models
-            for (Iterator j = models.iterator(); j.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) j.next();
+            for (XFormsModel currentModel: models) {
                 dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
             }
         }
@@ -333,8 +327,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         final List<XFormsModel> result = new ArrayList<XFormsModel>(models);
 
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 result.addAll(currentContainer.getAllModels());
             }
         }
@@ -351,8 +344,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public Object getObjectByEffectiveId(String effectiveId) {
 
         // Search in models
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel model = (XFormsModel) i.next();
+        for (XFormsModel model: models) {
             final Object resultObject = model.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
@@ -360,8 +352,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Search in children
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 final Object resultObject = currentContainer.getObjectByEffectiveId(effectiveId);
                 if (resultObject != null)
                     return resultObject;
@@ -452,8 +443,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
         // 2. Search in directly contained models
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel model = (XFormsModel) i.next();
+        for (XFormsModel model: models) {
             final Object resultObject = model.resolveObjectById(sourceControlEffectiveId, targetStaticId);
             if (resultObject != null)
                 return resultObject;
@@ -509,8 +499,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
 
         // Search in models
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
             if (currentInstance != null)
                 return currentInstance;
@@ -518,8 +507,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Search in children
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 final XFormsInstance currentInstance = currentContainer.getInstanceForNode(nodeInfo);
                 if (currentInstance != null)
                     return currentInstance;
@@ -537,8 +525,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return      instance containing the node
      */
     public XFormsInstance findInstance(String instanceId) {
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             final XFormsInstance currentInstance = currentModel.getInstance(instanceId);
             if (currentInstance != null)
                 return currentInstance;
@@ -555,12 +542,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     protected void serializeInstances(Element instancesElement) {
 
         // Serialize this container's model's
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-
+        for (XFormsModel currentModel: models) {
             if (currentModel.getInstances() != null) {
-                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                for (XFormsInstance currentInstance: currentModel.getInstances()) {
 
                     // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
@@ -577,8 +561,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Recurse into children containers
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 currentContainer.serializeInstances(instancesElement);
             }
         }
@@ -586,22 +569,19 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void restoreModelsState(PipelineContext pipelineContext) {
         // Handle this container only
-        for (Iterator iterator = models.iterator(); iterator.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) iterator.next();
+        for (XFormsModel currentModel: models) {
             currentModel.restoreState(pipelineContext);
         }
     }
 
     public void startOutermostActionHandler() {
         // Handle this container
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             currentModel.startOutermostActionHandler();
         }
         // Recurse into children containers
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 currentContainer.startOutermostActionHandler();
             }
         }
@@ -760,8 +740,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             }
 
             // Capture phase
-            for (Iterator i = eventObservers.iterator(); i.hasNext();) {
-                final XFormsEventObserver currentEventObserver = (XFormsEventObserver) i.next();
+            for (XFormsEventObserver currentEventObserver: eventObservers) {
                 final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
                 if (currentEventHandlers != null) {
@@ -831,8 +810,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     nextBoundaryEffectiveId = observer.getEffectiveId();
                 }
 
-                for (Iterator i = eventObservers.iterator(); i.hasNext();) {
-                    final XFormsEventObserver currentEventObserver = (XFormsEventObserver) i.next();
+                for (XFormsEventObserver currentEventObserver: eventObservers) {
                     final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
                     // Handle event retargetting
@@ -928,9 +906,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public void setDeferredFlagsForSetindex() {
         // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by
         // setting the deferred update flags for recalculate, revalidate and refresh."
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-
+        for (XFormsModel currentModel: models) {
             // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
             //currentModel.getBinds().rebuild(pipelineContext);
 

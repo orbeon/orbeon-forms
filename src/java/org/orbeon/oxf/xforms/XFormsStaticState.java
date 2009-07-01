@@ -310,9 +310,9 @@ public class XFormsStaticState {
                 }
             }
             // Properties on xforms:model elements
-            for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currenEntry = (Map.Entry) i.next();
-                final Document currentModelDocument = (Document) currenEntry.getValue();
+            for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry<String,Document> currenEntry = i.next();
+                final Document currentModelDocument = currenEntry.getValue();
                 for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
                     final Attribute currentAttribute = (Attribute) j.next();
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
@@ -434,10 +434,10 @@ public class XFormsStaticState {
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
-            final List extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
+            final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
-            for (Iterator i = extractedModels.iterator(); i.hasNext();) {
-                final Document currentModelDocument = (Document) i.next();
+            for (Iterator<Document> i = extractedModels.iterator(); i.hasNext();) {
+                final Document currentModelDocument = i.next();
                 addModelDocument(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
             }
         }
@@ -542,8 +542,8 @@ public class XFormsStaticState {
             // Add instances to Document if needed
             if (instancesMap != null && instancesMap.size() > 0) {
                 final Element instancesElement = rootElement.addElement("instances");
-                for (Iterator instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+                for (Iterator<SharedXFormsInstance> instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
+                    final XFormsInstance currentInstance = instancesIterator.next();
 
                     // Add information for all shared instances, but don't add content for globally shared instances
                     // NOTE: This strategy could be changed in the future or be configurable
@@ -562,8 +562,8 @@ public class XFormsStaticState {
             // Remember versioned paths
             if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
                 final Element matchersElement = rootElement.addElement("matchers");
-                for (Iterator i = versionedPathMatchers.iterator(); i.hasNext();) {
-                    final URLRewriterUtils.PathMatcher pathMatcher = (URLRewriterUtils.PathMatcher) i.next();
+                for (Iterator<URLRewriterUtils.PathMatcher> i = versionedPathMatchers.iterator(); i.hasNext();) {
+                    final URLRewriterUtils.PathMatcher pathMatcher = i.next();
 
                     matchersElement.add(pathMatcher.serialize());
                 }
@@ -784,8 +784,8 @@ public class XFormsStaticState {
     }
 
     public ControlInfo getAttributeControl(String prefixedForAttribute, String attributeName) {
-        final Map mapForId = (Map) attributeControls.get(prefixedForAttribute);
-        return (mapForId != null) ? (ControlInfo) mapForId.get(attributeName) : null;
+        final Map<String, ControlInfo> mapForId = (Map<String, ControlInfo>) attributeControls.get(prefixedForAttribute);
+        return (mapForId != null) ? mapForId.get(attributeName) : null;
     }
 
     /**
@@ -823,11 +823,11 @@ public class XFormsStaticState {
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
             // Iterate over models to extract event handlers and scripts
-            for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
+            for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry<String,Document> currentEntry = i.next();
 
-                final String modelPrefixedId = (String) currentEntry.getKey();
-                final Document modelDocument = (Document) currentEntry.getValue();
+                final String modelPrefixedId = currentEntry.getKey();
+                final Document modelDocument = currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
                 extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
@@ -1123,16 +1123,16 @@ public class XFormsStaticState {
             {
                 // Create list of all the documents to search
                 final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelDocuments.size() + 1);
-                for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currenEntry = (Map.Entry) i.next();
-                    final Document currentModelDocument = (Document) currenEntry.getValue();
+                for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry<String,Document> currenEntry = i.next();
+                    final Document currentModelDocument = currenEntry.getValue();
                     documentInfos.add(new DocumentWrapper(currentModelDocument, null, xpathConfiguration));
                 }
                 documentInfos.add(controlsDocumentInfo);
 
                 // Search for xxforms:offline which are not within instances
-                for (Iterator i = documentInfos.iterator(); i.hasNext();) {
-                    final DocumentInfo currentDocumentInfo = (DocumentInfo) i.next();
+                for (Iterator<DocumentWrapper> i = documentInfos.iterator(); i.hasNext();) {
+                    final DocumentInfo currentDocumentInfo = i.next();
                     hasOfflineSupport |= ((Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
                         "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
                         null, null, null, null, locationData)).booleanValue();
@@ -1185,8 +1185,8 @@ public class XFormsStaticState {
                     addClasses(prefix + currentId, "xxforms-offline-save");
                 }
 
-                for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = (String) i.next();
+                for (Iterator<String> i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = i.next();
                     addClasses(prefix + currentId, "xxforms-offline-insert");
                 }
 

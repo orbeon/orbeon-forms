@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class XFormsFunctionLibrary implements FunctionLibrary {
 
-    private static Map functionTable = new HashMap();
+    private static Map<String, StandardFunction.Entry> functionTable = new HashMap<String, StandardFunction.Entry>();
 
     private static StandardFunction.Entry register(String name,
                                                    Class implementationClass,
@@ -359,9 +359,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     private StandardFunction.Entry getEntry(String uri, String local, int arity) {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
-            entry = (StandardFunction.Entry) functionTable.get(local);
+            entry = functionTable.get(local);
         } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI) || uri.equals(XFormsConstants.EXFORMS_NAMESPACE_URI)) {
-            entry = (StandardFunction.Entry) functionTable.get("{" + uri + "}" + local);
+            entry = functionTable.get("{" + uri + "}" + local);
         } else {
             return null;
         }

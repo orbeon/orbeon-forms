@@ -61,7 +61,7 @@ public class Variable {
             contextStack.pushBinding(pipelineContext, variableElement);
             {
                 final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
-                final List currentNodeset = bindingContext.getNodeset();
+                final List<Item> currentNodeset = bindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
                     variableValue = XPathCache.evaluateAsExtent(pipelineContext,

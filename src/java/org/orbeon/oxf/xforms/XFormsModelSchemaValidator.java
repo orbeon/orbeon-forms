@@ -84,7 +84,7 @@ public class XFormsModelSchemaValidator {
     private Element modelElement;
     private Grammar schemaGrammar;
     private String[] schemaURIs;
-    private List schemaElements;
+    private List<Element> schemaElements;
 
     // REDocumentDeclaration is not reentrant, but the validator is used by a single thread
     private REDocumentDeclaration documentDeclaration;
@@ -103,7 +103,7 @@ public class XFormsModelSchemaValidator {
             final Element currentSchemaElement = (Element) i.next();
 
             if (schemaElements == null)
-                schemaElements = new ArrayList();
+                schemaElements = new ArrayList<Element>();
 
             schemaElements.add(currentSchemaElement);
         }
@@ -189,8 +189,8 @@ public class XFormsModelSchemaValidator {
 
     private static class SchemaInfo {
 
-        private final ArrayList includes = new ArrayList(0);
-        private final ArrayList modTimes = new ArrayList(0);
+        private final ArrayList<URL> includes = new ArrayList<URL>(0);
+        private final ArrayList<Long> modTimes = new ArrayList<Long>(0);
         private Grammar grammar;
 
         void addInclude(final URL url) throws IOException {
@@ -204,10 +204,10 @@ public class XFormsModelSchemaValidator {
             boolean ret = true;
             final int size = includes.size();
             for (int i = 0; ret && i < size; i++) {
-                final URL url = (URL) includes.get(i);
+                final URL url = includes.get(i);
                 try {
                     final Long lastModified = NetUtils.getLastModifiedAsLong(url);
-                    final Long lastTime = (Long) modTimes.get(i);
+                    final Long lastTime = modTimes.get(i);
                     ret = lastModified.equals(lastTime);
                 } catch (final IOException e) {
                     // We won't propagate here. Reason is that while an include may be missing it may just be the case
@@ -659,7 +659,7 @@ public class XFormsModelSchemaValidator {
 
         // Check for inline schemas
         if (schemaElements != null && schemaElements.size() > 0) {
-            schemaGrammar = loadInlineGrammar(null, (Element) schemaElements.get(0)); // TODO: specify baseURI
+            schemaGrammar = loadInlineGrammar(null, schemaElements.get(0)); // TODO: specify baseURI
         }
     }
 

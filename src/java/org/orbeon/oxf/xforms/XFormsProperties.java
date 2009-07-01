@@ -240,9 +240,9 @@ public class XFormsProperties {
             new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true)
     };
 
-    private static final Map SUPPORTED_DOCUMENT_PROPERTIES;
+    private static final Map<Object, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;
     static {
-        final Map tempMap = new HashMap();
+        final Map<Object, PropertyDefinition> tempMap = new HashMap<Object, PropertyDefinition>();
         for (int i = 0; i < SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS.length; i++) {
             final PropertyDefinition propertyDefinition = SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS[i];
             tempMap.put(propertyDefinition.name, propertyDefinition);
@@ -293,7 +293,7 @@ public class XFormsProperties {
      * @return              PropertyDefinition
      */
     public static PropertyDefinition getPropertyDefinition(String propertyName) {
-        return (XFormsProperties.PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
+        return SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
     }
 
     /**
@@ -301,7 +301,7 @@ public class XFormsProperties {
      *
      * @return  Iterator<Entry<String,PropertyDefinition>> mapping a property name to a definition
      */
-    public static Iterator getPropertyDefinitionEntryIterator() {
+    public static Iterator<Map.Entry<Object,PropertyDefinition>> getPropertyDefinitionEntryIterator() {
         return SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator();
     }
 

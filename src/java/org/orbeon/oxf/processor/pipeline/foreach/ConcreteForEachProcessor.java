@@ -201,7 +201,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                 if (output instanceof TeeProcessor.TeeProcessorOutputImpl) {
                     final TeeProcessor.TeeProcessorOutputImpl teeOutput = (TeeProcessor.TeeProcessorOutputImpl) output;
                     teeOutput.doneReading(pipelineContext);
-                    System.out.println("xxx telling TeeProcessor that we are done reading after " + iterationCount + " iterations for input " + input.getName());
+//                    System.out.println("xxx telling TeeProcessor that we are done reading after " + iterationCount + " iterations for input " + input.getName());
                 }
             }
         }

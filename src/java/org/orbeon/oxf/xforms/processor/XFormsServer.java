@@ -59,7 +59,7 @@ public class XFormsServer extends ProcessorImpl {
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
 
-    public static final Map XFORMS_NAMESPACES = new HashMap();
+    public static final Map<String, String> XFORMS_NAMESPACES = new HashMap<String, String>();
 
     static {
         XFORMS_NAMESPACES.put(XFormsConstants.XFORMS_SHORT_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
@@ -111,7 +111,7 @@ public class XFormsServer extends ProcessorImpl {
         serverEventsElements = requestDocument.getRootElement().elements(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Get events requested by the client
-        final List eventElements = new ArrayList();
+        final List<Element> eventElements = new ArrayList<Element>();
 
         // Gather server events first if any
         int serverEventsCount = 0;
@@ -120,7 +120,7 @@ public class XFormsServer extends ProcessorImpl {
                 final Element element = (Element) i.next();
 
                 final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
-                final List xxformsEventElements = serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME);
+                final List<Element> xxformsEventElements = serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME);
                 serverEventsCount += xxformsEventElements.size();
                 eventElements.addAll(xxformsEventElements);
             }
@@ -223,7 +223,7 @@ public class XFormsServer extends ProcessorImpl {
         synchronized (containingDocument) {
             try {
                 // Run events if any
-                final Map valueChangeControlIds = new HashMap();
+                final Map<String, String> valueChangeControlIds = new HashMap<String, String>();
                 boolean allEvents = false;
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
@@ -293,8 +293,8 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         final XFormsStaticState staticState = containingDocument.getStaticState();
 
-                        List noscriptActivateEvents = null;
-                        Map noscriptValueIds = null;
+                        List<Element> noscriptActivateEvents = null;
+                        Map<String, String> noscriptValueIds = null;
 
                         for (Iterator i = eventElements.iterator(); i.hasNext();) {
                             final Element eventElement = (Element) i.next();
@@ -314,12 +314,12 @@ public class XFormsServer extends ProcessorImpl {
                                     // instance before that.
                                     i.remove();
                                     if (noscriptActivateEvents == null)
-                                        noscriptActivateEvents = new ArrayList();
+                                        noscriptActivateEvents = new ArrayList<Element>();
                                     noscriptActivateEvents.add(eventElement);
                                 } else {
                                     // This is a value event, just remember the id
                                     if (noscriptValueIds == null)
-                                        noscriptValueIds = new HashMap();
+                                        noscriptValueIds = new HashMap<String, String>();
                                     noscriptValueIds.put(sourceControlId, "");
                                 }
                             }
@@ -672,8 +672,8 @@ public class XFormsServer extends ProcessorImpl {
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
 
                 // Output new controls values and associated information
-                final Map itemsetsFull1 = new HashMap();
-                final Map itemsetsFull2 = new HashMap();
+                final Map<String, List<XFormsItemUtils.Item>> itemsetsFull1 = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
+                final Map<String, List<XFormsItemUtils.Item>> itemsetsFull2 = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
@@ -877,8 +877,9 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static Map diffItemsets(Map itemsetsFull1, Map itemsetsFull2) {
-        Map itemsetUpdate;
+    public static Map<String, List<XFormsItemUtils.Item>> diffItemsets(Map<String, List<XFormsItemUtils.Item>> itemsetsFull1,
+                                                                       Map<String, List<XFormsItemUtils.Item>> itemsetsFull2) {
+        Map<String, List<XFormsItemUtils.Item>> itemsetUpdate;
         if (itemsetsFull2 == null) {
             // There is no update in the first place
             itemsetUpdate = null;
@@ -887,14 +888,13 @@ public class XFormsServer extends ProcessorImpl {
             itemsetUpdate = itemsetsFull2;
         } else {
             // Merge differences
-            itemsetUpdate = new HashMap();
+            itemsetUpdate = new HashMap<String, List<XFormsItemUtils.Item>>();
 
-            for (Iterator i = itemsetsFull2.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String itemsetId = (String) currentEntry.getKey();
-                final List newItems = (List) currentEntry.getValue();
+            for (Map.Entry<String, List<XFormsItemUtils.Item>> currentEntry: itemsetsFull2.entrySet()) {
+                final String itemsetId = currentEntry.getKey();
+                final List<XFormsItemUtils.Item> newItems = currentEntry.getValue();
 
-                final List existingItems = (List) itemsetsFull1.get(itemsetId);
+                final List<XFormsItemUtils.Item> existingItems = itemsetsFull1.get(itemsetId);
                 if (existingItems == null || !existingItems.equals(newItems)) {
                     // No existing items or new items are different from existing items
                     itemsetUpdate.put(itemsetId, newItems);
@@ -904,7 +904,10 @@ public class XFormsServer extends ProcessorImpl {
         return itemsetUpdate;
     }
 
-    public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
+                                    List state1, List state2,
+                                    Map<String, List<XFormsItemUtils.Item>> itemsetsFull1, Map<String, List<XFormsItemUtils.Item>> itemsetsFull2,
+                                    Map valueChangeControlIds) {
         containingDocument.startHandleOperation("XForms server", "computing differences");
         if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
             new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);

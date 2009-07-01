@@ -792,7 +792,7 @@ public class XFormsContextStack {
             return model;
         }
 
-        public List getNodeset() {
+        public List<NodeInfo> getNodeset() {
             return nodeset;
         }
 

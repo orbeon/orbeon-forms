@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.xbl;
 
-import org.apache.commons.collections.map.LinkedMap;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
@@ -68,7 +67,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     // Hierarchy of containers
     private final XBLContainer parentXBLContainer;
-    private LinkedHashMap childrenXBLContainers;  // Map<String, XFormsContainer> of static id to container
+    private LinkedHashMap<String, XBLContainer> childrenXBLContainers;  // Map<String, XBLContainer> of static id to container
 
     // Binding context for this container (may be null)
     private XFormsContextStack.BindingContext bindingContext;
@@ -76,8 +75,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private XFormsContainingDocument containingDocument;
     private final XFormsContextStack contextStack;  // for controls under this container
 
-    private List models = new ArrayList();  // List<XFormsModel>
-    private Map modelsMap = new HashMap();  // Map<String, XFormsModel> of effective model id to model
+    private List<XFormsModel> models = new ArrayList<XFormsModel>();
+    private Map<String, XFormsModel> modelsMap = new HashMap<String, XFormsModel>();    // Map<String, XFormsModel> of effective model id to model
 
     /**
      * Create a new container child of the control with id effectiveId.
@@ -187,7 +186,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     private void addChild(XBLContainer container) {
         if (childrenXBLContainers == null)
-            childrenXBLContainers = new LinkedHashMap();
+            childrenXBLContainers = new LinkedHashMap<String, XBLContainer>();
         childrenXBLContainers.put(container.getEffectiveId(), container);
     }
 
@@ -323,15 +322,15 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Get a list of all the models in this container.
      */
-    public List getModels() {
+    public List<XFormsModel> getModels() {
         return models;
     }
 
     /**
      * Get a list of all the models in this container and all sub-containers.
      */
-    public List getAllModels() {
-        final List result = new ArrayList(models);
+    public List<XFormsModel> getAllModels() {
+        final List<XFormsModel> result = new ArrayList<XFormsModel>(models);
 
         if (childrenXBLContainers != null) {
             for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
@@ -610,8 +609,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void endOutermostActionHandler(PipelineContext pipelineContext) {
         // Handle this container
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             currentModel.endOutermostActionHandler(pipelineContext);
         }
         // Recurse into children containers
@@ -620,9 +618,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // so make a copy here before processing.
             // TODO: The exact situation is not entirely clear and there might be other places in this class where this
             // might happen!
-            final Map tempMap = new LinkedHashMap(childrenXBLContainers);
-            for (Iterator i = tempMap.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            final Map<String, XBLContainer> tempMap = new LinkedHashMap<String, XBLContainer>(childrenXBLContainers);
+            for (XBLContainer currentContainer: tempMap.values()) {
                 currentContainer.endOutermostActionHandler(pipelineContext);
             }
         }
@@ -630,14 +627,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void rebuildRecalculateIfNeeded(PipelineContext pipelineContext) {
         // Handle this container
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             currentModel.rebuildRecalculateIfNeeded(pipelineContext);
         }
         // Recurse into children containers
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 currentContainer.rebuildRecalculateIfNeeded(pipelineContext);
             }
         }
@@ -645,14 +640,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void synchronizeInstanceDataEventState() {
         // Handle this container
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: models) {
             currentModel.synchronizeInstanceDataEventState();
         }
         // Recurse into children containers
         if (childrenXBLContainers != null) {
-            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-                final XBLContainer currentContainer = (XBLContainer) i.next();
+            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
                 currentContainer.synchronizeInstanceDataEventState();
             }
         }
@@ -711,9 +704,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 throw new ValidationException("Target object null for event: " + originalEvent.getEventName(), getLocationData());
 
             // Find all event handler containers
-            final List boundaries = new ArrayList();        // List<XFormsEventObserver>
-            final Map eventsForBoundaries = new LinkedMap();// Map<String effectiveId, XFormsEvent event>
-            final List eventObservers = new ArrayList();
+            final List<XFormsEventObserver> boundaries = new ArrayList<XFormsEventObserver>();
+            final Map<String, XFormsEvent> eventsForBoundaries = new LinkedHashMap<String, XFormsEvent>();// Map<String effectiveId, XFormsEvent event>
+            final List<XFormsEventObserver> eventObservers = new ArrayList<XFormsEventObserver>();
             {
                 XFormsEventObserver eventObserver
                         = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
@@ -918,7 +911,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    private XFormsEvent getRetargettedEvent(Map eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
+    private XFormsEvent getRetargettedEvent(Map<String, XFormsEvent> eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
         XFormsEvent retargettedEvent = (XFormsEvent) eventsForBoundaries.get(boundaryId);
 
         // Event already created, just return it

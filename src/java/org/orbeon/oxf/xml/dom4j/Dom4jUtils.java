@@ -281,7 +281,7 @@ public class Dom4jUtils {
      * @return                the input node, normalized
      */
     public static Node normalizeTextNodes(Node nodeToNormalize) {
-        final List nodesToDetatch = new ArrayList();
+        final List<Node> nodesToDetatch = new ArrayList<Node>();
         nodeToNormalize.accept(new VisitorSupport() {
             public void visit(Element element) {
                 final List children = element.content();
@@ -401,8 +401,8 @@ public class Dom4jUtils {
     /**
      * Return a Map of namespaces in scope on the given element.
      */
-    public static Map getNamespaceContext(Element element) {
-        final Map namespaces = new HashMap();
+    public static Map<String, String> getNamespaceContext(Element element) {
+        final Map<String, String> namespaces = new HashMap<String, String>();
         for (Element currentNode = element; currentNode != null; currentNode = currentNode.getParent()) {
             final List currentNamespaces = currentNode.declaredNamespaces();
             for (Iterator j = currentNamespaces.iterator(); j.hasNext();) {
@@ -821,20 +821,20 @@ public class Dom4jUtils {
      * @param ancestorElement   ancestor element to stop at
      * @return                  List<Element>
      */
-    public static List findPrecedingElements(Element startElement, Element ancestorElement) {
-        final List result = new ArrayList();
+    public static List<Element> findPrecedingElements(Element startElement, Element ancestorElement) {
+        final List<Element> result = new ArrayList<Element>();
         findPrecedingElements(result, startElement, ancestorElement);
         return result;
     }
 
-    private static void findPrecedingElements(List finalResult, Element startElement, Element ancestorElement) {
+    private static void findPrecedingElements(List<Element> finalResult, Element startElement, Element ancestorElement) {
         final Element parentElement = startElement.getParent();
         if (parentElement == null)
             return;
 
         final List siblingElements = parentElement.elements();
         if (siblingElements.size() > 1) {
-            final List result = new ArrayList();
+            final List<Element> result = new ArrayList<Element>();
             for (Iterator i = siblingElements.iterator(); i.hasNext();) {
                 final Element currentElement = (Element) i.next();
 

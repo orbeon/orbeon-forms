@@ -307,7 +307,7 @@ public class NetUtils {
             return null;
 
         // Parse parameters
-        final Map parameters = new HashMap();
+        final Map<String, String> parameters = new HashMap<String, String>();
         while (st.hasMoreTokens()) {
             final String parameter = st.nextToken().trim();
             final int equalIndex = parameter.indexOf('=');
@@ -331,7 +331,7 @@ public class NetUtils {
             charsets = header.substring(0, semicolonIndex).trim();
 
         final StringTokenizer st = new StringTokenizer(charsets, ",");
-        final Map charsetsMap = new HashMap();
+        final Map<String, String> charsetsMap = new HashMap<String, String>();
         while (st.hasMoreTokens()) {
             charsetsMap.put(st.nextToken(), "");
         }
@@ -352,10 +352,10 @@ public class NetUtils {
      * Convert an Enumeration of String into an array.
      */
     public static String[] stringEnumerationToArray(Enumeration enumeration) {
-        List values = new ArrayList();
+        final List<String> values = new ArrayList<String>();
         while (enumeration.hasMoreElements())
-            values.add(enumeration.nextElement());
-        String[] stringValues = new String[values.size()];
+            values.add((String) enumeration.nextElement());
+        final String[] stringValues = new String[values.size()];
         values.toArray(stringValues);
         return stringValues;
     }
@@ -403,9 +403,9 @@ public class NetUtils {
      *
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
-    public static Map decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
+    public static Map<String, String[]> decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
 
-        final Map result = new TreeMap();
+        final Map<String, String[]> result = new TreeMap<String, String[]>();
         if (queryString != null) {
             final Matcher matcher = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
             int matcherEnd = 0;
@@ -471,7 +471,7 @@ public class NetUtils {
         return sb.toString();
     }
 
-    public static void addValueToObjectArrayMap(Map map, String name, Object value) {
+    public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
         final Object[] currentValue = (Object[]) map.get(name);
         if (currentValue == null) {
             map.put(name, new Object[] { value });
@@ -483,7 +483,7 @@ public class NetUtils {
         }
     }
 
-    public static void addValueToStringArrayMap(Map map, String name, String value) {
+    public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
         final String[] currentValue = (String[]) map.get(name);
         if (currentValue == null) {
             map.put(name, new String[] { value });
@@ -495,7 +495,7 @@ public class NetUtils {
         }
     }
 
-    public static void addValuesToStringArrayMap(Map map, String name, String[] values) {
+    public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
         final String[] currentValue = (String[]) map.get(name);
         if (currentValue == null) {
             map.put(name, values);
@@ -1085,7 +1085,7 @@ public class NetUtils {
      */
     public static ConnectionResult openConnection(ExternalContext externalContext, IndentedLogger indentedLogger,
                                                   String httpMethod, final URL connectionURL, String username, String password, String contentType,
-                                                  byte[] messageBody, Map headerNameValues, String headersToForward) {
+                                                  byte[] messageBody, Map<String, String[]> headerNameValues, String headersToForward) {
 
         // Get  the headers to forward if any
         final Map headersMap = (externalContext.getRequest() != null) ?
@@ -1106,10 +1106,10 @@ public class NetUtils {
      *
      * @return LinkedHashMap<String headerName, String[] headerValues>
      */
-    public static Map getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
-                                    Map headerNameValues, String headersToForward) {
+    public static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
+                                    Map<String, String[]> headerNameValues, String headersToForward) {
         // Resulting header names and values to set
-        final LinkedHashMap /* <String headerName, String[] headerValues> */ headersMap = new LinkedHashMap();
+        final LinkedHashMap<String, String[]> headersMap = new LinkedHashMap<String, String[]>();
 
         // Get header forwarding information
         final Map headersToForwardMap = getHeadersToForward(headersToForward);
@@ -1469,11 +1469,11 @@ public class NetUtils {
      * @param headersToForward  space-separated list of headers to forward
      * @return  Map<String, String> lowercase header name to user-specified header name or null if null String passed
      */
-    public static Map getHeadersToForward(String headersToForward) {
+    public static Map<String, String> getHeadersToForward(String headersToForward) {
         if (headersToForward == null)
             return null;
 
-        final Map result = new HashMap();
+        final Map<String, String> result = new HashMap<String, String>();
         for (final StringTokenizer st = new StringTokenizer(headersToForward, ", "); st.hasMoreTokens();) {
             final String currentHeaderName = st.nextToken().trim();
             final String currentHeaderNameLowercase = currentHeaderName.toLowerCase();
@@ -1526,7 +1526,7 @@ public class NetUtils {
      */
     public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
 
-        final Map uploadParameterMap = new HashMap();
+        final Map<String, Object[]> uploadParameterMap = new HashMap<String, Object[]>();
         try {
             // Setup commons upload
 

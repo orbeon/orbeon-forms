@@ -81,16 +81,16 @@ public class XFormsContainingDocument extends XBLContainer {
 
     // Client state
     private XFormsModelSubmission activeSubmission;
-    private List asynchronousSubmissions;   // List<Runnable runnable>
+    private List<Runnable> asynchronousSubmissions;
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
-    private List messagesToRun;
-    private List loadsToRun;                // List<Load load>
-    private List scriptsToRun;              // List<Script script>
+    private List<Message> messagesToRun;
+    private List<Load> loadsToRun;
+    private List<Script> scriptsToRun;
     private String focusEffectiveControlId;
     private String helpEffectiveControlId;
-    private List delayedEvents;             // List<DelayedEvent delayedEvents>
+    private List<DelayedEvent> delayedEvents;
 
     private boolean goingOffline;
     private boolean goingOnline;
@@ -99,15 +99,15 @@ public class XFormsContainingDocument extends XBLContainer {
     private boolean mustPerformInitializationFirstRefresh;
 
     // Event information
-    private static final Map ignoredXFormsOutputExternalEvents = new HashMap();
-    private static final Map allowedXFormsOutputExternalEvents = new HashMap();
-    private static final Map allowedXFormsUploadExternalEvents = new HashMap();
-    private static final Map allowedXFormsControlsExternalEvents = new HashMap();
+    private static final Map<String, String> ignoredXFormsOutputExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXFormsOutputExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXFormsUploadExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXFormsControlsExternalEvents = new HashMap<String, String>();
 
-    private static final Map allowedXFormsRepeatExternalEvents = new HashMap();
-    private static final Map allowedXFormsSubmissionExternalEvents = new HashMap();
-    private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
-    private static final Map allowedXXFormsDialogExternalEvents = new HashMap();
+    private static final Map<String, String> allowedXFormsRepeatExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXFormsSubmissionExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXFormsContainingDocumentExternalEvents = new HashMap<String, String>();
+    private static final Map<String, String> allowedXXFormsDialogExternalEvents = new HashMap<String, String>();
     static {
         // External events ignored on xforms:output
         ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
@@ -309,7 +309,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Return a map of script id -> script text.
      */
-    public Map getScripts() {
+    public Map<String, String> getScripts() {
         return xformsStaticState.getScripts();
     }
 
@@ -337,7 +337,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Return external-events configuration attribute.
      */
-    private Map getExternalEventsMap() {
+    private Map<String, String> getExternalEventsMap() {
         return xformsStaticState.getExternalEventsMap();
     }
 
@@ -471,7 +471,7 @@ public class XFormsContainingDocument extends XBLContainer {
      */
     public void addAsynchronousSubmission(Runnable runnable) {
         if (asynchronousSubmissions == null)
-            asynchronousSubmissions = new ArrayList();
+            asynchronousSubmissions = new ArrayList<Runnable>();
         asynchronousSubmissions.add(runnable);
     }
 
@@ -505,7 +505,7 @@ public class XFormsContainingDocument extends XBLContainer {
             throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmission.getLocationData());
 
         if (messagesToRun == null)
-            messagesToRun = new ArrayList();
+            messagesToRun = new ArrayList<Message>();
         messagesToRun.add(new Message(message, level));
     }
 
@@ -529,7 +529,7 @@ public class XFormsContainingDocument extends XBLContainer {
      */
     public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay, boolean showProgress, String progressMessage) {
         if (delayedEvents == null)
-            delayedEvents = new ArrayList();
+            delayedEvents = new ArrayList<DelayedEvent>();
 
         delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress, progressMessage));
     }
@@ -611,7 +611,7 @@ public class XFormsContainingDocument extends XBLContainer {
             logWarning("noscript", "script won't run in noscript mode", new String[] { "script id", scriptId });
 
         if (scriptsToRun == null)
-            scriptsToRun = new ArrayList();
+            scriptsToRun = new ArrayList<Script>();
         scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventObserverId));
     }
 
@@ -652,7 +652,7 @@ public class XFormsContainingDocument extends XBLContainer {
             throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", activeSubmission.getLocationData());
 
         if (loadsToRun == null)
-            loadsToRun = new ArrayList();
+            loadsToRun = new ArrayList<Load>();
         loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad, isShowProgress));
     }
 
@@ -1202,7 +1202,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 final String resource = xxformsLoadEvent.getResource();
 
                 final String pathInfo;
-                final Map parameters;
+                final Map<String, String[]> parameters;
 
                 final int qmIndex = resource.indexOf('?');
                 if (qmIndex != -1) {
@@ -1239,11 +1239,10 @@ public class XFormsContainingDocument extends XBLContainer {
     public void goOffline(PipelineContext pipelineContext) {
 
         // Handle inserts of controls marked as "offline insert triggers"
-        final List offlineInsertTriggerPrefixedIds = getStaticState().getOfflineInsertTriggerIds();
+        final List<String> offlineInsertTriggerPrefixedIds = getStaticState().getOfflineInsertTriggerIds();
         if (offlineInsertTriggerPrefixedIds != null) {
-            
-            for (Iterator i = offlineInsertTriggerPrefixedIds.iterator(); i.hasNext();) {
-                final String currentPrefixedId = (String) i.next();
+
+            for (String currentPrefixedId: offlineInsertTriggerPrefixedIds) {
                 final Object o = getObjectByEffectiveId(currentPrefixedId);// NOTE: won't work for triggers within repeats
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
@@ -1263,8 +1262,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
 
         // Dispatch xxforms-offline to all models
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: getModels()) {
             // TODO: Dispatch to children containers
             dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
         }
@@ -1476,7 +1474,7 @@ public class XFormsContainingDocument extends XBLContainer {
         xformsControls.initialize(pipelineContext);
     }
 
-    private Stack eventStack = new Stack();
+    private Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
 
     public void startHandleEvent(XFormsEvent event) {
         eventStack.push(event);

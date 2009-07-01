@@ -52,7 +52,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     private final String xxformsRefresh;
     private final boolean isOpenSelection;
     private final boolean xxformsEncryptItemValues;
-    private List items;
+    private List<XFormsItemUtils.Item> items;
 
     public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
@@ -132,11 +132,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @param setBinding        whether to set the current binding on the control first
      * @return                  itemset
      */
-    public List getItemset(PipelineContext pipelineContext, boolean setBinding) {
+    public List<XFormsItemUtils.Item> getItemset(PipelineContext pipelineContext, boolean setBinding) {
         try {
             if ("false".equals(xxformsRefresh)) {
                 // Items are not automatically refreshed and stored globally
-                List items =  containingDocument.getControls().getConstantItems(getId());
+                List<XFormsItemUtils.Item> items =  containingDocument.getControls().getConstantItems(getId());
                 if (items == null) {
                     items = XFormsItemUtils.evaluateItemsets(pipelineContext, XFormsSelect1Control.this, setBinding);
                     containingDocument.getControls().setConstantItems(getId(), items);
@@ -204,8 +204,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
             // Iterate over all the items
             final List items = getItemset(pipelineContext, true);
-            final List selectEvents = new ArrayList();
-            final List deselectEvents = new ArrayList();
+            final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
+            final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
             for (Iterator i = items.iterator(); i.hasNext();) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentItemValue = currentItem.getValue();
@@ -261,7 +261,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 //    }
 
 // Work in progress for in-bounds/out-of-bounds
-    public boolean isInBounds(List items) {
+    public boolean isInBounds(List<XFormsItemUtils.Item> items) {
         return true;
 //        final String value = getValue(null);
 //        for (Iterator i = items.iterator(); i.hasNext();) {

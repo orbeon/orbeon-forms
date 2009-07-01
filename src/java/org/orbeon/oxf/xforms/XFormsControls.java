@@ -47,7 +47,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private XFormsContainingDocument containingDocument;
     private XBLContainer rootContainer;
     
-    private Map<String, List> constantItems;
+    private Map<String, List<XFormsItemUtils.Item>> constantItems;
 
     // Options configured by properties
     private boolean isPlainValueChange;
@@ -575,11 +575,11 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param controlId     original control id
      * @return              List of Item
      */
-    public List getConstantItems(String controlId) {
+    public List<XFormsItemUtils.Item> getConstantItems(String controlId) {
         if (constantItems == null)
             return null;
         else
-            return (List) constantItems.get(controlId);
+            return constantItems.get(controlId);
     }
 
     /**
@@ -588,9 +588,9 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param controlId     static control id
      * @param items         List<Item>
      */
-    public void setConstantItems(String controlId, List items) {
+    public void setConstantItems(String controlId, List<XFormsItemUtils.Item> items) {
         if (constantItems == null)
-            constantItems = new HashMap<String, List>();
+            constantItems = new HashMap<String, List<XFormsItemUtils.Item>>();
         constantItems.put(controlId, items);
     }
 

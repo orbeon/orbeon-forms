@@ -40,7 +40,7 @@ public class XFormsItemUtils {
      * @param items         list of XFormsSelect1Control.Item
      * @return              String representing a JSON tree
      */
-    public static String getJSONTreeInfo(PipelineContext pipelineContext, List items, LocationData locationData) {
+    public static String getJSONTreeInfo(PipelineContext pipelineContext, List<Item> items, LocationData locationData) {
         return getJSONTreeInfo(pipelineContext, items, null, false, locationData);
     }
 
@@ -52,7 +52,7 @@ public class XFormsItemUtils {
      * @param many          whether multiple selection is allowed (to determine selected item)
      * @return              String representing a JSON tree
      */
-    public static String getJSONTreeInfo(final PipelineContext pipelineContext, List items, final String controlValue, final boolean many, LocationData locationData) {
+    public static String getJSONTreeInfo(final PipelineContext pipelineContext, List<Item> items, final String controlValue, final boolean many, LocationData locationData) {
         // Produce a JSON fragment with hierachical information
         if (items.size() > 0) {
             final FastStringBuffer sb = new FastStringBuffer(100);
@@ -146,7 +146,7 @@ public class XFormsItemUtils {
      * @param locationData          LocationData in case of error, or null
      * @param listener              TreeListener to call back
      */
-    public static void visitItemsTree(ContentHandler contentHandler, List items, LocationData locationData, TreeListener listener) {
+    public static void visitItemsTree(ContentHandler contentHandler, List<Item> items, LocationData locationData, TreeListener listener) {
         if (items != null && items.size() > 0) { // may be null when there is no item in the itemset
 
             int currentLevel = 0;
@@ -209,7 +209,7 @@ public class XFormsItemUtils {
      * @param setBinding            whether this method must set the evaluation binding (false if it is already set)
      * @return                      List of Item
      */
-    public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsSelect1Control select1Control, boolean setBinding) {
+    public static List<Item> evaluateItemsets(final PipelineContext pipelineContext, final XFormsSelect1Control select1Control, boolean setBinding) {
 
         final XBLContainer container = select1Control.getXBLContainer();
 
@@ -224,7 +224,7 @@ public class XFormsItemUtils {
                 return evaluateStaticItemsets(container.getContainingDocument(), select1Control.getPrefixedId());
         }
 
-        final List newItems = new ArrayList();
+        final List<Item> newItems = new ArrayList<Item>();
 
         // Set binding on this control if required
         final XFormsContextStack contextStack = container.getContextStack();
@@ -268,16 +268,16 @@ public class XFormsItemUtils {
                         final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
                         //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                        final List currentNodeSet = currentBindingContext.getNodeset();
+                        final List<NodeInfo> currentNodeSet = currentBindingContext.getNodeset();
                         if (currentNodeSet != null) {
-                            final Stack nodeStack = new Stack();
+                            final Stack<NodeInfo> nodeStack = new Stack<NodeInfo>();
                             final int iterationCount = currentNodeSet.size();
                             for (int currentPosition = 1; currentPosition <= iterationCount; currentPosition++) {
 
                                 // Push iteration
                                 contextStack.pushIteration(currentPosition);
                                 {
-                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
+                                    final NodeInfo currentNodeInfo = currentNodeSet.get(currentPosition - 1);
 
                                     // NOTE: We support relevance of items as an extension to XForms.
                                     final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);
@@ -367,11 +367,11 @@ public class XFormsItemUtils {
             public void text(Text text) {
             }
 
-            private int getNodeLevel(NodeInfo nodeInfo, Stack stack) {
+            private int getNodeLevel(NodeInfo nodeInfo, Stack<NodeInfo> stack) {
                 Collections.reverse(stack);
                 int level = stack.size() + 1;
-                for (Iterator i = stack.iterator(); i.hasNext(); level--) {
-                    final NodeInfo currentNode = (NodeInfo) i.next();
+                for (Iterator<NodeInfo> i = stack.iterator(); i.hasNext(); level--) {
+                    final NodeInfo currentNode = i.next();
                     if (isAncestorNode(nodeInfo, currentNode)) {
                         Collections.reverse(stack);
                         return level;
@@ -396,11 +396,11 @@ public class XFormsItemUtils {
         return newItems;
     }
 
-    public static List evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String prefixedId) {
+    public static List<Item> evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String prefixedId) {
 
-        final List newItems = new ArrayList();
+        final List<Item> newItems = new ArrayList<Item>();
 
-        final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(prefixedId)).getElement();
+        final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).getElement();
         final boolean isEncryptItemValues = XFormsSelect1Control.isEncryptItemValues(containingDocument, controlElement);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {

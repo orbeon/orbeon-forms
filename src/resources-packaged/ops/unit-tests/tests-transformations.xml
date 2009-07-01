@@ -102,29 +102,30 @@
         </output>
     </test>
 
-    <test description="xalan:nodeset() function" name="oxf:xalan">
-        <input name="data">
-            <gaga/>
-        </input>
-        <input name="config">
-            <xsl:stylesheet version="1.0" exclude-result-prefixes="xalan" xmlns:xalan="http://xml.apache.org/xalan">
-                <xsl:template match="/">
-                    <xsl:variable name="gaga">
-                        <xsl:call-template name="gaga"/>
-                    </xsl:variable>
-                    <xsl:copy-of select="xalan:nodeset($gaga)/root/gaga"/>
-                </xsl:template>
-                <xsl:template name="gaga">
-                    <root>
-                        <gaga/>
-                    </root>
-                </xsl:template>
-            </xsl:stylesheet>
-        </input>
-        <output name="data">
-            <gaga/>
-        </output>
-    </test>
+    <!-- NOTE: We don't bundle Xalan anymore -->
+    <!--<test description="xalan:nodeset() function" name="oxf:xalan">-->
+        <!--<input name="data">-->
+            <!--<gaga/>-->
+        <!--</input>-->
+        <!--<input name="config">-->
+            <!--<xsl:stylesheet version="1.0" exclude-result-prefixes="xalan" xmlns:xalan="http://xml.apache.org/xalan">-->
+                <!--<xsl:template match="/">-->
+                    <!--<xsl:variable name="gaga">-->
+                        <!--<xsl:call-template name="gaga"/>-->
+                    <!--</xsl:variable>-->
+                    <!--<xsl:copy-of select="xalan:nodeset($gaga)/root/gaga"/>-->
+                <!--</xsl:template>-->
+                <!--<xsl:template name="gaga">-->
+                    <!--<root>-->
+                        <!--<gaga/>-->
+                    <!--</root>-->
+                <!--</xsl:template>-->
+            <!--</xsl:stylesheet>-->
+        <!--</input>-->
+        <!--<output name="data">-->
+            <!--<gaga/>-->
+        <!--</output>-->
+    <!--</test>-->
 
     <!--    <disable reason="STX doesn't support multi treading">-->
     <test description="STX Transformation on a request-like document" name="oxf:pipeline">

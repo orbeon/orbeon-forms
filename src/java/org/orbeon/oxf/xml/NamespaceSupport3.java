@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
-
 /**
  * This class provides enhanced namespace support for SAX-based handlers.
  */

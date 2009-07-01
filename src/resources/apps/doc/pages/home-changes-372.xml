@@ -98,6 +98,12 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                 </xml-source>
             </section>
             <section>
+                <title>Java 1.5 is now required</title>
+                <p>
+                    [TODO]
+                </p>
+            </section>
+            <section>
                 <title>Removal of Xalan and XSLTC from the standard distribution</title>
                 <p>
                     [TODO]

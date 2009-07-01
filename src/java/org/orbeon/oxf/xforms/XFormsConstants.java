@@ -184,6 +184,9 @@ public class XFormsConstants {
     public static final QName XXFORMS_FILES_QNAME = new QName("files", XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_MODEL_QNAME = new QName("model", XFORMS_NAMESPACE);
+    public static final QName XFORMS_INSTANCE_QNAME = new QName("instance", XFORMS_NAMESPACE);
+    public static final QName XFORMS_SUBMISSION_QNAME = new QName("submission", XFORMS_NAMESPACE);
+    public static final QName XFORMS_HEADER_QNAME = new QName("header", XFORMS_NAMESPACE);
 
     public static final QName XXFORMS_CONTROLS_QNAME = new QName("controls", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MODELS_QNAME = new QName("models", XXFORMS_NAMESPACE);

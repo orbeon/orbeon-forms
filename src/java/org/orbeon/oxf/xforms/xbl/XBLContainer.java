@@ -207,7 +207,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @param element       Element to get namsepace mapping for
      * @return              Map<String prefix, String uri>
      */
-    public Map getNamespaceMappings(Element element) {
+    public Map<String, String> getNamespaceMappings(Element element) {
         return containingDocument.getStaticState().getNamespaceMappings(fullPrefix, element);
     }
 

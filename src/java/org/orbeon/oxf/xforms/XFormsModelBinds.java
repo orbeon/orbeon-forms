@@ -37,10 +37,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
-import org.orbeon.saxon.om.FastStringBuffer;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.IndependentContext;
@@ -65,18 +62,18 @@ public class XFormsModelBinds {
     private final XFormsContainingDocument containingDocument;  // current containing document
     private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
 
-    private final List bindElements;
-    private List topLevelBinds = new ArrayList();               // List<Bind>
-    private Map singleNodeContextBinds = new HashMap();         // Map<String, Bind>
-    private Map iterationsForContextNodeInfo = new HashMap();   // Map<NodeInfo, List<BindIteration>>
-    private List offlineBinds = new ArrayList();                // List<Bind>
-    private Map variableNamesToIds = new HashMap();             // Map<String, String> of name to id
+    private final List<Element> bindElements;
+    private List<Bind> topLevelBinds = new ArrayList<Bind>();
+    private Map<String, Bind> singleNodeContextBinds = new HashMap<String, Bind>();
+    private Map<NodeInfo, List<BindIteration>> iterationsForContextNodeInfo = new HashMap<NodeInfo, List<BindIteration>>();
+    private List<Bind> offlineBinds = new ArrayList<Bind>();
+    private Map<String, String> variableNamesToIds = new HashMap<String, String>();
 
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
 
-    private static final Map BUILTIN_XFORMS_SCHEMA_TYPES = new HashMap();
+    private static final Map<String, String> BUILTIN_XFORMS_SCHEMA_TYPES = new HashMap<String, String>();
 
     static {
         BUILTIN_XFORMS_SCHEMA_TYPES.put("dayTimeDuration", "");
@@ -92,13 +89,13 @@ public class XFormsModelBinds {
      * @return      XFormsModelBinds or null if the model doesn't have xforms:bind elements
      */
     public static XFormsModelBinds create(XFormsModel model) {
-        final List bindElements = model.getModelDocument().getRootElement().elements(XFormsConstants.XFORMS_BIND_QNAME);
+        final List<Element> bindElements = model.getModelDocument().getRootElement().elements(XFormsConstants.XFORMS_BIND_QNAME);
         final boolean hasBinds = bindElements != null && bindElements.size() > 0;
 
         return hasBinds ? new XFormsModelBinds(model, bindElements) : null;
     }
 
-    private XFormsModelBinds(XFormsModel model, List bindElements) {
+    private XFormsModelBinds(XFormsModel model, List<Element> bindElements) {
         this.model = model;
 
         this.container = model.getXBLContainer();
@@ -132,8 +129,7 @@ public class XFormsModelBinds {
         variableNamesToIds.clear();
 
         // Iterate through all top-level bind elements
-        for (Iterator i = bindElements.iterator(); i.hasNext();) {
-            final Element currentBindElement = (Element) i.next();
+        for (Element currentBindElement: bindElements) {
             // Create and remember as top-level bind
             final Bind currentBind = new Bind(pipelineContext, currentBindElement, true);
             topLevelBinds.add(currentBind);
@@ -159,7 +155,7 @@ public class XFormsModelBinds {
         if (isFirstCalculate) {
             // Handle default values
             iterateBinds(pipelineContext, new BindRunner() {
-                public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+                public void applyBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
                     handleXXFormsDefaultBind(pipelineContext, bind, nodeset, position);
                 }
             });
@@ -171,7 +167,7 @@ public class XFormsModelBinds {
         // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
         // to evaluate "calculate" binds before the other binds.
         iterateBinds(pipelineContext, new BindRunner() {
-            public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+            public void applyBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
                 handleCalculateBind(pipelineContext, bind, nodeset, position);
             }
         });
@@ -196,10 +192,10 @@ public class XFormsModelBinds {
         model.getContextStack().resetBindingContext(pipelineContext, model);
 
         // Clear state
-        final List instances = model.getInstances();
+        final List<XFormsInstance> instances = model.getInstances();
         if (instances != null) {
-            for (Iterator i =  instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+            for (XFormsInstance instance: instances) {
+                XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
                     public void walk(NodeInfo nodeInfo) {
                         InstanceData.clearOtherState(nodeInfo);
                     }
@@ -207,7 +203,7 @@ public class XFormsModelBinds {
             }
 
             iterateBinds(pipelineContext, new BindRunner() {
-                public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+                public void applyBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
                     handleComputedExpressionBind(pipelineContext, bind, nodeset, position);
                 }
             });
@@ -219,14 +215,14 @@ public class XFormsModelBinds {
      *
      * @param pipelineContext   current PipelineContext
      */
-    public void applyValidationBinds(final PipelineContext pipelineContext, final Map invalidInstances) {
+    public void applyValidationBinds(final PipelineContext pipelineContext, final Map<String, String> invalidInstances) {
 
         // Reset context stack just to re-evaluate the variables
         model.getContextStack().resetBindingContext(pipelineContext, model);
 
         // Handle validation
         iterateBinds(pipelineContext, new BindRunner() {
-            public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+            public void applyBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
                 handleValidationBind(pipelineContext, bind, nodeset, position, invalidInstances);
             }
         });
@@ -245,7 +241,7 @@ public class XFormsModelBinds {
      * @param contextItem   context item if necessary
      * @return              bind nodeset
      */
-    public List getBindNodeset(String bindId, Item contextItem) {
+    public List<Item> getBindNodeset(String bindId, Item contextItem) {
 
         final Bind singleNodeContextBind = (Bind) singleNodeContextBinds.get(bindId);
         if (singleNodeContextBind != null) {
@@ -256,10 +252,9 @@ public class XFormsModelBinds {
 
             // This requires a context node, not just any item
             if (contextItem instanceof NodeInfo) {
-                final List iterationsForContextNode = (List) iterationsForContextNodeInfo.get(contextItem);
+                final List<BindIteration> iterationsForContextNode = iterationsForContextNodeInfo.get((NodeInfo) contextItem);
                 if (iterationsForContextNode != null) {
-                    for (Iterator i = iterationsForContextNode.iterator(); i.hasNext();) {
-                        final BindIteration currentIteration = (BindIteration) i.next();
+                    for (BindIteration currentIteration: iterationsForContextNode) {
                         final Bind currentBind = currentIteration.getBind(bindId);
                         if (currentBind != null) {
                             // Found
@@ -271,7 +266,7 @@ public class XFormsModelBinds {
         }
 
         // Nothing found
-        return Collections.EMPTY_LIST;
+        return XPathCache.EMPTY_ITEM_LIST;
     }
 
     /**
@@ -279,7 +274,7 @@ public class XFormsModelBinds {
      *
      * @return  List<Bind> of offline binds
      */
-    public List getOfflineBinds() {
+    public List<Bind> getOfflineBinds() {
         return offlineBinds;
     }
 
@@ -307,10 +302,10 @@ public class XFormsModelBinds {
         if (XFormsServer.logger.isDebugEnabled())
             containingDocument.startHandleOperation("model", "getting offline bind mappings");
 
-        final Map effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
+        final Map<String, XFormsControl> effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
-        final Map nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
+        final Map<NodeInfo, Object> nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
 
         // Handle MIPs
         sb.append("\"mips\": {");
@@ -318,25 +313,23 @@ public class XFormsModelBinds {
             boolean controlFound = false;
             // Iterate through models
             // TODO: Nested containers
-            for (Iterator h = containingDocument.getModels().iterator(); h.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) h.next();
+            for (XFormsModel currentModel: containingDocument.getModels()) {
                 final XFormsModelBinds currentBinds = currentModel.getBinds();
                 if (currentBinds != null) {
-                    final List offlineBinds = currentBinds.getOfflineBinds();
+                    final List<Bind> offlineBinds = currentBinds.getOfflineBinds();
                     //  Iterate through offline binds
-                    for (Iterator i = offlineBinds.iterator(); i.hasNext();) {
-                        final Bind currentBind = (Bind) i.next();
-                        final List currentNodeset = currentBind.getNodeset();
+                    for (Bind currentBind: offlineBinds) {
+                        final List<Item> currentNodeset = currentBind.getNodeset();
 
                         // Find ids of controls inheriting the readonly and relevant MIPs if necessary
                         final String readonly = currentBind.getReadonly();
                         final String relevant = currentBind.getRelevant();
-                        final List controlsInheritingMIPs;
+                        final List<XFormsControl> controlsInheritingMIPs;
                         if (readonly != null || relevant != null ) {
                             // Find ids of controls that inherit the property
 
                             // Find attributes and elements which are children of nodes in the current nodeset
-                            final List nestedNodeset = new ArrayList();
+                            final List<Item> nestedNodeset = new ArrayList<Item>();
                             XFormsUtils.getNestedAttributesAndElements(nestedNodeset, currentNodeset);
                             if (nestedNodeset.size() > 0) {
                                 // Find all controls bound to those nested nodes: they are influenced by the mips
@@ -350,11 +343,10 @@ public class XFormsModelBinds {
                         }
 
                         // Find controls directly bound to nodes in the bind nodeset
-                        final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
+                        final List<XFormsControl> boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
 
                         if (boundControls.size() > 0) {
-                            for (Iterator j = boundControls.iterator(); j.hasNext();) {
-                                final XFormsControl currentControl = (XFormsControl) j.next();
+                            for (XFormsControl currentControl: boundControls) {
 
                                 if (controlFound)
                                     sb.append(',');
@@ -393,26 +385,22 @@ public class XFormsModelBinds {
         {
             // Iterate through models
             // TODO: Nested containers
-            for (Iterator h = containingDocument.getModels().iterator(); h.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) h.next();
-
+            for (XFormsModel currentModel: containingDocument.getModels()) {
                 // Iterate through variables
                 // NOTE: We assume top-level or single-node context binds
                 final XFormsModelBinds currentBinds = currentModel.getBinds();
                 if (currentBinds != null) {
-                    final Map variables = currentModel.getBinds().getVariables(null);
+                    final Map<String, ValueRepresentation> variables = currentModel.getBinds().getVariables(null);
                     boolean controlFound = false;
-                    for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                        final String currentVariableName = (String) currentEntry.getKey();
+                    for (Map.Entry<String, ValueRepresentation> currentEntry: variables.entrySet()) {
+                        final String currentVariableName = currentEntry.getKey();
                         final SequenceExtent currentVariableValue = (SequenceExtent) currentEntry.getValue();
 
                         // Find controls bound to the bind exposed as a variable
-                        final List currentNodeset = sequenceExtentToList(currentVariableValue);
-                        final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
+                        final List<Item> currentNodeset = sequenceExtentToList(currentVariableValue);
+                        final List<XFormsControl> boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
                         if (boundControls.size() > 0) {
-                            for (Iterator j = boundControls.iterator(); j.hasNext();) {
-                                final XFormsControl currentControl = (XFormsControl) j.next();
+                            for (XFormsControl currentControl: boundControls) {
                                 // Make sure this is a value control (e.g. we can't get the value of bound groups in the UI)
                                 if (currentControl instanceof XFormsValueControl) {
                                     final String effectiveControlId = currentControl.getEffectiveId();
@@ -436,9 +424,9 @@ public class XFormsModelBinds {
         return result;
     }
 
-    private static final List sequenceExtentToList(SequenceExtent sequenceExtent) {
+    private static final List<Item> sequenceExtentToList(SequenceExtent sequenceExtent) {
         try {
-            final List result = new ArrayList(sequenceExtent.getLength());
+            final List<Item> result = new ArrayList<Item>(sequenceExtent.getLength());
             final SequenceIterator si = sequenceExtent.iterate(null);
             for (Item item = si.next(); item != null; item = si.next()) {
                 result.add(item);
@@ -450,18 +438,17 @@ public class XFormsModelBinds {
         }
     }
 
-    private static List getBoundControls(Map nodesToControlsMapping, List nodeset) {
-        final List result = new ArrayList();
+    private static List<XFormsControl> getBoundControls(Map<NodeInfo, Object> nodesToControlsMapping, List<Item> nodeset) {
+        final List<XFormsControl> result = new ArrayList<XFormsControl>();
 
         // Iterate through nodeset
-        for (Iterator j = nodeset.iterator(); j.hasNext();) {
-            final NodeInfo currentNodeInfo = (NodeInfo) j.next();
-            final Object match = nodesToControlsMapping.get(currentNodeInfo);
+        for (Item currentNodeInfo: nodeset) {
+            final Object match = nodesToControlsMapping.get((NodeInfo) currentNodeInfo);
             if (match == null) {
                 // Nothing to see here
             } else if (match instanceof XFormsControl) {
                 // Control
-                result.add(match);
+                result.add((XFormsControl) match);
             } else {
                 // List
                 result.addAll((Collection) match);
@@ -470,12 +457,11 @@ public class XFormsModelBinds {
         return result;
     }
 
-    private static Map getNodesToControlsMapping(Map idsToXFormsControls) {
-        final Map result = new HashMap();
+    private static Map<NodeInfo, Object> getNodesToControlsMapping(Map<String, XFormsControl> idsToXFormsControls) {
+        final Map<NodeInfo, Object> result = new HashMap<NodeInfo, Object>();
 
         // Iterate through controls
-        for (Iterator k = idsToXFormsControls.entrySet().iterator(); k.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) k.next();
+        for (Map.Entry currentEntry: idsToXFormsControls.entrySet()) {
             final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
 
             if (currentControl instanceof XFormsSingleNodeControl
@@ -491,13 +477,13 @@ public class XFormsModelBinds {
                         result.put(boundNode, currentControl);
                     } else if (existing instanceof XFormsControl) {
                         // There is just one control, which we replace with a list
-                        final List newList = new ArrayList();
+                        final List<Object> newList = new ArrayList<Object>();
                         newList.add(existing);
                         newList.add(currentControl);
                         result.put(boundNode, newList);
                     } else  {
                         // More than one control already, just add to it
-                        final List existingList = (List) existing;
+                        final List<Object> existingList = (List<Object>) existing;
                         existingList.add(currentControl);
                     }
                 }
@@ -506,7 +492,7 @@ public class XFormsModelBinds {
         return result;
     }
 
-    private static final boolean appendNameValue(FastStringBuffer sb, boolean found, String name, String value, List controlsInheritingMIPs) {
+    private static final boolean appendNameValue(FastStringBuffer sb, boolean found, String name, String value, List<XFormsControl> controlsInheritingMIPs) {
         if (value != null) {
             if (found)
                 sb.append(',');
@@ -520,9 +506,7 @@ public class XFormsModelBinds {
                 sb.append(", \"inherited\":[");
 
                 int idIndex = 0;
-                for (Iterator i = controlsInheritingMIPs.iterator(); i.hasNext(); idIndex++) {
-                    final XFormsControl currentControl = (XFormsControl) i.next();
-
+                for (XFormsControl currentControl: controlsInheritingMIPs) {
                     if (idIndex > 0)
                         sb.append(',');
 
@@ -545,8 +529,7 @@ public class XFormsModelBinds {
      */
     private void iterateBinds(PipelineContext pipelineContext, BindRunner bindRunner) {
         // Iterate over top-level binds
-        for (Iterator i = topLevelBinds.iterator(); i.hasNext();) {
-            final Bind currentBind = (Bind) i.next();
+        for (Bind currentBind: topLevelBinds) {
             try {
                 currentBind.applyBinds(pipelineContext, bindRunner);
             } catch (Exception e) {
@@ -555,7 +538,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleXXFormsDefaultBind(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleXXFormsDefaultBind(final PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
 
         // Handle xxforms:default MIP
         if (bind.getXXFormsDefault() != null) {
@@ -581,7 +564,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleCalculateBind(final PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleCalculateBind(final PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
         // Handle calculate MIP
         if (bind.getCalculate() != null) {
             // Compute calculated value
@@ -606,18 +589,17 @@ public class XFormsModelBinds {
         }
     }
 
-    private Map getVariables(NodeInfo contextNodeInfo) {
+    private Map<String, ValueRepresentation> getVariables(NodeInfo contextNodeInfo) {
 
         if (variableNamesToIds.size() > 0) {
-            final Map bindVariablesValues = new HashMap();
+            final Map<String, ValueRepresentation> bindVariablesValues = new HashMap<String, ValueRepresentation>();
 
             // Add bind variables
-            for (Iterator i = variableNamesToIds.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String currentVariableName = (String) currentEntry.getKey();
-                final String currentBindId = (String) currentEntry.getValue();
+            for (Map.Entry<String, String> currentEntry: variableNamesToIds.entrySet()) {
+                final String currentVariableName = currentEntry.getKey();
+                final String currentBindId = currentEntry.getValue();
 
-                final List currentBindNodeset = getBindNodeset(currentBindId, contextNodeInfo);
+                final List<Item> currentBindNodeset = getBindNodeset(currentBindId, contextNodeInfo);
                 bindVariablesValues.put(currentVariableName, new SequenceExtent(currentBindNodeset));
             }
 
@@ -629,10 +611,10 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleComputedExpressionBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleComputedExpressionBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-        final Map currentVariables = getVariables(currentNodeInfo);
+        final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
         // Handle required MIP
         if (bind.getRequired() != null) {
@@ -688,12 +670,11 @@ public class XFormsModelBinds {
             InstanceData.setReadonly(currentNodeInfo, true);
         }
 
-        final Map customMips = bind.getCustomMips();
+        final Map<String, String> customMips = bind.getCustomMips();
         if (customMips != null && customMips.size() > 0) {
-            for (Iterator i = customMips.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry entry = (Map.Entry) i.next();
-                final String key = (String) entry.getKey();
-                final String expression = (String) entry.getValue();
+            for (Map.Entry<String, String> entry: customMips.entrySet()) {
+                final String key = entry.getKey();
+                final String expression = entry.getValue();
 
                 try {
                     final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeset, position, expression,
@@ -712,23 +693,24 @@ public class XFormsModelBinds {
         }
     }
 
-    private boolean evaluateBooleanExpression1(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
+    private boolean evaluateBooleanExpression1(PipelineContext pipelineContext, Bind bind, String xpathExpression,
+                                               List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
         final String xpath = "boolean(" + xpathExpression + ")";
         return ((Boolean) XPathCache.evaluateSingle(pipelineContext,
             nodeset, position, xpath, container.getNamespaceMappings(bind.getBindElement()), currentVariables,
             XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
     }
 
-//    private boolean evaluateBooleanExpression2(PipelineContext pipelineContext, Bind bind, String xpathExpression, List nodeset, int position, Map currentVariables) {
+//    private boolean evaluateBooleanExpression2(PipelineContext pipelineContext, Bind bind, String xpathExpression, List<Item> nodeset, int position, Map currentVariables) {
 //        return XPathCache.evaluateAsBoolean(pipelineContext,
 //            nodeset, position, xpathExpression, containingDocument.getNamespaceMappings(bind.getBindElement()), currentVariables,
 //            XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
 //    }
 
-    private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {
+    private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position, Map<String, String> invalidInstances) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-        final Map namespaceMap = container.getNamespaceMappings(bind.getBindElement());
+        final Map<String, String> namespaceMap = container.getNamespaceMappings(bind.getBindElement());
 
         // Current validity value
         // NOTE: This may have been set by schema validation earlier in the validation process
@@ -753,8 +735,7 @@ public class XFormsModelBinds {
                     xpathEvaluator = new XPathEvaluator();
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = xpathEvaluator.getStaticContext();
-                    for (Iterator j = namespaceMap.keySet().iterator(); j.hasNext();) {
-                        final String prefix = (String) j.next();
+                    for (String prefix: namespaceMap.keySet()) {
                         context.declareNamespace(prefix, (String) namespaceMap.get(prefix));
                     }
                 } catch (Exception e) {
@@ -950,7 +931,7 @@ public class XFormsModelBinds {
     }
 
     private static interface BindRunner {
-        public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position);
+        public void applyBind(PipelineContext pipelineContext, Bind bind, List<Item> nodeset, int position);
     }
 
     private class Bind {
@@ -958,10 +939,10 @@ public class XFormsModelBinds {
         private Element bindElement;
         private String id;          // bind id
         private String name;        // bind name
-        private List nodeset;       // actual nodeset for this bind
+        private List<Item> nodeset;       // actual nodeset for this bind
 
-        private List childrenIterations; // List<BindIteration>
-        private Map customMips;          // Map<String name, String expression> where: foo:bar="true()" => "foo-bar" -> "true()"
+        private List<BindIteration> childrenIterations; // List<BindIteration>
+        private Map<String, String> customMips;         // Map<String name, String expression> where: foo:bar="true()" => "foo-bar" -> "true()"
 
         public Bind(PipelineContext pipelineContext, Element bindElement, boolean isSingleNodeContext) {
             this.bindElement = bindElement;
@@ -991,7 +972,7 @@ public class XFormsModelBinds {
                                      || attributePrefix.startsWith("xml"))) {
                         // Any QName-but-not-NCName which is not in the xforms or xxforms namespace
                         if (customMips == null)
-                            customMips = new HashMap();
+                            customMips = new HashMap<String, String>();
                         // E.g. foo:bar="true()" => "foo-bar" -> "true()"
                         customMips.put(attribute.getQualifiedName().replace(':', '-'), attribute.getValue());
                     }
@@ -1009,7 +990,7 @@ public class XFormsModelBinds {
                 } else {
                     // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)
                     final Item contextItem = model.getContextStack().getContextItem();
-                    this.nodeset = (contextItem == null) ? Collections.EMPTY_LIST : Collections.singletonList(contextItem);
+                    this.nodeset = (contextItem == null) ? XPathCache.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
                 }
                 final int nodesetSize = this.nodeset.size();
 
@@ -1020,10 +1001,10 @@ public class XFormsModelBinds {
                 if (isSingleNodeContext)
                     singleNodeContextBinds.put(id, this);
 
-                final List childElements = bindElement.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
+                final List<Element> childElements = bindElement.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
                 if (childElements.size() > 0) {
                     // There are children binds
-                    childrenIterations = new ArrayList();
+                    childrenIterations = new ArrayList<BindIteration>();
 
                     // Iterate over nodeset and produce child iterations
                     for (int currentPosition = 1; currentPosition <= nodesetSize; currentPosition++) {
@@ -1036,13 +1017,12 @@ public class XFormsModelBinds {
 
                             // Create mapping context node -> iteration
                             final NodeInfo iterationNodeInfo = (NodeInfo) nodeset.get(currentPosition - 1);
-                            List iterations = (List) iterationsForContextNodeInfo.get(iterationNodeInfo);
+                            List<BindIteration> iterations = iterationsForContextNodeInfo.get(iterationNodeInfo);
                             if (iterations == null) {
-                                iterations = new ArrayList();
+                                iterations = new ArrayList<BindIteration>();
                                 iterationsForContextNodeInfo.put(iterationNodeInfo, iterations);
                             }
                             iterations.add(currentBindIteration);
-
                         }
                         model.getContextStack().popBinding();
                     }
@@ -1078,7 +1058,7 @@ public class XFormsModelBinds {
             return name;
         }
 
-        public List getNodeset() {
+        public List<Item> getNodeset() {
             return nodeset;
         }
 
@@ -1126,24 +1106,23 @@ public class XFormsModelBinds {
             return bindElement.attributeValue(XFormsConstants.XXFORMS_EXTERNALIZE_QNAME);
         }
 
-        public Map getCustomMips() {
+        public Map<String, String> getCustomMips() {
             return customMips;
         }
     }
 
     private class BindIteration {
 
-        private List childrenBinds; // List<Bind>
+        private List<Bind> childrenBinds;
 
-        public BindIteration(PipelineContext pipelineContext, boolean isSingleNodeContext, List childElements) {
+        public BindIteration(PipelineContext pipelineContext, boolean isSingleNodeContext, List<Element> childElements) {
 
             if (childElements.size() > 0) {
                 // There are child elements
-                childrenBinds = new ArrayList();
+                childrenBinds = new ArrayList<Bind>();
 
                 // Iterate over child elements and create children binds
-                for (Iterator i = childElements.iterator(); i.hasNext();) {
-                    final Element currentBindElement = (Element) i.next();
+                for (Element currentBindElement: childElements) {
                     final Bind currentBind = new Bind(pipelineContext, currentBindElement, isSingleNodeContext);
                     childrenBinds.add(currentBind);
                 }

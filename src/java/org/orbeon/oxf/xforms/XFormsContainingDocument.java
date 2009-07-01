@@ -93,7 +93,7 @@ public class XFormsContainingDocument extends XBLContainer {
     private List<DelayedEvent> delayedEvents;
 
     private boolean goingOffline;
-    private boolean goingOnline;
+//    private boolean goingOnline;  // never used at the moment
 
     // Global flag used during initialization only
     private boolean mustPerformInitializationFirstRefresh;
@@ -407,7 +407,7 @@ public class XFormsContainingDocument extends XBLContainer {
         this.delayedEvents = null;
 
         this.goingOffline = false;
-        this.goingOnline = false;
+//        this.goingOnline = false;
     }
 
     /**
@@ -512,7 +512,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Return the list of messages to send to the client, null if none.
      */
-    public List getMessagesToRun() {
+    public List<Message> getMessagesToRun() {
         return messagesToRun;
     }
 
@@ -534,7 +534,7 @@ public class XFormsContainingDocument extends XBLContainer {
         delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress, progressMessage));
     }
 
-    public List getDelayedEvents() {
+    public List<DelayedEvent> getDelayedEvents() {
         return delayedEvents;
     }
 
@@ -639,7 +639,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
-    public List getScriptsToRun() {
+    public List<Script> getScriptsToRun() {
         return scriptsToRun;
     }
 
@@ -659,7 +659,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Return the list of loads to send to the client, null if none.
      */
-    public List getLoadsToRun() {
+    public List<Load> getLoadsToRun() {
         return loadsToRun;
     }
 
@@ -1232,7 +1232,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // TODO: Dispatch to children containers
             dispatchEvent(pipelineContext, new XXFormsOnlineEvent(currentModel));
         }
-        this.goingOnline = true;
+//        this.goingOnline = true;
         this.goingOffline = false;
     }
 
@@ -1266,7 +1266,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // TODO: Dispatch to children containers
             dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
         }
-        this.goingOnline = false;
+//        this.goingOnline = false;
         this.goingOffline = true;
     }
 

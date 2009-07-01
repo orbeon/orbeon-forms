@@ -300,11 +300,11 @@ public class ControlTree implements Cloneable {
         this.children = children;
     }
 
-    public List getChildren() {
+    public List<XFormsControl> getChildren() {
         return children;
     }
 
-    public Map getEffectiveIdsToControls() {
+    public Map<String, XFormsControl> getEffectiveIdsToControls() {
         return effectiveIdsToControls;
     }
 
@@ -391,12 +391,12 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    public Map getUploadControls() {
-        return (Map) ((controlTypes != null) ? controlTypes.get("upload") : null);
+    public Map<String, XFormsControl> getUploadControls() {
+        return (controlTypes != null) ? controlTypes.get("upload") : null;
     }
 
-    public Map getRepeatControls() {
-        return (Map) ((controlTypes != null) ? controlTypes.get("repeat") : null);
+    public Map<String, XFormsControl> getRepeatControls() {
+        return (controlTypes != null) ? controlTypes.get("repeat") : null;
     }
 
     /**
@@ -404,8 +404,8 @@ public class ControlTree implements Cloneable {
      *
      * @return LinkedHashMap<String effectiveId, XFormsSelectControl control>
      */
-    public Map getSelectFullControls() {
-        return (Map) ((controlTypes != null) ? controlTypes.get("select") : null);
+    public Map<String, XFormsControl> getSelectFullControls() {
+        return (controlTypes != null) ? controlTypes.get("select") : null;
     }
 
     /**

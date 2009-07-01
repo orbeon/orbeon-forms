@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -96,7 +97,7 @@ public class XFormsServer extends ProcessorImpl {
 
         final Element filesElement;
         final Element actionElement;
-        final List serverEventsElements;
+        final List<Element> serverEventsElements;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -116,8 +117,7 @@ public class XFormsServer extends ProcessorImpl {
         // Gather server events first if any
         int serverEventsCount = 0;
         if (serverEventsElements != null && serverEventsElements.size() > 0) {
-            for (Iterator i = serverEventsElements.iterator(); i.hasNext();) {
-                final Element element = (Element) i.next();
+            for (Element element: serverEventsElements) {
 
                 final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
                 final List<Element> xxformsEventElements = serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME);
@@ -328,13 +328,12 @@ public class XFormsServer extends ProcessorImpl {
                         // Special handling of checkboxes blanking in noscript mode
                         if (isNoscript) {
                             // LinkedHashMap<String effectiveId, XFormsSelectControl control>
-                            final Map selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
+                            final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
 
                             if (selectFullControls != null) {
 
-                                for (Iterator j = selectFullControls.entrySet().iterator(); j.hasNext();) {
-                                    final Map.Entry currentEntry = (Map.Entry) j.next();
-                                    final String currentEffectiveId = (String) currentEntry.getKey();
+                                for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
+                                    final String currentEffectiveId = currentEntry.getKey();
                                     final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
 
                                     if (currentControl != null
@@ -515,7 +514,9 @@ public class XFormsServer extends ProcessorImpl {
      * @throws IOException
      * @throws SAXException
      */
-    private static void outputNoscriptResponse(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState, boolean allEvents, ExternalContext externalContext) throws IOException, SAXException {
+    private static void outputNoscriptResponse(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
+                                               ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
+                                               boolean allEvents, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
         // QUESTION: Do we actually need to cache if a xforms:submission[@replace = 'all'] happened?
         final XFormsState encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
@@ -580,7 +581,7 @@ public class XFormsServer extends ProcessorImpl {
             String submissionServerEvents = null;
             {
                 final XFormsModelSubmission activeSubmission = containingDocument.getClientActiveSubmission();
-                final List loads = containingDocument.getLoadsToRun();
+                final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
                 if (activeSubmission != null || (loads != null && loads.size() > 0)) {
                     final Document eventsDocument = Dom4jUtils.createDocument();
                     final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
@@ -597,9 +598,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Check for xxforms-load event (for portlet mode only!)
                     {
                         if (loads != null && loads.size() > 0) {
-                            for (Iterator i = loads.iterator(); i.hasNext();) {
-                                final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
-
+                            for (XFormsContainingDocument.Load load: loads) {
                                 if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
                                     // We need to submit the event so that the portlet can load the new path
                                     final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
@@ -730,12 +729,10 @@ public class XFormsServer extends ProcessorImpl {
                     ch.endElement();
                 }
                 {
-                    final List delayedEvents = containingDocument.getDelayedEvents();
+                    final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
                     if (delayedEvents != null && delayedEvents.size() > 0) {
                         final long currentTime = System.currentTimeMillis();
-                        for (Iterator i = delayedEvents.iterator(); i.hasNext();) {
-                            final XFormsContainingDocument.DelayedEvent delayedEvent = (XFormsContainingDocument.DelayedEvent) i.next();
-
+                        for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                                     new String[] {
                                             "delay",  Long.toString(delayedEvent.getTime() - currentTime),
@@ -756,7 +753,7 @@ public class XFormsServer extends ProcessorImpl {
                 // TODO: the following should be ordered in the order they were requested
                 // Output messages to display
                 {
-                    final List messages = containingDocument.getMessagesToRun();
+                    final List<XFormsContainingDocument.Message> messages = containingDocument.getMessagesToRun();
                     if (messages != null) {
                         outputMessagesInfo(ch, messages);
                     }
@@ -764,7 +761,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output loads
                 {
-                    final List loads = containingDocument.getLoadsToRun();
+                    final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
                     if (loads != null && loads.size() > 0) {
                         outputLoadsInfo(ch, loads);
                     }
@@ -772,7 +769,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output scripts
                 {
-                    final List scripts = containingDocument.getScriptsToRun();
+                    final List<XFormsContainingDocument.Script> scripts = containingDocument.getScriptsToRun();
                     if (scripts != null) {
                         outputScriptsInfo(ch, scripts);
                     }
@@ -851,16 +848,16 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void diffIndexState(ContentHandlerHelper ch, Map initialRepeatIdToIndex, Map currentRepeatIdToIndex) {
+    private static void diffIndexState(ContentHandlerHelper ch, Map<String, Integer> initialRepeatIdToIndex,
+                                       Map<String, Integer> currentRepeatIdToIndex) {
         if (currentRepeatIdToIndex.size() != 0) {
             boolean found = false;
-            for (Iterator i = currentRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String repeatId = (String) currentEntry.getKey();
-                final Integer newIndex = (Integer) currentEntry.getValue();
+            for (Map.Entry<String, Integer> currentEntry: currentRepeatIdToIndex.entrySet()) {
+                final String repeatId = currentEntry.getKey();
+                final Integer newIndex = currentEntry.getValue();
 
                 // Output information if there is a difference
-                final Integer oldIndex = (Integer) initialRepeatIdToIndex.get(repeatId);// may be null if there was no iteration
+                final Integer oldIndex = initialRepeatIdToIndex.get(repeatId);// may be null if there was no iteration
                 if (!newIndex.equals(oldIndex)) {
 
                     if (!found) {
@@ -955,9 +952,8 @@ public class XFormsServer extends ProcessorImpl {
                 });
     }
 
-    private static void outputMessagesInfo(ContentHandlerHelper ch, List messages) {
-        for (Iterator i = messages.iterator(); i.hasNext();) {
-            final XFormsContainingDocument.Message message = (XFormsContainingDocument.Message) i.next();
+    private static void outputMessagesInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Message> messages) {
+        for (XFormsContainingDocument.Message message: messages) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "message",
                     new String[]{"level", message.getLevel()});
             ch.text(message.getMessage());
@@ -965,10 +961,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputLoadsInfo(ContentHandlerHelper ch, List loads) {
-        for (Iterator i = loads.iterator(); i.hasNext();) {
-            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
-
+    public static void outputLoadsInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Load> loads) {
+        for (XFormsContainingDocument.Load load: loads) {
             if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
                         new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new", "show-progress", load.isShowProgress() ? null : "false" });
@@ -976,9 +970,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputScriptsInfo(ContentHandlerHelper ch, List scripts) {
-        for (Iterator i = scripts.iterator(); i.hasNext();) {
-            final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
+    public static void outputScriptsInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Script> scripts) {
+        for (XFormsContainingDocument.Script script: scripts) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
                     new String[]{ "name", script.getFunctionName(), "target-id", script.getEventTargetId(), "observer-id", script.getEventObserverId() });
         }

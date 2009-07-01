@@ -44,7 +44,7 @@ public class PooledXPathExpression {
     private Map variables;
 
     // Dynamic context
-    private Map<String, Object> variableToValueMap;
+    private Map<String, ValueRepresentation> variableToValueMap;
     private List contextItems;
     private int contextPosition;
 
@@ -267,7 +267,7 @@ public class PooledXPathExpression {
                 final String name = (String) entry.getKey();
                 final Variable variable = (Variable) entry.getValue();
 
-                final Object object = variableToValueMap.get(name);
+                final ValueRepresentation object = variableToValueMap.get(name);
                 if (object != null) {
                     // Convert Java object to Saxon object
                     final ValueRepresentation valueRepresentation = XFormsUtils.convertJavaObjectToSaxonObject(object);
@@ -327,7 +327,7 @@ public class PooledXPathExpression {
         this.contextPosition = contextPosition;
     }
 
-    public void setVariables(Map<String, Object> variableToValueMap) {
+    public void setVariables(Map<String, ValueRepresentation> variableToValueMap) {
         // NOTE: We used to attempt to decect whether the expression required variables or not and throw an exception,
         // but we can't really detect this because there may be variables in scope even if the expression does not use
         // them. Conversely, if there are undeclared variables, we let the XPath engine complain about that.

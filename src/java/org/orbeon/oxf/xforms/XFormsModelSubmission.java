@@ -264,7 +264,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             // XPath function library and namespace mappings
             final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-            final Map prefixToURIMap = container.getNamespaceMappings(submissionElement);
+            final Map<String, String> prefixToURIMap = container.getNamespaceMappings(submissionElement);
 
             try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
@@ -637,7 +637,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean isAsyncSubmission = isReplaceNone && "asynchronous".equals(resolvedMode);// for now we only support this with replace="none"
 
                 // Evaluate headers if any
-                final Map /* LinkedHashMap<String headerName, String[] headerValues> */ customHeaderNameValues = evaluateHeaders(pipelineContext, contextStack);
+                final Map<String, String[]> customHeaderNameValues = evaluateHeaders(pipelineContext, contextStack);
 
                 // Result information
                 ConnectionResult connectionResult = null;
@@ -1237,7 +1237,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     private NodeInfo evaluateTargetRef(PipelineContext pipelineContext, XFormsInstance defaultReplaceInstance, Item submissionElementContextItem,
-                                       Map prefixToURIMap, XFormsContextStack contextStack, FunctionLibrary functionLibrary,
+                                       Map<String, String> prefixToURIMap, XFormsContextStack contextStack, FunctionLibrary functionLibrary,
                                        XPathCache.FunctionContext functionContext) {
         final Object destinationObject;
         if (targetref == null) {
@@ -1365,20 +1365,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      * @param contextStack      context stack set to enclosing <xforms:submission>
      * @return                  LinkedHashMap<String headerName, String[] headerValues>, or null if no header elements
      */
-    private Map evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
-        final List headerElements = submissionElement.elements("header");
+    private Map<String, String[]> evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
+        final List<Element> headerElements = submissionElement.elements(XFormsConstants.XFORMS_HEADER_QNAME);
         if (headerElements.size() > 0) {
-            final Map headerNameValues = new LinkedHashMap();
+            final Map<String, String[]> headerNameValues = new LinkedHashMap<String, String[]>();
 
             // Iterate over all <xforms:header> elements
-            for (Iterator i = headerElements.iterator(); i.hasNext();) {
-                final Element currentHeaderElement = (Element) i.next();
-
+            for (Element currentHeaderElement: headerElements) {
                 contextStack.pushBinding(pipelineContext, currentHeaderElement);
                 final XFormsContextStack.BindingContext currentHeaderBindingContext = contextStack.getCurrentBindingContext();
                 if (currentHeaderBindingContext.isNewBind()) {
                     // This means there was @nodeset or @bind so we must iterate
-                    final List currentNodeset = contextStack.getCurrentNodeset();
+                    final List<Item> currentNodeset = contextStack.getCurrentNodeset();
                     final int currentSize = currentNodeset.size();
                     if (currentSize > 0) {
                         // Push all iterations in turn
@@ -1409,7 +1407,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      * @param headerNameValues      LinkedHashMap<String headerName, String[] headerValues> to update
      * @param currentHeaderElement  <xforms:header> element to evaluate
      */
-    private void handleHeaderElement(PipelineContext pipelineContext, XFormsContextStack contextStack, Map headerNameValues, Element currentHeaderElement) {
+    private void handleHeaderElement(PipelineContext pipelineContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues, Element currentHeaderElement) {
         final String headerName;
         {
             final Element headerNameElement = currentHeaderElement.element("name");

@@ -94,14 +94,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Extract list of instances ids
         {
-            List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+            final List<Element> instanceContainers = modelElement.elements(XFormsConstants.XFORMS_INSTANCE_QNAME);
             instanceIds = new ArrayList<String>(instanceContainers.size());
-            if (instanceContainers.size() > 0) {
-                for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
-                    final Element instanceContainer = (Element) i.next();
-                    final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
-                    instanceIds.add(instanceId);
-                }
+            for (Element instanceContainer: instanceContainers) {
+                final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
+                instanceIds.add(instanceId);
             }
         }
 
@@ -111,8 +108,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Get <xforms:submission> elements (may be missing)
         {
-            for (Iterator i = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
-                final Element submissionElement = (Element) i.next();
+            final List<Element> submissionElements = modelElement.elements(XFormsConstants.XFORMS_SUBMISSION_QNAME);
+            for (Element submissionElement: submissionElements) {
                 final String submissionId = submissionElement.attributeValue("id");
 
                 if (this.submissions == null)

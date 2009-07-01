@@ -275,4 +275,18 @@
         <p:output name="data" ref="data"/>
     </p:processor>
 
+    <!-- TODO: example of oxf:add-attribute processor adding content-disposition information -->
+    <!-- TODO: build file name dynamically using requested document id? -->
+    <!--<p:processor name="oxf:add-attribute">-->
+        <!--<p:input name="data" href="#pdf-data"/>-->
+        <!--<p:input name="config">-->
+            <!--<config>-->
+                <!--<match>/*</match>-->
+                <!--<attribute-name>content-disposition</attribute-name>-->
+                <!--<attribute-value>attachment; filename=form.pdf</attribute-value>-->
+            <!--</config>-->
+        <!--</p:input>-->
+        <!--<p:output name="data" ref="data"/>-->
+    <!--</p:processor>-->
+
 </p:config>

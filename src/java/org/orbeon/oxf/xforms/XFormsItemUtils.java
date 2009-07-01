@@ -268,7 +268,7 @@ public class XFormsItemUtils {
                         final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
                         //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                        final List<NodeInfo> currentNodeSet = currentBindingContext.getNodeset();
+                        final List<org.orbeon.saxon.om.Item> currentNodeSet = currentBindingContext.getNodeset();
                         if (currentNodeSet != null) {
                             final Stack<NodeInfo> nodeStack = new Stack<NodeInfo>();
                             final int iterationCount = currentNodeSet.size();
@@ -277,7 +277,7 @@ public class XFormsItemUtils {
                                 // Push iteration
                                 contextStack.pushIteration(currentPosition);
                                 {
-                                    final NodeInfo currentNodeInfo = currentNodeSet.get(currentPosition - 1);
+                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
 
                                     // NOTE: We support relevance of items as an extension to XForms.
                                     final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);

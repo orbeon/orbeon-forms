@@ -718,7 +718,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output itemset information
                 if (allEvents || containingDocument.isDirtySinceLastRequest()) {
                     // Diff itemset information
-                    final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
+                    final Map<String, List<XFormsItemUtils.Item>> itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: Handle allEvents case. Something wrong here?
                     outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
@@ -888,7 +888,7 @@ public class XFormsServer extends ProcessorImpl {
             itemsetUpdate = itemsetsFull2;
         } else {
             // Merge differences
-            itemsetUpdate = new HashMap<String, List<XFormsItemUtils.Item>>();
+            itemsetUpdate = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
 
             for (Map.Entry<String, List<XFormsItemUtils.Item>> currentEntry: itemsetsFull2.entrySet()) {
                 final String itemsetId = currentEntry.getKey();
@@ -994,15 +994,15 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{"control-id", helpEffectiveControlId});
     }
 
-    private static void outputItemsets(PipelineContext pipelineContext, ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
+    private static void outputItemsets(PipelineContext pipelineContext, ContentHandlerHelper ch,
+                                       Map<String, List<XFormsItemUtils.Item>> itemsetIdToItemsetInfoMap) {
         if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
             // There are some xforms:itemset controls
 
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-            for (Iterator i = itemsetIdToItemsetInfoMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String itemsetId = (String) currentEntry.getKey();
-                final List items = (List) currentEntry.getValue();
+            for (Map.Entry<String, List<XFormsItemUtils.Item>> currentEntry: itemsetIdToItemsetInfoMap.entrySet()) {
+                final String itemsetId = currentEntry.getKey();
+                final List<XFormsItemUtils.Item> items = currentEntry.getValue();
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
                 final String result = XFormsItemUtils.getJSONTreeInfo(pipelineContext, items, null);// TODO: pass LocationData

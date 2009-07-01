@@ -94,10 +94,10 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
                 sb.append("</headers>");
 
-                final DocumentInfo headersDocument = TransformerUtils.stringToTinyTree(sb.toString());
+                final Item headersDocument = TransformerUtils.stringToTinyTree(sb.toString());
 
                 return XPathCache.evaluateAsExtent(getPipelineContext(), Collections.singletonList(headersDocument), 1,
-                        "/headers/header", Collections.EMPTY_MAP, null, null, null, null, getLocationData()).iterate(null);// NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+                        "/headers/header", XPathCache.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate(null);// NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
             } else {
                 // No headers
                 return EmptyIterator.getInstance();

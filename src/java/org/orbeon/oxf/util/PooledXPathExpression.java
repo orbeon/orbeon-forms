@@ -44,7 +44,7 @@ public class PooledXPathExpression {
     private Map variables;
 
     // Dynamic context
-    private Map variableToValueMap;
+    private Map<String, Object> variableToValueMap;
     private List contextItems;
     private int contextPosition;
 
@@ -146,12 +146,12 @@ public class PooledXPathExpression {
     /**
      * Evaluate and return a List of Item objects.
      */
-    public List evaluateKeepItems(Object functionContext) throws XPathException {
+    public List<Item> evaluateKeepItems(Object functionContext) throws XPathException {
         final Item contextItem = (contextItems.size() > contextPosition - 1) ? (Item) contextItems.get(contextPosition - 1) : null;
         final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
-        final ArrayList result = new ArrayList();
+        final List<Item> result = new ArrayList<Item>();
         Item next;
         while ((next = iter.next()) != null) {
             result.add(next);
@@ -170,8 +170,8 @@ public class PooledXPathExpression {
         return new SequenceExtent(iter);
     }
 
-    private List convertToJavaKeepNodeInfo(SequenceExtent extent, XPathContext context) throws XPathException {
-        final List result = new ArrayList(extent.getLength());
+    private List<Object> convertToJavaKeepNodeInfo(SequenceExtent extent, XPathContext context) throws XPathException {
+        final List<Object> result = new ArrayList<Object>(extent.getLength());
         final SequenceIterator iter = extent.iterate(null);
         while (true) {
             final Item currentItem = iter.next();
@@ -327,7 +327,7 @@ public class PooledXPathExpression {
         this.contextPosition = contextPosition;
     }
 
-    public void setVariables(Map variableToValueMap) {
+    public void setVariables(Map<String, Object> variableToValueMap) {
         // NOTE: We used to attempt to decect whether the expression required variables or not and throw an exception,
         // but we can't really detect this because there may be variables in scope even if the expression does not use
         // them. Conversely, if there are undeclared variables, we let the XPath engine complain about that.

@@ -37,12 +37,14 @@ import java.util.*;
  */
 public class XFormsContextStack {
 
+    private static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
+
     private XBLContainer container;
     private XFormsContainingDocument containingDocument;
     private XFormsFunction.Context functionContext;
     private BindingContext parentBindingContext;
 
-    private Stack contextStack = new Stack();
+    private Stack<BindingContext> contextStack = new Stack<BindingContext>();
 
     // COnstructor for XBLContainer and XFormsActionInterpreter
     public XFormsContextStack(XBLContainer container) {
@@ -91,8 +93,8 @@ public class XFormsContextStack {
 
         if (xformsModel != null && xformsModel.getDefaultInstance() != null) {
             // Push the default context if there is a model with an instance
-            final NodeInfo defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
-            final List defaultNodeset = Arrays.asList(new Object[]{ defaultNode });
+            final Item defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
+            final List<Item> defaultNodeset = Arrays.asList(defaultNode);
             contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, defaultNode));
         } else {
             // Push parent context
@@ -102,7 +104,7 @@ public class XFormsContextStack {
                 contextStack.push(containerBindingContext);
             } else {
                 // Push empty context
-                contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
+                contextStack.push(new BindingContext(null, xformsModel, EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
             }
         }
 
@@ -115,7 +117,7 @@ public class XFormsContextStack {
     private void addModelVariables(PipelineContext pipelineContext, XFormsModel xformsModel) {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
-        List /* <VariableInfo> */ variableInfos = null;
+        List<BindingContext.VariableInfo> variableInfos = null;
         for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); ) {
             final Element currentVariableElement = (Element) i.next();
 
@@ -132,7 +134,7 @@ public class XFormsContextStack {
 
             // Add VariableInfo created during above pushVariable(). There must be only one!
             if (variableInfos == null)
-                variableInfos = new ArrayList();
+                variableInfos = new ArrayList<BindingContext.VariableInfo>();
 
             variableInfos.addAll(getCurrentBindingContext().getVariables());
         }
@@ -170,7 +172,7 @@ public class XFormsContextStack {
             return;
 
         // Create ancestors-or-self list
-        final List ancestorsOrSelf = new ArrayList();
+        final List<BindingContext> ancestorsOrSelf = new ArrayList<BindingContext>();
         while (controlBindingContext != null) {
             ancestorsOrSelf.add(controlBindingContext);
             controlBindingContext = controlBindingContext.getParent();
@@ -196,7 +198,7 @@ public class XFormsContextStack {
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
             final XFormsModel xformsModel = container.getDefaultModel();
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
+            contextStack.push(new BindingContext(null, xformsModel, EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
         } else if (eventObserver instanceof XFormsControl) {
             setBinding((XFormsControl) eventObserver);
         } else if (eventObserver instanceof XFormsModel) {
@@ -293,17 +295,17 @@ public class XFormsContextStack {
             // Handle nodeset
             final boolean isNewBind;
             final int newPosition;
-            final List newNodeset;
+            final List<Item> newNodeset;
             final boolean hasOverriddenContext;
             final Item contextItem;
             final boolean isPushModelVariables;
-            final List variableInfo;
+            final List<BindingContext.VariableInfo> variableInfo;
             {
                 if (bindId != null) {
                     // Resolve the bind id to a nodeset
                     // TODO: dispatch xforms-binding-exception if no bind is found
                     final XFormsModelBinds binds = newModel.getBinds();
-                    newNodeset = (binds != null) ?  binds.getBindNodeset(bindId, currentBindingContext.getSingleItem()) : Collections.EMPTY_LIST;
+                    newNodeset = (binds != null) ?  binds.getBindNodeset(bindId, currentBindingContext.getSingleItem()) : EMPTY_ITEM_LIST;
                     hasOverriddenContext = false;
                     contextItem = currentBindingContext.getSingleItem();
                     isNewBind = true;
@@ -343,7 +345,7 @@ public class XFormsContextStack {
                         popBinding();
                     } else {
                         // Otherwise we consider we can't evaluate
-                        newNodeset = Collections.EMPTY_LIST;
+                        newNodeset = EMPTY_ITEM_LIST;
                     }
 
                     // Restore optional context
@@ -742,7 +744,7 @@ public class XFormsContextStack {
     public static class BindingContext {
         private BindingContext parent;
         private XFormsModel model;
-        private List nodeset;
+        private List<Item> nodeset;
         private int position = 1;
         private String elementId;
         private boolean newBind;
@@ -751,11 +753,11 @@ public class XFormsContextStack {
         private boolean hasOverriddenContext;
         private Item contextItem;
 
-        private List /* <VariableInfo> */ variables;
+        private List<VariableInfo> variables;
 
         private Map inScopeVariablesMap; // cached variable map
 
-        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String elementId, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
+        public BindingContext(BindingContext parent, XFormsModel model, List<Item> nodeSet, int position, String elementId, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
             this.parent = parent;
             this.model = model;
             this.nodeset = nodeSet;
@@ -780,7 +782,7 @@ public class XFormsContextStack {
 
         public BindingContext(BindingContext parent, Element controlElement, LocationData locationData, String variableName, ValueRepresentation variableValue) {
             this(parent, parent.getModel(), parent.getNodeset(), parent.getPosition(), parent.getElementId(), false, controlElement, locationData, false, parent.getContextItem());
-            variables = new ArrayList();
+            variables = new ArrayList<VariableInfo>();
             variables.add(new VariableInfo(variableName, variableValue));
         }
 
@@ -792,7 +794,7 @@ public class XFormsContextStack {
             return model;
         }
 
-        public List<NodeInfo> getNodeset() {
+        public List<Item> getNodeset() {
             return nodeset;
         }
 
@@ -848,12 +850,12 @@ public class XFormsContextStack {
             return (Item) nodeset.get(position - 1);
         }
 
-        public void setVariables(List /* <VariableInfo> */ variableInfo) {
+        public void setVariables(List<VariableInfo> variableInfo) {
             this.variables = variableInfo;
             this.inScopeVariablesMap = null;
         }
 
-        public List /* <VariableInfo> */ getVariables() {
+        public List<VariableInfo> getVariables() {
             return variables;
         }
 
@@ -869,7 +871,7 @@ public class XFormsContextStack {
         public Map /* <String, ValueRepresentation> */ getInScopeVariables(boolean useCache) {
             // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
             if (inScopeVariablesMap == null || !useCache) {
-                final Map tempVariablesMap = new HashMap();
+                final Map<String, ValueRepresentation> tempVariablesMap = new HashMap<String, ValueRepresentation>();
 
                 BindingContext currentBindingContext = this;
                 do {
@@ -896,7 +898,7 @@ public class XFormsContextStack {
             return inScopeVariablesMap;
         }
 
-        private static class VariableInfo {
+        public static class VariableInfo {
             private String variableName;
             private ValueRepresentation variableValue;
 

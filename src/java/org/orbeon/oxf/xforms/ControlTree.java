@@ -37,7 +37,7 @@ public class ControlTree implements Cloneable {
     private Map<String, Map<String, XFormsControl>> controlTypes;   // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
 
     // Map<String effectiveId, EventSchedule eventSchedule>
-    private Map<String, XFormsControls.EventSchedule> eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
+    private Map<String, XFormsControls.EventSchedule> eventsToDispatch = new LinkedHashMap<String, XFormsControls.EventSchedule>();
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
@@ -94,7 +94,7 @@ public class ControlTree implements Cloneable {
                 children = null;
                 effectiveIdsToControls = null;
                 controlTypes = null;
-                eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
+                clearEventsToDispatch();
             }
         }
     }
@@ -288,12 +288,12 @@ public class ControlTree implements Cloneable {
         this.isBindingsDirty = true;
     }
 
-    public Map getEventsToDispatch() {
+    public Map<String, XFormsControls.EventSchedule> getEventsToDispatch() {
         return eventsToDispatch;
     }
 
     public void clearEventsToDispatch() {
-        this.eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
+        this.eventsToDispatch = new LinkedHashMap<String, XFormsControls.EventSchedule>();
     }
 
     public void setChildren(List<XFormsControl> children) {

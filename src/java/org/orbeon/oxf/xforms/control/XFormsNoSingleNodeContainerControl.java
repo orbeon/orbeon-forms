@@ -23,7 +23,7 @@ import java.util.List;
 
 public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl implements XFormsContainerControl {
 
-    private List children;
+    private List<XFormsControl> children;
 
     public XFormsNoSingleNodeContainerControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -31,11 +31,11 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
 
     public void addChild(XFormsControl XFormsControl) {
         if (children == null)
-            children = new ArrayList();
+            children = new ArrayList<XFormsControl>();
         children.add(XFormsControl);
     }
 
-    public List getChildren() {
+    public List<XFormsControl> getChildren() {
         return children;
     }
 
@@ -43,7 +43,7 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
         return (children != null) ? children.size() : 0;
     }
 
-    protected void setChildren(List children) {
+    protected void setChildren(List<XFormsControl> children) {
         this.children = children;
     }
 
@@ -68,7 +68,7 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
 
         // Clone children if any
         if (children != null) {
-            cloned.children = new ArrayList(children.size());
+            cloned.children = new ArrayList<XFormsControl>(children.size());
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentChildControl = (XFormsControl) i.next();
                 final XFormsControl currentChildClone = (XFormsControl) currentChildControl.clone();

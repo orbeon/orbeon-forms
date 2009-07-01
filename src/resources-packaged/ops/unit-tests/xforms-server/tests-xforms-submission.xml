@@ -1183,14 +1183,14 @@
                                     <event type="xforms-insert" target="source-instance" inserted-nodes="book"/>
                                     <event type="xforms-delete" target="source-instance" deleted-nodes="book"/>
                                     <event type="xforms-submit-done" target="replace-instance"/>
-                                    <event type="xforms-enabled" target="lang1"/>
-                                    <event type="xforms-optional" target="lang1"/>
-                                    <event type="xforms-readwrite" target="lang1"/>
-                                    <event type="xforms-valid" target="lang1"/>
                                     <event type="xforms-enabled" target="title1"/>
                                     <event type="xforms-optional" target="title1"/>
                                     <event type="xforms-readwrite" target="title1"/>
                                     <event type="xforms-valid" target="title1"/>
+                                    <event type="xforms-enabled" target="lang1"/>
+                                    <event type="xforms-optional" target="lang1"/>
+                                    <event type="xforms-readwrite" target="lang1"/>
+                                    <event type="xforms-valid" target="lang1"/>
                                 </events>
                             </instance>
                         </instances>

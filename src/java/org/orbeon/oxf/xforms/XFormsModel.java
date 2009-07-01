@@ -83,7 +83,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Basic check trying to make sure this is an XForms model
         // TODO: should rather use schema here or when obtaining document passed to this constructor
         final Element modelElement = modelDocument.getRootElement();
-        String rootNamespaceURI = modelElement.getNamespaceURI();
+        final String rootNamespaceURI = modelElement.getNamespaceURI();
         if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
             throw new ValidationException("Root element of XForms model must be in namespace '"
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
@@ -234,7 +234,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Return all XFormsInstance objects for this model, in the order they appear in the model.
      */
-    public List getInstances() {
+    public List<XFormsInstance> getInstances() {
         return instances;
     }
 
@@ -434,7 +434,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
 
         // Then get instances from static state if necessary
-        final Map staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
+        final Map<String, SharedXFormsInstance> staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
         if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
             for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
@@ -489,9 +489,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
             {
                 // Build initial instance documents
-                final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+                final List<Element> instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map staticStateInstancesMap = staticState.isInitialized() ? staticState.getSharedInstancesMap() : null;
+                final Map<String, SharedXFormsInstance> staticStateInstancesMap = staticState.isInitialized() ? staticState.getSharedInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -560,7 +560,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                             final String srcAttribute = instanceContainerElement.attributeValue("src");
                             final String resourceAttribute = instanceContainerElement.attributeValue("resource");
-                            final List children = instanceContainerElement.elements();
+                            final List<Element> children = instanceContainerElement.elements();
                             if (srcAttribute != null) {
                                 // "If the src attribute is given, then it takes precedence over inline content and the
                                 // resource attribute, and the XML data for the instance is obtained from the link."
@@ -650,9 +650,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (staticState != null && !staticState.isInitialized()) {
                 // The static state is open to adding instances
                 if (getInstances() != null) {
-                    for (Iterator instanceIterator = getInstances().iterator(); instanceIterator.hasNext();) {
-                        final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
-
+                    for (XFormsInstance currentInstance : getInstances()) {
                         if (currentInstance instanceof SharedXFormsInstance) {
 
                             // NOTE: We add all shared instances, even the globally shared ones, and the static state
@@ -927,8 +925,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void synchronizeInstanceDataEventState() {
         if (instances != null) {
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+            for (XFormsInstance currentInstance : instances) {
                 currentInstance.synchronizeInstanceDataEventState();
             }
         }
@@ -973,8 +970,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 containingDocument.startHandleOperation("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
             // Clear validation state
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+            for (XFormsInstance currentInstance : instances) {
+                XFormsUtils.iterateInstanceData(currentInstance, new XFormsUtils.InstanceWalker() {
                     public void walk(NodeInfo nodeInfo) {
                         InstanceData.clearValidationState(nodeInfo);
                     }
@@ -987,8 +984,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Validate using schemas if needed
             if (mustSchemaValidate) {
                 // Apply schemas to all instances
-                for (Iterator i = instances.iterator(); i.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                for (XFormsInstance currentInstance : instances) {
                     // Currently we don't support validating read-only instances
                     if (!currentInstance.isReadOnly()) {
                         if (!schemaValidator.validateInstance(currentInstance)) {
@@ -1006,12 +1002,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance instance = (XFormsInstance) i.next();
-                if (invalidInstances.get(instance.getEffectiveId()) == null) {
-                    container.dispatchEvent(pipelineContext, new XXFormsValidEvent(instance));
+            for (XFormsInstance currentInstance : instances) {
+                if (invalidInstances.get(currentInstance.getEffectiveId()) == null) {
+                    container.dispatchEvent(pipelineContext, new XXFormsValidEvent(currentInstance));
                 } else {
-                    container.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(instance));
+                    container.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(currentInstance));
                 }
             }
 

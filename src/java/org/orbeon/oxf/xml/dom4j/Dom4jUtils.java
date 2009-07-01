@@ -422,8 +422,8 @@ public class Dom4jUtils {
     /**
      * Return a Map of namespaces in scope on the given element, without the default namespace.
      */
-    public static Map getNamespaceContextNoDefault(Element element) {
-        final Map namespaces = getNamespaceContext(element);
+    public static Map<String, String> getNamespaceContextNoDefault(Element element) {
+        final Map<String, String> namespaces = getNamespaceContext(element);
         namespaces.remove("");
         return namespaces;
     }

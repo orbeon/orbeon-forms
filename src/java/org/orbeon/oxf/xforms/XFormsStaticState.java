@@ -163,7 +163,7 @@ public class XFormsStaticState {
      *
      * @return  List of PathMatcher
      */
-    public List getVersionedPathMatchers() {
+    public List<URLRewriterUtils.PathMatcher> getVersionedPathMatchers() {
         return versionedPathMatchers;
     }
 
@@ -585,7 +585,7 @@ public class XFormsStaticState {
      *
      * @return  Map<String, SharedXFormsInstance
      */
-    public Map getSharedInstancesMap() {
+    public Map<String, SharedXFormsInstance> getSharedInstancesMap() {
         if (!initialized)
             throw new IllegalStateException("Cannot get instances from static before initialization.");
 
@@ -605,11 +605,11 @@ public class XFormsStaticState {
         return controlsDocument;
     }
 
-    public Map getModelDocuments() {
+    public Map<String, Document> getModelDocuments() {
         return modelDocuments;
     }
 
-    public Map getScripts() {
+    public Map<String, String> getScripts() {
         return xxformsScripts;
     }
 
@@ -625,7 +625,7 @@ public class XFormsStaticState {
         return baseURI;
     }
 
-    public Map getExternalEventsMap() {
+    public Map<String, String> getExternalEventsMap() {
         return externalEventsMap;
     }
 
@@ -641,7 +641,7 @@ public class XFormsStaticState {
         return locationData;
     }
 
-    public Map getNonDefaultProperties() {
+    public Map<String, Object> getNonDefaultProperties() {
         return nonDefaultProperties;
     }
     
@@ -685,40 +685,40 @@ public class XFormsStaticState {
         }
     }
 
-    public Map getEventNamesMap() {
+    public Map<String, String> getEventNamesMap() {
         return eventNamesMap;
     }
 
-    public List getEventHandlers(String id) {
-        return (List) eventHandlersMap.get(id);
+    public List<XFormsEventHandler> getEventHandlers(String id) {
+        return eventHandlersMap.get(id);
     }
 
-    public Map getControlInfoMap() {
+    public Map<String, ControlInfo> getControlInfoMap() {
         return controlInfoMap;
     }
 
-    public Map getRepeatControlInfoMap() {
-        return (Map) controlTypes.get("repeat");
+    public Map<String, ControlInfo> getRepeatControlInfoMap() {
+        return controlTypes.get("repeat");
     }
 
     public Element getControlElement(String prefixeId) {
-        return ((XFormsStaticState.ControlInfo) controlInfoMap.get(prefixeId)).getElement();
+        return controlInfoMap.get(prefixeId).getElement();
     }
 
     public Element getLabelElement(String prefixeId) {
-        return (Element) labelsMap.get(prefixeId);
+        return labelsMap.get(prefixeId);
     }
 
     public Element getHelpElement(String prefixeId) {
-        return (Element) helpsMap.get(prefixeId);
+        return helpsMap.get(prefixeId);
     }
 
     public Element getHintElement(String prefixeId) {
-        return (Element) hintsMap.get(prefixeId);
+        return hintsMap.get(prefixeId);
     }
 
     public Element getAlertElement(String prefixeId) {
-        return (Element) alertsMap.get(prefixeId);
+        return alertsMap.get(prefixeId);
     }
 
     /**
@@ -740,12 +740,12 @@ public class XFormsStaticState {
      * @param element       Element to get namsepace mapping for
      * @return              Map<String prefix, String uri>
      */
-    public Map getNamespaceMappings(String prefix, Element element) {
+    public Map<String, String> getNamespaceMappings(String prefix, Element element) {
         final String id = element.attributeValue("id");
         if (id != null) {
             // There is an id attribute
             final String prefixedId = (prefix != null) ? prefix + id : id; 
-            final Map cachedMap = (Map) namespacesMap.get(prefixedId);
+            final Map<String, String> cachedMap = namespacesMap.get(prefixedId);
             if (cachedMap != null) {
                 return cachedMap;
             } else {
@@ -1248,7 +1248,7 @@ public class XFormsStaticState {
             sb.append(classes);
     }
 
-    public List getOfflineInsertTriggerIds() {
+    public List<String> getOfflineInsertTriggerIds() {
         return offlineInsertTriggerIds;
     }
 

@@ -46,45 +46,44 @@ import java.util.*;
 
 public class XBLBindings {
 
-    private final XFormsStaticState staticState;    // associated static state
-    private Map namespacesMap;                      // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
+    private final XFormsStaticState staticState;            // associated static state
+    private Map<String, Map<String, String>> namespacesMap; // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
 
-    private Map xblComponentsFactories;        // Map<QName bindingQName, Factory> of QNames to component factory
-    private Map xblComponentBindings;          // Map<QName bindingQName, Element bindingElement> of QNames to bindings
-    private Map xblFullShadowTrees;            // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
-    private Map xblCompactShadowTrees;         // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
-    private Map xblBindingIds;                 // Map<String treePrefixedId, String bindingId>
-    private List xblScripts;                   // List<Element xblScriptElements>
-    private List xblStyles;                    // List<Element xblStyleElements>
-    private Map xblHandlers;                   // Map<QName bindingQName, List<Element handlerElement>>
-    private Map xblImplementations;            // Map<QName bindingQName, List<Element modelElement>>
+    private Map<QName, XFormsControlFactory.Factory> xblComponentsFactories;    // Map<QName bindingQName, Factory> of QNames to component factory
+    private Map<QName, Element> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
+    private Map<String, Document> xblFullShadowTrees;       // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
+    private Map<String, Document> xblCompactShadowTrees;    // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
+    private Map<String, String> xblBindingIds;              // Map<String treePrefixedId, String bindingId>
+    private List<Element> xblScripts;                       // List<Element xblScriptElements>
+    private List<Element> xblStyles;                        // List<Element xblStyleElements>
+    private Map<QName, List<Element>> xblHandlers;          // Map<QName bindingQName, List<Element handlerElement>>
+    private Map<QName, List<Document>> xblImplementations;  // Map<QName bindingQName, List<Document>>
 
-    public XBLBindings(XFormsStaticState staticState, Map namespacesMap, Element staticStateElement) {
+    public XBLBindings(XFormsStaticState staticState, Map<String, Map<String, String>> namespacesMap, Element staticStateElement) {
 
         this.staticState = staticState;
         this.namespacesMap = namespacesMap;
 
-        final List xblElements = (staticStateElement != null) ? staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME) : Collections.EMPTY_LIST;
+        final List<Element> xblElements = (staticStateElement != null) ? staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME) : Collections.EMPTY_LIST;
         if (xblElements.size() > 0) {
-            xblComponentsFactories = new HashMap();
-            xblComponentBindings = new HashMap();
-            xblFullShadowTrees = new HashMap();
-            xblCompactShadowTrees = new HashMap();
-            xblBindingIds = new HashMap();
+            xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
+            xblComponentBindings = new HashMap<QName, Element>();
+            xblFullShadowTrees = new HashMap<String, Document>();
+            xblCompactShadowTrees = new HashMap<String, Document>();
+            xblBindingIds = new HashMap<String, String>();
 
             int xblCount = 0;
             int xblBindingCount = 0;
-            for (Iterator i = xblElements.iterator(); i.hasNext(); xblCount++) {
-                final Element currentXBLElement = (Element) i.next();
+            for (Element currentXBLElement: xblElements) {
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document currentXBLDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentXBLElement);
 
                 // Extract xbl:xbl/xbl:script
                 // TODO: should do this differently, in order to include only the scripts and resources actually used
-                final List scriptElements = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_SCRIPT_QNAME);
+                final List<Element> scriptElements = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_SCRIPT_QNAME);
                 if (scriptElements != null && scriptElements.size() > 0) {
                     if (xblScripts == null)
-                        xblScripts = new ArrayList();
+                        xblScripts = new ArrayList<Element>();
                     xblScripts.addAll(scriptElements);
                 }
 
@@ -114,12 +113,13 @@ public class XBLBindings {
                         {
                             final Element handlersElement = currentBindingElement.element(XFormsConstants.XBL_HANDLERS_QNAME);
                             if (handlersElement != null) {
-                                final List handlerElements = handlersElement.elements(XFormsConstants.XBL_HANDLER_QNAME);
+                                final List<Element> handlerElements = handlersElement.elements(XFormsConstants.XBL_HANDLER_QNAME);
 
                                 if (xblHandlers == null) {
-                                    xblHandlers = new LinkedHashMap();
+                                    xblHandlers = new LinkedHashMap<QName, List<Element>>();
                                 }
 
+//                                xxx TODO: WIP: get unique ids for handlers
                                 xblHandlers.put(currentQNameMatch, handlerElements);
                             }
                         }
@@ -129,13 +129,13 @@ public class XBLBindings {
                             final Element implementationElement = currentBindingElement.element(XFormsConstants.XBL_IMPLEMENTATION_QNAME);
                             if (implementationElement != null) {
                                 // TODO: check if really need to pass detach == true
-                                final List modelElements = extractChildrenModels(implementationElement, true);
+                                final List<Document> modelDocuments = extractChildrenModels(implementationElement, true);
 
                                 if (xblImplementations == null) {
-                                    xblImplementations = new LinkedHashMap();
+                                    xblImplementations = new LinkedHashMap<QName, List<Document>>();
                                 }
 
-                                xblImplementations.put(currentQNameMatch, modelElements);
+                                xblImplementations.put(currentQNameMatch, modelDocuments);
                             }
                         }
 
@@ -146,10 +146,10 @@ public class XBLBindings {
                             if (resourcesElements != null) {
                                 for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
                                     final Element currentResourcesElement = (Element) k.next();
-                                    final List styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
+                                    final List<Element> styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
                                     if (styleElements != null && styleElements.size() > 0) {
                                         if (xblStyles == null) {
-                                            xblStyles = new ArrayList(styleElements);
+                                            xblStyles = new ArrayList<Element>(styleElements);
                                         } else {
                                             xblStyles.addAll(styleElements);
                                         }
@@ -166,15 +166,13 @@ public class XBLBindings {
         }
     }
 
-    private static List extractChildrenModels(Element parentElement, boolean detach) {
+    private static List<Document> extractChildrenModels(Element parentElement, boolean detach) {
 
-        final List result = new ArrayList();
-        final List modelElements = parentElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
+        final List<Document> result = new ArrayList<Document>();
+        final List<Element> modelElements = parentElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
 
         if (modelElements.size() > 0) {
-            for (Iterator i = modelElements.iterator(); i.hasNext();) {
-                final Element currentModelElement = (Element) i.next();
-
+            for (Element currentModelElement: modelElements) {
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement, detach);
                 result.add(modelDocument);
             }
@@ -185,7 +183,7 @@ public class XBLBindings {
 
     public void processElementIfNeeded(Element controlElement, String controlPrefixedId, LocationData locationData, PipelineContext pipelineContext,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
-                                       FastStringBuffer repeatHierarchyStringBuffer, Stack repeatAncestorsStack) {
+                                       FastStringBuffer repeatHierarchyStringBuffer, Stack<String> repeatAncestorsStack) {
         if (xblComponentBindings != null) {
             final Element bindingElement = (Element) xblComponentBindings.get(controlElement.getQName());
             if (bindingElement != null) {
@@ -202,10 +200,9 @@ public class XBLBindings {
 
                     // Register models placed under xbl:implementation
                     if (xblImplementations != null) {
-                        final List implementationModelDocuments = (List) xblImplementations.get(controlElement.getQName());
+                        final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
                         if (implementationModelDocuments.size() > 0) {
-                            for (Iterator iterator = implementationModelDocuments.iterator(); iterator.hasNext();) {
-                                final Document currentModelDocument = (Document) iterator.next();
+                            for (Document currentModelDocument: implementationModelDocuments) {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
@@ -215,10 +212,10 @@ public class XBLBindings {
 
                     // Extract and register models from within the template
                     {
-                        final List extractedModels = XFormsStaticState.extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
+                        final List<Document> extractedModels = XFormsStaticState.extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
                         if (extractedModels.size() > 0) {
-                            for (Iterator i = extractedModels.iterator(); i.hasNext();) {
-                                final Document currentModelDocument = (Document) i.next();
+                            for (Iterator<Document> i = extractedModels.iterator(); i.hasNext();) {
+                                final Document currentModelDocument = i.next();
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
@@ -241,11 +238,11 @@ public class XBLBindings {
 
                     // Gather xbl:handlers/xbl:handler attached to bound node
                     if (xblHandlers != null) {
-                        final List handlerElements = (List) xblHandlers.get(controlElement.getQName());
+                        final List<Element> handlerElements = (List<Element>) xblHandlers.get(controlElement.getQName());
 
                         if (handlerElements != null) {
-                            for (Iterator k = handlerElements.iterator(); k.hasNext();) {
-                                final Element currentHandlerElement = (Element) k.next();
+                            for (Iterator<Element> k = handlerElements.iterator(); k.hasNext();) {
+                                final Element currentHandlerElement = k.next();
 
                                 // Register xbl:handler as an action handler
                                 // NOTE: xbl:handler has similar attributes as XForms actions, in particular @event, @phase, etc.
@@ -278,7 +275,7 @@ public class XBLBindings {
      * @return                  shadow tree document
      */
     private Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper,
-                                                    final Element boundElement, Element binding, Map namespaceMappings, final String prefix) {
+                                                    final Element boundElement, Element binding, Map<String, Map<String, String>> namespaceMappings, final String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -299,11 +296,11 @@ public class XBLBindings {
                     final List resultingNodes;
                     if (isXBLContent) {
                         final String includesAttribute = element.attributeValue("includes");
-                        final List contentToInsert;
+                        final List<Node> contentToInsert;
                         if (includesAttribute == null) {
                             // All bound node content must be copied over
-                            final List elementContent = boundElement.content();
-                            final List clonedContent = new ArrayList();
+                            final List<Node> elementContent = boundElement.content();
+                            final List<Node> clonedContent = new ArrayList<Node>();
                             for (Iterator i = elementContent.iterator(); i.hasNext();) {
                                 final Node node = (Node) i.next();
                                 if (node instanceof Element) {
@@ -328,7 +325,7 @@ public class XBLBindings {
 
                             if (elements.size() > 0) {
                                 // Clone all the resulting elements
-                                contentToInsert = new ArrayList(elements.size());
+                                contentToInsert = new ArrayList<Node>(elements.size());
                                 for (Iterator i = elements.iterator(); i.hasNext();) {
                                     final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                                     final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
@@ -342,7 +339,7 @@ public class XBLBindings {
 
                         // Insert content if any
                         if (contentToInsert != null && contentToInsert.size() > 0) {
-                            final List parentContent = element.getParent().content();
+                            final List<Node> parentContent = element.getParent().content();
                             final int elementIndex = parentContent.indexOf(element);
                             parentContent.addAll(elementIndex, contentToInsert);
                         }
@@ -534,7 +531,7 @@ public class XBLBindings {
     }
 
     // Keep public for unit tests
-    public Document annotateShadowTree(Document shadowTreeDocument, Map namespaceMappings, final String prefix) {
+    public Document annotateShadowTree(Document shadowTreeDocument, Map<String, Map<String, String>> namespaceMappings, final String prefix) {
         // Create transformer
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -706,7 +703,7 @@ public class XBLBindings {
      *
      * @return Map<QName, Element> of QNames to bindings, or null
      */
-    public Map getComponentBindings() {
+    public Map<QName, Element> getComponentBindings() {
         return xblComponentBindings;
     }
 
@@ -763,14 +760,14 @@ public class XBLBindings {
     /**
      * Return a List of xbl:style elements.
      */
-    public List getXBLStyles() {
+    public List<Element> getXBLStyles() {
         return xblStyles;
     }
 
     /**
      * Return a List of xbl:script elements.
      */
-    public List getXBLScripts() {
+    public List<Element> getXBLScripts() {
         return xblScripts;
     }
 }

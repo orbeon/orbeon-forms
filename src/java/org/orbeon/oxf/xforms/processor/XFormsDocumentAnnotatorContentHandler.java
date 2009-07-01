@@ -58,12 +58,12 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final String containerNamespace;
     private final boolean portlet;
 
-    private final Map namespaceMappings;
+    private final Map<String, Map<String, String>> namespaceMappings;
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
-    private final Map ids = new HashMap();
+    private final Map<String, String> ids = new HashMap<String, String>();
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
@@ -78,14 +78,14 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
 
 
-    private Map xblBindings;        // Map<String uri, Map<String localname, ">>
+    private Map<String, Map<String, String>> xblBindings;   // Map<String uri, Map<String localname, "">>
 
     /**
      * This constructor just computes the namespace mappings and AVT elements
      *
      * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
      */
-    public XFormsDocumentAnnotatorContentHandler(Map namespaceMappings) {
+    public XFormsDocumentAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.containerNamespace = "";
@@ -102,11 +102,11 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
      * @param externalContext       ExternalContext
      * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
      */
-    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext, Map namespaceMappings) {
+    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext, Map<String, Map<String, String>> namespaceMappings) {
         this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), namespaceMappings);
     }
 
-    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet, Map namespaceMappings) {
+    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet, Map<String, Map<String, String>> namespaceMappings) {
         super(contentHandler, contentHandler != null);
 
         this.containerNamespace = containerNamespace;
@@ -328,7 +328,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     }
 
     protected void addNamespaces(String id) {
-        final Map namespaces = new HashMap();
+        final Map<String, String> namespaces = new HashMap<String, String>();
         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
             if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
@@ -349,11 +349,11 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 // Found URI
 
                 if (xblBindings == null)
-                    xblBindings = new HashMap();
+                    xblBindings = new HashMap<String, Map<String, String>>();
 
-                Map localnamesMap = (Map) xblBindings.get(bindingURI);
+                Map<String, String> localnamesMap = xblBindings.get(bindingURI);
                 if (localnamesMap == null) {
-                    localnamesMap = new HashMap();
+                    localnamesMap = new HashMap<String, String>();
                     xblBindings.put(bindingURI, localnamesMap);
                 }
 

@@ -97,6 +97,12 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                     <property as="xs:string"  processor-name="oxf:saxon8"    name="location-mode"            value="none"/>
                 </xml-source>
             </section>
+            <section>
+                <title>Removal of Xalan and XSLTC from the standard distribution</title>
+                <p>
+                    [TODO]
+                </p>
+            </section>
         </section>
     </body>
 </document>

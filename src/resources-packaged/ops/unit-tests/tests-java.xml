@@ -56,6 +56,10 @@
         </input>
         <output name="data">
             <inputs>
+                <input>required-input-1</input>
+                <data-1>
+                    <value-1>1</value-1>
+                </data-1>
                 <input>required-input-2</input>
                 <data-2>
                     <value-2>2</value-2>
@@ -64,10 +68,6 @@
                 <data-3>
                     <value-3>3</value-3>
                 </data-3>
-                <input>required-input-1</input>
-                <data-1>
-                    <value-1>1</value-1>
-                </data-1>
                 <input>optional-input-2</input>
                 <data-4>
                     <value-4>4</value-4>

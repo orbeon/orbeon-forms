@@ -65,8 +65,8 @@ final
 
     private String id;
     private QName name;
-    private Map inputMap = new HashMap();// Map<String name, List<ProcessorInput> inputs>
-    private Map outputMap = new HashMap();
+    private Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<String, List<ProcessorInput>>();
+    private Map outputMap = new LinkedHashMap();
     private int outputCount = 0;
     private List inputsInfo = new ArrayList(0);
     private List outputsInfo = new ArrayList(0);

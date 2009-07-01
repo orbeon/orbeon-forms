@@ -344,15 +344,15 @@
                         <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
                     <xxf:itemsets>
-                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                         <xxf:itemset id="fr-dropdown-date$month-select·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:itemset id="fr-dropdown-date$day-select·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:itemset id="fr-dropdown-date$year-select·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
+                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:itemset id="fr-dropdown-date$day-select·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                     </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>

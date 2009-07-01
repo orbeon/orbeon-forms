@@ -75,13 +75,18 @@ ORBEON.widgets.datatable = function (element, index) {
 	}
 
 	this.tableWidth = this.table.clientWidth;
+	if (this.tableWidth < pxWidth) {
+		this.tableWidth = pxWidth;
+	}
 	this.tableHeight = this.table.clientHeight;
 	if (this.scrollH) {
 		if (pxWidth > this.tableWidth) {
 			// Can be the case if table width was expressed as %
 			this.tableWidth = pxWidth;
 		}
-		this.tableWidth = this.optimizeWidth(this.table.clientWidth, this.table.clientHeight, 2500, this.getTableHeightForWidth(2500)) + 50;
+		var tw = this.tableWidth;
+		this.tableWidth = this.optimizeWidth(tw, this.getTableHeightForWidth(tw), 2500, this.getTableHeightForWidth(2500)) + 50;
+		//this.tableWidth = 1500;
 	} else if (this.scrollV) {
 		if (this.hasFixedWidthTable) {
 			width = this.tableWidth + 'px';

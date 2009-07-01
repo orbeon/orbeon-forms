@@ -30,13 +30,14 @@ public class ControlTree implements Cloneable {
     private final boolean isNoscript;   // whether we are in noscript mode
 
     // Top-level controls
-    private List children;              // List<XFormsControl control>
+    private List<XFormsControl> children;                           // List<XFormsControl control>
 
     // Indexing of controls
-    private Map effectiveIdsToControls; // Map<String effectiveId, XFormsControl control>
-    private Map controlTypes;           // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
+    private Map<String, XFormsControl> effectiveIdsToControls;      // Map<String effectiveId, XFormsControl control>
+    private Map<String, Map<String, XFormsControl>> controlTypes;   // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
 
-    private Map eventsToDispatch = new HashMap(); // Map<String effectiveId, EventSchedule eventSchedule>
+    // Map<String effectiveId, EventSchedule eventSchedule>
+    private Map<String, XFormsControls.EventSchedule> eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
@@ -54,36 +55,48 @@ public class ControlTree implements Cloneable {
 
         containingDocument.startHandleOperation("controls", "building");
 
-        // Create temporary root control
-        final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
-            public void addChild(XFormsControl XFormsControl) {
-                // Add child to root control
-                super.addChild(XFormsControl);
-                // Forward children list to ControlTree. This so that the tree is made available during construction
-                // to XPath functions like index() or xxforms:case()
-                if (ControlTree.this.children == null) {
-                    ControlTree.this.children = super.getChildren();
+        final int PROFILING_ITERATIONS = 1;
+        for (int k = 0; k < PROFILING_ITERATIONS; k++) {
+
+            // Create temporary root control
+            final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
+                public void addChild(XFormsControl XFormsControl) {
+                    // Add child to root control
+                    super.addChild(XFormsControl);
+                    // Forward children list to ControlTree. This so that the tree is made available during construction
+                    // to XPath functions like index() or xxforms:case()
+                    if (ControlTree.this.children == null) {
+                        ControlTree.this.children = super.getChildren();
+                    }
+                }
+            };
+
+            // Visit the static tree of controls to create the actual tree of controls
+            final CreateControlsListener listener
+                    = new CreateControlsListener(pipelineContext, this, rootControl, containingDocument.getSerializedControlStatesMap(pipelineContext), evaluateItemsets, false);
+            XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
+
+            // Detach all root XFormsControl
+            if (children != null) {
+                for (Iterator i = children.iterator(); i.hasNext();) {
+                    final XFormsControl currentXFormsControl = (XFormsControl) i.next();
+                    currentXFormsControl.detach();
                 }
             }
-        };
 
-        // Visit the static tree of controls to create the actual tree of controls
-        final CreateControlsListener listener
-                = new CreateControlsListener(pipelineContext, this, rootControl, containingDocument.getSerializedControlStatesMap(pipelineContext), evaluateItemsets, false);
-        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
-
-        // Detach all root XFormsControl
-        if (children != null) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-                currentXFormsControl.detach();
+            if (k == PROFILING_ITERATIONS - 1) {
+                containingDocument.endHandleOperation(new String[] {
+                        "controls updated", Integer.toString(listener.getUpdateCount()),
+                        "repeat iterations", Integer.toString(listener.getIterationCount())
+                });
+            } else {
+                // This is for profiling only
+                children = null;
+                effectiveIdsToControls = null;
+                controlTypes = null;
+                eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
             }
         }
-
-        containingDocument.endHandleOperation(new String[] {
-                "controls updated", Integer.toString(listener.getUpdateCount()),
-                "repeat iterations", Integer.toString(listener.getIterationCount())
-        });
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -93,7 +106,7 @@ public class ControlTree implements Cloneable {
 
         // Clone children if any
         if (children != null) {
-            cloned.children = new ArrayList(children.size());
+            cloned.children = new ArrayList<XFormsControl>(children.size());
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentControl = (XFormsControl) i.next();
                 final XFormsControl currentClone = (XFormsControl) currentControl.clone();
@@ -155,18 +168,18 @@ public class ControlTree implements Cloneable {
     private void indexControl(XFormsControl control, boolean registerEvents) {
         // Remember by effective id
         if (effectiveIdsToControls == null)
-            effectiveIdsToControls = new LinkedHashMap();// order is not strictly needed, but it can help debugging
+            effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();// order is not strictly needed, but it can help debugging
 
         effectiveIdsToControls.put(control.getEffectiveId(), control);
 
         // Remember by control type (for certain controls we know we need)
         if (mustMapControl(control)) {
             if (controlTypes == null)
-                controlTypes = new HashMap();// no need for order here
+                controlTypes = new HashMap<String, Map<String, XFormsControl>>();// no need for order here
 
-            Map controlsMap = (Map) controlTypes.get(control.getName());
+            Map<String, XFormsControl> controlsMap = controlTypes.get(control.getName());
             if (controlsMap == null) {
-                controlsMap = new LinkedHashMap(); // need for order here!
+                controlsMap = new LinkedHashMap<String, XFormsControl>(); // need for order here!
                 controlTypes.put(control.getName(), controlsMap);
             }
 
@@ -280,10 +293,10 @@ public class ControlTree implements Cloneable {
     }
 
     public void clearEventsToDispatch() {
-        this.eventsToDispatch = new HashMap();
+        this.eventsToDispatch = new HashMap<String, XFormsControls.EventSchedule>();
     }
 
-    public void setChildren(List children) {
+    public void setChildren(List<XFormsControl> children) {
         this.children = children;
     }
 
@@ -295,18 +308,18 @@ public class ControlTree implements Cloneable {
         return effectiveIdsToControls;
     }
 
-    public Map getInitialMinimalRepeatIdToIndex(XFormsStaticState staticState) {
+    public Map<String, Integer> getInitialMinimalRepeatIdToIndex(XFormsStaticState staticState) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
-        final Map repeatIdToIndex = new HashMap();
+        final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                    repeatIdToIndex.put(repeatControl.getPrefixedId(), new Integer(((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex()));
+                    repeatIdToIndex.put(repeatControl.getPrefixedId(), ((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex());
                 }
             }
         });
@@ -316,18 +329,18 @@ public class ControlTree implements Cloneable {
         return repeatIdToIndex;
     }
 
-    public Map getMinimalRepeatIdToIndex(XFormsStaticState staticState) {
+    public Map<String, Integer> getMinimalRepeatIdToIndex(XFormsStaticState staticState) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
-        final Map repeatIdToIndex = new HashMap();
+        final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                    repeatIdToIndex.put(repeatControl.getPrefixedId(), new Integer(repeatControl.getIndex()));
+                    repeatIdToIndex.put(repeatControl.getPrefixedId(), repeatControl.getIndex());
                 }
             }
         });
@@ -337,13 +350,13 @@ public class ControlTree implements Cloneable {
         return repeatIdToIndex;
     }
 
-    private void addMissingRepeatIndexes(XFormsStaticState staticState, Map repeatIdToIndex) {
+    private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
         final Map repeats = staticState.getRepeatControlInfoMap();
         if (repeats != null) {
             for (Iterator i = repeats.keySet().iterator(); i.hasNext();) {
                 final String repeatPrefixedId = (String) i.next();
                 if (repeatIdToIndex.get(repeatPrefixedId) == null) {
-                    repeatIdToIndex.put(repeatPrefixedId, new Integer(0));
+                    repeatIdToIndex.put(repeatPrefixedId, 0);
                 }
             }
         }

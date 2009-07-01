@@ -97,7 +97,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             // Try default format for known types
 
             // Assume xs: prefix for default formats
-            final Map prefixToURIMap = new HashMap();
+            final Map<String, String> prefixToURIMap = new HashMap<String, String>();
             prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
             // Format according to type

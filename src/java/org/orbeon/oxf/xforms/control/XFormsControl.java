@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -884,7 +885,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param variableToValueMap    variables to use
      * @return                      value, or null if cannot be computed
      */
-    protected String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString, Map prefixToURIMap, Map variableToValueMap) {
+    protected String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString,
+                                      Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap) {
 
         if (contextItem == null) {
             // TODO: in the future we should be able to try evaluating anyway

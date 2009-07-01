@@ -180,7 +180,9 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression and return its string value.
      */
-    public static String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString, Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+    public static String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString,
+                                          Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap,
+                                          FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
         return evaluateAsString(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 

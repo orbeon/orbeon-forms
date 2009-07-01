@@ -18,17 +18,17 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.CalendarValue;
 import org.orbeon.saxon.value.DateValue;
+import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.TimeValue;
 
 import java.util.Calendar;
@@ -45,7 +45,7 @@ public class XFormsInputControl extends XFormsValueControl {
     private static final QName[] EXTENSION_ATTRIBUTES = {
             XFormsConstants.XXFORMS_SIZE_QNAME,
             XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
-            XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME 
+            XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME
     };
 
     public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
@@ -442,11 +442,11 @@ public class XFormsInputControl extends XFormsValueControl {
 
     private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {
         // Assume xs: prefix for default formats
-        final Map prefixToURIMap = new HashMap();
+        final Map<String, String> prefixToURIMap = new HashMap<String, String>();
         prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
-        final Map variables = new HashMap();
-        variables.put("v", value);
+        final Map<String, ValueRepresentation> variables = new HashMap<String, ValueRepresentation>();
+        variables.put("v", new StringValue(value));
 
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null) {
@@ -459,7 +459,7 @@ public class XFormsInputControl extends XFormsValueControl {
                             + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(pipelineContext, boundNode, xpathExpression,prefixToURIMap, variables);
+            return evaluateAsString(pipelineContext, boundNode, xpathExpression, prefixToURIMap, variables);
         }
     }
 

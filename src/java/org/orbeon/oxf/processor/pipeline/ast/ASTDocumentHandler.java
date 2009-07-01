@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.pipeline.ast;
 
 import org.dom4j.*;
-import org.orbeon.oxf.processor.pipeline.ForEachProcessor;
+import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
@@ -109,7 +109,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void hrefId(ASTHrefId hrefId) {
-        href.push(ForEachProcessor.FOR_EACH_CURRENT_INPUT.equals(hrefId.getId())
+        href.push(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT.equals(hrefId.getId())
             ? "current()"
             : "#" + hrefId.getId());
     }

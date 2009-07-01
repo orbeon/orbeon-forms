@@ -26,6 +26,8 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.choose.AbstractChooseProcessor;
 import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
+import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
+import org.orbeon.oxf.processor.pipeline.foreach.ConcreteForEachProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
@@ -375,14 +377,14 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 // Instantiate processor
                 final ASTForEach forEach = (ASTForEach) statement;
                 final LocationData forEachLocationData = forEach.getLocationData();
-                final AbstractProcessor forEachAbstractProcessor = new ForEachProcessor(forEach, astPipeline.getValidity());
-                final ForEachProcessor.ConcreteForEachProcessor forEachProcessor =
-                        (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
+                final AbstractProcessor forEachAbstractProcessor = new AbstractForEachProcessor(forEach, astPipeline.getValidity());
+                final ConcreteForEachProcessor forEachProcessor =
+                        (ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
                 processor = forEachProcessor;
 
                 // Connect special $data input (document on which the decision is made, or iterated on)
                 final ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
-                        ForEachProcessor.FOR_EACH_DATA_INPUT, forEach.getHref());
+                        AbstractForEachProcessor.FOR_EACH_DATA_INPUT, forEach.getHref());
                 setDebugAndSchema(pin, forEach, forEachLocationData,
                         forEach.getInputSchemaUri(), forEach.getInputSchemaHref(), forEach.getInputDebug());
 
@@ -390,7 +392,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 for (Iterator j = processor.getInputsInfo().iterator(); j.hasNext();) {
                     // We reference a previously declared output
                     final String inputName = ((ProcessorInputOutputInfo) j.next()).getName();
-                    if (!inputName.equals(ForEachProcessor.FOR_EACH_DATA_INPUT)) {
+                    if (!inputName.equals(AbstractForEachProcessor.FOR_EACH_DATA_INPUT)) {
                         final ASTHrefId hrefId = new ASTHrefId();
                         hrefId.setId(inputName);
                         // NOTE: Force creation of a tee so that inputs of p:for-each are not read multiple times

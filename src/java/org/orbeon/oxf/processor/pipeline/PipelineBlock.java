@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
+import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.processor.transformer.XPathProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
@@ -74,7 +75,7 @@ public class PipelineBlock {
             final String referencedId = ((ASTHrefId) href).getId();
 
             // Nice messsage for current()
-            if (referencedId.equals(ForEachProcessor.FOR_EACH_CURRENT_INPUT) && !idToOutputMap.containsKey(ForEachProcessor.FOR_EACH_CURRENT_INPUT))
+            if (referencedId.equals(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT) && !idToOutputMap.containsKey(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT))
                 throw new ValidationException("Function current() can only be used in a for-each block", locationData);
 
             // Reference to previously defined id

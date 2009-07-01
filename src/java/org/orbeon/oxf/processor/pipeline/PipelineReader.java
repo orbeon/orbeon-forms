@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.processor.pipeline.ast.*;
+import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -280,7 +281,7 @@ public class PipelineReader extends ProcessorImpl {
                 if (!matcher.contains(href, FUNCTION_END))
                     throw new ValidationException("Expected ')' in current() function call", locationData);
                 ASTHrefId hrefId = new ASTHrefId();
-                hrefId.setId(ForEachProcessor.FOR_EACH_CURRENT_INPUT);
+                hrefId.setId(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
                 result.astHref = hrefId;
                 result.rest = href.substring(matcher.getMatch().endOffset(0));
             } else {

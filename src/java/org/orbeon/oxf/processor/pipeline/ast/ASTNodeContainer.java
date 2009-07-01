@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.pipeline.ast;
 import org.apache.commons.collections.CollectionUtils;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.pipeline.ForEachProcessor;
+import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.Collection;
@@ -162,7 +162,7 @@ public abstract class ASTNodeContainer {
                 final IdInfo statementsIdInfo;
                 {
                     IdInfoASTHandler statementsIdInfoASTHandler = new IdInfoASTHandler();
-                    statementsIdInfoASTHandler.getIdInfo().getOutputIds().add(ForEachProcessor.FOR_EACH_CURRENT_INPUT);
+                    statementsIdInfoASTHandler.getIdInfo().getOutputIds().add(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
                     for (Iterator i = forEach.getStatements().iterator(); i.hasNext();) {
                         ASTStatement statement = (ASTStatement) i.next();
                         statement.walk(statementsIdInfoASTHandler);

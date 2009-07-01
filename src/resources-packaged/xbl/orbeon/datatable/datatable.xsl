@@ -31,6 +31,7 @@
         <parameter>sortAndPaginationMode</parameter>
         <parameter>nbPages</parameter>
         <parameter>page</parameter>
+        <parameter>innerTableWidth</parameter>
     </xsl:variable>
 
     <!-- Set some variables that will dictate the geometry of the widget -->
@@ -48,6 +49,8 @@
     <xsl:variable name="rowsPerPage"
         select="if (/fr:datatable/@rowsPerPage castable as xs:integer) then /fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="sortAndPaginationMode" select="/fr:datatable/@sortAndPaginationMode"/>
+    <xsl:variable name="innerTableWidth"
+        select="if (/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, /fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
 
     <!--
         Pagination...
@@ -82,7 +85,6 @@
 
 
         <xhtml:div id="{$id}-container">
-            <!-- See http://snippets.dzone.com/posts/show/216... for the display: table hack-->
             <xsl:copy-of select="namespace::*"/>
 
 
@@ -229,7 +231,8 @@
             <xforms:group ref="xxforms:component-context()">
                 <xforms:action ev:event="xforms-enabled">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                        />","info"); ORBEON.widgets.datatable.init(this); </xxforms:script>
+                        />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
+                            select="$innerTableWidth"/>); </xxforms:script>
                 </xforms:action>
             </xforms:group>
 

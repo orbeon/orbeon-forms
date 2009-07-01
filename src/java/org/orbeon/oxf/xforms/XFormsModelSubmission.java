@@ -491,7 +491,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
                         // Handle all file elements
-                        XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, null, !isReplaceAll);
+                        XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, null, true);
                     }
 
                     // Check if a submission requires file upload information
@@ -811,7 +811,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             // Open connection
                             if (isAsyncSubmission) {
                                 final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
-                                final Map headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
+                                final Map<String, String[]> headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
                                             resolvedXXFormsUsername, customHeaderNameValues, newForwardSubmissionHeaders);
 
                                 // Pack call into a Runnable
@@ -1009,7 +1009,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                             } else {
                                                 // Generic insertion
 
-                                                final List destinationCollection = Collections.singletonList(destinationNodeInfo);
+                                                final List<NodeInfo> destinationCollection = Collections.singletonList(destinationNodeInfo);
 
                                                 // Perform the insertion
 

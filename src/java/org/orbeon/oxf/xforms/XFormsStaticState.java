@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
@@ -76,16 +77,16 @@ public class XFormsStaticState {
     private String encodedStaticState;      // encoded state
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
-    private Document controlsDocument;                  // controls cocument
-    private LinkedHashMap modelDocuments = new LinkedHashMap();// Map<String modelPrefixedId, Document modelDocument>
-    private SAXStore xhtmlDocument;                     // entire XHTML document for noscript mode only
+    private Document controlsDocument;                      // controls document
+    // Map<String modelPrefixedId, Document modelDocument>
+    private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>();
+    private SAXStore xhtmlDocument;                         // entire XHTML document for noscript mode only
 
-    private Map xxformsScripts;                         // Map<String, String> of id to script content
+    private Map<String, String> xxformsScripts;             // Map of id to script content
+    private Map<String, SharedXFormsInstance> instancesMap; // Map of id to shared instance
 
-    private Map instancesMap;                           // Map<String, SharedXFormsInstance> of id to shared instance
-
-    private Map nonDefaultProperties = new HashMap();   // Map<String, Object> of property name to property value (String, Integer, Boolean)
-    private Map externalEventsMap;                      // Map<String, ""> of event names
+    private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();   // Map of property name to property value (String, Integer, Boolean)
+    private Map<String, String> externalEventsMap;                                      // Map<String, ""> of event names
 
     private boolean isSeparateDeployment;
     private String requestContextPath;
@@ -94,32 +95,34 @@ public class XFormsStaticState {
     private String containerNamespace;
     private LocationData locationData;
 
-    private List versionedPathMatchers;     // List<PathMatcher>
+    private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
 
     // Static analysis
     private boolean isAnalyzed;             // whether this document has been analyzed already
-    private Map controlTypes;               // Map<String type, LinkedHashMap<String prefixedId, ControlInfo info>>
-    private Map eventNamesMap;              // Map<String eventName, String "">
-    private Map eventHandlersMap;           // Map<String controlPrefixedId, List<XFormsEventHandler> eventHandler>
-    private Map controlInfoMap;             // Map<String controlPrefixedId, ControlInfo>
-    private Map attributeControls;          // Map<String forPrefixedId, Map<String name, ControlInfo info>>
-    private Map namespacesMap;              // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
-    private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
-    private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
-    private Map itemsInfoMap;               // Map<String controlPrefixedId, ItemsInfo>
-    private Map controlClasses;             // Map<String controlPrefixedId, String classes>
-    private boolean hasOfflineSupport;      // whether the document requires offline support
-    private List offlineInsertTriggerIds;   // List<String triggerPrefixedId> of triggers can do inserts
-    
-    private Map labelsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
-    private Map helpsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
-    private Map hintsMap = new HashMap();   // Map<String controlPrefixedId, Element element>
-    private Map alertsMap = new HashMap();  // Map<String controlPrefixedId, Element element>
+
+    private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
+    private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
+    private Map<String, List<XFormsEventHandler>> eventHandlersMap;         // Map<String controlPrefixedId, List<XFormsEventHandler> eventHandler>
+    private Map<String, ControlInfo> controlInfoMap;                        // Map<String controlPrefixedId, ControlInfo>
+    private Map<String, Map<String, ControlInfo>> attributeControls;        // Map<String forPrefixedId, Map<String name, ControlInfo info>>
+    private Map<String, Map<String, String>> namespacesMap;                 // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
+    private Map<String, List<String>> repeatChildrenMap;                    // Map<String, List> of repeat id to List of children ids
+    private String repeatHierarchyString;                                   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
+    private Map<String, ItemsInfo> itemsInfoMap;                            // Map<String controlPrefixedId, ItemsInfo>
+    private Map<String, String> controlClasses;                             // Map<String controlPrefixedId, String classes>
+    private boolean hasOfflineSupport;                                      // whether the document requires offline support
+    private List<String> offlineInsertTriggerIds;                           // List<String triggerPrefixedId> of triggers can do inserts
+
+    // All these are Map<String controlPrefixedId, Element element>
+    private Map<String, Element> labelsMap = new HashMap<String, Element>();
+    private Map<String, Element> helpsMap = new HashMap<String, Element>();
+    private Map<String, Element> hintsMap = new HashMap<String, Element>();
+    private Map<String, Element> alertsMap = new HashMap<String, Element>();
 
     // Components
     private XBLBindings xblBindings;
 
-    private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
+    private static final Map<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
     static {
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -135,7 +138,7 @@ public class XFormsStaticState {
      * @param namespacesMap         Map<String staticId, Map<String prefix, String uri>> of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
-    public XFormsStaticState(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore annotatedDocument) {
+    public XFormsStaticState(PipelineContext pipelineContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
         initialize(pipelineContext, staticStateDocument, namespacesMap, annotatedDocument, null);
     }
 
@@ -175,7 +178,8 @@ public class XFormsStaticState {
      * @param namespacesMap
      * @param xhtmlDocument
      */
-    private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
+                            SAXStore xhtmlDocument, String encodedStaticState) {
 
         XFormsContainingDocument.logDebugStatic("static state", "initializing", null);
 
@@ -205,7 +209,7 @@ public class XFormsStaticState {
         // Recompute namespace mappings if needed
         final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
         if (namespacesMap == null) {
-            this.namespacesMap = new HashMap();
+            this.namespacesMap = new HashMap<String, Map<String, String>>();
             try {
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
@@ -256,11 +260,11 @@ public class XFormsStaticState {
         // Extract instances if present
         final Element instancesElement = staticStateElement.element("instances");
         if (instancesElement != null) {
-            instancesMap = new HashMap();
+            instancesMap = new HashMap<String, SharedXFormsInstance>();
 
             for (Iterator instanceIterator = instancesElement.elements("instance").iterator(); instanceIterator.hasNext();) {
                 final Element currentInstanceElement = (Element) instanceIterator.next();
-                final XFormsInstance newInstance = new SharedXFormsInstance(currentInstanceElement);
+                final SharedXFormsInstance newInstance = new SharedXFormsInstance(currentInstanceElement);
                 instancesMap.put(newInstance.getEffectiveId(), newInstance);
             }
         }
@@ -269,7 +273,7 @@ public class XFormsStaticState {
         final Element matchersElement = staticStateElement.element("matchers");
         if (matchersElement != null) {
             final List matchersElements = instancesElement.elements("matcher");
-            this.versionedPathMatchers = new ArrayList(matchersElements.size());
+            this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
             for (Iterator matcherIterator = matchersElements.iterator(); matcherIterator.hasNext();) {
                 final Element currentMatcherElement = (Element) matcherIterator.next();
 
@@ -277,7 +281,7 @@ public class XFormsStaticState {
             }
         } else {
             // Otherwise use matchers from the pipeline context
-            this.versionedPathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
         }
 
         if (encodedStaticState != null) {
@@ -372,7 +376,7 @@ public class XFormsStaticState {
             final StringTokenizer st = new StringTokenizer(externalEvents);
             while (st.hasMoreTokens()) {
                 if (externalEventsMap == null)
-                    externalEventsMap = new HashMap();
+                    externalEventsMap = new HashMap<String, String>();
                 externalEventsMap.put(st.nextToken(), "");
             }
         }
@@ -465,7 +469,7 @@ public class XFormsStaticState {
 
         if (scripts.size() > 0) {
             if (xxformsScripts == null)
-                xxformsScripts = new HashMap();
+                xxformsScripts = new HashMap<String, String>();
             for (Iterator i = scripts.iterator(); i.hasNext();) {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                 final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
@@ -512,7 +516,7 @@ public class XFormsStaticState {
             throw new IllegalStateException("Cannot add instances to static state after initialization.");
 
         if (instancesMap == null)
-            instancesMap = new HashMap();
+            instancesMap = new HashMap<String, SharedXFormsInstance>();
 
         instancesMap.put(instance.getEffectiveId(), instance);
     }
@@ -799,16 +803,16 @@ public class XFormsStaticState {
      */
     public synchronized boolean analyzeIfNecessary(final PipelineContext pipelineContext) {
         if (!isAnalyzed) {
-            controlTypes = new HashMap();
-            eventNamesMap = new HashMap();
-            eventHandlersMap = new HashMap();
-            controlInfoMap = new HashMap();
-            repeatChildrenMap = new HashMap();
+            controlTypes = new HashMap<String, Map<String, ControlInfo>>();
+            eventNamesMap = new HashMap<String, String>();
+            eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
+            controlInfoMap = new HashMap<String, ControlInfo>();
+            repeatChildrenMap = new HashMap<String, List<String>>();
 
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
-            final Stack repeatAncestorsStack = new Stack();
+            final Stack<String> repeatAncestorsStack = new Stack<String>();
             // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
             analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
 
@@ -915,7 +919,7 @@ public class XFormsStaticState {
 
     public void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,
                                       final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
-                                      final Stack repeatAncestorsStack, boolean excludeModelEventHandlers) {
+                                      final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
@@ -982,9 +986,9 @@ public class XFormsStaticState {
                 final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlURI, controlName));
                 controlInfoMap.put(controlPrefixedId, info);
                 {
-                    Map controlsMap = (Map) controlTypes.get(controlName);
+                    Map<String, ControlInfo> controlsMap = controlTypes.get(controlName);
                     if (controlsMap == null) {
-                        controlsMap = new LinkedHashMap();
+                        controlsMap = new LinkedHashMap<String, ControlInfo>();
                         controlTypes.put(controlName, controlsMap);
                     }
 
@@ -1014,9 +1018,9 @@ public class XFormsStaticState {
                         if (repeatAncestorsStack.size() > 0) {
                             // If we have a parent, tell the parent that it has a child
                             final String parentRepeatId = (String) repeatAncestorsStack.peek();
-                            List parentRepeatList = (List) repeatChildrenMap.get(parentRepeatId);
+                            List<String> parentRepeatList = repeatChildrenMap.get(parentRepeatId);
                             if (parentRepeatList == null) {
-                                parentRepeatList = new ArrayList();
+                                parentRepeatList = new ArrayList<String>();
                                 repeatChildrenMap.put(parentRepeatId, parentRepeatList);
                             }
                             parentRepeatList.add(controlPrefixedId);
@@ -1039,7 +1043,7 @@ public class XFormsStaticState {
 
                     // Remember information
                     if (itemsInfoMap == null)
-                        itemsInfoMap = new HashMap();
+                        itemsInfoMap = new HashMap<String, ItemsInfo>();
                     itemsInfoMap.put(controlPrefixedId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
 //                } else if (controlName.equals("case")) {
                     // TODO: Check that xforms:case is within: switch
@@ -1049,15 +1053,15 @@ public class XFormsStaticState {
                     // Special indexing of xxforms:attribute controls
                     final String prefixedForAttribute = prefix + controlElement.attributeValue("for");
                     final String nameAttribute = controlElement.attributeValue("name");
-                    Map mapForId;
+                    Map<String, ControlInfo> mapForId;
                     if (attributeControls == null) {
-                        attributeControls = new HashMap();
-                        mapForId = new HashMap();
+                        attributeControls = new HashMap<String, Map<String, ControlInfo>>();
+                        mapForId = new HashMap<String, ControlInfo>();
                         attributeControls.put(prefixedForAttribute, mapForId);
                     } else {
-                        mapForId = (Map) attributeControls.get(prefixedForAttribute);
+                        mapForId = attributeControls.get(prefixedForAttribute);
                         if (mapForId == null) {
-                            mapForId = new HashMap();
+                            mapForId = new HashMap<String, ControlInfo>();
                             attributeControls.put(prefixedForAttribute, mapForId);
                         }
                     }
@@ -1118,7 +1122,7 @@ public class XFormsStaticState {
         {
             {
                 // Create list of all the documents to search
-                final List documentInfos = new ArrayList(modelDocuments.size() + 1);
+                final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelDocuments.size() + 1);
                 for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currenEntry = (Map.Entry) i.next();
                     final Document currentModelDocument = (Document) currenEntry.getValue();
@@ -1194,9 +1198,9 @@ public class XFormsStaticState {
         }
     }
 
-    public static List extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
+    public static List<Document> extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
 
-        final List result = new ArrayList();
+        final List<Document> result = new ArrayList<Document>();
 
         final List modelElements = XPathCache.evaluate(pipelineContext, compactShadowTreeWrapper,
                 "//xforms:model[not(ancestor::xforms:instance)]",
@@ -1221,7 +1225,7 @@ public class XFormsStaticState {
 
     private void addClasses(String controlPrefixedId, String classes) {
         if (controlClasses == null)
-            controlClasses = new HashMap();
+            controlClasses = new HashMap<String, String>();
         final String currentClasses = (String) controlClasses.get(controlPrefixedId);
         if (currentClasses == null) {
             // Set
@@ -1269,14 +1273,14 @@ public class XFormsStaticState {
                         ? currentObserverStaticId : prefix + currentObserverStaticId;
 
                 // Get handlers for observer
-                final List eventHandlersForObserver;
+                final List<XFormsEventHandler> eventHandlersForObserver;
                 {
-                    final Object currentList = eventHandlersMap.get(currentObserverPrefixedId);
+                    final List<XFormsEventHandler> currentList = eventHandlersMap.get(currentObserverPrefixedId);
                     if (currentList == null) {
-                        eventHandlersForObserver = new ArrayList();
+                        eventHandlersForObserver = new ArrayList<XFormsEventHandler>();
                         eventHandlersMap.put(currentObserverPrefixedId, eventHandlersForObserver);
                     } else {
-                        eventHandlersForObserver = (List) currentList;
+                        eventHandlersForObserver = currentList;
                     }
                 }
 

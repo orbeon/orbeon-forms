@@ -185,11 +185,11 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getHeaderMap() {
             if (headerMap == null) {
-                Map map = new LinkedHashMap();
+                final Map<String, String> map = new LinkedHashMap<String, String>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
-                    Element e = (Element) i.next();
-                    String name = XPathUtils.selectStringValueNormalize(e, "name");
-                    String value = XPathUtils.selectStringValueNormalize(e, "value[1]");
+                    final Element e = (Element) i.next();
+                    final String name = XPathUtils.selectStringValueNormalize(e, "name");
+                    final String value = XPathUtils.selectStringValueNormalize(e, "value[1]");
                     map.put(name, value);
                 }
                 headerMap = Collections.unmodifiableMap(map);
@@ -199,7 +199,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getHeaderValuesMap() {
             if (headerValuesMap == null) {
-                final Map map = new LinkedHashMap();
+                final Map<String, String[]> map = new LinkedHashMap<String, String[]>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
@@ -230,7 +230,7 @@ public class TestExternalContext implements ExternalContext  {
 
         public Map getParameterMap() {
             if (parameterMap == null) {
-                final Map map = new LinkedHashMap();
+                final Map<String, Object[]> map = new LinkedHashMap<String, Object[]>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");

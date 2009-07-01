@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
@@ -37,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.ContentHandler;
@@ -62,14 +62,15 @@ final
     public static final String SAX_INSPECTION_FLAG = "oxf.sax.inspection";
 
     public static final char KEY_SEPARATOR = '?';
+    private static final List<ProcessorInput> EMPTY_INPUT_LIST = Collections.emptyList();
 
     private String id;
     private QName name;
     private Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<String, List<ProcessorInput>>();
-    private Map outputMap = new LinkedHashMap();
+    private Map<String, ProcessorOutput> outputMap = new LinkedHashMap<String, ProcessorOutput>();
     private int outputCount = 0;
-    private List inputsInfo = new ArrayList(0);
-    private List outputsInfo = new ArrayList(0);
+    private List<ProcessorInputOutputInfo> inputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
+    private List<ProcessorInputOutputInfo> outputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
 
     private LocationData locationData;
     public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
@@ -115,9 +116,9 @@ final
         return (ProcessorInput) l.get(0);
     }
 
-    public List getInputsByName(String name) {
-        List result = (List) inputMap.get(name);
-        return result == null ? Collections.EMPTY_LIST : result;
+    public List<ProcessorInput> getInputsByName(String name) {
+        final List<ProcessorInput> result = inputMap.get(name);
+        return result == null ? EMPTY_INPUT_LIST : result;
     }
 
     public ProcessorInput createInput(final String name) {
@@ -202,9 +203,9 @@ final
     }
 
     public void addInput(String name, ProcessorInput input) {
-        List inputs = (List) inputMap.get(name);
+        List<ProcessorInput> inputs = inputMap.get(name);
         if (inputs == null) {
-            inputs = new ArrayList();
+            inputs = new ArrayList<ProcessorInput>();
             inputMap.put(name, inputs);
         }
 //        if (inputs.size() > 0)
@@ -262,11 +263,11 @@ final
         outputsInfo.remove(outputInfo);
     }
 
-    public List getInputsInfo() {
+    public List<ProcessorInputOutputInfo> getInputsInfo() {
         return inputsInfo;
     }
 
-    public Map getConnectedInputs() {
+    public Map<String, List<ProcessorInput>> getConnectedInputs() {
         return Collections.unmodifiableMap(inputMap);
     }
 
@@ -279,11 +280,11 @@ final
         return null;
     }
 
-    public List getOutputsInfo() {
+    public List<ProcessorInputOutputInfo> getOutputsInfo() {
         return outputsInfo;
     }
 
-    public Map getConnectedOutputs() {
+    public Map<String, ProcessorOutput> getConnectedOutputs() {
         return Collections.unmodifiableMap(outputMap);
     }
 
@@ -495,9 +496,9 @@ final
     }
 
     private void addSelfAsParent(PipelineContext context) {
-        Stack parents = (Stack) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
+        Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
         if (parents == null) {
-            parents = new Stack();
+            parents = new Stack<ProcessorImpl>();
             context.setAttribute(PipelineContext.PARENT_PROCESSORS, parents);
         }
         parents.push(this);
@@ -530,21 +531,19 @@ final
      * processors on which we call read/start.
      */
     protected static void executeParents(PipelineContext context, Runnable runnable) {
-        Stack parents = (Stack) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        PipelineProcessor thisPipelineProcessor = (PipelineProcessor) parents.peek();
-        // We cast this here to go arround a javac bug.
-        ProcessorImpl castedThisPipelineProcessor = thisPipelineProcessor;
-        castedThisPipelineProcessor.removeSelfAsParent(context);
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
+        final ProcessorImpl thisPipelineProcessor = parents.peek();
+        thisPipelineProcessor.removeSelfAsParent(context);
         try {
             runnable.run();
         } finally {
-            castedThisPipelineProcessor.addSelfAsParent(context);
+            thisPipelineProcessor.addSelfAsParent(context);
         }
     }
 
     protected static Object getParentState(final PipelineContext context) {
-        Stack parents = (Stack) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        final ProcessorImpl parent = (ProcessorImpl) parents.peek();
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
+        final ProcessorImpl parent = parents.peek();
         final Object[] result = new Object[1];
         executeParents(context, new Runnable() {
             public void run() {
@@ -598,17 +597,17 @@ final
      * read/start is called.)
      */
     protected ProcessorKey getProcessorKey(PipelineContext context) {
-        Stack parents = (Stack) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
         return new ProcessorKey(parents);
     }
 
     public class ProcessorKey {
 
         private int hash = 0;
-        private List processors;
+        private List<ProcessorImpl> processors;
 
-        public ProcessorKey(Stack parents) {
-            processors = (parents == null ? new ArrayList() : new ArrayList(parents));
+        public ProcessorKey(Stack<ProcessorImpl> parents) {
+            processors = (parents == null ? new ArrayList<ProcessorImpl>() : new ArrayList<ProcessorImpl>(parents));
             processors.add(ProcessorImpl.this);
             // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
             for (int i = 0; i < processors.size(); i++) {
@@ -621,12 +620,12 @@ final
             return hash;
         }
 
-        private List getProcessors() {
+        private List<ProcessorImpl> getProcessors() {
             return processors;
         }
 
         public boolean equals(Object other) {
-            List otherProcessors = ((ProcessorKey) other).getProcessors();
+            final List<ProcessorImpl> otherProcessors = ((ProcessorKey) other).getProcessors();
             int processorsSize = processors.size();
             if (processorsSize != otherProcessors.size())
                 return false;
@@ -649,15 +648,14 @@ final
         }
 
         public String toString() {
-            StringBuffer result = null;
-            for (Iterator i = processors.iterator(); i.hasNext();) {
+            FastStringBuffer result = null;
+            for (Processor processor: processors) {
                 if (result == null) {
-                    result = new StringBuffer(hash + ": [");
+                    result = new FastStringBuffer(hash + ": [");
                 } else {
                     result.append(", ");
                 }
-                Processor processor = (Processor) i.next();
-                result.append(processor.hashCode());
+                result.append(Integer.toString(processor.hashCode()));
                 result.append(": ");
                 result.append(processor.getClass().getName());
             }
@@ -1326,13 +1324,13 @@ final
         }
 
         public Object getValidityImpl(PipelineContext pipelineContext) {
-            List validityObjects = new ArrayList();
+            final List<Object> validityObjects = new ArrayList<Object>();
 
-            Map inputsMap = getConnectedInputs();
+            final Map inputsMap = getConnectedInputs();
             for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
-                List currentInputs = (List) inputsMap.get(i.next());
+                final List currentInputs = (List) inputsMap.get(i.next());
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                    Object validity = getInputValidity(pipelineContext, (ProcessorInput) j.next());
+                    final Object validity = getInputValidity(pipelineContext, (ProcessorInput) j.next());
                     if (validity == null)
                         return null;
                     validityObjects.add(validity);
@@ -1341,7 +1339,7 @@ final
 
             // Add local validity if needed
             if (supportsLocalKeyValidity()) {
-                Object localValidity = getLocalValidity(pipelineContext);
+                final Object localValidity = getLocalValidity(pipelineContext);
                 if (localValidity == null) return null;
                 validityObjects.add(localValidity);
             }
@@ -1468,7 +1466,7 @@ final
             final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
                     new CacheKey[] { outputKeyValidity.key, internalCacheKey } );
 
-            final List compoundValidities = new ArrayList();
+            final List<Object> compoundValidities = new ArrayList<Object>();
             compoundValidities.add(outputKeyValidity.validity);
             compoundValidities.add(new Long(0));
 
@@ -1510,7 +1508,7 @@ final
             final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
                     new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
 
-            final List compoundValidities = new ArrayList();
+            final List<Object> compoundValidities = new ArrayList<Object>();
             compoundValidities.add(outputKeyValidityImpl.validity);
             compoundValidities.add(new Long(0));
 
@@ -1532,7 +1530,7 @@ final
             final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
                     new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
 
-            final List compoundValidities = new ArrayList();
+            final List<Object> compoundValidities = new ArrayList<Object>();
             compoundValidities.add(outputKeyValidityImpl.validity);
             compoundValidities.add(new Long(0));
 

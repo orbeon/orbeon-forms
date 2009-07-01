@@ -337,12 +337,12 @@
                     <request>
                         <parameters>
                             <parameter>
-                                <name>print</name>
-                                <value>false</value>
-                            </parameter>
-                            <parameter>
                                 <name>id</name>
                                 <value>13</value>
+                            </parameter>
+                            <parameter>
+                                <name>print</name>
+                                <value>false</value>
                             </parameter>
                         </parameters>
                         <path-info>/doc/home-welcome</path-info>
@@ -367,12 +367,12 @@
                     <request>
                         <parameters>
                             <parameter>
-                                <name>print</name>
-                                <value>false</value>
-                            </parameter>
-                            <parameter>
                                 <name>id</name>
                                 <value>13</value>
+                            </parameter>
+                            <parameter>
+                                <name>print</name>
+                                <value>false</value>
                             </parameter>
                         </parameters>
                     </request>

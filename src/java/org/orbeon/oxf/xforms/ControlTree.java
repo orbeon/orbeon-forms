@@ -30,19 +30,19 @@ public class ControlTree implements Cloneable {
     private final boolean isNoscript;   // whether we are in noscript mode
 
     // Top-level controls
-    private List<XFormsControl> children;                           // List<XFormsControl control>
+    private List<XFormsControl> children;                               // List<XFormsControl control>
 
     // Indexing of controls
-    private Map<String, XFormsControl> effectiveIdsToControls;      // Map<String effectiveId, XFormsControl control>
-    private Map<String, Map<String, XFormsControl>> controlTypes;   // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
+    private Map<String, XFormsControl> effectiveIdsToControls;          // Map<String effectiveId, XFormsControl control>
+    private Map<String, Map<String, XFormsControl>> controlTypes;       // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
 
-    // Map<String effectiveId, EventSchedule eventSchedule>
-    private Map<String, XFormsControls.EventSchedule> eventsToDispatch = new LinkedHashMap<String, XFormsControls.EventSchedule>();
+    private Map<String, XFormsControls.EventSchedule> eventsToDispatch; // Map<String effectiveId, EventSchedule eventSchedule>
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
     public ControlTree(boolean isNoscript) {
         this.isNoscript = isNoscript;
+        clearEventsToDispatch();
     }
 
     /**

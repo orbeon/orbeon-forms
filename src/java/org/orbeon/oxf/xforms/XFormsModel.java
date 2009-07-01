@@ -55,12 +55,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private String modelEffectiveId;
 
     // Instances
-    private List instanceIds;
-    private List instances;
-    private Map instancesMap;   // Map<String instanceStaticId, XFormsInstance>
+    private List<String> instanceIds;
+    private List<XFormsInstance> instances;
+    private Map<String, XFormsInstance> instancesMap;   // Map<String instanceStaticId, XFormsInstance>
 
     // Submissions
-    private Map submissions;    // Map<String submissionStaticId, XFormsModelSubmission>
+    private Map<String, XFormsModelSubmission> submissions;    // Map<String submissionStaticId, XFormsModelSubmission>
 
     // Binds
     private XFormsModelBinds binds;
@@ -95,7 +95,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Extract list of instances ids
         {
             List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
-            instanceIds = new ArrayList(instanceContainers.size());
+            instanceIds = new ArrayList<String>(instanceContainers.size());
             if (instanceContainers.size() > 0) {
                 for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
                     final Element instanceContainer = (Element) i.next();
@@ -116,7 +116,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String submissionId = submissionElement.attributeValue("id");
 
                 if (this.submissions == null)
-                    this.submissions = new HashMap();
+                    this.submissions = new HashMap<String, XFormsModelSubmission>();
 
                 this.submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
             }
@@ -279,7 +279,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-            instancesMap = new HashMap(instanceIds.size());
+            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
         }
         // Prepare and set instance
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
@@ -315,7 +315,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-            instancesMap = new HashMap(instanceIds.size());
+            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
         }
         // Prepare and set instance
         final String instanceId = instance.getId();// use static id as instanceIds contains static ids
@@ -483,10 +483,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
             //    Instance may not be specified.
 
-//            if (instances == null) {
             if (instances == null) {
                 instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-                instancesMap = new HashMap(instanceIds.size());
+                instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
             }
             {
                 // Build initial instance documents
@@ -983,7 +982,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
 
             // Run validation
-            final Map invalidInstances = new HashMap();
+            final Map<String, String> invalidInstances = new HashMap<String, String>();
 
             // Validate using schemas if needed
             if (mustSchemaValidate) {

@@ -47,7 +47,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private XFormsContainingDocument containingDocument;
     private XBLContainer rootContainer;
     
-    private Map constantItems;
+    private Map<String, List> constantItems;
 
     // Options configured by properties
     private boolean isPlainValueChange;
@@ -184,12 +184,11 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param   dynamicStateElement
      * @return  Map<String effectiveId, Element serializedState>
      */
-    public Map getSerializedControlStateMap(Element dynamicStateElement) {
-        final Map result = new HashMap();;
+    public Map<String, Element> getSerializedControlStateMap(Element dynamicStateElement) {
+        final Map<String, Element> result = new HashMap<String, Element>();
         final Element controlsElement = dynamicStateElement.element("controls");
         if (controlsElement != null) {
-            for (Iterator i = controlsElement.elements("control").iterator(); i.hasNext();) {
-                final Element currentControlElement = (Element) i.next();
+            for (Element currentControlElement : (List<Element>) controlsElement.elements("control")) {
                 result.put(currentControlElement.attributeValue("effective-id"), currentControlElement);
             }
         }
@@ -591,7 +590,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public void setConstantItems(String controlId, List items) {
         if (constantItems == null)
-            constantItems = new HashMap();
+            constantItems = new HashMap<String, List>();
         constantItems.put(controlId, items);
     }
 
@@ -599,18 +598,18 @@ public class XFormsControls implements XFormsObjectResolver {
 
         private final PipelineContext pipelineContext;
         private final Map effectiveIdsToControls;
-        private final Map eventsToDispatch;
+        private final Map<String, EventSchedule> eventsToDispatch;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        private UpdateBindingsListener(PipelineContext pipelineContext, Map effectiveIdsToControls, Map eventsToDispatch) {
+        private UpdateBindingsListener(PipelineContext pipelineContext, Map effectiveIdsToControls, Map<String, EventSchedule> eventsToDispatch) {
             this.pipelineContext = pipelineContext;
             this.effectiveIdsToControls = effectiveIdsToControls;
             this.eventsToDispatch = eventsToDispatch;
         }
 
-        private Map newIterationsMap = new HashMap();
+        private Map<String, XFormsRepeatIterationControl> newIterationsMap = new HashMap<String, XFormsRepeatIterationControl>();
 
         public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
 
@@ -784,8 +783,8 @@ public class XFormsControls implements XFormsObjectResolver {
             final boolean isFirstRefresh = isInitialRefreshEvents && containingDocument.isInitializationFirstRefreshClear();
 
             // Build list of events to send
-            final Map relevantBindingEvents = getCurrentControlTree().getEventsToDispatch();
-            final List eventsToDispatch = new ArrayList();
+            final Map<String, EventSchedule> relevantBindingEvents = getCurrentControlTree().getEventsToDispatch();
+            final List<EventSchedule> eventsToDispatch = new ArrayList<EventSchedule>();
 
             // Iterate through controls and check the nodes they are bound to
             visitAllControls(new XFormsControlVisitorAdapter() {
@@ -985,8 +984,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
             // Send events and (try to) make sure the event corresponds to the current instance data
             // NOTE: event order and the exact steps to take are under-specified in 1.0.
-            for (Iterator i = eventsToDispatch.iterator(); i.hasNext();) {
-                final EventSchedule eventSchedule = (EventSchedule) i.next();
+            for (EventSchedule eventSchedule : eventsToDispatch) {
 
                 final String controlInfoId = eventSchedule.getEffectiveControlId();
                 final int type = eventSchedule.getType();

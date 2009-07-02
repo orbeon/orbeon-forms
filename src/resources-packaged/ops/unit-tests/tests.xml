@@ -27,6 +27,7 @@
 
     <xi:include href="tests-xpl.xml"/>
     <xi:include href="xforms-server/tests-xforms-server.xml"/>
+    <xi:include href="xforms-server/tests-xforms-mips.xml"/>
     <xi:include href="xforms-server/tests-xforms-submission.xml"/>
     <xi:include href="xforms-server/tests-xforms-xbl.xml"/>
     <xi:include href="tests-qname-converter.xml"/>

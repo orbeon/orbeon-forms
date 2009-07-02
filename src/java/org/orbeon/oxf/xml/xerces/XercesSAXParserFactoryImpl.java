@@ -14,7 +14,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * Boasts a couple of improvemnts over the 'stock' xerces parser factory.
+ * Boasts a couple of improvements over the 'stock' xerces parser factory.
  *
  * o Doesn't create a new parser every time one calls setFeature or getFeature.  Stock one
  *   has to do this because valid feature set is encapsulated in the parser code.

@@ -1,22 +1,22 @@
 #!/bin/sh
 
 # This is a script which you can run under the checked out eXist source code directory to update eXist's references to
-# XML parser and XSLT code. This worked as of 2008-03-01.
+# XML parser and XSLT code. This worked as of 2009-07-02.
 #
 # Before running this script:
 #
 # 1) Set ORBEON_HOME to point to your Orbeon Forms source directory (which contains Orbeon's build.xml).
-# 2) Make sure that you have compile version of Orbeon Forms (will look for $ORBEON_HOME/build/lib/orbeon.jar)
+# 2) Make sure that you have a compiled version of Orbeon Forms (will look for $ORBEON_HOME/build/lib/orbeon.jar)
 # 3) Run this script from the eXist root directory
 
 ORBEON_HOME=../orbeon
 VERSION=1_2_4
+TODAY_DATE=`date +%Y%m%d`
 export ANT_OPTS=-Xmx256m
 rm lib/endorsed/xercesImpl-2.9.1.jar
 rm lib/endorsed/xalan-2.7.0.jar
 cp $ORBEON_HOME/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/
-cp $ORBEON_HOME/lib/xalan-2_5_1_orbeon.jar lib/endorsed/
-cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20080516.jar lib/endorsed/
+cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20090617.jar lib/endorsed/
 cp $ORBEON_HOME/build/lib/orbeon.jar lib/endorsed/
 for F in $(find src -name *.java)
 do
@@ -41,3 +41,6 @@ cp lib/core/xmlrpc-1.2-patched.jar $ORBEON_HOME/lib/exist-xmlrpc-1_2-patched.jar
 cp lib/core/quartz-1.6.0.jar $ORBEON_HOME/lib/exist-quartz-1_6_0.jar 
 cp lib/core/jta.jar $ORBEON_HOME/lib/exist-jta.jar
 cp lib/core/stax-api-1.0.1.jar $ORBEON_HOME/lib/exist-stax-api-1_0_1.jar
+
+# Create patch file
+svn diff > $ORBEON_HOME/tools/eXist-$VERSION-$TODAY_DATE.patch

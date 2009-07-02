@@ -34,7 +34,7 @@
         - http://exist-db.org/documentation.html
         - http://atomic.exist-db.org/
 
-    $Id: exist-conf.xml,v 1.3 2008/12/11 11:52:53 ebruchez Exp $
+    $Id: exist-conf.xml,v 1.4 2009/07/02 19:04:34 ebruchez Exp $
 
 -->
 <exist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -555,7 +555,8 @@
         and "string".  Anything else will be treated as type "string".
 
     -->
-    <transformer class="org.apache.xalan.processor.TransformerFactoryImpl"/>
+    <transformer class="org.orbeon.saxon.TransformerFactoryImpl"/>
+    <!--<transformer class="org.apache.xalan.processor.TransformerFactoryImpl"/>-->
 
     <!--
         Settings for XML validation

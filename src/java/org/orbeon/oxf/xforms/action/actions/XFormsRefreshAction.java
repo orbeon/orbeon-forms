@@ -44,6 +44,8 @@ public class XFormsRefreshAction extends XFormsAction {
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
 
+        // Because of inter-model dependencies, we consider for now that the action must force the operation
+        model.getDeferredActionContext().refresh = true;
         container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
     }
 }

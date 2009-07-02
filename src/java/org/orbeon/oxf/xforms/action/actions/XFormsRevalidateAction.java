@@ -44,6 +44,8 @@ public class XFormsRevalidateAction extends XFormsAction {
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
 
+        // Because of inter-model dependencies, we consider for now that the action must force the operation
+        model.getDeferredActionContext().revalidate = true;
         container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
     }
 }

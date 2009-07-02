@@ -20,8 +20,7 @@ cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20090617.jar lib/endorsed/
 cp $ORBEON_HOME/build/lib/orbeon.jar lib/endorsed/
 for F in $(find src -name *.java)
 do
-    sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F 
-    sed -i -e 's/org.apache.xalan/orbeon.apache.xalan/g' $F
+    sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F
     sed -i -e 's/net.sf.saxon/org.orbeon.saxon/g' $F
     sed -i -e 's/SAXParserFactory.newInstance()/new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl()/g' $F
     #sed -i -e 's/= DocumentBuilderFactory/= orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl/g' $F

@@ -623,6 +623,15 @@
         <class name="org.orbeon.oxf.processor.xmldb.XMLDBDeleteProcessor"/>
     </processor>
 
+    <!-- Zip processors -->
+    <processor name="oxf:unzip">
+        <class name="org.orbeon.oxf.processor.zip.UnzipProcessor"/>
+    </processor>
+
+    <processor name="oxf:zip">
+        <class name="org.orbeon.oxf.processor.zip.ZipProcessor"/>
+    </processor>
+
     <!-- Test processors -->
     <processor name="oxf:test-script">
         <class name="org.orbeon.oxf.processor.test.TestScriptProcessor"/>
@@ -657,10 +666,6 @@
     </processor>
 
     <!-- These mappings are kept only for backward compatibility -->
-    <processor name="oxf:webapp-controller">
-        <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
-    </processor>
-
     <processor name="oxf:pdf-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
@@ -699,14 +704,6 @@
 
     <processor name="oxf:instance-to-parameters">
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
-    </processor>
-
-    <processor name="oxf:unzip">
-        <class name="org.orbeon.oxf.processor.zip.UnzipProcessor"/>
-    </processor>
-
-    <processor name="oxf:zip">
-        <class name="org.orbeon.oxf.processor.zip.ZipProcessor"/>
     </processor>
 
     <!-- No longer supported processors -->

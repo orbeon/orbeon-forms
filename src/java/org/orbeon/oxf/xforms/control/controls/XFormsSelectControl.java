@@ -55,19 +55,18 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         final String newValue;
         {
             // All items
-            final List items = getItemset(pipelineContext, true);
+            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
 
             // Current values in the instance
-            final Map instanceValues = tokenize(pipelineContext, controlValue, false);
+            final Map<String, String> instanceValues = tokenize(pipelineContext, controlValue, false);
 
             // Values currently selected in the UI
-            final Map uiValues = tokenize(pipelineContext, value, isEncryptItemValues());
+            final Map<String, String> uiValues = tokenize(pipelineContext, value, isEncryptItemValues());
 
             // Iterate over all the items
-            final List selectEvents = new ArrayList();
-            final List deselectEvents = new ArrayList();
-            for (Iterator i = items.iterator(); i.hasNext();) {
-                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+            final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
+            final List<XFormsDeselectEvent> deselectEvents = new ArrayList<XFormsDeselectEvent>();
+            for (XFormsItemUtils.Item currentItem: items) {
                 final String currentItemValue = currentItem.getValue();
                 final boolean itemWasSelected = instanceValues.get(currentItemValue) != null;
                 final boolean itemIsSelected;
@@ -92,16 +91,14 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             }
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
-                for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
-                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                for (XFormsEvent currentEvent: deselectEvents) {
                     currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
-                for (Iterator i = selectEvents.iterator(); i.hasNext();) {
-                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                for (XFormsEvent currentEvent: selectEvents) {
                     currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
@@ -109,8 +106,8 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Create resulting string
             final FastStringBuffer sb = new FastStringBuffer(controlValue.length() + value.length() * 2);
             int index = 0;
-            for (Iterator i = instanceValues.keySet().iterator(); i.hasNext(); index++) {
-                final String currentKey = (String) i.next();
+            for (Iterator<String> i = instanceValues.keySet().iterator(); i.hasNext(); index++) {
+                final String currentKey = i.next();
                 if (index > 0)
                     sb.append(' ');
                 sb.append(currentKey);
@@ -128,21 +125,21 @@ public class XFormsSelectControl extends XFormsSelect1Control {
 
         final String internalValue = getValue(pipelineContext);
         final String updatedValue;
-        if (internalValue == null) {
-            updatedValue = null;
+        if (internalValue == null || "".equals(internalValue)) {
+            // Keep null or ""
+            updatedValue = internalValue;
         } else {
 
             // Current values in the instance
-            final Map instanceValues = tokenize(pipelineContext, internalValue, false);
+            final Map<String, String> instanceValues = tokenize(pipelineContext, internalValue, false);
 
             // Values in the itemset
-            final List items = getItemset(pipelineContext, true);
+            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
 
             // Actual value to return is the intersection of values in the instance and values in the itemset
             final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
             int index = 0;
-            for (Iterator i = items.iterator(); i.hasNext(); ) {
-                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+            for (XFormsItemUtils.Item currentItem: items) {
                 final String currentValue = currentItem.getValue();
                 if (instanceValues.get(currentValue) != null) {
                     if (index > 0)
@@ -158,8 +155,8 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         setExternalValue(updatedValue);
     }
 
-    private static Map tokenize(PipelineContext pipelineContext, String value, boolean decryptValues) {
-        final Map result = new HashMap();
+    private static Map<String, String> tokenize(PipelineContext pipelineContext, String value, boolean decryptValues) {
+        final Map<String, String> result = new HashMap<String, String>();
         if (value != null) {
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
                 final String token = st.nextToken();

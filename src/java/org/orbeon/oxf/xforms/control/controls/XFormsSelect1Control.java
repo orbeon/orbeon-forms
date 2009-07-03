@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -97,8 +96,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     /**
-     * Get itemset for a selection control given either directly or by id. If by id, the control MUST have a static
-     * itemset.
+     * Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
+     * lookup by id takes place and the control must have a static itemset or otherwise null is returned.
      *
      * @param pipelineContext       current pipeline context
      * @param containingDocument    current containing document
@@ -106,22 +105,19 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @param prefixedId            prefixed id of control from which to obtain itemset (if control is null)
      * @return                      itemset or null if it is not possible to obtain it
      */
-    public static List getItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsSelect1Control control, String prefixedId) {
-        if (control != null) {
-            // Control is there so just ask it
+    public static List<XFormsItemUtils.Item> getInitialItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                                        XFormsSelect1Control control, String prefixedId) {
+
+        if (control != null && control.isRelevant()) {
+            // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
             return control.getItemset(pipelineContext, true);
+        } else if (isStaticItemset(containingDocument, prefixedId)) {
+            // Control is not there or is not relevant, so use static itemsets
+            // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
+            return XFormsItemUtils.evaluateStaticItemsets(containingDocument, prefixedId);
         } else {
-            final boolean isStaticItemset; {
-                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
-                isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
-            }
-            if (isStaticItemset) {
-                // No control but the itemset is static so obtain it
-                return XFormsItemUtils.evaluateStaticItemsets(containingDocument, prefixedId);
-            } else {
-                // Not possible so return null
-                return null;
-            }
+            // Not possible so return null
+            return null;
         }
     }
 
@@ -134,6 +130,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
      */
     public List<XFormsItemUtils.Item> getItemset(PipelineContext pipelineContext, boolean setBinding) {
         try {
+            // Non-relevant control does not return an itemset
+            final NodeInfo boundNode = getBoundNode();
+            final boolean isRelevant = boundNode != null && InstanceData.getInheritedRelevant(boundNode);
+            if (!isRelevant)
+                return null;
+
             if ("false".equals(xxformsRefresh)) {
                 // Items are not automatically refreshed and stored globally
                 List<XFormsItemUtils.Item> items =  containingDocument.getControls().getConstantItems(getId());
@@ -152,6 +154,27 @@ public class XFormsSelect1Control extends XFormsValueControl {
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
         }
+    }
+
+    /**
+     * Whether the given control has a static set of items.
+     *
+     * @param containingDocument    containing document
+     * @param prefixedId            prefixed id
+     * @return                      true iif control has a static set of items
+     */
+    public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
+        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
+        return itemsInfo != null && !itemsInfo.hasNonStaticItem();
+    }
+
+    /**
+     * Whether this control has a static set of items.
+     *
+     * @return                      true iif control has a static set of items
+     */
+    public boolean isStaticItemset() {
+        return isStaticItemset(containingDocument, getPrefixedId());
     }
 
     public boolean isOpenSelection() {
@@ -176,9 +199,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
         final String internalValue = getValue(pipelineContext);
         final String updatedValue;
-        if (internalValue == null) {
-            updatedValue = null;
+
+        if (internalValue == null || "".equals(internalValue)) {
+            // Keep null or ""
+            // In the latter case, this is important for multiple selection, as the client expects a blank value to mean "nothing selected"
+            updatedValue = internalValue;
         } else {
+            // NOTE: We could in the future check that the value is in fact part of the itemset first, and send a blank value otherwise..
             if (isEncryptItemValues()) {
                 // For closed selection, values sent to client must be encrypted
                 updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
@@ -203,11 +230,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final String controlValue = getValue(pipelineContext);
 
             // Iterate over all the items
-            final List items = getItemset(pipelineContext, true);
+            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
-            for (Iterator i = items.iterator(); i.hasNext();) {
-                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+            for (XFormsItemUtils.Item currentItem: items) {
                 final String currentItemValue = currentItem.getValue();
                 final boolean itemWasSelected = controlValue.equals(currentItemValue);
                 final boolean itemIsSelected;
@@ -230,16 +256,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
-                for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
-                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                for (XFormsEvent currentEvent: deselectEvents) {
                     currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
-                for (Iterator i = selectEvents.iterator(); i.hasNext();) {
-                    final XFormsEvent currentEvent = (XFormsEvent) i.next();
+                for (XFormsEvent currentEvent: selectEvents) {
                     currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
                 }
             }

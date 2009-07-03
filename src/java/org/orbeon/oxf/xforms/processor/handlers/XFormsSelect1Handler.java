@@ -108,7 +108,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         // Get items, dynamic or static, if possible
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
-        final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
+
+        // Get items only if the control is present and relevant
+        final List items;
+        if (xformsSelect1Control != null && xformsSelect1Control.isRelevant()) {
+            items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
+        } else {
+            items = null;
+        }
 
         outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, items, isMany, isFull);
     }

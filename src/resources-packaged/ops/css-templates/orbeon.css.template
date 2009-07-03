@@ -1,0 +1,526 @@
+/*
+    Copyright (C) 2004-2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+body { margin: .71em; padding: 0 }
+
+body, input, button, table {
+    font-family: Arial, Helvetica, Geneva, sans-serif;
+    font-size: 9pt;
+}
+
+th {
+    color: #333333;
+}
+
+input[type = "submit"] {
+    font-size: 8pt;
+}
+
+fieldset {
+    margin-bottom: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    border: &light-color; 1px solid;
+}
+
+.tt, textarea, code {
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    font-size: 12px;
+}
+
+#orbeon-logo {
+    margin-left: 1em;
+}
+
+#main {
+    border-bottom:1px solid &dark-color;;
+    min-width: 650px;
+    width: expression(650 > document.body.clientWidth ? '650px' : '100%' );
+}
+
+#main1 {
+    margin: 0;
+    padding:0;
+}
+
+#main #leftcontent {
+    border-left: 1px solid &dark-color;;
+    width:230px;
+    margin:0;
+    padding-right: .5em;
+    line-height: 15pt;
+    background-color: &xlight-color;;
+}
+
+#maincontent {
+    margin:0;
+    background: white;
+    border-left: 1px solid &light-color;;
+    border-right: 1px solid &dark-color;;
+    vertical-align: top;
+    width: 99%;
+    line-height: 13pt;
+}
+
+.cleaner {
+    clear:both;
+    height:1px;
+    font-size:1px;
+    border:none;
+    margin:0; padding:0;
+    background:transparent;
+}
+
+#rightcontent p {
+    font-size: x-small;
+}
+
+#banner {
+    background:#fff;
+    height:3em;
+}
+
+p,h1,pre {
+    margin-top: .71em;
+    margin-bottom: .71em;
+}
+
+h1 {
+    font-size:14pt;
+    padding-top:.71em;
+}
+
+#banner h1 {
+    font-size:14pt;
+    padding:.71em .71em 0em .71em;
+    margin:0em;
+}
+
+.tabs {
+    background-image:  url('images/tabbar-blue.png');
+    background-repeat: repeat-x;
+    height: 23px;
+    text-align: center;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: bold;
+    clear: both;
+    line-height: 13pt;
+}
+
+.subtabs {
+    background-color: &xlight-color;;
+    color: &dark-color;;
+    font-weight: bolder;
+    text-align: left;
+    padding: .2em .5em .2em .5em;
+    margin-top: 0;
+    margin-bottom: 2em;
+    margin-left: -.8em;
+    margin-right: -0.8em;
+    border-bottom: solid 1px &dark-color;;
+    font-size: 10pt;
+}
+
+.subtab {
+    margin: 0 0 0 0;
+    padding: 0 1em 0 1em;
+    height: 17px;
+    position: relative;
+    border-right: 1px solid white;
+}
+
+.tab {
+    color: #000;
+    margin: 0 0 0 0;
+    padding: 0 1em 0 1em;
+    height: 17px;
+    position: relative;
+    top: 3px;
+    border-right: 1px solid white;
+}
+
+.tab:first-child {
+    border-left: 1px solid white;
+}
+
+.tab:hover {
+    color: #000;
+    background-color: &medium-color;;
+    text-decoration: none;
+}
+
+.tab-selected {
+    position: relative;
+    top: 3px;
+    margin: 0 0 0 0;
+    padding: 1px 1em 0 .5em;
+    background-image:  url('images/tab-shadow-top.png');
+    background-repeat: repeat-x;
+    background-color: #FFF;
+}
+
+.tab-selected-left {
+    position: relative;
+    top: 3px;
+    margin: 0 0 0 0;
+    padding: 1px 0 0 0;
+    background-image:  url('images/tab-shadow-left.png');
+    background-repeat: no-repeat;
+    background-color: #FFF;
+}
+
+.left-link {
+    color: &medium-color;;
+    background-color: #FFF;
+    font-weight: bold;
+    display: block;
+    margin: 0 .71em 0 .71em;
+    padding: .42em;
+    text-decoration: none;
+}
+
+.left-link:hover {
+    color: #000;
+    background-color: &light-color;;
+    text-decoration: none;
+}
+
+.left-link-selected {
+    color: #000;
+    background-color: &light-color;;
+    font-weight: bold;
+    display: block;
+    margin: 0 .71em 0 .71em;
+    padding: .42em;
+    text-decoration: none;
+}
+
+a {
+    color: &medium-color;;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#leftcontent h1 {
+    color: #000;
+    font-weight: bolder;
+    font-size: 14px;
+    text-align: left;
+    padding: 0.1em .5em .1em .5em;
+    margin-top: 0.5em;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+    margin-bottom: 0;
+}
+
+.maincontent h1 {
+    background-color: &xlight-color;;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: left;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-bottom: solid 1px &light-color;;
+    line-height: 180%;
+}
+
+.maincontent h2 {
+    color: &dark-color;;
+    background-color: &xlight-color;;
+    font-size: 9pt;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    border-bottom: solid 1px &dark-color;;
+    clear: right;
+}
+
+.maincontent h3 {
+    color: &dark-color;;
+    font-size: 10pt;
+    font-weight: bold;
+    clear: right;
+}
+
+.maincontent h4 {
+    color: &dark-color;;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+.maincontent h5 {
+    padding: 0.5em;
+}
+
+.maincontent b, .bold {
+    color: &dark-color;;
+}
+
+.maincontent hr {
+    height: 0;
+    border-top: solid gray 1px;
+    border-bottom: 0;
+}
+
+#mainbody {
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: .5em;
+}
+
+.box {
+     margin-left:3px;
+}
+
+.tree-sections {
+    margin-left: 0;
+    padding-left: 1em;
+    list-style-type: none;
+}
+
+.tree-section {
+    padding-top: 1em;
+    font-weight: bold;
+    color: #333333;
+}
+
+.tree-section .tree-section {
+    padding-top: 0;
+    padding-left: 1em;
+    font-weight: bold;
+    font-style: italic;
+    color: #555555;
+}
+
+.tree-section:first-child {
+    padding-top: 0;
+}
+
+.tree-items, .tree-items-selected {
+    margin-left: 0;
+    padding-left: 1em;
+    list-style-type: none;
+    color: black;
+    font-weight: normal;
+    font-style: normal;
+    white-space: nowrap;
+}
+
+.tree-items a {
+    color: black;
+    font-weight: normal;
+}
+
+.tree-items-selected {
+    color: &medium-color;;
+    font-weight: bold;
+}
+
+.tree-items a:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+.tree-items:hover {
+    color: &medium-color;;
+    text-decoration: none;
+}
+
+.minitoc ul {
+    list-style: none;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    margin-left: 2em;
+    padding-left: 0;
+    border-left: 0;
+}
+
+.ops-doc-section { padding-left: 1em; padding-right: 1em }
+.ops-doc-code { border: 1px solid black; padding: .5em; margin: .5em; font-size: smaller }
+.ops-doc-figure { border: 3px solid &light-color;; padding: 3px; margin-left: 1em }
+.ops-version { text-align: center; font-size: smaller }
+.ops-doc-image { clear: both; float: right; margin-left: 1em }
+
+ul {
+    list-style-type: square;
+}
+
+.frame { margin: 5px 20px 5px 20px; font-size: 12px; }
+.frame .content { margin: 5px; }
+
+.note { border: solid 1px &medium-color;; background-color: &xlight-color;; }
+.note .label { background-color: &medium-color;; color: #ffffff; }
+
+.notes { border: solid 1px #7099C5; background-color: #f0f0ff; }
+.notes .label { background-color: #7099C5; color: #ffffff; }
+
+.warning { border: solid 1px #D00000; background-color: #fff0f0; }
+.warning .label { background-color: #D00000; color: #ffffff; }
+
+.fixme { border: solid 1px #C6C600; background-color: #FAF9C3; }
+.fixme .label { background-color: #C6C600; color: #ffffff; }
+
+.code { font-family: "Lucida Console", "Courier New", Courier, monospace; font-size: 9pt;
+        padding-top: 0.5em; padding-bottom: 0.5em; padding-right: 1em; padding-left: 1em}
+
+.bordered { border-color: &light-color;; border-style: solid; border-width: 1px; line-height: 1.2em; }
+
+.ops-action-table td { white-space: nowrap; vertical-align: middle }
+.ops-action-table input { vertical-align: middle;}
+.ops-action-table a { vertical-align: middle;}
+
+.ops-source {
+    background-color: #eeeeee;
+    border: solid &dark-color; 1px;
+    padding: 0.5em;
+    line-height: 110%;
+    overflow: auto;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    font-size: 9pt;
+ }
+
+.gridtable {
+    font-size: 10pt;
+    border-collapse: collapse;
+}
+.gridtable .caption {
+    text-align: left;
+}
+.gridtable th {
+    background-color: &xlight-color;;
+    color: &dark-color;;
+    text-align: center;
+    padding: .3em;
+    border:    1px solid &light-color;;
+}
+.gridtable td {
+    color: black;
+    padding: .3em;
+    border:    1px solid &light-color;;
+    margin:    0;
+    vertical-align: top
+}
+
+.dashedbox {
+    border: 1px dotted black;
+    padding: 10px
+}
+
+.xml-cd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-rd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-id { margin-left: 2em; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-x {}
+.xml-c {}
+.xml-o {}
+
+.xml-symbol { color: black }
+.xml-text { color: black }
+.xml-comment { color: gray }
+.xml-elt-name { color: blue }
+.xml-elt-prefix { color: navy }
+.xml-att-prefix{ color: green }
+.xml-att-name { color: green }
+.xml-att-value { color: orange }
+
+/* Deprecated (for XForms Classic) */
+.calendar-button {
+    margin: 0 16px 3px 5px;
+    padding:0;
+    vertical-align: top;
+}
+
+/* This should not be here because it is too specific to particular applications */
+.fixed-width {
+    display: -moz-inline-box;
+    display: inline-block;
+    width: expression('9em'); /* Min-width for IE6 */
+    min-width: 9em;
+}
+
+.orbeon-portlet-div { text-align: left; margin: 1em }
+.orbeon-portlet-content { }
+.orbeon-portlet-home { margin-top: 1em; font-style: italic }
+
+@media print {
+    #orbeon-logo { display: none }
+    #main { border: none; }
+    #leftcontent { display: none }
+    #rightcontent { display: none }
+    #maincontent { border: none }
+    .tabs { display: none }
+    .tab { display: none }
+    #cleaner { display: none }
+    #navigation { display: none}
+    #main .maincontent { margin: 0; border: none; }
+
+    .maincontent h1 {
+        color: black;
+        background-color: white;
+        border: none;
+        font-size: 14pt;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .maincontent h2 {
+        color: black;
+        background-color: white;
+        border: none;
+        page-break-before: always;
+        font-size: 12pt;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .maincontent h3 {
+        color: black;
+        border: none;
+        page-break-before: always;
+        font-size: 10pt;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .maincontent a:first-child + h3 { page-break-before: avoid }
+
+    .maincontent h4 {
+        color: black;
+        border: none;
+        font-size: 9pt;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .maincontent thead { display: table-header-group }
+    .maincontent tfoot { display: table-footer-group }
+
+    a:link { color: black }
+    a:visited { color: black }
+    a { border: none }
+}

@@ -284,8 +284,7 @@
                 <include name="xbl/**/*.xsl"/>
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/css/*.template"/>
-                <exclude name="ops/css/*.properties"/>
+                <exclude name="ops/css-templates/**/*.*"/>
                 <exclude name="ops/**/*.css"/>
                 <exclude name="ops/**/*.js"/>
                 <exclude name="ops/**/*.gif"/>
@@ -394,16 +393,13 @@
 
     <target name="dev-css-templates" depends="init">
         <mkdir dir="${war.dir}/WEB-INF/resources/config/theme"/>
-        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/error.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/error.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/error.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms-widgets.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/xforms-widgets.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms-widgets.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>
@@ -472,19 +468,16 @@
 
     <target name="orbeon-css-templates" depends="init">
         <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
-            <filtersfile file="${resources-packaged.dir}/ops/css/css-constants.properties"/>
+            <filtersfile file="${resources-packaged.dir}/ops/css-templates/css-constants.properties"/>
         </filterset>
         <mkdir dir="${build.temp.dir}/theme"/>
-        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/error.css.template" toFile="${build.temp.dir}/theme/error.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${build.temp.dir}/theme/error.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
+        <copy file="${resources-packaged.dir}/ops/css-templates/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>
@@ -794,9 +787,6 @@
                 <!-- Form Builder is packaged as a JAR -->
                 <exclude name="forms/orbeon/builder/**"/>
             </zipfileset>
-            <!--<zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">-->
-                <!--<include name="*.css"/>-->
-            <!--</zipfileset>-->
         </zip>
     </target>
 

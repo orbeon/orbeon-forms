@@ -24,33 +24,39 @@
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <!-- This dummy instance ensures that xforms:submission doesn't complain about an empty single-node binding -->
-    <xforms:instance id="fr-navigation-instance"><dummy/></xforms:instance>
+    <xforms:instance id="fr-navigation-instance">
+        <navigation-instance>
+            <orbeon-embeddable/>
+        </navigation-instance>
+    </xforms:instance>
 
     <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+    <xxforms:variable name="common-get-parameters" select="string-join((
+        'fr-language=', xxforms:instance('fr-language-instance'),
+        if (instance('fr-navigation-instance')/orbeon-embeddable = '') then () else ('&amp;orbeon-embeddable=', instance('fr-navigation-instance')/orbeon-embeddable)), '')"/>
 
     <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
          URL design perspective having the language better identifies the resource -->
 
     <xforms:submission id="fr-edit-switch-script-summary-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="get" serialization="none" replace="all" validate="false" relevant="false"/>
 
     <xforms:submission id="fr-edit-switch-script-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}?fr-language={xxforms:instance('fr-language-instance')}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <xforms:submission id="fr-print-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
         xxforms:show-progress="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <xforms:submission id="fr-pdf-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}?fr-language={xxforms:instance('fr-language-instance')}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}?{$common-get-parameters}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
         xxforms:show-progress="false"/>
 
@@ -59,6 +65,10 @@
         <xxforms:script>window.close();</xxforms:script>
         <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"
                      xxforms:show-progress="false"/>
+    </xforms:action>
+
+    <xforms:action ev:event="xforms-model-construct-done">
+        <xforms:setvalue ref="orbeon-embeddable" value="(xxforms:get-request-parameter('orbeon-embeddable'), xxforms:get-request-parameter('orbeon-portlet'))"/>
     </xforms:action>
 
 </xforms:model>

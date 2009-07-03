@@ -2418,7 +2418,8 @@ ORBEON.xforms.Events = {
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
                 if (typeof ORBEON.xforms.Globals.serverValue[targetControlElement.id] == "undefined"
                         && ! ORBEON.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")) {
-                    ORBEON.xforms.Globals.serverValue[targetControlElement.id] = targetControlElement.value;
+                    var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(targetControlElement);
+                    ORBEON.xforms.Globals.serverValue[targetControlElement.id] = controlCurrentValue;
                 }
             }
 
@@ -3660,7 +3661,6 @@ ORBEON.widgets.RTE = function() {
             // has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
             // event is received.
             var registerChangeEvent = function() {
-                console.log("registerChangeEvent", registerChangeEvent);
                 yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
                 yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
                 yuiRTE.removeListener("afterNodeChange", registerChangeEvent);

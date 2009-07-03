@@ -151,6 +151,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
                     // Handle label classes
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
+                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, effectiveId + "-label");
 
                     // Output xhtml:legend with label content
                     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");

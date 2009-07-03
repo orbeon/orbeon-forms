@@ -381,7 +381,7 @@
                                 <p>
                                     The submission has <code>replace="all"</code> (which is the default if no
                                     <code>replace</code> attribute is specified) and the
-                                    <code>oxf.xforms.oxf.xforms.local-submission-forward</code> property is set to
+                                    <code>oxf.xforms.local-submission-forward</code> property is set to
                                     <code>true</code> (which is the default).
                                 </p>
                             </li>
@@ -389,7 +389,7 @@
                                 <p>
                                     The submission has <code>replace="instance"</code>, <code>replace="text"</code> or
                                     <code>replace="none"</code> and the
-                                    <code>oxf.xforms.oxf.xforms.local-submission-include</code> property is set to
+                                    <code>oxf.xforms.local-submission-include</code> property is set to
                                     <code>true</code> (the default is <code>false</code>).
                                 </p>
                             </li>

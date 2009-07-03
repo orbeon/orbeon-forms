@@ -98,6 +98,8 @@ h1.fr-form-title {
 .fb-toolbox-inside .fb-toolbox-controls-section { text-align: center }
 .fb-toolbox-inside dt { text-align: center }
 
+.fb-edit-items { text-decoration: none; display: block; clear: both }
+
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Itemset editor dialog */

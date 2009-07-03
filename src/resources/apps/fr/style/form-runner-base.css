@@ -368,8 +368,6 @@ button.xforms-trigger img { margin-right: 10px }
 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
-.fb-edit-items { text-decoration: none; display: block; clear: both }
-
 /* Styling common to all HTML form controls */
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,

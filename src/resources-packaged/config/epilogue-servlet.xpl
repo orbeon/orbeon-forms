@@ -69,12 +69,14 @@
                 <p:otherwise>
                     <p:processor name="oxf:identity">
                         <p:input name="data"
-                                 href="aggregate('config',
-                                                    #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
-                                                            for $t in concat('oxf:/apps/', $app,
-                                                                if (p:property('oxf.epilogue.embeddable') or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet', 'fr-portlet')]/value = 'true')
-                                                                    then '/theme-embeddable.xsl' else '/theme.xsl') return
-                                                            if (doc-available($t)) then $t else p:property('oxf.epilogue.theme')))"/>
+                                 href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
+                                            for $is-embeddable in
+                                                p:property('oxf.epilogue.embeddable')
+                                                or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet')]/value = 'true' return
+                                            for $app-style in concat('oxf:/apps/', $app, if ($is-embeddable) then '/theme-embeddable.xsl' else '/theme.xsl') return
+                                            if (doc-available($app-style))
+                                                then $app-style
+                                                else if ($is-embeddable) then p:property('oxf.epilogue.theme.embeddable') else p:property('oxf.epilogue.theme')))"/>
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:otherwise>

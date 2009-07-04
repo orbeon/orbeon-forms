@@ -41,6 +41,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         super(container, parent, element, name, effectiveId);
     }
 
+    @Override
     protected void evaluate(PipelineContext pipelineContext) {
 
         // Set context and evaluate other aspects of the control if necessary
@@ -51,10 +52,12 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         getExternalValue(pipelineContext);
     }
 
+    @Override
     public void markDirty() {
         super.markDirty();
         isValueEvaluated = false;
         isExternalValueEvaluated = false;
+        value = null;
     }
 
     protected void evaluateValue(PipelineContext pipelineContext) {
@@ -162,6 +165,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         this.externalValue = externalValue;
     }
 
+    @Override
     public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsValueControl))

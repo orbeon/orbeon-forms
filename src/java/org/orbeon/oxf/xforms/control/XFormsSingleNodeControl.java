@@ -54,9 +54,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         super(container, parent, element, name, effectiveId);
     }
 
+    @Override
     public void markDirty() {
         super.markDirty();
         mipsRead = false;
+        customMIPs = null;
         customMIPsAsString = null;
     }
 
@@ -158,10 +160,48 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return valid;
     }
 
+    @Override
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
         getMIPsIfNeeded();
     }
+
+    // Experiment with not evaluating labels, etc. if control is relevant.
+    // This is not the right way: must move basic concept of relevance to XFormsControl, as it is independent from
+    // notion of single-node binding.
+//    @Override
+//    protected void evaluate(PipelineContext pipelineContext) {
+//        getMIPsIfNeeded();
+//        super.evaluate(pipelineContext);
+//    }
+//
+//    @Override
+//    public String getLabel(PipelineContext pipelineContext) {
+//        getMIPsIfNeeded();
+//        // Do not compute if the control is not relevant
+//        return relevant ? super.getLabel(pipelineContext) : null;
+//    }
+//
+//    @Override
+//    public String getHelp(PipelineContext pipelineContext) {
+//        getMIPsIfNeeded();
+//        // Do not compute if the control is not relevant
+//        return relevant ? super.getHelp(pipelineContext) : null;
+//    }
+//
+//    @Override
+//    public String getHint(PipelineContext pipelineContext) {
+//        getMIPsIfNeeded();
+//        // Do not compute if the control is not relevant
+//        return relevant ? super.getHint(pipelineContext) : null;
+//    }
+//
+//    @Override
+//    public String getAlert(PipelineContext pipelineContext) {
+//        getMIPsIfNeeded();
+//        // Do not compute if the control is not relevant
+//        return relevant ? super.getAlert(pipelineContext) : null;
+//    }
 
     protected void getMIPsIfNeeded() {
         if (!mipsRead) {
@@ -227,6 +267,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         }
     }
 
+    @Override
     public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsSingleNodeControl))
@@ -267,6 +308,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return mips1 == null && mips2 == null || mips1 != null && mips1.equals(mips2);
     }
 
+    @Override
     public boolean isStaticReadonly() {
         // Static read-only if we are read-only and static (global or local setting)
         return isReadonly()

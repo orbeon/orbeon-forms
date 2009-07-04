@@ -55,9 +55,8 @@
 
             <!-- Pick theme -->
             <p:choose href="#request">
-                <p:when test="starts-with(/request/request-path, '/doc/')
-                              or starts-with(/request/request-path, '/fr/')
-                              or starts-with(/request/request-path, '/xforms-renderer')
+                <!-- Special case for plain theme (not sure if this is the best way) -->
+                <p:when test="starts-with(/request/request-path, '/xforms-renderer')
                               or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
                     <!-- Plain theme -->
                     <p:processor name="oxf:identity">
@@ -67,10 +66,16 @@
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:when>
+                <!-- Get regular or embeddable theme from file on disk or from property -->
                 <p:otherwise>
-                    <!-- Get theme from property -->
                     <p:processor name="oxf:identity">
-                        <p:input name="data" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme')))"/>
+                        <p:input name="data"
+                                 href="aggregate('config',
+                                                    #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
+                                                            for $t in concat('oxf:/apps/', $app,
+                                                                if (p:property('oxf.epilogue.embeddable') or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet', 'fr-portlet')]/value = 'true')
+                                                                    then '/theme-embeddable.xsl' else '/theme.xsl') return
+                                                            if (doc-available($t)) then $t else p:property('oxf.epilogue.theme')))"/>
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:otherwise>
@@ -145,13 +150,15 @@
                                         <method>xhtml</method>
                                         <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>
                                         <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
+                                        <!--<public-doctype>-//W3C//DTD XHTML 1.0 Strict//EN</public-doctype>-->
+                                        <!--<system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</system-doctype>-->
                                         <encoding>utf-8</encoding>
                                         <content-type>application/xhtml+xml</content-type>
-                                        <indent>false</indent>
+                                        <indent>true</indent>
                                         <indent-amount>0</indent-amount>
                                     </config>
                                 </p:input>
-                                <p:input name="data" href="#xhtml-data"/>
+                                <p:input name="data" href="#rewritten-data"/>
                                 <p:output name="data" id="converted"/>
                             </p:processor>
                         </p:when>
@@ -175,6 +182,8 @@
                                 <p:input name="config">
                                     <config>
                                         <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                                        <!--<public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>-->
+                                        <!--<system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>-->
                                         <version>4.01</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
@@ -228,7 +237,7 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <!-- NOTE: converter specifies text/html content-type -->
+                        <!-- NOTE: converters specify content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

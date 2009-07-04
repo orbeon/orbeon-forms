@@ -26,7 +26,7 @@
 
 /* ***** Basic HTML settings **************************************************************************************** */
 
-html { overflow: scroll }/* TODO: add comment about why this is useful (if is actually is) */
+html { overflow: scroll; background-color: #DDD }/* TODO: add comment about why this is useful (if is actually is) */
 
 body {
     background-color: #DDD;

@@ -513,7 +513,11 @@
                     </tr>
                     <tr>
                         <th>Purpose</th>
-                        <td>Specifies the theme stylesheet</td>
+                        <td>
+                            Specifies the theme stylesheet.
+                            This can be overwritten for a given app by placing a file <code>theme.xsl</code>
+                            inside the app directory.
+                        </td>
                     </tr>
                     <tr>
                         <th>Type</th>
@@ -528,15 +532,19 @@
                 </table>
             </section>
             <section>
-                <title>oxf.epilogue.theme.portlet</title>
+                <title>oxf.epilogue.theme.embeddable</title>
                 <table>
                     <tr>
                         <th>Name</th>
-                        <td><code>oxf.epilogue.theme.portlet</code></td>
+                        <td><code>oxf.epilogue.theme.embeddable</code></td>
                     </tr>
                     <tr>
                         <th>Purpose</th>
-                        <td>Specifies the theme stylesheet to use when within a portlet</td>
+                        <td>
+                            Specifies the theme stylesheet to use when within a portlet or in embeddable mode.
+                            This can be overwritten for a given app by placing a file <code>theme-embeddable.xsl</code>
+                            inside the app directory.
+                        </td>
                     </tr>
                     <tr>
                         <th>Type</th>
@@ -546,16 +554,7 @@
                     </tr>
                     <tr>
                         <th>Default Value</th>
-                        <td>
-                            <ul>
-                                <li>
-                                    For Form Runner pages: <code>oxf:/config/theme-portlet-fr.xsl</code>
-                                </li>
-                                <li>
-                                    For all other pages: <code>oxf:/config/theme-portlet-examples.xsl</code>
-                                </li>
-                            </ul>
-                        </td>
+                        <td><code>oxf:/config/theme-portlet-examples.xsl</code></td>
                     </tr>
                 </table>
             </section>

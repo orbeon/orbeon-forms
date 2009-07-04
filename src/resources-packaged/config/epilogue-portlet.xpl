@@ -76,28 +76,14 @@
         </p:otherwise>
     </p:choose>
 
-    <!-- Pick theme -->
-    <p:choose href="#request">
-        <p:when test="starts-with(/request/request-path, '/fr/')">
-            <!-- Plain theme -->
-            <p:processor name="oxf:identity">
-                <p:input name="data">
-                    <config>oxf:/config/theme-portlet-fr.xsl</config>
-                </p:input>
-                <p:output name="data" id="theme-config"/>
-            </p:processor>
-        </p:when>
-        <p:otherwise>
-            <!-- Get theme from property -->
-            <p:processor name="oxf:identity">
-                <p:input name="data" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme.portlet')))"/>
-                <p:output name="data" id="theme-config"/>
-            </p:processor>
-        </p:otherwise>
-    </p:choose>
     <!-- Extract a fragment and apply theme -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#theme-config"/>
+        <p:input name="config"
+                 href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
+                            for $app-style in concat('oxf:/apps/', $app, '/theme-embeddable.xsl') return
+                            if (doc-available($app-style))
+                                then $app-style
+                                else p:property('oxf.epilogue.theme.embeddable')))"/>
         <p:output name="data" id="theme"/>
     </p:processor>
     <p:processor name="oxf:unsafe-xslt">

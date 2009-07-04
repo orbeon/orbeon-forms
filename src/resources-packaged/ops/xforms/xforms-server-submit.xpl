@@ -98,41 +98,48 @@
                             </xsl:if>
 
                             <!-- Create list of events based on parameters -->
-                            <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or filename)]">
+                            <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or exists(filename))]">
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->
+
+                                <!-- If the parameter name ends with "[]", remove it. This is to support PHP-based proxies, which might add the brackets. -->
+                                <xsl:variable name="name" as="xs:string"
+                                              select="for $n in name return if (ends-with($n, '[]')) then substring($n, 1, string-length($n) - 2) else $n"/>
+
+                                <xsl:variable name="value" as="xs:string" select="value"/>
+
                                 <!-- For input[@type = 'image'], filter .y events above, and remove ending .x below -->
                                 <xxforms:event name="xxforms-value-or-activate"
-                                                       source-control-id="{if (ends-with(name, '.x')) then substring(name, 1, string-length(name) - 2) else name}">
+                                                       source-control-id="{if (ends-with($name, '.x')) then substring($name, 1, string-length($name) - 2) else $name}">
                                     <xsl:choose>
-                                        <xsl:when test="contains(name, '$xforms-input-1')">
+                                        <xsl:when test="contains($name, '$xforms-input-1')">
                                             <!-- Case of xforms:input, which may have two HTML input controls -->
-                                            <xsl:variable name="source-control-id" select="replace(name, '\$xforms-input-1', '')"/>
+                                            <xsl:variable name="source-control-id" select="replace($name, '\$xforms-input-1', '')"/>
                                             <xsl:attribute name="source-control-id" select="$source-control-id"/>
-                                            <xsl:variable name="second-input" select="../parameter[name = concat($source-control-id, '$xforms-input-2')]"/>
+                                            <xsl:variable name="second-input" select="../parameter[$name = concat($source-control-id, '$xforms-input-2')]"/>
                                             <xsl:choose>
                                                 <xsl:when test="$second-input">
                                                     <!-- This is a bit of a hack: we concatenate the two values with a
                                                     separator. In the future, use a component for dateTime anyway. -->
-                                                    <xsl:value-of select="concat(value, '·', $second-input/value)"/>
+                                                    <xsl:value-of select="concat($value, '·', $second-input/value)"/>
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                    <xsl:value-of select="value"/>
+                                                    <xsl:value-of select="$value"/>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:when>
-                                        <xsl:when test="contains(name, '$xforms-input-2')">
+                                        <xsl:when test="contains($name, '$xforms-input-2')">
                                             <!-- NOP: handled with $xforms-input-1 -->
                                         </xsl:when>
-                                        <xsl:when test="ends-with(name, '.x')">
+                                        <xsl:when test="ends-with($name, '.x')">
                                             <!-- input[@type = 'image'] -->
-                                            <xsl:attribute name="source-control-id" select="substring(name, 1, string-length(name) - 2)"/>
-                                            <xsl:value-of select="value"/>
+                                            <xsl:attribute name="source-control-id" select="substring($name, 1, string-length($name) - 2)"/>
+                                            <xsl:value-of select="$value"/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <!-- Regular case -->
-                                            <xsl:attribute name="source-control-id" select="name"/>
+                                            <xsl:attribute name="source-control-id" select="$name"/>
                                             <!-- There may be several times the same value with selection controls: keep only one so as not to confuse xforms:select1 -->
-                                            <xsl:value-of select="string-join(distinct-values(value), ' ')"/>
+                                            <xsl:value-of select="string-join(distinct-values($value), ' ')"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xxforms:event>

@@ -17,20 +17,20 @@
     views, for example applying a common theme, serializing the pages to HTML or XML, etc.
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:fo="http://www.w3.org/1999/XSL/Format"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:atom="http://www.w3.org/2005/Atom">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:fo="http://www.w3.org/1999/XSL/Format"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:atom="http://www.w3.org/2005/Atom">
 
     <!-- The document produced by the page view with XForms processing performed -->
     <p:param type="input" name="xformed-data"/>
     <!-- The raw document produced by the page view -->
-<!--    <p:param type="input" name="data"/>-->
+    <!--    <p:param type="input" name="data"/>-->
     <!-- The XML submission if any -->
     <p:param type="input" name="instance"/>
 
@@ -51,7 +51,6 @@
     <p:choose href="#xformed-data">
         <!-- XHTML detection. Apply the theme, rewrite URLs, and serialize to HTML or XHTML. -->
         <p:when test="/xhtml:html">
-            <!-- Apply theme and perform URL rewriting -->
 
             <!-- Pick theme -->
             <p:choose href="#request">
@@ -158,7 +157,7 @@
                                         <indent-amount>0</indent-amount>
                                     </config>
                                 </p:input>
-                                <p:input name="data" href="#rewritten-data"/>
+                                <p:input name="data" href="#xhtml-data"/>
                                 <p:output name="data" id="converted"/>
                             </p:processor>
                         </p:when>
@@ -214,22 +213,48 @@
                         <p:input name="data" href="#rewritten-data"/>
                         <p:output name="data" id="html-data"/>
                     </p:processor>
-                    <!-- Convert to plain HTML -->
+
+                    <!-- For embeddable, don't put a doctype declaration -->
+                    <p:choose href="#request">
+                        <p:when test="(p:property('oxf.epilogue.embeddable')
+                             or (/request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet')]/value = 'true'))">
+                            <p:processor name="oxf:identity">
+                                <p:input name="data">
+                                    <config>
+                                        <version>4.01</version>
+                                        <encoding>utf-8</encoding>
+                                        <indent>true</indent>
+                                        <indent-amount>0</indent-amount>
+                                    </config>
+                                </p:input>
+                                <p:output name="data" id="html-converter-config"/>
+                            </p:processor>
+                        </p:when>
+                        <p:otherwise>
+                            <p:processor name="oxf:identity">
+                                <p:input name="data">
+                                    <config>
+                                        <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
+                                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                                        <system-doctype>http://www.w3.org/TR/html4/strict2.dtd</system-doctype>
+                                        <version>4.01</version>
+                                        <encoding>utf-8</encoding>
+                                        <indent>true</indent>
+                                        <indent-amount>0</indent-amount>
+                                    </config>
+                                </p:input>
+                                <p:output name="data" id="html-converter-config"/>
+                            </p:processor>
+                        </p:otherwise>
+                    </p:choose>
+
+                    <!-- Convert to HTML, choosing between embeddable and plain -->
                     <p:processor name="oxf:html-converter">
-                        <p:input name="config">
-                            <config>
-                                <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
-                                <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
-                                <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
-                                <version>4.01</version>
-                                <encoding>utf-8</encoding>
-                                <indent>true</indent>
-                                <indent-amount>0</indent-amount>
-                            </config>
-                        </p:input>
+                        <p:input name="config" href="#html-converter-config"/>
                         <p:input name="data" href="#html-data"/>
                         <p:output name="data" id="converted"/>
                     </p:processor>
+
                 </p:otherwise>
             </p:choose>
 
@@ -303,7 +328,7 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                         NOTE: SVG converter specifies content-type, usually image/png
+                        NOTE: SVG converter specifies content-type, usually image/png
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

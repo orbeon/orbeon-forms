@@ -1,10 +1,15 @@
 YAHOO.namespace("xbl.fr");
 YAHOO.xbl.fr.Currency = {
-    instances: {},
+    _instances: {},
+
+    _getInstance: function(target) {
+        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
+        return this._instances[container.id];
+    },
 
     init: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        if (! YAHOO.xbl.fr.Currency.instances[container.id]) {
+        if (! this._instances[container.id]) {
 
             // Get information from the DOM
             var xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, container)[0];
@@ -65,6 +70,12 @@ YAHOO.xbl.fr.Currency = {
                     var currencyFormattedValue = this.numberToCurrency(xformsValue);
                     visibleInputElement.value = hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
                 },
+                readonly: function() {
+                    visibleInputElement.disabled = true;
+                },
+                readwrite: function() {
+                    visibleInputElement.disabled = false;
+                },
                 propertyPrefixChanged: function() {
                     prefix = ORBEON.xforms.Document.getValue(symbolElement.id) + " ";
                     instance.xformsToVisible();
@@ -81,22 +92,13 @@ YAHOO.xbl.fr.Currency = {
             // Register listener
             YAHOO.util.Event.addFocusListener(visibleInputElement, instance.focus);
             YAHOO.util.Event.addBlurListener(visibleInputElement, instance.blur);
-            YAHOO.xbl.fr.Currency.instances[container.id] = instance;
+            this._instances[container.id] = instance;
         }
     },
-    valueChanged: function(target) {
-        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        var instance = YAHOO.xbl.fr.Currency.instances[container.id];
-        instance.xformsToVisible();
-    },
-    propertyPrefixChanged: function(target) {
-        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        var instance = YAHOO.xbl.fr.Currency.instances[container.id];
-        instance.propertyPrefixChanged();
-    },
-    propertyDigitsAfterDecimalChanged: function(target) {
-        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        var instance = YAHOO.xbl.fr.Currency.instances[container.id];
-        instance.propertyDigitsAfterDecimalChanged();
-    }
+
+    valueChanged:                           function(target) { this._getInstance(target).xformsToVisible(); },
+    readonly:                               function(target) { this._getInstance(target).readonly(); },
+    readwrite:                              function(target) { this._getInstance(target).readwrite(); },
+    propertyPrefixChanged:                  function(target) { this._getInstance(target).propertyPrefixChanged(); },
+    propertyDigitsAfterDecimalChanged:      function(target) { this._getInstance(target).propertyDigitsAfterDecimalChanged(); }
 };

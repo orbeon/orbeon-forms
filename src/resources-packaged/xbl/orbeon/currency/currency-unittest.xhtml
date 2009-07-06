@@ -32,9 +32,11 @@
                     <currency>4567</currency>
                     <digits-after-decimal>3</digits-after-decimal>
                     <float>123.456</float>
+                    <readonly is-readonly="true">42</readonly>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="double" calculate="../value * 2"/>
+            <xforms:bind nodeset="double" readonly="false()" calculate="../value * 2"/>
+            <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
@@ -56,6 +58,7 @@
                     var floatStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-static")[0];
                     var floatDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-dynamic")[0];
                     var floatNoDigitsInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-no-digits")[0];
+                    var readonlyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "readonly")[0];
 
                     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -141,6 +144,19 @@
                         },
                         testNoDigits: function() {
                             YAHOO.util.Assert.areEqual("$ 123", floatNoDigitsInput.value);
+                        },
+                        testReadonly: function() {
+                            YAHOO.util.Assert.isTrue(readonlyInput.disabled);
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("set-readwrite"));
+                            }, function() {
+                                YAHOO.util.Assert.isFalse(readonlyInput.disabled);
+                                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get("set-readonly"));
+                                }, function() {
+                                    YAHOO.util.Assert.isTrue(readonlyInput.disabled);
+                                });
+                            });
                         }
                     }));
 
@@ -206,6 +222,20 @@
             <fr:currency ref="float" id="float-no-digits" digits-after-decimal="0">
                 <xforms:label>No digits after dec.</xforms:label>
             </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="readonly" id="readonly">
+                <xforms:label>Read-only</xforms:label>
+            </fr:currency>
+            <xforms:trigger id="set-readonly" appearance="minimal">
+                <xforms:label>Read-only</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">true</xforms:setvalue>
+            </xforms:trigger>
+            |
+            <xforms:trigger id="set-readwrite" appearance="minimal">
+                <xforms:label>Read-write</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">false</xforms:setvalue>
+            </xforms:trigger>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

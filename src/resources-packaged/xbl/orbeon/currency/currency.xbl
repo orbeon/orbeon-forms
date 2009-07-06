@@ -43,6 +43,8 @@
                         <!-- Access to XForms value, and xforms-value-changed event -->
                         <xforms:input ref="." class="xbl-fr-currency-xforms-input">
                             <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.valueChanged(this);</xxforms:script>
+                            <xxforms:script ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.readonly(this);</xxforms:script>
+                            <xxforms:script ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.readwrite(this);</xxforms:script>
                         </xforms:input>
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'prefix')"/>

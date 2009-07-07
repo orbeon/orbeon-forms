@@ -24,7 +24,7 @@
 * @param index {integer} Index (position) of the table in the document.
 *        Currently not used, but might be useful to generate IDs.
 */
-ORBEON.widgets.datatable = function (element, index) {
+ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
     
     YAHOO.log("Creating datatable index " + index, "info")
     // Store useful stuff as properties
@@ -46,7 +46,7 @@ ORBEON.widgets.datatable = function (element, index) {
     
     this.restructure();
     
-    this.resize();
+    this.resize(innerTableWidth);
     
     this.createColResizers();
      
@@ -80,7 +80,7 @@ ORBEON.widgets.datatable.prototype.restructure = function () {
     this.headerContainer.appendChild(this.header);
 }
 
-ORBEON.widgets.datatable.prototype.resize = function () {
+ORBEON.widgets.datatable.prototype.resize = function (innerTableWidth) {
 	
     var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
     var pxWidth = this.table.clientWidth;
@@ -98,13 +98,21 @@ ORBEON.widgets.datatable.prototype.resize = function () {
     }
     
     this.tableWidth = this.table.clientWidth;
+	if (this.tableWidth < pxWidth) {
+		this.tableWidth = pxWidth;
+	}
     this.tableHeight = this.table.clientHeight;
     if (this.scrollH) {
         if (pxWidth > this.tableWidth) {
             // Can be the case if table width was expressed as %
             this.tableWidth = pxWidth;
         }
-        this.tableWidth = this.optimizeWidth(this.table.clientWidth, this.table.clientHeight, 2500, this.getTableHeightForWidth(2500)) + 50;
+		if (innerTableWidth != null) {
+			YAHOO.util.Dom.setStyle(this.table, 'width', innerTableWidth);
+			this.tableWidth = this.table.clientWidth;
+		} else {
+			this.tableWidth = this.optimizeWidth(this.tableWidth, this.getTableHeightForWidth(this.tableWidth), 2500, this.getTableHeightForWidth(2500)) + 50;			
+		}
     } else if (this.scrollV) {
         if (this.hasFixedWidthTable) {
             width = this.tableWidth + 'px';
@@ -436,13 +444,13 @@ ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
 }
 
 
-ORBEON.widgets.datatable.init = function (target) {
+ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     // Initializes a datatable (called by xforms-enabled events)
     var container = target.parentNode.parentNode;
     var id = container.id;
     if (ORBEON.widgets.datatable.datatables[id] == undefined) {
         var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-        ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id);
+        ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
     }
 }
 

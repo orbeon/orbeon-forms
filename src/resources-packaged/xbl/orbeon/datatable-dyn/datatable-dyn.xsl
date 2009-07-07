@@ -28,6 +28,7 @@
         <parameter>height</parameter>
         <parameter>paginated</parameter>
         <parameter>rowsPerPage</parameter>
+        <parameter>innerTableWidth</parameter>
     </xsl:variable>
 
 
@@ -42,6 +43,8 @@
     <xsl:variable name="paginated" select="/*/@paginated = 'true'"/>
     <xsl:variable name="rowsPerPage"
         select="if (/*/@rowsPerPage castable as xs:integer) then /*/@rowsPerPage cast as xs:integer else 10"/>
+    <xsl:variable name="innerTableWidth"
+        select="if (/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, /fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
 
     <xsl:template match="@*|node()" mode="#all">
         <!-- Default template == identity -->
@@ -67,7 +70,6 @@
         </xsl:variable>
 
         <xhtml:div id="{$id}-container">
-            <!-- See http://snippets.dzone.com/posts/show/216... for the display: table hack-->
             <xsl:copy-of select="namespace::*"/>
 
             <xforms:model id="datatable-model">
@@ -137,10 +139,11 @@
             <xforms:group ref="xxforms:component-context()">
                 <xforms:action ev:event="xforms-enabled">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                    />","info"); ORBEON.widgets.datatable.init(this); </xxforms:script>
+                        />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
+                            select="$innerTableWidth"/>); </xxforms:script>
                 </xforms:action>
             </xforms:group>
-            
+
             <xhtml:table id="{$id}-table"
                 class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
                 style="{$height} {$width}">
@@ -181,7 +184,7 @@
                 <xhtml:span class="yui-dt-label">
                     <xsl:choose>
                         <xsl:when test="@fr:sortable = 'true'">
-                           <!-- <xxforms:variable name="myCurrentSortOrder"
+                            <!-- <xxforms:variable name="myCurrentSortOrder"
                                 select="if ($currentSortColumn = $columnDesc/@index) then $currentSortOrder else 'none'"/>
                             <xxforms:variable name="myNextSortOrder"
                                 select="if ($myCurrentSortOrder = 'ascending') then 'descending' else 'ascending'"/>-->
@@ -190,8 +193,8 @@
                                 <xforms:label>
                                     <xsl:apply-templates select="node()"/>
                                 </xforms:label>
-                                <xforms:hint>Click to sort <xforms:output value="$columnDesc/@nextSortOrder"
-                                    /></xforms:hint>
+                                <xforms:hint>Click to sort <xforms:output
+                                        value="$columnDesc/@nextSortOrder"/></xforms:hint>
                                 <xforms:action ev:event="DOMActivate">
                                     <!-- <xxforms:script> alert('ping');</xxforms:script>-->
                                     <xforms:setvalue ref="$columnDesc/@currentSortOrder"
@@ -286,7 +289,8 @@
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat">
         <xxforms:variable name="sort" model="datatable-model" select="."/>
-        <xxforms:variable name="key" model="datatable-model" select="key[position() = $sort/@currentId]"/>
+        <xxforms:variable name="key" model="datatable-model"
+            select="key[position() = $sort/@currentId]"/>
         <xforms:repeat nodeset="{@nodeset}">
             <!-- <xsl:attribute name="nodeset">
                 <xsl:if test="$paginated">(</xsl:if>

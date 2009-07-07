@@ -104,9 +104,11 @@
         </xforms:action>
 
         <!-- Update resources -->
-        <xforms:insert nodeset="instance('fr-current-form-resources')"
+        <xforms:insert if="not(instance('fr-current-form-resources')/@xml:lang = $lang)"
+                       nodeset="instance('fr-current-form-resources')"
                        origin="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
-        <xforms:insert nodeset="instance('fr-fr-current-resources')"
+        <xforms:insert if="not(instance('fr-fr-current-resources')/@xml:lang = $lang)"
+                       nodeset="instance('fr-fr-current-resources')"
                        origin="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
 
         <!-- Save current language into the session -->

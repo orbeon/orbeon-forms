@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
@@ -34,7 +31,7 @@ import java.util.List;
  */
 public class XFormsInsertEvent extends XFormsEvent {
 
-    private List insertedNodeInfos;
+    private List<Item> insertedNodeInfos;
     private List originItems;
     private NodeInfo insertLocationNodeInfo;
     private String position;
@@ -49,7 +46,7 @@ public class XFormsInsertEvent extends XFormsEvent {
     }
 
     public XFormsInsertEvent(XFormsEventTarget targetObject,
-                             List insertedNodes, List originItems,
+                             List<Item> insertedNodes, List originItems,
                              NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes, boolean isAdjustIndexes) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         
@@ -81,7 +78,7 @@ public class XFormsInsertEvent extends XFormsEvent {
         }
     }
 
-    public List getInsertedNodeInfos() {
+    public List<Item> getInsertedNodeInfos() {
         return insertedNodeInfos;
     }
 

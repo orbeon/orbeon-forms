@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.*;
@@ -97,7 +98,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                 final Item headersDocument = TransformerUtils.stringToTinyTree(sb.toString());
 
                 return XPathCache.evaluateAsExtent(getPipelineContext(), Collections.singletonList(headersDocument), 1,
-                        "/headers/header", XPathCache.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate(null);// NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+                        "/headers/header", XFormsConstants.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate(null);// NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
             } else {
                 // No headers
                 return EmptyIterator.getInstance();

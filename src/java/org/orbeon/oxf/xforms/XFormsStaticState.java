@@ -55,18 +55,6 @@ import java.util.*;
  * All the information contained here must be constant, and never change as the XForms engine operates on a page. This
  * information can be shared between multiple running copies of an XForms pages.
  *
- * The only exception to the above is during initialization, between the time initialized == false and initialized ==
- * true, where instances can be added.
- *
- * The static state may contain constant shared XForms instances. These may be used as:
- *
- * o read-only instances that don't need to be in the dynamic state
- * o initial instances needed for xforms:reset
- * o initial instances needed for back/reload
- *
- * Instances in the static state may not be initialized yet (i.e. not have the actual instance document include) in case
- * they are shared instances.
- *
  * NOTE: This code will have to change a bit if we move towards TinyTree to store the static state.
  */
 public class XFormsStaticState {
@@ -82,8 +70,7 @@ public class XFormsStaticState {
     private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>();
     private SAXStore xhtmlDocument;                         // entire XHTML document for noscript mode only
 
-    private Map<String, String> xxformsScripts;             // Map of id to script content
-    private Map<String, SharedXFormsInstance> instancesMap; // Map of id to shared instance
+    private Map<String, String> xxformsScripts;                         // Map of id to script content
 
     private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();   // Map of property name to property value (String, Integer, Boolean)
     private Map<String, String> externalEventsMap;                                      // Map<String, ""> of event names
@@ -257,31 +244,19 @@ public class XFormsStaticState {
             }
         }
 
-        // Extract instances if present
-        final Element instancesElement = staticStateElement.element("instances");
-        if (instancesElement != null) {
-            instancesMap = new HashMap<String, SharedXFormsInstance>();
-
-            for (Iterator instanceIterator = instancesElement.elements("instance").iterator(); instanceIterator.hasNext();) {
-                final Element currentInstanceElement = (Element) instanceIterator.next();
-                final SharedXFormsInstance newInstance = new SharedXFormsInstance(currentInstanceElement);
-                instancesMap.put(newInstance.getEffectiveId(), newInstance);
-            }
-        }
-
         // Extract versioned paths matchers if present
-        final Element matchersElement = staticStateElement.element("matchers");
-        if (matchersElement != null) {
-            final List matchersElements = instancesElement.elements("matcher");
-            this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
-            for (Iterator matcherIterator = matchersElements.iterator(); matcherIterator.hasNext();) {
-                final Element currentMatcherElement = (Element) matcherIterator.next();
-
-                versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
+        {
+            final Element matchersElement = staticStateElement.element("matchers");
+            if (matchersElement != null) {
+                final List<Element> matchersElements = Dom4jUtils.elements(matchersElement, "matcher");
+                this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
+                for (Element currentMatcherElement: matchersElements) {
+                    versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
+                }
+            } else {
+                // Otherwise use matchers from the pipeline context
+                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             }
-        } else {
-            // Otherwise use matchers from the pipeline context
-            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
         }
 
         if (encodedStaticState != null) {
@@ -490,7 +465,7 @@ public class XFormsStaticState {
      * o An encodedStaticState string was provided when restoring the static state, OR
      * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
      *
-     * Before the static state if fully initialized, shared instances can be added and contribute to the static state.
+     * Before the static state if fully initialized, cached instances can be added and contribute to the static state.
      * The lifecycle goes as follows:
      *
      * o Create initial static state from document
@@ -504,21 +479,6 @@ public class XFormsStaticState {
      */
     public boolean isInitialized() {
         return initialized;
-    }
-
-    /**
-     * Add a shared instance to this static state. Can only be called if the static state is not entirely initialized.
-     *
-     * @param instance  shared instance
-     */
-    public void addSharedInstance(SharedXFormsInstance instance) {
-        if (initialized)
-            throw new IllegalStateException("Cannot add instances to static state after initialization.");
-
-        if (instancesMap == null)
-            instancesMap = new HashMap<String, SharedXFormsInstance>();
-
-        instancesMap.put(instance.getEffectiveId(), instance);
     }
 
     /**
@@ -538,19 +498,6 @@ public class XFormsStaticState {
                 throw new IllegalStateException("Element instances already present in static state.");
 
             // TODO: if staticStateDocument will contains XHTML document, don't store controls and models in there
-
-            // Add instances to Document if needed
-            if (instancesMap != null && instancesMap.size() > 0) {
-                final Element instancesElement = rootElement.addElement("instances");
-                for (Iterator<SharedXFormsInstance> instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
-                    final XFormsInstance currentInstance = instancesIterator.next();
-
-                    // Add information for all shared instances, but don't add content for globally shared instances
-                    // NOTE: This strategy could be changed in the future or be configurable
-                    final boolean serializeInstance = !currentInstance.isApplicationShared();
-                    instancesElement.add(currentInstance.createContainerElement(serializeInstance));
-                }
-            }
 
             // Handle XHTML document if needed (for noscript mode)
             if (xhtmlDocument != null && rootElement.element(XMLConstants.XHTML_HTML_QNAME) == null) {
@@ -581,15 +528,18 @@ public class XFormsStaticState {
     }
 
     /**
-     * Get a map of available shared instances. Can only be called after initialization is complete.
+     * Return all instance containers of the specified model.
      *
-     * @return  Map<String, SharedXFormsInstance
+     * @param modelPrefixedId       model prefixed id
+     * @return                      container elements
      */
-    public Map<String, SharedXFormsInstance> getSharedInstancesMap() {
-        if (!initialized)
-            throw new IllegalStateException("Cannot get instances from static before initialization.");
+    public List<Element> getInstanceContainers(String modelPrefixedId) {
+        
+        // Find model document
+        final Document modelDocument = modelDocuments.get(modelPrefixedId);
 
-        return instancesMap;
+        // Return all containers
+        return Dom4jUtils.elements(modelDocument.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
     }
 
     /**

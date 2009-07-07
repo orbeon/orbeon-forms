@@ -34,6 +34,9 @@ import java.util.Iterator;
  */
 public abstract class XFormsSingleNodeControl extends XFormsControl {
 
+    // Bound node
+    private NodeInfo boundNode;
+
     // Whether MIPs have been read from the node
     private boolean mipsRead;
 
@@ -44,7 +47,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     private boolean valid;
 
     // Custom MIPs
-    private Map customMIPs;
+    private Map<String, String> customMIPs;
     private String customMIPsAsString;
 
     // Type
@@ -60,6 +63,27 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         mipsRead = false;
         customMIPs = null;
         customMIPsAsString = null;
+    }
+
+    @Override
+    public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
+
+        // Keep binding context
+        super.setBindingContext(pipelineContext, bindingContext);
+
+        // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
+        if (bindingContext.isNewBind())
+            this.boundNode = bindingContext.getSingleNode();
+    }
+
+    /**
+     * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
+     * the node to which the control no longer exists, return null.
+     *
+     * @return bound node or null
+     */
+    public NodeInfo getBoundNode() {
+        return boundNode;
     }
 
     public boolean isReadonly() {
@@ -219,7 +243,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     // Custom MIPs
                     this.customMIPs = InstanceData.getAllCustom(currentNodeInfo);
                     if (this.customMIPs != null)
-                        this.customMIPs = new HashMap(this.customMIPs);
+                        this.customMIPs = new HashMap<String, String>(this.customMIPs);
 
                     // Handle global read-only setting
                     if (XFormsProperties.isReadonly(containingDocument))

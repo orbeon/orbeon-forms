@@ -20,8 +20,8 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -60,9 +60,9 @@ public class XFormsInsertAction extends XFormsAction {
         final String contextAttribute = actionElement.attributeValue("context");
 
         // "2. The Node Set Binding node-set is determined."
-        final List collectionToBeUpdated; {
+        final List<Item> collectionToBeUpdated; {
             final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
-            collectionToBeUpdated = currentBindingContext.isNewBind() ? currentBindingContext.getNodeset() : Collections.EMPTY_LIST;
+            collectionToBeUpdated = currentBindingContext.isNewBind() ? currentBindingContext.getNodeset() : XFormsConstants.EMPTY_ITEM_LIST;
         }
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -174,10 +174,10 @@ public class XFormsInsertAction extends XFormsAction {
 
         // "3. The origin node-set is determined."
         // "5. Each node in the origin node-set is cloned in the order it appears in the origin node-set."
-        final List sourceNodes;
-        final List clonedNodes;
+        final List<Node> sourceNodes;
+        final List<Node> clonedNodes;
         {
-            final List clonedNodesTemp;
+            final List<Node> clonedNodesTemp;
             if (originItems == null) {
                 // There are no explicitly specified origin objects, use node from Node Set Binding node-set
 
@@ -213,8 +213,8 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
 
-                sourceNodes = new ArrayList(originItems.size()); // set to max possible size
-                clonedNodesTemp = new ArrayList(originItems.size());
+                sourceNodes = new ArrayList<Node>(originItems.size()); // set to max possible size
+                clonedNodesTemp = new ArrayList<Node>(originItems.size());
 
                 for (Iterator i = originItems.iterator(); i.hasNext();) {
                     final Object currentObject = i.next();
@@ -286,7 +286,7 @@ public class XFormsInsertAction extends XFormsAction {
         final XFormsInstance modifiedInstance;
         // Find actual insertion point and insert
         final NodeInfo insertLocationNodeInfo;
-        final List insertedNodes;
+        final List<Node> insertedNodes;
         if (isEmptyNodesetBinding) {
 
             // "If the Node Set Binding node-set is not specified or empty, the insert location node is the insert
@@ -356,7 +356,7 @@ public class XFormsInsertAction extends XFormsAction {
                 } else {
                     // Other node types
                     final Element parentNode = insertLocationNode.getParent();
-                    final List siblingElements = parentNode.content();
+                    final List<Node> siblingElements = Dom4jUtils.content(parentNode);
                     final int actualIndex = siblingElements.indexOf(insertLocationNode);
 
                     // Prepare insertion of new element
@@ -374,7 +374,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                     boolean hasTextNode = false;
                     int addIndex = 0;
-                    insertedNodes = new ArrayList(clonedNodes.size());
+                    insertedNodes = new ArrayList<Node>(clonedNodes.size());
                     for (int i = 0; i < clonedNodes.size(); i++) {
                         final Node clonedNode = (Node) clonedNodes.get(i);
 
@@ -429,7 +429,7 @@ public class XFormsInsertAction extends XFormsAction {
         // XFormsInstance handles index and repeat items updates 
         if (doDispatch && modifiedInstance != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            final List insertedNodeInfos;
+            final List<Item> insertedNodeInfos;
             if (didInsertNodes) {
                 final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
 //                if (modifiedInstance != null) {
@@ -441,11 +441,11 @@ public class XFormsInsertAction extends XFormsAction {
 //                    documentWrapper = new DocumentWrapper(insertDocument, null, new Configuration());
 //                }
 
-                insertedNodeInfos = new ArrayList(insertedNodes.size());
+                insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
                 for (Iterator i = insertedNodes.iterator(); i.hasNext();)
                     insertedNodeInfos.add(documentWrapper.wrap(i.next()));
             } else {
-                insertedNodeInfos = Collections.EMPTY_LIST;
+                insertedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
             }
 
             modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
@@ -476,8 +476,8 @@ public class XFormsInsertAction extends XFormsAction {
         return true;
     }
 
-    private static List doInsert(Node insertionNode, List clonedNodes) {
-        final List insertedNodes = new ArrayList(clonedNodes.size());
+    private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes) {
+        final List<Node> insertedNodes = new ArrayList<Node>(clonedNodes.size());
         if (insertionNode instanceof Element) {
             // Insert inside an element
             final Element insertContextElement = (Element) insertionNode;
@@ -506,7 +506,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                     } else if (!(clonedNode instanceof Document)) {
                         // Add other node to element
-                        insertContextElement.content().add(otherNodeIndex++, clonedNode);
+                        Dom4jUtils.content(insertContextElement).add(otherNodeIndex++, clonedNode);
                         insertedNodes.add(clonedNode);
                     } else {
                         // "If a cloned node cannot be placed at the target location due to a node type conflict, then the

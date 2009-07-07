@@ -64,7 +64,7 @@ public class XBLBindings {
         this.staticState = staticState;
         this.namespacesMap = namespacesMap;
 
-        final List<Element> xblElements = (staticStateElement != null) ? staticStateElement.elements(XFormsConstants.XBL_XBL_QNAME) : Collections.EMPTY_LIST;
+        final List<Element> xblElements = (staticStateElement != null) ? Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME) : XFormsConstants.EMPTY_ELEMENT_LIST;
         if (xblElements.size() > 0) {
             xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
             xblComponentBindings = new HashMap<QName, Element>();
@@ -80,7 +80,7 @@ public class XBLBindings {
 
                 // Extract xbl:xbl/xbl:script
                 // TODO: should do this differently, in order to include only the scripts and resources actually used
-                final List<Element> scriptElements = currentXBLDocument.getRootElement().elements(XFormsConstants.XBL_SCRIPT_QNAME);
+                final List<Element> scriptElements = Dom4jUtils.elements(currentXBLDocument.getRootElement(), XFormsConstants.XBL_SCRIPT_QNAME);
                 if (scriptElements != null && scriptElements.size() > 0) {
                     if (xblScripts == null)
                         xblScripts = new ArrayList<Element>();
@@ -113,7 +113,7 @@ public class XBLBindings {
                         {
                             final Element handlersElement = currentBindingElement.element(XFormsConstants.XBL_HANDLERS_QNAME);
                             if (handlersElement != null) {
-                                final List<Element> handlerElements = handlersElement.elements(XFormsConstants.XBL_HANDLER_QNAME);
+                                final List<Element> handlerElements = Dom4jUtils.elements(handlersElement, XFormsConstants.XBL_HANDLER_QNAME);
 
                                 if (xblHandlers == null) {
                                     xblHandlers = new LinkedHashMap<QName, List<Element>>();
@@ -146,7 +146,7 @@ public class XBLBindings {
                             if (resourcesElements != null) {
                                 for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
                                     final Element currentResourcesElement = (Element) k.next();
-                                    final List<Element> styleElements = currentResourcesElement.elements(XFormsConstants.XBL_STYLE_QNAME);
+                                    final List<Element> styleElements = Dom4jUtils.elements(currentResourcesElement, XFormsConstants.XBL_STYLE_QNAME);
                                     if (styleElements != null && styleElements.size() > 0) {
                                         if (xblStyles == null) {
                                             xblStyles = new ArrayList<Element>(styleElements);
@@ -169,7 +169,7 @@ public class XBLBindings {
     private static List<Document> extractChildrenModels(Element parentElement, boolean detach) {
 
         final List<Document> result = new ArrayList<Document>();
-        final List<Element> modelElements = parentElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
+        final List<Element> modelElements = Dom4jUtils.elements(parentElement, XFormsConstants.XFORMS_MODEL_QNAME);
 
         if (modelElements.size() > 0) {
             for (Element currentModelElement: modelElements) {
@@ -295,7 +295,7 @@ public class XBLBindings {
                         final List<Node> contentToInsert;
                         if (includesAttribute == null) {
                             // All bound node content must be copied over
-                            final List<Node> elementContent = boundElement.content();
+                            final List<Node> elementContent = Dom4jUtils.content(boundElement);
                             final List<Node> clonedContent = new ArrayList<Node>();
                             for (Node node: elementContent) {
                                 if (node instanceof Element) {
@@ -334,7 +334,7 @@ public class XBLBindings {
 
                         // Insert content if any
                         if (contentToInsert != null && contentToInsert.size() > 0) {
-                            final List<Node> parentContent = element.getParent().content();
+                            final List<Node> parentContent = Dom4jUtils.content(element.getParent());
                             final int elementIndex = parentContent.indexOf(element);
                             parentContent.addAll(elementIndex, contentToInsert);
                         }

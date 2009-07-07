@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -32,12 +31,13 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Navigator;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.net.URI;
 import java.net.URL;
@@ -51,8 +51,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private Document modelDocument;
 
     // Model attributes
-    private String modelId;
-    private String modelEffectiveId;
+    private String staticId;
+    private String prefixedId;
+    private String effectiveId;
 
     // Instances
     private List<String> instanceIds;
@@ -89,12 +90,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
 
-        modelId = modelElement.attributeValue("id");
-        modelEffectiveId = effectiveId;
+        staticId = modelElement.attributeValue("id");
+        this.effectiveId = effectiveId;
 
         // Extract list of instances ids
         {
-            final List<Element> instanceContainers = modelElement.elements(XFormsConstants.XFORMS_INSTANCE_QNAME);
+            final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
             instanceIds = new ArrayList<String>(instanceContainers.size());
             for (Element instanceContainer: instanceContainers) {
                 final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
@@ -108,7 +109,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Get <xforms:submission> elements (may be missing)
         {
-            final List<Element> submissionElements = modelElement.elements(XFormsConstants.XFORMS_SUBMISSION_QNAME);
+            final List<Element> submissionElements = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_SUBMISSION_QNAME);
             for (Element submissionElement: submissionElements) {
                 final String submissionId = submissionElement.attributeValue("id");
 
@@ -128,16 +129,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public void updateEffectiveId(String effectiveId) {
-        this.modelEffectiveId = effectiveId;
+        this.effectiveId = effectiveId;
 
         // Update effective ids of all nested instances
         if (instances != null) {
-            for (Iterator<XFormsInstance> i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = i.next();
+            for (XFormsInstance currentInstance: instances) {
                 // NOTE: we pass the new model id, not the instance id
                 currentInstance.updateModelEffectiveId(effectiveId);
             }
         }
+    }
+
+    public String getPrefixedId() {
+        if (prefixedId == null) {
+            prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+        }
+        return prefixedId;
     }
 
     public XFormsContextStack getContextStack() {
@@ -257,8 +264,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final DocumentInfo documentInfo = nodeInfo.getDocumentRoot();
 
         if (instances != null) {
-            for (Iterator<XFormsInstance> i = instances.iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = i.next();
+            for (XFormsInstance currentInstance: instances) {
                 if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
@@ -272,7 +278,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * have an associated id that identifies it.
      */
     public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI,
-                                              String username, String password, boolean shared, long timeToLive, String validation, boolean handleXInclude) {
+                                              String username, String password, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -283,9 +289,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation, handleXInclude);
+                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI, username, password, cached, timeToLive, validation, handleXInclude);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation, handleXInclude);
+                newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, cached, timeToLive, validation, handleXInclude);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -304,7 +310,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @param instance          XFormsInstance to set
      * @param replaced          whether this is an instance replacement (as result of a submission)
      */
-    public void setInstance(XFormsInstance instance, boolean replaced) {
+    private void setInstance(XFormsInstance instance, boolean replaced) {
 
         // Mark the instance as replaced if needed
         instance.setReplaced(replaced);
@@ -325,11 +331,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public String getId() {
-        return modelId;
+        return staticId;
     }
 
     public String getEffectiveId() {
-        return modelEffectiveId;
+        return effectiveId;
     }
 
     public LocationData getLocationData() {
@@ -387,6 +393,34 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     /**
+     * Serialize this model's instances.
+     *
+     * @param instancesElement  container element for serialized instances
+     */
+    public void serializeInstances(Element instancesElement) {
+        if (instances != null) {
+            for (XFormsInstance currentInstance: instances) {
+
+                // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
+
+                final boolean isReadonlyNonReplacedInline = currentInstance.isReadOnly() && !currentInstance.isReplaced() && currentInstance.getSourceURI() == null;
+                if (!isReadonlyNonReplacedInline) {
+                    // Serialize full instance of instance metadata (latter if instance is cached)
+                    // If it is readonly, not replaced, and inline, then don't even add information to the dynamic state
+
+                    instancesElement.add(currentInstance.createContainerElement(!currentInstance.isCache()));
+
+                    containingDocument.logDebug("serialize", currentInstance.isCache() ? "storing instance metadata to dynamic state" : "storing full instance to dynamic state",
+                        new String[] { "model effective id", effectiveId, "instance static id", currentInstance.getId() });
+
+                    // Log instance if needed
+                    currentInstance.logIfNeeded(getContainingDocument(), "serialized instance");
+                }
+            }
+        }
+    }
+
+    /**
      * Restore all the instances serialized as children of the given container element.
      *
      * @param pipelineContext   current PipelineContext containing attribute with serialized instances
@@ -398,68 +432,38 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Get instances from dynamic state first
         if (instancesElement != null) {
-            for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
-                final Element currentInstanceElement = (Element) i.next();
-
+            for (Element currentInstanceElement: Dom4jUtils.elements(instancesElement)) {
                 // Check that the instance belongs to this model
                 final String currentModelEffectiveId = currentInstanceElement.attributeValue("model-id");
-                if (modelEffectiveId.equals(currentModelEffectiveId)) {
-
+                if (effectiveId.equals(currentModelEffectiveId)) {
                     // Create and set instance document on current model
                     final XFormsInstance newInstance = new XFormsInstance(currentInstanceElement);
-
-                    if (newInstance.getDocumentInfo() == null) {
-                        // Instance is not initialized yet
-
-                        // This means that the instance was application shared
-                        if (!newInstance.isApplicationShared())
-                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
-
-                        final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, newInstance.getId(), newInstance.getEffectiveModelId(),
-                                    newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation(), newInstance.isHandleXInclude());
-
-                        setInstance(sharedInstance, false);
-                    } else {
-                        // Instance is initialized, just use it
-                        setInstance(newInstance, newInstance.isReplaced());
-                    }
-
-                    containingDocument.logDebug("restore", "restoring instance from dynamic state", new String[] { "model effective id", modelEffectiveId, "instance static id", newInstance.getId() });
+                    final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(currentInstanceElement);
+                    // NOTE: Here instance must contain document
+                    setInstanceLoadFromCacheIfNecessary(pipelineContext, isReadonlyHint, newInstance, null);
+                    containingDocument.logDebug("restore", "restoring instance from dynamic state", new String[] { "model effective id", effectiveId, "instance static id", newInstance.getId() });
                 }
             }
         }
 
         // Then get instances from static state if necessary
-        final Map<String, SharedXFormsInstance> staticInstancesMap = containingDocument.getStaticState().getSharedInstancesMap();
-        if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
-            for (Iterator<SharedXFormsInstance> instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
-                final XFormsInstance currentInstance = instancesIterator.next();
+        // This can happen if the instance is inline, readonly, and not replaced
+        for (Element containerElement: containingDocument.getStaticState().getInstanceContainers(getPrefixedId())) {
+            final String instanceStaticId = XFormsInstance.getInstanceStaticId(containerElement);
+            if (instancesMap.get(instanceStaticId) == null) {
+                // Must create instance
 
-                // Check that the instance belongs to this model
-                if (modelEffectiveId.equals(currentInstance.getEffectiveModelId())) {
-                    if (getInstance(currentInstance.getId()) == null) {
-                        // Instance was not set from dynamic state
+                final String xxformsExcludeResultPrefixes = containerElement.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
+                final List<Element> children = Dom4jUtils.elements(containerElement);
 
-                        if (currentInstance.getDocumentInfo() == null) {
-                            // Instance is not initialized yet
+                final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(containerElement);
+                final String xxformsValidation = containerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
-                            // This means that the instance was application shared
-                            if (!currentInstance.isApplicationShared())
-                                throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
+                // Extract document
+                final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
-                            final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, currentInstance.getId(),
-                                        currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation(), currentInstance.isHandleXInclude());
-                            setInstance(sharedInstance, false);
-                        } else {
-                            // Instance is initialized, just use it
-                            setInstance(currentInstance, false);
-                        }
-
-                        containingDocument.logDebug("restore", "restoring instance from static state", new String[] { "model effective id", modelEffectiveId, "instance static id", currentInstance.getId() });
-                    }
-                }
+                // Set instance and associated information
+                setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
             }
         }
     }
@@ -469,252 +473,34 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
-
-            final Element modelElement = modelDocument.getRootElement();
-
-            // 1. All XML Schemas loaded (throws xforms-link-exception)
-
-            loadSchemasIfNeeded(pipelineContext);
-            // TODO: throw exception event
-
-            // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
-            //    Instance may not be specified.
-
-            if (instances == null) {
-                instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-                instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
-            }
-            {
-                // Build initial instance documents
-                final List<Element> instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
-                final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map<String, SharedXFormsInstance> staticStateInstancesMap = staticState.isInitialized() ? staticState.getSharedInstancesMap() : null;
-                if (instanceContainers.size() > 0) {
-                    // Iterate through all instances
-                    int instancePosition = 0;
-                    for (Iterator<Element> i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
-
-                        final Element instanceContainerElement = i.next();
-                        final LocationData locationData = (LocationData) instanceContainerElement.getData();
-                        final String instanceStaticId = XFormsInstance.getInstanceStaticId(instanceContainerElement);
-
-                        // Handle read-only hints
-                        final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(instanceContainerElement);
-                        final boolean isApplicationSharedHint = XFormsInstance.isApplicationSharedHint(instanceContainerElement);
-                        final long xxformsTimeToLive = XFormsInstance.getTimeToLive(instanceContainerElement);
-
-                        // Skip processing in case somebody has already set this particular instance
-                        if (instances.get(instancePosition) != null) {
-                            continue;
-                        }
-
-                        // Get instance from static state if possible
-                        if (staticStateInstancesMap != null) {
-                            final XFormsInstance staticStateInstance = (XFormsInstance) staticStateInstancesMap.get(instanceStaticId);
-                            if (staticStateInstance != null) {
-                                // The instance is already available in the static state
-
-                                if (staticStateInstance.getDocumentInfo() == null) {
-                                    // Instance is not initialized yet
-
-                                    // This means that the instance was application shared
-                                    if (!staticStateInstance.isApplicationShared())
-                                        throw new ValidationException("Non-initialized instance has to be application shared for id: " + staticStateInstance.getEffectiveId(),
-                                                (LocationData) instanceContainerElement.getData());
-
-                                    if (XFormsServer.logger.isDebugEnabled())
-                                        containingDocument.logDebug("model", "using instance from application shared instance cache (instance from static state was not initialized)",
-                                                new String[] { "id", staticStateInstance.getEffectiveId() });
-
-                                    final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getId(),
-                                                staticStateInstance.getEffectiveModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(),
-                                                staticStateInstance.getValidation(), staticStateInstance.isHandleXInclude());
-                                    setInstance(sharedInstance, false);
-
-                                } else {
-                                    // Instance is initialized, just use it
-
-                                    if (XFormsServer.logger.isDebugEnabled())
-                                        containingDocument.logDebug("model", "using initialized instance from static state",
-                                                new String[] { "id", staticStateInstance.getEffectiveId() });
-
-                                    setInstance(staticStateInstance, false);
-                                }
-
-                                continue;
-                            }
-                        }
-
-                        // Did not get the instance from static state
-                        final String xxformsValidation = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
-
-                        containingDocument.startHandleOperation("model", "loading instance",
-                                new String[] { "instance id", instanceContainerElement.attributeValue("id") });
-                        {
-                            // Get instance resource URI, can be from @src or @resource
-                            //final String instanceResource = getOriginalInstanceResourceURI(instanceContainerElement);
-
-                            final String srcAttribute = instanceContainerElement.attributeValue("src");
-                            final String resourceAttribute = instanceContainerElement.attributeValue("resource");
-                            final List<Element> children = instanceContainerElement.elements();
-                            if (srcAttribute != null) {
-                                // "If the src attribute is given, then it takes precedence over inline content and the
-                                // resource attribute, and the XML data for the instance is obtained from the link."
-
-                                if (srcAttribute.trim().equals("")) {
-                                    // Got a blank src attribute, just dispatch xforms-link-exception
-                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
-                                    final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceStaticId, extendedLocationData);
-                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
-                                    break;
-                                }
-
-                                // Load instance
-                                loadExternalInstance(pipelineContext, instanceContainerElement, instanceStaticId, srcAttribute, locationData, isReadonlyHint, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
-                            } else if (children != null && children.size() >= 1) {
-                                // "If the src attribute is omitted, then the data for the instance is obtained from
-                                // inline content if it is given or the resource attribute otherwise. If both the
-                                // resource attribute and inline content are provided, the inline content takes
-                                // precedence."
-
-                                final String xxformsExcludeResultPrefixes = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
-
-                                if (children.size() > 1) {
-                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
-                                    final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
-                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
-                                    break;
-                                }
-
-                                try {
-                                    // Extract document
-                                    final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
-
-                                    // Set instance and associated information if everything went well
-                                    // NOTE: No XInclude supported to read instances with @src for now
-                                    setInstanceDocument(instanceDocument, modelEffectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
-                                } catch (Exception e) {
-                                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
-                                    final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
-                                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
-                                    break;
-                                }
-                            } else if (resourceAttribute != null) {
-                                // "the data for the instance is obtained from inline content if it is given or the
-                                // resource attribute otherwise"
-
-                                // Load instance
-                                loadExternalInstance(pipelineContext, instanceContainerElement, instanceStaticId, resourceAttribute, locationData, isReadonlyHint, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
-                            } else {
-                                // Everything missing
-                                final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
-                                final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
-                                container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, "", instanceContainerElement, throwable));
-                                break;
-                            }
-                        }
-                        containingDocument.endHandleOperation();
-                    }
-                }
-            }
-
-            // 3. P3P (N/A)
-
-            // 4. Instance data is constructed. Evaluate binds:
-            //    a. Evaluate nodeset
-            //    b. Apply model item properties on nodes
-            //    c. Throws xforms-binding-exception if the node has already model item property with same name
-            // TODO: a, b, c
-
-            // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            deferredActionContext.rebuild = true;
-            deferredActionContext.recalculate = true;
-            deferredActionContext.revalidate = true;
-
-            doRebuild(pipelineContext);
-            doRecalculate(pipelineContext);
-            doRevalidate(pipelineContext);
-
-            synchronizeInstanceDataEventState();
-
+            doModelConstruct(pipelineContext);
         } else if (XFormsEvents.XXFORMS_READY.equals(eventName)) {
-
             // This is called after xforms-ready events have been dispatched to all models
-
-            final XFormsStaticState staticState = containingDocument.getStaticState();
-
-            if (staticState != null && !staticState.isInitialized()) {
-                // The static state is open to adding instances
-                if (getInstances() != null) {
-                    for (XFormsInstance currentInstance : getInstances()) {
-                        if (currentInstance instanceof SharedXFormsInstance) {
-
-                            // NOTE: We add all shared instances, even the globally shared ones, and the static state
-                            // decides of the amount of information to actually store
-                            if (XFormsServer.logger.isDebugEnabled())
-                                containingDocument.logDebug("model", "adding read-only instance to static state",
-                                    new String[] { "instance", currentInstance.getEffectiveId() });
-                            staticState.addSharedInstance((SharedXFormsInstance) currentInstance);
-                        }
-                        // TODO: something like staticState.hasReset(modelId);
-                        // TODO: maybe we won't do this here, but by restoring the initial dynamic state instead
-//                        final boolean modelHasReset = false;
-//                        else if (modelHasReset) {
-//                            if (XFormsServer.logger.isDebugEnabled())
-//                                containingDocument.logDebug("model", "adding reset instance to static state",
-//                                    new String[] { "instance", currentInstance.getEffectiveId() });
-//                            staticState.addSharedInstance(currentInstance.createSharedInstance());
-//                        }
-                    }
-                }
-            }
-
+            doAfterReady();
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
-
             // TODO: implicit lazy instance construction
-
         } else if (XFormsEvents.XFORMS_REBUILD.equals(eventName)) {
             // 4.3.7 The xforms-rebuild Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
             doRebuild(pipelineContext);
-
         } else if (XFormsEvents.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
             doRecalculate(pipelineContext);
-
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
             doRevalidate(pipelineContext);
-
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
             doRefresh(pipelineContext);
-
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
-            // TODO
-            // "The instance data is reset to the tree structure and values it had immediately
-            // after having processed the xforms-ready event."
-
-            // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
-            // xforms-refresh are dispatched to the model element in sequence."
-            container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
-            container.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
-            container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
-            container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
-
+            doReset(pipelineContext);
         } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName) || XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
             // 4.5.4 The xforms-compute-exception Event
             // Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
@@ -733,7 +519,186 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    private void loadExternalInstance(PipelineContext pipelineContext, Element instanceContainerElement, String instanceStaticId, String instanceResource, LocationData locationData, boolean readonlyHint, boolean applicationSharedHint, long xxformsTimeToLive, String xxformsValidation) {
+    private void doReset(PipelineContext pipelineContext) {
+        // TODO
+        // "The instance data is reset to the tree structure and values it had immediately
+        // after having processed the xforms-ready event."
+
+        // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
+        // xforms-refresh are dispatched to the model element in sequence."
+        container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
+        container.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
+        container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
+        container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
+    }
+
+    private void doAfterReady() {
+    }
+
+    private void doModelConstruct(PipelineContext pipelineContext) {
+        final Element modelElement = modelDocument.getRootElement();
+
+        // 1. All XML Schemas loaded (throws xforms-link-exception)
+
+        loadSchemasIfNeeded(pipelineContext);
+        // TODO: throw exception event
+
+        // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
+        //    Instance may not be specified.
+
+        if (instances == null) {
+            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
+            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
+        }
+        {
+            // Build initial instance documents
+            final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
+            if (instanceContainers.size() > 0) {
+                // Iterate through all instances
+                int instancePosition = 0;
+                for (Element containerElement : instanceContainers) {
+                    // Skip processing in case somebody has already set this particular instance
+                    if (instances.get(instancePosition++) != null) {
+                        // NOP
+                    } else {
+                        // Did not get the instance from static state
+
+                        final LocationData locationData = (LocationData) containerElement.getData();
+                        final String instanceStaticId = XFormsInstance.getInstanceStaticId(containerElement);
+                        final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(containerElement);
+                        final boolean isCacheHint = XFormsInstance.isCacheHint(containerElement);
+                        final long xxformsTimeToLive = XFormsInstance.getTimeToLive(containerElement);
+                        final String xxformsValidation = containerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
+
+                        // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
+                        loadInstance(pipelineContext, containerElement, instanceStaticId, isReadonlyHint, isCacheHint, xxformsTimeToLive, xxformsValidation, locationData);
+                    }
+                }
+            }
+        }
+
+        // 3. P3P (N/A)
+
+        // 4. Instance data is constructed. Evaluate binds:
+        //    a. Evaluate nodeset
+        //    b. Apply model item properties on nodes
+        //    c. Throws xforms-binding-exception if the node has already model item property with same name
+        // TODO: a, b, c
+
+        // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
+        deferredActionContext.rebuild = true;
+        deferredActionContext.recalculate = true;
+        deferredActionContext.revalidate = true;
+
+        doRebuild(pipelineContext);
+        doRecalculate(pipelineContext);
+        doRevalidate(pipelineContext);
+
+        synchronizeInstanceDataEventState();
+    }
+
+    private void setInstanceLoadFromCacheIfNecessary(PipelineContext pipelineContext, boolean readonlyHint, XFormsInstance newInstance, Element locationDataElement) {
+        if (newInstance.getDocumentInfo() == null && newInstance.getSourceURI() != null) {
+            // Instance not initialized yet and must be loaded from URL
+
+            // This means that the instance was cached
+            if (!newInstance.isCache())
+                throw new ValidationException("Non-initialized instance has to be cacheable for id: " + newInstance.getEffectiveId(),
+                        (locationDataElement != null) ? (LocationData) locationDataElement.getData() : getLocationData());
+
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("model", "using instance from instance cache (instance was not initialized)",
+                        new String[] { "id", newInstance.getEffectiveId() });
+
+            // NOTE: No XInclude supported to read instances with @src for now
+            final XFormsInstance cachedInstance
+                    = XFormsServerSharedInstancesCache.instance().findConvert(pipelineContext, containingDocument, newInstance.getId(), newInstance.getEffectiveModelId(),
+                        newInstance.getSourceURI(), readonlyHint, newInstance.getTimeToLive(), newInstance.getValidation(), false);
+
+            setInstance(cachedInstance, newInstance.isReplaced());
+        } else {
+            // Instance is initialized, just use it
+
+            // This means that the instance was not cached
+            if (newInstance.isCache())
+                throw new ValidationException("Initialized instance has to be non-cacheable for id: " + newInstance.getEffectiveId(),
+                        (locationDataElement != null) ? (LocationData) locationDataElement.getData() : getLocationData());
+
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("model", "using initialized instance from state",
+                        new String[] { "id", newInstance.getEffectiveId() });
+
+            setInstance(newInstance, newInstance.isReplaced());
+        }
+    }
+
+    private void loadInstance(PipelineContext pipelineContext, Element instanceContainer, String instanceStaticId, boolean readonlyHint, boolean isCacheHint, long xxformsTimeToLive, String xxformsValidation, LocationData locationData) {
+        containingDocument.startHandleOperation("model", "loading instance",
+                new String[] { "instance id", instanceContainer.attributeValue("id") });
+        {
+            // Get instance resource URI, can be from @src or @resource
+
+            final String srcAttribute = instanceContainer.attributeValue("src");
+            final String resourceAttribute = instanceContainer.attributeValue("resource");
+
+            final List<Element> children = Dom4jUtils.elements(instanceContainer);
+            if (srcAttribute != null) {
+                // "If the src attribute is given, then it takes precedence over inline content and the resource
+                // attribute, and the XML data for the instance is obtained from the link."
+
+                if (srcAttribute.trim().equals("")) {
+                    // Got a blank src attribute, just dispatch xforms-link-exception
+                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainer);
+                    final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceStaticId, extendedLocationData);
+                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainer, throwable));
+                }
+
+                // Load instance
+                loadExternalInstance(pipelineContext, instanceContainer, instanceStaticId, srcAttribute, locationData, readonlyHint, isCacheHint, xxformsTimeToLive, xxformsValidation);
+            } else if (children != null && children.size() >= 1) {
+                // "If the src attribute is omitted, then the data for the instance is obtained from inline content if
+                // it is given or the resource attribute otherwise. If both the resource attribute and inline content
+                // are provided, the inline content takes precedence."
+
+                final String xxformsExcludeResultPrefixes = instanceContainer.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
+
+                if (children.size() > 1) {
+                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainer);
+                    final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
+                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainer, throwable));
+                }
+
+                try {
+                    // Extract document
+                    final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, readonlyHint);
+
+                    // Set instance and associated information if everything went well
+                    // NOTE: No XInclude supported to read instances with @src for now
+                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
+                } catch (Exception e) {
+                    final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainer);
+                    final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
+                    container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainer, throwable));
+                }
+            } else if (resourceAttribute != null) {
+                // "the data for the instance is obtained from inline content if it is given or the
+                // resource attribute otherwise"
+
+                // Load instance
+                loadExternalInstance(pipelineContext, instanceContainer, instanceStaticId, resourceAttribute, locationData, readonlyHint, isCacheHint, xxformsTimeToLive, xxformsValidation);
+            } else {
+                // Everything missing
+                final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainer);
+                final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
+                container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, "", instanceContainer, throwable));
+            }
+        }
+        containingDocument.endHandleOperation();
+    }
+
+    private void loadExternalInstance(PipelineContext pipelineContext, Element instanceContainer, String instanceStaticId,
+                                      String instanceResource, LocationData locationData,
+                                      boolean readonlyHint, boolean cacheHint, long xxformsTimeToLive, String xxformsValidation) {
         // External instance
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -742,12 +707,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Resolve to absolute resource path
         final String resourceAbsolutePathOrAbsoluteURL
-                = XFormsUtils.resolveServiceURL(pipelineContext, instanceContainerElement, instanceResourceHHRI,
+                = XFormsUtils.resolveServiceURL(pipelineContext, instanceContainer, instanceResourceHHRI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
 
         try {
-            if (applicationSharedHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) != null) {
-                // Instance can be shared
+            if (cacheHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) != null) {
+                // Instance can be cached
                 // NOTE: We don't allow sharing for input:* URLs because this is very likely NOT to make sense
 
                 // TODO: This doesn't handle optimized submissions!
@@ -760,12 +725,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 }
 
                 // NOTE: No XInclude supported to read instances with @src for now
-                final SharedXFormsInstance sharedXFormsInstance
-                        = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceStaticId, modelEffectiveId,
-                            absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation, false);
+                final XFormsInstance sharedXFormsInstance
+                        = XFormsServerSharedInstancesCache.instance().findConvert(pipelineContext, containingDocument, instanceStaticId, effectiveId,
+                            absoluteResolvedURLString, readonlyHint, xxformsTimeToLive, xxformsValidation, false);
                 setInstance(sharedXFormsInstance, false);
             } else {
-                // Instance cannot be shared
+                // Instance cannot be cached
 
                 // NOTE: Optimizing with include() for servlets has limitations, in particular
                 // the proper split between servlet path and path info is not done.
@@ -778,24 +743,24 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 if (optimizeLocal) {
                     // Use URL resolved against current context
-                    final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResourceHHRI);
-                    loadInstanceOptimized(pipelineContext, externalContext, instanceContainerElement, instanceStaticId, resolvedURI.toString(), readonlyHint, xxformsValidation);
+                    final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainer, instanceResourceHHRI);
+                    loadInstanceOptimized(pipelineContext, externalContext, instanceContainer, instanceStaticId, resolvedURI.toString(), readonlyHint, xxformsValidation);
                 } else {
                     // Use full resolved resource URL
                     // o absolute URL, e.g. http://example.org/instance.xml
                     // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
-                    loadInstance(externalContext, instanceContainerElement, instanceStaticId, resourceAbsolutePathOrAbsoluteURL, readonlyHint, xxformsValidation);
+                    loadInstance(externalContext, instanceContainer, instanceStaticId, resourceAbsolutePathOrAbsoluteURL, readonlyHint, xxformsValidation);
                 }
             }
         } catch (Exception e) {
             final ValidationException validationException
-                = ValidationException.wrapException(e, new ExtendedLocationData(locationData, "reading external instance", instanceContainerElement));
-            container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, resourceAbsolutePathOrAbsoluteURL, instanceContainerElement, validationException));
+                = ValidationException.wrapException(e, new ExtendedLocationData(locationData, "reading external instance", instanceContainer));
+            container.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, resourceAbsolutePathOrAbsoluteURL, instanceContainer, validationException));
         }
     }
 
-    private void loadInstance(ExternalContext externalContext, Element instanceContainerElement,
-                                          String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
+    private void loadInstance(ExternalContext externalContext, Element instanceContainer, String instanceId,
+                              String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
 
         // Connect using external protocol
 
@@ -818,12 +783,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Extension: username and password
         // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
         // instances that haven't been loaded yet.
-        final String xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
-        final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+        final String xxformsUsername = instanceContainer.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+        final String xxformsPassword = instanceContainer.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
 
         final Object instanceDocument;// Document or DocumentInfo
         if (containingDocument.getURIResolver() == null) {
-            // Connect directly if there is no resolver or if the instance is globally shared
+            // Connect directly if there is no resolver or if the instance is globally cached
 
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("model", "getting document from URI",
@@ -872,14 +837,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, absoluteResolvedURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation, false);
+        setInstanceDocument(instanceDocument, effectiveId, instanceId, absoluteResolvedURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation, false);
     }
 
-    private void loadInstanceOptimized(PipelineContext pipelineContext, ExternalContext externalContext, Element instanceContainerElement,
-                                          String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
+    private void loadInstanceOptimized(PipelineContext pipelineContext, ExternalContext externalContext, Element instanceContainer,
+                                       String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
 
         // Whether or not to rewrite URLs
-        final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainerElement);
+        final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainer);
 
         if (XFormsServer.logger.isDebugEnabled())
             containingDocument.logDebug("model", "getting document from optimized URI",
@@ -913,16 +878,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, modelEffectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
+        setInstanceDocument(instanceDocument, effectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
     }
-
+    
     public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
     public void synchronizeInstanceDataEventState() {
         if (instances != null) {
-            for (XFormsInstance currentInstance : instances) {
+            for (XFormsInstance currentInstance: instances) {
                 currentInstance.synchronizeInstanceDataEventState();
             }
         }
@@ -967,7 +932,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 containingDocument.startHandleOperation("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
             // Clear validation state
-            for (XFormsInstance currentInstance : instances) {
+            for (XFormsInstance currentInstance: instances) {
                 XFormsUtils.iterateInstanceData(currentInstance, new XFormsUtils.InstanceWalker() {
                     public void walk(NodeInfo nodeInfo) {
                         InstanceData.clearValidationState(nodeInfo);
@@ -981,7 +946,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Validate using schemas if needed
             if (mustSchemaValidate) {
                 // Apply schemas to all instances
-                for (XFormsInstance currentInstance : instances) {
+                for (XFormsInstance currentInstance: instances) {
                     // Currently we don't support validating read-only instances
                     if (!currentInstance.isReadOnly()) {
                         if (!schemaValidator.validateInstance(currentInstance)) {
@@ -999,7 +964,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
-            for (XFormsInstance currentInstance : instances) {
+            for (XFormsInstance currentInstance: instances) {
                 if (invalidInstances.get(currentInstance.getEffectiveId()) == null) {
                     container.dispatchEvent(pipelineContext, new XXFormsValidEvent(currentInstance));
                 } else {
@@ -1094,7 +1059,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                             return;
 
                         // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
-                        final NodeInfo boundNodeInfo = control.getBoundNode();
+                        final NodeInfo boundNodeInfo = ((XFormsSingleNodeControl) control).getBoundNode();
                         if (boundNodeInfo == null)
                             return;
 

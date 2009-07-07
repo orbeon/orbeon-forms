@@ -59,7 +59,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     // Static information (never changes for the lifetime of the containing document)
     private Element controlElement;
-    //private NodeInfo controlNodeInfo; TODO
     private String id;
     private String name;
     private String appearance;// could become more dynamic in the future
@@ -73,12 +72,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private String prefixedId;
 
     protected XFormsContextStack.BindingContext bindingContext;
-    private NodeInfo boundNode;
 
     private boolean isEvaluated;
 
     // Optional extension attributes supported by the control
-    private Map extensionAttributesValues;
+    private Map<QName, String> extensionAttributesValues;
 
     private String label;
     private boolean isLabelEvaluated;
@@ -460,10 +458,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Compare values of extension attributes if any
         if (extensionAttributesValues != null) {
-            for (Iterator i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final QName currentName = (QName) currentEntry.getKey();
-                final String currentValue = (String) currentEntry.getValue();
+            for (Iterator<Map.Entry<QName,String>> i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry<QName,String> currentEntry = i.next();
+                final QName currentName = currentEntry.getKey();
+                final String currentValue = currentEntry.getValue();
 
                 if (!XFormsUtils.compareStrings(currentValue, other.getExtensionAttributeValue(currentName)))
                     return false;
@@ -477,13 +475,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Set this control's binding context.
      */
     public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
-
-        // Keep binding context
         this.bindingContext = bindingContext;
-
-        // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
-        if (bindingContext.isNewBind())// TODO: this must be done in XFormsSingleNodeControl
-            this.boundNode = bindingContext.getSingleNode();
     }
 
     /**
@@ -491,17 +483,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public XFormsContextStack.BindingContext getBindingContext() {
         return bindingContext;
-    }
-
-    /**
-     * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
-     * the node to which the control no longer exists, return null.
-     *
-     * @return bound node or null
-     */
-    public NodeInfo getBoundNode() {
-        // TODO: this must be done in XFormsSingleNodeControl
-        return boundNode;
     }
 
     public final void evaluateIfNeeded(PipelineContext pipelineContext) {
@@ -530,7 +511,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 final String resolvedValue = evaluateAvt(pipelineContext, attributeValue);
 
                 if (extensionAttributesValues == null)
-                    extensionAttributesValues = new HashMap();
+                    extensionAttributesValues = new HashMap<QName, String>();
 
                 extensionAttributesValues.put(avtAttributeQName, resolvedValue);
             }
@@ -576,7 +557,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Try to update xforms:repeat indices based on this
             {
                 // Find current path through ancestor xforms:repeat elements, if any
-                final List repeatIterationsToModify = new ArrayList();
+                final List<String> repeatIterationsToModify = new ArrayList<String>();
                 {
                     XFormsControl currentXFormsControl = XFormsControl.this; // start with this, as we can be a RepeatIteration
                     while (currentXFormsControl != null) {
@@ -600,8 +581,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     final XFormsControls controls = containingDocument.getControls();
 
                     // Find all repeat iterations and controls again
-                    for (Iterator i = repeatIterationsToModify.iterator(); i.hasNext();) {
-                        final String repeatIterationEffectiveId = (String) i.next();
+                    for (Iterator<String> i = repeatIterationsToModify.iterator(); i.hasNext();) {
+                        final String repeatIterationEffectiveId = i.next();
                         final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) controls.getObjectByEffectiveId(repeatIterationEffectiveId);
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
 
@@ -814,7 +795,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Possible AVT
     
             // NOTE: the control may or may not be bound, so don't use getBoundNode()
-            final List contextNodeset = bindingContext.getNodeset();
+            final List<Item> contextNodeset = bindingContext.getNodeset();
             if (contextNodeset == null || contextNodeset.size() == 0) {
                 // TODO: in the future we should be able to try evaluating anyway
                 return null;
@@ -850,7 +831,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     protected String evaluateAsString(PipelineContext pipelineContext, String xpathString) {
 
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
-        final List contextNodeset = bindingContext.getNodeset();
+        final List<Item> contextNodeset = bindingContext.getNodeset();
         if (contextNodeset == null || contextNodeset.size() == 0) {
             // TODO: in the future we should be able to try evaluating anyway
             return null;
@@ -933,12 +914,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      *
      * @return              Map<String prefix, String uri>
      */
-    public Map getNamespaceMappings() {
+    public Map<String, String> getNamespaceMappings() {
         return container.getNamespaceMappings(controlElement);
     }
 
     protected String getExtensionAttributeValue(QName attributeName) {
-        return (extensionAttributesValues == null) ? null : (String) extensionAttributesValues.get(attributeName);
+        return (extensionAttributesValues == null) ? null : extensionAttributesValues.get(attributeName);
     }
 
     /**
@@ -949,15 +930,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public void addExtensionAttributes(AttributesImpl attributesImpl, String namespaceURI) {
         if (extensionAttributesValues != null) {
-            for (Iterator i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final QName currentName = (QName) currentEntry.getKey();
+            for (Iterator<Map.Entry<QName,String>> i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry<QName,String> currentEntry = i.next();
+                final QName currentName = currentEntry.getKey();
 
                 // Skip if namespace URI is excluded
                 if (namespaceURI != null && !namespaceURI.equals(currentName.getNamespaceURI()))
                     continue;
 
-                final String currentValue = (String) currentEntry.getValue();
+                final String currentValue = currentEntry.getValue();
 
                 if (currentValue != null) {
                     final String localName = currentName.getName();
@@ -971,9 +952,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Serialize this control's information which cannot be reconstructed from instances. The result is null if no
      * serialization is needed, or a map of name/value pairs otherwise.
      *
-     * @return  map<String name, String value>
+     * @return  Map<String name, String value>
      */
-    public Map serializeLocal() {
+    public Map<String, String> serializeLocal() {
         return null;
     }
 
@@ -1017,7 +998,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Handle extension attributes if any
         if (extensionAttributesValues != null) {
-            cloned.extensionAttributesValues = new HashMap(this.extensionAttributesValues);
+            cloned.extensionAttributesValues = new HashMap<QName, String>(this.extensionAttributesValues);
         }
 
         return cloned;

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -62,7 +63,11 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             }
 
             // Return the node to which the control is bound
-            return new ListIterator(Collections.singletonList(targetXFormsControl.getBoundNode()));
+            if (targetXFormsControl instanceof XFormsSingleNodeControl) {
+                return new ListIterator(Collections.singletonList(((XFormsSingleNodeControl) targetXFormsControl).getBoundNode()));
+            } else {
+                return EmptyIterator.getInstance();
+            }
         } else if ("alert".equals(name) || XXFORMS_ALERT_ATTRIBUTE.equals(name)) {
 
             if ("alert".equals(name)) {

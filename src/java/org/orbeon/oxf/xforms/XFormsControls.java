@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.xml.sax.Locator;
 
@@ -188,7 +189,7 @@ public class XFormsControls implements XFormsObjectResolver {
         final Map<String, Element> result = new HashMap<String, Element>();
         final Element controlsElement = dynamicStateElement.element("controls");
         if (controlsElement != null) {
-            for (Element currentControlElement : (List<Element>) controlsElement.elements("control")) {
+            for (Element currentControlElement : Dom4jUtils.elements(controlsElement, "control")) {
                 result.put(currentControlElement.attributeValue("effective-id"), currentControlElement);
             }
         }
@@ -623,7 +624,8 @@ public class XFormsControls implements XFormsObjectResolver {
             // Handle special relevance events
             // NOTE: We don't dispatch events to repeat iterations
             if (control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
-                final NodeInfo boundNode1 = control.getBoundNode();
+                final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                final NodeInfo boundNode1 = singleNodeControl.getBoundNode();
                 final NodeInfo boundNode2 = newBindingContext.getSingleNode();
 
                 boolean found = false;
@@ -648,8 +650,8 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Remember that we need to dispatch information about this control
                 if (found) {
-                    eventsToDispatch.put(control.getEffectiveId(),
-                            new EventSchedule(control.getEffectiveId(), eventType, control));
+                    eventsToDispatch.put(singleNodeControl.getEffectiveId(),
+                            new EventSchedule(singleNodeControl.getEffectiveId(), eventType, singleNodeControl));
                 }
             }
 
@@ -658,10 +660,10 @@ public class XFormsControls implements XFormsObjectResolver {
                 // TODO: handle this through inheritance
 
                 // Get old nodeset
-                final List oldRepeatNodeset = oldBindingContext.getNodeset();
+                final List<Item> oldRepeatNodeset = oldBindingContext.getNodeset();
 
                 // Get new nodeset
-                final List newRepeatNodeset = newBindingContext.getNodeset();
+                final List<Item> newRepeatNodeset = newBindingContext.getNodeset();
 
                 // Set new current binding for control element
                 control.setBindingContext(pipelineContext, newBindingContext);
@@ -796,7 +798,7 @@ public class XFormsControls implements XFormsObjectResolver {
                         return;
 
                     // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
-                    final NodeInfo currentNodeInfo = control.getBoundNode();
+                    final NodeInfo currentNodeInfo = ((XFormsSingleNodeControl) control).getBoundNode();
                     if (currentNodeInfo == null)
                         return;
 
@@ -1003,7 +1005,7 @@ public class XFormsControls implements XFormsObjectResolver {
                     }
 
                     // Re-obtain node to which control is bound, in case things have changed (includes xforms:group[not(@ref) and not(@bind)])
-                    final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
+                    final NodeInfo currentNodeInfo = ((XFormsSingleNodeControl) xformsControl).getBoundNode();
                     if (currentNodeInfo == null) {
                         // See comment above about things that can have happened since.
                         continue;
@@ -1069,7 +1071,7 @@ public class XFormsControls implements XFormsObjectResolver {
                             continue;
 
                         // Re-obtain node to which control is bound, in case things have changed
-                        final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
+                        final NodeInfo currentNodeInfo = ((XFormsSingleNodeControl) xformsControl).getBoundNode();
                         if (currentNodeInfo != null) {
 
                             // We only dispatch value-changed and other events for controls bound to a mutable document

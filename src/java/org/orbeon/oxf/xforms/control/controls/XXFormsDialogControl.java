@@ -115,6 +115,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         return initiallyVisible;
     }
 
+    @Override
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getEventName())) {
             // Close the dialog
@@ -137,10 +138,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         super.performDefaultAction(pipelineContext, event);
     }
 
-    public Map serializeLocal() {
+    @Override
+    public Map<String, String> serializeLocal() {
         // Serialize
         final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
-        final Map result = new HashMap(3);
+        final Map<String, String> result = new HashMap<String, String>(3);
         result.put("visible", Boolean.toString(local.visible));
         if (local.visible) {
             result.put("constrain", Boolean.toString(local.constrainToViewport));
@@ -150,6 +152,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         return result;
     }
 
+    @Override
     public void deserializeLocal(Element element) {
         // Deserialize
 
@@ -164,7 +167,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         final XFormsControls controls = containingDocument.getControls();
         final ControlTree currentControlTree = controls.getCurrentControlTree();
 
-        final List children = getChildren();
+        final List<XFormsControl> children = getChildren();
 
         if (isVisible) {
             // Became visible: create children

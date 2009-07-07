@@ -65,10 +65,10 @@ public class InstanceData {
     private boolean previousValidState = DEFAULT_VALID;
 
     private String invalidBindIds;
-    private List schemaErrors;
+    private List<String> schemaErrors;
 
     // Custom MIPs
-    private Map customMips = null;
+    private Map<String, String> customMips = null;
 
     private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
         {
@@ -98,17 +98,17 @@ public class InstanceData {
                 // Changing from the default
                 final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
                 if (newInstanceData.customMips == null)
-                    newInstanceData.customMips = new HashMap();
+                    newInstanceData.customMips = new HashMap<String, String>();
                 newInstanceData.customMips.put(name, value);
             }
         } else {
             if (existingInstanceData.customMips == null)
-                existingInstanceData.customMips = new HashMap();
+                existingInstanceData.customMips = new HashMap<String, String>();
             existingInstanceData.customMips.put(name, value);
         }
     }
 
-    public static Map getAllCustom(NodeInfo nodeInfo) {
+    public static Map<String, String> getAllCustom(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
         return (existingInstanceData == null) ? null : existingInstanceData.customMips;
     }
@@ -330,7 +330,7 @@ public class InstanceData {
         // Add schema errors if provided
         if (schemaError != null) {
             if (instanceData.schemaErrors == null)
-                instanceData.schemaErrors = new ArrayList(1);
+                instanceData.schemaErrors = new ArrayList<String>(1);
             instanceData.schemaErrors.add(schemaError);
         }
 

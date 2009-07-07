@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -36,6 +36,7 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 import org.xml.sax.ContentHandler;
@@ -47,7 +48,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,13 +60,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     private DocumentInfo documentInfo;
 
-    private String instanceStaticId;
-    private String modelEffectiveId;
+    protected String instanceStaticId;
+    protected String modelEffectiveId;
 
     private String sourceURI;
 
     private boolean readonly;
-    private boolean applicationShared;
+    private boolean cache;
     private long timeToLive;
     private String username;
     private String password;
@@ -83,7 +83,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
      * such as id, username, URI, etc.
      *
-     * <instance readonly="true" shared="application" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
+     * <instance readonly="true" cache="true" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
      *     x7wer...
      * </instance>
      *
@@ -100,7 +100,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.sourceURI = containerElement.attributeValue("source-uri");
 
         this.readonly = "true".equals(containerElement.attributeValue("readonly"));
-        this.applicationShared = "application".equals(containerElement.attributeValue("shared"));
+        this.cache = "true".equals(containerElement.attributeValue("cache"));
         final String timeToLiveAttribute = containerElement.attributeValue("ttl");
         this.timeToLive = (timeToLiveAttribute != null) ? Long.parseLong(timeToLiveAttribute) : -1;
 
@@ -113,58 +113,45 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
         // Create and set instance document on current model
         final DocumentInfo documentInfo;
-        if (containerElement.elements().size() == 0) {
-            // New serialization (use serialized XML)
-            try {
-                final String xmlString = containerElement.getStringValue();
+        // Instance is available as serialized XML
+        try {
+            final String xmlString = containerElement.getStringValue();
+            if (xmlString.length() > 0) {
+                // Instance document is available in serialized form
                 if (!readonly) {
-//                    try {
-                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
-//                    } catch (Exception e) {
-//                        XFormsServer.logger.error(xmlString);
-//                        throw e;
-//                    }
+                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
                 } else {
-
-                    if (xmlString.length() > 0) {
-                        // Instance document is available in serialized form
-                        documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
-                    } else {
-                        // Instance document is not available, defer to later initialization
-                        documentInfo = null;
-                    }
+                    documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
                 }
-            } catch (Exception e) {
-                throw new OXFException(e);
+            } else {
+                // Instance document is not available, defer to later initialization
+                documentInfo = null;
             }
-        } else {
-            // Old serialization (instance is directly in the DOM)
-            // TODO: Do we still need this?
-            final Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) containerElement.elements().get(0));
-            documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
+        } catch (Exception e) {
+            throw new OXFException(e);
         }
 
         this.documentInfo = documentInfo;
     }
 
     public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI,
-                          String username, String password, boolean applicationShared, long timeToLive, String validation, boolean handleXInclude) {
+                          String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         this(modelEffectiveId, instanceStaticId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
-                instanceSourceURI, username, password, applicationShared, timeToLive, validation, handleXInclude);
+                instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude);
     }
 
     protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
-                             String username, String password, boolean applicationShared, long timeToLive, String validation, boolean handleXInclude) {
+                             String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
 
-        if (applicationShared && instanceSourceURI == null)
-            throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
+        if (cache && instanceSourceURI == null)
+            throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:cache=\"true\".");
 
         this.instanceStaticId = instanceStaticId;
         this.modelEffectiveId = modelEffectiveId;
 
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
-        this.applicationShared = applicationShared;
+        this.cache = cache;
         this.timeToLive = timeToLive;
 
         this.sourceURI = instanceSourceURI;
@@ -194,8 +181,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
         if (readonly)
             instanceElement.addAttribute("readonly", "true");
-        if (applicationShared)
-            instanceElement.addAttribute("shared", "application");
+        if (cache)
+            instanceElement.addAttribute("cache", "true");
         if (timeToLive >= 0)
             instanceElement.addAttribute("ttl", Long.toString(timeToLive));
 
@@ -273,8 +260,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
 
-    public boolean isApplicationShared() {
-        return applicationShared;
+    public boolean isCache() {
+        return cache;
     }
 
 
@@ -516,11 +503,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
-            // Invalidate instance if it is shared read-only
-            if (applicationShared) {
+            // Invalidate instance if it is cached
+            if (cache) {
                 XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI, handleXInclude);
             } else {
-                XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-shared instance with id: " + getEffectiveId());
+                XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
             }
         }
     }
@@ -542,7 +529,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // inserted.
 
             // Find affected repeats
-            final List insertedNodeInfos = insertEvent.getInsertedNodeInfos();
+            final List<Item> insertedNodeInfos = insertEvent.getInsertedNodeInfos();
 
             final boolean didInsertNodes = insertedNodeInfos.size() != 0;
             final boolean mustAdjustIndexes = didInsertNodes && insertEvent.isAdjustIndexes();// isAdjustIndexes() used for offline mode optimizations
@@ -568,16 +555,15 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    private void updateRepeatNodeset(PipelineContext pipelineContext, XFormsControls controls, List insertedNodeInfos) {
-        final Map repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
+    private void updateRepeatNodeset(PipelineContext pipelineContext, XFormsControls controls, List<Item> insertedNodeInfos) {
+        final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
-            final List repeatControls = new ArrayList(repeatControlsMap.values());
-            for (Iterator i = repeatControls.iterator(); i.hasNext();) {
-                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) i.next();
+            final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());
+            for (XFormsControl control: repeatControls) {
                 // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
                 // TODO: is this needed with new clone/update mechanism?
-                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
+                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(control.getEffectiveId());
                 // Update node-set
                 if (newRepeatControl != null) {
 
@@ -610,15 +596,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    /**
-     * Create a shared version of this instance with the same instance document.
-     *
-     * @return  mutable XFormsInstance
-     */
-    public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, sourceURI, username, password, false, timeToLive, validation, handleXInclude);
-    }
-
     public static String getInstanceStaticId(Element xformsInstanceElement) {
         return xformsInstanceElement.attributeValue("id");
     }
@@ -627,32 +604,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
          return "true".equals(element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
     }
 
-    public static boolean isApplicationSharedHint(Element element) {
-        final String sharedAttributeValue = element.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
-        final boolean isApplicationSharedHint = "application".equals(sharedAttributeValue);
-
-        checkSharedHints(element, element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME),
-                element.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME));
-
-        return isApplicationSharedHint;
-    }
-
-    public static void checkSharedHints(Element element, String readonly, String shared) {
-        if (shared != null) {
-
-            // Can't have shared hints if not read-only
-            if (!"true".equals(readonly))
-                throw new ValidationException("xxforms:shared can be set only if xxforms:readonly is \"true\" for element: "
-                        + element.attributeValue("id"), (LocationData) element.getData());
-
-            final boolean isApplicationSharedHint = "application".equals(shared);
-            final boolean isDocumentSharedHint = "document".equals(shared);
-
-            // Check values if set
-            if (!(isApplicationSharedHint || isDocumentSharedHint))
-                throw new ValidationException("xxforms:shared must be either of \"application\" or \"document\" for element: "
-                        + element.attributeValue("id"), (LocationData) element.getData());
-        }
+    public static boolean isCacheHint(Element element) {
+        return "true".equals(element.attributeValue(XFormsConstants.XXFORMS_CACHE_QNAME));
     }
 
     public static long getTimeToLive(Element element) {

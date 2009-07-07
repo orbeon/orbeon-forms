@@ -89,7 +89,7 @@ public class XFormsModelBinds {
      * @return      XFormsModelBinds or null if the model doesn't have xforms:bind elements
      */
     public static XFormsModelBinds create(XFormsModel model) {
-        final List<Element> bindElements = model.getModelDocument().getRootElement().elements(XFormsConstants.XFORMS_BIND_QNAME);
+        final List<Element> bindElements = Dom4jUtils.elements(model.getModelDocument().getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);
         final boolean hasBinds = bindElements != null && bindElements.size() > 0;
 
         return hasBinds ? new XFormsModelBinds(model, bindElements) : null;
@@ -266,7 +266,7 @@ public class XFormsModelBinds {
         }
 
         // Nothing found
-        return XPathCache.EMPTY_ITEM_LIST;
+        return XFormsConstants.EMPTY_ITEM_LIST;
     }
 
     /**
@@ -468,7 +468,7 @@ public class XFormsModelBinds {
                     && (currentControl instanceof XFormsRepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
                 // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
                 // But also support repeat iterations, as their MIPs
-                final NodeInfo boundNode = currentControl.getBoundNode();
+                final NodeInfo boundNode = ((XFormsSingleNodeControl) currentControl).getBoundNode();
                 if (boundNode != null) {
                     // There is a match
                     final Object existing = result.get(boundNode);// multiple controls may be bound to a node
@@ -990,7 +990,7 @@ public class XFormsModelBinds {
                 } else {
                     // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)
                     final Item contextItem = model.getContextStack().getContextItem();
-                    this.nodeset = (contextItem == null) ? XPathCache.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
+                    this.nodeset = (contextItem == null) ? XFormsConstants.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
                 }
                 final int nodesetSize = this.nodeset.size();
 
@@ -1001,7 +1001,7 @@ public class XFormsModelBinds {
                 if (isSingleNodeContext)
                     singleNodeContextBinds.put(id, this);
 
-                final List<Element> childElements = bindElement.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
+                final List<Element> childElements = Dom4jUtils.elements(bindElement, XFormsConstants.XFORMS_BIND_QNAME);
                 if (childElements.size() > 0) {
                     // There are children binds
                     childrenIterations = new ArrayList<BindIteration>();

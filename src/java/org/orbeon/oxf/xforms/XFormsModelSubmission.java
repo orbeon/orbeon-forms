@@ -102,6 +102,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtXXFormsPassword;
     private String avtXXFormsReadonly;
     private String avtXXFormsShared;
+    private String avtXXFormsCache;
     private String avtXXFormsTarget;
     private String resolvedXXFormsTarget;
     private String avtXXFormsHandleXInclude;
@@ -200,6 +201,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
             avtXXFormsShared = submissionElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
+            avtXXFormsCache = submissionElement.attributeValue(XFormsConstants.XXFORMS_CACHE_QNAME);
 
             avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
             xxfFormsEnsureUploads = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_ENSURE_UPLOADS_QNAME));
@@ -322,6 +324,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Evaluate early AVTs
+                final XPathCache.XPathContext xpathContext = new XPathCache.XPathContext(prefixToURIMap, contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
+                
                 final String resolvedMethod;
                 final String actualHttpMethod;
                 final String resolvedMediatype;
@@ -330,20 +334,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final boolean resolvedRelevant;
                 {
                     // Resolved method AVT
-                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
+                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo , avtMethod);
                     resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, true));
 
                     // Get actual method based on the method attribute
                     actualHttpMethod = getActualHttpMethod(resolvedMethod);
 
                     // Get mediatype
-                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo , avtMediatype);
 
                     // Resolve validate and relevant AVTs
-                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtValidate);
+                    final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo , avtValidate);
                     resolvedValidate = !"false".equals(resolvedValidateString);
 
-                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtRelevant);
+                    final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo , avtRelevant);
                     resolvedRelevant = !"false".equals(resolvedRelevantString);
                 }
 
@@ -394,7 +398,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
+                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo , avtXXFormsTarget);
 
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
@@ -422,59 +426,70 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final Boolean resolvedStandalone;
                 final String resolvedXXFormsUsername;
                 final String resolvedXXFormsPassword;
-                final String resolvedXXFormsReadonly;
-                final String resolvedXXFormsShared;
+                final boolean resolvedXXFormsReadonly;
+                final boolean resolvedXXFormsCache;
                 final boolean resolvedXXFormsHandleXInclude;
                 {
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
-
-                    if (tempActionOrResource == null) {
-                        // This can be null if, e.g. you have an AVT like resource="{()}"
-                        throw new XFormsSubmissionException("xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
-                                "resolving resource URI");
+                    {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtActionOrResource);
+                        if (temp == null) {
+                            // This can be null if, e.g. you have an AVT like resource="{()}"
+                            throw new XFormsSubmissionException("xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
+                                    "resolving resource URI");
+                        }
+                        resolvedActionOrResource = XFormsUtils.encodeHRRI(temp, true);
                     }
 
-                    resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
+                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtSerialization);
+                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtMode);
+                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtVersion);
+                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtEncoding);
+                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtSeparator);
 
-                    resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
-                    resolvedMode = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMode);
-                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
-                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
-                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
+                    {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtIndent);
+                        resolvedIndent = Boolean.valueOf(temp).booleanValue();
+                    }
+                    {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtOmitxmldeclaration);
+                        resolvedOmitxmldeclaration = Boolean.valueOf(temp).booleanValue();
+                    }
+                    {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtStandalone);
+                        resolvedStandalone = (temp != null) ? Boolean.valueOf(temp) : null;
+                    }
 
-                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
-                    resolvedIndent = Boolean.valueOf(tempIndent).booleanValue();
-
-                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
-                    resolvedOmitxmldeclaration = Boolean.valueOf(tempAvtOmitxmldeclaration).booleanValue();
-
-                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
-                    resolvedStandalone = (tempStandalone != null) ? Boolean.valueOf(tempStandalone) : null;
-
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsPassword);
+                    {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsReadonly);
+                        resolvedXXFormsReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
+                    }
+                    
+                    if (avtXXFormsCache != null) {
+                        final String temp = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsCache);
+                        // New attribute
+                        resolvedXXFormsCache = Boolean.valueOf(temp).booleanValue();
+                    } else {
+                        // For backward compatibility
+                        resolvedXXFormsCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsShared));
+                    }
+                    
 
                     // Default is "false" for security reasons
-                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, refNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
+                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xpathContext, refNodeInfo, avtXXFormsHandleXInclude);
                     resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude).booleanValue();
                 }
 
-                // Check read-only and shared hints
-                XFormsInstance.checkSharedHints(submissionElement, resolvedXXFormsReadonly, resolvedXXFormsShared);
-                final boolean isReadonlyHint = "true".equals(resolvedXXFormsReadonly);
-                final boolean isApplicationSharedHint = "application".equals(resolvedXXFormsShared);
-                final long timeToLive = XFormsInstance.getTimeToLive(submissionElement);
-                // TODO: move this to XFormsInstance.checkSharedHints(), and check how to deal w/ use of XFormsInstance.checkSharedHints() by XFormsInstance
-                if (isApplicationSharedHint) {
+                // Check read-only and cache hints
+                if (resolvedXXFormsCache) {
                     if (!actualHttpMethod.equals("GET"))
-                        throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".",
+                        throw new XFormsSubmissionException("xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with method=\"get\".",
                                 "checking read-only and shared hints");
                     if (!isReplaceInstance)
-                        throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with replace=\"instance\".",
+                        throw new XFormsSubmissionException("xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with replace=\"instance\".",
                                 "checking read-only and shared hints");
-                } else if (isReadonlyHint) {
+                } else if (resolvedXXFormsReadonly) {
                     if (!isReplaceInstance)
                         throw new XFormsSubmissionException("xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
                                 "checking read-only and shared hints");
@@ -738,9 +753,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             }
                         }
 
-                        if (isApplicationSharedHint) {
+                        // Compute absolute submission URL
+                        final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+                        if (resolvedXXFormsCache) {
                             // Get the instance from shared instance cache
-                            // This can only happen is method="get" and replace="instance" and xxforms:readonly="true" and xxforms:shared="application"
+                            // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
 
                             final NodeInfo destinationNodeInfo = evaluateTargetRef(pipelineContext, findReplaceInstanceNoTargetref(refInstance), submissionElementContextItem,
                                                         prefixToURIMap, contextStack, functionLibrary, functionContext);
@@ -758,27 +775,36 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
                             if (updatedInstance == null || !updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo)) {
-                                // Only support replacing the root element of an instance when using a shared instance
+                                // Only support replacing the root element of an instance
+                                // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
                                 submitErrorEvent = createErrorEvent(pipelineContext, null, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
-                                throw new XFormsSubmissionException("targetref attribute must point to an instance root element when using shared instance replacement.", "processing targetref attribute");
+                                throw new XFormsSubmissionException("targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute");
                             }
 
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "using instance from application shared instance cache",
                                         new String[] { "instance", updatedInstance.getEffectiveId() });
 
-                            final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+
+                            // Convert URL to string
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
-                            final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, updatedInstance.getId(), updatedInstance.getEffectiveModelId(),
-                                        absoluteResolvedURLString, timeToLive, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
+                            final long timeToLive = XFormsInstance.getTimeToLive(submissionElement);
+                            final XFormsInstance newInstance
+                                    = XFormsServerSharedInstancesCache.instance().findConvert(pipelineContext, containingDocument, updatedInstance.getId(), updatedInstance.getEffectiveModelId(),
+                                        absoluteResolvedURLString, resolvedXXFormsReadonly, timeToLive, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
 
-                            if (XFormsServer.logger.isDebugEnabled())
-                                containingDocument.logDebug("submission", "replacing instance with read-only instance",
-                                        new String[] { "instance", sharedInstance.getEffectiveId() });
+                            if (resolvedXXFormsReadonly) {
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    containingDocument.logDebug("submission", "replacing instance with read-only cached instance",
+                                                new String[] { "instance", newInstance.getEffectiveId() });
+                            } else {
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    containingDocument.logDebug("submission", "replacing instance with read-write cached instance",
+                                                new String[] { "instance", newInstance.getEffectiveId() });
+                            }
 
-                            final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
+                            final XFormsModel replaceModel = newInstance.getModel(containingDocument);
 
                             // Dispatch xforms-delete event
                             // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
@@ -787,22 +813,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
 
                             // Handle new instance and associated event markings
-                            final NodeInfo newRootElementInfo = sharedInstance.getInstanceRootElementInfo();
-                            replaceModel.handleUpdatedInstance(pipelineContext, sharedInstance, newRootElementInfo);
+                            final NodeInfo newRootElementInfo = newInstance.getInstanceRootElementInfo();
+                            replaceModel.handleUpdatedInstance(pipelineContext, newInstance, newRootElementInfo);
 
                             // Dispatch xforms-insert event
                             // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-                            sharedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
-                                new XFormsInsertEvent(sharedInstance, Collections.singletonList(newRootElementInfo), null, newRootElementInfo.getDocumentRoot(),
+                            newInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
+                                new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newRootElementInfo), null, newRootElementInfo.getDocumentRoot(),
                                         "after", null, null, true));
 
                             connectionResult = null;
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString, 200);
                         } else {
                             // Perform actual submission
-
-                            // Compute absolute submission URL
-                            final URL submissionURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
 
                             // Gather remaining information to process the request
                             final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
@@ -828,7 +851,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                         // XFCD. Remember, we can't change XFCD because it may get out of the caches
                                         // and not be picked up by further incoming Ajax requests.
                                         NetUtils.openConnection(indentedLogger,
-                                            actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                            actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                             actualRequestMediatype, messageBody, headersMap);
 
                                         // NOTE: In this very basic level of support, we don't support xforms-submit-done / xforms-submit-error handlers
@@ -845,7 +868,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             } else {
                                 // Just run it now
                                 connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
-                                        actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                        actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
                                         customHeaderNameValues, newForwardSubmissionHeaders);
                             }
@@ -937,7 +960,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                                             // Whether the destination node is the root element of an instance
                                             final boolean isDestinationRootElement = updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo);
-                                            if (isReadonlyHint && !isDestinationRootElement) {
+                                            if (resolvedXXFormsReadonly && !isDestinationRootElement) {
                                                 // Only support replacing the root element of an instance when using a shared instance
                                                 submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
                                                 throw new XFormsSubmissionException("targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute");
@@ -950,7 +973,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                 // Create resulting instance whether entire instance is replaced or not, because this:
                                                 // 1. Wraps a Document within a DocumentInfo if needed
                                                 // 2. Performs text nodes adjustments if needed
-                                                if (!isReadonlyHint) {
+                                                if (!resolvedXXFormsReadonly) {
                                                     // Resulting instance must not be read-only
 
                                                     // TODO: What about configuring validation? And what default to choose?
@@ -976,7 +999,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                         containingDocument.logDebug("submission", "replacing instance with read-only instance",
                                                             new String[] { "instance", updatedInstance.getEffectiveId() });
 
-                                                    newInstance = new SharedXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
+                                                    newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
                                                             resultingInstanceDocument, connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                                             false, -1, updatedInstance.getValidation(), resolvedXXFormsHandleXInclude);
                                                 }
@@ -1008,7 +1031,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                                 // Dispatch xforms-insert event
                                                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
                                                 newInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
-                                                    new XFormsInsertEvent(newInstance, Collections.singletonList(newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
+                                                    new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
                                                             "after", null, null, true));
 
                                             } else {
@@ -1371,7 +1394,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
      * @return                  LinkedHashMap<String headerName, String[] headerValues>, or null if no header elements
      */
     private Map<String, String[]> evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
-        final List<Element> headerElements = submissionElement.elements(XFormsConstants.XFORMS_HEADER_QNAME);
+        final List<Element> headerElements = Dom4jUtils.elements(submissionElement, XFormsConstants.XFORMS_HEADER_QNAME);
         if (headerElements.size() > 0) {
             final Map<String, String[]> headerNameValues = new LinkedHashMap<String, String[]>();
 

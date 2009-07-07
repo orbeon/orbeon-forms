@@ -84,7 +84,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
         } else if (excludeResultPrefixes != null && excludeResultPrefixes.trim().length() != 0) {
             // List of prefixes
             final StringTokenizer st = new StringTokenizer(excludeResultPrefixes);
-            final Map prefixesToExclude = new HashMap();
+            final Map<String, String> prefixesToExclude = new HashMap<String, String>();
             while (st.hasMoreTokens()) {
                 prefixesToExclude.put(st.nextToken(), "");
             }

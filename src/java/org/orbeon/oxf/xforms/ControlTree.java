@@ -189,11 +189,12 @@ public class ControlTree implements Cloneable {
         // Add event if necessary
         // NOTE: We don't dispatch events to repeat iterations
         if (registerEvents && control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
-            final NodeInfo boundNode = control.getBoundNode();
+            final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+            final NodeInfo boundNode = singleNodeControl.getBoundNode();
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control just came to existence and is now bound to a node and relevant
-                eventsToDispatch.put(control.getEffectiveId(),
-                        new XFormsControls.EventSchedule(control.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, control));
+                eventsToDispatch.put(singleNodeControl.getEffectiveId(),
+                        new XFormsControls.EventSchedule(singleNodeControl.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, singleNodeControl));
             }
         }
     }
@@ -224,11 +225,12 @@ public class ControlTree implements Cloneable {
         // Add event if necessary
         // NOTE: We don't dispatch events to repeat iterations
         if (registerEvents && control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)) {
-            final NodeInfo boundNode = control.getBoundNode();
+            final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+            final NodeInfo boundNode = singleNodeControl.getBoundNode();
             if (boundNode != null && InstanceData.getInheritedRelevant(boundNode)) {
                 // Control was bound to a node and relevant and is going out of existence
-                eventsToDispatch.put(control.getEffectiveId(),
-                        new XFormsControls.EventSchedule(control.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, control));
+                eventsToDispatch.put(singleNodeControl.getEffectiveId(),
+                        new XFormsControls.EventSchedule(singleNodeControl.getEffectiveId(), XFormsControls.EventSchedule.RELEVANT_BINDING, singleNodeControl));
             }
         }
     }
@@ -570,6 +572,10 @@ public class ControlTree implements Cloneable {
                     control.deserializeLocal(element);
             }
 
+            // Set current binding for control element
+            final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
+            control.setBindingContext(pipelineContext, currentBindingContext);
+
             // Control type-specific handling
             if (control instanceof XFormsSelectControl || control instanceof XFormsSelect1Control) {
                 // Handle xforms:itemset
@@ -578,10 +584,6 @@ public class ControlTree implements Cloneable {
                 if (evaluateItemsets)
                     select1Control.getItemset(pipelineContext, false);
             }
-
-            // Set current binding for control element
-            final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            control.setBindingContext(pipelineContext, currentBindingContext);
 
             // Index this control
             // NOTE: Must do after setting the context, so that relevance can be properly determined

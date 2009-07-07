@@ -102,7 +102,7 @@ public class XFormsContextStack {
                 contextStack.push(containerBindingContext);
             } else {
                 // Push empty context
-                contextStack.push(new BindingContext(null, xformsModel, XPathCache.EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
+                contextStack.push(new BindingContext(null, xformsModel, XFormsConstants.EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
             }
         }
 
@@ -196,7 +196,7 @@ public class XFormsContextStack {
             // NOTE: Should ideally still try to figure out the context model, for example.
             resetBindingContext(pipelineContext);
             final XFormsModel xformsModel = container.getDefaultModel();
-            contextStack.push(new BindingContext(null, xformsModel, XPathCache.EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
+            contextStack.push(new BindingContext(null, xformsModel, XFormsConstants.EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
         } else if (eventObserver instanceof XFormsControl) {
             setBinding((XFormsControl) eventObserver);
         } else if (eventObserver instanceof XFormsModel) {
@@ -303,7 +303,7 @@ public class XFormsContextStack {
                     // Resolve the bind id to a nodeset
                     // TODO: dispatch xforms-binding-exception if no bind is found
                     final XFormsModelBinds binds = newModel.getBinds();
-                    newNodeset = (binds != null) ?  binds.getBindNodeset(bindId, currentBindingContext.getSingleItem()) : XPathCache.EMPTY_ITEM_LIST;
+                    newNodeset = (binds != null) ?  binds.getBindNodeset(bindId, currentBindingContext.getSingleItem()) : XFormsConstants.EMPTY_ITEM_LIST;
                     hasOverriddenContext = false;
                     contextItem = currentBindingContext.getSingleItem();
                     isNewBind = true;
@@ -343,7 +343,7 @@ public class XFormsContextStack {
                         popBinding();
                     } else {
                         // Otherwise we consider we can't evaluate
-                        newNodeset = XPathCache.EMPTY_ITEM_LIST;
+                        newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                     }
 
                     // Restore optional context
@@ -458,7 +458,7 @@ public class XFormsContextStack {
      */
     public void pushIteration(int currentPosition) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
-        final List currentNodeset = currentBindingContext.getNodeset();
+        final List<Item> currentNodeset = currentBindingContext.getNodeset();
 
         // Set a new context item, although the context() function is never called on the iteration itself
         final Item newContextItem;
@@ -522,7 +522,7 @@ public class XFormsContextStack {
         // If there is no default instance, return an empty node-set
         final XFormsInstance defaultInstance = model.getDefaultInstance();
         if (defaultInstance == null)
-            return XPathCache.EMPTY_ITEM_LIST;
+            return XFormsConstants.EMPTY_ITEM_LIST;
 
         // If not found, return the document element of the model's default instance
         try {

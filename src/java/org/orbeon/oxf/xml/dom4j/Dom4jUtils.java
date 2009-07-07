@@ -68,6 +68,37 @@ public class Dom4jUtils {
     private static SAXReader createSAXReader() throws SAXException {
         return createSAXReader(XMLUtils.DEFAULT_VALIDATING, XMLUtils.DEFAULT_HANDLE_XINCLUDE);
     }
+    /**
+     * Typed version of the dom4j API.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Element> elements(Element element) {
+        return (List<Element>) element.elements();
+    }
+
+    /**
+     * Typed version of the dom4j API.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Element> elements(Element element, QName name) {
+        return (List<Element>) element.elements(name);
+    }
+
+    /**
+     * Typed version of the dom4j API.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Element> elements(Element element, String name) {
+        return (List<Element>) element.elements(name);
+    }
+
+    /**
+     * Typed version of the dom4j API.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Node> content(Element container) {
+        return (List<Node>) container.content();
+    }
 
     /**
      * Convert a dom4j document to a string.
@@ -741,7 +772,7 @@ public class Dom4jUtils {
     public static void visitSubtree(Element container, VisitorListener visitorListener, boolean mutable) {
 
         // If the source tree can mutate, copy the list first, otherwise dom4j might throw exceptions
-        final List content = mutable ? new ArrayList(container.content()) : container.content() ;
+        final List<Node> content = mutable ? new ArrayList<Node>(content(container)) : content(container);
 
         // Iterate over the content
         for (Iterator i = content.iterator(); i.hasNext();) {

@@ -570,34 +570,6 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    /**
-     * Returns the first relevant upload controls bound the given node if any.
-     *
-     * @param containingDocument    current XFormsContainingDocument
-     * @param node                  node to check
-     * @return                      first bound relevant XFormsUploadControl, null if not found
-     */
-//    public static XFormsUploadControl getFirstBoundRelevantUploadControl(XFormsContainingDocument containingDocument, Node node) {
-//        final XFormsControls xformsControls = containingDocument.getControls();
-//        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
-//        if (uploadControls != null) {
-//            for (Iterator i = uploadControls.values().iterator(); i.hasNext();) {
-//                final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
-//                if (currentControl.isRelevant()) {
-//                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
-//                    if (controlBoundNodeInfo instanceof NodeWrapper) {
-//                        final Node controlBoundNode = getNodeFromNodeInfo(controlBoundNodeInfo, "");
-//                        if (node == controlBoundNode) {
-//                            // Found one relevant upload control bound to the given node
-//                            return currentControl;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
     private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
             XFormsServer.logger.debug("XForms - creating new Deflater.");
@@ -959,7 +931,7 @@ public class XFormsUtils {
      */
     public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
                                                         FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
-                                                        Map prefixToURIMap, LocationData locationData, String attributeValue) {
+                                                        Map<String, String> prefixToURIMap, LocationData locationData, String attributeValue) {
 
         if (attributeValue == null)
             return null;
@@ -971,25 +943,18 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param pipelineContext    current pipeline context
-     * @param contextNode        context node for evaluation
-     * @param variableToValueMap variables
-     * @param functionLibrary    XPath function libary to use
-     * @param functionContext    context object to pass to the XForms function
-     * @param prefixToURIMap     namespace mappings
-     * @param locationData       LocationData for error reporting
-     * @param attributeValue     attribute value
-     * @return                   resolved attribute value
+     * @param pipelineContext   current pipeline context
+     * @param xpathContext      current XPath context
+     * @param contextNode       context node for evaluation
+     * @param attributeValue    attribute value
+     * @return                  resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map<String, ValueRepresentation> variableToValueMap,
-                                                        FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
-                                                        Map<String, String> prefixToURIMap, LocationData locationData, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, XPathCache.XPathContext xpathContext, NodeInfo contextNode, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, prefixToURIMap,
-                variableToValueMap, functionLibrary, functionContext, null, locationData);
+        return XPathCache.evaluateAsAvt(pipelineContext, xpathContext, contextNode, attributeValue);
     }
 
     /**
@@ -1224,8 +1189,8 @@ public class XFormsUtils {
      * @param nodeInfo  element NodeInfo to look at
      * @return          elements NodeInfo or empty list
      */
-    public static List getChildrenElements(NodeInfo nodeInfo) {
-        final List result = new ArrayList();
+    public static List<NodeInfo> getChildrenElements(NodeInfo nodeInfo) {
+        final List<NodeInfo> result = new ArrayList<NodeInfo>();
         getChildrenElements(result, nodeInfo);
         return result;
     }
@@ -1236,7 +1201,7 @@ public class XFormsUtils {
      * @param result    List to which to add the elements found
      * @param nodeInfo  element NodeInfo to look at
      */
-    public static void getChildrenElements(List result, NodeInfo nodeInfo) {
+    public static void getChildrenElements(List<NodeInfo> result, NodeInfo nodeInfo) {
         final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
         i.next();
         while (i.current() != null) {
@@ -1279,8 +1244,8 @@ public class XFormsUtils {
      * @param nodeInfo  element NodeInfo to look at
      * @return          attributes or empty list
      */
-    public static List getAttributes(NodeInfo nodeInfo) {
-        final List result = new ArrayList();
+    public static List<Item> getAttributes(NodeInfo nodeInfo) {
+        final List<Item> result = new ArrayList<Item>();
         getAttributes(result, nodeInfo);
         return result;
     }
@@ -1291,7 +1256,7 @@ public class XFormsUtils {
      * @param result    List to which to add the attributes found
      * @param nodeInfo  element NodeInfo to look at
      */
-    public static void getAttributes(List result, NodeInfo nodeInfo) {
+    public static void getAttributes(List<Item> result, NodeInfo nodeInfo) {
 
         if (nodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE)
             throw new OXFException("Invalid node type passed to getAttributes(): " + nodeInfo.getNodeKind());
@@ -1313,7 +1278,7 @@ public class XFormsUtils {
     /**
      * Find all attributes and nested nodes of the given nodeset.
      */
-    public static void getNestedAttributesAndElements(List result, List nodeset) {
+    public static void getNestedAttributesAndElements(List<Item> result, List nodeset) {
         // Iterate through all nodes
         if (nodeset.size() > 0) {
             for (Iterator i = nodeset.iterator(); i.hasNext();) {
@@ -1326,7 +1291,7 @@ public class XFormsUtils {
                     getAttributes(result, currentNodeInfo);
 
                     // Find children elements
-                    final List childrenElements = getChildrenElements(currentNodeInfo);
+                    final List<NodeInfo> childrenElements = getChildrenElements(currentNodeInfo);
 
                     // Add all children elements
                     result.addAll(childrenElements);

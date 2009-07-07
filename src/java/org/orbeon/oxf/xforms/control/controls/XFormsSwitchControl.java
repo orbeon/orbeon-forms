@@ -83,6 +83,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
+    @Override
     public String getType() {
         return null;
     }
@@ -140,6 +141,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         return (XFormsCaseControl) children.get(0);
     }
 
+    @Override
     public Object clone() {
 
         final XFormsSwitchControl cloned;
@@ -164,11 +166,13 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         return cloned;
     }
 
-    public Map serializeLocal() {
+    @Override
+    public Map<String, String> serializeLocal() {
         // Serialize case id
         return Collections.singletonMap("case-id", getSelectedCase().getId());
     }
 
+    @Override
     public void deserializeLocal(Element element) {
         // Deserialize case id
         this.restoredCaseId = element.attributeValue("case-id");

@@ -74,7 +74,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private Locator locator;
     private LocationData locationData;
 
-    private Map properties = new HashMap();
+    private Map<String, String> properties = new HashMap<String, String>();
 
     private int level;
 
@@ -85,7 +85,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private final ExternalContext externalContext;
     private final boolean ignoreRootElement;
 
-    private Stack xmlBaseStack = new Stack();
+    private Stack<URI> xmlBaseStack = new Stack<URI>();
     private boolean isSeparateDeployment;
     private String requestContextPath;
 
@@ -165,7 +165,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
             if (externalContext != null) {// case of nested document (XBL templates)
                 // Add xml:base attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL((xmlBaseStack.get(0)).toString()));
                 // Add deployment attribute
                 attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, isSeparateDeployment ? "separate" : "integrated");
                 // Add context path attribute
@@ -195,10 +195,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         // Output global properties
         if (properties.size() > 0) {
             final AttributesImpl newAttributes = new AttributesImpl();
-            for (Iterator i = properties.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String propertyName = (String) currentEntry.getKey();
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxforms:" + propertyName, ContentHandlerHelper.CDATA, (String) currentEntry.getValue());
+            for (Iterator<Map.Entry<String,String>> i = properties.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry<String,String> currentEntry = i.next();
+                final String propertyName = currentEntry.getKey();
+                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxforms:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue());
             }
 
             super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -248,7 +248,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 xmlBaseStack.push(xmlBaseStack.peek());
             } else {
                 try {
-                    final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+                    final URI currentXMLBaseURI = xmlBaseStack.peek();
                     xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)).normalize());// normalize to remove "..", etc.
                 } catch (URISyntaxException e) {
                     throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
@@ -331,7 +331,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     }
 
     private String getCurrentBaseURI() {
-        final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+        final URI currentXMLBaseURI = xmlBaseStack.peek();
         return currentXMLBaseURI.toString();
     }
 

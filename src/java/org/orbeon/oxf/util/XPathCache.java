@@ -57,14 +57,30 @@ import java.util.*;
  */
 public class XPathCache {
 
-    public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
     public static final String XPATH_CACHE_NAME = "cache.xpath";
     private static final int XPATH_CACHE_DEFAULT_SIZE = 200;
 
     private static final boolean DEBUG_TEST_KEY_OPTIMIZATION = false;
 
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
-    public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
+
+    public static class XPathContext {
+        public Map<String, String> prefixToURIMap;
+        public Map<String, ValueRepresentation> variableToValueMap;
+        public FunctionLibrary functionLibrary;
+        public FunctionContext functionContext;
+        public String baseURI;
+        public LocationData locationData;
+
+        public XPathContext(Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+            this.prefixToURIMap = prefixToURIMap;
+            this.variableToValueMap = variableToValueMap;
+            this.functionLibrary = functionLibrary;
+            this.functionContext = functionContext;
+            this.baseURI = baseURI;
+            this.locationData = locationData;
+        }
+    }
 
     /**
      * Evaluate an XPath expression on the document.
@@ -152,6 +168,14 @@ public class XPathCache {
             if (xpathExpression != null)
                 xpathExpression.returnToPool();
         }
+    }
+
+    /**
+     * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
+     */
+    public static String evaluateAsAvt(PipelineContext pipelineContext, XPathCache.XPathContext xpathContext, Item contextItem, String xpathString) {
+        return evaluateAsAvt(pipelineContext, Collections.singletonList(contextItem), 1, xpathString, xpathContext.prefixToURIMap,
+                xpathContext.variableToValueMap, xpathContext.functionLibrary, xpathContext.functionContext, xpathContext.baseURI, xpathContext.locationData);
     }
 
     /**

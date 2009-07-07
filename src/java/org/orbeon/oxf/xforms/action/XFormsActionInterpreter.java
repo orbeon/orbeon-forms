@@ -145,7 +145,7 @@ public class XFormsActionInterpreter {
      * @param actionElement Element to get namsepace mapping for
      * @return              Map<String prefix, String uri>
      */
-    public Map getNamespaceMappings(Element actionElement) {
+    public Map<String, String> getNamespaceMappings(Element actionElement) {
         return container.getNamespaceMappings(actionElement);
     }
 
@@ -207,7 +207,7 @@ public class XFormsActionInterpreter {
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here
                 final XFormsContextStack.BindingContext actionBindingContext = contextStack.popBinding();
-                final Map namespaceContext = container.getNamespaceMappings(actionElement);
+                final Map<String, String> namespaceContext = container.getNamespaceMappings(actionElement);
                 {
                     final String contextAttribute = actionElement.attributeValue("context");
                     final String modelAttribute = actionElement.attributeValue("model");
@@ -307,7 +307,7 @@ public class XFormsActionInterpreter {
                                       Item contextItem) {
 
         // Execute condition relative to the overridden context if it exists, or the in-scope context if not
-        final List contextNodeset;
+        final List<Item> contextNodeset;
         final int contextPosition;
         {
             if (contextItem != null) {
@@ -316,7 +316,7 @@ public class XFormsActionInterpreter {
                 contextPosition = 1;
             } else {
                 // Use empty context
-                contextNodeset = Collections.EMPTY_LIST;
+                contextNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                 contextPosition = 0;
             }
         }

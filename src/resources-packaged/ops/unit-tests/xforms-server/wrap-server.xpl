@@ -35,35 +35,47 @@
         <p:input name="models" href="#models"/>
         <p:input name="instances" href="#instances"/>
         <p:input name="config">
-            <event-request xmlns="http://orbeon.org/oxf/xml/xforms" xsl:version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <static-state>
-                    <xsl:variable name="static-state" as="document-node()">
-                        <xsl:document>
-                            <static-state xmlns="">
-                                <xsl:copy-of select="doc('input:controls')/*/*"/>
-                                <xsl:copy-of select="doc('input:models')/*/*"/>
-                                <properties xxforms:state-handling="client"/>
-                            </static-state>
-                        </xsl:document>
-                    </xsl:variable>
-                    <xsl:value-of select="context:encodeXML($static-state)"/>
-                </static-state>
-                <dynamic-state>
-                    <xsl:if test="doc('input:instances')/*/*">
-                        <xsl:variable name="dynamic-state" as="document-node()">
-                            <xsl:document>
-                                <dynamic-state xmlns="">
-                                    <xsl:copy-of select="doc('input:instances')/*"/>
-                                </dynamic-state>
-                            </xsl:document>
-                        </xsl:variable>
-                        <xsl:value-of select="context:encodeXML($dynamic-state)"/>
-                    </xsl:if>
-                </dynamic-state>
-                <action>
-                    <xsl:copy-of select="doc('input:action')/*/*"/>
-                </action>
-            </event-request>
+            <xsl:transform version="2.0">
+                <xsl:output method="xml" name="xml"/>
+                <xsl:template match="/">
+                    <event-request xmlns="http://orbeon.org/oxf/xml/xforms" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <static-state>
+                            <xsl:variable name="static-state" as="document-node()">
+                                <xsl:document>
+                                    <static-state xmlns="">
+                                        <xsl:copy-of select="doc('input:controls')/*/*"/>
+                                        <xsl:copy-of select="doc('input:models')/*/*"/>
+                                        <properties xxforms:state-handling="client"/>
+                                    </static-state>
+                                </xsl:document>
+                            </xsl:variable>
+                            <xsl:value-of select="context:encodeXML($static-state)"/>
+                        </static-state>
+                        <dynamic-state>
+                            <xsl:if test="doc('input:instances')/instances/instance">
+                                <xsl:variable name="dynamic-state" as="document-node()">
+                                    <xsl:document>
+                                        <dynamic-state xmlns="">
+                                            <instances>
+                                                <xsl:for-each select="doc('input:instances')/instances/instance">
+                                                    <xsl:copy>
+                                                        <xsl:copy-of select="@*"/>
+                                                        <xsl:value-of select="saxon:serialize(*[1], 'xml')"/>
+                                                    </xsl:copy>
+                                                </xsl:for-each>
+                                            </instances>
+                                        </dynamic-state>
+                                    </xsl:document>
+                                </xsl:variable>
+                                <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                            </xsl:if>
+                        </dynamic-state>
+                        <action>
+                            <xsl:copy-of select="doc('input:action')/*/*"/>
+                        </action>
+                    </event-request>
+                </xsl:template>
+            </xsl:transform>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>

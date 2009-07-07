@@ -538,25 +538,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      *
      * @param instancesElement  container element
      */
-    // TODO: xxx move to XFormsModel
     protected void serializeInstances(Element instancesElement) {
 
         // Serialize this container's model's
         for (XFormsModel currentModel: models) {
-            if (currentModel.getInstances() != null) {
-                for (XFormsInstance currentInstance: currentModel.getInstances()) {
-
-                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
-
-                    if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
-                        // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
-                        instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
-
-                        // Log instance if needed
-                        currentInstance.logIfNeeded(getContainingDocument(), "storing instance to dynamic state");
-                    }
-                }
-            }
+            currentModel.serializeInstances(instancesElement);
         }
 
         // Recurse into children containers

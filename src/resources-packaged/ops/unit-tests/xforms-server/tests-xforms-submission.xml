@@ -367,8 +367,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance readonly="true" shared="application" id="instance-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" xinclude="true" replaced="true"/>
-                            <instance readonly="true" shared="application" id="instance-no-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" replaced="true"/>
+                            <instance readonly="true" cache="true" id="instance-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" xinclude="true" replaced="true"/>
+                            <instance readonly="true" cache="true" id="instance-no-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" replaced="true"/>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>

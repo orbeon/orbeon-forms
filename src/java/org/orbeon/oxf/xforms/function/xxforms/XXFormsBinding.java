@@ -45,7 +45,7 @@ public class XXFormsBinding extends XFormsFunction {
         // For now allow single-node controls only
         if (object instanceof XFormsSingleNodeControl) {
             // Get and return control binding
-            final XFormsControl control = (XFormsControl) object;
+            final XFormsSingleNodeControl control = (XFormsSingleNodeControl) object;
             final NodeInfo boundNode = control.getBoundNode();
 
             if (boundNode == null)

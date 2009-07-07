@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import java.util.*;
 
@@ -111,7 +112,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // For now, repeat does not support label, help, etc. so don't call super.evaluate()
 
         // Evaluate iterations
-        final List children = getChildren();
+        final List<XFormsControl> children = getChildren();
         if (children != null && children.size() > 0) {
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) i.next();
@@ -135,7 +136,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final String[] dndEnd = StringUtils.split(dndEvent.getDndEnd(), '-');
 
             // Find source information
-            final List sourceNodeset;
+            final List<Item> sourceNodeset;
             final int requestedSourceIndex;
             {
                 sourceNodeset = getBindingContext().getNodeset();
@@ -146,7 +147,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
 
             // Find destination
-            final List destinationNodeset;
+            final List<Item> destinationNodeset;
             final int requestedDestinationIndex;
             {
                 final XFormsRepeatControl destinationControl;
@@ -162,7 +163,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     destinationControl = this;
                 }
 
-                destinationNodeset = new ArrayList(destinationControl.getBindingContext().getNodeset());
+                destinationNodeset = new ArrayList<Item>(destinationControl.getBindingContext().getNodeset());
                 requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
             }
 
@@ -220,13 +221,13 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return dndAttribute != null && !"none".equals(dndAttribute);
     }
 
-    public void updateNodeset(PipelineContext pipelineContext, List insertedNodeInfos) {
+    public void updateNodeset(PipelineContext pipelineContext, List<Item> insertedNodeInfos) {
 
         // Get old nodeset
-        final List oldRepeatNodeset = getBindingContext().getNodeset();
+        final List<Item> oldRepeatNodeset = getBindingContext().getNodeset();
 
         // Get new nodeset
-        final List newRepeatNodeset;
+        final List<Item> newRepeatNodeset;
         {
             // Set new binding context on the repeat control
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
@@ -265,7 +266,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * @param insertedNodeInfos     nodes just inserted by xforms:insert if any
      * @return                      List<XFormsRepeatIterationControl> of new iterations if any, or an empty list
      */
-    public List updateIterations(PipelineContext pipelineContext, List oldRepeatNodeset, List newRepeatNodeset, List insertedNodeInfos) {
+    public List updateIterations(PipelineContext pipelineContext, List<Item> oldRepeatNodeset, List<Item> newRepeatNodeset, List<Item> insertedNodeInfos) {
 
         // NOTE: The following assumes the nodesets have changed
 
@@ -310,8 +311,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
             // Iterate over new nodeset to move or add iterations
             final int newSize = newRepeatNodeset.size();
-            final List newChildren = new ArrayList(newSize);
-            final List newIterations = new ArrayList();
+            final List<XFormsControl> newChildren = new ArrayList<XFormsControl>(newSize);
+            final List<XFormsRepeatIterationControl> newIterations = new ArrayList<XFormsRepeatIterationControl>();
             for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
 
                 final XFormsRepeatIterationControl newIteration;
@@ -466,18 +467,18 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    private int indexOfNodeInfo(List nodeset, NodeInfo nodeInfo) {
+    private int indexOfNodeInfo(List<Item> nodeset, NodeInfo nodeInfo) {
         int index = 0;
-        for (Iterator i = nodeset.iterator(); i.hasNext(); index++) {
-            final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-            if (currentNodeInfo.isSameNodeInfo(nodeInfo)) {
+        for (Item currentNodeInfo: nodeset) {
+            if (((NodeInfo) currentNodeInfo).isSameNodeInfo(nodeInfo)) {
                 return index;
             }
+            index++;
         }
         return -1;
     }
 
-    private int[] findNodeIndexes(List nodeset1, List nodeset2) {
+    private int[] findNodeIndexes(List<Item> nodeset1, List<Item> nodeset2) {
         final int[] result = new int[nodeset1.size()];
 
         int index = 0;
@@ -488,11 +489,13 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return result;
     }
 
-    public Map serializeLocal() {
+    @Override
+    public Map<String, String> serializeLocal() {
         // Serialize index
         return Collections.singletonMap("index", Integer.toString(getIndex()));
     }
 
+    @Override
     public void deserializeLocal(Element element) {
         // Deserialize index
 

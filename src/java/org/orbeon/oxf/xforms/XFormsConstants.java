@@ -15,22 +15,30 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.dom4j.Element;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.Item;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Collections;
 
 /**
  * Constants useful for the XForms engine. 
  */
 public class XFormsConstants {
 
-    public static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
-    public static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
-    public static final Map ALLOWED_XBL_ELEMENTS = new HashMap();
-    public static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
+    public static final List<Element> EMPTY_ELEMENT_LIST = Collections.emptyList();
+    public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
+    public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
+
+    public static final Map<String, String> ALLOWED_XXFORMS_ELEMENTS = new HashMap<String, String>();
+    public static final Map<String, String> ALLOWED_EXFORMS_ELEMENTS = new HashMap<String, String>();
+    public static final Map<String, String> ALLOWED_XBL_ELEMENTS = new HashMap<String, String>();
+    public static final Map<String, String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap<String, String>();
         
     static {
         // TODO: should probably just use this for warnings. Also see XFormsActions: bad to duplicate.
@@ -53,8 +61,8 @@ public class XFormsConstants {
 
         ALLOWED_XBL_ELEMENTS.put("xbl", "");
         ALLOWED_XBL_ELEMENTS.put("binding", "");
-//        ALLOWED_XBL_ELEMENTS.put("handlers", "");
-//        ALLOWED_XBL_ELEMENTS.put("implementation", "");
+        ALLOWED_XBL_ELEMENTS.put("handlers", "");
+        ALLOWED_XBL_ELEMENTS.put("implementation", "");
         ALLOWED_XBL_ELEMENTS.put("template", "");
 
         XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
@@ -257,6 +265,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHARED_QNAME = new QName("shared", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_CACHE_QNAME = new QName("cache", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TIME_TO_LIVE_QNAME = new QName("ttl", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_VALIDATION_QNAME = new QName("validation", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXCLUDE_RESULT_PREFIXES = new QName("exclude-result-prefixes", XXFORMS_NAMESPACE);

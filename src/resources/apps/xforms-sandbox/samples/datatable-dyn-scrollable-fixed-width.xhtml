@@ -20,19 +20,20 @@
     <head>
         <title>Using YUI's datatable</title>
         <xforms:model id="model">
-            <xforms:instance id="instance">
-                <empty xmlns=""/>
-            </xforms:instance>
+            <xforms:instance id="instance" src="oxf:/apps/xforms-sandbox/services/twitter.atom"/>
+            <!--<xforms:instance id="instance" src="http://search.twitter.com/search.atom?q=xforms&amp;rpp=100"/>-->
+            <xforms:bind nodeset="instance('instance')/atom:entry/atom:published"
+                type="xforms:dateTime"/>
         </xforms:model>
     </head>
     <body>
 
         <h1>Scrolable data table widgets (new generation)</h1>
 
-        <p>This sample tets an empty scrollable datatable.</p>
+        <p>This sample demonstrates scrollable datatables.</p>
 
         <p>Scrollable in both directions</p>
-        <fr:datatable scrollable="both" width="150px" height="100px">
+        <fr:datatable-dyn scrollable="both" width="800px" height="500px" innerTableWidth="1600px">
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">Date</th>
@@ -59,10 +60,10 @@
                     </tr>
                 </xforms:repeat>
             </tbody>
-        </fr:datatable>
-        
-        <p>Scrollable horinzontally only</p>
-        <fr:datatable scrollable="horizontal" width="150px">
+        </fr:datatable-dyn>
+
+        <!-- <p>Scrollable vertically only</p>
+        <fr:datatable-dyn scrollable="vertical" height="500px">
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">Date</th>
@@ -71,28 +72,24 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat nodeset="/atom:feed/atom:entry">
-                    <tr>
-                        <td>
-                            <xforms:output ref="atom:published"
-                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
-                            />
-                        </td>
-                        <td>
-                            <a href="{atom:author/atom:uri}">
-                                <xforms:output value="atom:author/atom:name"/>
-                            </a>
-                        </td>
-                        <td>
-                            <xforms:output value="atom:title"/>
-                        </td>
-                    </tr>
-                </xforms:repeat>
+                <tr repeat-nodeset="/atom:feed/atom:entry">
+                    <td>
+                        <xforms:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
+                    </td>
+                    <td>
+                        <a href="{atom:author/atom:uri}">
+                            <xforms:output value="atom:author/atom:name"/>
+                        </a>
+                    </td>
+                    <td>
+                        <xforms:output value="atom:title"/>
+                    </td>
+                </tr>
             </tbody>
-        </fr:datatable>
-        
-        <p>Scrollable horinzontally only (larger)</p>
-        <fr:datatable scrollable="horizontal" width="500px">
+        </fr:datatable-dyn>
+
+        <p>Scrollable horizontally only</p>
+        <fr:datatable-dyn scrollable="horizontal" width="800px">
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">Date</th>
@@ -101,25 +98,21 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat nodeset="/atom:feed/atom:entry">
-                    <tr>
-                        <td>
-                            <xforms:output ref="atom:published"
-                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
-                            />
-                        </td>
-                        <td>
-                            <a href="{atom:author/atom:uri}">
-                                <xforms:output value="atom:author/atom:name"/>
-                            </a>
-                        </td>
-                        <td>
-                            <xforms:output value="atom:title"/>
-                        </td>
-                    </tr>
-                </xforms:repeat>
+                <tr repeat-nodeset="/atom:feed/atom:entry[position() &lt;= 10]">
+                    <td>
+                        <xforms:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
+                    </td>
+                    <td>
+                        <a href="{atom:author/atom:uri}">
+                            <xforms:output value="atom:author/atom:name"/>
+                        </a>
+                    </td>
+                    <td>
+                        <xforms:output value="atom:title"/>
+                    </td>
+                </tr>
             </tbody>
-        </fr:datatable>
-        
+        </fr:datatable-dyn>-->
+
     </body>
 </html>

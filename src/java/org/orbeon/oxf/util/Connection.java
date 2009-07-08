@@ -39,6 +39,8 @@ public class Connection {
     public enum StateScope {
         NONE, REQUEST, SESSION, APPLICATION
     }
+    
+    private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
 
     public static final String HTTP_CLIENT_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_CLIENT_STATE_ATTRIBUTE = "oxf.http.state";
@@ -304,13 +306,6 @@ public class Connection {
         }
     }
 
-    private static StateScope getStateScope() {
-        // NOTE: Property values are same as enum except in lowercase
-        final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
-        final String proxyHost = propertySet.getString(HTTP_CLIENT_STATE_PROPERTY, StateScope.NONE.name().toLowerCase());
-        return StateScope.valueOf(proxyHost.toUpperCase());
-    }
-
     /**
      *
      * @param indentedLogger
@@ -554,5 +549,12 @@ public class Connection {
         } else {
             indentedLogger.logDebug("submission", "setting binary request body", "mediatype", mediatype);
         }
+    }
+
+    private static StateScope getStateScope() {
+        // NOTE: Property values are same as enum except in lowercase
+        final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+        final String proxyHost = propertySet.getString(HTTP_CLIENT_STATE_PROPERTY, DEFAULT_STATE_SCOPE.name().toLowerCase());
+        return StateScope.valueOf(proxyHost.toUpperCase());
     }
 }

@@ -61,6 +61,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         this.xxformsEncryptItemValues = isEncryptItemValues(containingDocument, element); 
     }
 
+    @Override
     protected QName[] getExtensionAttributes() {
         if (!(this instanceof XFormsSelectControl) && isFullAppearance())
             return EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL;
@@ -74,12 +75,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
         return (customGroupName != null) ? customGroupName : getEffectiveId();
     }
 
+    @Override
     public boolean hasJavaScriptInitialization() {
         final String appearance = getAppearance();
         return appearance != null
                 && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
+    @Override
     public void markDirty() {
         super.markDirty();
         // Force recalculation of items here
@@ -196,6 +199,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 "true".equals(isLocalEncryptItemValues) : XFormsProperties.isEncryptItemValues(containingDocument));
     }
 
+    @Override
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
         final String internalValue = getValue(pipelineContext);
         final String updatedValue;
@@ -217,6 +221,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         super.setExternalValue(updatedValue);
     }
 
+    @Override
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
@@ -233,24 +238,26 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
-            for (XFormsItemUtils.Item currentItem: items) {
-                final String currentItemValue = currentItem.getValue();
-                final boolean itemWasSelected = controlValue.equals(currentItemValue);
-                final boolean itemIsSelected;
-                if (value.equals(currentItemValue)) {
-                    // Value is currently selected in the UI
-                    itemIsSelected = true;
-                } else {
-                    // Value is currently NOT selected in the UI
-                    itemIsSelected = false;
-                }
+            if (items == null) {
+                for (XFormsItemUtils.Item currentItem: items) {
+                    final String currentItemValue = currentItem.getValue();
+                    final boolean itemWasSelected = controlValue.equals(currentItemValue);
+                    final boolean itemIsSelected;
+                    if (value.equals(currentItemValue)) {
+                        // Value is currently selected in the UI
+                        itemIsSelected = true;
+                    } else {
+                        // Value is currently NOT selected in the UI
+                        itemIsSelected = false;
+                    }
 
-                // Handle xforms-select / xforms-deselect
-                // TODO: Dispatch to itemset or item once we support doing that
-                if (!itemWasSelected && itemIsSelected) {
-                    selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
-                } else if (itemWasSelected && !itemIsSelected) {
-                    deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
+                    // Handle xforms-select / xforms-deselect
+                    // TODO: Dispatch to itemset or item once we support doing that
+                    if (!itemWasSelected && itemIsSelected) {
+                        selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
+                    } else if (itemWasSelected && !itemIsSelected) {
+                        deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
+                    }
                 }
             }
 

@@ -47,6 +47,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * @param type              should probably be null
      * @param filesElement
      */
+    @Override
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
 
         final String controlValue = getValue(pipelineContext);
@@ -56,7 +57,6 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         {
             // All items
             final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
-
             // Current values in the instance
             final Map<String, String> instanceValues = tokenize(pipelineContext, controlValue, false);
 
@@ -66,6 +66,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Iterate over all the items
             final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
             final List<XFormsDeselectEvent> deselectEvents = new ArrayList<XFormsDeselectEvent>();
+
             for (XFormsItemUtils.Item currentItem: items) {
                 final String currentItemValue = currentItem.getValue();
                 final boolean itemWasSelected = instanceValues.get(currentItemValue) != null;
@@ -87,7 +88,6 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 } else if (itemWasSelected && !itemIsSelected) {
                     deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
                 }
-
             }
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
@@ -121,6 +121,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         super.storeExternalValue(pipelineContext, newValue, type, filesElement);
     }
 
+    @Override
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
 
         final String internalValue = getValue(pipelineContext);
@@ -129,28 +130,35 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Keep null or ""
             updatedValue = internalValue;
         } else {
-
-            // Current values in the instance
-            final Map<String, String> instanceValues = tokenize(pipelineContext, internalValue, false);
-
             // Values in the itemset
             final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
+            if (items != null) {
 
-            // Actual value to return is the intersection of values in the instance and values in the itemset
-            final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
-            int index = 0;
-            for (XFormsItemUtils.Item currentItem: items) {
-                final String currentValue = currentItem.getValue();
-                if (instanceValues.get(currentValue) != null) {
-                    if (index > 0)
-                        sb.append(' ');
+                // Current values in the instance
+                final Map<String, String> instanceValues = tokenize(pipelineContext, internalValue, false);
 
-                    sb.append(currentItem.getExternalValue(pipelineContext));
 
-                    index++;
+
+                // Actual value to return is the intersection of values in the instance and values in the itemset
+                final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
+                int index = 0;
+                for (XFormsItemUtils.Item currentItem: items) {
+                    final String currentValue = currentItem.getValue();
+                    if (instanceValues.get(currentValue) != null) {
+                        if (index > 0)
+                            sb.append(' ');
+
+                        sb.append(currentItem.getExternalValue(pipelineContext));
+
+                        index++;
+                    }
                 }
+                updatedValue = sb.toString();
+            } else {
+                // Null itemset probably means the control was non-relevant. This should be handled better: if the
+                // control is not relevant, it should simply not be evaluated.
+                updatedValue = null;
             }
-            updatedValue = sb.toString();
         }
         setExternalValue(updatedValue);
     }

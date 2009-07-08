@@ -1971,42 +1971,54 @@
                 </p>
             </section>
             <a name="xxforms-shared"/>
+            <a name="xxforms-cache"/>
             <section>
-                <title>Sharing of Read-Only XForms Instances with <code>xxforms:shared</code></title>
+                <title>Caching of XForms Instances with <code>xxforms:cache</code></title>
                 <p>
-                    Orbeon Forms supports an extension attribute, <code>xxforms:shared</code>, on the
-                    <code>&lt;xforms:instance></code> and <code>&lt;xforms:submission></code> elements. This
-                    attribute can be used only when an XForms instance is marked as read-only with
-                    <code>xxforms:readonly="true"</code>. <code>xxforms:shared</code> can take two values:
-                    <code>document</code> (the default if the attribute is not specified) and
-                    <code>application</code>. When <code>application</code> is specified:
+                    Orbeon Forms supports a boolean extension attribute, <code>xxforms:cache</code>, on the
+                    <code>&lt;xforms:instance></code> and <code>&lt;xforms:submission></code> elements. This attribute
+                    can be used with instances that are read-only or read-write. When set to <code>true</code>:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            The instance can be shared at the application level identified just by its source URL.
+                            The instance can be shared at the application level. It is identified by its source URL.
                         </p>
                     </li>
                     <li>
                         <p>
                             The instance is not stored into the XForms document's state, but in a global cache,
-                            therefore potentially saving memory. If, upon loading an XForms document, the instance
-                            is found in the cache, it is directly retrieved from the cache. This can save time
-                            especially if the URL can take significant time to load.
+                            therefore potentially saving memory. If, upon loading an XForms instance or running a
+                            submission, the instance is found in the cache, it is directly retrieved from the cache.
+                            This can save time especially if the URL can take significant time to load.
                         </p>
                     </li>
                     <li>
                         <p>
-                            The URL must refer to a constant XML document and authorization credentials such as
-                            username and password should not cause different data to be loaded.
+                            The instance stored in cache is read-only. If the <code>xxforms:readonly</code> attribute is
+                            set to true (on <code>&lt;xforms:instance></code> or <code>&lt;xforms:submission></code>), a
+                            single copy of the instance is used in memory. Otherwise, a read-write copy is made.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            In general, the URL should refer to a constant or rarely-changing XML document, and
+                            authorization credentials such as username and password should not cause different data to
+                            be loaded.
                         </p>
                     </li>
                 </ul>
+                <note>
+                    This attribute deprecates the <code>xxforms:shared</code> attribute. Using
+                    <code>xxforms:cache="true"</code> is equivalent to using <code>xxforms:shared="application"</code>.
+                    Using <code>xxforms:cache="false"</code> is equivalent to using
+                    <code>xxforms:shared="document"</code>.
+                </note>
                 <p>
                     Here is how you use the attribute on <code>&lt;xforms:instance></code>:
                 </p>
                 <xml-source>
-                    <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application"/>
+                    <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:cache="true"/>
                 </xml-source>
                 <p>
                     When used on <code>&lt;xforms:submission></code>, the submission has to use
@@ -2014,13 +2026,13 @@
                 </p>
                 <xml-source>
                     <xforms:submission serialization="none" resource="/forms/resources/fr" method="get"
-                                       replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:shared="application"/>
+                                       replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:cache="true"/>
                 </xml-source>
                 <p>
                     You set the size of the shared instances cache using a property in <code>properties.xml</code>:
                 </p>
                 <xml-source>
-                    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="10"/>
+                    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="50"/>
                 </xml-source>
                 <p>
                     You can force the XForms engine to remove a shared instance from the cache by dispatching the
@@ -2049,7 +2061,7 @@
                     <comment> Submission loading a shared instance and enabling XInclude processing </comment>
                     <xforms:submission serialization="none" resource="/forms/resources/fr" method="get"
                                        replace="instance" instance="resources-instance"
-                                       xxforms:readonly="true" xxforms:shared="application"
+                                       xxforms:readonly="true" xxforms:cache="true"
                                        xxforms:xinclude="true"/>
                     <comment> Action invalidating only the instance which was loaded with xxforms:xinclude="true" </comment>
                     <xxforms:invalidate-instance ev:event="DOMActivate" resource="/forms/resources/fr" xinclude="true"/>
@@ -2066,21 +2078,20 @@
                     <xxforms:invalidate-instances ev:event="DOMActivate"/>
                 </xml-source>
                 <p>
-                    When using <code>xxforms:readonly="true"</code>, another attribute, <code>xxforms:ttl</code>,
-                    can be used to set a <i>time to live</i> for the instance in cache. This duration is expressed
-                    in milliseconds and has to be greater than zero. When a shared instance if found in cache but
-                    has an associated time to live, if it was put in the cache more than time to live milliseconds
-                    in the past, then the instance is discarded from the cache and retrieved again by URI as if it
-                    had not been found in cache at all. The following example expires the shared instance after one
-                    hour:
+                    The <code>xxforms:ttl</code> attribute can be used to set a <i>time to live</i> for the instance in
+                    cache. This duration is expressed in milliseconds and has to be greater than zero. When a shared
+                    instance if found in cache but has an associated time to live, if it was put in the cache more than
+                    time to live milliseconds in the past, then the instance is discarded from the cache and retrieved
+                    again by URI as if it had not been found in cache at all. The following example expires the shared
+                    instance after one hour:
                 </p>
                 <xml-source>
-                    <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application" xxforms:ttl="3600000"/>
+                    <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:cache="true" xxforms:ttl="3600000"/>
                 </xml-source>
                 <warning>
-                    When using <code>xxforms:shared="application"</code>, be sure that the data contained in the
-                    instance does not contain information that could be inadvertently shared with other XForms
-                    documents. It is recommended to use it to load localized resources or similar types of data.
+                    When using <code>xxforms:cache="true"</code>, be sure that the data contained in the instance does
+                    not contain information that could be inadvertently shared with other XForms documents. It is
+                    recommended to use it to load localized resources or similar types of data.
                 </warning>
             </section>
             <a name="xxforms-refresh-items"/>

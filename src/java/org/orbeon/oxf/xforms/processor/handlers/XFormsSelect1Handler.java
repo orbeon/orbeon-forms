@@ -55,6 +55,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
+    @Override
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
         this.isMany = localname.equals("select");
         this.appearance = getAppearance(attributes);
@@ -77,6 +78,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         this.isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(appearance);
     }
 
+    @Override
     protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
         if (isOpenSelection)
             classes.append(" xforms-select1-open");
@@ -86,11 +88,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             classes.append(" xforms-initially-hidden");
     }
 
+    @Override
     protected boolean isDefaultIncremental() {
         // Incremental mode is the default
         return true;
     }
 
+    @Override
     protected QName getAppearance(Attributes attributes) {
         final QName tempAppearance = super.getAppearance(attributes);
 
@@ -117,6 +121,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, items, isMany, isFull);
     }
 
+    @Override
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
         if (isStaticReadonly(xformsControl) || !isFull || !handlerContext.isNoScript())

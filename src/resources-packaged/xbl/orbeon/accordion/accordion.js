@@ -1,10 +1,10 @@
 YAHOO.namespace("xbl.fr");
 YAHOO.xbl.fr.Accordion = {
-    instances: {},
+    _instances: {},
 
     init: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-accordion");
-        if (! YAHOO.xbl.fr.Accordion.instances[container.id]) {
+        if (! YAHOO.xbl.fr.Accordion._instances[container.id]) {
             var dlElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-dl", null, container)[0];
             var selectedElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-selected", null, container)[0];
 
@@ -40,7 +40,7 @@ YAHOO.xbl.fr.Accordion = {
                 }
             }
 
-            YAHOO.xbl.fr.Accordion.instances[container.id] = {
+            YAHOO.xbl.fr.Accordion._instances[container.id] = {
                 toggleAll: function() {
                     YAHOO.util.Dom.getElementsByClassName("a-m-t", null, container, function(dt) {
                         expandOrCollapse(dt);
@@ -55,10 +55,10 @@ YAHOO.xbl.fr.Accordion = {
     },
     toggleAll: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-accordion");
-        YAHOO.xbl.fr.Accordion.instances[container.id].toggleAll();
+        YAHOO.xbl.fr.Accordion._instances[container.id].toggleAll();
     },
     toggle: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-accordion");
-        YAHOO.xbl.fr.Accordion.instances[container.id].toggle(target);
+        YAHOO.xbl.fr.Accordion._instances[container.id].toggle(target);
     }
 };

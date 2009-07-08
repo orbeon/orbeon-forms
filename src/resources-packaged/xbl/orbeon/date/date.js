@@ -1,10 +1,10 @@
 YAHOO.namespace("xbl.fr");
 YAHOO.xbl.fr.Date = {
-    instances: {},
+    _instances: {},
 
     init: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-date");
-        if (! YAHOO.xbl.fr.Date.instances[container.id]) {
+        if (! YAHOO.xbl.fr.Date._instances[container.id]) {
 
             // Get information from the DOM
             var calendarDivElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-calendar-div", null, container)[0];
@@ -91,23 +91,23 @@ YAHOO.xbl.fr.Date = {
             instance.propertyMaxdateChanged();
             yuiCalendar.render();
 
-            YAHOO.xbl.fr.Date.instances[container.id] = instance;
+            YAHOO.xbl.fr.Date._instances[container.id] = instance;
         }
     },
     valueChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-date");
-        var instance = YAHOO.xbl.fr.Date.instances[container.id];
+        var instance = YAHOO.xbl.fr.Date._instances[container.id];
         instance.valueChanged();
     },
     propertyMindateChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-date");
-        var instance = YAHOO.xbl.fr.Date.instances[container.id];
+        var instance = YAHOO.xbl.fr.Date._instances[container.id];
         if (! YAHOO.lang.isUndefined(instance))
             instance.propertyMindateChanged();
     },
     propertyMaxdateChanged: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-date");
-        var instance = YAHOO.xbl.fr.Date.instances[container.id];
+        var instance = YAHOO.xbl.fr.Date._instances[container.id];
         if (! YAHOO.lang.isUndefined(instance))
             instance.propertyMaxdateChanged();
     }

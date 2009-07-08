@@ -15,20 +15,22 @@ package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
-import java.util.Map;
-import java.util.Iterator;
-import java.util.List;
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class ConnectionResult {
+
+    public static final Map<String, List<String>> EMPTY_HEADERS_MAP = Collections.emptyMap();
 
     public boolean dontHandleResponse;
     public int statusCode;
     private String responseMediaType;
     private String responseContentType;
-    public Map responseHeaders;
+    public Map<String, List<String>> responseHeaders;
     private Long lastModified;
     public String resourceURI;
 
@@ -91,26 +93,15 @@ public class ConnectionResult {
 
     public void forwardHeaders(ExternalContext.Response response) {
         if (responseHeaders != null) {
-            for (Iterator i = responseHeaders.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
+            for (Map.Entry<String, List<String>> currentEntry: responseHeaders.entrySet()) {
                 final String headerName = (String) currentEntry.getKey();
-
                 if (headerName != null) {
-                    // NOTE: As per the doc, this should always be a List, but for some unknown reason
-                    // it appears to be a String sometimes
-                    if (currentEntry.getValue() instanceof String) {
-                        // Case of String
-                        final String headerValue = (String) currentEntry.getValue();
-                        forwardHeaderFilter(response, headerName, headerValue);
-                    } else {
-                        // Case of List
-                        final List headerValues = (List) currentEntry.getValue();
-                        if (headerValues != null) {
-                            for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                final String headerValue = (String) j.next();
-                                if (headerValue != null) {
-                                    forwardHeaderFilter(response, headerName, headerValue);
-                                }
+                    // NOTE: Values could be a String in the past, but that shouldn't be the case anymore!
+                    final List<String> headerValues = currentEntry.getValue();
+                    if (headerValues != null) {
+                        for (String headerValue: headerValues) {
+                            if (headerValue != null) {
+                                forwardHeaderFilter(response, headerName, headerValue);
                             }
                         }
                     }

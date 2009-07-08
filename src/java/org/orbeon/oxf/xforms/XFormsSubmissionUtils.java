@@ -223,7 +223,7 @@ public class XFormsSubmissionUtils {
                 connectionResult.statusCode = responseAdapter.getResponseCode();
                 connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
                 connectionResult.setResponseInputStream(responseAdapter.getInputStream());
-                connectionResult.responseHeaders = new HashMap();
+                connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
                 connectionResult.setLastModified(null);
             }
 

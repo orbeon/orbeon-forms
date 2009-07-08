@@ -67,7 +67,7 @@ public class HTTPURLConnection extends URLConnection {
     private int responseCode;
     private byte[] requestBody;
     private Map<String, String[]> requestProperties = new LinkedHashMap<String, String[]>();    // LinkedHashMap<String lowercaseHeaderName, String[] headerValues>
-    private HashMap<String,List<String>> responseHeaders;
+    private HashMap<String, List<String>> responseHeaders;
 
     private String username;
     private String password;
@@ -220,21 +220,24 @@ public class HTTPURLConnection extends URLConnection {
             if (!connected)
                 connect();
             if (responseHeaders == null) {
-                responseHeaders = new HashMap<String,List<String>>();
+                responseHeaders = new HashMap<String, List<String>>();
                 final Header[] headers = method.getResponseHeaders();
                 for (int i = headers.length - 1; i >= 0; i--) {
-                    final HeaderElement[] elements = headers[i].getElements();
-                    if (elements.length == 1) {
-                        // Mosts common case
-                        responseHeaders.put(headers[i].getName().toLowerCase(), Collections.singletonList(elements[0].getValue()));
-                    } else {
-                        // General case
-                        final List<String> values = new ArrayList<String>(elements.length);
-                        for (HeaderElement element: elements) {
-                            values.add(element.getValue());
-                        }
-                        responseHeaders.put(headers[i].getName().toLowerCase(), values);
-                    }
+                    responseHeaders.put(headers[i].getName().toLowerCase(), Collections.singletonList(headers[i].getValue()));
+
+                    // HeaderElement does not contain what I thought it did and the code below doesn't work
+//                    final HeaderElement[] elements = headers[i].getElements();
+//                    if (elements.length == 1) {
+//                        // Mosts common case
+//                        responseHeaders.put(headers[i].getName().toLowerCase(), Collections.singletonList(elements[0].getValue()));
+//                    } else {
+//                        // General case
+//                        final List<String> values = new ArrayList<String>(elements.length);
+//                        for (HeaderElement element: elements) {
+//                            values.add(element.getValue());
+//                        }
+//                        responseHeaders.put(headers[i].getName().toLowerCase(), values);
+//                    }
                 }
             }
         } catch (IOException e) {

@@ -35,7 +35,7 @@ import java.io.UnsupportedEncodingException;
 
 public class Connection {
 
-    // NOTE: Could add a distinction for portlet session scopes.
+    // NOTE: Could add a distinction for portlet session scope.
     public enum StateScope {
         NONE, REQUEST, SESSION, APPLICATION
     }

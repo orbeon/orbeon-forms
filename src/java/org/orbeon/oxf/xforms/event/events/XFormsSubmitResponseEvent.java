@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.*;
@@ -26,7 +26,7 @@ import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -36,7 +36,7 @@ import java.util.Map;
 public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
     private String resourceURI;
-    private Map headers;
+    private Map<String, List<String>>  headers;
     private int statusCode;
 
     public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, ConnectionResult connectionResult) {
@@ -77,19 +77,15 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                 // Create and return sequence of <header> elements
                 final FastStringBuffer sb = new FastStringBuffer(100);
                 sb.append("<headers>");
-                for (final Iterator i = headers.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                for (Map.Entry<String, List<String>> currentEntry: headers.entrySet()) {
                     sb.append("<header><name>");
-                    sb.append(XMLUtils.escapeXMLMinimal((String) currentEntry.getKey()));
+                    sb.append(XMLUtils.escapeXMLMinimal(currentEntry.getKey()));
                     sb.append("</name>");
-                    sb.append("<value>");
-                    sb.append(XMLUtils.escapeXMLMinimal((String) currentEntry.getValue()));
-                    sb.append("</value>");
-//                    for (Iterator j = ((List) currentEntry.getValue()).iterator(); j.hasNext();) {
-//                        sb.append("<value>");
-//                        sb.append((String) j.next());
-//                        sb.append("</value>");
-//                    }
+                    for (String headerValue: currentEntry.getValue()) {
+                        sb.append("<value>");
+                        sb.append(headerValue);
+                        sb.append("</value>");
+                    }
                     sb.append("</header>");
                 }
 

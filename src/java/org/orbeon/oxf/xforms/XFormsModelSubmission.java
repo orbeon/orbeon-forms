@@ -680,9 +680,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         // Do as if we are receiving a regular XML response
                         connectionResult = new ConnectionResult(null);
                         connectionResult.statusCode = 200;
-                        connectionResult.responseHeaders = new HashMap();
+                        connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
                         connectionResult.setLastModified(null);
-                        connectionResult.setResponseContentType("application/xml");// should we use actualRequestMediatype instead?
+                        connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);// should we use actualRequestMediatype instead?
                         connectionResult.dontHandleResponse = false;
                         connectionResult.setResponseInputStream(new ByteArrayInputStream(messageBody));
 

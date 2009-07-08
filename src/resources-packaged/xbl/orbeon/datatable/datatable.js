@@ -18,7 +18,7 @@
 
 /**
  * Implementation of datatable constructor. Creates column resizers.
- * 
+ *
  * @method ORBEON.widgets.datatable
  * @param element
  *            {DOM Element} The DOM element that contains the table.
@@ -88,7 +88,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 			YAHOO.util.Dom.setStyle(this.table, 'width', innerTableWidth);
 			this.tableWidth = this.table.clientWidth;
 		} else {
-			this.tableWidth = this.optimizeWidth(this.tableWidth, this.getTableHeightForWidth(this.tableWidth), 2500, this.getTableHeightForWidth(2500)) + 50;			
+			this.tableWidth = this.optimizeWidth(this.tableWidth, this.getTableHeightForWidth(this.tableWidth), 2500, this.getTableHeightForWidth(2500)) + 50;
 		}
 	} else if (this.scrollV) {
 		if (this.hasFixedWidthTable) {
@@ -161,7 +161,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		// And more assembly
 		this.container.appendChild(this.bodyContainer);
 		this.bodyContainer.appendChild(this.table);
-		
+
 		// Add a dummy div with the same width as the table so that the scrollbar appears when the body is empty
 
 		var widthControlDiv = document.createElement('div');
@@ -187,7 +187,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
 			colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
 			this.colResizers[ this.colResizers.length] = colResizer;
-		} 
+		}
 
 		var width = (columnWidths[j] - 20) + 'px';
 		var rule;
@@ -235,7 +235,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		}
 	}
 
-	// Now that the table has been properly sized, reconsider its 
+	// Now that the table has been properly sized, reconsider its
 	// "resizeability"
 
 	if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
@@ -347,12 +347,10 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
 	this.init(this.resizer, this.resizer, {
 		dragOnly: true, dragElId: this.resizer.id
 	});
-	this.setYConstraint(0, 0);
-	this.initFrame();
 
-	var colRegion = YAHOO.util.Dom.getRegion(this.th);
-	var X = YAHOO.util.Dom.getX(this.resizer);
-	this.delta = colRegion.right - X;
+    this.setYConstraint(0, 0);
+    this.initFrame();
+	this.delta = 7;
 }
 
 
@@ -380,7 +378,7 @@ setRule: function (rule) {
 
 /**
  * Handles mousedown events on the Column resizer.
- * 
+ *
  * @method onMouseDown
  * @param e
  *            {string} The mousedown event

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -28,20 +29,20 @@ import java.util.Map;
  */
 public class XFormsControlFactory {
 
-    private static Map nameToClassMap = new HashMap();
+    private static Map<QName, Factory> nameToClassMap = new HashMap<QName, Factory>();
 
     // TODO: fix terminology which is not consistent with class hierarchy
-    private static final Map CONTAINER_CONTROLS = new HashMap();
-    private static final Map CORE_VALUE_CONTROLS = new HashMap();
-    private static final Map CORE_CONTROLS = new HashMap();
-    private static final Map BUILTIN_CONTROLS = new HashMap();
+    private static final Map<String, String> CONTAINER_CONTROLS = new HashMap<String, String>();
+    private static final Map<String, String> CORE_VALUE_CONTROLS = new HashMap<String, String>();
+    private static final Map<String, String> CORE_CONTROLS = new HashMap<String, String>();
+    private static final Map<String, String> BUILTIN_CONTROLS = new HashMap<String, String>();
 
-    public static final Map MANDATORY_SINGLE_NODE_CONTROLS = new HashMap();
-    public static final Map OPTIONAL_SINGLE_NODE_CONTROLS = new HashMap();
-    public static final Map NO_SINGLE_NODE_CONTROLS = new HashMap();
-    public static final Map MANDATORY_NODESET_CONTROLS = new HashMap();
-    public static final Map NO_NODESET_CONTROLS = new HashMap();
-    public static final Map SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap();
+    public static final Map<String, String> MANDATORY_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
+    public static final Map<String, String> OPTIONAL_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
+    public static final Map<String, String> NO_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
+    public static final Map<String, String> MANDATORY_NODESET_CONTROLS = new HashMap<String, String>();
+    public static final Map<String, String> NO_NODESET_CONTROLS = new HashMap<String, String>();
+    public static final Map<String, String> SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap<String, String>();
 
     static {
         // TODO: standardize on QName?
@@ -61,7 +62,7 @@ public class XFormsControlFactory {
         CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
         CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT1_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
 
-        final Map coreNoValueControls = new HashMap();
+        final Map<String, String> coreNoValueControls = new HashMap<String, String>();
         coreNoValueControls.put(XFormsConstants.SUBMIT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
         coreNoValueControls.put(XFormsConstants.TRIGGER_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
 

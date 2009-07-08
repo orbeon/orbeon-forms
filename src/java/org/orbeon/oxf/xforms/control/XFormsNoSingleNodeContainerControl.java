@@ -50,12 +50,13 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
     /**
      * Update this control's effective id and its descendants based on the parent's effective id.
      */
+    @Override
     public void updateEffectiveId() {
         super.updateEffectiveId();
-        final List children = getChildren();
+        final List<XFormsControl> children = getChildren();
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (Iterator<XFormsControl> i = children.iterator(); i.hasNext();) {
+                final XFormsControl currentControl = i.next();
                 currentControl.updateEffectiveId();
             }
         }
@@ -69,8 +70,8 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentChildControl = (XFormsControl) i.next();
+            for (Iterator<XFormsControl> i = children.iterator(); i.hasNext();) {
+                final XFormsControl currentChildControl = i.next();
                 final XFormsControl currentChildClone = (XFormsControl) currentChildControl.clone();
                 currentChildClone.setParent(cloned);
                 cloned.children.add(currentChildClone);
@@ -84,11 +85,12 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
         // For subclasses
     }
 
+    @Override
     public void iterationRemoved(PipelineContext pipelineContext) {
-        final List children = getChildren();
+        final List<XFormsControl> children = getChildren();
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (Iterator<XFormsControl> i = children.iterator(); i.hasNext();) {
+                final XFormsControl currentControl = i.next();
                 currentControl.iterationRemoved(pipelineContext);
             }
         }

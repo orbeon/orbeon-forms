@@ -13,14 +13,7 @@
  */
 package org.orbeon.oxf.resources.handler;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.NTCredentials;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
@@ -33,7 +26,7 @@ import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,10 +34,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
 
@@ -62,20 +52,22 @@ public class HTTPURLConnection extends URLConnection {
         final HttpConnectionManagerParams params = new HttpConnectionManagerParams();
         params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
         params.setMaxTotalConnections(Integer.MAX_VALUE);
-        // The code commented below isables retries. By default HttpClient will try 3 times, and it is not clear
+        // The code commented below disables retries. By default HttpClient will try 3 times, and it is not clear
         // if this is a good thing or not in our case.
         //DefaultHttpMethodRetryHandler retryHandler = new DefaultHttpMethodRetryHandler(0, false);
         //params.setParameter(HttpMethodParams.RETRY_HANDLER, retryHandler);
         connectionManager.setParams(params);
     }
 
+    private HttpState httpState;
+
     private URL url;
     private boolean connected = false;
     private HttpMethodBase method;
     private int responseCode;
     private byte[] requestBody;
-    private Map requestProperties = new LinkedHashMap();    // LinkedHashMap<String lowercaseHeaderName, String[] headerValues>
-    private HashMap responseHeaders;
+    private Map<String, String[]> requestProperties = new LinkedHashMap<String, String[]>();    // LinkedHashMap<String lowercaseHeaderName, String[] headerValues>
+    private HashMap<String,List<String>> responseHeaders;
 
     private String username;
     private String password;
@@ -99,16 +91,30 @@ public class HTTPURLConnection extends URLConnection {
         else throw new ProtocolException("Method " + methodName + " not supported");
     }
 
+    public HttpState getHttpState() {
+        return httpState;
+    }
+
+    public void setHttpState(HttpState httpState) {
+        this.httpState = httpState;
+    }
+
     public void connect() throws IOException {
         if (!connected) {
             final String userinfo = url.getUserInfo();
             final boolean isAuthenticationRequestedWithUsername = username != null && !username.equals("");
 
             // Create the HTTP client (this *should* be fairly lightweight)
-
-            // NOTE: This will also reset the client's state, including cookies and authorization stuff, as currently
-            // don't have the ability to keep this state for example in association with an XForms page.
             final HttpClient httpClient = new HttpClient(connectionManager);
+
+            // Determine which state to use
+            if (httpState != null) {
+                // Use state provided by user
+                httpClient.setState(httpState);
+            } else {
+                // Expose state created by HttpClient
+                httpState = httpClient.getState();
+            }
 
             // Make authentification preemptive
             if (userinfo != null || isAuthenticationRequestedWithUsername)
@@ -141,7 +147,7 @@ public class HTTPURLConnection extends URLConnection {
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL
-                int separatorPosition = userinfo.indexOf(":");
+                final int separatorPosition = userinfo.indexOf(":");
                 String username = separatorPosition == -1 ? userinfo : userinfo.substring(0, separatorPosition);
                 String password = separatorPosition == -1 ? "" : userinfo.substring(separatorPosition + 1);
                 // If the username/password contain special character, those character will be encoded, since we
@@ -214,10 +220,22 @@ public class HTTPURLConnection extends URLConnection {
             if (!connected)
                 connect();
             if (responseHeaders == null) {
-                responseHeaders = new HashMap();
-                Header[] headers = method.getResponseHeaders();
-                for (int i = headers.length - 1; i >= 0; i--)
-                    responseHeaders.put(headers[i].getName().toLowerCase(), headers[i].getValue());
+                responseHeaders = new HashMap<String,List<String>>();
+                final Header[] headers = method.getResponseHeaders();
+                for (int i = headers.length - 1; i >= 0; i--) {
+                    final HeaderElement[] elements = headers[i].getElements();
+                    if (elements.length == 1) {
+                        // Mosts common case
+                        responseHeaders.put(headers[i].getName().toLowerCase(), Collections.singletonList(elements[0].getValue()));
+                    } else {
+                        // General case
+                        final List<String> values = new ArrayList<String>(elements.length);
+                        for (HeaderElement element: elements) {
+                            values.add(element.getValue());
+                        }
+                        responseHeaders.put(headers[i].getName().toLowerCase(), values);
+                    }
+                }
             }
         } catch (IOException e) {
             throw new OXFException(e);
@@ -225,36 +243,44 @@ public class HTTPURLConnection extends URLConnection {
     }
 
     /**
-     * This method will be called by URLConnection.getLastModified(),
-     * URLConnection.getContentLength(), etc.
+     * This method will be called by URLConnection.getLastModified(), URLConnection.getContentLength(), etc.
      */
+    @Override
     public String getHeaderField(String name) {
         initResponseHeaders();
-        return (String) responseHeaders.get(name);
+        // We return the first header value only. This is not really right, is it? But it will work for the few calls
+        // done by URLConnection.
+        final List<String> values = responseHeaders.get(name);
+        return (values != null) ? values.get(0) : null;
     }
 
-    public Map getHeaderFields() {
+    @Override
+    public Map<String, List<String>> getHeaderFields() {
         initResponseHeaders();
         return responseHeaders;
     }
 
+    @Override
     public void setRequestProperty(String key, String value) {
         super.setRequestProperty(key, value);
         requestProperties.put(key, new String[] { value });
     }
 
+    @Override
     public void addRequestProperty(String key, String value) {
         super.addRequestProperty(key, value);
-        NetUtils.addValueToStringArrayMap(requestProperties, key, value);
+        StringUtils.addValueToStringArrayMap(requestProperties, key, value);
     }
 
+    @Override
     public String getRequestProperty(String key) {
         // Not sure what should be returned so return the first value if any. But likely nobody is calling this method.
         final String[] values = (String[]) requestProperties.get(key);
         return (values == null) ? null : values[0];
     }
 
-    public Map getRequestProperties() {
+    @Override
+    public Map<String,List<String>> getRequestProperties() {
         return super.getRequestProperties();
     }
 
@@ -274,6 +300,7 @@ public class HTTPURLConnection extends URLConnection {
         this.password = password.trim();
     }
 
+    @Override
     public long getLastModified() {
         // Default implementation throws an exception if the header is not present, so optimize on calling side
         final String field = getHeaderField("last-modified");

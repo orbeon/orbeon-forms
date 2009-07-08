@@ -24,7 +24,7 @@ public class IndentedLogger {
     private Logger logger;
     private String prefix;
     private int logIndentLevel = 0;
-    private Stack stack = new Stack();
+    private Stack<Operation> stack = new Stack<Operation>();
 
     private class Operation {
         public String type;
@@ -74,7 +74,7 @@ public class IndentedLogger {
         logIndentLevel++;
     }
 
-    public void startHandleOperation(String type, String message, String[] parameters) {
+    public void startHandleOperation(String type, String message, String... parameters) {
         if (logger.isDebugEnabled()) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message, parameters);
@@ -85,17 +85,17 @@ public class IndentedLogger {
     public void endHandleOperation() {
         logIndentLevel--;
         if (logger.isDebugEnabled()) {
-            final Operation operation = (Operation) stack.pop();
+            final Operation operation = stack.pop();
             if (operation != null) {
-                logDebug(operation.type, "end " + operation.message, new String[] { "time (ms)", Long.toString(operation.getTimeElapsed()) });
+                logDebug(operation.type, "end " + operation.message, "time (ms)", Long.toString(operation.getTimeElapsed()));
             }
         }
     }
 
-    public void endHandleOperation(String[] parameters) {
+    public void endHandleOperation(String... parameters) {
         logIndentLevel--;
         if (logger.isDebugEnabled()) {
-            final Operation operation = (Operation) stack.pop();
+            final Operation operation = stack.pop();
             if (operation != null) {
 
                 final String[] newParameters = new String[parameters.length + 2];
@@ -119,11 +119,11 @@ public class IndentedLogger {
         log(Level.DEBUG, logIndentLevel, type, message, null);
     }
 
-    public void logDebug(String type, String message, String[] parameters) {
+    public void logDebug(String type, String message, String... parameters) {
         log(Level.DEBUG, logIndentLevel, type, message, parameters);
     }
 
-    public static void logDebugStatic(Logger logger, String prefix, String type, String message, String[] parameters) {
+    public static void logDebugStatic(Logger logger, String prefix, String type, String message, String... parameters) {
         log(logger, Level.DEBUG, 0, prefix, type, message, parameters);
     }
 

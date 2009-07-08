@@ -8,8 +8,8 @@ import java.util.Map;
  */
 public interface WebAppExternalContext {
 
-    public Map getAttributesMap();
-    public Map getInitAttributesMap();
+    public Map<String, Object> getAttributesMap();
+    public Map<String, String> getInitAttributesMap();
     public String getRealPath(String path);
 
     public void log(String message, Throwable throwable);

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.StringUtils;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
 
     public String[] getParameterValues(String name) {
         // Convert as parameters MAY contain FileItem values
-        return NetUtils.objectArrayToStringArray((Object[]) parameters.get(name));
+        return StringUtils.objectArrayToStringArray((Object[]) parameters.get(name));
     }
 
     public String getParameter(String s) {

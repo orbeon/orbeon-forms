@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -121,7 +121,7 @@ public class XFormsServerSharedInstancesCache {
                         new String[] { "id", instanceStaticId, "URI", instanceSourceURI });
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-            final ConnectionResult connectionResult = NetUtils.openConnection(externalContext,
+            final ConnectionResult connectionResult = new Connection().open(externalContext,
                     containingDocument.getIndentedLogger(), "GET", sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

@@ -90,13 +90,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtIndent;
     private String avtOmitxmldeclaration;
     private String avtStandalone;
-    private String cdatasectionelements;
+//    private String cdatasectionelements;
 
     private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
     private String replaceInstanceId;
     private String xxfReplaceInstanceId;
     private String avtSeparator = "&";// XForms 1.1 changes back the default to the ampersand as of February 2009
-    private String includenamespaceprefixes;
+//    private String includenamespaceprefixes;
 
     private String avtXXFormsUsername;
     private String avtXXFormsPassword;
@@ -181,7 +181,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             avtOmitxmldeclaration = submissionElement.attributeValue("omit-xml-declaration");
             avtStandalone = submissionElement.attributeValue("standalone");
 
-            cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
+            // TODO
+//            cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
             if (submissionElement.attributeValue("replace") != null) {
                 replace = submissionElement.attributeValue("replace");
 
@@ -193,7 +194,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (submissionElement.attributeValue("separator") != null) {
                 avtSeparator = submissionElement.attributeValue("separator");
             }
-            includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
+            // TODO
+//            includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
 
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
@@ -672,7 +674,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         } else {
                             // Log message mody for debugging purposes
                             if (XFormsServer.logger.isDebugEnabled())
-                                NetUtils.logRequestBody(containingDocument.getIndentedLogger(), actualRequestMediatype, messageBody);
+                                Connection.logRequestBody(containingDocument.getIndentedLogger(), actualRequestMediatype, messageBody);
                         }
 
                         // Do as if we are receiving a regular XML response
@@ -838,23 +840,29 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             // Open connection
                             if (isAsyncSubmission) {
-                                final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
-                                final Map<String, String[]> headersMap = NetUtils.getHeadersMap(externalContext, indentedLogger,
-                                            resolvedXXFormsUsername, customHeaderNameValues, newForwardSubmissionHeaders);
 
                                 // Pack call into a Runnable
                                 final Runnable runnable = new Runnable() {
 
                                     public void run() {
 
-                                        // Here we just want to run the submission and not touch the HttpRequest or
-                                        // XFCD. Remember, we can't change XFCD because it may get out of the caches
-                                        // and not be picked up by further incoming Ajax requests.
-                                        NetUtils.openConnection(indentedLogger,
-                                            actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
-                                            actualRequestMediatype, messageBody, headersMap);
+                                        // Here we just want to run the submission and not touch the XFCD. Remember,
+                                        // we can't change XFCD because it may get out of the caches and not be picked
+                                        // up by further incoming Ajax requests.
 
-                                        // NOTE: In this very basic level of support, we don't support xforms-submit-done / xforms-submit-error handlers
+                                        // NOTE: If the submission was truly asynchronous, we should not touch
+                                        // ExternalContext either. But currently, since the submission actually runs
+                                        // at the end of a request, we do have access to ExternalContext, so we still
+                                        // use it.
+
+                                        final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
+                                        new Connection().open(externalContext, indentedLogger,
+                                                actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                                actualRequestMediatype, messageBody,
+                                                customHeaderNameValues, newForwardSubmissionHeaders);
+
+                                        // NOTE: In this very basic level of support, we don't support
+                                        // xforms-submit-done / xforms-submit-error handlers
 
                                         // TODO: Do something with result, e.g. log?
                                         // final ConnectionResult connectionResult = ...
@@ -867,7 +875,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             } else {
                                 // Just run it now
-                                connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
+                                connectionResult = new Connection().open(externalContext, containingDocument.getIndentedLogger(),
                                         actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
                                         customHeaderNameValues, newForwardSubmissionHeaders);
@@ -1457,7 +1465,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             contextStack.popBinding();
         }
 
-        NetUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
+        StringUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
     }
 
     public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {

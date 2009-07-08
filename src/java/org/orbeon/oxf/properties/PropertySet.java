@@ -41,10 +41,10 @@ public class PropertySet {
 
     private static class PropertyNode {
         public TypeValue typeValue;
-        public Map children;// Map<String, PropertyNode> of token to property node
+        public Map<String, PropertyNode> children;// Map<String, PropertyNode> of token to property node
     }
 
-    private Map exactProperties = new HashMap();// Map<String, TypeValue> of property name to typed value
+    private Map<String, TypeValue> exactProperties = new HashMap<String, TypeValue>();// Map<String, TypeValue> of property name to typed value
     private PropertyNode wildcardProperties = new PropertyNode();
 
     /**
@@ -52,7 +52,7 @@ public class PropertySet {
      *
      * @return set of property names
      */
-    public Set keySet() {
+    public Set<String> keySet() {
         return exactProperties.keySet();
     }
 
@@ -70,11 +70,11 @@ public class PropertySet {
      *
      * @return Map
      */
-    public Map getObjectMap() {
+    public Map<String, Object> getObjectMap() {
         if (size() > 0) {
-            final Map result = new HashMap();
-            for (final Iterator i = keySet().iterator(); i.hasNext();) {
-                String key = (String) i.next();
+            final Map<String, Object> result = new HashMap<String, Object>();
+            for (final Iterator<String> i = keySet().iterator(); i.hasNext();) {
+                String key = i.next();
                 result.put(key, getObject(key));
             }
             return result;
@@ -105,7 +105,7 @@ public class PropertySet {
         while (st.hasMoreTokens()) {
             final String currentToken = st.nextToken();
             if (currentNode.children == null) {
-                currentNode.children = new LinkedHashMap();
+                currentNode.children = new LinkedHashMap<String, PropertyNode>();
             }
             PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
             if (newNode == null) {
@@ -120,9 +120,9 @@ public class PropertySet {
     }
 
 
-    private List getPropertiesStartsWithWorker(PropertyNode propertyNode, String consumed, String[] tokens, int currentTokenPosition) {
-        List result = new ArrayList();
-        String token = currentTokenPosition >= tokens.length ? null : tokens[currentTokenPosition];
+    private List<String> getPropertiesStartsWithWorker(PropertyNode propertyNode, String consumed, String[] tokens, int currentTokenPosition) {
+        final List<String> result = new ArrayList<String>();
+        final String token = currentTokenPosition >= tokens.length ? null : tokens[currentTokenPosition];
 
         if (token == null || "*".equals(token)) {
             if (propertyNode.children == null && token == null) {
@@ -131,26 +131,26 @@ public class PropertySet {
 
             // Go through all children
             if (propertyNode.children != null) {
-                for (Iterator keys = propertyNode.children.keySet().iterator(); keys.hasNext();) {
-                    String key = (String) keys.next();
-                    String newConsumed = consumed.length() == 0 ? key : consumed + "." +  key;
-                    List keyProperties = getPropertiesStartsWithWorker((PropertyNode) propertyNode.children.get(key), newConsumed, tokens, currentTokenPosition + 1);
+                for (Iterator<String> keys = propertyNode.children.keySet().iterator(); keys.hasNext();) {
+                    final String key = keys.next();
+                    final String newConsumed = consumed.length() == 0 ? key : consumed + "." +  key;
+                    final List<String> keyProperties = getPropertiesStartsWithWorker((PropertyNode) propertyNode.children.get(key), newConsumed, tokens, currentTokenPosition + 1);
                     result.addAll(keyProperties);
                 }
             }
         } else {
             // Regular token
-            PropertyNode[] newPropertNodes = new PropertyNode[2];
+            final PropertyNode[] newPropertNodes = new PropertyNode[2];
             // Find property node with exact name
             newPropertNodes[0] = (PropertyNode) propertyNode.children.get(token);
             // Find property node with *
             newPropertNodes[1] = (PropertyNode) propertyNode.children.get("*");
             for (int newPropertNodesIndex = 0; newPropertNodesIndex < 2; newPropertNodesIndex++) {
-                PropertyNode newPropertNode = newPropertNodes[newPropertNodesIndex];
+                final PropertyNode newPropertNode = newPropertNodes[newPropertNodesIndex];
                 if (newPropertNode != null) {
-                    String actualToken = newPropertNodesIndex == 0 ? token : "*";
-                    String newConsumed = consumed.length() == 0 ? actualToken : consumed + "." +  actualToken;
-                    List keyProperties = getPropertiesStartsWithWorker(newPropertNode, newConsumed, tokens, currentTokenPosition + 1);
+                    final String actualToken = newPropertNodesIndex == 0 ? token : "*";
+                    final String newConsumed = consumed.length() == 0 ? actualToken : consumed + "." +  actualToken;
+                    final List<String> keyProperties = getPropertiesStartsWithWorker(newPropertNode, newConsumed, tokens, currentTokenPosition + 1);
                     result.addAll(keyProperties);
                 }
             }
@@ -158,11 +158,11 @@ public class PropertySet {
         return result;
     }
 
-    public List getPropertiesStartsWith(String name) {
-        List tokensList = new ArrayList();
+    public List<String> getPropertiesStartsWith(String name) {
+        final List<String> tokensList = new ArrayList<String>();
         for (StringTokenizer nameTokenizer = new StringTokenizer(name, "."); nameTokenizer.hasMoreTokens();)
             tokensList.add(nameTokenizer.nextToken());
-        String[] tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
+        final String[] tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
         return getPropertiesStartsWithWorker(wildcardProperties, "", tokensArray, 0);
     }
 
@@ -206,10 +206,10 @@ public class PropertySet {
             // Parse name and put into array
             final String[] tokensArray;
             {
-                List tokensList = new ArrayList();
+                final List<String> tokensList = new ArrayList<String>();
                 for (StringTokenizer nameTokenizer = new StringTokenizer(name, "."); nameTokenizer.hasMoreTokens();)
                     tokensList.add(nameTokenizer.nextToken());
-                tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
+                tokensArray = tokensList.toArray(new String[tokensList.size()]);
             }
             // Call recursive worker
             typeValue = getPropertyWorker(wildcardProperties, tokensArray, 0);

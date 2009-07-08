@@ -53,7 +53,7 @@ public class WebAppContext {
     private static Logger logger = LoggerFactory.createLogger(WebAppContext.class);
 
     private ServletContext servletContext;
-    private Map contextInitParameters;
+    private Map<String, String> contextInitParameters;
 
     public static WebAppContext instance() {
         if (instance == null)
@@ -85,9 +85,9 @@ public class WebAppContext {
             logger.info("Starting Orbeon Forms Release " + Version.getVersion());
 
             // 1. Initialize the Resource Manager
-            Map properties = new HashMap();
+            final Map<String, Object> properties = new HashMap<String, Object>();
             for (Iterator i = getServletInitParametersMap().keySet().iterator(); i.hasNext();) {
-                String name = (String) i.next();
+                final String name = (String) i.next();
                 if (name.startsWith("oxf.resources."))
                     properties.put(name, getServletInitParametersMap().get(name));
             }
@@ -97,7 +97,7 @@ public class WebAppContext {
             ResourceManagerWrapper.init(properties);
 
             // 2. Initialize properties
-            String propertiesFile = (String) getServletInitParametersMap().get(PROPERTIES_PROPERTY);
+            final String propertiesFile = getServletInitParametersMap().get(PROPERTIES_PROPERTY);
             if (propertiesFile != null)
                 org.orbeon.oxf.properties.Properties.init(propertiesFile);
 
@@ -117,13 +117,13 @@ public class WebAppContext {
     /**
      * Return an unmodifiable Map of the Servlet initialization parameters.
      */
-    public Map getServletInitParametersMap() {
+    public Map<String, String> getServletInitParametersMap() {
         if (contextInitParameters == null) {
             synchronized (this) {
                 if (contextInitParameters == null) {
-                    Map result = new HashMap();
+                    final Map<String, String> result = new HashMap<String, String>();
                     for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
-                        String name = (String) e.nextElement();
+                        final String name = (String) e.nextElement();
                         result.put(name, servletContext.getInitParameter(name));
                     }
                     contextInitParameters = Collections.unmodifiableMap(result);

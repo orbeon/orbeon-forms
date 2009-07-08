@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -794,7 +795,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 containingDocument.logDebug("model", "getting document from URI",
                         new String[] { "URI", absoluteResolvedURLString });
 
-            final ConnectionResult connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
+            final ConnectionResult connectionResult = new Connection().open(externalContext, containingDocument.getIndentedLogger(),
                     "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

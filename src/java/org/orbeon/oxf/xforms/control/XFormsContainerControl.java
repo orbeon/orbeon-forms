@@ -33,7 +33,7 @@ public interface XFormsContainerControl {
      *
      * @return  List<XFormsControl>
      */
-    public List getChildren();
+    public List<XFormsControl> getChildren();
 
     /**
      * Number of direct children control.

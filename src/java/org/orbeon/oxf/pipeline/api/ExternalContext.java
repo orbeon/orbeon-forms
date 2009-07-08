@@ -42,10 +42,10 @@ public interface ExternalContext extends WebAppExternalContext {
         public String getContextPath();
         public String getServletPath();
 
-        public Map getAttributesMap();
-        public Map getHeaderMap();
-        public Map getHeaderValuesMap();
-        public Map getParameterMap();
+        public Map<String, Object> getAttributesMap();
+        public Map<String, String> getHeaderMap();
+        public Map<String, String[]> getHeaderValuesMap();
+        public Map<String, Object[]> getParameterMap();
 
         public String getCharacterEncoding();
         public int getContentLength();
@@ -150,8 +150,8 @@ public interface ExternalContext extends WebAppExternalContext {
         public boolean isNew();
         public void setMaxInactiveInterval(int interval);
 
-        public Map getAttributesMap();
-        public Map getAttributesMap(int scope);
+        public Map<String, Object> getAttributesMap();
+        public Map<String, Object> getAttributesMap(int scope);
 
         public void addListener(SessionListener sessionListener);
         public void removeListener(SessionListener sessionListener);

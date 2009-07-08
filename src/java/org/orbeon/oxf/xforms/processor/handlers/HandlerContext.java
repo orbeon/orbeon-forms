@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -137,8 +137,8 @@ public class HandlerContext {
     private void processedUserAgentIfNeeded() {
         if (!processedUserAgent) {
             final ExternalContext.Request request = externalContext.getRequest();
-            isRenderingEngineIE6OrEarlier = NetUtils.isRenderingEngineIE6OrEarlier(request);
-            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : NetUtils.isRenderingEngineTrident(request);
+            isRenderingEngineIE6OrEarlier = UserAgent.isRenderingEngineIE6OrEarlier(request);
+            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : UserAgent.isRenderingEngineTrident(request);
             processedUserAgent = true;
         }
     }

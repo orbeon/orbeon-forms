@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
@@ -88,7 +89,7 @@ public class ResourceServer extends ProcessorImpl {
                     URLConnection urlConnection = null;
                     {
                         // IE 6 hack for PNG images
-                        final boolean isIE6 = NetUtils.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
+                        final boolean isIE6 = UserAgent.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
                         if (isIE6 && newURL.getProtocol().equals("oxf")) {
                             final String urlPath = newURL.getPath();
                             if (urlPath.endsWith(".png")) {

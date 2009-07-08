@@ -23,6 +23,7 @@ import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -40,10 +41,10 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     private static final String OPS_CONTEXT_NAMESPACE_KEY = "org.orbeon.ops.portlet.namespace";
 
     private class Request implements ExternalContext.Request {
-        private Map attributesMap;
-        private Map headerMap;
-        private Map headerValuesMap;
-        private Map parameterMap;
+        private Map<String, Object> attributesMap;
+        private Map<String, String> headerMap;
+        private Map<String, String[]> headerValuesMap;
+        private Map<String, Object[]> parameterMap;
 
         public Portlet2ExternalContext getPortlet2ExternalContext() {
             return Portlet2ExternalContext.this;
@@ -88,12 +89,12 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return null;
         }
 
-        public synchronized Map getHeaderMap() {
+        public synchronized Map<String, String> getHeaderMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerMap == null) {
-                headerMap = new HashMap();
-                for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
+                headerMap = new HashMap<String, String>();
+                for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
+                    String name = e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
                     headerMap.put(name.toLowerCase(), portletRequest.getProperty(name));
                 }
@@ -101,14 +102,14 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return headerMap;
         }
 
-        public synchronized Map getHeaderValuesMap() {
+        public synchronized Map<String, String[]> getHeaderValuesMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerValuesMap == null) {
-                headerValuesMap = new HashMap();
-                for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
+                headerValuesMap = new HashMap<String, String[]>();
+                for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
+                    String name = e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
+                    headerValuesMap.put(name.toLowerCase(), StringUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
                 }
             }
             return headerValuesMap;
@@ -152,7 +153,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return (clientDataRequest != null) ? clientDataRequest.getMethod() : null;
         }
 
-        public synchronized Map getParameterMap() {
+        public synchronized Map<String, Object[]> getParameterMap() {
             if (parameterMap == null) {
                 // Two conditions: file upload ("multipart/form-data") or not
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
@@ -163,7 +164,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
                 } else {
                     // Just use native request parameters
-                    parameterMap = new HashMap(portletRequest.getParameterMap());
+                    parameterMap = new HashMap<String, Object[]>(portletRequest.getParameterMap());
                     parameterMap.remove(PATH_PARAMETER_NAME);
                     parameterMap = Collections.unmodifiableMap(parameterMap);
                 }
@@ -171,7 +172,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return parameterMap;
         }
 
-        public synchronized Map getAttributesMap() {
+        public synchronized Map<String, Object> getAttributesMap() {
             if (attributesMap == null) {
                 attributesMap = new Portlet2ExternalContext.RequestMap(portletRequest);
             }
@@ -276,7 +277,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     private class Session implements ExternalContext.Session {
 
         private PortletSession portletSession;
-        private Map[] sessionAttributesMaps;
+        private Map<String, Object>[] sessionAttributesMaps;
 
         public Session(PortletSession httpSession) {
             this.portletSession = httpSession;
@@ -310,11 +311,11 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             portletSession.setMaxInactiveInterval(interval);
         }
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             return getAttributesMap(PortletSession.PORTLET_SCOPE);
         }
 
-        public Map getAttributesMap(int scope) {
+        public Map<String, Object> getAttributesMap(int scope) {
             if (sessionAttributesMaps == null) {
                 sessionAttributesMaps = new Map[2];
             }
@@ -638,12 +639,12 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     private ClientDataRequest clientDataRequest;
     private MimeResponse mimeResponse;
 
-    private Portlet2ExternalContext(ProcessorService processorService, PortletContext portletContext, Map initAttributesMap) {
+    private Portlet2ExternalContext(ProcessorService processorService, PortletContext portletContext, Map<String, String> initAttributesMap) {
         super(portletContext, initAttributesMap);
         this.processorService = processorService;
     }
 
-    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest) {
+    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
         this(processorService, portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
         this.portletRequest = portletRequest;
@@ -651,7 +652,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             this.clientDataRequest = (ClientDataRequest) portletRequest;
     }
 
-    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
+    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
         this(processorService, pipelineContext, portletContext, initAttributesMap, portletRequest);
         this.mimeResponse = mimeResponse;
     }
@@ -775,14 +776,14 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     /**
      * Present a view of the HttpServletRequest properties as a Map.
      */
-    public static class RequestMap extends AttributesToMap {
+    public static class RequestMap extends AttributesToMap<Object> {
         public RequestMap(final PortletRequest portletRequest) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return portletRequest.getAttribute(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public Enumeration<String> getAttributeNames() {
                     return portletRequest.getAttributeNames();
                 }
 
@@ -800,14 +801,14 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     /**
      * Present a view of the HttpSession properties as a Map.
      */
-    public static class SessionMap extends AttributesToMap {
+    public static class SessionMap extends AttributesToMap<Object> {
         public SessionMap(final PortletSession portletSession, final int scope) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return portletSession.getAttribute(s, scope);
                 }
 
-                public Enumeration getAttributeNames() {
+                public Enumeration<String> getAttributeNames() {
                     return portletSession.getAttributeNames(scope);
                 }
 

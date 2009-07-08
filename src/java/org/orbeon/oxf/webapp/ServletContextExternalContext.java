@@ -40,8 +40,8 @@ public class ServletContextExternalContext implements ExternalContext {
     private Session session;
     private Application application;
 
-    private Map attributesMap;
-    private Map initAttributesMap;
+    private Map<String, Object> attributesMap;
+    private Map<String, String> initAttributesMap;
 
     public ServletContextExternalContext(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -56,7 +56,7 @@ public class ServletContextExternalContext implements ExternalContext {
         this.delegatingExternalContext = externalContext;
     }
 
-    public Map getInitAttributesMap() {
+    public Map<String, String> getInitAttributesMap() {
         if (initAttributesMap == null) {
             if (servletContext != null)
                 initAttributesMap = InitUtils.getContextInitParametersMap(servletContext);
@@ -66,7 +66,7 @@ public class ServletContextExternalContext implements ExternalContext {
         return initAttributesMap;
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         if (attributesMap == null) {
             if (servletContext != null)
                 attributesMap = new ServletWebAppExternalContext.ServletContextMap(servletContext);
@@ -173,7 +173,7 @@ public class ServletContextExternalContext implements ExternalContext {
     private class Session implements ExternalContext.Session {
 
         private HttpSession httpSession;
-        private Map sessionAttributesMap;
+        private Map<String, Object> sessionAttributesMap;
 
         public Session(HttpSession httpSession) {
             this.httpSession = httpSession;
@@ -207,14 +207,14 @@ public class ServletContextExternalContext implements ExternalContext {
             httpSession.setMaxInactiveInterval(interval);
         }
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             if (sessionAttributesMap == null) {
                 sessionAttributesMap = new InitUtils.SessionMap(httpSession);
             }
             return sessionAttributesMap;
         }
 
-        public Map getAttributesMap(int scope) {
+        public Map<String, Object> getAttributesMap(int scope) {
             if (scope != Session.APPLICATION_SCOPE)
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Servlets");
             return getAttributesMap();

@@ -19,20 +19,16 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
@@ -281,11 +277,11 @@ public class NetUtils {
     }
 
     public static String getContentTypeCharset(String contentType) {
-        final Map parameters = getContentTypeParameters(contentType);
+        final Map<String, String> parameters = getContentTypeParameters(contentType);
         return (String) ((parameters == null) ? null : parameters.get("charset"));
     }
 
-    public static Map getContentTypeParameters(String contentType) {
+    public static Map<String, String> getContentTypeParameters(String contentType) {
         if (contentType == null)
             return null;
 
@@ -320,7 +316,7 @@ public class NetUtils {
         return parameters;
     }
 
-    public static Map getCharsetHeaderCharsets(String header) {
+    public static Map<String, String> getCharsetHeaderCharsets(String header) {
         if (header == null)
             return null;
         int semicolonIndex = header.indexOf(";");
@@ -349,55 +345,6 @@ public class NetUtils {
     }
 
     /**
-     * Convert an Enumeration of String into an array.
-     */
-    public static String[] stringEnumerationToArray(Enumeration enumeration) {
-        final List<String> values = new ArrayList<String>();
-        while (enumeration.hasMoreElements())
-            values.add((String) enumeration.nextElement());
-        final String[] stringValues = new String[values.size()];
-        values.toArray(stringValues);
-        return stringValues;
-    }
-
-    /**
-     * Convert an Object array into a String array, removing non-string values.
-     */
-    public static String[] objectArrayToStringArray(Object[] values) {
-
-        if (values == null)
-            return null;
-
-        final String[] result = new String[values.length];
-        int size = 0;
-        for (int i = 0; i < values.length; i++) {
-            final Object currentValue = values[i];
-            if (currentValue instanceof String) {
-                result[size++] = (String) currentValue;
-            }
-        }
-        if (size == values.length) {
-            // Optimistic approach worked
-            return result;
-        } else {
-            // Optimistic approach failed
-            final String[] newResult = new String[size];
-            System.arraycopy(result, 0, newResult, 0, size);
-            return newResult;
-        }
-    }
-
-    /**
-     * Return the value of the first object in the array as a String.
-     */
-    public static String getStringFromObjectArray(Object[] values) {
-        if (values == null || values.length == 0 || !(values[0] instanceof String))
-            return null;
-        else
-            return (String) values[0];
-    }
-
-    /**
      * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
      * @param acceptAmp -> "&amp;" if true, "&" if false
      *
@@ -417,7 +364,7 @@ public class NetUtils {
                     final String name = URLDecoder.decode(matcher.group(1), NetUtils.STANDARD_PARAMETER_ENCODING);
                     final String value = URLDecoder.decode(matcher.group(2), NetUtils.STANDARD_PARAMETER_ENCODING);
 
-                    NetUtils.addValueToStringArrayMap(result, name, value);
+                    StringUtils.addValueToStringArrayMap(result, name, value);
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
                     throw new OXFException(e);
@@ -469,42 +416,6 @@ public class NetUtils {
             throw new OXFException(e);
         }
         return sb.toString();
-    }
-
-    public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
-        final Object[] currentValue = (Object[]) map.get(name);
-        if (currentValue == null) {
-            map.put(name, new Object[] { value });
-        } else {
-            final Object[] newValue = new Object[currentValue.length + 1];
-            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
-            newValue[currentValue.length] = value;
-            map.put(name, newValue);
-        }
-    }
-
-    public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
-        final String[] currentValue = (String[]) map.get(name);
-        if (currentValue == null) {
-            map.put(name, new String[] { value });
-        } else {
-            final String[] newValue = new String[currentValue.length + 1];
-            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
-            newValue[currentValue.length] = value;
-            map.put(name, newValue);
-        }
-    }
-
-    public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
-        final String[] currentValue = (String[]) map.get(name);
-        if (currentValue == null) {
-            map.put(name, values);
-        } else {
-            final String[] newValues = new String[currentValue.length + values.length];
-            System.arraycopy(currentValue, 0, newValues, 0, currentValue.length);
-            System.arraycopy(values, 0, newValues, currentValue.length, values.length);
-            map.put(name, newValues);
-        }
     }
 
     /**
@@ -946,60 +857,6 @@ public class NetUtils {
     }
 
     /**
-     * Test whether the user agent is Trident.
-     *
-     * @param request   incoming request
-     * @return          true if Trident is identified
-     */
-    public static boolean isRenderingEngineTrident(ExternalContext.Request request) {
-        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-        if (userAgentHeader == null)
-            return false;
-
-        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-        return userAgent.indexOf("msie") != -1 && userAgent.indexOf("opera") == -1;
-    }
-
-    /**
-     * Test whether the user agent is IE 6 or earlier.
-     *
-     * @param request   incoming request
-     * @return          true if IE 6 or earlier is identified
-     */
-    public static boolean isRenderingEngineIE6OrEarlier(ExternalContext.Request request) {
-        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-        if (userAgentHeader == null)
-            return false;
-
-        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-
-        final int msieIndex = userAgent.indexOf("msie");
-        final boolean isIE = msieIndex != -1 && userAgent.indexOf("opera") == -1;
-        if (!isIE)
-            return false;
-
-        final String versionString = userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)).trim();
-
-        final int dotIndex = versionString.indexOf('.');
-        final int version;
-        if (dotIndex == -1) {
-            version = Integer.parseInt(versionString);
-        } else {
-            version = Integer.parseInt(versionString.substring(0, dotIndex));
-        }
-        return version <= 6;
-    }
-
-//    public static boolean isRenderingEngineSafari(ExternalContext.Request request) {
-//        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-//        if (userAgentHeader == null)
-//            return false;
-//
-//        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-//        return userAgent.indexOf("safari") != -1;
-//    }
-
-    /**
      * Create an absolute URL from an action string and a search string.
      *
      * @param action            absolute URL or absolute path
@@ -1072,426 +929,6 @@ public class NetUtils {
     }
 
     /**
-     * Perform a connection to the given URL with the given parameters.
-     *
-     * This handles:
-     *
-     * o PUTting or POSTing a body
-     * o handling username and password
-     * o setting HTTP heades
-     * o forwarding session cookies
-     * o forwarding specified HTTP headers
-     * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
-     */
-    public static ConnectionResult openConnection(ExternalContext externalContext, IndentedLogger indentedLogger,
-                                                  String httpMethod, final URL connectionURL, String username, String password, String contentType,
-                                                  byte[] messageBody, Map<String, String[]> headerNameValues, String headersToForward) {
-
-        // Get  the headers to forward if any
-        final Map headersMap = (externalContext.getRequest() != null) ?
-                getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
-        // Open the connection
-        return openConnection(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
-    }
-
-    /**
-     * Get header names and values to send given:
-     *
-     * o the incoming request
-     * o a list of headers names and values to set
-     * o authentication information including username
-     * o a list of headers to forward
-     *
-     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
-     *
-     * @return LinkedHashMap<String headerName, String[] headerValues>
-     */
-    public static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
-                                    Map<String, String[]> headerNameValues, String headersToForward) {
-        // Resulting header names and values to set
-        final LinkedHashMap<String, String[]> headersMap = new LinkedHashMap<String, String[]>();
-
-        // Get header forwarding information
-        final Map headersToForwardMap = getHeadersToForward(headersToForward);
-
-        // Set headers if provided
-        if (headerNameValues != null && headerNameValues.size() > 0) {
-            for (Iterator i = headerNameValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String currentHeaderName = (String) currentEntry.getKey();
-                final String[] currentHeaderValues = (String[]) currentEntry.getValue();
-                // Set header
-                headersMap.put(currentHeaderName, currentHeaderValues);
-                // Remove from list of headers to forward below
-                if (headersToForwardMap != null)
-                    headersToForwardMap.remove(currentHeaderName.toLowerCase());
-            }
-        }
-
-        // Forward cookies for session handling
-        boolean sessionCookieSet = false;
-        if (username == null) {
-
-            // START NEW ALGORITHM
-
-            // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
-            // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
-            // Websphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
-            // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
-
-            // TODO: ExternalContext must provide direct access to cookies
-            final Object nativeRequest = externalContext.getNativeRequest();
-            if (nativeRequest instanceof HttpServletRequest) {
-                final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
-                final Cookie[] cookies = httpServletRequest.getCookies();
-
-                StringBuffer sb = new StringBuffer();
-
-                if (cookies != null) {
-                    for (int i = 0; i < cookies.length; i++) {
-                        final Cookie cookie = cookies[i];
-
-                        // This is the standard JSESSIONID cookie
-                        final boolean isJsessionId = cookie.getName().equals("JSESSIONID");
-                        // Remember if we've seen JSESSIONID
-                        sessionCookieSet |= isJsessionId;
-
-                        // Forward JSESSIONID and JSESSIONIDSSO for JBoss
-                        if (isJsessionId || cookie.getName().equals("JSESSIONIDSSO")) {
-                            // Multiple cookies in the header, separated with ";"
-                            if (sb.length() > 0)
-                                sb.append("; ");
-
-                            sb.append(cookie.getName());
-                            sb.append('=');
-                            sb.append(cookie.getValue());
-                        }
-                    }
-
-                    if (sb.length() > 0) {
-                        // One or more cookies were set
-                        final String cookieString = sb.toString();
-                        indentedLogger.logDebug("connection", "forwarding cookies", new String[] { "cookie", cookieString });
-                        NetUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
-
-//                            CookieTools.getCookieHeaderValue(cookie, sb);
-                    }
-                }
-            }
-
-            // 2. If there is no incoming JSESSIONID cookie, try to make our own cookie. This may fail with e.g.
-            // Websphere.
-            if (!sessionCookieSet) {
-                final ExternalContext.Session session = externalContext.getSession(false);
-
-                if (session != null) {
-
-                    // This will work with Tomcat, but may not work with other app servers
-                    NetUtils.addValueToStringArrayMap(headersMap, "Cookie", "JSESSIONID=" + session.getId());
-
-                    if (indentedLogger.isDebugEnabled()) {
-
-                        String incomingSessionHeader = null;
-                        final String[] cookieHeaders = (String[]) externalContext.getRequest(   ).getHeaderValuesMap().get("cookie");
-                        if (cookieHeaders != null) {
-                            for (int i = 0; i < cookieHeaders.length; i++) {
-                                final String cookie = cookieHeaders[i];
-                                if (cookie.indexOf("JSESSIONID") != -1) {
-                                    incomingSessionHeader = cookie;
-                                }
-                            }
-                        }
-
-                        String incomingSessionCookie = null;
-                        if (externalContext.getNativeRequest() instanceof HttpServletRequest) {
-                            final Cookie[] cookies = ((HttpServletRequest) externalContext.getNativeRequest()).getCookies();
-                            if (cookies != null) {
-                                for (int i = 0; i < cookies.length; i++) {
-                                    final Cookie cookie = cookies[i];
-                                    if (cookie.getName().equals("JSESSIONID")) {
-                                        incomingSessionCookie = cookie.getValue();
-                                    }
-                                }
-                            }
-                        }
-
-                        indentedLogger.logDebug("connection", "setting cookie",
-                            new String[] {
-                                    "new session", Boolean.toString(session.isNew()),
-                                    "session id", session.getId(),
-                                    "requested session id", externalContext.getRequest().getRequestedSessionId(),
-                                    "incoming JSESSIONID cookie", incomingSessionCookie,
-                                    "incoming JSESSIONID header", incomingSessionHeader
-                            });
-                    }
-                }
-            }
-
-            // END NEW ALGORITHM
-        }
-
-        // Forward headers if needed
-        // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ JSESSIONID
-        if (headersToForwardMap != null) {
-
-            final Map requestHeaderValuesMap = externalContext.getRequest().getHeaderValuesMap();
-
-            for (Iterator i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String currentHeaderName = (String) currentEntry.getValue();
-                final String currentHeaderNameLowercase = (String) currentEntry.getKey();
-
-                // Get incoming header value (Map contains values in lowercase!)
-                final String[] currentIncomingHeaderValues = (String[]) requestHeaderValuesMap.get(currentHeaderNameLowercase);
-                // Forward header if present
-                if (currentIncomingHeaderValues != null) {
-                    final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
-                    if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
-                        // Only forward Authorization header if there is no username provided
-                        indentedLogger.logDebug("connection", "forwarding header",
-                            new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValues.toString() });
-                        NetUtils.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
-                    } else {
-                        // Just log this information
-                        indentedLogger.logDebug("connection",
-                                "not forwarding Authorization header because username is present");
-                    }
-                }
-            }
-        }
-
-        return headersMap;
-    }
-
-    /**
-     *
-     * @param indentedLogger
-     * @param httpMethod
-     * @param connectionURL
-     * @param username
-     * @param password
-     * @param contentType
-     * @param messageBody
-     * @param headersMap        LinkedHashMap<String headerName, String[] headerValues>
-     * @return
-     */
-    public static ConnectionResult openConnection(IndentedLogger indentedLogger,
-                                                   String httpMethod, final URL connectionURL, String username, String password,
-                                                   String contentType, byte[] messageBody, Map headersMap) {
-
-        // Perform connection
-        final String scheme = connectionURL.getProtocol();
-        if (scheme.equals("http") || scheme.equals("https") || (httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf")))) {
-            // http MUST be supported
-            // https SHOULD be supported
-            // file SHOULD be supported
-            try {
-                if (indentedLogger.isDebugEnabled()) {
-                    final URI connectionURI;
-                    try {
-                        String userInfo = connectionURL.getUserInfo();
-                        if (userInfo != null) {
-                            final int colonIndex = userInfo.indexOf(':');
-                            if (colonIndex != -1)
-                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";// hide password in logs
-                        }
-                        connectionURI = new URI(connectionURL.getProtocol(), userInfo, connectionURL.getHost(),
-                                connectionURL.getPort(), connectionURL.getPath(), connectionURL.getQuery(), connectionURL.getRef());
-                    } catch (URISyntaxException e) {
-                        throw new OXFException(e);
-                    }
-                    indentedLogger.logDebug("connection", "opening URL connection",
-                        new String[] { "URL", connectionURI.toString() });
-                }
-
-                final URLConnection urlConnection = connectionURL.openConnection();
-                final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
-
-                // Whether a message body must be sent
-                final boolean hasRequestBody = httpMethod.equals("POST") || httpMethod.equals("PUT");
-                // Case of empty body
-                if (messageBody == null)
-                    messageBody = new byte[0];
-
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(hasRequestBody);
-
-                if (httpURLConnection != null) {
-                    httpURLConnection.setRequestMethod(httpMethod);
-                    if (username != null) {
-                        httpURLConnection.setUsername(username);
-                        if (password != null)
-                           httpURLConnection.setPassword(password);
-                    }
-                }
-                final String contentTypeMediaType = getContentTypeMediaType(contentType);
-                if (hasRequestBody) {
-                    if (httpMethod.equals("POST") && APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
-                        // SOAP POST
-
-                        indentedLogger.logDebug("connection", "found SOAP POST");
-
-                        final Map parameters = getContentTypeParameters(contentType);
-                        final FastStringBuffer sb = new FastStringBuffer("text/xml");
-
-                        // Extract charset parameter if present
-                        // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
-                        if (parameters != null) {
-                            final String charsetParameter = (String) parameters.get("charset");
-                            if (charsetParameter != null) {
-                                // Append charset parameter
-                                sb.append("; ");
-                                sb.append(charsetParameter);
-                            }
-                        }
-
-                        // Set new content type
-                        urlConnection.setRequestProperty("Content-Type", sb.toString());
-
-                        // Extract action parameter if present
-                        if (parameters != null) {
-                            final String actionParameter = (String) parameters.get("action");
-                            if (actionParameter != null) {
-                                // Set SOAPAction header
-                                urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                indentedLogger.logDebug("connection", "setting header",
-                                    new String[] { "SOAPAction", actionParameter });
-                            }
-                        }
-                    } else {
-                        urlConnection.setRequestProperty("Content-Type", (contentType != null) ? contentType : "application/xml");
-                    }
-                } else {
-                    if (httpMethod.equals("GET") && APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
-                        // SOAP GET
-                        indentedLogger.logDebug("connection", "found SOAP GET");
-
-                        final Map parameters = getContentTypeParameters(contentType);
-                        final FastStringBuffer sb = new FastStringBuffer(APPLICATION_SOAP_XML);
-
-                        // Extract charset parameter if present
-                        if (parameters != null) {
-                            final String charsetParameter = (String) parameters.get("charset");
-                            if (charsetParameter != null) {
-                                // Append charset parameter
-                                sb.append("; ");
-                                sb.append(charsetParameter);
-                            }
-                        }
-
-                        // Set Accept header with optional charset
-                        urlConnection.setRequestProperty("Accept", sb.toString());
-                    }
-                }
-
-                // Set headers if provided
-                if (headersMap != null && headersMap.size() > 0) {
-                    for (Iterator i = headersMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                        final String currentHeaderName = (String) currentEntry.getKey();
-                        final String[] currentHeaderValues = (String[]) currentEntry.getValue();
-                        if (currentHeaderValues != null) {
-                            // Add all header values as "request properties"
-                            for (int j = 0; j < currentHeaderValues.length; j++) {
-                                final String currentHeaderValue = currentHeaderValues[j];
-                                urlConnection.addRequestProperty(currentHeaderName, currentHeaderValue);
-                            }
-                        }
-                    }
-                }
-
-                // Write request body if needed
-                if (hasRequestBody) {
-                    // Log message mody for debugging purposes
-                    if (indentedLogger.isDebugEnabled())
-                        logRequestBody(indentedLogger, contentType, messageBody);
-                    
-                    // Set request body on connection
-                    httpURLConnection.setRequestBody(messageBody);
-                }
-
-                urlConnection.connect();
-
-                // Create result
-                final ConnectionResult connectionResult = new ConnectionResult(connectionURL.toExternalForm()) {
-                    public void close() {
-                        if (getResponseInputStream() != null) {
-                            try {
-                                getResponseInputStream().close();
-                            } catch (IOException e) {
-                                throw new OXFException("Exception while closing input stream for action: " + connectionURL);
-                            }
-                        }
-
-                        if (httpURLConnection != null)
-                            httpURLConnection.disconnect();
-                    }
-                };
-
-                // Get response information that needs to be forwarded
-                connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
-                final String receivedContentType = urlConnection.getContentType();
-
-                connectionResult.setResponseContentType(receivedContentType != null ? receivedContentType : "application/xml");
-                connectionResult.responseHeaders = urlConnection.getHeaderFields();
-                connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection));
-                connectionResult.setResponseInputStream(urlConnection.getInputStream());
-
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug("connection", "results", new String[] {
-                            "status", Integer.toString(connectionResult.statusCode),
-                            "content-type", receivedContentType,
-                            "used content-type", connectionResult.getResponseContentType()
-                        });
-                }
-
-                return connectionResult;
-
-            } catch (IOException e) {
-                throw new ValidationException(e, new LocationData(connectionURL.toExternalForm(), -1, -1));
-            }
-        } else if (!httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf"))) {
-            // TODO: implement writing to file: and oxf:
-            // SHOULD be supported (should probably support oxf: as well)
-            throw new OXFException("submission URL scheme not yet implemented: " + scheme);
-        } else if (scheme.equals("mailto")) {
-            // TODO: implement sending mail
-            // MAY be supported
-            throw new OXFException("submission URL scheme not yet implemented: " + scheme);
-        } else {
-            throw new OXFException("submission URL scheme not supported: " + scheme);
-        }
-    }
-
-    /**
-     * Get user-specified list of headers to forward.
-     *
-     * @param headersToForward  space-separated list of headers to forward
-     * @return  Map<String, String> lowercase header name to user-specified header name or null if null String passed
-     */
-    public static Map<String, String> getHeadersToForward(String headersToForward) {
-        if (headersToForward == null)
-            return null;
-
-        final Map<String, String> result = new HashMap<String, String>();
-        for (final StringTokenizer st = new StringTokenizer(headersToForward, ", "); st.hasMoreTokens();) {
-            final String currentHeaderName = st.nextToken().trim();
-            final String currentHeaderNameLowercase = currentHeaderName.toLowerCase();
-            result.put(currentHeaderNameLowercase, currentHeaderName);
-        }
-        return result;
-    }
-
-    public static void logRequestBody(IndentedLogger indentedLogger, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
-        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
-            indentedLogger.logDebug("submission", "setting request body",
-                new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
-        } else {
-            indentedLogger.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
-        }
-    }
-
-    /**
      * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
      * session.
      *
@@ -1524,7 +961,7 @@ public class NetUtils {
      * Utility method to decode a multipart/fomr-data stream and return a Map of parameters of type Object[], each of
      * which can be a String or FileData.
      */
-    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
+    public static Map<String, Object[]> getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
 
         final Map<String, Object[]> uploadParameterMap = new HashMap<String, Object[]>();
         try {
@@ -1563,8 +1000,8 @@ public class NetUtils {
             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                 public void contextDestroyed(boolean success) {
                     if (uploadParameterMap != null) {
-                        for (Iterator i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
-                            final String name = (String) i.next();
+                        for (Iterator<String> i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
+                            final String name = i.next();
                             final Object values[] = (Object[]) uploadParameterMap.get(name);
                             for (int j = 0; j < values.length; j++) {
                                 final Object currentValue = values[j];
@@ -1620,10 +1057,10 @@ public class NetUtils {
                     if (fileItem.isFormField()) {
                         // Simple form field
                         // Assume that form fields are in UTF-8. Can they have another encoding? If so, how is it specified?
-                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
+                        StringUtils.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
                     } else {
                         // File
-                        addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
+                        StringUtils.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
                     }
                 }
             } catch (FileUploadBase.SizeLimitExceededException e) {

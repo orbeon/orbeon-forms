@@ -22,6 +22,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -56,7 +57,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         if (uriReferences == null)
             return null;
 
-        final List keys = new ArrayList();
+        final List<CacheKey> keys = new ArrayList<CacheKey>();
 
         // Handle config if read as input
         if (localConfigURIReferences == null) {
@@ -83,8 +84,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
-            for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
-                final URIReference uriReference = (URIReference) i.next();
+            for (Iterator<URIReference> i = uriReferences.getReferences().iterator(); i.hasNext();) {
+                final URIReference uriReference = i.next();
                 if (uriReference == null)
                     return null;
                 final CacheKey uriKey = getURIKey(pipelineContext, uriReference);
@@ -103,7 +104,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         if (uriReferences == null)
             return null;
 
-        final List validities = new ArrayList();
+        final List<Object> validities = new ArrayList<Object>();
 
         // Handle config if read as input
         if (localConfigURIReferences == null) {
@@ -129,8 +130,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
-            for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
-                final URIReference uriReference = (URIReference) i.next();
+            for (Iterator<URIReference> i = uriReferences.getReferences().iterator(); i.hasNext();) {
+                final URIReference uriReference = i.next();
                 if (uriReference == null)
                     return null;
 
@@ -278,11 +279,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
     public static class URIReferencesState {
 
-        private Map map;
+        private Map<String, DocumentInfo> map;
 
         public void setDocument(String urlString, String username, String password, SAXStore documentSAXStore, Long lastModified) {
             if (map == null)
-                map = new HashMap();
+                map = new HashMap<String, DocumentInfo>();
             map.put(buildURIUsernamePasswordString(urlString, username, password), new DocumentInfo(documentSAXStore, lastModified));
         }
 
@@ -309,7 +310,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
      */
     public static class URIReferences {
 
-        private List references;
+        private List<URIReference> references;
 
         /**
          * Add a URL reference.
@@ -319,7 +320,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          */
         public void addReference(String context, String spec, String username, String password, String headersToForward) {
             if (references == null)
-                references = new ArrayList();
+                references = new ArrayList<URIReference>();
 
 //            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
 
@@ -332,7 +333,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         public void setNoCache() {
             // Make sure we have an empty list of references
             if (references == null)
-                references = new ArrayList();
+                references = new ArrayList<URIReference>();
             else
                 references.clear();
 
@@ -345,7 +346,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          *
          * @return  references or null if none
          */
-        public List getReferences() {
+        public List<URIReference> getReferences() {
             return references;
         }
     }
@@ -384,7 +385,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, headersToForward);
+                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

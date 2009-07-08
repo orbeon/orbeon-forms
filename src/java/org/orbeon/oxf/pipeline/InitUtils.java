@@ -40,10 +40,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 
 public class InitUtils {
@@ -298,8 +295,8 @@ public class InitUtils {
         }
     }
 
-    public static Map getContextInitParametersMap(ServletContext servletContext) {
-        final Map contextInitParameters = new HashMap();
+    public static Map<String, String> getContextInitParametersMap(ServletContext servletContext) {
+        final Map<String, String> contextInitParameters = new HashMap<String, String>();
         for (java.util.Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
             final String name = (String) e.nextElement();
             contextInitParameters.put(name, servletContext.getInitParameter(name));
@@ -343,15 +340,15 @@ public class InitUtils {
     /**
      * Present a read-only view of the properties as a Map.
      */
-    public static class OXFPropertiesMap extends AttributesToMap {
+    public static class OXFPropertiesMap extends AttributesToMap<Object> {
         public OXFPropertiesMap() {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return Properties.instance().getPropertySet().getObject(s);
                 }
 
-                public java.util.Enumeration getAttributeNames() {
-                    return java.util.Collections.enumeration(Properties.instance().getPropertySet().keySet());
+                public java.util.Enumeration<String> getAttributeNames() {
+                    return Collections.enumeration(Properties.instance().getPropertySet().keySet());
                 }
 
                 public void removeAttribute(String s) {
@@ -368,14 +365,14 @@ public class InitUtils {
     /**
      * Present a read-only view of the ServletContext initialization parameters as a Map.
      */
-    public static class ServletContextInitMap extends AttributesToMap {
+    public static class ServletContextInitMap extends AttributesToMap<Object> {
         public ServletContextInitMap(final ServletContext servletContext) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return servletContext.getInitParameter(s);
                 }
 
-                public java.util.Enumeration getAttributeNames() {
+                public java.util.Enumeration<String> getAttributeNames() {
                     return servletContext.getInitParameterNames();
                 }
 
@@ -393,14 +390,14 @@ public class InitUtils {
     /**
      * Present a view of the HttpSession properties as a Map.
      */
-    public static class SessionMap extends AttributesToMap {
+    public static class SessionMap extends AttributesToMap<Object> {
         public SessionMap(final HttpSession httpSession) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return httpSession.getAttribute(s);
                 }
 
-                public java.util.Enumeration getAttributeNames() {
+                public java.util.Enumeration<String> getAttributeNames() {
                     return httpSession.getAttributeNames();
                 }
 
@@ -418,14 +415,14 @@ public class InitUtils {
     /**
      * Present a view of the HttpServletRequest properties as a Map.
      */
-    public static class RequestMap extends AttributesToMap {
+    public static class RequestMap extends AttributesToMap<Object> {
         public RequestMap(final HttpServletRequest httpServletRequest) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return httpServletRequest.getAttribute(s);
                 }
 
-                public java.util.Enumeration getAttributeNames() {
+                public Enumeration<String> getAttributeNames() {
                     return httpServletRequest.getAttributeNames();
                 }
 

@@ -12,6 +12,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -206,7 +207,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        NetUtils.addValueToStringArrayMap(map, name, value);
+                        StringUtils.addValueToStringArrayMap(map, name, value);
                     }
                 }
                 headerValuesMap = Collections.unmodifiableMap(map);
@@ -237,7 +238,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        NetUtils.addValueToObjectArrayMap(map, name, value);
+                        StringUtils.addValueToObjectArrayMap(map, name, value);
                     }
                 }
                 parameterMap = Collections.unmodifiableMap(map);

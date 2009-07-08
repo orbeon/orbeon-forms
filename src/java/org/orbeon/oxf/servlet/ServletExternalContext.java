@@ -23,6 +23,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
@@ -56,11 +57,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         private String contextPath;
 
-        private Map attributesMap;
-        private Map headerMap;
-        private Map headerValuesMap;
-        private Map sessionMap;
-        private Map parameterMap;
+        private Map<String, Object> attributesMap;
+        private Map<String, String> headerMap;
+        private Map<String, String[]> headerValuesMap;
+        private Map<String, Object> sessionMap;
+        private Map<String, Object[]> parameterMap;
 
         private boolean getParameterMapMultipartFormDataCalled;
         private boolean getInputStreamCalled;
@@ -101,16 +102,16 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return nativeRequest.getRemoteAddr();
         }
 
-        public synchronized Map getAttributesMap() {
+        public synchronized Map<String, Object> getAttributesMap() {
             if (attributesMap == null) {
                 attributesMap = new InitUtils.RequestMap(nativeRequest);
             }
             return attributesMap;
         }
 
-        public synchronized Map getHeaderMap() {
+        public synchronized Map<String, String> getHeaderMap() {
             if (headerMap == null) {
-                headerMap = new HashMap();
+                headerMap = new HashMap<String, String>();
                 for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
@@ -120,19 +121,19 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return headerMap;
         }
 
-        public synchronized Map getHeaderValuesMap() {
+        public synchronized Map<String, String[]> getHeaderValuesMap() {
             if (headerValuesMap == null) {
-                headerValuesMap = new HashMap();
+                headerValuesMap = new HashMap<String, String[]>();
                 for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
                     final String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(nativeRequest.getHeaders(name)));
+                    headerValuesMap.put(name.toLowerCase(), StringUtils.stringEnumerationToArray(nativeRequest.getHeaders(name)));
                 }
             }
             return headerValuesMap;
         }
 
-        public synchronized Map getParameterMap() {
+        public synchronized Map<String, Object[]> getParameterMap() {
             if (parameterMap == null) {
                 // Two conditions: file upload ("multipart/form-data") or not
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
@@ -154,9 +155,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                         throw new OXFException(e);
                     }
                     // Just use native request parameters
-                    parameterMap = new HashMap();
-                    for (Enumeration e = nativeRequest.getParameterNames(); e.hasMoreElements();) {
-                        String name = (String) e.nextElement();
+                    parameterMap = new HashMap<String, Object[]>();
+                    for (Enumeration<String> e = nativeRequest.getParameterNames(); e.hasMoreElements();) {
+                        final String name = e.nextElement();
                         parameterMap.put(name, nativeRequest.getParameterValues(name));
                     }
                 }
@@ -186,7 +187,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 session.invalidate();
         }
 
-        public synchronized Map getSessionMap() {
+        public synchronized Map<String, Object> getSessionMap() {
             if (sessionMap == null) {
                 HttpSession session = nativeRequest.getSession(false);
                 if (session != null)
@@ -553,7 +554,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     private class Session implements ExternalContext.Session {
 
         private HttpSession httpSession;
-        private Map sessionAttributesMap;
+        private Map<String, Object> sessionAttributesMap;
 
         public Session(HttpSession httpSession) {
             this.httpSession = httpSession;
@@ -587,14 +588,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             httpSession.setMaxInactiveInterval(interval);
         }
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             if (sessionAttributesMap == null) {
                 sessionAttributesMap = new InitUtils.SessionMap(httpSession);
             }
             return sessionAttributesMap;
         }
 
-        public Map getAttributesMap(int scope) {
+        public Map<String, Object> getAttributesMap(int scope) {
             if (scope != Session.APPLICATION_SCOPE)
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Servlets");
             return getAttributesMap();
@@ -643,10 +644,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public static class SessionListeners implements Serializable {
         // Store this class instead of the List directly, so we can have a transient member
-        private transient List listeners;
+        private transient List<ExternalContext.Session.SessionListener> listeners;
         public void addListener(ExternalContext.Session.SessionListener sessionListener) {
             if (listeners == null) {
-                listeners = new ArrayList();
+                listeners = new ArrayList<ExternalContext.Session.SessionListener>();
             }
             listeners.add(sessionListener);
         }
@@ -656,16 +657,16 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 listeners.remove(sessionListener);
         }
 
-        public Iterator iterator() {
+        public Iterator<ExternalContext.Session.SessionListener> iterator() {
             return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
         }
     }
 
     public static class ApplicationListeners implements Serializable {
-        private transient List listeners;
+        private transient List<ExternalContext.Application.ApplicationListener> listeners;
         public void addListener(ExternalContext.Application.ApplicationListener applicationListener) {
             if (listeners == null) {
-                listeners = new ArrayList();
+                listeners = new ArrayList<ExternalContext.Application.ApplicationListener>();
             }
             listeners.add(applicationListener);
         }
@@ -675,7 +676,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 listeners.remove(applicationListener);
         }
 
-        public Iterator iterator() {
+        public Iterator<ExternalContext.Application.ApplicationListener> iterator() {
             return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
         }
     }
@@ -689,7 +690,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     private HttpServletRequest nativeRequest;
     private HttpServletResponse nativeResponse;
 
-    public ServletExternalContext(ServletContext servletContext, PipelineContext pipelineContext, Map initAttributesMap, HttpServletRequest request, HttpServletResponse response) {
+    public ServletExternalContext(ServletContext servletContext, PipelineContext pipelineContext, Map<String, String> initAttributesMap, HttpServletRequest request, HttpServletResponse response) {
         super(servletContext, initAttributesMap);
 
         this.pipelineContext = pipelineContext;

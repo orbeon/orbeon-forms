@@ -35,7 +35,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         children.add(XFormsControl);
     }
 
-    public List getChildren() {
+    public List<XFormsControl> getChildren() {
         return children;
     }
 
@@ -50,6 +50,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
     /**
      * Update this control's effective id and its descendants based on the parent's effective id.
      */
+    @Override
     public void updateEffectiveId() {
         super.updateEffectiveId();
         final List children = getChildren();
@@ -61,6 +62,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         }
     }
 
+    @Override
     public Object clone() {
 
         // Clone this
@@ -69,8 +71,8 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentChildControl = (XFormsControl) i.next();
+            for (Iterator<XFormsControl> i = children.iterator(); i.hasNext();) {
+                final XFormsControl currentChildControl = i.next();
                 final XFormsControl currentChildClone = (XFormsControl) currentChildControl.clone();
                 currentChildClone.setParent(cloned);
                 cloned.children.add(currentChildClone);
@@ -84,6 +86,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         // For subclasses
     }
 
+    @Override
     public void iterationRemoved(PipelineContext pipelineContext) {
         final List children = getChildren();
         if (children != null && children.size() > 0) {

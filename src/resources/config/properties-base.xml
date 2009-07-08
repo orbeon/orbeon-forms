@@ -29,8 +29,11 @@
     <!--<property as="xs:string"  name="oxf.url-rewriting.portlet.context"               value=""/>-->
     <property as="xs:string"  name="oxf.url-rewriting.portlet2.context"              value=""/>
 
+    <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->
     <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
+    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.host"                        value=""/>-->
+    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.domain"                      value=""/>-->
 
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>

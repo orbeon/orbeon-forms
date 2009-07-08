@@ -27,6 +27,7 @@ import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -119,7 +120,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      Map headerNameValues, String forwardHeaders,
+                      Map<String, String[]> headerNameValues, String forwardHeaders,
                       boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode,
@@ -136,7 +137,7 @@ public class URLGenerator extends ProcessorImpl {
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private boolean validating = DEFAULT_VALIDATING;
-        private Map headerNameValues;
+        private Map<String, String[]> headerNameValues;
         private String headersToForward;
         private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
 
@@ -167,7 +168,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      Map headerNameValues, String headersToForward,
+                      Map<String, String[]> headerNameValues, String headersToForward,
                       boolean cacheUseLocalCache, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
@@ -227,7 +228,7 @@ public class URLGenerator extends ProcessorImpl {
             return mode;
         }
 
-        public Map getHeaderNameValues() {
+        public Map<String, String[]> getHeaderNameValues() {
             return headerNameValues;
         }
 
@@ -310,7 +311,7 @@ public class URLGenerator extends ProcessorImpl {
                                     throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                                 // Get headers
-                                Map headerNameValues = null;
+                                Map<String, String[]> headerNameValues = null;
                                 for (Iterator i = configElement.selectNodes("/config/header").iterator(); i.hasNext();) {
                                     final Element currentHeaderElement = (Element) i.next();
                                     final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
@@ -318,7 +319,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                     if (headerNameValues == null) {
                                         // Lazily create collections
-                                        headerNameValues = new LinkedHashMap();
+                                        headerNameValues = new LinkedHashMap<String, String[]>();
                                     }
 
                                     headerNameValues.put(currentHeaderName, new String[] {currentHeaderValue});
@@ -510,8 +511,8 @@ public class URLGenerator extends ProcessorImpl {
                     outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
-                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
-                            URIReference uriReference = (URIReference) i.next();
+                        for (Iterator<URIReference> i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
+                            URIReference uriReference = i.next();
                             outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
                         }
                     }
@@ -528,7 +529,7 @@ public class URLGenerator extends ProcessorImpl {
                     if (configURIReferences == null)
                         return null;
 
-                    List validities = new ArrayList();
+                    List<Object> validities = new ArrayList<Object>();
 
                     // Handle config if read as input
                     if (localConfigURIReferences == null) {
@@ -543,8 +544,8 @@ public class URLGenerator extends ProcessorImpl {
                     validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), resourceHandler));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
-                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
-                            URIReference uriReference = (URIReference) i.next();
+                        for (Iterator<URIReference> i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
+                            URIReference uriReference = i.next();
                             validities.add(getHandlerValidity(pipelineContext, URLFactory.createURL(uriReference.context, uriReference.spec), null));
                         }
                     }
@@ -791,7 +792,7 @@ public class URLGenerator extends ProcessorImpl {
             if (connectionResult == null) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
-                connectionResult = NetUtils.openConnection(externalContext, indentedLogger, "GET", config.getURL(), null, null, null, null,
+                connectionResult = new Connection().open(externalContext, indentedLogger, "GET", config.getURL(), null, null, null, null,
                         config.getHeaderNameValues(), config.getHeadersToForward());
                 inputStream = connectionResult.getResponseInputStream();
             }
@@ -881,17 +882,17 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private static class URIReferences {
-        public List references = new ArrayList();
+        public List<URIReference> references = new ArrayList<URIReference>();
     }
 
     private class URLGeneratorState {
 
         private ResourceHandler mainResourceHandler;
-        private Map map;
+        private Map<String, Object> map;
 
         public void setLastModified(String urlString, Long lastModified) {
             if (map == null)
-                map = new HashMap();
+                map = new HashMap<String, Object>();
             map.put(urlString, lastModified == null ? (Object) "" : lastModified);
         }
 

@@ -34,7 +34,7 @@ public class MemoryCacheImpl implements Cache {
 
     private final String statisticsContextKey;
 
-    private Map keyToEntryMap = new HashMap();
+    private Map<CacheKey, CacheEntry> keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
     private CacheLinkedList linkedList = new CacheLinkedList();
     private int currentSize;
 
@@ -75,7 +75,7 @@ public class MemoryCacheImpl implements Cache {
         final MemoryCacheStatistics statistics = (pipelineContext != null) ? (MemoryCacheStatistics) getStatistics(pipelineContext) : null;
         if (statistics != null)
             statistics.incrementAddCount();
-        CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
+        CacheEntry entry = keyToEntryMap.get(key);
         if (entry == null) {
             // No existing entry found
             if (currentSize == maxSize) {
@@ -103,7 +103,7 @@ public class MemoryCacheImpl implements Cache {
     }
 
     public synchronized void remove(PipelineContext context, CacheKey key) {
-        final CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
+        final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null) {
             keyToEntryMap.remove(key);
             linkedList.remove(entry.listEntry);
@@ -113,7 +113,7 @@ public class MemoryCacheImpl implements Cache {
 
     public synchronized int removeAll(PipelineContext pipelineContext) {
         final int previousSize = currentSize;
-        keyToEntryMap = new HashMap();
+        keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
         linkedList = new CacheLinkedList();
         currentSize = 0;
         return previousSize;
@@ -121,7 +121,7 @@ public class MemoryCacheImpl implements Cache {
 
     public synchronized Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity) {
 
-        CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
+        CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
             // Place in first position and return
             if (pipelineContext != null)
@@ -142,7 +142,7 @@ public class MemoryCacheImpl implements Cache {
     public synchronized Object findValidWithExpiration(PipelineContext pipelineContext, CacheKey key, long expiration) {
 
         Object result = null;
-        CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
+        CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && entry.validity instanceof Long) {
             if (expiration == EXPIRATION_NO_EXPIRATION) {
                 // Cache hit whatever the last modified date was
@@ -187,7 +187,7 @@ public class MemoryCacheImpl implements Cache {
     public Iterator iterateCacheObjects(PipelineContext context) {
         return new TransformIterator(keyToEntryMap.keySet().iterator(), new Transformer() {
             public Object transform(Object o) {
-                return ((CacheEntry) keyToEntryMap.get(o)).object;
+                return (keyToEntryMap.get(o)).object;
             }
         });
     }

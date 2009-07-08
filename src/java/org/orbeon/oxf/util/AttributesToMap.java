@@ -18,30 +18,30 @@ import java.util.*;
 /**
  * Generic class to present a Map view of an attribute-based API.
  */
-public abstract class AttributesToMap implements Map {
+public abstract class AttributesToMap<E> implements Map<String, E> {
 
-    private Attributeable attributeable;
+    private Attributeable<E> attributeable;
 
-    public static interface Attributeable {
-        Object getAttribute(String s);
-        Enumeration getAttributeNames();
-        void removeAttribute(String s);
-        void setAttribute(String s, Object o);
+    public static interface Attributeable<E> {
+        E getAttribute(String key);
+        Enumeration<String> getAttributeNames();
+        void removeAttribute(String key);
+        void setAttribute(String key, E value);
     }
 
-    public AttributesToMap(Attributeable attributeable) {
+    public AttributesToMap(Attributeable<E> attributeable) {
         this.attributeable = attributeable;
     }
 
-    public Object put(Object key, Object value) {
-        Object existing = attributeable.getAttribute((String) key);
-        attributeable.setAttribute((String) key, value);
+    public E put(String key, E value) {
+        final E existing = attributeable.getAttribute(key);
+        attributeable.setAttribute(key, value);
         return existing;
     }
 
     public void clear() {
-        for (Enumeration e = attributeable.getAttributeNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
+        for (Enumeration<String> e = attributeable.getAttributeNames(); e.hasMoreElements();) {
+            final String name = e.nextElement();
             attributeable.removeAttribute(name);
         }
     }
@@ -51,21 +51,21 @@ public abstract class AttributesToMap implements Map {
     }
 
     public boolean containsValue(Object value) {
-        for (Enumeration e = attributeable.getAttributeNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
-            Object o = get(name);
+        for (Enumeration<String> e = attributeable.getAttributeNames(); e.hasMoreElements();) {
+            final String name = e.nextElement();
+            final Object o = get(name);
             if (o == value)
                 return true;
         }
         return false;
     }
 
-    public Set entrySet() {
+    public Set<Map.Entry<String, E>> entrySet() {
         // TODO: It's harder than it looks, as changes to the Entry elements must be reflected in the Map.
         throw new UnsupportedOperationException();
     }
 
-    public Object get(Object key) {
+    public E get(Object key) {
         return attributeable.getAttribute((String) key);
     }
 
@@ -73,20 +73,19 @@ public abstract class AttributesToMap implements Map {
         return size() == 0;
     }
 
-    public Set keySet() {
+    public Set<String> keySet() {
         // FIXME: Changes to the Set must be reflected in the Map. For now return an immutable Map.
-        return Collections.unmodifiableSet(new HashSet(Collections.list(attributeable.getAttributeNames())));
+        return Collections.unmodifiableSet(new HashSet<String>(Collections.list(attributeable.getAttributeNames())));
     }
 
-    public void putAll(Map t) {
-        for (Iterator i = t.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
-            put(key, t.get(key));
+    public void putAll(Map<? extends String, ? extends E> t) {
+        for (String key: t.keySet()) {
+            put(key, t.get((String) key));
         }
     }
 
-    public Object remove(Object key) {
-        Object existing = attributeable.getAttribute((String) key);
+    public E remove(Object key) {
+        final E existing = attributeable.getAttribute((String) key);
         attributeable.removeAttribute((String) key);
         return existing;
     }
@@ -95,11 +94,11 @@ public abstract class AttributesToMap implements Map {
         return keySet().size();
     }
 
-    public Collection values() {
+    public Collection<E> values() {
         // FIXME: Changes to the Set must be reflected in the Map. For now return an immutable Map.
-        List results = new ArrayList();
-        for (Enumeration e = attributeable.getAttributeNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
+        List<E> results = new ArrayList<E>();
+        for (Enumeration<String> e = attributeable.getAttributeNames(); e.hasMoreElements();) {
+            final String name = e.nextElement();
             results.add(get(name));
         }
         return Collections.unmodifiableCollection(results);

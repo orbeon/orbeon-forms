@@ -45,6 +45,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         nestedContainer.setLocationData(XFormsUtils.getNodeLocationData(element));
     }
 
+    @Override
     public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
         final boolean isNewBinding = getBindingContext() == null;
         final boolean isNodesetChange = isNewBinding|| !compareNodesets(getBindingContext().getNodeset(), bindingContext.getNodeset());
@@ -76,6 +77,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
+    @Override
     public void childrenAdded(PipelineContext pipelineContext) {
         super.childrenAdded(pipelineContext);
 
@@ -93,6 +95,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         return nestedContainer;
     }
 
+    @Override
     public void updateEffectiveId() {
 
         // This is called iif the iteration index changes
@@ -104,6 +107,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         nestedContainer.updateEffectiveId(getEffectiveId());
     }
 
+    @Override
     public void iterationRemoved(PipelineContext pipelineContext) {
         // Inform descendants
         super.iterationRemoved(pipelineContext);

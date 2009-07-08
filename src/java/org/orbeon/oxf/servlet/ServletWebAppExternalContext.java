@@ -16,13 +16,13 @@ public class ServletWebAppExternalContext implements WebAppExternalContext {
 
     protected ServletContext servletContext;
 
-    private Map initAttributesMap;
-    private Map attributesMap;
+    private Map<String, String> initAttributesMap;
+    private Map<String, Object> attributesMap;
 
     public ServletWebAppExternalContext(ServletContext servletContext) {
         this.servletContext = servletContext;
 
-        Map result = new HashMap();
+        final Map<String, String> result = new HashMap<String, String>();
         for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
             result.put(name, servletContext.getInitParameter(name));
@@ -30,16 +30,16 @@ public class ServletWebAppExternalContext implements WebAppExternalContext {
         this.initAttributesMap = Collections.unmodifiableMap(result);
     }
 
-    public ServletWebAppExternalContext(ServletContext servletContext, Map initAttributesMap) {
+    public ServletWebAppExternalContext(ServletContext servletContext, Map<String, String> initAttributesMap) {
         this.servletContext = servletContext;
         this.initAttributesMap = initAttributesMap;
     }
 
-    public synchronized Map getInitAttributesMap() {
+    public synchronized Map<String, String> getInitAttributesMap() {
         return initAttributesMap;
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         if (attributesMap == null) {
             attributesMap = new ServletContextMap(servletContext);
         }
@@ -65,14 +65,14 @@ public class ServletWebAppExternalContext implements WebAppExternalContext {
     /**
      * Present a view of the ServletContext properties as a Map.
      */
-    public static class ServletContextMap extends AttributesToMap {
+    public static class ServletContextMap extends AttributesToMap<Object> {
         public ServletContextMap(final ServletContext servletContext) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return servletContext.getAttribute(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public Enumeration<String> getAttributeNames() {
                     return servletContext.getAttributeNames();
                 }
 

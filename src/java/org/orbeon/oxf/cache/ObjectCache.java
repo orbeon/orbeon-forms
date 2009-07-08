@@ -29,7 +29,7 @@ public class ObjectCache {
     private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.";
     private static final String CACHE_PROPERTY_NAME_SIZE_SUFFIX = ".size";
 
-    private static Map namedObjectCaches = new HashMap();
+    private static Map<String, Cache> namedObjectCaches = new HashMap<String, Cache>();
 
     static {
         namedObjectCaches.put(DEFAULT_CACHE_NAME, new MemoryCacheImpl(DEFAULT_CACHE_NAME, DEFAULT_SIZE));
@@ -43,7 +43,7 @@ public class ObjectCache {
      * @return instance of cache
      */
     public static Cache instance() {
-        return (Cache) namedObjectCaches.get(DEFAULT_CACHE_NAME);
+        return namedObjectCaches.get(DEFAULT_CACHE_NAME);
     }
 
     /**
@@ -54,7 +54,7 @@ public class ObjectCache {
      * @return              instance of cache
      */
     public synchronized static Cache instance(String cacheName, int defaultSize) {
-        Cache cache = (Cache) namedObjectCaches.get(cacheName);
+        Cache cache = namedObjectCaches.get(cacheName);
         if (cache == null) {
             final String propertyName = CACHE_PROPERTY_NAME_PREFIX + cacheName + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
             final Integer size = Properties.instance().getPropertySet().getInteger(propertyName, defaultSize);
@@ -71,6 +71,6 @@ public class ObjectCache {
      * @return              instance of cache, null if did not exist
      */
     public synchronized static Cache instanceIfExists(String cacheName) {
-        return (namedObjectCaches == null) ? null : (Cache) namedObjectCaches.get(cacheName);
+        return (namedObjectCaches == null) ? null : namedObjectCaches.get(cacheName);
     }
 }

@@ -15,30 +15,30 @@ import java.util.Map;
 public class PortletWebAppExternalContext implements WebAppExternalContext {
 
     protected PortletContext portletContext;
-    private Map initAttributesMap;
-    private Map attributesMap;
+    private Map<String, String> initAttributesMap;
+    private Map<String, Object> attributesMap;
 
     public PortletWebAppExternalContext(PortletContext portletContext) {
         this.portletContext = portletContext;
 
-        Map result = new HashMap();
+        final Map<String, String> result = new HashMap<String, String>();
         for (Enumeration e = portletContext.getInitParameterNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
+            final String name = (String) e.nextElement();
             result.put(name, portletContext.getInitParameter(name));
         }
         this.initAttributesMap = Collections.unmodifiableMap(result);
     }
 
-    public PortletWebAppExternalContext(PortletContext portletContext, Map initAttributesMap) {
+    public PortletWebAppExternalContext(PortletContext portletContext, Map<String, String> initAttributesMap) {
         this.portletContext = portletContext;
         this.initAttributesMap = initAttributesMap;
     }
 
-    public synchronized Map getInitAttributesMap() {
+    public synchronized Map<String, String> getInitAttributesMap() {
         return initAttributesMap;
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         if (attributesMap == null) {
             attributesMap = new PortletExternalContext.PortletContextMap(portletContext);
         }
@@ -68,14 +68,14 @@ public class PortletWebAppExternalContext implements WebAppExternalContext {
     /**
      * Present a view of the ServletContext properties as a Map.
      */
-    public static class PortletContextMap extends AttributesToMap {
+    public static class PortletContextMap extends AttributesToMap<Object> {
         public PortletContextMap(final PortletContext portletContext) {
-            super(new Attributeable() {
+            super(new Attributeable<Object>() {
                 public Object getAttribute(String s) {
                     return portletContext.getAttribute(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public Enumeration<String> getAttributeNames() {
                     return portletContext.getAttributeNames();
                 }
 

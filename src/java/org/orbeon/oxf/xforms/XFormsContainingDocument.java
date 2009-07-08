@@ -481,8 +481,8 @@ public class XFormsContainingDocument extends XBLContainer {
     public void processAsynchronousSubmissions() {
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
         if (asynchronousSubmissions != null && asynchronousSubmissions.size() > 0) {
-            for (Iterator i = asynchronousSubmissions.iterator(); i.hasNext();) {
-                final Runnable currentRunnable = (Runnable) i.next();
+            for (Iterator<Runnable> i = asynchronousSubmissions.iterator(); i.hasNext();) {
+                final Runnable currentRunnable = i.next();
                 try {
                     // Run submission
                     currentRunnable.run();

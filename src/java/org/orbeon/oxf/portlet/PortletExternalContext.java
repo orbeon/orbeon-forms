@@ -22,6 +22,7 @@ import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -41,8 +42,8 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
 
     private class Request implements ExternalContext.Request {
         private Map attributesMap;
-        private Map headerMap;
-        private Map headerValuesMap;
+        private Map<String, String> headerMap;
+        private Map<String, String[]> headerValuesMap;
         private Map parameterMap;
 
         public PortletExternalContext getPortletExternalContext() {
@@ -91,7 +92,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public synchronized Map getHeaderMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerMap == null) {
-                headerMap = new HashMap();
+                headerMap = new HashMap<String, String>();
                 for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
@@ -104,11 +105,11 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public synchronized Map getHeaderValuesMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerValuesMap == null) {
-                headerValuesMap = new HashMap();
+                headerValuesMap = new HashMap<String, String[]>();
                 for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
+                    headerValuesMap.put(name.toLowerCase(), StringUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
                 }
             }
             return headerValuesMap;
@@ -434,7 +435,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 final URL baseURL = new URL("http", "example.org", getRequest().getRequestPath());
                 final URL u = new URL(baseURL, urlString);
                 // Decode query string
-                final Map parameters = NetUtils.decodeQueryString(u.getQuery(), true);
+                final Map<String, String[]> parameters = NetUtils.decodeQueryString(u.getQuery(), true);
                 // Add special path parameter
                 if (urlString.startsWith("?")) {
                     // This is a special case that appears to be implemented
@@ -666,12 +667,12 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
     private ActionRequest actionRequest;
     private RenderResponse renderResponse;
 
-    private PortletExternalContext(ProcessorService processorService, PortletContext portletContext, Map initAttributesMap) {
+    private PortletExternalContext(ProcessorService processorService, PortletContext portletContext, Map<String, String> initAttributesMap) {
         super(portletContext, initAttributesMap);
         this.processorService = processorService;
     }
 
-    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest) {
+    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
         this(processorService, portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
         this.portletRequest = portletRequest;
@@ -679,7 +680,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
             this.actionRequest = (ActionRequest) portletRequest;
     }
 
-    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
         this(processorService, pipelineContext, portletContext, initAttributesMap, portletRequest);
         this.renderResponse = renderResponse;
     }

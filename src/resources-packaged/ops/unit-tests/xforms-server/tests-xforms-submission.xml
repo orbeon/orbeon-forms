@@ -317,7 +317,7 @@
         </output>
     </test>
 
-    <test description="XInclude upon replacement of shared instance" name="oxf:pipeline">
+    <test description="XInclude upon replacement of cached instance" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -346,7 +346,7 @@
                                     <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
                                     <xforms:submission id="get-instance-no-xinclude" method="get" serialization="none"
                                             resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
-                                            replace="instance" instance="instance-no-xinclude" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="false"/>
+                                            replace="instance" instance="instance-no-xinclude" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="false"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
@@ -1379,6 +1379,74 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Replacement of read-write cached instance keeps instances separate" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client">
+
+                                    <xforms:instance id="instance-1">
+                                        <dummy xmlns=""/>
+                                    </xforms:instance>
+                                    <xforms:instance id="instance-2">
+                                        <dummy xmlns=""/>
+                                    </xforms:instance>
+
+                                    <!-- Load instances upon init -->
+                                    <xforms:action ev:event="xforms-model-construct-done">
+                                        <xforms:send submission="get-instance-1"/>
+                                        <xforms:send submission="get-instance-2"/>
+                                    </xforms:action>
+                                    <xforms:submission id="get-instance-1" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
+                                            replace="instance" targetref="instance('instance-1')" xxforms:readonly="false" xxforms:cache="true">
+                                        <xforms:setvalue ev:event="xforms-submit-done" ref="details/link">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
+                                    </xforms:submission>
+                                    <xforms:submission id="get-instance-2" method="get" serialization="none"
+                                            resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
+                                            replace="instance" targetref="instance('instance-2')" xxforms:cache="true">
+                                        <xforms:setvalue ev:event="xforms-submit-done" ref="instance('instance-2')/details/link">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
+                                    </xforms:submission>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:output id="my-output-1" ref="instance('instance-1')/details/link"/>
+                                <xforms:output id="my-output-2" ref="instance('instance-2')/details/link"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance cache="true" id="instance-1" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml" replaced="true"/>
+                            <instance cache="true" id="instance-2" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml" replaced="true"/>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output-1">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:control>
+                        <xxf:control id="my-output-2">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

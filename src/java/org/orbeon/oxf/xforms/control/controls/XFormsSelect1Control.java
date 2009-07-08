@@ -238,7 +238,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
-            if (items == null) {
+            if (items != null) {
                 for (XFormsItemUtils.Item currentItem: items) {
                     final String currentItemValue = currentItem.getValue();
                     final boolean itemWasSelected = controlValue.equals(currentItemValue);
@@ -292,18 +292,18 @@ public class XFormsSelect1Control extends XFormsValueControl {
 //    }
 
 // Work in progress for in-bounds/out-of-bounds
-    public boolean isInBounds(List<XFormsItemUtils.Item> items) {
-        return true;
-//        final String value = getValue(null);
-//        for (Iterator i = items.iterator(); i.hasNext();) {
-//            final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
-//            final String currentItemValue = currentItem.getValue();
-//            if (value.equals(currentItemValue)) {
-//                return true;
-//            }
-//        }
-//        return false;
-    }
+//    public boolean isInBounds(List<XFormsItemUtils.Item> items) {
+//        return true;
+////        final String value = getValue(null);
+////        for (Iterator i = items.iterator(); i.hasNext();) {
+////            final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+////            final String currentItemValue = currentItem.getValue();
+////            if (value.equals(currentItemValue)) {
+////                return true;
+////            }
+////        }
+////        return false;
+//    }
 
     /**
      * Represents xforms:itemset information.

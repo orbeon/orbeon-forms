@@ -452,7 +452,7 @@ final
 
             // Result was not found in cache, read result
 
-            final long startTime = System.nanoTime();
+//            final long startTime = System.nanoTime();
 
             if (logger.isDebugEnabled())
                 logger.debug("Cache " + debugInfo + ": READING.");
@@ -467,7 +467,7 @@ final
                     logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
                 cache.add(context, keyValidity.key, keyValidity.validity, result);
 
-                System.out.println("Cache cost: " + (System.nanoTime() - startTime));
+//                System.out.println("Cache cost: " + (System.nanoTime() - startTime));
 
                 reader.storedInCache();
             }

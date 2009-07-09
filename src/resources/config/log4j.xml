@@ -1,14 +1,14 @@
 <!--
     Copyright (C) 2006-2007 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" xmlns="http://jakarta.apache.org/log4j/">
@@ -29,15 +29,6 @@
         <param name="RemoteHost" value="localhost"/>
         <param name="Port" value="4445"/>
         <param name="LocationInfo" value="true"/>
-    </appender>
-    
-    <!-- This is the Orbeon Forms Studio monitor -->
-    <appender name="OPSMonitor" class="org.apache.log4j.net.SocketHubAppender">
-        <param name="Port" value="4446"/>
-        <param name="LocationInfo" value="true"/>
-        <filter class="org.apache.log4j.varia.LevelRangeFilter">
-            <param name="LevelMin" value="debug" />
-        </filter>
     </appender>
 
     <!-- Logging to a single file, typically used in development when you don't want
@@ -67,17 +58,37 @@
         <!--<priority value="debug"/>-->
     <!--</category>-->
 
-    <!--<category name="org.orbeon.oxf.xforms.XFormsInstance">-->
+    <!--<category name="org.orbeon.oxf.xforms.XFormsModelSubmission">-->
         <!--<priority value="debug"/>-->
     <!--</category>-->
 
-    <!--<category name="org.orbeon.oxf.xforms.processor.XFormsModelSubmission">-->
+    <!--<category name="org.orbeon.oxf.xforms.state.XFormsStateManager">-->
+        <!--<priority value="debug"/>-->
+    <!--</category>-->
+
+    <!--<category name="org.orbeon.oxf.xforms.XFormsInstance">-->
         <!--<priority value="debug"/>-->
     <!--</category>-->
 
     <!-- To enable logging for any of the sub-systems below, copy that section outside of the
          comment block. The XFormsServer is the one you are most likely to be interested in. -->
     <!--
+    <category name="org.orbeon.oxf.properties.Properties">
+        <priority value="debug"/>
+    </category>
+
+    <category name="org.orbeon.oxf.processor.pipeline.TeeProcessor">
+        <priority value="debug"/>
+    </category>
+
+    <category name="org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor">
+        <priority value="debug"/>
+    </category>
+
+    <category name="org.orbeon.oxf.processor.generator.URLGenerator">
+        <priority value="debug"/>
+    </category>
+
     <category name="org.orbeon.oxf.processor.xmldb.XMLDBProcessor">
         <priority value="debug"/>
     </category>
@@ -123,7 +134,6 @@
         <!--<appender-ref ref="ChainsawAppender"/>-->
         <appender-ref ref="SingleFileAppender"/>
         <!--<appender-ref ref="RollingFileAppender"/>-->
-        <!--<appender-ref ref="OPSMonitor"/>-->
     </root>
 
 </log4j:configuration>

@@ -24,7 +24,7 @@
     height: 20px;
 }
 
-.is-loading { 
+.fr-datatable-is-loading { 
     background-image:
     url(../../../ops/images/xforms/processing.gif); 
     height: 50px; background-position: center;

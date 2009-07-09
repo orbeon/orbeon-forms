@@ -387,7 +387,7 @@
                                 <xhtml:tbody>
                                     <xhtml:tr>
                                         <xhtml:td colspan="{count($pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}"
-                                            class="is-loading"/>
+                                            class="fr-datatable-is-loading"/>
                                     </xhtml:tr>
                                 </xhtml:tbody>
                             </xhtml:table>

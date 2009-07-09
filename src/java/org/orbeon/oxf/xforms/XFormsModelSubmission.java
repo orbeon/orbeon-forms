@@ -672,7 +672,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             // Not sure when this can happen, but it can't be good
                             throw new XFormsSubmissionException("Action 'test:': no message body.", "processing submission response");
                         } else {
-                            // Log message mody for debugging purposes
+                            // Log message body for debugging purposes
+                            //xxx TODO: complete logging
                             if (XFormsServer.logger.isDebugEnabled())
                                 Connection.logRequestBody(containingDocument.getIndentedLogger(), actualRequestMediatype, messageBody);
                         }
@@ -838,6 +839,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             // element.
                             final String newForwardSubmissionHeaders = isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
 
+                            // Create new indented logger just for the Connection object.
+                            final IndentedLogger indentedLogger = new IndentedLogger(logger, "XForms submission " + (isAsyncSubmission ? "(asynchronous)" : "(synchronous)"),
+                                    containingDocument.getIndentedLogger().getLogIndentLevel());
+
                             // Open connection
                             if (isAsyncSubmission) {
 
@@ -854,8 +859,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                         // ExternalContext either. But currently, since the submission actually runs
                                         // at the end of a request, we do have access to ExternalContext, so we still
                                         // use it.
-
-                                        final IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms (async)");
                                         new Connection().open(externalContext, indentedLogger,
                                                 actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                                 actualRequestMediatype, messageBody,
@@ -875,7 +878,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                             } else {
                                 // Just run it now
-                                connectionResult = new Connection().open(externalContext, containingDocument.getIndentedLogger(),
+                                connectionResult = new Connection().open(externalContext, indentedLogger,
                                         actualHttpMethod, absoluteResolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
                                         actualRequestMediatype, messageBody,
                                         customHeaderNameValues, newForwardSubmissionHeaders);
@@ -1105,6 +1108,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                             }
                                         } catch (Exception e) {
                                             XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                                            //xxx exception is swallowed: intentional??? check spec
                                         }
                                     } else if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
                                         // XML mediatype other than text/xml

@@ -41,6 +41,7 @@ public class Connection {
     }
     
     private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
+    private static final String LOG_TYPE = "connection";
 
     public static final String HTTP_CLIENT_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_CLIENT_STATE_ATTRIBUTE = "oxf.http.state";
@@ -64,23 +65,29 @@ public class Connection {
                                  String httpMethod, final URL connectionURL, String username, String password, String contentType,
                                  byte[] messageBody, Map<String, String[]> headerNameValues, String headersToForward) {
 
-        final boolean isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
+        indentedLogger.startHandleOperation(LOG_TYPE, "opening connection");
+        try {
+            final boolean isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
 
-        // Get state if possible
-        if (isHTTPOrHTTPS)
-            loadHttpState(externalContext, indentedLogger);
+            // Get state if possible
+            if (isHTTPOrHTTPS)
+                loadHttpState(externalContext, indentedLogger);
 
-        // Get  the headers to forward if any
-        final Map<String, String[]> headersMap = (externalContext.getRequest() != null) ?
-                getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
-        // Open the connection
-        final ConnectionResult result = open(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
+            // Get  the headers to forward if any
+            final Map<String, String[]> headersMap = (externalContext.getRequest() != null) ?
+                    getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
+            // Open the connection
+            final ConnectionResult result = open(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
 
-        // Save state if possible
-        if (isHTTPOrHTTPS)
-            saveHttpState(externalContext, indentedLogger);
+            // Save state if possible
+            if (isHTTPOrHTTPS)
+                saveHttpState(externalContext, indentedLogger);
 
-        return result;
+            return result;
+        } finally {
+            // In case an exception is thrown in the body, still do adjust the logs
+            indentedLogger.endHandleOperation();
+        }
     }
 
     /**
@@ -160,10 +167,8 @@ public class Connection {
                     if (sb.length() > 0) {
                         // One or more cookies were set
                         final String cookieString = sb.toString();
-                        indentedLogger.logDebug("connection", "forwarding cookies", "cookie", cookieString);
+                        indentedLogger.logDebug(LOG_TYPE, "forwarding cookies", "cookie", cookieString);
                         StringUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
-
-//                            CookieTools.getCookieHeaderValue(cookie, sb);
                     }
                 }
             }
@@ -204,7 +209,7 @@ public class Connection {
                             }
                         }
 
-                        indentedLogger.logDebug("connection", "setting cookie",
+                        indentedLogger.logDebug(LOG_TYPE, "setting cookie",
                                 "new session", Boolean.toString(session.isNew()),
                                 "session id", session.getId(),
                                 "requested session id", externalContext.getRequest().getRequestedSessionId(),
@@ -235,12 +240,12 @@ public class Connection {
                     final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
                     if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                         // Only forward Authorization header if there is no username provided
-                        indentedLogger.logDebug("connection", "forwarding header",
+                        indentedLogger.logDebug(LOG_TYPE, "forwarding header",
                                 "name", currentHeaderName, "value", currentIncomingHeaderValues.toString());
                         StringUtils.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
                     } else {
                         // Just log this information
-                        indentedLogger.logDebug("connection",
+                        indentedLogger.logDebug(LOG_TYPE,
                                 "not forwarding Authorization header because username is present");
                     }
                 }
@@ -266,9 +271,9 @@ public class Connection {
         }
 
         if (httpState != null) {
-            indentedLogger.logDebug("connection", "loaded HTTP state", "scope", stateScope.toString().toLowerCase());
+            indentedLogger.logDebug(LOG_TYPE, "loaded HTTP state", "scope", stateScope.toString().toLowerCase());
         } else {
-            indentedLogger.logDebug("connection", "did not load HTTP state");
+            indentedLogger.logDebug(LOG_TYPE, "did not load HTTP state");
         }
     }
 
@@ -299,9 +304,9 @@ public class Connection {
                     sb.append(cookie.getName());
                 }
 
-                indentedLogger.logDebug("connection", "saved HTTP state",
+                indentedLogger.logDebug(LOG_TYPE, "saved HTTP state",
                         "scope", stateScope.toString().toLowerCase(),
-                        "cookie names", sb.toString());
+                        (sb.length() > 0) ? "cookie names" : null, sb.toString());
             }
         }
     }
@@ -322,6 +327,8 @@ public class Connection {
                                  String httpMethod, final URL connectionURL, String username, String password,
                                  String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
 
+        final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
+
         // Perform connection
         final String scheme = connectionURL.getProtocol();
         if (isHTTPOrHTTPS(scheme) || (httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf")))) {
@@ -329,7 +336,8 @@ public class Connection {
             // https SHOULD be supported
             // file SHOULD be supported
             try {
-                if (indentedLogger.isDebugEnabled()) {
+                // Log basic connection information
+                if (isDebugEnabled) {
                     final URI connectionURI;
                     try {
                         String userInfo = connectionURL.getUserInfo();
@@ -343,10 +351,11 @@ public class Connection {
                     } catch (URISyntaxException e) {
                         throw new OXFException(e);
                     }
-                    indentedLogger.logDebug("connection", "opening URL connection",
-                            "URL", connectionURI.toString());
+                    indentedLogger.logDebug(LOG_TYPE, "opening URL connection", "method", httpMethod,
+                            "URL", connectionURI.toString(), "request Content-Type", contentType);
                 }
 
+                // Create URL connection object
                 final URLConnection urlConnection = connectionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
 
@@ -356,6 +365,7 @@ public class Connection {
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(hasRequestBody);
 
+                // Configure HTTPURLConnection
                 if (httpURLConnection != null) {
                     // Set state if possible
                     httpURLConnection.setHttpState(this.httpState);
@@ -371,78 +381,42 @@ public class Connection {
                            httpURLConnection.setPassword(password);
                     }
                 }
-                final String contentTypeMediaType = NetUtils.getContentTypeMediaType(contentType);
-                if (hasRequestBody) {
-                    if (httpMethod.equals("POST") && NetUtils.APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
-                        // SOAP POST
 
-                        indentedLogger.logDebug("connection", "found SOAP POST");
+                // Handle SOAP
+                // Set request Content-Type, SOAPAction or Accept header if needed
+                final boolean didSOAP = handleSOAP(indentedLogger, httpMethod, headersMap, contentType, hasRequestBody);
 
-                        final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
-                        final FastStringBuffer sb = new FastStringBuffer("text/xml");
-
-                        // Extract charset parameter if present
-                        // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
-                        if (parameters != null) {
-                            final String charsetParameter = parameters.get("charset");
-                            if (charsetParameter != null) {
-                                // Append charset parameter
-                                sb.append("; ");
-                                sb.append(charsetParameter);
-                            }
-                        }
-
-                        // Set new content type
-                        urlConnection.setRequestProperty("Content-Type", sb.toString());
-
-                        // Extract action parameter if present
-                        if (parameters != null) {
-                            final String actionParameter = parameters.get("action");
-                            if (actionParameter != null) {
-                                // Set SOAPAction header
-                                urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                indentedLogger.logDebug("connection", "setting header", "SOAPAction", actionParameter);
-                            }
-                        }
-                    } else {
-                        urlConnection.setRequestProperty("Content-Type", (contentType != null) ? contentType : "application/xml");
-                    }
-                } else {
-                    if (httpMethod.equals("GET") && NetUtils.APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
-                        // SOAP GET
-                        indentedLogger.logDebug("connection", "found SOAP GET");
-
-                        final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
-                        final FastStringBuffer sb = new FastStringBuffer(NetUtils.APPLICATION_SOAP_XML);
-
-                        // Extract charset parameter if present
-                        if (parameters != null) {
-                            final String charsetParameter = parameters.get("charset");
-                            if (charsetParameter != null) {
-                                // Append charset parameter
-                                sb.append("; ");
-                                sb.append(charsetParameter);
-                            }
-                        }
-
-                        // Set Accept header with optional charset
-                        urlConnection.setRequestProperty("Accept", sb.toString());
-                    }
+                // Set request content type if method was not
+                if (!didSOAP && hasRequestBody) {
+                    final String actualContentType = (contentType != null) ? contentType : "application/xml";
+                    headersMap.put("Content-Type", new String[] { actualContentType });
+                    indentedLogger.logDebug(LOG_TYPE, "setting header", "Content-Type", actualContentType);
                 }
 
                 // Set headers if provided
                 if (headersMap != null && headersMap.size() > 0) {
-                    for (Iterator<Map.Entry<String,String[]>> i = headersMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry<String,String[]> currentEntry = i.next();
+
+                    final List<String> headersToLog = isDebugEnabled ? new ArrayList<String>() : null;
+
+                    for (Map.Entry<String,String[]> currentEntry: headersMap.entrySet()) {
                         final String currentHeaderName = currentEntry.getKey();
                         final String[] currentHeaderValues = currentEntry.getValue();
                         if (currentHeaderValues != null) {
                             // Add all header values as "request properties"
-                            for (int j = 0; j < currentHeaderValues.length; j++) {
-                                final String currentHeaderValue = currentHeaderValues[j];
+                            for (String currentHeaderValue: currentHeaderValues) {
                                 urlConnection.addRequestProperty(currentHeaderName, currentHeaderValue);
+
+                                if (headersToLog != null) {
+                                    headersToLog.add(currentHeaderName);
+                                    headersToLog.add(currentHeaderValue);
+                                }
                             }
                         }
+                    }
+
+                    if (headersToLog != null) {
+                        final String[] strings = new String[headersToLog.size()];
+                        indentedLogger.logDebug(LOG_TYPE, "request headers", headersToLog.toArray(strings));
                     }
                 }
 
@@ -454,7 +428,7 @@ public class Connection {
                         messageBody = new byte[0];
 
                     // Log message mody for debugging purposes
-                    if (indentedLogger.isDebugEnabled())
+                    if (isDebugEnabled)
                         logRequestBody(indentedLogger, contentType, messageBody);
 
                     // Set request body on connection
@@ -487,19 +461,54 @@ public class Connection {
                 };
 
                 // Get response information that needs to be forwarded
-                connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
-                final String receivedContentType = urlConnection.getContentType();
 
-                connectionResult.setResponseContentType(receivedContentType != null ? receivedContentType : "application/xml");
-                connectionResult.responseHeaders = urlConnection.getHeaderFields();
-                connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection));
-                connectionResult.setResponseInputStream(urlConnection.getInputStream());
-
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug("connection", "results", "status", Integer.toString(connectionResult.statusCode),
-                            "content-type", receivedContentType,
-                            "used content-type", connectionResult.getResponseContentType());
+                // Status code
+                {
+                    connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
+                    if (isDebugEnabled)
+                        indentedLogger.logDebug(LOG_TYPE, "response", "status code", Integer.toString(connectionResult.statusCode));
                 }
+
+                // Headers
+                {
+                    connectionResult.responseHeaders = urlConnection.getHeaderFields();
+                    connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection));
+
+                    // Log headers if needed
+                    if (isDebugEnabled && connectionResult.responseHeaders.size() > 0) {
+                        final List<String> headersToLog = new ArrayList<String>();
+
+                        for (Map.Entry<String, List<String>> currentEntry: connectionResult.responseHeaders.entrySet()) {
+                            final String currentHeaderName = currentEntry.getKey();
+                            final List<String> currentHeaderValues = currentEntry.getValue();
+                            if (currentHeaderValues != null) {
+                                // Add all header values as "request properties"
+                                for (String currentHeaderValue: currentHeaderValues) {
+                                    headersToLog.add(currentHeaderName);
+                                    headersToLog.add(currentHeaderValue);
+                                }
+                            }
+                        }
+
+                        final String[] strings = new String[headersToLog.size()];
+                        indentedLogger.logDebug(LOG_TYPE, "response headers", headersToLog.toArray(strings));
+                    }
+                }
+
+                // Content-Type
+                {
+                    final String receivedContentType = urlConnection.getContentType();
+                    if (receivedContentType != null) {
+                        connectionResult.setResponseContentType(receivedContentType);
+                    } else {
+                        connectionResult.setResponseContentType("application/xml");
+                        if (isDebugEnabled)
+                            indentedLogger.logDebug(LOG_TYPE, "received null response Content-Type, using application/xml");
+                    }
+                }
+
+                // Response stream
+                connectionResult.setResponseInputStream(urlConnection.getInputStream());
 
                 return connectionResult;
 
@@ -517,6 +526,92 @@ public class Connection {
         } else {
             throw new OXFException("submission URL scheme not supported: " + scheme);
         }
+    }
+
+    /**
+     * Add SOAP-related headers if needed.
+     *
+     * TODO: check this logic against the latest XForms 1.1.
+     *
+     * @param indentedLogger    logger
+     * @param httpMethod        method
+     * @param headersMap        existing headers
+     * @param contentType       content-type requested
+     * @param hasRequestBody    whether there is a request body
+     * @return                  true iif a SOAP request was detected and headers added
+     */
+    private boolean handleSOAP(IndentedLogger indentedLogger, String httpMethod, Map<String, String[]> headersMap, String contentType, boolean hasRequestBody) {
+        final String contentTypeMediaType = NetUtils.getContentTypeMediaType(contentType);
+        if (hasRequestBody) {
+            if (httpMethod.equals("POST") && NetUtils.APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
+                // SOAP POST
+
+                final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
+                final FastStringBuffer sb = new FastStringBuffer("text/xml");
+
+                // Extract charset parameter if present
+                // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
+                if (parameters != null) {
+                    final String charsetParameter = parameters.get("charset");
+                    if (charsetParameter != null) {
+                        // Append charset parameter
+                        sb.append("; ");
+                        sb.append(charsetParameter);
+                    }
+                }
+
+                // Set new content type
+                final String overriddenContentType = sb.toString();
+                headersMap.put("Content-Type", new String[] { overriddenContentType });
+
+                // Extract action parameter if present
+                String actionParameter = null;
+                if (parameters != null) {
+                    actionParameter = parameters.get("action");
+                    if (actionParameter != null) {
+                        // Set SOAPAction header
+                        headersMap.put("SOAPAction", new String[] { actionParameter });
+                    }
+                }
+
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug(LOG_TYPE, "found SOAP POST",
+                            "request Content-Type", overriddenContentType,
+                            "request SOAPAction header", actionParameter);
+                }
+
+                return true;
+            }
+        } else {
+            if (httpMethod.equals("GET") && NetUtils.APPLICATION_SOAP_XML.equals(contentTypeMediaType)) {
+                // SOAP GET
+
+                final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
+                final FastStringBuffer sb = new FastStringBuffer(NetUtils.APPLICATION_SOAP_XML);
+
+                // Extract charset parameter if present
+                if (parameters != null) {
+                    final String charsetParameter = parameters.get("charset");
+                    if (charsetParameter != null) {
+                        // Append charset parameter
+                        sb.append("; ");
+                        sb.append(charsetParameter);
+                    }
+                }
+
+                // Set Accept header with optional charset
+                final String acceptHeader = sb.toString();
+                headersMap.put("Accept", new String[] { acceptHeader });
+
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug(LOG_TYPE, "found SOAP GET", "request Accept header", acceptHeader);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isHTTPOrHTTPS(String scheme) {
@@ -544,10 +639,9 @@ public class Connection {
 
     public static void logRequestBody(IndentedLogger indentedLogger, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
         if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
-            indentedLogger.logDebug("submission", "setting request body",
-                    "mediatype", mediatype, "body", new String(messageBody, "UTF-8"));
+            indentedLogger.logDebug("submission", "setting request body", "body", new String(messageBody, "UTF-8"));
         } else {
-            indentedLogger.logDebug("submission", "setting binary request body", "mediatype", mediatype);
+            indentedLogger.logDebug("submission", "setting binary request body");
         }
     }
 

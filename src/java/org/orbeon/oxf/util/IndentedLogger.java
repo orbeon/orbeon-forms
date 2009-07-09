@@ -55,6 +55,16 @@ public class IndentedLogger {
         this.prefix = prefix;
     }
 
+    public IndentedLogger(Logger logger, String prefix, int logIndentLevel) {
+        this.logger = logger;
+        this.prefix = prefix;
+        this.logIndentLevel = logIndentLevel;
+    }
+
+    public int getLogIndentLevel() {
+        return logIndentLevel;
+    }
+
     public final boolean isDebugEnabled() {
         return logger.isDebugEnabled();
     }

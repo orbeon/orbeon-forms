@@ -28,7 +28,8 @@ YAHOO.xbl.fr.Currency = {
                 },
                 blur: function() {
                     hasFocus = false;
-                    var cleanNumber = new Number(visibleInputElement.value).toString();
+                    var cleanString = visibleInputElement.value.replace(new RegExp("[\\s,]", "g"), "");
+                    var cleanNumber = new Number(cleanString).toString();
                     ORBEON.xforms.Document.setValue(xformsInputElement.id, visibleInputElement.value == "" || cleanNumber == "NaN" ? visibleInputElement.value : cleanNumber);
                     visibleInputElement.value = instance.numberToCurrency(visibleInputElement.value);
                 },

@@ -35,7 +35,7 @@
                     <readonly is-readonly="true">42</readonly>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="double" readonly="false()" calculate="../value * 2"/>
+            <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
             <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
         </xforms:model>
         <xhtml:style type="text/css">
@@ -52,6 +52,7 @@
 
                     var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "empty")[0];
                     var valueInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "value")[0];
+                    var valueOutput = YAHOO.util.Dom.get("value-output");
                     var doubleInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "double")[0];
                     var prefixStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-static")[0];
                     var prefixDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-dynamic")[0];
@@ -157,6 +158,16 @@
                                     YAHOO.util.Assert.isTrue(readonlyInput.disabled);
                                 });
                             });
+                        },
+                        testCleanup: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                valueInput.focus();
+                                valueInput.value = "1,1";
+                                doubleInput.focus();
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("11", ORBEON.util.Dom.getStringValue(valueOutput));
+                            });
+
                         }
                     }));
 
@@ -182,6 +193,7 @@
                 <xforms:label>Value</xforms:label>
                 <xforms:help>Help</xforms:help>
             </fr:currency>
+            <xforms:output value="value" id="value-output"/>
         </xhtml:div>
         <xhtml:div>
             <fr:currency ref="double" id="double">

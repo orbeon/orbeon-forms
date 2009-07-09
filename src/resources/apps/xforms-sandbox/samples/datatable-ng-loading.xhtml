@@ -51,70 +51,30 @@
                 <xforms:insert nodeset="instance('instance')" origin="instance('datasource')"/>
             </xforms:action>
         </xforms:model>
-        <xhtml:style type="text/css"> .is-loading { background-image:
-            url(../../ops/images/xforms/processing.gif); height: 50px; background-position: center;
-            background-repeat: no-repeat; } </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:group ref=".[@loading = true()]">
-            <div>
-                <span class="yui-dt yui-dt-scrollable" style="display: table; ">
-                    <span class="yui-dt-hd"
-                        style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
-                        <table class="datatable  yui-dt-table">
-                            <thead>
-                                <tr class="yui-dt-first yui-dt-last">
-                                    <th class="yui-dt-sortable yui-dt-resizeable">
-                                        <div class="yui-dt-resizerliner">
-                                            <div class="yui-dt-liner">AAA (imp)</div>
-                                        </div>
-                                    </th>
-                                    <th class="yui-dt-sortable yui-dt-resizeable">
-                                        <div class="yui-dt-resizerliner">
-                                            <div class="yui-dt-liner">BBB (imp)</div>
-                                        </div>
-                                    </th>
-                                    <th class="yui-dt-sortable yui-dt-resizeable">
-                                        <div class="yui-dt-resizerliner">
-                                            <div class="yui-dt-liner">CCC (imp)</div>
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="3" class="is-loading"/>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </span>
-                </span>
-            </div>
-        </xforms:group>
-        <xforms:group ref=".[not(@loading = true())]">
-            <fr:datatable id="table-repeat2">
-                <xhtml:tr repeat-nodeset="record">
-                    <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
-                        <xforms:output ref="AAA">
-                            <xforms:label>AAA (imp)</xforms:label>
-                        </xforms:output>
-                    </xhtml:td>
-                    <xhtml:td fr:sortable="true" fr:resizeable="true">
-                        <xforms:output ref="BBB">
-                            <!-- Optional label used if there is no <head> -->
-                            <xforms:label>BBB (imp)</xforms:label>
-                        </xforms:output>
-                    </xhtml:td>
-                    <xhtml:td fr:sortable="true" fr:resizeable="true">
-                        <xforms:output ref="CCC">
-                            <!-- Optional label used if there is no <head> -->
-                            <xforms:label>CCC (imp)</xforms:label>
-                        </xforms:output>
-                    </xhtml:td>
-                </xhtml:tr>
-            </fr:datatable>
-        </xforms:group>
+        <fr:datatable id="table-repeat2" loading="@loading = 'true'">
+            <xhtml:tr repeat-nodeset="record">
+                <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
+                    <xforms:output ref="AAA">
+                        <xforms:label>AAA (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+                <xhtml:td fr:sortable="true" fr:resizeable="true">
+                    <xforms:output ref="BBB">
+                        <!-- Optional label used if there is no <head> -->
+                        <xforms:label>BBB (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+                <xhtml:td fr:sortable="true" fr:resizeable="true">
+                    <xforms:output ref="CCC">
+                        <!-- Optional label used if there is no <head> -->
+                        <xforms:label>CCC (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+            </xhtml:tr>
+        </fr:datatable>
 
         <span>XXXXX</span>
 

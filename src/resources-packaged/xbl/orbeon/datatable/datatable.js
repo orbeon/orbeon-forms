@@ -438,7 +438,7 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
 	// Initializes a datatable (called by xforms-enabled events)
 	var container = target.parentNode.parentNode;
 	var id = container.id;
-	if (ORBEON.widgets.datatable.datatables[id] == undefined) {
+	if (ORBEON.widgets.datatable.datatables[id] == undefined && ! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
 		var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
 		ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
 	}

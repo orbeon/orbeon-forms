@@ -24,3 +24,9 @@
     height: 20px;
 }
 
+.is-loading { 
+    background-image:
+    url(../../../ops/images/xforms/processing.gif); 
+    height: 50px; background-position: center;
+    background-repeat: no-repeat; 
+}

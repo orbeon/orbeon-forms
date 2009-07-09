@@ -531,6 +531,11 @@
     <xsl:template match="xforms:repeat" mode="YUI">
         <xxforms:variable name="sort" model="datatable" select="."/>
         <xxforms:variable name="key" model="datatable" select="key[position() = $sort/@currentId]"/>
+        <xforms:group ref=".[empty({@nodeset})]">
+            <xhtml:tr>
+                <xhtml:td class="fr-datatable-empty"/>
+            </xhtml:tr>
+        </xforms:group>
         <xforms:repeat id="fr-datatable-repeat">
             <xsl:attribute name="nodeset">
                 <xsl:choose>

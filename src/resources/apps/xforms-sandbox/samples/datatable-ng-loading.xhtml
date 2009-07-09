@@ -1,0 +1,84 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Using YUI's datatable</xhtml:title>
+        <xforms:model id="model" xxforms:external-events="load-initial-data">
+            <xforms:instance id="instance">
+                <placeholder loading="true"/>
+            </xforms:instance>
+            <xforms:instance id="datasource">
+                <instance>
+                    <record>
+                        <AAA>1</AAA>
+                        <BBB>foo</BBB>
+                        <CCC>bar</CCC>
+                    </record>
+                    <record>
+                        <AAA>100</AAA>
+                        <BBB>bat</BBB>
+                        <CCC>baz</CCC>
+                    </record>
+                    <record>
+                        <AAA>2</AAA>
+                        <BBB>bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                </instance>
+            </xforms:instance>
+            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+            <xxforms:script ev:event="xforms-model-construct-done">
+                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data");
+            </xxforms:script>
+            <xforms:action ev:event="load-initial-data">
+                <xforms:send submission="sleep-5-seconds"/>
+                <xforms:insert nodeset="instance('instance')" origin="instance('datasource')"/>
+            </xforms:action>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .is-loading .fr-datatable-empty {
+                background-image: url(../../ops/images/xforms/processing.gif);
+                height: 50px; background-position: center; background-repeat: no-repeat; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <fr:datatable id="table-repeat2" initially-loading="true" class="{if (@loading) then 'is-loading' else ''}">
+            <!-- Optional <thead>, otherwise try to build one from body -->
+            <xhtml:tr repeat-nodeset="record">
+                <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
+                    <xforms:output ref="AAA">
+                        <xforms:label>AAA (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+                <xhtml:td fr:sortable="true" fr:resizeable="true">
+                    <xforms:output ref="BBB">
+                        <!-- Optional label used if there is no <head> -->
+                        <xforms:label>BBB (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+                <xhtml:td fr:sortable="true" fr:resizeable="true">
+                    <xforms:output ref="CCC">
+                        <!-- Optional label used if there is no <head> -->
+                        <xforms:label>CCC (imp)</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+            </xhtml:tr>
+        </fr:datatable>
+
+    </xhtml:body>
+</xhtml:html>

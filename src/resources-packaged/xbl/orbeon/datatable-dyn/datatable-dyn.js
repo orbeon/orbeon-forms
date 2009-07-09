@@ -386,9 +386,7 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
 	this.setYConstraint(0, 0);
 	this.initFrame();
 
-	var colRegion = YAHOO.util.Dom.getRegion(this.th);
-	var X = YAHOO.util.Dom.getX(this.resizer);
-	this.delta = colRegion.right - X;
+	this.delta = 7;
 }
 
 

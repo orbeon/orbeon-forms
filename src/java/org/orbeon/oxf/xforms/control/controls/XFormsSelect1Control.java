@@ -18,6 +18,9 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -48,15 +51,15 @@ public class XFormsSelect1Control extends XFormsValueControl {
             XFormsConstants.XXFORMS_GROUP_QNAME
     };
 
-    private final String xxformsRefresh;
+    private final boolean isNorefresh;
     private final boolean isOpenSelection;
     private final boolean xxformsEncryptItemValues;
-    private List<XFormsItemUtils.Item> items;
+    private Itemset itemset;
 
     public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         // TODO: part of static state?
-        this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
+        this.isNorefresh = "false".equals(element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME));
         this.isOpenSelection = isOpenSelection(element);
         this.xxformsEncryptItemValues = isEncryptItemValues(containingDocument, element); 
     }
@@ -86,7 +89,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public void markDirty() {
         super.markDirty();
         // Force recalculation of items here
-        items = null;
+        itemset = null;
     }
 
     /**
@@ -108,8 +111,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @param prefixedId            prefixed id of control from which to obtain itemset (if control is null)
      * @return                      itemset or null if it is not possible to obtain it
      */
-    public static List<XFormsItemUtils.Item> getInitialItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
-                                                        XFormsSelect1Control control, String prefixedId) {
+    public static Itemset getInitialItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                                            XFormsSelect1Control control, String prefixedId) {
 
         if (control != null && control.isRelevant()) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
@@ -131,7 +134,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @param setBinding        whether to set the current binding on the control first
      * @return                  itemset
      */
-    public List<XFormsItemUtils.Item> getItemset(PipelineContext pipelineContext, boolean setBinding) {
+    public Itemset getItemset(PipelineContext pipelineContext, boolean setBinding) {
         try {
             // Non-relevant control does not return an itemset
             final NodeInfo boundNode = getBoundNode();
@@ -139,20 +142,21 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (!isRelevant)
                 return null;
 
-            if ("false".equals(xxformsRefresh)) {
+            if (isNorefresh) {
                 // Items are not automatically refreshed and stored globally
-                List<XFormsItemUtils.Item> items =  containingDocument.getControls().getConstantItems(getId());
-                if (items == null) {
-                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, XFormsSelect1Control.this, setBinding);
-                    containingDocument.getControls().setConstantItems(getId(), items);
+                // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
+                Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
+                if (constantItemset == null) {
+                    constantItemset = XFormsItemUtils.evaluateItemset(pipelineContext, XFormsSelect1Control.this, setBinding);
+                    containingDocument.getControls().setConstantItems(getPrefixedId(), constantItemset);
                 }
-                return items;
+                return constantItemset;
             } else {
                 // Items are stored in the control
-                if (items == null) {
-                    items = XFormsItemUtils.evaluateItemsets(pipelineContext, XFormsSelect1Control.this, setBinding);
+                if (itemset == null) {
+                    itemset = XFormsItemUtils.evaluateItemset(pipelineContext, XFormsSelect1Control.this, setBinding);
                 }
-                return items;
+                return itemset;
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
@@ -235,11 +239,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final String controlValue = getValue(pipelineContext);
 
             // Iterate over all the items
-            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
+            final Itemset itemset = getItemset(pipelineContext, true);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
-            if (items != null) {
-                for (XFormsItemUtils.Item currentItem: items) {
+            if (itemset != null) {
+                for (Item currentItem: itemset.toList()) {
                     final String currentItemValue = currentItem.getValue();
                     final boolean itemWasSelected = controlValue.equals(currentItemValue);
                     final boolean itemIsSelected;

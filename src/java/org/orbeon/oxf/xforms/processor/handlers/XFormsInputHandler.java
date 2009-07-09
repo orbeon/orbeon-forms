@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -26,9 +27,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Handle xforms:input.
@@ -86,11 +85,11 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // Produce a boolean output
 
             final boolean isMany = true;
-            final List items = new ArrayList(2);
+            final Itemset itemset = new Itemset();
             // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
             // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
             // the encrypted value of "true". So we do not encrypt values.
-            items.add(new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "true", 1));
+            itemset.addChildItem(new Item(false, Collections.EMPTY_LIST, "", "true"));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
@@ -101,7 +100,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 }
             };
             select1Handler.setContext(getContext());
-            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, items, isMany, true);
+            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, itemset, isMany, true);
 
         } else {
 
@@ -122,14 +121,16 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                         // Main input field
                         {
-                            final String inputId = effectiveId + "$xforms-input-1";// do as if this was in a component, noscript has to handle that
+                            final String inputIdName = effectiveId + "$xforms-input-1";// do as if this was in a component, noscript has to handle that
+                            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+//                            final String inputIdName = XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
 
                             reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
                             if (!isDateMinimal)
                                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             // Use effective id for name of first field
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName);
                             final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
@@ -182,15 +183,17 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // NOTE: In the future, we probably want to do this as an XBL component
                         if (isDateTime) {
 
-                            final String inputId = effectiveId + "$xforms-input-2";// do as if this was in a component, noscript has to handle that
+                            final String inputIdName = effectiveId + "$xforms-input-2";// do as if this was in a component, noscript has to handle that
+                            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+//                            final String inputIdName = XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
 
                             reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
                             reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
                             reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
                             reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");
                             // TODO: Is this an appropriate name? Noscript must be able to find this
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName);
 
                             final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
                             if (isConcreteControl) {

@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -56,7 +58,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         final String newValue;
         {
             // All items
-            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
+            final Itemset itemset = getItemset(pipelineContext, true);
             // Current values in the instance
             final Map<String, String> instanceValues = tokenize(pipelineContext, controlValue, false);
 
@@ -67,7 +69,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
             final List<XFormsDeselectEvent> deselectEvents = new ArrayList<XFormsDeselectEvent>();
 
-            for (XFormsItemUtils.Item currentItem: items) {
+            for (Item currentItem: itemset.toList()) {
                 final String currentItemValue = currentItem.getValue();
                 final boolean itemWasSelected = instanceValues.get(currentItemValue) != null;
                 final boolean itemIsSelected;
@@ -131,18 +133,16 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             updatedValue = internalValue;
         } else {
             // Values in the itemset
-            final List<XFormsItemUtils.Item> items = getItemset(pipelineContext, true);
-            if (items != null) {
+            final Itemset itemset = getItemset(pipelineContext, true);
+            if (itemset != null) {
 
                 // Current values in the instance
                 final Map<String, String> instanceValues = tokenize(pipelineContext, internalValue, false);
 
-
-
                 // Actual value to return is the intersection of values in the instance and values in the itemset
                 final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
                 int index = 0;
-                for (XFormsItemUtils.Item currentItem: items) {
+                for (Item currentItem: itemset.toList()) {
                     final String currentValue = currentItem.getValue();
                     if (instanceValues.get(currentValue) != null) {
                         if (index > 0)

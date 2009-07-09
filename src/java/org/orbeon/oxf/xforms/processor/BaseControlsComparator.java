@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -36,14 +37,14 @@ public abstract class BaseControlsComparator implements ControlsComparator {
     protected final PipelineContext pipelineContext;
     protected final ContentHandlerHelper ch;
     protected final XFormsContainingDocument containingDocument;
-    protected final Map<String, List<XFormsItemUtils.Item>> itemsetsFull1;
-    protected final Map<String, List<XFormsItemUtils.Item>> itemsetsFull2;
+    protected final Map<String, Itemset> itemsetsFull1;
+    protected final Map<String, Itemset> itemsetsFull2;
     protected final Map valueChangeControlIds;
 
     protected final boolean isStaticReadonly;
 
     public BaseControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                  Map<String, List<XFormsItemUtils.Item>> itemsetsFull1, Map<String, List<XFormsItemUtils.Item>> itemsetsFull2,
+                                  Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
                                   Map valueChangeControlIds) {
         this.pipelineContext = pipelineContext;
         this.ch = ch;
@@ -114,15 +115,15 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 // Don't update itemset for static readonly controls
 
                 if (itemsetsFull1 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1)) {
-                    final List<XFormsItemUtils.Item> items = xformsSelect1Control1.getItemset(pipelineContext, true);
-                    if (items != null)
-                        itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
+                    final Itemset itemset = xformsSelect1Control1.getItemset(pipelineContext, true);
+                    if (itemset != null)
+                        itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), itemset);
                 }
 
                 if (itemsetsFull2 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control2)) {
-                    final List<XFormsItemUtils.Item> items = xformsSelect1Control2.getItemset(pipelineContext, true);
-                    if (items != null)
-                        itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
+                    final Itemset itemset = xformsSelect1Control2.getItemset(pipelineContext, true);
+                    if (itemset != null)
+                        itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), itemset);
                 }
             }
         }

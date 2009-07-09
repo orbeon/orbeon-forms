@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -109,7 +110,7 @@ public class XFormsServer extends ProcessorImpl {
         filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
         // Get server events if any
-        serverEventsElements = requestDocument.getRootElement().elements(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
+        serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Get events requested by the client
         final List<Element> eventElements = new ArrayList<Element>();
@@ -120,7 +121,7 @@ public class XFormsServer extends ProcessorImpl {
             for (Element element: serverEventsElements) {
 
                 final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
-                final List<Element> xxformsEventElements = serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME);
+                final List<Element> xxformsEventElements = Dom4jUtils.elements(serverEventsDocument.getRootElement(), XFormsConstants.XXFORMS_EVENT_QNAME);
                 serverEventsCount += xxformsEventElements.size();
                 eventElements.addAll(xxformsEventElements);
             }
@@ -128,7 +129,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Gather client events if any
         if (actionElement != null) {
-            eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+            eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
         // Check for message where there is only the heartbeat event
@@ -671,8 +672,8 @@ public class XFormsServer extends ProcessorImpl {
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
 
                 // Output new controls values and associated information
-                final Map<String, List<XFormsItemUtils.Item>> itemsetsFull1 = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
-                final Map<String, List<XFormsItemUtils.Item>> itemsetsFull2 = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
+                final Map<String, Itemset> itemsetsFull1 = new LinkedHashMap<String, Itemset>();
+                final Map<String, Itemset> itemsetsFull2 = new LinkedHashMap<String, Itemset>();
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
@@ -717,7 +718,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output itemset information
                 if (allEvents || containingDocument.isDirtySinceLastRequest()) {
                     // Diff itemset information
-                    final Map<String, List<XFormsItemUtils.Item>> itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
+                    final Map<String, Itemset> itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: Handle allEvents case. Something wrong here?
                     outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
@@ -874,9 +875,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static Map<String, List<XFormsItemUtils.Item>> diffItemsets(Map<String, List<XFormsItemUtils.Item>> itemsetsFull1,
-                                                                       Map<String, List<XFormsItemUtils.Item>> itemsetsFull2) {
-        Map<String, List<XFormsItemUtils.Item>> itemsetUpdate;
+    public static Map<String, Itemset> diffItemsets(Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2) {
+        Map<String, Itemset> itemsetUpdate;
         if (itemsetsFull2 == null) {
             // There is no update in the first place
             itemsetUpdate = null;
@@ -885,13 +885,13 @@ public class XFormsServer extends ProcessorImpl {
             itemsetUpdate = itemsetsFull2;
         } else {
             // Merge differences
-            itemsetUpdate = new LinkedHashMap<String, List<XFormsItemUtils.Item>>();
+            itemsetUpdate = new LinkedHashMap<String, Itemset>();
 
-            for (Map.Entry<String, List<XFormsItemUtils.Item>> currentEntry: itemsetsFull2.entrySet()) {
+            for (Map.Entry<String, Itemset> currentEntry: itemsetsFull2.entrySet()) {
                 final String itemsetId = currentEntry.getKey();
-                final List<XFormsItemUtils.Item> newItems = currentEntry.getValue();
+                final Itemset newItems = currentEntry.getValue();
 
-                final List<XFormsItemUtils.Item> existingItems = itemsetsFull1.get(itemsetId);
+                final Itemset existingItems = itemsetsFull1.get(itemsetId);
                 if (existingItems == null || !existingItems.equals(newItems)) {
                     // No existing items or new items are different from existing items
                     itemsetUpdate.put(itemsetId, newItems);
@@ -903,7 +903,7 @@ public class XFormsServer extends ProcessorImpl {
 
     public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                                     List state1, List state2,
-                                    Map<String, List<XFormsItemUtils.Item>> itemsetsFull1, Map<String, List<XFormsItemUtils.Item>> itemsetsFull2,
+                                    Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
                                     Map valueChangeControlIds) {
         containingDocument.startHandleOperation("XForms server", "computing differences");
         if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
@@ -988,17 +988,17 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private static void outputItemsets(PipelineContext pipelineContext, ContentHandlerHelper ch,
-                                       Map<String, List<XFormsItemUtils.Item>> itemsetIdToItemsetInfoMap) {
+                                       Map<String, Itemset> itemsetIdToItemsetInfoMap) {
         if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
             // There are some xforms:itemset controls
 
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-            for (Map.Entry<String, List<XFormsItemUtils.Item>> currentEntry: itemsetIdToItemsetInfoMap.entrySet()) {
+            for (Map.Entry<String, Itemset> currentEntry: itemsetIdToItemsetInfoMap.entrySet()) {
                 final String itemsetId = currentEntry.getKey();
-                final List<XFormsItemUtils.Item> items = currentEntry.getValue();
+                final Itemset itemset = currentEntry.getValue();
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
-                final String result = XFormsItemUtils.getJSONTreeInfo(pipelineContext, items, null);// TODO: pass LocationData
+                final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, null);// TODO: pass LocationData
                 if (result.length() > 0)
                     ch.text(result);
                 ch.endElement();

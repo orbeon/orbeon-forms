@@ -17,7 +17,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class OldControlsComparator extends BaseControlsComparator {
 
     public OldControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                 Map<String, List<XFormsItemUtils.Item>> itemsetsFull1, Map<String, List<XFormsItemUtils.Item>> itemsetsFull2, Map valueChangeControlIds) {
+                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Map valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 

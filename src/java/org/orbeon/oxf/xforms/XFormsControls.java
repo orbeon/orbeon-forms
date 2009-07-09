@@ -19,15 +19,16 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
 import java.util.*;
@@ -48,7 +49,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private XFormsContainingDocument containingDocument;
     private XBLContainer rootContainer;
     
-    private Map<String, List<XFormsItemUtils.Item>> constantItems;
+    private Map<String, Itemset> constantItems;
 
     // Options configured by properties
     private boolean isPlainValueChange;
@@ -576,7 +577,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param controlId     original control id
      * @return              List of Item
      */
-    public List<XFormsItemUtils.Item> getConstantItems(String controlId) {
+    public Itemset getConstantItems(String controlId) {
         if (constantItems == null)
             return null;
         else
@@ -589,9 +590,9 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param controlId     static control id
      * @param items         List<Item>
      */
-    public void setConstantItems(String controlId, List<XFormsItemUtils.Item> items) {
+    public void setConstantItems(String controlId, Itemset items) {
         if (constantItems == null)
-            constantItems = new HashMap<String, List<XFormsItemUtils.Item>>();
+            constantItems = new HashMap<String, Itemset>();
         constantItems.put(controlId, items);
     }
 

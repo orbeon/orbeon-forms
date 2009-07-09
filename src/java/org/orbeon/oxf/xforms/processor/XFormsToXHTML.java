@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005-2008 Orbeon, Inc.
+ *  Copyright (C) 2005-2009 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -140,7 +140,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity));
 
                         // Read the input through the annotator and gather namespace mappings
-                        final Map namespaceMappings = new HashMap();
+                        final Map<String, Map<String, String>> namespaceMappings = new HashMap<String, Map<String, String>>();
                         readInputAsSAX(pipelineContext, processorInput, new XFormsDocumentAnnotatorContentHandler(annotatedSAXStore, externalContext, namespaceMappings));
 
                         // Get static state document and create static state object
@@ -279,8 +279,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Set caching dependencies if the input was actually read
         // WIP INSTANCE INSPECTOR: for (Iterator i = containingDocument.getAllModels().iterator(); i.hasNext();) {
-        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (Iterator<XFormsModel> i = containingDocument.getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = i.next();
 
             // Add schema dependencies
             final String[] schemaURIs = currentModel.getSchemaURIs();
@@ -297,8 +297,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Add instance source dependencies
             if (currentModel.getInstances() != null) {
-                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                for (Iterator<XFormsInstance> j = currentModel.getInstances().iterator(); j.hasNext();) {
+                    final XFormsInstance currentInstance = j.next();
                     final String instanceSourceURI = currentInstance.getSourceURI();
 
                     if (instanceSourceURI != null) {
@@ -351,7 +351,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
         xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
-        final List loads = containingDocument.getLoadsToRun();
+        final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
             // 1. Got a submission with replace="all"
 
@@ -364,7 +364,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Send redirect out
 
             // Get first load only
-            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
+            final XFormsContainingDocument.Load load = loads.get(0);
 
             // Send redirect
             final String redirectResource = load.getResource();
@@ -420,5 +420,4 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);
     }
-
 }

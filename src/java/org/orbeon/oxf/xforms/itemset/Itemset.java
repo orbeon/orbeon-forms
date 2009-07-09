@@ -146,7 +146,7 @@ public class Itemset implements ItemContainer {
     public List<Item> toList() {
         final List<Item> result = new ArrayList<Item>();
         for (Item item: children) {
-            item.addToList(result, 1);
+            item.addToList(result);
         }
         return result;
     }

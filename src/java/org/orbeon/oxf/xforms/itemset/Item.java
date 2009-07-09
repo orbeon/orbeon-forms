@@ -151,12 +151,11 @@ public class Item implements ItemContainer {
         }
     }
 
-    void addToList(List<Item> result, int currentLevel) {
-        this.level = currentLevel;
+    void addToList(List<Item> result) {
         result.add(this);
         if (children != null) {
             for (Item item: children) {
-                item.addToList(result, currentLevel + 1);
+                item.addToList(result);
             }
         }
     }

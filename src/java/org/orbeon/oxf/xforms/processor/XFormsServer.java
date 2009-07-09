@@ -716,7 +716,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output itemset information
-                if (allEvents || containingDocument.isDirtySinceLastRequest()) {
+                if (allEvents || containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
                     // Diff itemset information
                     final Map<String, Itemset> itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: Handle allEvents case. Something wrong here?

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XForms Server" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="Simple itemset" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client" xxforms:encrypt-item-values="false">
+                                    <xforms:instance id="selection">
+                                        <selected>1</selected>
+                                    </xforms:instance>
+                                    <xforms:instance id="itemset">
+                                        <fruits>
+                                            <fruit id="1">
+                                                <description>Apple</description>
+                                                <color>Green</color>
+                                            </fruit>
+                                            <fruit id="2">
+                                                <description>Banana</description>
+                                                <color>Yellow</color>
+                                            </fruit>
+                                            <fruit id="3">
+                                                <description>Orange</description>
+                                                <color>Orange</color>
+                                            </fruit>
+                                            <fruit id="4">
+                                                <description>Kiwi</description>
+                                                <color>Green</color>
+                                            </fruit>
+                                        </fruits>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:select id="select-control" ref=".">
+                                    <xforms:label>Items</xforms:label>
+                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                        <xforms:label ref="description"/>
+                                        <xforms:value ref="@id"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="selection" model-id="model">
+                                <selected>1</selected>
+                            </instance>
+                            <instance id="itemset" model-id="model">
+                                <fruits>
+                                    <fruit id="1">
+                                        <description>Apple</description>
+                                        <color>Green</color>
+                                    </fruit>
+                                    <fruit id="2">
+                                        <description>Banana</description>
+                                        <color>Yellow</color>
+                                    </fruit>
+                                    <fruit id="3">
+                                        <description>Orange</description>
+                                        <color>Orange</color>
+                                    </fruit>
+                                    <fruit id="4">
+                                        <description>Kiwi</description>
+                                        <color>Green</color>
+                                    </fruit>
+                                </fruits>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="select-control" label="Items">1</xxf:control>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="select-control">[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</xxf:itemset>
+                    </xxf:itemsets>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Hierarchical itemset" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:state-handling="client" xxforms:encrypt-item-values="false">
+                                    <xforms:instance id="selection">
+                                        <selected>1</selected>
+                                    </xforms:instance>
+                                    <xforms:instance id="itemset">
+                                        <items>
+                                            <item label="Encyclopedia" value="en1">
+                                                <item label="Science" value="sc1"/>
+                                                <item label="Culture" value="cu1">
+                                                    <item label="Art" value="ar1"/>
+                                                    <item label="Craft" value="cr1"/>
+                                                </item>
+                                            </item>
+                                            <item label="Encyclopedia" value="en2">
+                                                <item label="Science" value="sc2"/>
+                                                <item label="Culture" value="cu2">
+                                                    <item label="Art" value="ar2"/>
+                                                    <item label="Craft" value="cr2"/>
+                                                </item>
+                                            </item>
+                                        </items>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:select id="select-control" ref=".">
+                                    <xforms:label>Items</xforms:label>
+                                    <xforms:itemset nodeset="instance('itemset')//item">
+                                        <xforms:label ref="@label"/>
+                                        <xforms:value ref="@value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="selection" model-id="model">
+                                <selected>1</selected>
+                            </instance>
+                            <instance id="itemset" model-id="model">
+                                <items>
+                                    <item label="Encyclopedia" value="en1">
+                                        <item label="Science" value="sc1"/>
+                                        <item label="Culture" value="cu1">
+                                            <item label="Art" value="ar1"/>
+                                            <item label="Craft" value="cr1"/>
+                                        </item>
+                                    </item>
+                                    <item label="Encyclopedia" value="en2">
+                                        <item label="Science" value="sc2"/>
+                                        <item label="Culture" value="cu2">
+                                            <item label="Art" value="ar2"/>
+                                            <item label="Craft" value="cr2"/>
+                                        </item>
+                                    </item>
+                                </items>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="select-control" label="Items"/>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="select-control">[["Encyclopedia","en1",["Science","sc1"],["Culture","cu1",["Art","ar1"],["Craft","cr1"]]],["Encyclopedia","en2",["Science","sc2"],["Culture","cu2",["Art","ar2"],["Craft","cr2"]]]]</xxf:itemset>
+                    </xxf:itemsets>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+</group>

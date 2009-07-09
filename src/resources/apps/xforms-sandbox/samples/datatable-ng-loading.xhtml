@@ -11,9 +11,11 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
         <xhtml:title>Using YUI's datatable</xhtml:title>
@@ -40,45 +42,81 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+            <xforms:submission id="sleep-5-seconds" method="post"
+                action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
             <xxforms:script ev:event="xforms-model-construct-done">
-                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data");
-            </xxforms:script>
+                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
             <xforms:action ev:event="load-initial-data">
                 <xforms:send submission="sleep-5-seconds"/>
                 <xforms:insert nodeset="instance('instance')" origin="instance('datasource')"/>
             </xforms:action>
         </xforms:model>
-        <xhtml:style type="text/css">
-            .is-loading .fr-datatable-empty {
-                background-image: url(../../ops/images/xforms/processing.gif);
-                height: 50px; background-position: center; background-repeat: no-repeat; }
-        </xhtml:style>
+        <xhtml:style type="text/css"> .is-loading { background-image:
+            url(../../ops/images/xforms/processing.gif); height: 50px; background-position: center;
+            background-repeat: no-repeat; } </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
-        <fr:datatable id="table-repeat2" initially-loading="true" class="{if (@loading) then 'is-loading' else ''}">
-            <!-- Optional <thead>, otherwise try to build one from body -->
-            <xhtml:tr repeat-nodeset="record">
-                <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
-                    <xforms:output ref="AAA">
-                        <xforms:label>AAA (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-                <xhtml:td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="BBB">
-                        <!-- Optional label used if there is no <head> -->
-                        <xforms:label>BBB (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-                <xhtml:td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="CCC">
-                        <!-- Optional label used if there is no <head> -->
-                        <xforms:label>CCC (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-            </xhtml:tr>
-        </fr:datatable>
+        <xforms:group ref=".[@loading = true()]">
+            <div>
+                <span class="yui-dt yui-dt-scrollable" style="display: table; ">
+                    <span class="yui-dt-hd"
+                        style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
+                        <table class="datatable  yui-dt-table">
+                            <thead>
+                                <tr class="yui-dt-first yui-dt-last">
+                                    <th class="yui-dt-sortable yui-dt-resizeable">
+                                        <div class="yui-dt-resizerliner">
+                                            <div class="yui-dt-liner">AAA (imp)</div>
+                                        </div>
+                                    </th>
+                                    <th class="yui-dt-sortable yui-dt-resizeable">
+                                        <div class="yui-dt-resizerliner">
+                                            <div class="yui-dt-liner">BBB (imp)</div>
+                                        </div>
+                                    </th>
+                                    <th class="yui-dt-sortable yui-dt-resizeable">
+                                        <div class="yui-dt-resizerliner">
+                                            <div class="yui-dt-liner">CCC (imp)</div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3" class="is-loading"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </span>
+                </span>
+            </div>
+        </xforms:group>
+        <xforms:group ref=".[not(@loading = true())]">
+            <fr:datatable id="table-repeat2">
+                <xhtml:tr repeat-nodeset="record">
+                    <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </xhtml:td>
+                    <xhtml:td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <!-- Optional label used if there is no <head> -->
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </xhtml:td>
+                    <xhtml:td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <!-- Optional label used if there is no <head> -->
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </xhtml:td>
+                </xhtml:tr>
+            </fr:datatable>
+        </xforms:group>
+
+        <span>XXXXX</span>
 
     </xhtml:body>
 </xhtml:html>

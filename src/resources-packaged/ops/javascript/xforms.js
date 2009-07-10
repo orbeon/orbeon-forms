@@ -4188,7 +4188,9 @@ ORBEON.xforms.Init = {
     },
 
     profileDocument: function() {
+        console.profile("XForms initialization");
         ORBEON.xforms.Init.document();
+        console.profileEnd();
     },
 
     /**

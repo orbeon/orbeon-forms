@@ -4185,13 +4185,10 @@ ORBEON.xforms.Init = {
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
-        console.profileEnd();
     },
 
     profileDocument: function() {
-        console.profile("XForms initialization");
         ORBEON.xforms.Init.document();
-        console.profileEnd();
     },
 
     /**

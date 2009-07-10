@@ -714,8 +714,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
 
         try {
-            if (cacheHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) != null) {
-                // Instance can be cached
+            if (cacheHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) == null) {
+                // Instance 1) has cache hing and 2) is not input:*, so it can be cached
                 // NOTE: We don't allow sharing for input:* URLs because this is very likely NOT to make sense
 
                 // TODO: This doesn't handle optimized submissions!
@@ -765,6 +765,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private final InstanceLoader INSTANCE_LOADER = new InstanceLoader();
 
+    // TODO: Use XFormsModelSubmission instead of duplicating code here
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
         public ReadonlyXFormsInstance load(PipelineContext pipelineContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
             final URL sourceURL;

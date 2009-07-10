@@ -100,10 +100,14 @@ public class XFormsServerSharedInstancesCache {
         return newInstance;
     }
 
-    private void add(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String instanceSourceURI, String requestBodyHash, ReadonlyXFormsInstance readonlyXFormsInstance, boolean handleXInclude) {
+    private void add(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String instanceSourceURI,
+                     String requestBodyHash, ReadonlyXFormsInstance readonlyXFormsInstance, boolean handleXInclude) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug(LOG_TYPE, "adding instance", "id", readonlyXFormsInstance.getEffectiveId(), "URI", instanceSourceURI);
+            containingDocument.logDebug(LOG_TYPE, "adding instance",
+                    "id", readonlyXFormsInstance.getEffectiveId(),
+                    "URI", instanceSourceURI,
+                    "request hash", requestBodyHash);
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
@@ -112,7 +116,7 @@ public class XFormsServerSharedInstancesCache {
     }
 
     private synchronized ReadonlyXFormsInstance findInCache(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
-                                                          String instanceStaticId, String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
+                                                            String instanceStaticId, String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
 
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
@@ -125,20 +129,27 @@ public class XFormsServerSharedInstancesCache {
         // Remove expired entry if any
         if (isExpired) {
             if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug(LOG_TYPE, "expiring instance", "id", instanceStaticId, "URI", instanceSourceURI);
+                containingDocument.logDebug(LOG_TYPE, "expiring instance",
+                        "id", instanceStaticId,
+                        "URI", instanceSourceURI,
+                        "request hash", requestBodyHash);
             cache.remove(pipelineContext, cacheKey);
         }
 
         if (sharedInstanceCacheEntry != null && !isExpired) {
             // Instance was found
             if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug(LOG_TYPE, "found instance", "id", instanceStaticId, "URI", instanceSourceURI);
+                containingDocument.logDebug(LOG_TYPE, "found instance",
+                        "id", instanceStaticId,
+                        "URI", instanceSourceURI,
+                        "request hash", requestBodyHash);
 
             final ReadonlyXFormsInstance readonlyInstance = sharedInstanceCacheEntry.readonlyInstance;
 
             // Return a copy because id, etc. can be different
             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, readonlyInstance.getDocumentInfo(),
-                        instanceSourceURI, null, null, readonlyInstance.isCache(), readonlyInstance.getTimeToLive(), readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude());
+                        instanceSourceURI, null, null, readonlyInstance.isCache(), readonlyInstance.getTimeToLive(),
+                    readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude());
         } else {
             // Not found
             return null;
@@ -153,7 +164,9 @@ public class XFormsServerSharedInstancesCache {
     public synchronized void remove(PipelineContext pipelineContext, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removing instance", "URI", instanceSourceURI);
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removing instance",
+                    "URI", instanceSourceURI,
+                    "request hash", requestBodyHash);
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);

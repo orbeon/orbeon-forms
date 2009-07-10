@@ -1982,7 +1982,8 @@
                 <ul>
                     <li>
                         <p>
-                            The instance can be shared at the application level. It is identified by its source URL.
+                            The instance can be shared at the application level. It is identified by its source URL
+                            and, in the case of a submission with POST or PUT method, by the body of the request sent.
                         </p>
                     </li>
                     <li>
@@ -2022,12 +2023,18 @@
                 </xml-source>
                 <p>
                     When used on <code>&lt;xforms:submission></code>, the submission has to use
-                    <code>method="get"</code> method and <code>replace="instance"</code>:
+                    <code>method="get"</code>, <code>method="post"</code> or <code>method="put"</code> method and
+                    <code>replace="instance"</code>:
                 </p>
                 <xml-source>
                     <xforms:submission serialization="none" resource="/forms/resources/fr" method="get"
                                        replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:cache="true"/>
                 </xml-source>
+                <note>
+                    Since POST and PUT are not meant to be idempotent methods, you should use
+                    <code>xxforms:cache="true"</code> with these methods carefully, typically for calls to services you
+                    know are idempotent. Otherwise, incorrect or stale data might be returned by the submission.
+                </note>
                 <p>
                     You set the size of the shared instances cache using a property in <code>properties.xml</code>:
                 </p>

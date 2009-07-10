@@ -13,31 +13,37 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.apache.commons.httpclient.HttpState;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.resources.handler.HTTPURLConnection;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.resources.handler.HTTPURLConnection;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
-import org.apache.commons.httpclient.HttpState;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
-import java.net.URL;
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class Connection {
 
     // NOTE: Could add a distinction for portlet session scope.
     public enum StateScope {
         NONE, REQUEST, SESSION, APPLICATION
+    }
+    
+    public enum Method {
+        GET, PUT, POST
     }
     
     private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
@@ -61,7 +67,7 @@ public class Connection {
      * o forwarding specified HTTP headers
      * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
      */
-    public ConnectionResult open(ExternalContext externalContext, IndentedLogger indentedLogger,
+    public ConnectionResult open(ExternalContext externalContext, IndentedLogger indentedLogger, boolean logBody,
                                  String httpMethod, final URL connectionURL, String username, String password, String contentType,
                                  byte[] messageBody, Map<String, String[]> headerNameValues, String headersToForward) {
 
@@ -76,8 +82,9 @@ public class Connection {
             // Get  the headers to forward if any
             final Map<String, String[]> headersMap = (externalContext.getRequest() != null) ?
                     getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
+            
             // Open the connection
-            final ConnectionResult result = open(indentedLogger, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
+            final ConnectionResult result = connect(indentedLogger, logBody, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
 
             // Save state if possible
             if (isHTTPOrHTTPS)
@@ -312,20 +319,21 @@ public class Connection {
     }
 
     /**
+     * Open the connection. This sends request headers, request body, and reads status and response headers.
      *
-     * @param indentedLogger
-     * @param httpMethod
-     * @param connectionURL
-     * @param username
-     * @param password
-     * @param contentType
-     * @param messageBody
-     * @param headersMap        LinkedHashMap<String headerName, String[] headerValues>
-     * @return
+     * @param indentedLogger    logger
+     * @param httpMethod        method i.e. GET, etc.
+     * @param connectionURL     URL to connect to
+     * @param username          username or null
+     * @param password          password or null
+     * @param contentType       content type for POST and PUT
+     * @param messageBody       request body for POST and PUT
+     * @param headersMap        LinkedHashMap<String headerName, String[] headerValues> headers to set
+     * @return                  connection result
      */
-    private ConnectionResult open(IndentedLogger indentedLogger,
-                                 String httpMethod, final URL connectionURL, String username, String password,
-                                 String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
+    private ConnectionResult connect(IndentedLogger indentedLogger, boolean logBody,
+                                     String httpMethod, final URL connectionURL, String username, String password,
+                                     String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
 
@@ -428,7 +436,7 @@ public class Connection {
                         messageBody = new byte[0];
 
                     // Log message mody for debugging purposes
-                    if (isDebugEnabled)
+                    if (logBody)
                         logRequestBody(indentedLogger, contentType, messageBody);
 
                     // Set request body on connection
@@ -446,6 +454,7 @@ public class Connection {
 
                 // Create result
                 final ConnectionResult connectionResult = new ConnectionResult(connectionURL.toExternalForm()) {
+                    @Override
                     public void close() {
                         if (getResponseInputStream() != null) {
                             try {
@@ -509,6 +518,37 @@ public class Connection {
 
                 // Response stream
                 connectionResult.setResponseInputStream(urlConnection.getInputStream());
+
+                // Log response body if possible and requested
+                if (isDebugEnabled) {
+                    if (connectionResult.hasContent()) {
+                        indentedLogger.logDebug(LOG_TYPE, "response has content");
+
+                        if (logBody) {
+                            // Save response stream to byte array
+                            final InputStream is = connectionResult.getResponseInputStream();
+                            final byte[] tempResponse = NetUtils.inputStreamToByteArray(is);
+                            try {
+                                is.close();
+                            } catch (Exception e) {
+                            }
+
+                            // Restore response stream and get as text
+                            connectionResult.setResponseInputStream(new ByteArrayInputStream(tempResponse));
+                            final String responseBody = connectionResult.getTextResponseBody();
+                            if (responseBody != null) {
+                                // Log
+                                indentedLogger.logDebug("submission", "response body", "body", responseBody);
+                                // Restore response stream
+                                connectionResult.setResponseInputStream(new ByteArrayInputStream(tempResponse));
+                            } else {
+                                indentedLogger.logDebug("submission", "binary response body");
+                            }
+                        }
+                    } else {
+                        indentedLogger.logDebug(LOG_TYPE, "response has no content");
+                    }
+                }
 
                 return connectionResult;
 

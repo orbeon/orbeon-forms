@@ -14,10 +14,9 @@
 package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.xml.XMLUtils;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -134,4 +133,42 @@ public class ConnectionResult {
     }
 
     public void close() {}
+
+    /**
+     * Return the response body as text, null if not a text or XML result.
+     *
+     * @return  response body or null
+     * @throws IOException
+     */
+    public String getTextResponseBody() throws IOException {
+        if (XMLUtils.isTextContentType(getResponseMediaType())) {
+            // Text mediatype (including text/xml), read stream into String
+            final String charset = NetUtils.getTextCharsetFromContentType(getResponseContentType());
+            final Reader reader = new InputStreamReader(getResponseInputStream(), charset);
+            try {
+                return NetUtils.readStreamAsString(reader);
+            } finally {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                }
+            }
+        } else if (XMLUtils.isXMLMediatype(getResponseMediaType())) {
+            // XML mediatype other than text/xml
+
+            // TODO: What should we do if the response Content-Type includes a charset parameter?
+            final Reader reader = XMLUtils.getReaderFromXMLInputStream(resourceURI, getResponseInputStream());
+            try {
+                return NetUtils.readStreamAsString(reader);
+            } finally {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                }
+            }
+        } else {
+            // This is a binary result
+            return null;
+        }
+    }
 }

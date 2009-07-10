@@ -25,7 +25,7 @@ public abstract class XFormsStateStore {
 
     private int currentStoreSize = 0;
 
-    private Map keyToEntryMap = new HashMap();
+    private Map<String, CacheLinkedList.ListEntry> keyToEntryMap = new HashMap<String, CacheLinkedList.ListEntry>();
     private CacheLinkedList linkedList = new CacheLinkedList();
 
     protected XFormsStateStore() {
@@ -87,14 +87,14 @@ public abstract class XFormsStateStore {
 
         // NOTE: We don't remove old entries if they are already persisted. Is this a good strategy?
         if (!isInitialEntry) {
-            final CacheLinkedList.ListEntry previousListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
+            final CacheLinkedList.ListEntry previousListEntry = keyToEntryMap.get(oldRequestId);
             if (previousListEntry != null) {
                 // Found previous entry
                 final StoreEntry previousStoredEntry = (StoreEntry) previousListEntry.element;
 
                 if (previousStoredEntry.previousKey != null) {
                     // Found "previous previous" entry
-                    final CacheLinkedList.ListEntry previousPreviousListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(previousStoredEntry.previousKey);
+                    final CacheLinkedList.ListEntry previousPreviousListEntry = keyToEntryMap.get(previousStoredEntry.previousKey);
                     if (previousPreviousListEntry != null) {
                         final StoreEntry previousPreviousStoredEntry = (StoreEntry) previousPreviousListEntry.element;
 
@@ -134,7 +134,7 @@ public abstract class XFormsStateStore {
 
     protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId, String previousKey) {
 
-        final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+        final CacheLinkedList.ListEntry existingListEntry = keyToEntryMap.get(key);
         if (existingListEntry != null) {
             // Entry already exists, move to the front
             if (linkedList.getFirst() != existingListEntry.element) {
@@ -150,14 +150,14 @@ public abstract class XFormsStateStore {
                 debug("added and refreshed entry for key: " + key);
         } else {
             // Entry doesn't exist, add it
-            final Map sessionIds = new HashMap();
+            final Map<String, String> sessionIds = new HashMap<String, String>();
             if (currentSessionId != null)
                 sessionIds.put(currentSessionId, "");
             addOne(key, value, isPinned, sessionIds, previousKey);
         }
     }
 
-    protected void addOne(String key, String value, boolean isPinned, Map sessionIds, String previousKey) {
+    protected void addOne(String key, String value, boolean isPinned, Map<String, String> sessionIds, String previousKey) {
         // Make room if needed
         final int size = value.length() * 2;
         final int storeSizeBeforeExpire = currentStoreSize;
@@ -182,7 +182,7 @@ public abstract class XFormsStateStore {
     }
 
     protected String findOne(String key) {
-        final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+        final CacheLinkedList.ListEntry existingListEntry = keyToEntryMap.get(key);
         if (existingListEntry != null) {
             // Found, move to the front
             if (linkedList.getFirst() != existingListEntry.element) {
@@ -206,7 +206,7 @@ public abstract class XFormsStateStore {
     }
 
     protected CacheLinkedList.ListEntry findEntry(String key) {
-        return (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+        return keyToEntryMap.get(key);
     }
 
     protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
@@ -265,11 +265,11 @@ public abstract class XFormsStateStore {
         public String key;
         public String value;
         public boolean isPinned;
-        public Map sessionIds;
+        public Map<String, String> sessionIds;
 
         public String previousKey; // link to the previous key (for dynamic state only)
 
-        public StoreEntry(String key, String value, boolean isPinned, Map sessionIds, String previousKey) {
+        public StoreEntry(String key, String value, boolean isPinned, Map<String, String> sessionIds, String previousKey) {
             this.key = key;
             this.value = value;
             this.isPinned = isPinned;
@@ -280,7 +280,7 @@ public abstract class XFormsStateStore {
         public void addSessionId(String sessionId) {
             if (sessionId != null) {
                 if (sessionIds == null)
-                    sessionIds = new HashMap();
+                    sessionIds = new HashMap<String, String>();
                 sessionIds.put(sessionId, "");
             }
         }

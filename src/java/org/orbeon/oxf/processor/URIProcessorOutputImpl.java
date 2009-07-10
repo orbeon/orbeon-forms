@@ -20,9 +20,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -385,7 +385,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, headersToForward);
+                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, false, "GET", submissionURL, username, password, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

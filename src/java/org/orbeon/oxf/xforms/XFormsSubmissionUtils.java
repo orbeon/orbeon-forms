@@ -23,9 +23,9 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -34,7 +34,10 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities for XForms submission processing.
@@ -123,7 +126,7 @@ public class XFormsSubmissionUtils {
 
                     if (XFormsServer.logger.isDebugEnabled())
                         XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
-                            new String[] { "body", new String(messageBody, "UTF-8") });
+                            "body", new String(messageBody, "UTF-8"));
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
@@ -156,18 +159,17 @@ public class XFormsSubmissionUtils {
 
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
-                            new String[] {
-                                    "method", httpMethod,
-                                    "mediatype", mediatype,
-                                    "context path", destinationContextPath,
-                                    "effective resource URI (original)", effectiveResourceURI,
-                                    "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
-                            });
+                            "method", httpMethod,
+                            "mediatype", mediatype,
+                            "context path", destinationContextPath,
+                            "effective resource URI (original)", effectiveResourceURI,
+                            "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
 
             // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
             final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response != null ? response : externalContext.getResponse();
 
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
+                @Override
                 public void close() {
                     if (getResponseInputStream() != null) {
                         // Case of !isReplaceAll where we read from the response
@@ -272,7 +274,7 @@ public class XFormsSubmissionUtils {
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
                         containingDocument.logDebug("submission", "found invalid element",
-                            new String[] { "element name", Dom4jUtils.elementToString(element) });
+                            "element name", Dom4jUtils.elementToString(element));
                     }
                 }
 
@@ -283,7 +285,7 @@ public class XFormsSubmissionUtils {
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
                         containingDocument.logDebug("submission", "found invalid attribute",
-                            new String[] { "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()) });
+                            "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()));
                     }
                 }
 

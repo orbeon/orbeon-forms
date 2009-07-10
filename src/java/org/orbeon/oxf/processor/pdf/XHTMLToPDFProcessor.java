@@ -19,9 +19,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.NetUtils;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.pdf.ITextUserAgent;
@@ -70,7 +70,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 try {
                     final String resolvedURI = resolveURI(uri);
                     final ConnectionResult connectionResult
-                            = new Connection().open(externalContext, indentedLogger, "GET", new URL(resolvedURI),
+                            = new Connection().open(externalContext, indentedLogger, false, "GET", new URL(resolvedURI),
                                 null, null, null, null, null, null);
 
                     if (connectionResult.statusCode != 200) {

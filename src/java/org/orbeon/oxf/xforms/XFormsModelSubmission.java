@@ -49,7 +49,10 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -381,7 +384,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Serialize
-                final SerializationParameters sp = new SerializationParameters(pipelineContext, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData);
+                final SerializationParameters sp = new SerializationParameters(pipelineContext, p, p2,
+                        requestedSerialization, documentToSubmit, overriddenSerializedData);
 
                 /* ************************************* Execute submission ************************************* */
 
@@ -626,38 +630,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                     // content of the replacement target node."
 
                                     // Get response body
-                                    String responseBody = "";
-                                    if (XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
-                                        // Text mediatype (including text/xml), read stream into String
-                                        try {
-                                            final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType());
-                                            final Reader reader = new InputStreamReader(connectionResult.getResponseInputStream(), charset);
-                                            try {
-                                                responseBody = NetUtils.readStreamAsString(reader);
-                                            } finally {
-                                                try {
-                                                    reader.close();
-                                                } catch (Exception e) {
-                                                }
-                                            }
-                                        } catch (Exception e) {
-                                            XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
-                                            //xxx exception is swallowed: intentional??? check spec
-                                        }
-                                    } else if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
-                                        // XML mediatype other than text/xml
-
-                                        // TODO: What should we do if the response Content-Type includes a charset parameter?
-                                        final Reader reader = XMLUtils.getReaderFromXMLInputStream(connectionResult.resourceURI, connectionResult.getResponseInputStream());
-                                        try {
-                                            responseBody = NetUtils.readStreamAsString(reader);
-                                        } finally {
-                                            try {
-                                                reader.close();
-                                            } catch (Exception e) {
-                                            }
-                                        }
-                                    } else {
+                                    final String responseBody = connectionResult.getTextResponseBody();
+                                    if (responseBody == null) {
                                         // This is a binary result
 
                                         // Don't store anything for now as per the spec, but we could do something better by going beyond the spec
@@ -1252,9 +1226,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         // element.
         final String newForwardSubmissionHeaders = p.isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
 
-        // Create new indented logger just for the Connection object.
-        final IndentedLogger indentedLogger = new IndentedLogger(logger, "XForms submission " + (p2.isAsyncSubmission ? "(asynchronous)" : "(synchronous)"),
-                containingDocument.getIndentedLogger().getLogIndentLevel());
+        final IndentedLogger connectionLogger;
+        final boolean logBody;
+        if (logger.isDebugEnabled()) {
+            // Create new indented logger just for the Connection object. This will log more stuff.
+            connectionLogger = new IndentedLogger(logger, "XForms submission " + (p2.isAsyncSubmission ? "(asynchronous)" : "(synchronous)"),
+                    containingDocument.getIndentedLogger().getLogIndentLevel());
+            logBody = true;
+        } else {
+            // Use regular logger
+            connectionLogger = containingDocument.getIndentedLogger();
+            logBody = false;
+        }
 
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(pipelineContext, p.contextStack);
@@ -1275,7 +1258,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // ExternalContext either. But currently, since the submission actually runs
                     // at the end of a request, we do have access to ExternalContext, so we still
                     // use it.
-                    new Connection().open(externalContext, indentedLogger,
+                    new Connection().open(externalContext, connectionLogger, logBody,
                             p.actualHttpMethod, absoluteResolvedURL, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
                             sp.actualRequestMediatype, sp.messageBody,
                             customHeaderNameValues, newForwardSubmissionHeaders);
@@ -1295,7 +1278,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             return null;
         } else {
             // Just run it now
-            return new Connection().open(externalContext, indentedLogger,
+            return new Connection().open(externalContext, connectionLogger, logBody,
                     p.actualHttpMethod, absoluteResolvedURL, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
                     sp.actualRequestMediatype, sp.messageBody,
                     customHeaderNameValues, newForwardSubmissionHeaders);

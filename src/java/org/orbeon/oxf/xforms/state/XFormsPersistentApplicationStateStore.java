@@ -114,7 +114,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     private static final XMLDBAccessor XMLDB_ACCESSOR = new XMLDBAccessor();
 
     // Map session ids -> Map of keys
-    private final Map sessionToKeysMap = new HashMap();
+    private final Map<String, Map<String, Object>> sessionToKeysMap = new HashMap<String, Map<String, Object>>();
 
     // Stats
     // TODO
@@ -177,7 +177,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
                     throw new OXFException("Inconsistent session ids when persisting XForms state store entry (entry session id: " + sessionId + ", actual session id: " + session.getId() + ").");
 
                 // We want to register only one expiration listener per session
-                final Map sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
+                final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
                 if (sessionAttributes.get(XFORMS_STATE_STORE_LISTENER_STATE_KEY) == null) {
                     session.addListener(new ExternalContext.Session.SessionListener() {
                         public void sessionDestroyed() {
@@ -223,9 +223,9 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
         // Remember that this key is associated with a session
         if (currentSessionId != null) {
-            Map sessionMap = (Map) sessionToKeysMap.get(currentSessionId);
+            Map<String, Object> sessionMap = sessionToKeysMap.get(currentSessionId);
             if (sessionMap == null) {
-                sessionMap = new HashMap();
+                sessionMap = new HashMap<String, Object>();
                 sessionToKeysMap.put(currentSessionId, sessionMap);
             }
             sessionMap.put(key, "");
@@ -244,7 +244,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             for (Iterator i = existingStoreEntry.sessionIds.keySet().iterator(); i.hasNext();) {
                 final String currentSessionId = (String) i.next();
 
-                final Map sessionMap = (Map) sessionToKeysMap.get(currentSessionId);
+                final Map<String, Object> sessionMap = sessionToKeysMap.get(currentSessionId);
                 if (sessionMap != null) {
                     sessionMap.remove(existingStoreEntry.key);
                 }
@@ -278,13 +278,13 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
      */
     private void expireMemoryBySession(String sessionId) {
 
-        final Map sessionMap = (Map) sessionToKeysMap.get(sessionId);
+        final Map<String, Object> sessionMap = sessionToKeysMap.get(sessionId);
         if (sessionMap != null) {
             final int storeSizeBeforeExpire = getCurrentStoreSize();
             int expiredCount = 0;
             if (sessionMap.size() > 0) {
-                for (Iterator i = sessionMap.keySet().iterator(); i.hasNext();) {
-                    final String currentKey = (String) i.next();
+                for (Iterator<String> i = sessionMap.keySet().iterator(); i.hasNext();) {
+                    final String currentKey = i.next();
                     final CacheLinkedList.ListEntry currentListEntry = findEntry(currentKey);
                     final StoreEntry currentStoreEntry = (StoreEntry) currentListEntry.element;
 
@@ -513,7 +513,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
         final String value = rootElement.element("value").getStringValue();
         final boolean isPinned = new Boolean(rootElement.element("pinned").getStringValue()).booleanValue();
-        final Map sessionIdsMap = new HashMap();
+        final Map<String, String> sessionIdsMap = new HashMap<String, String>();
         {
             final List sessionIdsList = rootElement.elements("session-id");
             for (Iterator i = sessionIdsList.iterator(); i.hasNext();) {

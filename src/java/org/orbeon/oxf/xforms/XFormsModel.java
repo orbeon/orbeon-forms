@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -80,8 +81,32 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // Containing document
     private XFormsContainingDocument containingDocument;
+    
+    // Logging
+    private final IndentedLogger connectionLogger;
+    private final boolean logBody;
 
     public XFormsModel(XBLContainer container, String effectiveId, Document modelDocument) {
+
+        // Set container
+        this.container = container;
+        this.containingDocument = container.getContainingDocument();
+
+        // Initialize instance logging
+        if (XFormsModelSubmission.logger.isDebugEnabled()) {
+            // Create new indented logger just for the Connection object. This will log more stuff.
+            // NOTE: Use the XFormsModelSubmission logger for this, for consistency with submissions which want to
+            // unify with instance loading anyway.
+            connectionLogger = new IndentedLogger(XFormsModelSubmission.logger, "XForms submission (synchronous)",
+                    containingDocument.getIndentedLogger().getLogIndentLevel());
+            logBody = true;
+        } else {
+            // Use regular logger
+            connectionLogger = containingDocument.getIndentedLogger();
+            logBody = false;
+        }
+        
+        // Remember document
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
@@ -105,10 +130,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 instanceIds.add(instanceId);
             }
         }
-
-        // Set container
-        this.container = container;
-        this.containingDocument = container.getContainingDocument();
 
         // Get <xforms:submission> elements (may be missing)
         {
@@ -780,7 +801,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    containingDocument.getIndentedLogger(), "GET", sourceURL, null, null, null, null, null,
+                    connectionLogger, logBody, "GET", sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -838,7 +859,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("model", "getting document from URI", "URI", absoluteResolvedURLString);
 
-            final ConnectionResult connectionResult = new Connection().open(externalContext, containingDocument.getIndentedLogger(),
+            final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
                     "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

@@ -18,16 +18,16 @@ import org.dom4j.Element;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -792,7 +792,7 @@ public class URLGenerator extends ProcessorImpl {
             if (connectionResult == null) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
-                connectionResult = new Connection().open(externalContext, indentedLogger, "GET", config.getURL(), null, null, null, null,
+                connectionResult = new Connection().open(externalContext, indentedLogger, false, "GET", config.getURL(), null, null, null, null,
                         config.getHeaderNameValues(), config.getHeadersToForward());
                 inputStream = connectionResult.getResponseInputStream();
             }

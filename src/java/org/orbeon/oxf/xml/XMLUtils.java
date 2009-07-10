@@ -101,7 +101,7 @@ public class XMLUtils {
     private static final ContentHandler NULL_CONTENT_HANDLER = new ContentHandlerAdapter();
 
     private static DocumentBuilderFactory documentBuilderFactory;
-    private static Map documentBuilders = null;
+    private static Map<Thread, DocumentBuilder> documentBuilders = null;
 
     private static SAXParserFactory nonValidatingXIncludeSAXParserFactory;
     private static SAXParserFactory validatingXIncludeSAXParserFactory;
@@ -497,15 +497,15 @@ public class XMLUtils {
      */
     private static DocumentBuilder getThreadDocumentBuilder() {
         Thread thread = Thread.currentThread();
-        DocumentBuilder documentBuilder = (documentBuilders == null) ? null : (DocumentBuilder) documentBuilders.get(thread);
+        DocumentBuilder documentBuilder = (documentBuilders == null) ? null : documentBuilders.get(thread);
         // Try a first test outside the synchronized block
         if (documentBuilder == null) {
             synchronized (documentBuilderFactory) {
                 // Redo the test within the synchronized block
-                documentBuilder = (documentBuilders == null) ? null : (DocumentBuilder) documentBuilders.get(thread);
+                documentBuilder = (documentBuilders == null) ? null : documentBuilders.get(thread);
                 if (documentBuilder == null) {
                     if (documentBuilders == null)
-                        documentBuilders = new HashMap();
+                        documentBuilders = new HashMap<Thread, DocumentBuilder>();
                     documentBuilder = newDocumentBuilder();
                     documentBuilders.put(thread, documentBuilder);
                 }
@@ -893,7 +893,7 @@ public class XMLUtils {
         try {
             final XMLReader xmlReader = newSAXParser().getXMLReader();
             xmlReader.setContentHandler(new XMLFragmentContentHandler(contentHandler));
-            final ArrayList readers = new ArrayList(3);
+            final ArrayList<Reader> readers = new ArrayList<Reader>(3);
             readers.add(new StringReader("<root>"));
             readers.add(reader);
             readers.add(new StringReader("</root>"));

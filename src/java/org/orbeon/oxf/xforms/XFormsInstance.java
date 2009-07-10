@@ -505,7 +505,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
             // Invalidate instance if it is cached
             if (cache) {
-                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI, handleXInclude);
+                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI, null, handleXInclude);
             } else {
                 XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
             }
@@ -619,8 +619,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
         if (logger.isDebugEnabled()) {
-            containingDocument.logDebug("instance", message, new String[] { "effective model id", getEffectiveModelId(), "effective instance id", getEffectiveId(),
-                    "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()) } );
+            containingDocument.logDebug("instance", message,
+                    "effective model id", getEffectiveModelId(),
+                    "effective instance id", getEffectiveId(),
+                    "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));
         }
     }
 }

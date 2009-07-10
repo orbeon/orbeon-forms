@@ -48,15 +48,15 @@ public class SecureUtils {
     private static final PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt, count);
     private static final String CIPHER_TYPE = "PBEWithMD5AndDES";
 
-    private static Map passwordToEncryptionCipher = new HashMap();
-    private static Map passwordToDecryptionCipher = new HashMap();
+    private static Map<String, Cipher> passwordToEncryptionCipher = new HashMap<String, Cipher>();
+    private static Map<String, Cipher> passwordToDecryptionCipher = new HashMap<String, Cipher>();
 
     public static Cipher getEncryptingCipher(String password, boolean cacheCipher) {
         try {
             Cipher cipher;
             if (cacheCipher) {
                 synchronized(passwordToEncryptionCipher) {
-                    cipher = (Cipher) passwordToEncryptionCipher.get(password);
+                    cipher = passwordToEncryptionCipher.get(password);
                     if (cipher == null) {
                         cipher = Cipher.getInstance(CIPHER_TYPE);
                         cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
@@ -78,7 +78,7 @@ public class SecureUtils {
             Cipher cipher;
             if (cacheCipher) {
                 synchronized(passwordToDecryptionCipher) {
-                    cipher = (Cipher) passwordToDecryptionCipher.get(password);
+                    cipher = passwordToDecryptionCipher.get(password);
                     if (cipher == null) {
                         cipher = Cipher.getInstance(CIPHER_TYPE);
                         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
@@ -205,13 +205,21 @@ public class SecureUtils {
     }
 
     public static String digestString(String data, String algorithm, String encoding) {
+        try {
+            return digestBytes(data.getBytes("utf-8"), algorithm, encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException("Exception computing digest with algorithm: " + algorithm, e);
+        }
+    }
+
+    public static String digestBytes(byte[] data, String algorithm, String encoding) {
         final MessageDigest messageDigest;
         try {
             messageDigest = MessageDigest.getInstance(algorithm);
-            messageDigest.update(data.getBytes("utf-8"));
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new OXFException("Exception computing digest with algorithm: " + algorithm, e);
         }
+        messageDigest.update(data);
         byte[] digestBytes = messageDigest.digest();
 
         // Format result

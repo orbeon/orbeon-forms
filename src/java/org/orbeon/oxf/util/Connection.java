@@ -43,7 +43,7 @@ public class Connection {
     private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
     private static final String LOG_TYPE = "connection";
 
-    public static final String HTTP_CLIENT_STATE_PROPERTY = "oxf.http.state";
+    private static final String HTTP_CLIENT_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_CLIENT_STATE_ATTRIBUTE = "oxf.http.state";
 
     private HttpState httpState;

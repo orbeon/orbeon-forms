@@ -3434,7 +3434,7 @@ ORBEON.widgets.YUICalendar = function() {
             for (var key in resources)
                 yuiCalendar.cfg.setProperty(key, resources[key]);
             // Listen on clicks on the page, so we can close the dialog
-            ORBEON.xforms.Events.clickEvent.subscribe(clickAnywhere)
+            ORBEON.xforms.Events.clickEvent.subscribe(clickAnywhere);
 
             // Set date
             control = target;
@@ -3822,7 +3822,6 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElements: function(form) {
-        return; // Disabled for now for performance
         var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
         for (var dnElementIndex = 0; dnElementIndex < dndElements.length; dnElementIndex++) {
             var dndElement = dndElements[dnElementIndex];
@@ -6266,6 +6265,13 @@ ORBEON.xforms.DnD = {
     DraggableItem: function(element, sGroup, config) {
         ORBEON.xforms.DnD.DraggableItem.superclass.constructor.call(this, element, element.tagName, config);
         YAHOO.util.Dom.setStyle(element, "cursor", "move");
+
+        // Move the drag element under the form for our CSS rules to work
+        var dragElement = this.getDragEl();
+        if (! YAHOO.util.Dom.hasClass(dragElement.parentNode, "xforms-form")) {
+            var form = ORBEON.xforms.Controls.getForm(element);
+            form.appendChild(dragElement);
+        }
     }
 };
 
@@ -6282,6 +6288,55 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
             previousSibling = YAHOO.util.Dom.getPreviousSibling(previousSibling);
         }
         return position;
+    },
+
+    _renumberIDsWorker: function(element, repeatDepth, newIndex) {
+        // Rename ID on this element
+        var repeatSeparatorPosition = element.id.indexOf(XFORMS_SEPARATOR_1);
+        if (repeatSeparatorPosition != -1) {
+            var repeatIndexes =  element.id.substring(repeatSeparatorPosition + 1).split(XFORMS_SEPARATOR_2);
+            repeatIndexes[repeatDepth] = newIndex;
+            var newID = element.id.substring(0, repeatSeparatorPosition) + XFORMS_SEPARATOR_1 + repeatIndexes.join(XFORMS_SEPARATOR_2);
+            element.id = newID;
+
+        }
+        // Do the same with all the children
+        YAHOO.util.Dom.batch(YAHOO.util.Dom.getChildren(element), function(childElement) {
+            this._renumberIDsWorker(childElement, repeatDepth, newIndex);
+        }, this, true);
+    },
+
+    /**
+     * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
+     * @param repeatID      E.g. repeat-begin-todoá1 for the repeat on to-dos in the first to-do list.
+     */
+    _renumberIDs: function(repeatID) {
+
+        // Figure at what depth this repeat is
+        var repeatDepth = 0;
+        var currentRepeat = repeatID;
+        var repeatSeparatorPosition = currentRepeat.indexOf(XFORMS_SEPARATOR_1);
+        if (repeatSeparatorPosition != -1)
+            currentRepeat = currentRepeat.substring(0, repeatSeparatorPosition);
+        while (true) {
+            var parentRepeat = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeat];
+            if (! parentRepeat) break;
+            repeatDepth++;
+            currentRepeat = parentRepeat;
+        }
+
+        // Go through the top elements and change the IDs of all the children
+        var currentElement = YAHOO.util.Dom.get("repeat-begin-" + repeatID);
+        var newIndex = 0;
+        while (true) {
+            currentElement = YAHOO.util.Dom.getNextSibling(currentElement);
+            if (currentElement == null || YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-begin-end")) break;
+            if (! YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-delimiter")
+                    && ! YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-template")) {
+                newIndex++;
+                this._renumberIDsWorker(currentElement, repeatDepth, newIndex);
+            }
+        }
     },
 
     startDrag: function(x, y) {
@@ -6353,6 +6408,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         var form = ORBEON.xforms.Controls.getForm(srcElement);
         var event = new ORBEON.xforms.Server.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
                 ["dnd-start", this._startPosition, "dnd-end", endPosition]);
+        this._renumberIDs(this.sourceControlID);
         ORBEON.xforms.Server.fireEvents([event], false);
     }
 

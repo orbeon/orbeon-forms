@@ -104,7 +104,7 @@
                 select="instance('datatable-instance')/@currentSortColumn"/>
 
 
-            <xhtml:div style="border:thin solid black">
+            <!--<xhtml:div style="border:thin solid black">
                 <xhtml:h3>Local instance:</xhtml:h3>
                 <xforms:group model="datatable-model" instance="datatable-instance">
                     <xhtml:p>columns</xhtml:p>
@@ -136,7 +136,7 @@
                         </xhtml:ul>
                     </xforms:repeat>
                 </xforms:group>
-            </xhtml:div>
+            </xhtml:div>-->
 
             <xsl:if test="$hasLoadingFeature">
                 <xxforms:variable name="loading" xbl:attr="select=loading"/>
@@ -461,7 +461,17 @@
     <xsl:template match="column" mode="loadingIndicator">
         <xsl:apply-templates select="header/xhtml:th"/>
     </xsl:template>
-        
+
+    <xsl:variable name="fakeColumn">
+        <header xmlns="">
+            <xhtml:th class="fr-datatable-columnset-loading-indicator">&#160;...&#160;</xhtml:th>
+        </header>
+    </xsl:variable>
+    
+    <xsl:template match="columnSet" mode="loadingIndicator">
+        <xsl:apply-templates select="$fakeColumn/header/xhtml:th"/>
+    </xsl:template>
+
 
 
 </xsl:transform>

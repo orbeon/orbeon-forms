@@ -30,3 +30,7 @@
     height: 50px; background-position: center;
     background-repeat: no-repeat; 
 }
+
+.fr-datatable-columnset-loading-indicator {
+    min-width: 50px;
+}

@@ -29,6 +29,7 @@
         <parameter>paginated</parameter>
         <parameter>rowsPerPage</parameter>
         <parameter>innerTableWidth</parameter>
+        <parameter>loading</parameter>
     </xsl:variable>
 
 
@@ -44,7 +45,8 @@
     <xsl:variable name="rowsPerPage"
         select="if (/*/@rowsPerPage castable as xs:integer) then /*/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="innerTableWidth"
-        select="if (/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, /fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
+        select="if (/*/@innerTableWidth) then concat(&quot;'&quot;, /*/@innerTableWidth, &quot;'&quot;) else 'null'"/>
+    <xsl:variable name="hasLoadingFeature" select="count(/*/@loading) = 1"/>
 
     <xsl:template match="@*|node()" mode="#all">
         <!-- Default template == identity -->
@@ -136,26 +138,62 @@
                 </xforms:group>
             </xhtml:div>
 
-            <xforms:group ref="xxforms:component-context()">
+            <xsl:if test="$hasLoadingFeature">
+                <xxforms:variable name="loading" xbl:attr="select=loading"/>
+            </xsl:if>
+
+            <xforms:group>
+                <xsl:attribute name="ref">
+                    <xsl:text>xxforms:component-context()</xsl:text>
+                    <xsl:if test="$hasLoadingFeature">[not($loading = true())]</xsl:if>
+                </xsl:attribute>
+
                 <xforms:action ev:event="xforms-enabled">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
                         />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
                             select="$innerTableWidth"/>); </xxforms:script>
                 </xforms:action>
+
+                <xhtml:table id="{$id}-table"
+                    class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                    style="{$height} {$width}">
+                    <!-- Copy attributes that are not parameters! -->
+                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
+                    <xhtml:thead id="{$id}-thead">
+                        <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
+                            <xsl:apply-templates select="$columns/*"/>
+                        </xhtml:tr>
+                    </xhtml:thead>
+                    <xsl:apply-templates select="xhtml:tbody"/>
+                </xhtml:table>
+
             </xforms:group>
 
-            <xhtml:table id="{$id}-table"
-                class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
-                style="{$height} {$width}">
-                <!-- Copy attributes that are not parameters! -->
-                <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
-                <xhtml:thead id="{$id}-thead">
-                    <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-                        <xsl:apply-templates select="$columns/*"/>
-                    </xhtml:tr>
-                </xhtml:thead>
-                <xsl:apply-templates select="xhtml:tbody"/>
-            </xhtml:table>
+            <xsl:if test="$hasLoadingFeature">
+                <xforms:group ref="xxforms:component-context()[$loading = true()]">
+                    <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
+                        <xhtml:span class="yui-dt-hd"
+                            style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
+                            <xhtml:table class="datatable  yui-dt-table" style="{$height} {$width}">
+                                <xhtml:thead>
+                                    <xhtml:tr class="yui-dt-first yui-dt-last">
+                                        <xsl:apply-templates select="$columns/*"
+                                            mode="loadingIndicator"/>
+                                    </xhtml:tr>
+                                </xhtml:thead>
+                                <xhtml:tbody>
+                                    <xhtml:tr>
+                                        <xhtml:td colspan="{count($columns/*)}"
+                                            class="fr-datatable-is-loading"/>
+                                    </xhtml:tr>
+                                </xhtml:tbody>
+                            </xhtml:table>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xforms:group>
+            </xsl:if>
+
+
         </xhtml:div>
         <!-- End of template on the bound element -->
     </xsl:template>
@@ -420,6 +458,10 @@
         </columnSet>
     </xsl:template>
 
+    <xsl:template match="column" mode="loadingIndicator">
+        <xsl:apply-templates select="header/xhtml:th"/>
+    </xsl:template>
+        
 
 
 </xsl:transform>

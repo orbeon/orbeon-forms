@@ -29,13 +29,14 @@ import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -922,7 +923,7 @@ public class XFormsServer extends ProcessorImpl {
         // when executed from within a portlet is ran as very much like the replace="all" submissions.
         final String activeSubmissionReplace = activeSubmission == null ? "all" : activeSubmission.getReplace();
         final String activeSubmissionResolvedXXFormsTarget = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();
-        final String activeSubmissionShowProgress = (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false";
+        final String activeSubmissionShowProgress = (activeSubmission == null || activeSubmission.isShowProgress()) ? null : "false";
 
         if ("all".equals(activeSubmissionReplace)) {
             // Replace all

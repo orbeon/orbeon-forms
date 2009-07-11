@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
  * Represents an xforms:submit control.
@@ -52,7 +52,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
-                            new String[] { "submission id", submissionId } );
+                            "submission id", submissionId);
             }
         }
         super.performDefaultAction(pipelineContext, event);

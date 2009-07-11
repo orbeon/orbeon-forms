@@ -17,8 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -26,6 +24,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -65,7 +65,7 @@ public class XFormsSendAction extends XFormsAction {
 
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
-                        new String[] { "submission id", submissionId } );
+                        "submission id", submissionId);
         }
     }
 }

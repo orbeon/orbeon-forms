@@ -22,30 +22,30 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XPathCacheStaticContext;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
+import org.orbeon.oxf.xml.XPathCacheStaticContext;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.event.LocationProvider;
 import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.functions.Doc;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
-import org.orbeon.saxon.functions.Doc;
+import org.orbeon.saxon.instruct.Executable;
+import org.orbeon.saxon.instruct.LocationMap;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.style.AttributeValueTemplate;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.instruct.Executable;
-import org.orbeon.saxon.instruct.LocationMap;
-import org.orbeon.saxon.event.LocationProvider;
-import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.type.Type;
-import org.orbeon.saxon.style.AttributeValueTemplate;
+import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.*;
 
@@ -142,6 +142,15 @@ public class XPathCache {
             if (xpathExpression != null)
                 xpathExpression.returnToPool();
         }
+    }
+
+    /**
+     * Evaluate an XPath expression on the document.
+     */
+    public static Object evaluateSingle(PipelineContext pipelineContext, XPathCache.XPathContext xpathContext, Item contextItem, String xpathString) {
+        return evaluateSingle(pipelineContext, Collections.singletonList(contextItem), 1, xpathString,
+                xpathContext.prefixToURIMap, xpathContext.variableToValueMap, xpathContext.functionLibrary,
+                xpathContext.functionContext, xpathContext.baseURI, xpathContext.locationData);
     }
 
     /**

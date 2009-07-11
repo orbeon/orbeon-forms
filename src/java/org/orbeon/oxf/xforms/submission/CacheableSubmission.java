@@ -36,6 +36,8 @@ import java.util.Collections;
 
 /**
  * Cacheable remote submission going through a protocol handler.
+ *
+ * TODO: This should be made to work as well for optimized submissions.
  */
 public class CacheableSubmission extends SubmissionBase {
 
@@ -92,7 +94,7 @@ public class CacheableSubmission extends SubmissionBase {
 
         final long timeToLive = XFormsInstance.getTimeToLive(submission.getSubmissionElement());
 
-        // Compute a hash of the body if possible
+        // Compute a hash of the body if needed
         final String requestBodyHash;
         if (sp.messageBody != null) {
             requestBodyHash = SecureUtils.digestBytes(sp.messageBody, "MD5", "hex");

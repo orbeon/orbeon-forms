@@ -19,6 +19,9 @@ import org.orbeon.oxf.util.ConnectionResult;
 
 import java.io.IOException;
 
+/**
+ * Represents a submission mechanism.
+ */
 public interface Submission {
 
     boolean isMatch(PipelineContext pipelineContext,

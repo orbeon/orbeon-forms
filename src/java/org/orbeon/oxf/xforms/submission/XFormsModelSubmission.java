@@ -60,7 +60,8 @@ import java.util.Map;
 /**
  * Represents an XForms model submission instance.
  *
- * TODO: This badly needs to be modularized instead of being a soup of "ifs"!
+ * TODO: Refactor handling of serialization to separate classes.
+ * TODO: Refactor handling of response content to separate classes.
  */
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObserver {
 

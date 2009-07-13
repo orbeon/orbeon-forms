@@ -103,13 +103,7 @@
     </processor>
 
     <processor name="oxf:saxon">
-        <instantiation name="oxf:generic-xslt-1.0">
-            <input name="transformer">
-                <config>
-                    <class>com.icl.saxon.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
+        <instantiation name="oxf:saxon8"/>
     </processor>
 
     <processor name="oxf:saxon8">

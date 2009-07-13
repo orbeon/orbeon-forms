@@ -33,8 +33,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'filesystem resource manager'"/>
-                <!-- XXX -->
-                <xsl:with-param name="commented" select="false()"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <xsl:comment>Filesystem resource managers</xsl:comment>
                     <context-param>
@@ -71,8 +70,7 @@
             </xsl:call-template>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'webapp resource manager'"/>
-                <!-- XXX -->
-                <xsl:with-param name="commented" select="true()"/>
+                <xsl:with-param name="commented" select="$target = 'devel'"/>
                 <xsl:with-param name="content">
                     <xsl:comment>Web application resource manager</xsl:comment>
                     <context-param>

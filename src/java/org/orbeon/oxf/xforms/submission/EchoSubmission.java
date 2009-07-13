@@ -35,6 +35,8 @@ public class EchoSubmission extends SubmissionBase {
 
     public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+
+        // Match for replace="instance|none" and the submission resource starts with "test:"
         return (p.isReplaceInstance || p.isReplaceNone) && p2.resolvedActionOrResource.startsWith("test:");
     }
 

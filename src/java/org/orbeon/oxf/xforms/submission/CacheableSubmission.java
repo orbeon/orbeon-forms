@@ -47,6 +47,8 @@ public class CacheableSubmission extends SubmissionBase {
 
     public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+
+        // Match if the submission has xxforms:cache="true"
         return p2.resolvedXXFormsCache;
     }
 

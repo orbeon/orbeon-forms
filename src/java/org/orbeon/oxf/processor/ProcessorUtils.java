@@ -90,7 +90,7 @@ public class ProcessorUtils {
                 if (originalElement == null)
                     throw new OXFException("Input content is mandatory");
                 Element copiedElement = originalElement.createCopy();
-                addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+                addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet<String>());
                 final String sid = Dom4jUtils.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
                     (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
@@ -133,7 +133,7 @@ public class ProcessorUtils {
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             final Element copiedElement = originalElement.createCopy();
-            addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+            addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet<String>());
             result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
@@ -157,8 +157,8 @@ public class ProcessorUtils {
         return domSerializer.getDocument(domSerializerPipelineContext);
     }
 
-    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
-        Set newAlreadyDeclaredPrefixes = new HashSet(alreadyDeclaredPrefixes);
+    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set<String> alreadyDeclaredPrefixes) {
+        Set<String> newAlreadyDeclaredPrefixes = new HashSet<String>(alreadyDeclaredPrefixes);
 
         // Add namespaces declared on this element
         for (Iterator i = copyElement.declaredNamespaces().iterator(); i.hasNext();) {

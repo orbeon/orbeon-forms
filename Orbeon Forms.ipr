@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project relativePaths="true" version="4">
+  <component name="AntConfiguration">
+    <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <additionalClassPath>
+        <entry path="file://$PROJECT_DIR$/lib/junit.jar" />
+      </additionalClassPath>
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="32" />
+      <properties>
+        <property name="skip.compilation" value="true" />
+      </properties>
+    </buildFile>
+  </component>
+  <component name="BuildJarProjectSettings">
+    <option name="BUILD_JARS_ON_MAKE" value="false" />
+  </component>
+  <component name="CodeStyleProjectProfileManger">
+    <option name="PROJECT_PROFILE" />
+    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
+  </component>
+  <component name="CodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="false" />
+  </component>
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+    <option name="DEPLOY_AFTER_MAKE" value="0" />
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/tools" includeSubdirectories="true" />
+    </excludeFromCompile>
+    <resourceExtensions>
+      <entry name=".+\.(properties|xml|html|dtd|tld)" />
+      <entry name=".+\.(gif|png|jpeg|jpg)" />
+    </resourceExtensions>
+    <wildcardResourcePatterns>
+      <entry name="?*.properties" />
+      <entry name="?*.xml" />
+      <entry name="?*.gif" />
+      <entry name="?*.png" />
+      <entry name="?*.jpeg" />
+      <entry name="?*.jpg" />
+      <entry name="?*.html" />
+      <entry name="?*.dtd" />
+      <entry name="?*.tld" />
+    </wildcardResourcePatterns>
+  </component>
+  <component name="CopyrightManager" default="Orbeon LGPL">
+    <copyright>
+      <option name="notice" value="Copyright (C) &amp;#36;today.year Orbeon, Inc.&#10;&#10;This program is free software; you can redistribute it and/or modify it under the terms of the&#10;GNU Lesser General Public License as published by the Free Software Foundation; either version&#10;2.1 of the License, or (at your option) any later version.&#10;&#10;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;&#10;without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&#10;See the GNU Lesser General Public License for more details.&#10;&#10;The full text of the license is available at http://www.gnu.org/copyleft/lesser.html" />
+      <option name="keyword" value="Copyright" />
+      <option name="myName" value="Orbeon LGPL" />
+      <option name="myLocal" value="true" />
+    </copyright>
+    <module2copyright>
+      <element module="All" copyright="Orbeon LGPL" />
+    </module2copyright>
+    <LanguageOptions name="XML">
+      <option name="fileTypeOverride" value="3" />
+      <option name="relativeBefore" value="true" />
+      <option name="addBlankAfter" value="true" />
+      <option name="fileLocation" value="1" />
+      <option name="block" value="true" />
+      <option name="separateBefore" value="false" />
+      <option name="separateAfter" value="false" />
+      <option name="prefixLines" value="false" />
+      <option name="lenBefore" value="80" />
+      <option name="lenAfter" value="80" />
+      <option name="box" value="false" />
+      <option name="filler" value=" " />
+    </LanguageOptions>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="fileTypeOverride" value="2" />
+      <option name="relativeBefore" value="true" />
+      <option name="addBlankAfter" value="false" />
+      <option name="fileLocation" value="1" />
+      <option name="block" value="true" />
+      <option name="separateBefore" value="true" />
+      <option name="separateAfter" value="false" />
+      <option name="prefixLines" value="true" />
+      <option name="lenBefore" value="1" />
+      <option name="lenAfter" value="80" />
+      <option name="box" value="false" />
+      <option name="filler" value=" " />
+    </LanguageOptions>
+  </component>
+  <component name="DependenciesAnalyzeManager">
+    <option name="myForwardDirection" value="false" />
+  </component>
+  <component name="DependencyValidationManager">
+    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
+  </component>
+  <component name="EclipseCompilerSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+  </component>
+  <component name="EclipseEmbeddedCompilerSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+  </component>
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="PRINT_LINE_NUMBERS" value="false" />
+    <option name="OPEN_IN_BROWSER" value="false" />
+    <option name="OUTPUT_DIRECTORY" />
+  </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="web">
+        <modules>
+          <module name="Amnesty" />
+          <module name="Common" />
+          <module name="Orbeon" />
+          <module name="dom4j-1.6.1">
+            <files>
+              <file url="file://$PROJECT_DIR$/../dom4j-1.6.1/xml/web.xml" />
+            </files>
+          </module>
+          <module name="xforms-alone.war" />
+          <module name="CSC WMS">
+            <files>
+              <file url="file://$PROJECT_DIR$/../Internal/Common/projects/CSC/WMS/wars/WMS/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="ORI" />
+          <module name="Teleflex Contracts" />
+          <module name="Teleflex Inter Company" />
+          <module name="Teleflex PMP" />
+          <module name="Mascagni" />
+          <module name="Etat de Vaud Proto" />
+          <module name="MSV" />
+          <module name="Orbeon Web Site" />
+          <module name="Tomcat" />
+          <module name="apache-tomcat-5.5.27-src" />
+          <module name="CRIX" />
+          <module name="apache-tomcat-6.0.18-src" />
+          <module name="Etat de Vaud eForms" />
+          <module name="Apache Sling" />
+          <module name="eXist">
+            <files>
+              <file url="file://$PROJECT_DIR$/../eXist-1.2.4/webapp/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="LogicBlox">
+            <files>
+              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/LbContainer-portlet/docroot/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/orbeon-war/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/tmp/target/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="CRV">
+            <files>
+              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/crv_dmz/src/main/webapp/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/crv_inside/src/main/webapp/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/exist_webapp/src/main/webapp/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/appserv/test-config/crv-dmz/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/appserv/test-config/crv-inside/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="talentManagement">
+            <files>
+              <file url="file://$PROJECT_DIR$/../Teleflex/talentManagement/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="tmUtilities">
+            <files>
+              <file url="file://$PROJECT_DIR$/../Teleflex/tmUtilities/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="of-erik">
+            <files>
+              <file url="file://$PROJECT_DIR$/build/iarq-war/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/build/separate-war/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="Orbeon Forms">
+            <files>
+              <file url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/web.xml" />
+            </files>
+          </module>
+          <module name="apache-tomcat-5.5.27">
+            <files>
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/conf/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/server/webapps/host-manager/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/server/webapps/manager/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/ROOT/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/balancer/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/jsp-examples/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/servlets-examples/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/tomcat-docs/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/tomcat-docs/appdev/sample/web/WEB-INF/web.xml" />
+              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/webdav/WEB-INF/web.xml" />
+            </files>
+          </module>
+        </modules>
+      </facet-type>
+      <facet-type id="struts">
+        <modules>
+          <module name="Orbeon 3.0.x">
+            <files>
+              <file url="file://$PROJECT_DIR$/../orbeon301/descriptors/examples/web/struts-config.xml" />
+            </files>
+          </module>
+          <module name="CSC WMS" />
+          <module name="Common" />
+          <module name="Orbeon" />
+          <module name="apache-tomcat-5.5.27-src" />
+        </modules>
+      </facet-type>
+      <facet-type id="jsf">
+        <modules>
+          <module name="Orbeon 3.0.x">
+            <files>
+              <file url="file://$PROJECT_DIR$/../orbeon301/src/java/org/orbeon/faces/components/demo/conf/faces-config.xml" />
+              <file url="file://$PROJECT_DIR$/../orbeon301/src/java/org/orbeon/faces/example/conf/faces-config.xml" />
+            </files>
+          </module>
+          <module name="Common" />
+        </modules>
+      </facet-type>
+      <facet-type id="javaeeApplication">
+        <modules>
+          <module name="Common" />
+          <module name="Orbeon" />
+          <module name="of-erik">
+            <files>
+              <file url="file://$PROJECT_DIR$/src/resources-packaged/ops/fckeditor.2.6/_samples/adobeair/application.xml" />
+            </files>
+          </module>
+        </modules>
+      </facet-type>
+      <facet-type id="Spring">
+        <modules>
+          <module name="Common" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
+  <component name="IdProvider" IDEtalkID="11F1F6BCFCEF250CF8C992303A792A29" />
+  <component name="InspectionProjectProfileManager">
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
+    <scopes />
+    <profiles>
+      <profile version="1.0" is_locked="false">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <inspection_tool class="MethodNameWithMistakes" enabled="false" level="INFO" enabled_by_default="false" />
+      </profile>
+    </profiles>
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
+      <item index="1" class="java.lang.String" itemvalue="INFO" />
+      <item index="2" class="java.lang.String" itemvalue="WARNING" />
+      <item index="3" class="java.lang.String" itemvalue="ERROR" />
+    </list>
+  </component>
+  <component name="JavacSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="true" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+  </component>
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" />
+    <option name="OPTION_SCOPE" value="protected" />
+    <option name="OPTION_HIERARCHY" value="true" />
+    <option name="OPTION_NAVIGATOR" value="true" />
+    <option name="OPTION_INDEX" value="true" />
+    <option name="OPTION_SEPARATE_INDEX" value="true" />
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
+    <option name="OPTION_DEPRECATED_LIST" value="true" />
+    <option name="OTHER_OPTIONS" value="" />
+    <option name="HEAP_SIZE" />
+    <option name="LOCALE" />
+    <option name="OPEN_IN_BROWSER" value="true" />
+  </component>
+  <component name="JikesSettings">
+    <option name="JIKES_PATH" value="" />
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="DEPRECATION" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="false" />
+    <option name="IS_EMACS_ERRORS_MODE" value="true" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="LogConsolePreferences">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="Palette2">
+    <group name="Swing">
+      <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="1" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="com.intellij.uiDesigner.VSpacer" tooltip-text="Vertical Spacer" icon="/com/intellij/uiDesigner/icons/vspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="1" anchor="0" fill="2" />
+      </item>
+      <item class="javax.swing.JPanel" icon="/com/intellij/uiDesigner/icons/panel.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.png" removable="false" auto-create-binding="false" can-attach-label="true">
+        <default-constraints vsize-policy="7" hsize-policy="7" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JButton" icon="/com/intellij/uiDesigner/icons/button.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="0" fill="1" />
+        <initial-values>
+          <property name="text" value="Button" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JRadioButton" icon="/com/intellij/uiDesigner/icons/radioButton.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="RadioButton" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JCheckBox" icon="/com/intellij/uiDesigner/icons/checkBox.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="CheckBox" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JLabel" icon="/com/intellij/uiDesigner/icons/label.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="Label" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JTextField" icon="/com/intellij/uiDesigner/icons/textField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JPasswordField" icon="/com/intellij/uiDesigner/icons/passwordField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JFormattedTextField" icon="/com/intellij/uiDesigner/icons/formattedTextField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextArea" icon="/com/intellij/uiDesigner/icons/textArea.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextPane" icon="/com/intellij/uiDesigner/icons/textPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JEditorPane" icon="/com/intellij/uiDesigner/icons/editorPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JComboBox" icon="/com/intellij/uiDesigner/icons/comboBox.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="2" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JTable" icon="/com/intellij/uiDesigner/icons/table.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JList" icon="/com/intellij/uiDesigner/icons/list.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="2" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTree" icon="/com/intellij/uiDesigner/icons/tree.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTabbedPane" icon="/com/intellij/uiDesigner/icons/tabbedPane.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSplitPane" icon="/com/intellij/uiDesigner/icons/splitPane.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSpinner" icon="/com/intellij/uiDesigner/icons/spinner.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JSeparator" icon="/com/intellij/uiDesigner/icons/separator.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JProgressBar" icon="/com/intellij/uiDesigner/icons/progressbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JToolBar" icon="/com/intellij/uiDesigner/icons/toolbar.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1">
+          <preferred-size width="-1" height="20" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JToolBar$Separator" icon="/com/intellij/uiDesigner/icons/toolbarSeparator.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JScrollBar" icon="/com/intellij/uiDesigner/icons/scrollbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
+      </item>
+    </group>
+  </component>
+  <component name="ProjectDetails">
+    <option name="projectName" value="Orbeon" />
+  </component>
+  <component name="ProjectFileVersion" converted="true" />
+  <component name="ProjectKey">
+    <option name="state" value=":ext:ebruchez@cvs.orbeon.com:/home/cvs/objectweb-src|orbeon/Orbeon Forms.ipr" />
+  </component>
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Orbeon Forms.iml" filepath="$PROJECT_DIR$/Orbeon Forms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/apache-tomcat-5.5.27.iml" filepath="$PROJECT_DIR$/../apache-tomcat-5.5.27/apache-tomcat-5.5.27.iml" />
+    </modules>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/classes" />
+  </component>
+  <component name="ResourceManagerContainer">
+    <option name="myResourceBundles">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+  </component>
+  <component name="RmicSettings">
+    <option name="IS_EANABLED" value="false" />
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="false" />
+    <option name="GENERATE_IIOP_STUBS" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$/../../Documents/Repository/Adina/war/WEB-INF/resources/apps">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="http://adina.bruchez.org/svn/Adina/war/WEB-INF/resources/apps" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../Documents/Repository/Mascagni">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="http://adina.bruchez.org/svn/Mascagni" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../CRIX/rfd/trunk">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://orbeon.svn.beanstalkapp.com/rfd/branches" />
+                  <option value="https://orbeon.svn.beanstalkapp.com/rfd/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://orbeon.svn.beanstalkapp.com/rfd/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../Etat de Vaud eForms/trunk">
+          <value>
+            <SvnBranchConfiguration />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../Internal/Common">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Common" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../Internal/Common/oss-site">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Common/oss-site" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../Internal/Private">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Private" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../LogicBlox/logicblox">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://orbeon.svn.beanstalkapp.com/logicblox" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk">
+          <value>
+            <SvnBranchConfiguration />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../ORI">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/branches" />
+                  <option value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../eXist-1.2.4">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://exist.svn.sourceforge.net/svnroot/exist/releases/eXist-1.2.4" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="myVersion" value="124" />
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="" />
+    <mapping directory="$PROJECT_DIR$/../../Desktop/git-repository" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Documents/Repository/Adina/war/WEB-INF/resources/apps" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../Documents/Repository/Mascagni" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../Etat de Vaud eForms/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../Internal/Common/oss-site" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../Internal/Private" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../LogicBlox/logicblox" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../Teleflex/talentManagement" vcs="" />
+    <mapping directory="$PROJECT_DIR$/../Teleflex/tmUtilities" vcs="" />
+    <mapping directory="$PROJECT_DIR$/../W3C XForms Test Suite" vcs="CVS" />
+    <mapping directory="$PROJECT_DIR$/../eXist-1.2.4" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../eXist-stable-1.2" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$" vcs="CVS" />
+    <mapping directory="$PROJECT_DIR$/../saxon" vcs="CVS" />
+  </component>
+  <component name="WebServicesPlugin" addRequiredLibraries="true" />
+  <component name="com.intellij.jsf.UserDefinedFacesConfigs">
+    <option name="USER_DEFINED_CONFIGS">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+  </component>
+  <component name="libraryTable">
+    <library name="Orbeon Forms">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/lib" />
+        <root url="file://$PROJECT_DIR$/lib/oracle" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
+      <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />
+    </library>
+  </component>
+</project>
+

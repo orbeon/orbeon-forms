@@ -41,7 +41,8 @@
                 <include>/request/container-type</include>
                 <include>/request/request-path</include>
                 <include>/request/headers/header[name = 'accept']</include>
-                <include>/request/parameters/parameter[starts-with(name, 'orbeon')]</include>
+                <!-- Return all parameters so they are made available to the theme -->
+                <include>/request/parameters/parameter</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>

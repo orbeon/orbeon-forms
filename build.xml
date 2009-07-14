@@ -755,7 +755,7 @@
         <!-- Create md5 for all files -->
         <checksum>
             <fileset dir="${deployDir}">
-                <include name="**"/>
+                <include name="*"/>
             </fileset>
         </checksum>
 

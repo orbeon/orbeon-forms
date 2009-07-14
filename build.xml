@@ -135,6 +135,24 @@
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
 
+        <!-- dump version string with dots in into a file, then read that file convert -->
+        <!-- the dots to underscores while reeading.   i.e. convert 2.5.4-3234 to      -->
+        <!-- 2_5_4_3234                                                                -->
+        <tempfile property='ops-temp-version-file'/>
+        <echo message='${project.name}-version=${release.number}' file='${ops-temp-version-file}'/>
+
+        <loadproperties srcFile='${ops-temp-version-file}'>
+            <filterchain>
+                <tokenfilter>
+                    <!-- Cannot seem to be able to tell ant to replace "-" here! -->
+                    <replacestring from="." to="_"/>
+                </tokenfilter>
+            </filterchain>
+        </loadproperties>
+
+        <!-- Provide custom version number to TeamCity -->
+        <echo message="##teamcity[buildNumber '${orbeon-version}']"/>
+
         <property name="java-src.dir" value="${src.dir}/java"/>
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
@@ -651,26 +669,6 @@
     </target>
 
     <target name="teamcity-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled, test">
-
-        <!-- dump version string with dots in into a file, then read that file convert -->
-        <!-- the dots to underscores while reeading.   i.e. convert 2.5.4-3234 to      -->
-        <!-- 2_5_4_3234                                                                -->
-        <tempfile property='ops-temp-version-file'/>
-        <echo message='${project.name}-version=${release.number}' file='${ops-temp-version-file}'/>
-
-        <loadproperties srcFile='${ops-temp-version-file}'>
-            <filterchain>
-                <tokenfilter>
-                    <replaceregex pattern='\.' replace='_' flags='g'/>
-                </tokenfilter>
-                <tokenfilter>
-                    <replaceregex pattern='\-' replace='_' flags='g'/>
-                </tokenfilter>
-            </filterchain>
-        </loadproperties>
-
-        <!-- Provide custom version number to TeamCity -->
-        <echo message="##teamcity[buildNumber '${orbeon-version}']"/>
 
         <property name="deployDir" value="${build.dir}/deploy"/>
         <mkdir dir="${deployDir}"/>

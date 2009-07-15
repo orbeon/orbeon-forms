@@ -11,24 +11,15 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 
-/**
- * Represents a submission mechanism.
- */
-public interface Submission {
+import java.io.IOException;
 
-    boolean isMatch(PipelineContext pipelineContext,
-                    XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp);
-
-    ConnectionResult connect(PipelineContext pipelineContext,
-                    XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp) throws Exception;
+public interface Replacer {
+    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult,
+                        XFormsModelSubmission.SubmissionParameters p,
+                        XFormsModelSubmission.SecondPassParameters p2) throws IOException;
 }

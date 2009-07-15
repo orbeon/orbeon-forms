@@ -18,7 +18,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
@@ -28,7 +27,7 @@ import java.util.Map;
 /**
  * Optimized submission doesn't issue HTTP requests but goes through the Servlet API.
  */
-public class OptimizedSubmission extends SubmissionBase {
+public class OptimizedSubmission extends BaseSubmission {
 
     public OptimizedSubmission(XFormsModelSubmission submission) {
         super(submission);
@@ -169,6 +168,7 @@ public class OptimizedSubmission extends SubmissionBase {
         // This means we got a submission with replace="all"
         if (connectionResult.dontHandleResponse)
             containingDocument.setGotSubmissionReplaceAll();
+
         return connectionResult;
     }
 }

@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Test submission which just echoes the incoming document.
  */
-public class EchoSubmission extends SubmissionBase {
+public class EchoSubmission extends BaseSubmission {
 
     public EchoSubmission(XFormsModelSubmission submission) {
         super(submission);

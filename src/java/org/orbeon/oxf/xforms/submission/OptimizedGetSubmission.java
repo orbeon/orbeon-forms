@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 /**
  * Optimized GET submission. It stores the resulting location directly into the containing document.
  */
-public class OptimizedGetSubmission extends SubmissionBase {
+public class OptimizedGetSubmission extends BaseSubmission {
 
     public OptimizedGetSubmission(XFormsModelSubmission submission) {
         super(submission);

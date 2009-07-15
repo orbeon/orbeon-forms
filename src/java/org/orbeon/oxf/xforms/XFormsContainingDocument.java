@@ -1,24 +1,26 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.ObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
@@ -44,6 +46,7 @@ import org.orbeon.saxon.value.SequenceExtent;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Future;
 
 /**
  * Represents an XForms containing document.
@@ -60,6 +63,7 @@ public class XFormsContainingDocument extends XBLContainer {
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
     private IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms");
+    private static final String LOG_TYPE = "containing document";
 
     // Global XForms function library
     private static XFormsFunctionLibrary functionLibrary = new XFormsFunctionLibrary();
@@ -82,7 +86,9 @@ public class XFormsContainingDocument extends XBLContainer {
 
     // Client state
     private XFormsModelSubmission activeSubmission;
-    private List<Runnable> asynchronousSubmissions;
+    private List<AsynchronousSubmission> asynchronousSubmissions;
+    private boolean hasBackbgroundAsynchronousSubmissions;
+    private boolean hasForegroundAsynchronousSubmissions;
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
@@ -109,6 +115,7 @@ public class XFormsContainingDocument extends XBLContainer {
     private static final Map<String, String> allowedXFormsSubmissionExternalEvents = new HashMap<String, String>();
     private static final Map<String, String> allowedXFormsContainingDocumentExternalEvents = new HashMap<String, String>();
     private static final Map<String, String> allowedXXFormsDialogExternalEvents = new HashMap<String, String>();
+
     static {
         // External events ignored on xforms:output
         ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
@@ -166,7 +173,7 @@ public class XFormsContainingDocument extends XBLContainer {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
         setLocationData(xformsStaticState.getLocationData());
 
-        startHandleOperation("containing document", "creating new ContainingDocument (static state object provided).");
+        startHandleOperation(LOG_TYPE, "creating new ContainingDocument (static state object provided).");
 
         // Remember static state
         this.xformsStaticState = xformsStaticState;
@@ -203,12 +210,12 @@ public class XFormsContainingDocument extends XBLContainer {
 
         if (xformsStaticState != null) {
             // Use passed static state object
-            startHandleOperation("containing document", "restoring containing document (static state object provided).");
+            startHandleOperation(LOG_TYPE, "restoring containing document (static state object provided).");
             this.xformsStaticState = xformsStaticState;
         } else {
             // Create static state object
             // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
-            startHandleOperation("containing document", "restoring containing document (static state object not provided).");
+            startHandleOperation(LOG_TYPE, "restoring containing document (static state object not provided).");
             this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
         }
 
@@ -250,7 +257,7 @@ public class XFormsContainingDocument extends XBLContainer {
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
         // Encode state
-        startHandleOperation("containing document", "encoding state");
+        startHandleOperation(LOG_TYPE, "encoding state");
         final XFormsState result = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
                 createEncodedDynamicState(pipelineContext, false));
         endHandleOperation();
@@ -399,6 +406,8 @@ public class XFormsContainingDocument extends XBLContainer {
         this.gotSubmissionSecondPass = false;
         this.gotSubmissionReplaceAll = false;
         this.asynchronousSubmissions = null;
+        this.hasBackbgroundAsynchronousSubmissions = false;
+        this.hasForegroundAsynchronousSubmissions = false;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -465,34 +474,92 @@ public class XFormsContainingDocument extends XBLContainer {
         return gotSubmissionReplaceAll;
     }
 
-    /**
-     * Add an asynchronous submission to run after sending the Ajax response.
-     *
-     * @param runnable  Runnable that will execute the submission
-     */
-    public void addAsynchronousSubmission(Runnable runnable) {
-        if (asynchronousSubmissions == null)
-            asynchronousSubmissions = new ArrayList<Runnable>();
-        asynchronousSubmissions.add(runnable);
+    private static class AsynchronousSubmission {
+        public Future<ConnectionResult> future;
+        public String submissionEffectiveId;
+        public boolean isBackground;
+
+        public AsynchronousSubmission(Future<ConnectionResult> future, String submissionEffectiveId, boolean isBackground) {
+            this.future = future;
+            this.submissionEffectiveId = submissionEffectiveId;
+            this.isBackground = isBackground;
+        }
     }
 
-    /**
-     * Process pending asynchronous submissions.
-     */
-    public void processAsynchronousSubmissions() {
+    public void addAsynchronousSubmission(Future<ConnectionResult> future, String submissionEffectiveId, boolean isBackground) {
+
+        // Add submission future
+        if (asynchronousSubmissions == null)
+            asynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
+        asynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
+
+        // Hepful flags
+        if (isBackground)
+            this.hasBackbgroundAsynchronousSubmissions = true;
+        else
+            this.hasForegroundAsynchronousSubmissions = true;
+    }
+
+    public boolean hasBackgroundAsynchronousSubmissions() {
+        return hasBackbgroundAsynchronousSubmissions;
+    }
+
+    public void processBackgroundAsynchronousSubmissions(PipelineContext pipelineContext) {
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
-        if (asynchronousSubmissions != null && asynchronousSubmissions.size() > 0) {
-            for (Iterator<Runnable> i = asynchronousSubmissions.iterator(); i.hasNext();) {
-                final Runnable currentRunnable = i.next();
-                try {
-                    // Run submission
-                    currentRunnable.run();
-                } catch (RuntimeException e) {
-                    // Something happened but we keep going
-                    XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
+        if (hasBackbgroundAsynchronousSubmissions) {
+            startHandleOperation(LOG_TYPE, "processing background asynchronous submissions");
+            int count = 0;
+            try {
+                for (Iterator<AsynchronousSubmission> i = asynchronousSubmissions.iterator(); i.hasNext(); count++) {
+                    final AsynchronousSubmission asyncSubmission = i.next();
+                    if (asyncSubmission.isBackground) {
+                        try {
+                            // Submission was already started. We wait to get its result
+                            final ConnectionResult result = asyncSubmission.future.get();
+
+                            // Process response by dispatching an event to the submission
+                            final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(asyncSubmission.submissionEffectiveId);
+                            submission.getXBLContainer(this).dispatchEvent(pipelineContext, new XXFormsSubmitReplaceEvent(submission, result));
+
+                        } catch (Exception e) {
+                            // Something bad happened
+                            throw new OXFException(e);
+                        }
+                        // Remove submission from list of submission so we can gc the Runnable
+                        i.remove();
+                    }
                 }
-                // Remove submission from list of submission so we can gc the Runnable
-                i.remove();
+            } finally {
+                endHandleOperation("count", Integer.toString(count));
+            }
+        }
+    }
+
+    public void processForegroundAsynchronousSubmissions() {
+        // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
+        if (hasForegroundAsynchronousSubmissions) {
+            startHandleOperation(LOG_TYPE, "processing foreground asynchronous submissions");
+            int count = 0;
+            try {
+                for (Iterator<AsynchronousSubmission> i = asynchronousSubmissions.iterator(); i.hasNext(); count++) {
+                    final AsynchronousSubmission asyncSubmission = i.next();
+                    if (!asyncSubmission.isBackground) {
+                        try {
+                            // Submission is run at this point
+                            asyncSubmission.future.get();
+
+                            // NOTE: We do not process the response at all
+
+                        } catch (Exception e) {
+                            // Something happened but we swallow the exception and keep going
+                            XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
+                        }
+                        // Remove submission from list of submission so we can gc the Runnable
+                        i.remove();
+                    }
+                }
+            } finally {
+                endHandleOperation("count", Integer.toString(count));
             }
         }
     }
@@ -811,7 +878,7 @@ public class XFormsContainingDocument extends XBLContainer {
                         throw new ValidationException("Event target id '" + targetEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                     } else {
                         if (XFormsServer.logger.isDebugEnabled()) {
-                            logDebug("containing document", "ignoring client event with invalid target id", "target id", targetEffectiveId, "event name", eventName);
+                            logDebug(LOG_TYPE, "ignoring client event with invalid target id", "target id", targetEffectiveId, "event name", eventName);
                         }
                         return;
                     }
@@ -822,7 +889,7 @@ public class XFormsContainingDocument extends XBLContainer {
             if (isTrustedEvent) {
                 // Event is trusted, don't check if it is allowed
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    logDebug("containing document", "processing trusted event", "target id", targetEffectiveId, "event name", eventName);
+                    logDebug(LOG_TYPE, "processing trusted event", "target id", targetEffectiveId, "event name", eventName);
                 }
             } else if (!checkForAllowedEvents(pipelineContext, eventName, eventTarget, handleGoingOnline)) {
                 // Event is not trusted and is not allowed
@@ -840,7 +907,7 @@ public class XFormsContainingDocument extends XBLContainer {
                         throw new ValidationException("Other event target id '" + otherControlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
                     } else {
                         if (XFormsServer.logger.isDebugEnabled()) {
-                            logDebug("containing document", "ignoring invalid client event with invalid second control id", "target id", targetEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId);
+                            logDebug(LOG_TYPE, "ignoring invalid client event with invalid second control id", "target id", targetEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId);
                         }
                         return;
                     }
@@ -914,7 +981,7 @@ public class XFormsContainingDocument extends XBLContainer {
                                 // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
                                 final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
                                 if (isIgnoreValueChangeEvent) {
-                                    logDebug("containing document", "ignoring value change event as value is the same",
+                                    logDebug(LOG_TYPE, "ignoring value change event as value is the same",
                                             "control id", eventTarget.getEffectiveId(), "event name", eventName, "value", currentExternalValue);
 
                                     // Ensure deferred event handling
@@ -924,7 +991,7 @@ public class XFormsContainingDocument extends XBLContainer {
                                 }
                             } else {
                                 // shouldn't happen really, but just in case let's log this
-                                logDebug("containing document", "got null currentExternalValue", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                logDebug(LOG_TYPE, "got null currentExternalValue", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                         } else {
                             // There will be a focus event too, so don't ignore
@@ -1043,7 +1110,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Check for implicitly allowed events
                 if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on xxforms:dialog", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        logDebug(LOG_TYPE, "ignoring invalid client event on xxforms:dialog", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
                     return false;
                 }
@@ -1051,7 +1118,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Target is a repeat
                 if (allowedXFormsRepeatExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on xforms:repeat", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        logDebug(LOG_TYPE, "ignoring invalid client event on xforms:repeat", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
                     return false;
                 }
@@ -1062,7 +1129,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Only single-node controls accept events from the client
                 if (!(eventTarget instanceof XFormsSingleNodeControl)) {// NOTE: This includes xforms:trigger/xforms:submit
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on non-single-node control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        logDebug(LOG_TYPE, "ignoring invalid client event on non-single-node control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
                     return false;
                 }
@@ -1082,7 +1149,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
                     // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on non-relevant or read-only control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        logDebug(LOG_TYPE, "ignoring invalid client event on non-relevant or read-only control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
                     return false;
                 }
@@ -1092,21 +1159,21 @@ public class XFormsContainingDocument extends XBLContainer {
                     if (xformsControl instanceof XFormsOutputControl) {
                         if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                logDebug("containing document", "ignoring invalid client event on xforms:output", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                logDebug(LOG_TYPE, "ignoring invalid client event on xforms:output", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                             return false;
                         }
                     } else if (xformsControl instanceof XFormsUploadControl) {
                         if (allowedXFormsUploadExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                logDebug("containing document", "ignoring invalid client event on xforms:upload", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                logDebug(LOG_TYPE, "ignoring invalid client event on xforms:upload", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                             return false;
                         }
                     } else {
                         if (allowedXFormsControlsExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                logDebug("containing document", "ignoring invalid client event", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                logDebug(LOG_TYPE, "ignoring invalid client event", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                             return false;
                         }
@@ -1119,7 +1186,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // The event is not explicitly allowed: check for implicitly allowed events
                 if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event on xforms:submission", "submission id", eventTarget.getEffectiveId(), "event name", eventName);
+                        logDebug(LOG_TYPE, "ignoring invalid client event on xforms:submission", "submission id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
                     return false;
                 }
@@ -1129,7 +1196,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    logDebug("containing document", "ignoring invalid client event on containing document", "target id", eventTarget.getEffectiveId(), "event name", eventName);
+                    logDebug(LOG_TYPE, "ignoring invalid client event on containing document", "target id", eventTarget.getEffectiveId(), "event name", eventName);
                 }
                 return false;
             }
@@ -1138,7 +1205,7 @@ public class XFormsContainingDocument extends XBLContainer {
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    logDebug("containing document", "ignoring invalid client event", "target id", eventTarget.getEffectiveId(), "event name", eventName);
+                    logDebug(LOG_TYPE, "ignoring invalid client event", "target id", eventTarget.getEffectiveId(), "event name", eventName);
                 }
                 return false;
             }
@@ -1434,6 +1501,9 @@ public class XFormsContainingDocument extends XBLContainer {
         // Initialize models
         initializeModels(pipelineContext);
 
+        // Check for background asynchronous submissions
+        processBackgroundAsynchronousSubmissions(pipelineContext);
+
         // End deferred behavior
         endOutermostActionHandler(pipelineContext);
 
@@ -1449,12 +1519,12 @@ public class XFormsContainingDocument extends XBLContainer {
         final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
         if (XFormsServer.logger.isDebugEnabled()) {
             if (analyzed)
-                logDebug("containing document", "performed static analysis",
+                logDebug(LOG_TYPE, "performed static analysis",
                             "time", Long.toString(System.currentTimeMillis() - startTime),
                             "controls", Integer.toString(xformsStaticState.getControlInfoMap().size())
                     );
             else
-                logDebug("containing document", "static analysis already available");
+                logDebug(LOG_TYPE, "static analysis already available");
         }
 
         // Create XForms controls

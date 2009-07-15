@@ -39,7 +39,7 @@ import java.util.Collections;
  *
  * TODO: This should be made to work as well for optimized submissions.
  */
-public class CacheableSubmission extends SubmissionBase {
+public class CacheableSubmission extends BaseSubmission {
 
     public CacheableSubmission(XFormsModelSubmission submission) {
         super(submission);
@@ -110,8 +110,10 @@ public class CacheableSubmission extends SubmissionBase {
                     public ReadonlyXFormsInstance load(PipelineContext pipelineContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
 
                         // Call regular submission
-                        final ConnectionResult connectionResult = new RegularSubmission(submission).connect(pipelineContext, p, p2, sp);
+                        ConnectionResult connectionResult = null;
                         try {
+                            connectionResult = new RegularSubmission(submission).connect(pipelineContext, p, p2, sp);
+
                             // Handle connection errors
                             if (connectionResult.statusCode != 200) {
                                 connectionResult.close();
@@ -141,9 +143,9 @@ public class CacheableSubmission extends SubmissionBase {
         final XFormsModel replaceModel = newInstance.getModel(submission.getContainingDocument());
 
         // Dispatch xforms-delete event
-        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
-        // (see below). In the future, we might want to dispatch this, especially if
-        // XFormsInsertAction dispatches xforms-delete when removing the root element
+        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement (see below). In the
+        // future, we might want to dispatch this, especially if XFormsInsertAction dispatches xforms-delete when
+        // removing the root element
         //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
 
         // Handle new instance and associated event markings

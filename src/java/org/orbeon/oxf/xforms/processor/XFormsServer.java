@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -455,6 +455,13 @@ public class XFormsServer extends ProcessorImpl {
                     // End external events
                     containingDocument.endExternalEventsSequence(pipelineContext, hasXXFormsOnline);
                     containingDocument.endHandleOperation();
+
+                    // Check for background asynchronous submissions
+                    if (containingDocument.hasBackgroundAsynchronousSubmissions()) {
+                        containingDocument.startOutermostActionHandler();
+                        containingDocument.processBackgroundAsynchronousSubmissions(pipelineContext);
+                        containingDocument.endOutermostActionHandler(pipelineContext);
+                    }
                 }
 
                 if (contentHandler != null) {
@@ -476,7 +483,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Process asynchronous submissions if any
-                    containingDocument.processAsynchronousSubmissions();
+                    containingDocument.processForegroundAsynchronousSubmissions();
                 } else {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.
@@ -532,7 +539,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // Send redirect
             final String redirectResource = load.getResource();
-            containingDocument.logDebug("XForms server", "handling noscript redirect response for xforms:load", new String[] { "url", redirectResource });
+            containingDocument.logDebug("XForms server", "handling noscript redirect response for xforms:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 

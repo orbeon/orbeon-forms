@@ -11,24 +11,23 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
- * Represents a submission mechanism.
+ * Handle replace="none".
  */
-public interface Submission {
+public class NoneReplacer extends BaseReplacer {
 
-    boolean isMatch(PipelineContext pipelineContext,
-                    XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp);
+    public NoneReplacer(XFormsModelSubmission submission, XFormsContainingDocument containingDocument) {
+        super(submission, containingDocument);
+    }
 
-    ConnectionResult connect(PipelineContext pipelineContext,
-                    XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp) throws Exception;
+    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+        // Just notify that processing is terminated by dispatching xforms-submit-done
+        dispatchSubmitDone(pipelineContext, connectionResult);
+    }
 }

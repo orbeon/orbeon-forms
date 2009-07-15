@@ -5760,6 +5760,12 @@ ORBEON.xforms.Server = {
                                                     previousServerValue = ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
                                                     currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
                                                     newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
+
+                                                    var isInput = ORBEON.util.Dom.hasClass(documentElement, "xforms-input");
+                                                    var inputSize = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
+                                                    var inputlength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                                    var inputAutocomplete = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
+
                                                     var doUpdate =
                                                             // If this was an input that was recreated because of a type change, we always set its value
                                                             recreatedInput ||
@@ -5771,14 +5777,13 @@ ORBEON.xforms.Server = {
                                                                 // Update only if the value in the HTML area is the same now as it was when we sent it to the server
                                                                 // If there is no previousServerValue, go ahead and update field
                                                                 && (previousServerValue == null || currentValue == previousServerValue)
-                                                            );
+                                                            ) ||
+                                                            // Special xforms:input attributes
+                                                            (isInput && (inputSize != null || inputlength != null || inputAutocomplete != null));
                                                     if (doUpdate) {
-                                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                                        if (isInput) {
                                                             // Additional attributes for xforms:input
-                                                            var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                            var maxlength = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
-                                                            var autocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
-                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, size, maxlength, autocomplete);
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputlength, inputAutocomplete);
                                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);

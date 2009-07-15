@@ -1,16 +1,16 @@
-<!--
-    Copyright (C) 2008 Orbeon, Inc.
-
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+<!--~
+  ~ Copyright (C) 2009 Orbeon, Inc.
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under the terms of the
+  ~ GNU Lesser General Public License as published by the Free Software Foundation; either version
+  ~ 2.1 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  ~ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  ~ See the GNU Lesser General Public License for more details.
+  ~
+  ~ The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -45,16 +45,34 @@
                 </instance>
             </xforms:instance>
 
+            <xforms:instance id="result-instance">
+                <text/>
+            </xforms:instance>
+
             <xforms:submission id="test-submission" mode="asynchronous"
                 ref="." method="get" resource="http://www.google.com/"
                 replace="none"/>
+
+            <xforms:submission id="test-submission-2" mode="asynchronous"
+                ref="." method="get" resource="http://www.google.com/"
+                serialization="none"
+                replace="text" targetref="instance('result-instance')"/>
+
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:send submission="test-submission"/>
+                <xforms:send submission="test-submission-2"/>
+            </xforms:action>
 
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
 
         <xforms:submit submission="test-submission">
-            <xforms:label>Test</xforms:label>
+            <xforms:label>Test replace="none"</xforms:label>
+        </xforms:submit>
+
+        <xforms:submit submission="test-submission-2">
+            <xforms:label>Test replace="text"</xforms:label>
         </xforms:submit>
 
     </xhtml:body>

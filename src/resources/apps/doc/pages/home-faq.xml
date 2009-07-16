@@ -479,7 +479,7 @@
                     general, you can't just import your existing forms into Form Builder.
                 </p>
             </section>
-        </section>    
+        </section>
         <a name="xforms"/>
         <section>
             <title>XForms FAQ</title>
@@ -1022,7 +1022,7 @@
                     <li>
                         <p>
                             As of Orbeon Forms 3.7, the <a
-                            href="http://wiki.orbeon.com/forms/developer-documentation/noscript-mode">Noscript Mode</a>
+                            href="http://wiki.orbeon.com/forms/projects/noscript-mode">Noscript Mode</a>
                             provides support in Orbeon Forms for JavaScript-free operation.
                         </p>
                     </li>

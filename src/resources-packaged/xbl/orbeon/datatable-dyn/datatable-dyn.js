@@ -426,6 +426,19 @@ onMouseDown: function (ev) {
 	this.resizerX = YAHOO.util.Event.getXY(ev)[0];
 },
 
+/**
+* Handles mouseup events on the Column resizer.
+* Reset style left property so that the resizer finds its place 
+* if it had lost it!
+* 
+* @method onMouseUp
+* @param e
+*            {string} The mousedown event
+*/
+onMouseUp: function (ev) {
+	this.resizer.style.left = "auto";
+},
+
 
 /**
  * Handles drag events on the Column resizer.
@@ -443,7 +456,7 @@ onDrag: function (ev) {
 	var widthStyle = (width - 20) + 'px'; // TODO : determine 20 from
 	// padding
 	// If different and non null, try to set it
-	if (width > 20 && width != this.width) {
+	if (width > 0 && width != this.width) {
 		if (this.rule) {
 			this.rule.style.width = widthStyle;
 		} else {

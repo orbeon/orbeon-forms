@@ -390,7 +390,18 @@ onMouseDown: function (ev) {
 	this.resizerX = YAHOO.util.Event.getXY(ev)[0];
 },
 
-
+/**
+* Handles mouseup events on the Column resizer.
+* Reset style left property so that the resizer finds its place 
+* if it had lost it!
+* 
+* @method onMouseUp
+* @param e
+*            {string} The mousedown event
+*/
+onMouseUp: function (ev) {
+	this.resizer.style.left = "auto";
+},
 /**
  * Handles drag events on the Column resizer.
  *

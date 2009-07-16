@@ -59,59 +59,61 @@
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
 
     <!-- Other XForms options -->
-    <property as="xs:string"  name="oxf.xforms.order"                                   value="label control help alert hint"/>
-    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                        value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.local-submission-include"                value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.local-instance-include"                  value="false"/>
-    <property as="xs:string"  name="oxf.xforms.forward-submission-headers"              value="Authorization"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                  value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                        value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.gzip-state"                              value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                       value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                       value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                      value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                       value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                      value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.noscript"                                value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax-portlet"                            value="false"/>
+    <property as="xs:string"  name="oxf.xforms.order"                                       value="label control help alert hint"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                            value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.local-submission-include"                    value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.local-instance-include"                      value="false"/>
+    <property as="xs:string"  name="oxf.xforms.forward-submission-headers"                  value="Authorization"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                            value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.combine-resources"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                    value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                          value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax-portlet"                                value="false"/>
     <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                    value="4"/>
-    <property as="xs:integer" name="oxf.xforms.request-retries"                         value="1"/>
-    <property as="xs:string"  name="oxf.xforms.datepicker"                              value="yui"/>  <!-- jcalendar or yui -->
-    <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                    value="false"/>
-    <property as="xs:string"  name="oxf.xforms.htmleditor"                              value="yui"/>  <!-- fck or yui -->
-    <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                       value="true"/>
+    <property as="xs:integer" name="oxf.xforms.request-retries"                             value="1"/>
+    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>  <!-- jcalendar or yui -->
+    <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
+    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>  <!-- fck or yui -->
+    <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
 
-    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                    value="100"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"        value="500"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"  value="2000"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"            value="500"/>
+    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"      value="2000"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
 
-    <property as="xs:boolean" name="oxf.xforms.server.events.plain-value-change"        value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.server.events.initial-refresh-events"    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.server.events.plain-value-change"            value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.server.events.initial-refresh-events"        value="true"/>
 
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                      value="default"/>  <!-- default or deferred -->
-    <property as="xs:string"  name="oxf.xforms.client.events.filter"                    value=""/>
+    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>  <!-- default or deferred -->
+    <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.fusion-charts.uri-to-swf"             value=""/>
 
-    <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                  value="false"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"              value=""/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                        value="true"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                    value="oxf:/config/xforms-widgets.xsl"/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"                        value="true"/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                            value="true"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                        value="oxf:/config/xforms-widgets.xsl"/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"    value="true"/>
     <!-- Some of those elements are used by XBL components. We won't need to list those here anymore when xi:fallback is implemented.
          See: http://forge.ow2.org/tracker/index.php?func=detail&aid=313798&group_id=168&atid=350207 -->
-    <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"    value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
+    <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"        value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
                                                                                                fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
                                                                                                fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
                                                                                                fr:mindate fr:maxdate"/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                      value="false"/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

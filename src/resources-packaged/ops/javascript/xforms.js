@@ -60,6 +60,7 @@ var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
 var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
 var DATE_PICKER_PROPERTY = "datepicker";
 var DATE_PICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
+var DATE_PICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
 var HTML_EDITOR_PROPERTY = "htmleditor";
 var SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
 var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
@@ -90,7 +91,8 @@ var XFORMS_OFFLINE_SUPPORT = false;
 var XFORMS_FORMAT_INPUT_TIME = "[h]:[m]:[s] [P]";
 var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
 var XFORMS_DATEPICKER = "yui";
-var XFORMS_DATEPICKER_NAVIGATOR = false;
+var XFORMS_DATEPICKER_NAVIGATOR = true;
+var XFORMS_DATEPICKER_TWO_MONTHS = false;
 var XFORMS_HTMLEDITOR = "yui";
 var XFORMS_CLIENT_EVENTS_MODE = "default";
 var XFORMS_CLIENT_EVENTS_FILTER = "";
@@ -1037,6 +1039,7 @@ ORBEON.util.Utils = {
             case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
             case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
             case DATE_PICKER_NAVIGATOR_PROPERTY: { return XFORMS_DATEPICKER_NAVIGATOR; }
+            case DATE_PICKER_TWO_MONTHS_PROPERTY: { return XFORMS_DATEPICKER_TWO_MONTHS; }
             case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
             case SHOW_ERROR_DIALOG_PROPERTY: { return "true"; }
             case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
@@ -3303,19 +3306,46 @@ ORBEON.widgets.YUICalendar = function() {
 
     var RESOURCES = {
         "en": {
-            "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "September",  "October",  "November",  "December" ],
-            "WEEKDAYS_SHORT": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-            "START_WEEKDAY": 0
+            properties: {
+                "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "September",  "October",  "November",  "December" ],
+                "WEEKDAYS_SHORT": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "Month",
+                year: "Year",
+                submit: "OK",
+                cancel: "Cancel",
+                invalidYear: "Year needs to be a number"
+            }
         },
         "fr": {
-            "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],
-            "WEEKDAYS_SHORT": ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
-            "START_WEEKDAY": 1
+            properties: {
+                "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],
+                "WEEKDAYS_SHORT": ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
+                "START_WEEKDAY": 1
+            },
+            navigator: {
+                month: "Moi",
+                year: "Ann\xe9e",
+                submit: "OK",
+                cancel: "Annuler",
+                invalidYear: "L'ann\xe9e est invalide"
+            }
         },
         "es": {
-            "MONTHS_LONG": [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",  "Septiembre",  "Octubre",  "Noviembre",  "Diciembre" ],
-            "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "S\xe1"],
-            "START_WEEKDAY": 1
+            properties: {
+                "MONTHS_LONG": [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",  "Septiembre",  "Octubre",  "Noviembre",  "Diciembre" ],
+                "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "S\xe1"],
+                "START_WEEKDAY": 1
+            },
+            navigator: {
+                month: "Mes",
+                year: "A\xf1o",
+                submit: "OK",
+                cancel: "Aancelar",
+                invalidYear: "A\xf1o debe ser un n\xfamero"
+            }
         }
     };
 
@@ -3413,8 +3443,9 @@ ORBEON.widgets.YUICalendar = function() {
 
             if (yuiCalendar == null) {
                 // Create YUI calendar
-                yuiCalendar = ORBEON.util.Utils.getProperty(DATE_PICKER_NAVIGATOR_PROPERTY)
-                    ? new YAHOO.widget.CalendarGroup(calendarDiv.id, { navigator:true })
+                var hasTwoMonths = ORBEON.util.Utils.getProperty(DATE_PICKER_TWO_MONTHS_PROPERTY);
+                yuiCalendar = hasTwoMonths
+                    ? new YAHOO.widget.CalendarGroup(calendarDiv.id)
                     : new YAHOO.widget.Calendar(calendarDiv.id);
 
                 // Listeners on calendar events
@@ -3431,8 +3462,16 @@ ORBEON.widgets.YUICalendar = function() {
             lang = lang.substring(0, 2);
             // Find resource for selected language
             var resources = RESOURCES[lang];
-            for (var key in resources)
-                yuiCalendar.cfg.setProperty(key, resources[key]);
+            for (var key in resources.properties)
+                yuiCalendar.cfg.setProperty(key, resources.properties[key]);
+            var hasNavigator = ORBEON.util.Utils.getProperty(DATE_PICKER_NAVIGATOR_PROPERTY);
+            if (hasNavigator) {
+                yuiCalendar.cfg.setProperty("navigator", {
+                    strings : resources.navigator,
+                     monthFormat: YAHOO.widget.Calendar.SHORT,
+                     initialFocus: "year"
+                });
+            }
             // Listen on clicks on the page, so we can close the dialog
             ORBEON.xforms.Events.clickEvent.subscribe(clickAnywhere);
 
@@ -6354,8 +6393,14 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         this.sourceControlID = repeatId.substring(13);
 
         YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
-        YAHOO.util.Dom.setStyle(dragElement, "width", parseInt(dragElement.style.width)+10 +"px");
-        dragElement.innerHTML = srcElement.innerHTML;
+        // We set the width of the div to be the same as the one of the source element, otherwise if copy the content of
+        // the source element into a div, the resulting div might be much smaller or larger than the source element.
+        YAHOO.util.Dom.setStyle(dragElement, "width", parseInt(dragElement.style.width) + 2 +"px");
+        YAHOO.util.Dom.setStyle(dragElement, "height", "auto");
+        // If the source element is a table row, we can't copy table cells into a div. So we insert a table around the cell.
+        var tagName = srcElement.tagName.toLowerCase();
+        dragElement.innerHTML = tagName == "tr" ? "<table'><tr>" + srcElement.innerHTML + "</tr></table>"
+                : srcElement.innerHTML;
         dragElement.className = srcElement.className;
         YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
     },
@@ -6410,11 +6455,13 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
         // Find end position in repeat
         var endPosition = this._getPosition(srcElement);
-        var form = ORBEON.xforms.Controls.getForm(srcElement);
-        var event = new ORBEON.xforms.Server.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
-                ["dnd-start", this._startPosition, "dnd-end", endPosition]);
-        this._renumberIDs(this.sourceControlID);
-        ORBEON.xforms.Server.fireEvents([event], false);
+        if (endPosition != this._startPosition) {
+            var form = ORBEON.xforms.Controls.getForm(srcElement);
+            var event = new ORBEON.xforms.Server.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
+                    ["dnd-start", this._startPosition, "dnd-end", endPosition]);
+            this._renumberIDs(this.sourceControlID);
+            ORBEON.xforms.Server.fireEvents([event], false);
+        }
     }
 
 });

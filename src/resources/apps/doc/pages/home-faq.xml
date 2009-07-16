@@ -472,7 +472,7 @@
                 </p>
             </section>
             <section added="2008-06-05">
-                <title>Can I import my existingt XForms documents into Form Builder?</title>
+                <title>Can I import my existing XForms documents into Form Builder?</title>
                 <p>
                     Form Builder produces XHTML+XForms files as output, but it follows a number of convention when
                     creating forms. It is only able to read forms that follow those conventions, which means that in
@@ -787,7 +787,7 @@
                 <p>
                     <i>HISTORICAL NOTE: There has been a lot of code in Orbeon Forms to support JSR-168 since late
                     2003 already. When this code was written, the JSR-168 specification was not final and no JSR-168
-                    container was available. So Orbeon developped a container based on draft specifications for testing.
+                    container was available. So Orbeon developed a container based on draft specifications for testing.
                     This code was used until recently to run the Orbeon Forms examples portal: examples were actually
                     using the portlet code and running as portlets, and the examples portal is an early JSR-168 portal.
                     Note that this is no longer the case with Orbeon Forms 3.6, where the example applications portal
@@ -863,7 +863,7 @@
                 </p>
                 <p>
                     The good news is that Orbeon Forms is very configurable and you are not forced to use XML pipelines
-                    or the PFC. Users have been successfuylly using the Orbeon Forms XForms engine with JSP/Struts or
+                    or the PFC. Users have been successfully using the Orbeon Forms XForms engine with JSP/Struts or
                     PHP. Please visit <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
                     Applications for more details</a>. Post additional questions to the <a
                     href="http://www.orbeon.com/forms/mailing-list">ops-users</a> mailing-list.
@@ -1147,7 +1147,7 @@
                             (more information about the <a href="#xforms-javascript"><i>noscript</i> mode</a>).
                         </p>
                         <p>
-                            XForms is only one of the technologie that enable Form Runner and Form Builder. Form Runner
+                            XForms is only one of the technologies that enable Form Runner and Form Builder. Form Runner
                             provides a full environment to manage forms, including persistence, PDF generation, etc.
                         </p>
                     </li>

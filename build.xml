@@ -94,6 +94,7 @@
         <include name="exist-jta.jar"/>
         <include name="exist-quartz-1_6_0.jar"/>
         <include name="exist-stax-api-1_0_1.jar"/>
+        <include name="exist-ws-commons-util-1.0.2.jar"/>
         <include name="exist-xmldb.jar"/>
         <include name="exist-xmlrpc-client-3_1_1.jar"/>
         <include name="exist-xmlrpc-common-3_1_1.jar"/>

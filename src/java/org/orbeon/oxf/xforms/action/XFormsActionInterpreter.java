@@ -280,9 +280,14 @@ public class XFormsActionInterpreter {
 
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-            containingDocument.startHandleOperation();
             xformsAction.execute(this, propertyContext, targetEffectiveId, eventObserver, actionElement, hasOverriddenContext, contextItem);
-            containingDocument.endHandleOperation();
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                if (whileIterationAttribute == null)
+                    containingDocument.endHandleOperation("action name", actionName);
+                else
+                    containingDocument.endHandleOperation("action name", actionName, "while iteration", Integer.toString(whileIteration));
+            }
 
             // Stop if there is no iteration
             if (whileIterationAttribute == null)

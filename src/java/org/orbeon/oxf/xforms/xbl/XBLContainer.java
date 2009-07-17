@@ -872,7 +872,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.endHandleOperation();
+            containingDocument.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+                    originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
     }
 

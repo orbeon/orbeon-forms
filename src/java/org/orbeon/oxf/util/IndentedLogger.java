@@ -15,7 +15,6 @@ package org.orbeon.oxf.util;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.Stack;
 
@@ -125,7 +124,7 @@ public class IndentedLogger {
     }
 
     private static String getLogIndentSpaces(int level) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < level; i++)
             sb.append("  ");
         return sb.toString();
@@ -154,7 +153,7 @@ public class IndentedLogger {
     private static void log(Logger logger, Level level, int indentLevel, String prefix, String type, String message, String[] parameters) {
         final String parametersString;
         if (parameters != null) {
-            final FastStringBuffer sb = new FastStringBuffer(" {");
+            final StringBuilder sb = new StringBuilder(" {");
             if (parameters != null) {
                 boolean first = true;
                 for (int i = 0; i < parameters.length; i += 2) {

@@ -102,7 +102,13 @@ public class CacheableSubmission extends BaseSubmission {
                                 // Call regular submission
                                 ConnectionResult connectionResult = null;
                                 try {
-                                    connectionResult = new RegularSubmission(submission).connect(propertyContext, p, p2, sp);
+                                    // Run regular submission but force synchronous execution
+                                    connectionResult = new RegularSubmission(submission) {
+                                        @Override
+                                        protected boolean isAsyncSubmission(XFormsModelSubmission.SecondPassParameters p2) {
+                                            return false;
+                                        }
+                                    }.connect(propertyContext, p, p2, sp);
 
                                     // Handle connection errors
                                     if (connectionResult.statusCode != 200) {

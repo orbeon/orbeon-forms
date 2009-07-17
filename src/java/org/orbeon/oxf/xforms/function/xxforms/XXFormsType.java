@@ -21,6 +21,11 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.QNameValue;
+import org.orbeon.saxon.value.Value;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.type.ItemType;
+import org.orbeon.saxon.type.BuiltInAtomicType;
+import org.orbeon.saxon.style.StandardNames;
 
 public class XXFormsType extends XFormsFunction {
 
@@ -35,29 +40,42 @@ public class XXFormsType extends XFormsFunction {
         else
             item = nodesetExpression.iterate(xpathContext).next();
 
-        // Return () if we can't access the node
-        if (item == null || !(item instanceof NodeInfo))
-            return null;
 
-        // Get type from node
-        final String typeExplodedQName = InstanceData.getType((NodeInfo) item);
-        if (typeExplodedQName == null)
-            return null;
+        if (item instanceof AtomicValue) {
+            // Atomic type
+            final ItemType type = ((Value) item).getItemType(null);
+            if (type instanceof BuiltInAtomicType) {
+                final BuiltInAtomicType atomicType = (BuiltInAtomicType) type;
+                final int fingerprint = atomicType.getFingerprint();
 
-        // Create Saxon QName
-        final String uri;
-        final String localname;
-        {
-            int openIndex = typeExplodedQName.indexOf("{");
-            if (openIndex == -1) {
-                uri = "";
-                localname = typeExplodedQName;
+                return new QNameValue(StandardNames.getPrefix(fingerprint), StandardNames.getURI(fingerprint), StandardNames.getLocalName(fingerprint), null);
             } else {
-                uri = typeExplodedQName.substring(openIndex + 1, typeExplodedQName.indexOf("}"));
-                localname = typeExplodedQName.substring(typeExplodedQName.indexOf("}") + 1);
+                return null;
             }
-        }
+        } else if (item instanceof NodeInfo) {
+            // Get type from node
+            final String typeExplodedQName = InstanceData.getType((NodeInfo) item);
+            if (typeExplodedQName == null)
+                return null;
 
-        return new QNameValue(null, uri, localname, null);
+            // Create Saxon QName
+            final String uri;
+            final String localname;
+            {
+                int openIndex = typeExplodedQName.indexOf("{");
+                if (openIndex == -1) {
+                    uri = "";
+                    localname = typeExplodedQName;
+                } else {
+                    uri = typeExplodedQName.substring(openIndex + 1, typeExplodedQName.indexOf("}"));
+                    localname = typeExplodedQName.substring(typeExplodedQName.indexOf("}") + 1);
+                }
+            }
+
+            return new QNameValue(null, uri, localname, null);
+        } else {
+            // Return () if we can't access the node or if it is not an atomic value or a node
+            return null;
+        }
     }
 }

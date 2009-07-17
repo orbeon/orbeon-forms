@@ -190,9 +190,11 @@
                 <xsl:for-each
                     select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
                     <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
-                    <xxforms:variable name="node"
-                        select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
-                    <xxforms:variable name="type" select="xxforms:type($node)"/>
+                    <xxforms:variable name="node{$position}"
+                    select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
+                    <!--Note: the following expression filters out values (for which . instance of node() is false) since xxforms:type doesn't work for them -->
+                    <xxforms:variable name="isNode{$position}" select="$node{$position} instance of node()"/>
+                    <xxforms:variable name="type{$position}" select="if ($isNode{$position}) then xxforms:type($node{$position}) else ()"/>
                     <xsl:variable name="numberTypes">
                         <type>xs:decimal</type>
                         <type>xs:integer</type>
@@ -218,7 +220,7 @@
                         </xsl:for-each>
                     </xsl:variable>
                     <xforms:bind nodeset="key[{$position}]/@type"
-                        calculate="if ($type = ({$numberTypesEnumeration})) then 'number' else 'text'"
+                        calculate="if (($isNode{$position} and $type{$position} = ({$numberTypesEnumeration})) or $node{$position} instance of xs:decimal) then 'number' else 'text'"
                     />
                 </xsl:for-each>
                 <xsl:if test="$paginated">

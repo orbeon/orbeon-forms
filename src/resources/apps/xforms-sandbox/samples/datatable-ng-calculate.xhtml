@@ -1,0 +1,85 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Using YUI's datatable</title>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <AAA>1</AAA>
+                        <BBB>foo</BBB>
+                        <CCC>bar</CCC>
+                    </record>
+                    <record>
+                        <AAA>100</AAA>
+                        <BBB>bat</BBB>
+                        <CCC>baz</CCC>
+                    </record>
+                    <record>
+                        <AAA>2</AAA>
+                        <BBB>bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+        </xforms:model>
+    </head>
+    <body>
+
+        <h1>Using the datatable widget (new generation)</h1>
+
+        <p>A first table with explicit labels. The first three colums are sortable and resizeable
+            and the first one is a number. The labels are defined separately in a thead element.</p>
+        <fr:datatable id="table-repeat1">
+            <!-- Optional <thead>, otherwise try to build one from body -->
+            <thead>
+                <tr>
+                    <th fr:sortable="true" fr:resizeable="true">AAA (s)</th>
+                    <th fr:sortable="true" fr:resizeable="true">twice AAA (s)</th>
+                    <th fr:sortable="true" fr:resizeable="true">twice AAA as a string(s)</th>
+                    <th fr:sortable="true" fr:resizeable="true">BBB (s)</th>
+                    <th>CCC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr repeat-nodeset="record">
+                    <td>
+                        <xforms:output ref="AAA"/>
+                    </td>
+                    <td>
+                        <xforms:output value="(AAA * 2) cast as xs:integer"/>
+                    </td>
+                    <td>
+                        <xforms:output value="string(AAA * 2)"/>
+                    </td>
+                    <td>
+                        <xforms:output ref="BBB"/>
+                    </td>
+                    <td>
+                        <xforms:output ref="CCC"/>
+                    </td>
+                </tr>
+            </tbody>
+        </fr:datatable>
+
+
+    </body>
+</html>

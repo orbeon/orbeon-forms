@@ -51,38 +51,40 @@ public class XFormsActions {
     public static final String XXFORMS_ONLINE_ACTION = "online";
     public static final String XXFORMS_OFFLINE_ACTION = "offline";
     public static final String XXFORMS_OFFLINE_SAVE_ACTION = "offline-save";
+    public static final String XXFORMS_JOIN_SUBMISSIONS_ACTION = "join-submissions";
 
-    private static final Map actions = new HashMap();
+    private static final Map<String, XFormsAction> ACTIONS = new HashMap<String, XFormsAction>();
 
     static {
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_ACTION_ACTION), new XFormsActionAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_DISPATCH_ACTION), new XFormsDispatchAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REBUILD_ACTION), new XFormsRebuildAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_RECALCULATE_ACTION), new XFormsRecalculateAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REVALIDATE_ACTION), new XFormsRevalidateAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REFRESH_ACTION), new XFormsRefreshAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETFOCUS_ACTION), new XFormsSetfocusAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_LOAD_ACTION), new XFormsLoadAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETVALUE_ACTION), new XFormsSetvalueAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SEND_ACTION), new XFormsSendAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_RESET_ACTION), new XFormsResetAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_MESSAGE_ACTION), new XFormsMessageAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_TOGGLE_ACTION), new XFormsToggleAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_INSERT_ACTION), new XFormsInsertAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_DELETE_ACTION), new XFormsDeleteAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETINDEX_ACTION), new XFormsSetindexAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_ACTION_ACTION), new XFormsActionAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_DISPATCH_ACTION), new XFormsDispatchAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REBUILD_ACTION), new XFormsRebuildAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_RECALCULATE_ACTION), new XFormsRecalculateAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REVALIDATE_ACTION), new XFormsRevalidateAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_REFRESH_ACTION), new XFormsRefreshAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETFOCUS_ACTION), new XFormsSetfocusAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_LOAD_ACTION), new XFormsLoadAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETVALUE_ACTION), new XFormsSetvalueAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SEND_ACTION), new XFormsSendAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_RESET_ACTION), new XFormsResetAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_MESSAGE_ACTION), new XFormsMessageAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_TOGGLE_ACTION), new XFormsToggleAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_INSERT_ACTION), new XFormsInsertAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_DELETE_ACTION), new XFormsDeleteAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETINDEX_ACTION), new XFormsSetindexAction());
 
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SCRIPT_ACTION), new XXFormsScriptAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SHOW_ACTION), new XXFormsShowAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCE_ACTION), new XXFormsInvalidateInstanceAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCES_ACTION), new XXFormsInvalidateInstancesAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ONLINE_ACTION), new XXFormsOnlineAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_ACTION), new XXFormsOfflineAction());
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_SAVE_ACTION), new XXFormsOfflineSaveAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SCRIPT_ACTION), new XXFormsScriptAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SHOW_ACTION), new XXFormsShowAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCE_ACTION), new XXFormsInvalidateInstanceAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCES_ACTION), new XXFormsInvalidateInstancesAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ONLINE_ACTION), new XXFormsOnlineAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_ACTION), new XXFormsOfflineAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_SAVE_ACTION), new XXFormsOfflineSaveAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_JOIN_SUBMISSIONS_ACTION), new XXFormsJoinSubmissions());
 
         // Also support xbl:handler
-        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XBL_NAMESPACE_URI, XFormsConstants.XBL_HANDLER_QNAME.getName()), new XFormsActionAction());
+        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XBL_NAMESPACE_URI, XFormsConstants.XBL_HANDLER_QNAME.getName()), new XFormsActionAction());
     }
 
     /**
@@ -93,7 +95,7 @@ public class XFormsActions {
      * @return              XFormsAction or null
      */
     public static XFormsAction getAction(String uri, String localname) {
-        return (XFormsAction) actions.get(XMLUtils.buildExplodedQName(uri, localname));
+        return ACTIONS.get(XMLUtils.buildExplodedQName(uri, localname));
     }
 
     /**

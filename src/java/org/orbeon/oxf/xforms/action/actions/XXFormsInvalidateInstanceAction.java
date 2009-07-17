@@ -14,35 +14,35 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
  * Extension xxforms:invalidate-instance action.
  */
 public class XXFormsInvalidateInstanceAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         // Evaluate AVTs
-        final String resourceURI = resolveAVT(actionInterpreter, pipelineContext, actionElement, "resource", false);
-        final String handleXIncludeString = resolveAVT(actionInterpreter, pipelineContext, actionElement, "xinclude", false);
+        final String resourceURI = resolveAVT(actionInterpreter, propertyContext, actionElement, "resource", false);
+        final String handleXIncludeString = resolveAVT(actionInterpreter, propertyContext, actionElement, "xinclude", false);
 
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(pipelineContext, resourceURI, null, true);
-            XFormsServerSharedInstancesCache.instance().remove(pipelineContext, resourceURI, null, false);
+            XFormsServerSharedInstancesCache.instance().remove(propertyContext, resourceURI, null, true);
+            XFormsServerSharedInstancesCache.instance().remove(propertyContext, resourceURI, null, false);
         } else {
             // Just remove instances matching both @resource and @xinclude
-            final boolean handleXInclude = Boolean.valueOf(handleXIncludeString).booleanValue();
+            final boolean handleXInclude = Boolean.valueOf(handleXIncludeString);
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(pipelineContext, resourceURI, null, handleXInclude);
+            XFormsServerSharedInstancesCache.instance().remove(propertyContext, resourceURI, null, handleXInclude);
         }
     }
 }

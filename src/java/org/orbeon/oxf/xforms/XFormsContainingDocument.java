@@ -20,9 +20,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -86,9 +87,8 @@ public class XFormsContainingDocument extends XBLContainer {
 
     // Client state
     private XFormsModelSubmission activeSubmission;
-    private List<AsynchronousSubmission> asynchronousSubmissions;
-    private boolean hasBackbgroundAsynchronousSubmissions;
-    private boolean hasForegroundAsynchronousSubmissions;
+    private List<AsynchronousSubmission> backgroundAsynchronousSubmissions;
+    private List<AsynchronousSubmission> foregroundAsynchronousSubmissions;
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
@@ -405,9 +405,8 @@ public class XFormsContainingDocument extends XBLContainer {
         this.gotSubmission = false;
         this.gotSubmissionSecondPass = false;
         this.gotSubmissionReplaceAll = false;
-        this.asynchronousSubmissions = null;
-        this.hasBackbgroundAsynchronousSubmissions = false;
-        this.hasForegroundAsynchronousSubmissions = false;
+        this.backgroundAsynchronousSubmissions = null;
+        this.foregroundAsynchronousSubmissions = null;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -475,88 +474,100 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     private static class AsynchronousSubmission {
-        public Future<ConnectionResult> future;
+        public Future<SubmissionResult> future;
         public String submissionEffectiveId;
         public boolean isBackground;
 
-        public AsynchronousSubmission(Future<ConnectionResult> future, String submissionEffectiveId, boolean isBackground) {
+        public AsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId, boolean isBackground) {
             this.future = future;
             this.submissionEffectiveId = submissionEffectiveId;
             this.isBackground = isBackground;
         }
     }
 
-    public void addAsynchronousSubmission(Future<ConnectionResult> future, String submissionEffectiveId, boolean isBackground) {
+    public void addAsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId, boolean isBackground) {
 
         // Add submission future
-        if (asynchronousSubmissions == null)
-            asynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-        asynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
-
-        // Hepful flags
-        if (isBackground)
-            this.hasBackbgroundAsynchronousSubmissions = true;
-        else
-            this.hasForegroundAsynchronousSubmissions = true;
+        if (isBackground) {
+            if (backgroundAsynchronousSubmissions == null)
+                backgroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
+            backgroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
+        } else {
+            if (foregroundAsynchronousSubmissions == null)
+                foregroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
+            foregroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
+        }
     }
 
     public boolean hasBackgroundAsynchronousSubmissions() {
-        return hasBackbgroundAsynchronousSubmissions;
+        return backgroundAsynchronousSubmissions != null && backgroundAsynchronousSubmissions.size() > 0;
     }
 
-    public void processBackgroundAsynchronousSubmissions(PipelineContext pipelineContext) {
+    private boolean hasForegroundAsynchronousSubmissions() {
+        return foregroundAsynchronousSubmissions != null && foregroundAsynchronousSubmissions.size() > 0;
+    }
+
+    public void processBackgroundAsynchronousSubmissions(PropertyContext propertyContext) {
+
+        // Processing a series of background asynchronous submission might in turn trigger the creation of new
+        // background asynchronous submissions. We need to process until no submissions are left.
+        while (hasBackgroundAsynchronousSubmissions())
+            processBackgroundAsynchronousSubmissionsBatch(propertyContext);
+    }
+
+    private void processBackgroundAsynchronousSubmissionsBatch(PropertyContext propertyContext) {
+
+        // Get then reset current list and reset
+        final List<AsynchronousSubmission> submissionsToProcess = backgroundAsynchronousSubmissions;
+        backgroundAsynchronousSubmissions = null;
+
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
-        if (hasBackbgroundAsynchronousSubmissions) {
-            startHandleOperation(LOG_TYPE, "processing background asynchronous submissions");
-            int count = 0;
-            try {
-                for (Iterator<AsynchronousSubmission> i = asynchronousSubmissions.iterator(); i.hasNext(); count++) {
-                    final AsynchronousSubmission asyncSubmission = i.next();
-                    if (asyncSubmission.isBackground) {
-                        try {
-                            // Submission was already started. We wait to get its result
-                            final ConnectionResult result = asyncSubmission.future.get();
 
-                            // Process response by dispatching an event to the submission
-                            final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(asyncSubmission.submissionEffectiveId);
-                            submission.getXBLContainer(this).dispatchEvent(pipelineContext, new XXFormsSubmitReplaceEvent(submission, result));
+        startHandleOperation(LOG_TYPE, "processing background asynchronous submissions");
+        int count = 0;
+        try {
+            for (Iterator<AsynchronousSubmission> i = submissionsToProcess.iterator(); i.hasNext(); count++) {
+                final AsynchronousSubmission asyncSubmission = i.next();
+                try {
+                    // Submission was already started. We wait to get its result
+                    final SubmissionResult result = asyncSubmission.future.get();
 
-                        } catch (Exception e) {
-                            // Something bad happened
-                            throw new OXFException(e);
-                        }
-                        // Remove submission from list of submission so we can gc the Runnable
-                        i.remove();
-                    }
+                    // Process response by dispatching an event to the submission
+                    final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(asyncSubmission.submissionEffectiveId);
+                    submission.getXBLContainer(this).dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(submission, result));
+
+                } catch (Exception e) {
+                    // Something bad happened
+                    throw new OXFException(e);
                 }
-            } finally {
-                endHandleOperation("count", Integer.toString(count));
+                // Remove submission from list of submission so we can gc the Runnable
+                i.remove();
             }
+        } finally {
+            endHandleOperation("count", Integer.toString(count));
         }
     }
 
     public void processForegroundAsynchronousSubmissions() {
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
-        if (hasForegroundAsynchronousSubmissions) {
+        if (hasForegroundAsynchronousSubmissions()) {
             startHandleOperation(LOG_TYPE, "processing foreground asynchronous submissions");
             int count = 0;
             try {
-                for (Iterator<AsynchronousSubmission> i = asynchronousSubmissions.iterator(); i.hasNext(); count++) {
+                for (Iterator<AsynchronousSubmission> i = foregroundAsynchronousSubmissions.iterator(); i.hasNext(); count++) {
                     final AsynchronousSubmission asyncSubmission = i.next();
-                    if (!asyncSubmission.isBackground) {
-                        try {
-                            // Submission is run at this point
-                            asyncSubmission.future.get();
+                    try {
+                        // Submission is run at this point
+                        asyncSubmission.future.get();
 
-                            // NOTE: We do not process the response at all
+                        // NOTE: We do not process the response at all
 
-                        } catch (Exception e) {
-                            // Something happened but we swallow the exception and keep going
-                            XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
-                        }
-                        // Remove submission from list of submission so we can gc the Runnable
-                        i.remove();
+                    } catch (Exception e) {
+                        // Something happened but we swallow the exception and keep going
+                        XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
                     }
+                    // Remove submission from list of submission so we can gc the Runnable
+                    i.remove();
                 }
             } finally {
                 endHandleOperation("count", Integer.toString(count));
@@ -1021,7 +1032,7 @@ public class XFormsContainingDocument extends XBLContainer {
                         if (!xformsOutputControl.isReadonly()) {
                             dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
                         }
-                    } else if (!ignoredXFormsOutputExternalEvents.equals(eventName)) {
+                    } else if (ignoredXFormsOutputExternalEvents.get(eventName) == null) {
                         // Dispatch other event
                         dispatchEvent(pipelineContext, xformsEvent);
                     }
@@ -1259,13 +1270,13 @@ public class XFormsContainingDocument extends XBLContainer {
         return response;
     }
 
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
 
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
             // Internal load event
             final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
-            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             try {
                 final String resource = xxformsLoadEvent.getResource();
 
@@ -1286,25 +1297,24 @@ public class XFormsContainingDocument extends XBLContainer {
             }
         } else if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
             // Internal event for going online
-            goOnline(pipelineContext);
+            goOnline(propertyContext);
         } else if (XFormsEvents.XXFORMS_OFFLINE.equals(eventName)) {
             // Internal event for going offline
-            goOffline(pipelineContext);
+            goOffline(propertyContext);
         }
     }
 
-    public void goOnline(PipelineContext pipelineContext) {
+    public void goOnline(PropertyContext propertyContext) {
         // Dispatch to all models
-        for (Iterator i = getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
+        for (XFormsModel currentModel: getModels()) {
             // TODO: Dispatch to children containers
-            dispatchEvent(pipelineContext, new XXFormsOnlineEvent(currentModel));
+            dispatchEvent(propertyContext, new XXFormsOnlineEvent(currentModel));
         }
 //        this.goingOnline = true;
         this.goingOffline = false;
     }
 
-    public void goOffline(PipelineContext pipelineContext) {
+    public void goOffline(PropertyContext propertyContext) {
 
         // Handle inserts of controls marked as "offline insert triggers"
         final List<String> offlineInsertTriggerPrefixedIds = getStaticState().getOfflineInsertTriggerIds();
@@ -1324,7 +1334,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // Dispatch event n times
                     final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
                     for (int j = 0; j < repeatCount; j++)
-                        dispatchEvent(pipelineContext, event);
+                        dispatchEvent(propertyContext, event);
                 }
             }
         }
@@ -1332,7 +1342,7 @@ public class XFormsContainingDocument extends XBLContainer {
         // Dispatch xxforms-offline to all models
         for (XFormsModel currentModel: getModels()) {
             // TODO: Dispatch to children containers
-            dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
+            dispatchEvent(propertyContext, new XXFormsOfflineEvent(currentModel));
         }
 //        this.goingOnline = false;
         this.goingOffline = true;
@@ -1461,15 +1471,15 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Whether the containing document is in a phase of restoring the dynamic state.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext
      * @return                  true iif restore is in process
      */
-    public boolean isRestoringDynamicState(PipelineContext pipelineContext) {
-        return pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
+    public boolean isRestoringDynamicState(PropertyContext propertyContext) {
+        return propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
     }
 
-    public Map getSerializedControlStatesMap(PipelineContext pipelineContext) {
-        return (Map) pipelineContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
+    public Map getSerializedControlStatesMap(PropertyContext propertyContext) {
+        return (Map) propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
     /**
@@ -1534,14 +1544,14 @@ public class XFormsContainingDocument extends XBLContainer {
         addAllModels();
     }
 
-    protected void initializeNestedControls(PipelineContext pipelineContext) {
+    protected void initializeNestedControls(PropertyContext propertyContext) {
         // Call-back from super class models initialization
 
         // This is important because if controls use binds, those must be up to date
-        rebuildRecalculateIfNeeded(pipelineContext);
+        rebuildRecalculateIfNeeded(propertyContext);
 
         // Initialize controls
-        xformsControls.initialize(pipelineContext);
+        xformsControls.initialize(propertyContext);
     }
 
     private Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
@@ -1560,7 +1570,7 @@ public class XFormsContainingDocument extends XBLContainer {
      * Return the event being processed by the current event handler, null if no event is being processed.
      */
     public XFormsEvent getCurrentEvent() {
-        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
+        return (eventStack.size() == 0) ? null : eventStack.peek();
     }
           
     public List getEventHandlers(XBLContainer container) {

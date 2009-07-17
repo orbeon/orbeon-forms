@@ -168,7 +168,7 @@ public class XFormsStaticState {
     private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
                             SAXStore xhtmlDocument, String encodedStaticState) {
 
-        XFormsContainingDocument.logDebugStatic("static state", "initializing", null);
+        XFormsContainingDocument.logDebugStatic("static state", "initializing");
 
         final Element staticStateElement = staticStateDocument.getRootElement();
 
@@ -285,9 +285,8 @@ public class XFormsStaticState {
                 }
             }
             // Properties on xforms:model elements
-            for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<String,Document> currenEntry = i.next();
-                final Document currentModelDocument = currenEntry.getValue();
+            for (final Map.Entry<String, Document> currentEntry: modelDocuments.entrySet()) {
+                final Document currentModelDocument = currentEntry.getValue();
                 for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
                     final Attribute currentAttribute = (Attribute) j.next();
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
@@ -375,7 +374,7 @@ public class XFormsStaticState {
                 addModelDocument(modelElement.attributeValue("id"), modelDocument);
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", new String[] { "count", Integer.toString(modelsCount) });
+            XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", "count", Integer.toString(modelsCount));
         }
 
         // Get controls document
@@ -387,8 +386,8 @@ public class XFormsStaticState {
 
             // Find all top-level controls
             int topLevelControlsCount = 0;
-            for (Iterator i = staticStateElement.elements().iterator(); i.hasNext();) {
-                final Element currentElement = (Element) i.next();
+            for (Object o: staticStateElement.elements()) {
+                final Element currentElement = (Element) o;
                 final QName currentElementQName = currentElement.getQName();
 
                 if (!currentElementQName.equals(XFormsConstants.XFORMS_MODEL_QNAME)
@@ -403,16 +402,15 @@ public class XFormsStaticState {
                 }
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created controls document", new String[] { "top-level controls count", Integer.toString(topLevelControlsCount) });
+            XFormsContainingDocument.logDebugStatic("static state", "created controls document", "top-level controls count", Integer.toString(topLevelControlsCount));
         }
 
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
-            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
-            for (Iterator<Document> i = extractedModels.iterator(); i.hasNext();) {
-                final Document currentModelDocument = i.next();
+            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", "count", Integer.toString(extractedModels.size()));
+            for (final Document currentModelDocument: extractedModels) {
                 addModelDocument(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
             }
         }
@@ -445,8 +443,8 @@ public class XFormsStaticState {
         if (scripts.size() > 0) {
             if (xxformsScripts == null)
                 xxformsScripts = new HashMap<String, String>();
-            for (Iterator i = scripts.iterator(); i.hasNext();) {
-                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+            for (Object script: scripts) {
+                final NodeInfo currentNodeInfo = (NodeInfo) script;
                 final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
                 // Remember script content
@@ -459,27 +457,27 @@ public class XFormsStaticState {
         return uuid;
     }
 
-    /**
-     * Whether the static state is fully initialized. It is the case when:
-     *
-     * o An encodedStaticState string was provided when restoring the static state, OR
-     * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
-     *
-     * Before the static state if fully initialized, cached instances can be added and contribute to the static state.
-     * The lifecycle goes as follows:
-     *
-     * o Create initial static state from document
-     * o 0..n add instances to state
-     * o Create serialized static state string
-     *
-     * o Get existing static state from cache, OR
-     * o Restore static state from serialized form
-     *
-     * @return  true iif static state is fully initialized
-     */
-    public boolean isInitialized() {
-        return initialized;
-    }
+//    /**
+//     * Whether the static state is fully initialized. It is the case when:
+//     *
+//     * o An encodedStaticState string was provided when restoring the static state, OR
+//     * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
+//     *
+//     * Before the static state if fully initialized, cached instances can be added and contribute to the static state.
+//     * The lifecycle goes as follows:
+//     *
+//     * o Create initial static state from document
+//     * o 0..n add instances to state
+//     * o Create serialized static state string
+//     *
+//     * o Get existing static state from cache, OR
+//     * o Restore static state from serialized form
+//     *
+//     * @return  true iif static state is fully initialized
+//     */
+//    public boolean isInitialized() {
+//        return initialized;
+//    }
 
     /**
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
@@ -509,9 +507,7 @@ public class XFormsStaticState {
             // Remember versioned paths
             if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
                 final Element matchersElement = rootElement.addElement("matchers");
-                for (Iterator<URLRewriterUtils.PathMatcher> i = versionedPathMatchers.iterator(); i.hasNext();) {
-                    final URLRewriterUtils.PathMatcher pathMatcher = i.next();
-
+                for (final URLRewriterUtils.PathMatcher pathMatcher: versionedPathMatchers) {
                     matchersElement.add(pathMatcher.serialize());
                 }
             }
@@ -596,7 +592,7 @@ public class XFormsStaticState {
     }
     
     public Object getProperty(String propertyName) {
-        final Object documentProperty = (Object) nonDefaultProperties.get(propertyName);
+        final Object documentProperty = nonDefaultProperties.get(propertyName);
         if (documentProperty != null) {
             return documentProperty;
         } else {
@@ -618,20 +614,20 @@ public class XFormsStaticState {
     public boolean getBooleanProperty(String propertyName) {
         final Boolean documentProperty = (Boolean) nonDefaultProperties.get(propertyName);
         if (documentProperty != null) {
-            return documentProperty.booleanValue();
+            return documentProperty;
         } else {
             final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
-            return ((Boolean) propertyDefinition.getDefaultValue()).booleanValue();
+            return (Boolean) propertyDefinition.getDefaultValue();
         }
     }
 
     public int getIntegerProperty(String propertyName) {
         final Integer documentProperty = (Integer) nonDefaultProperties.get(propertyName);
         if (documentProperty != null) {
-            return documentProperty.intValue();
+            return documentProperty;
         } else {
             final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
-            return ((Integer) propertyDefinition.getDefaultValue()).intValue();
+            return (Integer) propertyDefinition.getDefaultValue();
         }
     }
 
@@ -678,8 +674,8 @@ public class XFormsStaticState {
      * @return                      true iif the control is a value control
      */
     public boolean isValueControl(String controlEffectiveId) {
-        final ControlInfo controlInfo = (ControlInfo) controlInfoMap.get(XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId));
-        return (controlInfo != null) ? controlInfo.isValueControl() : false;
+        final ControlInfo controlInfo = controlInfoMap.get(XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId));
+        return (controlInfo != null) && controlInfo.isValueControl();
     }
 
     /**
@@ -687,7 +683,8 @@ public class XFormsStaticState {
      * cached, compute the mapping on the fly. Note that in this case, the resulting mapping is not added to the cache
      * as the mapping is considered transient and not sharable among pages.
      *
-     * @param element       Element to get namsepace mapping for
+     * @param prefix
+     * @param element       Element to get namespace mapping for
      * @return              Map<String prefix, String uri>
      */
     public Map<String, String> getNamespaceMappings(String prefix, Element element) {
@@ -700,13 +697,13 @@ public class XFormsStaticState {
                 return cachedMap;
             } else {
                 XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached",
-                        new String[] { "prefix", prefix, "element", Dom4jUtils.elementToString(element) });
+                        "prefix", prefix, "element", Dom4jUtils.elementToString(element));
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
             XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not available because element doesn't have an id attribute",
-                    new String[] { "prefix", prefix, "element", Dom4jUtils.elementToString(element) });
+                    "prefix", prefix, "element", Dom4jUtils.elementToString(element));
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }
@@ -720,7 +717,7 @@ public class XFormsStaticState {
     }
 
     public ItemsInfo getItemsInfo(String controlPrefixedId) {
-        return (itemsInfoMap != null) ? (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlPrefixedId) : null;
+        return (itemsInfoMap != null) ? itemsInfoMap.get(controlPrefixedId) : null;
     }
 
     /**
@@ -734,7 +731,7 @@ public class XFormsStaticState {
     }
 
     public ControlInfo getAttributeControl(String prefixedForAttribute, String attributeName) {
-        final Map<String, ControlInfo> mapForId = (Map<String, ControlInfo>) attributeControls.get(prefixedForAttribute);
+        final Map<String, ControlInfo> mapForId = attributeControls.get(prefixedForAttribute);
         return (mapForId != null) ? mapForId.get(attributeName) : null;
     }
 
@@ -767,15 +764,13 @@ public class XFormsStaticState {
             analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
-                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(xxformsScripts.size()) });
+                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
 
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
             // Iterate over models to extract event handlers and scripts
-            for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<String,Document> currentEntry = i.next();
-
+            for (final Map.Entry<String, Document> currentEntry: modelDocuments.entrySet()) {
                 final String modelPrefixedId = currentEntry.getKey();
                 final Document modelDocument = currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
@@ -810,8 +805,8 @@ public class XFormsStaticState {
                 xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         // Check them all
-        for (Iterator i = actionHandlers.iterator(); i.hasNext();) {
-            final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+        for (Object actionHandler: actionHandlers) {
+            final NodeInfo currentNodeInfo = (NodeInfo) actionHandler;
 
             if (currentNodeInfo instanceof NodeWrapper) {
                 final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
@@ -903,8 +898,7 @@ public class XFormsStaticState {
 
                 // Check for mandatory and optional bindings
                 final boolean hasBinding;
-                if (controlElement != null) {
-
+                {
                     final boolean hasBind = controlElement.attribute("bind") != null;
                     final boolean hasRef = controlElement.attribute("ref") != null;
                     final boolean hasNodeset = controlElement.attribute("nodeset") != null;
@@ -928,8 +922,6 @@ public class XFormsStaticState {
                     }
 
                     hasBinding = hasBind || hasRef || hasNodeset;
-                } else {
-                    hasBinding = false;
                 }
 
                 // Create and index static control information
@@ -958,7 +950,7 @@ public class XFormsStaticState {
 
                         if (repeatAncestorsStack.size() > 0) {
                             // If we have a parent, append it
-                            final String parentRepeatId = (String) repeatAncestorsStack.peek();
+                            final String parentRepeatId = repeatAncestorsStack.peek();
                             repeatHierarchyStringBuffer.append(' ');
                             repeatHierarchyStringBuffer.append(parentRepeatId);
                         }
@@ -967,7 +959,7 @@ public class XFormsStaticState {
                     {
                         if (repeatAncestorsStack.size() > 0) {
                             // If we have a parent, tell the parent that it has a child
-                            final String parentRepeatId = (String) repeatAncestorsStack.peek();
+                            final String parentRepeatId = repeatAncestorsStack.peek();
                             List<String> parentRepeatList = repeatChildrenMap.get(parentRepeatId);
                             if (parentRepeatList == null) {
                                 parentRepeatList = new ArrayList<String>();
@@ -987,9 +979,9 @@ public class XFormsStaticState {
                     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
                     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
                     // don't check things like event handlers.
-                    final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
+                    final boolean hasNonStaticItem = (Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
                             "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
-                            null, null, null, null, locationData)).booleanValue();
+                            null, null, null, null, locationData);
 
                     // Remember information
                     if (itemsInfoMap == null)
@@ -1065,7 +1057,7 @@ public class XFormsStaticState {
                     alertsMap.put(controlPrefixedId, llhaElement);
                 }
             }
-            XFormsContainingDocument.logDebugStatic("static state", "extracted label, help, hint and alert elements", new String[] { "count", Integer.toString(lhhaCount) });
+            XFormsContainingDocument.logDebugStatic("static state", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
         }
 
         // Gather online/offline information
@@ -1073,19 +1065,17 @@ public class XFormsStaticState {
             {
                 // Create list of all the documents to search
                 final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelDocuments.size() + 1);
-                for (Iterator<Map.Entry<String,Document>> i = modelDocuments.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry<String,Document> currenEntry = i.next();
+                for (final Map.Entry<String, Document> currenEntry: modelDocuments.entrySet()) {
                     final Document currentModelDocument = currenEntry.getValue();
                     documentInfos.add(new DocumentWrapper(currentModelDocument, null, xpathConfiguration));
                 }
                 documentInfos.add(controlsDocumentInfo);
 
                 // Search for xxforms:offline which are not within instances
-                for (Iterator<DocumentWrapper> i = documentInfos.iterator(); i.hasNext();) {
-                    final DocumentInfo currentDocumentInfo = i.next();
-                    hasOfflineSupport |= ((Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
-                        "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
-                        null, null, null, null, locationData)).booleanValue();
+                for (final DocumentWrapper currentDocumentInfo: documentInfos) {
+                    hasOfflineSupport |= (Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
+                            "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
+                            null, null, null, null, locationData);
 
                     if (hasOfflineSupport) {
                         break;
@@ -1120,28 +1110,27 @@ public class XFormsStaticState {
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
-                for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = (String) i.next();
+                for (Object onlineTriggerId: onlineTriggerIds) {
+                    final String currentId = (String) onlineTriggerId;
                     addClasses(prefix + currentId, "xxforms-online");
                 }
 
-                for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = (String) i.next();
+                for (Object offlineTriggerId: offlineTriggerIds) {
+                    final String currentId = (String) offlineTriggerId;
                     addClasses(prefix + currentId, "xxforms-offline");
                 }
 
-                for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = (String) i.next();
+                for (Object offlineSaveTriggerId: offlineSaveTriggerIds) {
+                    final String currentId = (String) offlineSaveTriggerId;
                     addClasses(prefix + currentId, "xxforms-offline-save");
                 }
 
-                for (Iterator<String> i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = i.next();
+                for (final String currentId: offlineInsertTriggerIds) {
                     addClasses(prefix + currentId, "xxforms-offline-insert");
                 }
 
-                for (Iterator i = offlineDeleteTriggerIds.iterator(); i.hasNext();) {
-                    final String currentId = (String) i.next();
+                for (Object offlineDeleteTriggerId: offlineDeleteTriggerIds) {
+                    final String currentId = (String) offlineDeleteTriggerId;
                     addClasses(prefix + currentId, "xxforms-offline-delete");
                 }
             }
@@ -1157,8 +1146,8 @@ public class XFormsStaticState {
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         if (modelElements.size() > 0) {
-            for (Iterator i = modelElements.iterator(); i.hasNext();) {
-                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+            for (Object modelElement : modelElements) {
+                final NodeInfo currentNodeInfo = (NodeInfo) modelElement;
                 final Element currentModelElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement, detach);
@@ -1176,7 +1165,7 @@ public class XFormsStaticState {
     private void addClasses(String controlPrefixedId, String classes) {
         if (controlClasses == null)
             controlClasses = new HashMap<String, String>();
-        final String currentClasses = (String) controlClasses.get(controlPrefixedId);
+        final String currentClasses = controlClasses.get(controlPrefixedId);
         if (currentClasses == null) {
             // Set
             controlClasses.put(controlPrefixedId, classes);
@@ -1193,7 +1182,7 @@ public class XFormsStaticState {
         if (sb.length() > 0)
             sb.append(' ');
 
-        final String classes = (String) controlClasses.get(prefixedId);
+        final String classes = controlClasses.get(prefixedId);
         if (classes != null)
             sb.append(classes);
     }
@@ -1214,9 +1203,7 @@ public class XFormsStaticState {
         final String[] observersStaticIds = newEventHandlerImpl.getObserversStaticIds();
         if (observersStaticIds.length > 0) {
             // There is at least one observer
-            for (int j = 0; j < observersStaticIds.length; j++) {
-                final String currentObserverStaticId = observersStaticIds[j];
-
+            for (final String currentObserverStaticId: observersStaticIds) {
                 // NOTE: Handle special case of global id on containing document
                 final String currentObserverPrefixedId
                         = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID.equals(currentObserverStaticId)
@@ -1242,8 +1229,7 @@ public class XFormsStaticState {
             if (newEventHandlerImpl.isAllEvents()) {
                 eventNamesMap.put(XFormsConstants.XXFORMS_ALL_EVENTS, "");
             } else {
-                for (Iterator i = newEventHandlerImpl.getEventNames().keySet().iterator(); i.hasNext();) {
-                    final String eventName = (String) i.next();
+                for (final String eventName: newEventHandlerImpl.getEventNames().keySet()) {
                     eventNamesMap.put(eventName, "");
                 }
             }
@@ -1252,15 +1238,15 @@ public class XFormsStaticState {
 
     /**
      * Visit all the control elements without handling repeats or looking at the binding contexts. This is done entirely
-     * staticaly. Only controls are visited, including grouping controls, leaf controls, and components.
+     * statically. Only controls are visited, including grouping controls, leaf controls, and components.
      */
     private void visitAllControlStatic(Element startElement, ControlElementVisitorListener controlElementVisitorListener) {
         handleControlsStatic(controlElementVisitorListener, startElement);
     }
 
     private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container) {
-        for (Iterator i = container.elements().iterator(); i.hasNext();) {
-            final Element currentControlElement = (Element) i.next();
+        for (Object o: container.elements()) {
+            final Element currentControlElement = (Element) o;
 
             final String controlName = currentControlElement.getName();
             final String controlId = currentControlElement.attributeValue("id");

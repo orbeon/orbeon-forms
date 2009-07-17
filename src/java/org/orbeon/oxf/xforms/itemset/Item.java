@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.itemset;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -103,12 +103,12 @@ public class Item implements ItemContainer {
         return value;
     }
 
-    public String getExternalValue(PipelineContext pipelineContext) {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : value;
+    public String getExternalValue(PropertyContext propertyContext) {
+        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(propertyContext, value) : value;
     }
 
-    public String getExternalJSValue(PipelineContext pipelineContext) {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : XFormsUtils.escapeJavaScript(value);
+    public String getExternalJSValue(PropertyContext propertyContext) {
+        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(propertyContext, value) : XFormsUtils.escapeJavaScript(value);
     }
 
     public String getExternalJSLabel() {

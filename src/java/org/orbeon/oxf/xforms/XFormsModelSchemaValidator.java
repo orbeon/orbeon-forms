@@ -47,6 +47,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -99,8 +100,8 @@ public class XFormsModelSchemaValidator {
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
-        for (Iterator i = modelElement.elements(XMLConstants.XML_SCHEMA_QNAME).iterator(); i.hasNext(); ) {
-            final Element currentSchemaElement = (Element) i.next();
+        for (Object o: modelElement.elements(XMLConstants.XML_SCHEMA_QNAME)) {
+            final Element currentSchemaElement = (Element) o;
 
             if (schemaElements == null)
                 schemaElements = new ArrayList<Element>();
@@ -130,7 +131,7 @@ public class XFormsModelSchemaValidator {
         }
 
         public void warning(final Locator[] locators, final String message) {
-            if (locators == null && locators.length == 0) {
+            if (locators == null || locators.length == 0) {
                 logger.warn(message);
             } else {
                 final String first = XMLUtils.toString(locators[0]);
@@ -237,7 +238,7 @@ public class XFormsModelSchemaValidator {
         }
 
         public String resolveNamespacePrefix(final String prefix) {
-            return (String) Dom4jUtils.getNamespaceContext(currentElement).get(prefix);
+            return Dom4jUtils.getNamespaceContext(currentElement).get(prefix);
         }
 
         public String getBaseUri() {
@@ -300,8 +301,8 @@ public class XFormsModelSchemaValidator {
             final List attributesList = element.attributes();
             final AttributesImpl attributes = new AttributesImpl();
 
-            for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();) {
-                final Attribute attribute = (Attribute) iterator.next();
+            for (Object anAttributesList: attributesList) {
+                final Attribute attribute = (Attribute) anAttributesList;
                 final String attributeURI = attribute.getNamespaceURI();
                 final String attributeName = attribute.getName();
                 final String attributeQName = attribute.getQualifiedName();
@@ -539,7 +540,7 @@ public class XFormsModelSchemaValidator {
                 if (!acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, null, attributeDatatypeRef)) {
                     if (isReportErrors) {
                         final Attribute attribute = element.attribute(i);
-                        acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, stringRef, (DatatypeRef) null);
+                        acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, stringRef, null);
                         addSchemaError(attribute, stringRef.str);
                         isElementChildrenValid = false;
                     } else {
@@ -567,7 +568,7 @@ public class XFormsModelSchemaValidator {
         // Validate children elements
         for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
             final Element childElement = (Element) iterator.next();
-            final boolean isChildElementValid = validateElement((Element) childElement, acceptor, icc, isReportErrors);
+            final boolean isChildElementValid = validateElement(childElement, acceptor, icc, isReportErrors);
             if (!isChildElementValid) {
                 if (isReportErrors) {
                     isElementChildrenValid = false;
@@ -638,26 +639,26 @@ public class XFormsModelSchemaValidator {
     /**
      * Load XForms model schemas.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      */
-    public void loadSchemas(final PipelineContext pipelineContext) {
+    public void loadSchemas(final PropertyContext propertyContext) {
 
-        // Check for external schemas
+        // Check for external schema
         if (schemaURIs != null && schemaURIs.length > 0) {
             // External context
-            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-            final String resolvedURLString = XFormsUtils.resolveServiceURL(pipelineContext, modelElement, schemaURIs[0],
+            final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, modelElement, schemaURIs[0],
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             final URL resolvedURL = NetUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
 
             // Load associated grammar
-            schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
+            schemaGrammar = loadCacheGrammar(propertyContext, resolvedURL.toExternalForm());
         }
 
-        // Check for inline schemas
+        // Check for inline schema
         if (schemaElements != null && schemaElements.size() > 0) {
             schemaGrammar = loadInlineGrammar(null, schemaElements.get(0)); // TODO: specify baseURI
         }
@@ -666,7 +667,7 @@ public class XFormsModelSchemaValidator {
     /**
      * Load and cache a Grammar for a given schema URI.
      */
-    private Grammar loadCacheGrammar(final PipelineContext pipelineContext, final String schemaURI) {
+    private Grammar loadCacheGrammar(final PropertyContext propertyContext, final String schemaURI) {
         try {
             final URL url = URLFactory.createURL(schemaURI);
             final Long modificationTime = NetUtils.getLastModifiedAsLong(url);
@@ -676,7 +677,7 @@ public class XFormsModelSchemaValidator {
 
             final SchemaInfo schemaInfo;
             {
-                final Object cached = cache.findValid(pipelineContext, schemaKey, modificationTime);
+                final Object cached = cache.findValid(propertyContext, schemaKey, modificationTime);
                 schemaInfo = cached == null ? null : (SchemaInfo) cached;
             }
 
@@ -692,7 +693,7 @@ public class XFormsModelSchemaValidator {
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
                 newSchemaInfo.setGrammar(grammar);
-                cache.add(pipelineContext, schemaKey, modificationTime, newSchemaInfo);
+                cache.add(propertyContext, schemaKey, modificationTime, newSchemaInfo);
             } else {
                 grammar = schemaInfo.getGrammar();
             }
@@ -811,7 +812,7 @@ public class XFormsModelSchemaValidator {
                     final ComplexTypeExp complexTypeExpression = schema.complexTypes.get(typeLocalname);
                     if (complexTypeExpression != null) {
                         // There is a complex type definition
-                        if (complexTypeExpression != null && complexTypeExpression.simpleBaseType != null) {
+                        if (complexTypeExpression.simpleBaseType != null) {
                             // Complex type with simple content
                             // Here, we only validate the datatype part
                             // NOTE: Here we are guessing a little bit from MSV by looking at simpleBaseType. Is this 100% correct?

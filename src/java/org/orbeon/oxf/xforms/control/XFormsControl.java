@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -134,7 +135,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return container.getContextStack();
     }
 
-    public void iterationRemoved(PipelineContext pipelineContext) {
+    public void iterationRemoved(PropertyContext propertyContext) {
         // NOP, can be overridden
     }
 
@@ -176,11 +177,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return (controlElement != null) ? (LocationData) controlElement.getData() : null;
     }
 
-    public String getAlert(PipelineContext pipelineContext) {
+    public String getAlert(PropertyContext propertyContext) {
         if (!isAlertEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
-                alert = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, true, tempContainsHTML);
+                alert = getLabelHelpHintAlertValue(propertyContext, lhhaElement, true, tempContainsHTML);
                 isHTMLAlert = alert != null && tempContainsHTML[0];
             }
             isAlertEvaluated = true;
@@ -198,11 +199,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return isHTMLAlert;
     }
 
-    public String getHelp(PipelineContext pipelineContext) {
+    public String getHelp(PropertyContext propertyContext) {
         if (!isHelpEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
-                help = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, true, tempContainsHTML);
+                help = getLabelHelpHintAlertValue(propertyContext, lhhaElement, true, tempContainsHTML);
                 isHTMLHelp = help != null && tempContainsHTML[0];
             }
             isHelpEvaluated = true;
@@ -220,11 +221,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return isHTMLHelp;
     }
 
-    public String getHint(PipelineContext pipelineContext) {
+    public String getHint(PropertyContext propertyContext) {
         if (!isHintEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
-                hint = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
+                hint = getLabelHelpHintAlertValue(propertyContext, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
 
                 isHTMLHint = hint != null && tempContainsHTML[0];
             }
@@ -243,11 +244,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return isHTMLHint;
     }
 
-    public String getLabel(PipelineContext pipelineContext) {
+    public String getLabel(PropertyContext propertyContext) {
         if (!isLabelEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
                 final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
-                label = getLabelHelpHintAlertValue(pipelineContext, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
+                label = getLabelHelpHintAlertValue(propertyContext, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
 
                 isHTMLLabel = label != null && tempContainsHTML[0];
             }
@@ -269,13 +270,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Get the value of a label, help, hint or alert related to this control.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
+     * @param containsHTML          whether the result actually contains HTML (null allowed)    @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    private String getLabelHelpHintAlertValue(PipelineContext pipelineContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
+    private String getLabelHelpHintAlertValue(PropertyContext propertyContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
         final XFormsContextStack contextStack = getContextStack();
         final String value;
@@ -285,8 +285,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else if (lhhaElement.getParent() == getControlElement()) {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(this);
-            contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.pushBinding(propertyContext, lhhaElement);
+            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         } else {
             // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
@@ -297,7 +297,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final String parentStaticId = parentElement.attributeValue("id");
             if (parentStaticId == null) {
                 // Assume we are at the top-level
-                contextStack.resetBindingContext(pipelineContext);
+                contextStack.resetBindingContext(propertyContext);
             } else {
                 // Not at top-level, find containing object
 
@@ -308,13 +308,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     contextStack.setBinding((XFormsControl) contextObject);
                 } else {
                     // No context, don't evaluate (not sure why this should happen!)
-                    contextStack.resetBindingContext(pipelineContext);
+                    contextStack.resetBindingContext(propertyContext);
                 }
             }
 
             // Push binding relative to context established above and evaluate
-            contextStack.pushBinding(pipelineContext, lhhaElement);
-            value = XFormsUtils.getElementValue(pipelineContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.pushBinding(propertyContext, lhhaElement);
+            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         }
         return value;
@@ -458,8 +458,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Compare values of extension attributes if any
         if (extensionAttributesValues != null) {
-            for (Iterator<Map.Entry<QName,String>> i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<QName,String> currentEntry = i.next();
+            for (final Map.Entry<QName, String> currentEntry: extensionAttributesValues.entrySet()) {
                 final QName currentName = currentEntry.getKey();
                 final String currentValue = currentEntry.getValue();
 
@@ -474,7 +473,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
     }
 
@@ -485,30 +484,29 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return bindingContext;
     }
 
-    public final void evaluateIfNeeded(PipelineContext pipelineContext) {
+    public final void evaluateIfNeeded(PropertyContext propertyContext) {
         if (!isEvaluated) {
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
-            evaluate(pipelineContext);
+            evaluate(propertyContext);
 
             // Evaluate standard extension attributes
-            evaluateExtensionAttributes(pipelineContext, EXTENSION_ATTRIBUTES);
+            evaluateExtensionAttributes(propertyContext, EXTENSION_ATTRIBUTES);
             // Evaluate custom extension attributes
             final QName[] extensionAttributes = getExtensionAttributes();
             if (extensionAttributes != null) {
-                evaluateExtensionAttributes(pipelineContext, extensionAttributes);
+                evaluateExtensionAttributes(propertyContext, extensionAttributes);
             }
         }
     }
 
-    private void evaluateExtensionAttributes(PipelineContext pipelineContext, QName[] attributeQNames) {
+    private void evaluateExtensionAttributes(PropertyContext propertyContext, QName[] attributeQNames) {
         final Element controlElement = getControlElement();
-        for (int i = 0; i < attributeQNames.length; i++) {
-            final QName avtAttributeQName = attributeQNames[i];
+        for (final QName avtAttributeQName: attributeQNames) {
             final String attributeValue = controlElement.attributeValue(avtAttributeQName);
 
             if (attributeValue != null) {
                 // NOTE: This can return null if there is no context
-                final String resolvedValue = evaluateAvt(pipelineContext, attributeValue);
+                final String resolvedValue = evaluateAvt(propertyContext, attributeValue);
 
                 if (extensionAttributesValues == null)
                     extensionAttributesValues = new HashMap<QName, String>();
@@ -528,11 +526,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             extensionAttributesValues.clear();
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
-        getLabel(pipelineContext);
-        getHint(pipelineContext);
-        getHelp(pipelineContext);
-        getAlert(pipelineContext);
+    protected void evaluate(PropertyContext propertyContext) {
+        getLabel(propertyContext);
+        getHint(propertyContext);
+        getHelp(propertyContext);
+        getAlert(propertyContext);
     }
 
     /**
@@ -551,7 +549,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return containingDocument.getStaticState().getEventHandlers(getPrefixedId());
     }
 
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
             // Try to update xforms:repeat indices based on this
@@ -581,8 +579,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     final XFormsControls controls = containingDocument.getControls();
 
                     // Find all repeat iterations and controls again
-                    for (Iterator<String> i = repeatIterationsToModify.iterator(); i.hasNext();) {
-                        final String repeatIterationEffectiveId = i.next();
+                    for (final String repeatIterationEffectiveId : repeatIterationsToModify) {
                         final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) controls.getObjectByEffectiveId(repeatIterationEffectiveId);
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
 
@@ -590,7 +587,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                         if (XFormsServer.logger.isDebugEnabled()) {
                             containingDocument.logDebug("repeat", "setting index upon focus change",
-                                    new String[] { "new index", Integer.toString(newRepeatIndex)});
+                                    "new index", Integer.toString(newRepeatIndex));
                         }
 
                         repeatControl.setIndex(newRepeatIndex);
@@ -612,7 +609,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public void performTargetAction(PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
@@ -708,14 +705,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     private boolean addAttributesDiffs(XFormsControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
 
-        final XFormsControl control1 = (XFormsControl) other;
+        final XFormsControl control1 = other;
         final XFormsControl control2 = this;
 
         boolean added = false;
 
-        for (int i = 0; i < attributeQNames.length; i++) {
-            final QName avtAttributeQName = attributeQNames[i];
-
+        for (final QName avtAttributeQName: attributeQNames) {
             // Skip if namespace URI is excluded
             if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
                 continue;
@@ -745,12 +740,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public void addAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
         final QName[] extensionAttributes = EXTENSION_ATTRIBUTES;
         if (extensionAttributes != null) {
-            final XFormsControl control1 = (XFormsControl) originalControl;
+            final XFormsControl control1 = originalControl;
             final XFormsControl control2 = this;
 
-            for (int i = 0; i < extensionAttributes.length; i++) {
-                final QName avtAttributeQName = extensionAttributes[i];
-
+            for (final QName avtAttributeQName: extensionAttributes) {
                 final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
                 final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
 
@@ -781,11 +774,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an attribute of the control as an AVT.
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext
      * @param attributeValue    value of the attribute
      * @return                  value of the AVT or null if cannot be computed
      */
-    protected String evaluateAvt(PipelineContext pipelineContext, String attributeValue) {
+    protected String evaluateAvt(PropertyContext propertyContext, String attributeValue) {
 
         if (attributeValue.indexOf('{') == -1) {
             // Definitely not an AVT
@@ -810,7 +803,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 final XFormsFunction.Context functionContext = getFunctionContext();
 
                 // Evaluate
-                final String result = XPathCache.evaluateAsAvt(pipelineContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
+                final String result = XPathCache.evaluateAsAvt(propertyContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
                         bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
 
                 // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -824,11 +817,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext
      * @param xpathString       XPath expression
      * @return                  value, or null if cannot be computed
      */
-    protected String evaluateAsString(PipelineContext pipelineContext, String xpathString) {
+    protected String evaluateAsString(PropertyContext propertyContext, String xpathString) {
 
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
         final List<Item> contextNodeset = bindingContext.getNodeset();
@@ -844,7 +837,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Get function context
             final XFormsFunction.Context functionContext = getFunctionContext();
 
-            final String result = XPathCache.evaluateAsString(pipelineContext, contextNodeset, bindingContext.getPosition(),
+            final String result = XPathCache.evaluateAsString(propertyContext, contextNodeset, bindingContext.getPosition(),
                                 xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                                 XFormsContainingDocument.getFunctionLibrary(),
                                 getFunctionContext(), null, getLocationData());
@@ -859,14 +852,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param pipelineContext       current pipeline context
+     * @param propertyContext
      * @param contextItem           context item
      * @param xpathString           XPath expression
      * @param prefixToURIMap        namespace mappings to use
      * @param variableToValueMap    variables to use
      * @return                      value, or null if cannot be computed
      */
-    protected String evaluateAsString(PipelineContext pipelineContext, Item contextItem, String xpathString,
+    protected String evaluateAsString(PropertyContext propertyContext, Item contextItem, String xpathString,
                                       Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap) {
 
         if (contextItem == null) {
@@ -882,7 +875,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final XFormsFunction.Context functionContext = getFunctionContext();
 
             // Evaluate
-            final String result = XPathCache.evaluateAsString(pipelineContext, contextItem,
+            final String result = XPathCache.evaluateAsString(propertyContext, contextItem,
                                 xpathString, prefixToURIMap, variableToValueMap,
                                 XFormsContainingDocument.getFunctionLibrary(),
                                 getFunctionContext(), null, getLocationData());
@@ -930,8 +923,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public void addExtensionAttributes(AttributesImpl attributesImpl, String namespaceURI) {
         if (extensionAttributesValues != null) {
-            for (Iterator<Map.Entry<QName,String>> i = extensionAttributesValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<QName,String> currentEntry = i.next();
+            for (final Map.Entry<QName, String> currentEntry: extensionAttributesValues.entrySet()) {
                 final QName currentName = currentEntry.getKey();
 
                 // Skip if namespace URI is excluded
@@ -1051,8 +1043,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return false;
 
         final Iterator j = nodeset2.iterator();
-        for (Iterator i = nodeset1.iterator(); i.hasNext(); ) {
-            final NodeInfo currentNodeInfo1 = (NodeInfo) i.next();
+        for (Object aNodeset1: nodeset1) {
+            final NodeInfo currentNodeInfo1 = (NodeInfo) aNodeset1;
             final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
 
             // Found a difference

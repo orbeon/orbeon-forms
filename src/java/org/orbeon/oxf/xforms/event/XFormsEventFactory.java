@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class XFormsEventFactory {
 
-    private static Map nameToClassMap = new HashMap();
+    private static Map<String, Factory> nameToClassMap = new HashMap<String, Factory>();
 
     static {
         nameToClassMap.put(XFormsEvents.XFORMS_DOM_ACTIVATE, new Factory() {
@@ -304,7 +304,7 @@ public class XFormsEventFactory {
     private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                            String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
 
-        final Factory factory = (Factory) nameToClassMap.get(eventName);
+        final Factory factory = nameToClassMap.get(eventName);
         if (factory == null) {
             if (!allowCustomEvents) {
                 // No custom events are allowed, just throw

@@ -18,12 +18,13 @@ import java.util.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * PipelineContext represents a context object passed to all the processors running in a given
  * pipeline session.
  */
-public class PipelineContext {
+public class PipelineContext implements PropertyContext {
 
     public static class TraceInfo {
         public final long start;
@@ -99,9 +100,9 @@ public class PipelineContext {
         void add(final TraceInfo tinf);
     }
 
-    private Map attributes = new HashMap();
+    private Map<Object, Object> attributes = new HashMap<Object, Object>();
 
-    private List listeners;
+    private List<ContextListener> listeners;
 
     private boolean destroyed;
 
@@ -165,11 +166,11 @@ public class PipelineContext {
     /**
      * Add a new listener to the context.
      *
-     * @param listener listner to add
+     * @param listener listener to add
      */
     public synchronized void addContextListener(ContextListener listener) {
         if (listeners == null)
-            listeners = new ArrayList();
+            listeners = new ArrayList<ContextListener>();
         listeners.add(listener);
     }
 
@@ -186,8 +187,7 @@ public class PipelineContext {
                     trace.contextDestroyed(success);
                 }
                 if (listeners != null) {
-                    for (Iterator i = listeners.iterator(); i.hasNext();) {
-                        final ContextListener contextListener = (ContextListener) i.next();
+                    for (final ContextListener contextListener: listeners) {
                         contextListener.contextDestroyed(success);
                     }
                 }

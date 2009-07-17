@@ -100,7 +100,7 @@ public class XMLUtils {
 
     private static final ContentHandler NULL_CONTENT_HANDLER = new ContentHandlerAdapter();
 
-    private static DocumentBuilderFactory documentBuilderFactory;
+    private static final DocumentBuilderFactory documentBuilderFactory;
     private static Map<Thread, DocumentBuilder> documentBuilders = null;
 
     private static SAXParserFactory nonValidatingXIncludeSAXParserFactory;
@@ -469,25 +469,25 @@ public class XMLUtils {
         }
     }
 
-    public static Document fileToDOM(File xmlFile) {
-        try {
-            return getThreadDocumentBuilder().parse(new InputSource(new FileReader(xmlFile)));
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    public static Document base64ToDOM(String base64) {
-        try {
-            return getThreadDocumentBuilder().parse(new InputSource(new ByteArrayInputStream(Base64.decode(base64))));
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
+//    public static Document fileToDOM(File xmlFile) {
+//        try {
+//            return getThreadDocumentBuilder().parse(new InputSource(new FileReader(xmlFile)));
+//        } catch (SAXException e) {
+//            throw new OXFException(e);
+//        } catch (IOException e) {
+//            throw new OXFException(e);
+//        }
+//    }
+//
+//    public static Document base64ToDOM(String base64) {
+//        try {
+//            return getThreadDocumentBuilder().parse(new InputSource(new ByteArrayInputStream(Base64.decode(base64))));
+//        } catch (SAXException e) {
+//            throw new OXFException(e);
+//        } catch (IOException e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     /**
      * Associated one DocumentBuilder per thread. This is so we avoid synchronizing (parse() for
@@ -584,9 +584,9 @@ public class XMLUtils {
         }
     }
 
-    public static DigestContentHandler getDigestContentHandler(String algorithm) {
-        return new DigestContentHandler(algorithm);
-    }
+//    public static DigestContentHandler getDigestContentHandler(String algorithm) {
+//        return new DigestContentHandler(algorithm);
+//    }
 
     /**
      * This digester is based on some existing public document (not sure which). There are some
@@ -944,54 +944,54 @@ public class XMLUtils {
         }
     }
 
-    /**
-     * Iterator over DOM Attributes.
-     *
-     * The object returned is of type XMLUtils.Attribute.
-     */
-    public static class AttributesIterator implements Iterator {
-
-        private Attributes attributes;
-        private int size;
-        private int currentIndex;
-
-        public AttributesIterator(Attributes attributes) {
-            this.attributes = attributes;
-            size = attributes.getLength();
-            currentIndex = 0;
-        }
-
-        public boolean hasNext() {
-            return currentIndex < size;
-        }
-
-        public Object next() {
-            if (!hasNext())
-                throw new NoSuchElementException();
-            final int _currentIndex = currentIndex++;
-            return new Attribute() {
-                public String getURI() {
-                    return attributes.getURI(_currentIndex);
-                }
-
-                public String getLocalName() {
-                    return attributes.getLocalName(_currentIndex);
-                }
-
-                public String getQName() {
-                    return attributes.getQName(_currentIndex);
-                }
-
-                public String getValue() {
-                    return attributes.getValue(_currentIndex);
-                }
-            };
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
+//    /**
+//     * Iterator over DOM Attributes.
+//     *
+//     * The object returned is of type XMLUtils.Attribute.
+//     */
+//    public static class AttributesIterator implements Iterator {
+//
+//        private Attributes attributes;
+//        private int size;
+//        private int currentIndex;
+//
+//        public AttributesIterator(Attributes attributes) {
+//            this.attributes = attributes;
+//            size = attributes.getLength();
+//            currentIndex = 0;
+//        }
+//
+//        public boolean hasNext() {
+//            return currentIndex < size;
+//        }
+//
+//        public Object next() {
+//            if (!hasNext())
+//                throw new NoSuchElementException();
+//            final int _currentIndex = currentIndex++;
+//            return new Attribute() {
+//                public String getURI() {
+//                    return attributes.getURI(_currentIndex);
+//                }
+//
+//                public String getLocalName() {
+//                    return attributes.getLocalName(_currentIndex);
+//                }
+//
+//                public String getQName() {
+//                    return attributes.getQName(_currentIndex);
+//                }
+//
+//                public String getValue() {
+//                    return attributes.getValue(_currentIndex);
+//                }
+//            };
+//        }
+//
+//        public void remove() {
+//            throw new UnsupportedOperationException();
+//        }
+//    }
 
     /**
      * Convert an Object to a String and generate SAX characters events.

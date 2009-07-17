@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
@@ -44,7 +44,7 @@ public class InstanceReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
 
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // Handling of XML media type
@@ -61,10 +61,10 @@ public class InstanceReplacer extends BaseReplacer {
                 // case, I think that this should be a (currently non-specified by XForms)
                 // xforms-binding-error.
 
-                submission.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(submission));
+                submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(submission));
             } else {
 
-                final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(pipelineContext,
+                final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext,
                         p.xpathContext, replaceInstanceNoTargetref, p.submissionElementContextItem);
 
                 if (destinationNodeInfo == null) {
@@ -75,14 +75,14 @@ public class InstanceReplacer extends BaseReplacer {
                     // xforms-submit-error with an error-type of target-error."
 
                     throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
 
                 // This is the instance which is effectively going to be updated
                 final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
                 if (updatedInstance == null) {
                     throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element in an existing instance for replace=\"instance\".", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
 
                 // Whether the destination node is the root element of an instance
@@ -90,7 +90,7 @@ public class InstanceReplacer extends BaseReplacer {
                 if (p2.resolvedXXFormsReadonly && !isDestinationRootElement) {
                     // Only support replacing the root element of an instance when using a shared instance
                     throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
 
                 // Obtain root element to insert
@@ -133,7 +133,7 @@ public class InstanceReplacer extends BaseReplacer {
                     newDocumentRootElement = newInstance.getInstanceRootElementInfo();
                 } catch (Exception e) {
                     throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
-                            new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
                 }
 
                 // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
@@ -147,7 +147,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                     // Handle new instance and associated event markings
                     final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                    replaceModel.handleUpdatedInstance(pipelineContext, newInstance, newDocumentRootElement);
+                    replaceModel.handleUpdatedInstance(propertyContext, newInstance, newDocumentRootElement);
 
                     // Dispatch xforms-delete event
                     // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
@@ -157,7 +157,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                     // Dispatch xforms-insert event
                     // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-                    newInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
+                    newInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
                         new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
                                 "after", null, null, true));
 
@@ -170,7 +170,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                     // Insert before the target node, so that the position of the inserted node
                     // wrt its parent does not change after the target node is removed
-                    final List insertedNode = XFormsInsertAction.doInsert(pipelineContext, containingDocument, "before",
+                    final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, "before",
                             destinationCollection, destinationNodeInfo.getParent(),
                             Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -178,7 +178,7 @@ public class InstanceReplacer extends BaseReplacer {
                         // The node to replace is NOT a root element
 
                         // Perform the deletion of the selected node
-                        XFormsDeleteAction.doDelete(pipelineContext, containingDocument, destinationCollection, 1, true);
+                        XFormsDeleteAction.doDelete(propertyContext, containingDocument, destinationCollection, 1, true);
                     }
 
                     // Perform model instance update
@@ -188,16 +188,16 @@ public class InstanceReplacer extends BaseReplacer {
                     // * doDelete() does as well
                     // Does this mean that we should check that the node is still where it should be?
                     final XFormsModel updatedModel = updatedInstance.getModel(containingDocument);
-                    updatedModel.handleUpdatedInstance(pipelineContext, updatedInstance, (NodeInfo) insertedNode.get(0));
+                    updatedModel.handleUpdatedInstance(propertyContext, updatedInstance, (NodeInfo) insertedNode.get(0));
                 }
 
                 // Dispatch xforms-submit-done
-                dispatchSubmitDone(pipelineContext, connectionResult);
+                dispatchSubmitDone(propertyContext, connectionResult);
             }
         } else {
             // Other media type
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
-                    new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
     }
 }

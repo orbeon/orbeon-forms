@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 
@@ -28,8 +28,8 @@ public abstract class BaseReplacer implements Replacer {
         this.containingDocument = containingDocument;
     }
 
-    protected void dispatchSubmitDone(PipelineContext pipelineContext, ConnectionResult connectionResult) {
+    protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {
         submission.getXBLContainer(containingDocument)
-                .dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(submission, connectionResult));
+                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(submission, connectionResult));
     }
 }

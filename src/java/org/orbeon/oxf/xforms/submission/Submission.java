@@ -14,20 +14,20 @@
 
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents a submission mechanism.
  */
 public interface Submission {
 
-    boolean isMatch(PipelineContext pipelineContext,
+    boolean isMatch(PropertyContext propertyContext,
                     XFormsModelSubmission.SubmissionParameters p,
                     XFormsModelSubmission.SecondPassParameters p2,
                     XFormsModelSubmission.SerializationParameters sp);
 
-    ConnectionResult connect(PipelineContext pipelineContext,
+    ConnectionResult connect(PropertyContext propertyContext,
                     XFormsModelSubmission.SubmissionParameters p,
                     XFormsModelSubmission.SecondPassParameters p2,
                     XFormsModelSubmission.SerializationParameters sp) throws Exception;

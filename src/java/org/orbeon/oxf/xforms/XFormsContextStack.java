@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -70,10 +70,10 @@ public class XFormsContextStack {
     /**
      * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
      */
-    public void resetBindingContext(PipelineContext pipelineContext) {
+    public void resetBindingContext(PropertyContext propertyContext) {
         if (parentBindingContext == null) {
             // Reset to default model
-            resetBindingContext(pipelineContext, container.getDefaultModel());
+            resetBindingContext(propertyContext, container.getDefaultModel());
         } else {
             // Clear existing stack
             contextStack.clear();
@@ -85,7 +85,7 @@ public class XFormsContextStack {
     /**
      * Reset the binding context to the root of the given model's first instance.
      */
-    public void resetBindingContext(PipelineContext pipelineContext, XFormsModel xformsModel) {
+    public void resetBindingContext(PropertyContext propertyContext, XFormsModel xformsModel) {
 
         // Clear existing stack
         contextStack.clear();
@@ -109,16 +109,16 @@ public class XFormsContextStack {
 
         // Add model variables for default model
         if (xformsModel != null) {
-            addModelVariables(pipelineContext, xformsModel);
+            addModelVariables(propertyContext, xformsModel);
         }
     }
 
-    private void addModelVariables(PipelineContext pipelineContext, XFormsModel xformsModel) {
+    private void addModelVariables(PropertyContext propertyContext, XFormsModel xformsModel) {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         List<BindingContext.VariableInfo> variableInfos = null;
-        for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); ) {
-            final Element currentVariableElement = (Element) i.next();
+        for (Object o: xformsModel.getModelDocument().getRootElement().elements("variable")) {
+            final Element currentVariableElement = (Element) o;
 
             // All variables in the model are in scope for the nested binds and actions.
             // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
@@ -129,7 +129,7 @@ public class XFormsContextStack {
             // because BindingContext caches variables in scope, after a first request for in-scope variables, further
             // variables values could not be added. The method below temporarily adds more elements on the stack but it
             // is safer.
-            pushVariable(currentVariableElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+            pushVariable(currentVariableElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
 
             // Add VariableInfo created during above pushVariable(). There must be only one!
             if (variableInfos == null)
@@ -144,8 +144,7 @@ public class XFormsContextStack {
             final int variableCount = variableInfos.size();
 
             if (XFormsServer.logger.isDebugEnabled()) {
-                containingDocument.logDebug("model", "evaluated variables",
-                        new String[] { "count", Integer.toString(variableCount) });
+                containingDocument.logDebug("model", "evaluated variables", "count", Integer.toString(variableCount));
             }
 
             // Remove extra bindings added
@@ -186,31 +185,31 @@ public class XFormsContextStack {
     /**
      * Set the binding for an event handler container. Support controls, models, and submissions.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext       current PropertyContext
      * @param eventObserver container object
      */
-    public void setBinding(PipelineContext pipelineContext, XFormsEventObserver eventObserver) {
+    public void setBinding(PropertyContext propertyContext, XFormsEventObserver eventObserver) {
 
         if (eventObserver == null) {
             // Odd case which can happen when an action handler and control are in a removed iteration. Set an empty context.
             // OR, case where an action handler is within another action handler!
             // NOTE: Should ideally still try to figure out the context model, for example.
-            resetBindingContext(pipelineContext);
+            resetBindingContext(propertyContext);
             final XFormsModel xformsModel = container.getDefaultModel();
             contextStack.push(new BindingContext(null, xformsModel, XFormsConstants.EMPTY_ITEM_LIST, 0, null, true, null, (xformsModel != null) ? xformsModel.getLocationData() : null, false, null));
         } else if (eventObserver instanceof XFormsControl) {
             setBinding((XFormsControl) eventObserver);
         } else if (eventObserver instanceof XFormsModel) {
             final XFormsModel xformsModel = (XFormsModel) eventObserver;
-            resetBindingContext(pipelineContext, xformsModel);
+            resetBindingContext(propertyContext, xformsModel);
         } else if (eventObserver instanceof XFormsInstance) {
             final XFormsInstance xformsInstance = (XFormsInstance) eventObserver;
-            resetBindingContext(pipelineContext, xformsInstance.getModel(containingDocument));
+            resetBindingContext(propertyContext, xformsInstance.getModel(containingDocument));
         } else if (eventObserver instanceof XFormsModelSubmission) {
             final XFormsModelSubmission submission = (XFormsModelSubmission) eventObserver;
-            final XFormsModel xformsModel = (XFormsModel) submission.getModel();
-            resetBindingContext(pipelineContext, xformsModel);
-            pushBinding(pipelineContext, submission.getSubmissionElement());
+            final XFormsModel xformsModel = submission.getModel();
+            resetBindingContext(propertyContext, xformsModel);
+            pushBinding(propertyContext, submission.getSubmissionElement());
         } else {
             // Should not happen
             throw new OXFException("Invalid XFormsEventObserver type: " + eventObserver.getClass());
@@ -228,12 +227,12 @@ public class XFormsContextStack {
 //                    final int childrenSize = children.size();
 //                    if (index > 0 && index < childrenSize) {
 //                        final RepeatIterationControl repeatIteration = (RepeatIterationControl) children.get(index);
-//                        xformsControls.setBinding(pipelineContext, repeatIteration);
+//                        xformsControls.setBinding(propertyContext, repeatIteration);
 //                    } else {
-//                        xformsControls.setBinding(pipelineContext, (XFormsControl) eventObserver);
+//                        xformsControls.setBinding(propertyContext, (XFormsControl) eventObserver);
 //                    }
 //                } else {
-//                    xformsControls.setBinding(pipelineContext, (XFormsControl) eventObserver);
+//                    xformsControls.setBinding(propertyContext, (XFormsControl) eventObserver);
 //                }
 //            } else {
 //                contextStack.setBinding((XFormsControl) eventObserver);
@@ -250,10 +249,10 @@ public class XFormsContextStack {
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext   current PropertyContext
      * @param bindingElement    current element containing node binding attributes
      */
-    public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
+    public void pushBinding(PropertyContext propertyContext, Element bindingElement) {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
@@ -261,10 +260,10 @@ public class XFormsContextStack {
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
         final Map<String, String> bindingElementNamespaceContext = container.getNamespaceMappings(bindingElement);
-        pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
+        pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
     }
 
-    public void pushBinding(PipelineContext pipelineContext, String ref, String context, String nodeset, String modelId, String bindId,
+    public void pushBinding(PropertyContext propertyContext, String ref, String context, String nodeset, String modelId, String bindId,
                             Element bindingElement, Map<String, String> bindingElementNamespaceContext) {
 
         // Get location data for error reporting
@@ -281,7 +280,7 @@ public class XFormsContextStack {
             final XFormsModel newModel;
             final boolean isNewModel;
             if (modelId != null) {
-                newModel = (XFormsModel) container.findModelByStaticId(modelId);
+                newModel = container.findModelByStaticId(modelId);
                 // TODO: dispatch xforms-binding-exception
                 if (newModel == null)
                     throw new ValidationException("Invalid model id: " + modelId, locationData);
@@ -317,13 +316,13 @@ public class XFormsContextStack {
                     if (context != null) {
                         // Push model and context
                         pushTemporaryContext(currentBindingContext.getSingleItem());// provide context information for the context() function
-                        pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
+                        pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
                         hasOverriddenContext = true;
                         contextItem = getCurrentSingleNode();
                         variableInfo = getCurrentBindingContext().getVariables();
                     } else if (isNewModel) {
                         // Push model only
-                        pushBinding(pipelineContext, null, null, null, modelId, null, null, bindingElementNamespaceContext);
+                        pushBinding(propertyContext, null, null, null, modelId, null, null, bindingElementNamespaceContext);
                         hasOverriddenContext = false;
                         contextItem = currentBindingContext.getSingleItem();
                         variableInfo = getCurrentBindingContext().getVariables();
@@ -338,7 +337,7 @@ public class XFormsContextStack {
                         // Evaluate new XPath in context if the current contex is not empty
 
                         pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the context() function
-                        newNodeset = XPathCache.evaluateKeepItems(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
+                        newNodeset = XPathCache.evaluateKeepItems(propertyContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, contextBindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                 functionContext, null, locationData);
                         popBinding();
@@ -378,7 +377,7 @@ public class XFormsContextStack {
 
                 } else if (context != null) {
                     // Only the context has changed, and possibly the model
-                    pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
+                    pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
                     {
                         newNodeset = getCurrentNodeset();
                         newPosition = getCurrentPosition();
@@ -433,14 +432,14 @@ public class XFormsContextStack {
                 getCurrentBindingContext().setVariables(variableInfo);
             } else if (isPushModelVariables) {
                 // In this case, the model just changed and so we gather the variables in scope for the new model
-                addModelVariables(pipelineContext, newModel);
+                addModelVariables(propertyContext, newModel);
             }
 //        } catch (Throwable e) {
             // TODO: handle dispatch of xforms-binding-exception
 //            final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression",
 //                        bindingElement, new String[] { "xxx", xxxx }));
 //
-//            currentBindingContext.getModel().getContainer().dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(model, ve.getMessage(), ve));
+//            currentBindingContext.getModel().getContainer().dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(model, ve.getMessage(), ve));
 //        }
     }
 
@@ -466,7 +465,7 @@ public class XFormsContextStack {
         if (currentNodeset == null || currentNodeset.size() == 0)
             newContextItem = null;
         else
-            newContextItem = (Item) currentNodeset.get(currentPosition - 1);
+            newContextItem = currentNodeset.get(currentPosition - 1);
 
         contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
                 currentNodeset, currentPosition, currentBindingContext.getElementId(), true, null, currentBindingContext.getLocationData(),
@@ -486,13 +485,13 @@ public class XFormsContextStack {
     }
 
     public BindingContext getCurrentBindingContext() {
-        return (BindingContext) contextStack.peek();
+        return contextStack.peek();
     }
 
     public BindingContext popBinding() {
         if (contextStack.size() == 1)
             throw new OXFException("Attempt to clear context stack.");
-        return (BindingContext) contextStack.pop();
+        return contextStack.pop();
     }
 
     /**
@@ -501,7 +500,7 @@ public class XFormsContextStack {
     public BindingContext getCurrentBindingContextForModel(XFormsModel model) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
             if (model == currentBindingContext.getModel())
                 return currentBindingContext;
         }
@@ -624,7 +623,7 @@ public class XFormsContextStack {
      */
     public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
             if (isRepeatIterationBindingContext(currentBindingContext) && (repeatId == null || currentBindingContext.getParent().getElementId().equals(repeatId))) {
                 // Found binding context for relevant repeat iteration
                 return currentBindingContext.getSingleNode();
@@ -655,7 +654,7 @@ public class XFormsContextStack {
      */
     public String getEnclosingRepeatId() {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
 
             if (isRepeatIterationBindingContext(currentBindingContext)) {
                 // Found binding context for relevant repeat iteration
@@ -676,7 +675,7 @@ public class XFormsContextStack {
      */
     public Item getContextForId(String contextId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
             if (bindingElement != null && XFormsControlFactory.isContainerControl(bindingElement.getNamespaceURI(), bindingElement.getName())) {
@@ -705,7 +704,7 @@ public class XFormsContextStack {
      */
     public List getRepeatNodeset(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String elementId = currentBindingContext.getElementId();
@@ -718,7 +717,7 @@ public class XFormsContextStack {
     }
 
     /**
-     * Return the currrent model for the current nodeset binding.
+     * Return the current model for the current nodeset binding.
      */
     public XFormsModel getCurrentModel() {
         return getCurrentBindingContext().getModel();
@@ -731,7 +730,7 @@ public class XFormsContextStack {
      */
     public XFormsInstance getCurrentInstance() {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = contextStack.get(i);
             final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
 
             if (currentSingleNode != null)
@@ -846,7 +845,7 @@ public class XFormsContextStack {
             if (nodeset == null || nodeset.size() == 0)
                 return null;
 
-            return (Item) nodeset.get(position - 1);
+            return nodeset.get(position - 1);
         }
 
         public void setVariables(List<VariableInfo> variableInfo) {

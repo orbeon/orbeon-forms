@@ -18,8 +18,8 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -39,7 +39,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
     public static final String CANNOT_DELETE_READONLY_MESSAGE = "Cannot perform deletion in read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -49,7 +49,7 @@ public class XFormsDeleteAction extends XFormsAction {
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue("context");
 
-        final List collectionToUpdate = contextStack.getCurrentNodeset();
+        final List<Item> collectionToUpdate = contextStack.getCurrentNodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
@@ -86,7 +86,7 @@ public class XFormsDeleteAction extends XFormsAction {
                     // position is 1."
 
                     // "2. The return value is processed according to the rules of the XPath function round()"
-                    final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
+                    final String insertionIndexString = XPathCache.evaluateAsString(propertyContext,
                             collectionToUpdate, 1,
                             "round(" + atAttribute + ")",
                             actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
@@ -110,21 +110,21 @@ public class XFormsDeleteAction extends XFormsAction {
                 }
             }
 
-            doDelete(pipelineContext, containingDocument, collectionToUpdate, deleteIndex, true);
+            doDelete(propertyContext, containingDocument, collectionToUpdate, deleteIndex, true);
         }
     }
 
-    public static List doDelete(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex, boolean doDispatch) {
+    public static List<Item> doDelete(PropertyContext propertyContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
-        final List deletedNodeInfos;
+        final List<Item> deletedNodeInfos;
         if (isEmptyNodesetBinding) {
-            deletedNodeInfos = Collections.EMPTY_LIST;
+            deletedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
         } else if (deleteIndex == -1) {
             // Delete the entire collection
 
-            deletedNodeInfos = new ArrayList(collectionToUpdate.size());
+            deletedNodeInfos = new ArrayList<Item>(collectionToUpdate.size());
             for (int i = 1; i <= collectionToUpdate.size(); i++) {
                 final NodeInfo deletedNodeInfo = doDeleteOne(containingDocument, collectionToUpdate, i);
                 if (deletedNodeInfo != null) {
@@ -136,9 +136,9 @@ public class XFormsDeleteAction extends XFormsAction {
 
             final NodeInfo deletedNodeInfo = doDeleteOne(containingDocument, collectionToUpdate, deleteIndex);
             if (deletedNodeInfo != null) {
-                deletedNodeInfos = Collections.singletonList(deletedNodeInfo);
+                deletedNodeInfos = Collections.singletonList((Item) deletedNodeInfo);
             } else {
-                deletedNodeInfos = Collections.EMPTY_LIST;
+                deletedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
             }
         }
 
@@ -152,8 +152,8 @@ public class XFormsDeleteAction extends XFormsAction {
 
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:delete", "removed nodes",
-                        new String[] { "count", Integer.toString(deletedNodeInfos.size()), "instance",
-                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null });
+                        "count", Integer.toString(deletedNodeInfos.size()), "instance",
+                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
 
             if (modifiedInstance != null) {
                 // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
@@ -164,7 +164,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
             }
         }
 

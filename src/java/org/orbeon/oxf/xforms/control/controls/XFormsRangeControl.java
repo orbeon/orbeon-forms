@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an xforms:range control.
@@ -37,6 +37,7 @@ public class XFormsRangeControl extends XFormsValueControl {
         this.step = element.attributeValue("step");
     }
 
+    @Override
     public boolean hasJavaScriptInitialization() {
         return true;
     }
@@ -53,9 +54,10 @@ public class XFormsRangeControl extends XFormsValueControl {
         return step;
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    @Override
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         // Store after converting
-        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type, filesElement);
+        super.storeExternalValue(propertyContext, convertFromExternalValue(value), type, filesElement);
     }
 
     private String convertFromExternalValue(String externalValue) {
@@ -71,8 +73,9 @@ public class XFormsRangeControl extends XFormsValueControl {
         }
     }
 
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
-        final String internalValue = getValue(pipelineContext);
+    @Override
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
+        final String internalValue = getValue(propertyContext);
         final String updatedValue;
         if (internalValue == null) {// can it be really?
             updatedValue = null;

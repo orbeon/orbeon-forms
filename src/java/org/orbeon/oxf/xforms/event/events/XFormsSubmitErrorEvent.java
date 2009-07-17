@@ -14,14 +14,15 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -56,7 +57,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         this.errorType = errorType;
     }
 
-    public XFormsSubmitErrorEvent(PipelineContext pipelineContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
+    public XFormsSubmitErrorEvent(PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
 
@@ -71,10 +72,11 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Read the whole stream to a temp URI so we can read it more than once if needed
             final String tempURI;
             try {
-                tempURI = NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
+                // NOTE: cast to PipelineContext not desireable. Must rework interfaces?
+                tempURI = NetUtils.inputStreamToAnyURI((PipelineContext) propertyContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
                 connectionResult.getResponseInputStream().close();
             } catch (Exception e) {
-                // Simply can't read the bocy
+                // Simply can't read the body
                 XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
                 return;
             }
@@ -97,6 +99,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     try {
                         is.close();
                     } catch (Exception e) {
+                        // NOP
                     }
                 }
             }
@@ -115,6 +118,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                         try {
                             reader.close();
                         } catch (Exception e) {
+                            // NOP
                         }
                     }
                 } catch (Exception e) {

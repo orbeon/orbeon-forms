@@ -115,16 +115,16 @@ public class InstanceData {
 
     public static String getCustom(NodeInfo nodeInfo, String name) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (String) ((existingInstanceData == null)
+        return (existingInstanceData == null)
                 ? DEFAULT_CUSTOM
-                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name));
+                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name);
     }
 
     public static String getCustom(Node node, String name) {
         final InstanceData existingInstanceData = getLocalInstanceData(node, false);
-        return (String) ((existingInstanceData == null)
+        return (existingInstanceData == null)
                 ? DEFAULT_CUSTOM
-                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name));
+                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name);
     }
 
     public static void setRelevant(NodeInfo nodeInfo, boolean relevant) {
@@ -468,12 +468,12 @@ public class InstanceData {
 
     public static boolean isValueChanged(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? false : existingInstanceData.valueChanged;
+        return (existingInstanceData != null) && existingInstanceData.valueChanged;
     }
 
     public static boolean isValueChanged(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node, false);
-        return (existingInstanceData == null) ? false : existingInstanceData.valueChanged;
+        return (existingInstanceData != null) && existingInstanceData.valueChanged;
     }
 
     public static void markValueChanged(NodeInfo nodeInfo) {
@@ -546,13 +546,13 @@ public class InstanceData {
             element.setData(null);
 
             // Handle attributes
-            for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-                final Attribute attribute = (Attribute) i.next();
+            for (Object o: element.attributes()) {
+                final Attribute attribute = (Attribute) o;
                 remove(attribute);
             }
             // Handle children elements
-            for (Iterator i = element.elements().iterator(); i.hasNext();) {
-                final Element childElement = (Element) i.next();
+            for (Object o: element.elements()) {
+                final Element childElement = (Element) o;
                 remove(childElement);
             }
 

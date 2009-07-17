@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 
 /**
@@ -26,16 +26,16 @@ public class OptimizedGetSubmission extends BaseSubmission {
         super(submission);
     }
 
-    public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         return p.isHandlingOptimizedGet;
     }
 
-    public ConnectionResult connect(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public ConnectionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         final String actionString = (sp.queryString == null) ? p2.resolvedActionOrResource : p2.resolvedActionOrResource + ((p2.resolvedActionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString;
-        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submission.getSubmissionElement(), true, actionString, null, null, submission.isURLNorewrite(), submission.isShowProgress());
+        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, propertyContext, submission.getSubmissionElement(), true, actionString, null, null, submission.isURLNorewrite(), submission.isShowProgress());
 
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;

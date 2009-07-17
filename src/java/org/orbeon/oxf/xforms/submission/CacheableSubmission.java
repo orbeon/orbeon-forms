@@ -15,24 +15,21 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
-import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.net.URL;
-import java.util.Collections;
+import java.util.concurrent.Callable;
 
 /**
  * Cacheable remote submission going through a protocol handler.
@@ -45,56 +42,26 @@ public class CacheableSubmission extends BaseSubmission {
         super(submission);
     }
 
-    public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match if the submission has xxforms:cache="true"
         return p2.resolvedXXFormsCache;
     }
 
-    public ConnectionResult connect(PipelineContext pipelineContext, final XFormsModelSubmission.SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) {
+    public ConnectionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
 
-        final ExternalContext externalContext = getExternalContext(pipelineContext);
-        final ExternalContext.Request request = externalContext.getRequest();
-        final URL absoluteResolvedURL = getResolvedSubmissionURL(pipelineContext, externalContext, request, p2.resolvedActionOrResource, sp.queryString);
+
         // Convert URL to string
-        final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
-
-        // Find and check replacement location
-        final XFormsInstance updatedInstance;
+        final String absoluteResolvedURLString;
         {
-            final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(pipelineContext, p.xpathContext,
-                    submission.findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
-
-            if (destinationNodeInfo == null) {
-                // Throw target-error
-
-                // XForms 1.1: "If the processing of the targetref attribute fails,
-                // then submission processing ends after dispatching the event
-                // xforms-submit-error with an error-type of target-error."
-
-                throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
-            }
-
-            updatedInstance = submission.getContainingDocument().getInstanceForNode(destinationNodeInfo);
-            if (updatedInstance == null || !updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo)) {
-                // Only support replacing the root element of an instance
-                // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
-                throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
-            }
-
-            if (XFormsServer.logger.isDebugEnabled())
-                submission.getContainingDocument().logDebug("submission", "using instance from application shared instance cache",
-                        "instance", updatedInstance.getEffectiveId());
+            final ExternalContext externalContext = getExternalContext(propertyContext);
+            final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.resolvedActionOrResource, sp.queryString);
+            absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
         }
-
-
-        final long timeToLive = XFormsInstance.getTimeToLive(submission.getSubmissionElement());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;
@@ -104,70 +71,102 @@ public class CacheableSubmission extends BaseSubmission {
             requestBodyHash = null;
         }
 
-        final XFormsInstance newInstance
-                = XFormsServerSharedInstancesCache.instance().findConvert(pipelineContext, submission.getContainingDocument(), updatedInstance.getId(), updatedInstance.getEffectiveModelId(),
-                    absoluteResolvedURLString, requestBodyHash, p2.resolvedXXFormsReadonly, p2.resolvedXXFormsHandleXInclude, timeToLive, updatedInstance.getValidation(), new XFormsServerSharedInstancesCache.Loader() {
-                    public ReadonlyXFormsInstance load(PipelineContext pipelineContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
+        // Parameters to callable
+        final String instanceStaticId;
+        final String modelEffectiveId;
+        final String validation;
+        {
+            // Find and check replacement location
+            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, p);
 
-                        // Call regular submission
-                        ConnectionResult connectionResult = null;
-                        try {
-                            connectionResult = new RegularSubmission(submission).connect(pipelineContext, p, p2, sp);
+            instanceStaticId = updatedInstance.getId();
+            modelEffectiveId = updatedInstance.getEffectiveModelId();
+            validation = updatedInstance.getValidation();
+        }
+        final boolean isReadonly = p2.resolvedXXFormsReadonly;
+        final boolean handleXInclude = p2.resolvedXXFormsHandleXInclude;
+        final long timeToLive = XFormsInstance.getTimeToLive(submission.getSubmissionElement());
 
-                            // Handle connection errors
-                            if (connectionResult.statusCode != 200) {
-                                connectionResult.close();
-                                throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
+        // Create new logger as the submission might be asynchronous
+        final IndentedLogger submissionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
+
+        // Create callable
+        final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
+            public SubmissionResult call() {
+
+                return new SubmissionResult(XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
+                        absoluteResolvedURLString, requestBodyHash, isReadonly, handleXInclude, timeToLive, validation,
+                        new XFormsServerSharedInstancesCache.Loader() {
+                            public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
+
+                                // Call regular submission
+                                ConnectionResult connectionResult = null;
+                                try {
+                                    connectionResult = new RegularSubmission(submission).connect(propertyContext, p, p2, sp);
+
+                                    // Handle connection errors
+                                    if (connectionResult.statusCode != 200) {
+                                        connectionResult.close();
+                                        throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
+                                    }
+                                    // Read into TinyTree
+                                    // TODO: Handle validating?
+                                    final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
+
+                                    // Create new shared instance
+                                    return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
+                                            p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude);
+                                } catch (Exception e) {
+                                    throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
+                                } finally {
+                                    // Clean-up
+                                    if (connectionResult != null)
+                                        connectionResult.close();
+                                }
                             }
-                            // Read into TinyTree
-                            // TODO: Handle validating?
-                            final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
+                        }));
+            }
+        };
 
-                            // Create new shared instance
-                            return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                    p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude);
-                        } catch (Exception e) {
-                            throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
-                        } finally {
-                            // Clean-up
-                            connectionResult.close();
-                        }
-                    }
-                });
+        // Submit the callable
+        // This returns null if the execution is asynchronous
+        final SubmissionResult submissionResult = submitCallable(p, p2, callable);
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            submission.getContainingDocument().logDebug("submission", "replacing instance with " + (p2.resolvedXXFormsReadonly ? "read-only" : "read-write") +  " cached instance",
-                        "instance", newInstance.getEffectiveId());
+        // Process response right away if possible
+        if (submissionResult != null)
+            submission.handleResponse(propertyContext, submissionResult.getInstance(), p2);
+
+        // Tell caller he doesn't need to do anything
+        return null;
+    }
+
+    private XFormsInstance checkInstanceToUpdate(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p) {
+        XFormsInstance updatedInstance;
+        final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext, p.xpathContext,
+                submission.findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
+
+        if (destinationNodeInfo == null) {
+            // Throw target-error
+
+            // XForms 1.1: "If the processing of the targetref attribute fails,
+            // then submission processing ends after dispatching the event
+            // xforms-submit-error with an error-type of target-error."
+
+            throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
+                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
         }
 
-        final XFormsModel replaceModel = newInstance.getModel(submission.getContainingDocument());
+        updatedInstance = submission.getContainingDocument().getInstanceForNode(destinationNodeInfo);
+        if (updatedInstance == null || !updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo)) {
+            // Only support replacing the root element of an instance
+            // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
+            throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
+                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
+        }
 
-        // Dispatch xforms-delete event
-        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement (see below). In the
-        // future, we might want to dispatch this, especially if XFormsInsertAction dispatches xforms-delete when
-        // removing the root element
-        //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
-
-        // Handle new instance and associated event markings
-        final NodeInfo newRootElementInfo = newInstance.getInstanceRootElementInfo();
-        replaceModel.handleUpdatedInstance(pipelineContext, newInstance, newRootElementInfo);
-
-        // Dispatch xforms-insert event
-        // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-        newInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
-                            new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newRootElementInfo), null, newRootElementInfo.getDocumentRoot(),
-                    "after", null, null, true));
-
-
-        // If no exception, submission is done here: just dispatch the event
-        submission.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
-                            new XFormsSubmitDoneEvent(submission, absoluteResolvedURLString, 200));
-
-        // Return minimal information to caller
-        final ConnectionResult connectionResult = new ConnectionResult(absoluteResolvedURLString);
-        connectionResult.dontHandleResponse = true;
-        connectionResult.statusCode = 200;
-
-        return connectionResult;
+        if (XFormsServer.logger.isDebugEnabled())
+            submission.getContainingDocument().logDebug("submission", "using instance from application shared instance cache",
+                    "instance", updatedInstance.getEffectiveId());
+        return updatedInstance;
     }
 }

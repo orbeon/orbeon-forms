@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
@@ -26,8 +26,8 @@ public class NoneReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // Just notify that processing is terminated by dispatching xforms-submit-done
-        dispatchSubmitDone(pipelineContext, connectionResult);
+        dispatchSubmitDone(propertyContext, connectionResult);
     }
 }

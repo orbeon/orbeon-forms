@@ -50,8 +50,8 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
@@ -97,14 +97,14 @@ public class XFormsUtils {
             instanceWalker.walk(elementNodeInfo);
 
         // "walk" current element's attributes
-        for (Iterator i = getAttributes(elementNodeInfo).iterator(); i.hasNext();) {
-            final NodeInfo attributeNodeInfo = (NodeInfo) i.next();
+        for (Object o: getAttributes(elementNodeInfo)) {
+            final NodeInfo attributeNodeInfo = (NodeInfo) o;
             instanceWalker.walk(attributeNodeInfo);
         }
         // "walk" current element's children elements
         if (childrenElements.size() != 0) {
-            for (Iterator i = childrenElements.iterator(); i.hasNext();) {
-                final NodeInfo childElement = (NodeInfo) i.next();
+            for (Object childrenElement: childrenElements) {
+                final NodeInfo childElement = (NodeInfo) childrenElement;
                 iterateInstanceData(childElement, instanceWalker, allNodes);
             }
         }
@@ -409,14 +409,14 @@ public class XFormsUtils {
      * Get the value of a child element by pushing the context of the child element on the binding stack first, then
      * calling getElementValue() and finally popping the binding context.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param container             current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PipelineContext pipelineContext, final XBLContainer container,
+    public static String getChildElementValue(final PropertyContext propertyContext, final XBLContainer container,
                                               final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
@@ -425,8 +425,8 @@ public class XFormsUtils {
 
         // Child element becomes the new binding
         final XFormsContextStack contextStack = container.getContextStack();
-        contextStack.pushBinding(pipelineContext, childElement);
-        final String result = getElementValue(pipelineContext, container, contextStack, childElement, acceptHTML, containsHTML);
+        contextStack.pushBinding(propertyContext, childElement);
+        final String result = getElementValue(propertyContext, container, contextStack, childElement, acceptHTML, containsHTML);
         contextStack.popBinding();
         return result;
     }
@@ -437,7 +437,7 @@ public class XFormsUtils {
      *
      * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext       current PipelineContext
      * @param container             current XBLContainer
      * @param contextStack          context stack for XPath evaluation
      * @param childElement          element to evaluate (xforms:label, etc.)
@@ -445,7 +445,7 @@ public class XFormsUtils {
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getElementValue(final PipelineContext pipelineContext, final XBLContainer container,
+    public static String getElementValue(final PropertyContext propertyContext, final XBLContainer container,
                                          final XFormsContextStack contextStack,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
@@ -478,7 +478,7 @@ public class XFormsUtils {
             if (hasValueAttribute) {
                 final List<Item> currentNodeset = currentBindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
-                    final String tempResult = XPathCache.evaluateAsString(pipelineContext,
+                    final String tempResult = XPathCache.evaluateAsString(propertyContext,
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, container.getNamespaceMappings(childElement),
                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
@@ -508,7 +508,7 @@ public class XFormsUtils {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    currentModel.getXBLContainer(null).dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                    currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
                     return null;
                 }
             }
@@ -520,11 +520,11 @@ public class XFormsUtils {
 
             // Visit the subtree and serialize
 
-            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM and
+            // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(pipelineContext, container, contextStack, acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(propertyContext, container, contextStack, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -543,7 +543,7 @@ public class XFormsUtils {
      * @param value2    second value or null
      * @return          whether the values are identical or both null
      */
-    public static final boolean compareStrings(String value1, String value2) {
+    public static boolean compareStrings(String value1, String value2) {
         return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
     }
 
@@ -555,15 +555,15 @@ public class XFormsUtils {
         } else if (object instanceof String) {
             valueRepresentation = new StringValue((String) object);
         } else if (object instanceof Boolean) {
-            valueRepresentation = BooleanValue.get(((Boolean) object).booleanValue());
+            valueRepresentation = BooleanValue.get((Boolean) object);
         } else if (object instanceof Integer) {
-            valueRepresentation = new IntegerValue(((Integer) object).intValue());
+            valueRepresentation = new IntegerValue((Integer) object);
         } else if (object instanceof Float) {
-            valueRepresentation = new FloatValue(((Float) object).floatValue());
+            valueRepresentation = new FloatValue((Float) object);
         } else if (object instanceof Double) {
-            valueRepresentation = new DoubleValue(((Double) object).doubleValue());
+            valueRepresentation = new DoubleValue((Double) object);
         } else if (object instanceof URI) {
-            valueRepresentation = new AnyURIValue(((URI) object).toString());
+            valueRepresentation = new AnyURIValue(object.toString());
         } else {
             throw new OXFException("Invalid variable type: " + object.getClass());
         }
@@ -779,8 +779,7 @@ public class XFormsUtils {
             while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
         } finally {
-            if (reader != null)
-                reader.close();
+            reader.close();
         }
     }
 
@@ -788,13 +787,13 @@ public class XFormsUtils {
      * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
      * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext
      * @param value             value to convert
      * @param currentType       current type as exploded QName
      * @param newType           new type as exploded QName
      * @return                  converted value, or value passed
      */
-    public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
+    public static String convertUploadTypes(PropertyContext propertyContext, String value, String currentType, String newType) {
 
         final String currentTypeLocalName = SUPPORTED_BINARY_TYPES.get(currentType);
         if (currentTypeLocalName == null)
@@ -808,7 +807,8 @@ public class XFormsUtils {
 
         if (currentTypeLocalName.equals("base64Binary")) {
             // Convert from xs:base64Binary or xforms:base64Binary to xs:anyURI or xforms:anyURI
-            return NetUtils.base64BinaryToAnyURI(pipelineContext, value, NetUtils.REQUEST_SCOPE);
+            // TODO: remove cast to PipelineContext
+            return NetUtils.base64BinaryToAnyURI((PipelineContext) propertyContext, value, NetUtils.REQUEST_SCOPE);
         } else {
             // Convert from xs:anyURI or xforms:anyURI to xs:base64Binary or xforms:base64Binary
             return NetUtils.anyURIToBase64Binary(value);
@@ -819,16 +819,16 @@ public class XFormsUtils {
      * Resolve a render or action URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
      * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
      * @return                      resolved URL
      */
-    public static String resolveRenderOrActionURL(boolean isPortletLoad, PipelineContext pipelineContext, Element currentElement, String url, boolean generateAbsoluteURL) {
+    public static String resolveRenderOrActionURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url, boolean generateAbsoluteURL) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         final String externalURL;
         // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
@@ -859,34 +859,34 @@ public class XFormsUtils {
     /**
      * Resolve a resource URL including xml:base resolution.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
      * @return                      resolved URL
      */
-    public static String resolveResourceURL(PipelineContext pipelineContext, Element element, String url, int rewriteMode) {
+    public static String resolveResourceURL(PropertyContext propertyContext, Element element, String url, int rewriteMode) {
 
         final URI resolvedURI = resolveXMLBase(element, url);
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         return externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
     }
 
     /**
      * Resolve a resource URL including xml:base resolution.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext       current PropertyContext
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
      * @return                      resolved URL
      */
-    public static String resolveServiceURL(PipelineContext pipelineContext, Element element, String url, int rewriteMode) {
+    public static String resolveServiceURL(PropertyContext propertyContext, Element element, String url, int rewriteMode) {
 
         final URI resolvedURI = resolveXMLBase(element, url);
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         return externalContext.rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
     }
 
@@ -894,6 +894,7 @@ public class XFormsUtils {
      * Rewrite an attribute if that attribute contains a URI, e.g. @href or @src.
      *
      * @param pipelineContext       current PipelineContext
+     * @param containingDocument    current containing document
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param attributeName         attribute name
      * @param attributeValue        attribute value
@@ -918,7 +919,7 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param pipelineContext    current pipeline context
+     * @param propertyContext
      * @param contextItems       context items
      * @param contextPosition    context position
      * @param variableToValueMap variables
@@ -929,32 +930,32 @@ public class XFormsUtils {
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
+    public static String resolveAttributeValueTemplates(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
                                                         FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
                                                         Map<String, String> prefixToURIMap, LocationData locationData, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextItems, contextPosition, attributeValue, prefixToURIMap,
+        return XPathCache.evaluateAsAvt(propertyContext, contextItems, contextPosition, attributeValue, prefixToURIMap,
                 variableToValueMap, functionLibrary, functionContext, null, locationData);
     }
 
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext
      * @param xpathContext      current XPath context
      * @param contextNode       context node for evaluation
      * @param attributeValue    attribute value
      * @return                  resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, XPathCache.XPathContext xpathContext, NodeInfo contextNode, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PropertyContext propertyContext, XPathCache.XPathContext xpathContext, NodeInfo contextNode, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, xpathContext, contextNode, attributeValue);
+        return XPathCache.evaluateAsAvt(propertyContext, xpathContext, contextNode, attributeValue);
     }
 
     /**
@@ -995,7 +996,7 @@ public class XFormsUtils {
             } else {
                 sb.append(currentChar);
             }
-        };
+        }
 
         return sb.toString();
     }
@@ -1035,8 +1036,7 @@ public class XFormsUtils {
 
             // Resolve paths from root to leaf
             URI result = null;
-            for (Iterator<String> i = xmlBaseElements.iterator(); i.hasNext();) {
-                final String currentXMLBase = i.next();
+            for (final String currentXMLBase: xmlBaseElements) {
                 final URI currentXMLBaseURI = new URI(currentXMLBase);
                 result = (result == null) ? currentXMLBaseURI : result.resolve(currentXMLBaseURI);
             }
@@ -1281,8 +1281,8 @@ public class XFormsUtils {
     public static void getNestedAttributesAndElements(List<Item> result, List nodeset) {
         // Iterate through all nodes
         if (nodeset.size() > 0) {
-            for (Iterator i = nodeset.iterator(); i.hasNext();) {
-                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+            for (Object aNodeset: nodeset) {
+                final NodeInfo currentNodeInfo = (NodeInfo) aNodeset;
 
                 if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
                     // Found an element
@@ -1307,6 +1307,7 @@ public class XFormsUtils {
      * Return whether the given string contains a well-formed XPath 2.0 expression.
      *
      * @param xpathString   string to check
+     * @param namespaceMap  in-scope namespaces
      * @return              true iif the given string contains well-formed XPath 2.0
      */
     public static boolean isXPath2Expression(String xpathString, Map<String, String> namespaceMap) {
@@ -1335,7 +1336,7 @@ public class XFormsUtils {
     }
 
     private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
-        private final PipelineContext pipelineContext;
+        private final PropertyContext pipelineContext;
         private final XBLContainer container;
         private final XFormsContextStack contextStack;
         private final boolean acceptHTML;
@@ -1357,7 +1358,7 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public LHHAElementVisitorListener(PipelineContext pipelineContext, XBLContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PropertyContext pipelineContext, XBLContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
             this.pipelineContext = pipelineContext;
             this.container = container;
             this.contextStack = contextStack;
@@ -1422,8 +1423,8 @@ public class XFormsUtils {
                 sb.append(element.getName());
                 final List attributes = element.attributes();
                 if (attributes.size() > 0) {
-                    for (Iterator i = attributes.iterator(); i.hasNext();) {
-                        final Attribute currentAttribute = (Attribute) i.next();
+                    for (Object attribute: attributes) {
+                        final Attribute currentAttribute = (Attribute) attribute;
 
                         final String currentAttributeName = currentAttribute.getName();
                         final String currentAttributeValue = currentAttribute.getValue();

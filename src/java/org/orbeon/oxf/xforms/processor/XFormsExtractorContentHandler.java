@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -290,10 +291,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
             // Check for preserved content
             if (inXFormsOrExtension && !inPreserve) {
-
+                // TODO: Just warn?
                 if (isXXForms) {
                     // Check that we are getting a valid xxforms:* element
-                    if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
+                    if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null && !XFormsActions.isActionName(XFormsConstants.XXFORMS_NAMESPACE_URI, localname))
                         throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
                 } else if (isEXForms) {
                     // Check that we are getting a valid exforms:* element

@@ -14,12 +14,25 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsInstance;
 
-import java.io.IOException;
+public class SubmissionResult {
+    private ConnectionResult connectionResult;
+    private XFormsInstance instance;
 
-public interface Replacer {
-    void replace(PropertyContext propertyContext, ConnectionResult connectionResult,
-                 XFormsModelSubmission.SubmissionParameters p,
-                 XFormsModelSubmission.SecondPassParameters p2) throws IOException;
+    public SubmissionResult(ConnectionResult connectionResult) {
+        this.connectionResult = connectionResult;
+    }
+
+    public SubmissionResult(XFormsInstance instance) {
+        this.instance = instance;
+    }
+
+    public ConnectionResult getConnectionResult() {
+        return connectionResult;
+    }
+
+    public XFormsInstance getInstance() {
+        return instance;
+    }
 }

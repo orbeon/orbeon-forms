@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
@@ -48,10 +48,12 @@ public class ControlTree implements Cloneable {
     /**
      * Build the entire tree of controls and associated information.
      *
-     * @param pipelineContext   pipeline context
+     * @param propertyContext
+     * @param containingDocument
+     * @param rootContainer
      * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
      */
-    public void initialize(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean evaluateItemsets) {
+    public void initialize(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean evaluateItemsets) {
 
         containingDocument.startHandleOperation("controls", "building");
 
@@ -73,22 +75,21 @@ public class ControlTree implements Cloneable {
 
             // Visit the static tree of controls to create the actual tree of controls
             final CreateControlsListener listener
-                    = new CreateControlsListener(pipelineContext, this, rootControl, containingDocument.getSerializedControlStatesMap(pipelineContext), evaluateItemsets, false);
-            XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
+                    = new CreateControlsListener(propertyContext, this, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext), evaluateItemsets, false);
+            XFormsControls.visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
 
             // Detach all root XFormsControl
             if (children != null) {
-                for (Iterator i = children.iterator(); i.hasNext();) {
-                    final XFormsControl currentXFormsControl = (XFormsControl) i.next();
+                for (XFormsControl currentXFormsControl: children) {
                     currentXFormsControl.detach();
                 }
             }
 
             if (k == PROFILING_ITERATIONS - 1) {
-                containingDocument.endHandleOperation(new String[] {
+                containingDocument.endHandleOperation(
                         "controls updated", Integer.toString(listener.getUpdateCount()),
                         "repeat iterations", Integer.toString(listener.getIterationCount())
-                });
+                );
             } else {
                 // This is for profiling only
                 children = null;
@@ -107,8 +108,7 @@ public class ControlTree implements Cloneable {
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (XFormsControl currentControl: children) {
                 final XFormsControl currentClone = (XFormsControl) currentControl.clone();
                 cloned.children.add(currentClone);
             }
@@ -129,16 +129,18 @@ public class ControlTree implements Cloneable {
      *
      * WARNING: The binding context must be set to the current iteration before calling.
      *
-     * @param pipelineContext   pipeline context
+     * @param propertyContext
+     * @param bindingContext
      * @param repeatControl     repeat control
      * @param iterationIndex    new iteration to repeat (1..repeat size + 1)
+     * @return
      */
-    public XFormsRepeatIterationControl createRepeatIterationTree(final PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext,
+    public XFormsRepeatIterationControl createRepeatIterationTree(final PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext,
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
-        repeatIterationControl.setBindingContext(pipelineContext, bindingContext);
+        repeatIterationControl.setBindingContext(propertyContext, bindingContext);
 
         // Index this control
         // NOTE: Must do after setting the context, so that relevance can be properly determined
@@ -146,17 +148,17 @@ public class ControlTree implements Cloneable {
         indexControl(repeatIterationControl, false);
 
         // Create the subtree
-        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, repeatControl, iterationIndex,
-                new CreateControlsListener(pipelineContext, this, repeatIterationControl, null, false, true));
+        XFormsControls.visitControlElementsHandleRepeat(propertyContext, repeatControl, iterationIndex,
+                new CreateControlsListener(propertyContext, this, repeatIterationControl, null, false, true));
 
         return repeatIterationControl;
     }
 
-    public void createSubTree(PipelineContext pipelineContext, XFormsContainerControl containerControl) {
+    public void createSubTree(PropertyContext propertyContext, XFormsContainerControl containerControl) {
 
         final XFormsControl control = (XFormsControl) containerControl;
-        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, containerControl,
-                new CreateControlsListener(pipelineContext, this, control, null, false, true));
+        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containerControl,
+                new CreateControlsListener(propertyContext, this, control, null, false, true));
     }
 
     /**
@@ -215,7 +217,7 @@ public class ControlTree implements Cloneable {
         // Remove by control type (for certain controls we know we need)
         if (mustMapControl(control)) {
             if (controlTypes != null) {
-                final Map controlsMap = (Map) controlTypes.get(control.getName());
+                final Map controlsMap = controlTypes.get(control.getName());
                 if (controlsMap != null) {
                     controlsMap.remove(control.getEffectiveId());
                 }
@@ -235,7 +237,7 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    private final boolean mustMapControl(XFormsControl control) {
+    private boolean mustMapControl(XFormsControl control) {
 
         // Remember:
         // xforms:upload
@@ -353,10 +355,9 @@ public class ControlTree implements Cloneable {
     }
 
     private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
-        final Map repeats = staticState.getRepeatControlInfoMap();
+        final Map<String, XFormsStaticState.ControlInfo> repeats = staticState.getRepeatControlInfoMap();
         if (repeats != null) {
-            for (Iterator i = repeats.keySet().iterator(); i.hasNext();) {
-                final String repeatPrefixedId = (String) i.next();
+            for (String repeatPrefixedId: repeats.keySet()) {
                 if (repeatIdToIndex.get(repeatPrefixedId) == null) {
                     repeatIdToIndex.put(repeatPrefixedId, 0);
                 }
@@ -381,10 +382,9 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    private static void handleControl(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, List children) {
+    private static void handleControl(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, List<XFormsControl> children) {
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (XFormsControl currentControl: children) {
                 xformsControlVisitorListener.startVisitControl(currentControl);
                 if (currentControl instanceof XFormsContainerControl)
                     handleControl(xformsControlVisitorListener, ((XFormsContainerControl) currentControl).getChildren());
@@ -417,11 +417,9 @@ public class ControlTree implements Cloneable {
         visitControlsFollowRepeats(this.children, xformsControlVisitorListener);
     }
 
-    private void visitControlsFollowRepeats(List children, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
+    private void visitControlsFollowRepeats(List<XFormsControl> children, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
-
+            for (XFormsControl currentControl: children) {
                 xformsControlVisitorListener.startVisitControl(currentControl);
                 {
                     if (currentControl instanceof XFormsRepeatControl) {
@@ -430,7 +428,7 @@ public class ControlTree implements Cloneable {
                         final int currentRepeatIndex = currentRepeatControl.getIndex();
 
                         if (currentRepeatIndex > 0) {
-                            final List newChildren = currentRepeatControl.getChildren();
+                            final List<XFormsControl> newChildren = currentRepeatControl.getChildren();
                             if (newChildren != null && newChildren.size() > 0)
                                 visitControlsFollowRepeats(Collections.singletonList(newChildren.get(currentRepeatIndex - 1)), xformsControlVisitorListener);
                         }
@@ -457,7 +455,7 @@ public class ControlTree implements Cloneable {
             // The source is within a particular component, so search only within that component
 
             // Start from source control
-            XFormsControl componentControl = (XFormsControl) effectiveIdsToControls.get(sourceControlEffectiveId);
+            XFormsControl componentControl = effectiveIdsToControls.get(sourceControlEffectiveId);
             if (componentControl != null) {
                 // Source is an existing control, go down parents until component is found
                 while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
@@ -472,7 +470,7 @@ public class ControlTree implements Cloneable {
                 // Also, this manipulation of prefix/suffix has the potential to be wrong with repeat iterations, e.g.
                 // if the component is within repeats, and the control is within repeats within the component.
                 final String componentEffectiveId = XFormsUtils.getEffectiveIdPrefixNoSeparator(sourceControlEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(sourceControlEffectiveId);
-                componentControl = (XFormsControl) effectiveIdsToControls.get(componentEffectiveId);
+                componentControl = effectiveIdsToControls.get(componentEffectiveId);
             }
 
             // Can't keep going if the source control or one of its ancestors is not found
@@ -487,11 +485,10 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    private String findEffectiveControlId(String sourceControlEffectiveId, String targetId, List children) {
+    private String findEffectiveControlId(String sourceControlEffectiveId, String targetId, List<XFormsControl> children) {
         // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (XFormsControl currentControl: children) {
                 final String staticControlId = currentControl.getId();
 
                 if (targetId.equals(staticControlId)) {
@@ -504,7 +501,7 @@ public class ControlTree implements Cloneable {
                     // Find index and try to follow the current repeat index
                     final int index = currentRepeatControl.getIndex();
                     if (index > 0) {
-                        final List newChildren = currentRepeatControl.getChildren();
+                        final List<XFormsControl> newChildren = currentRepeatControl.getChildren();
                         if (newChildren != null && newChildren.size() > 0) {
                             final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, Collections.singletonList(newChildren.get(index - 1)));
                             if (result != null)
@@ -514,7 +511,7 @@ public class ControlTree implements Cloneable {
 
                 } else if (currentControl instanceof XFormsContainerControl) {
                     // Handle container control
-                    final List newChildren = ((XFormsContainerControl) currentControl).getChildren();
+                    final List<XFormsControl> newChildren = ((XFormsContainerControl) currentControl).getChildren();
                     if (newChildren != null && newChildren.size() > 0) {
                         final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, newChildren);
                         if (result != null)
@@ -540,20 +537,20 @@ public class ControlTree implements Cloneable {
 
         private final Map serializedControls;
         private final boolean evaluateItemsets;
-        private final PipelineContext pipelineContext;
+        private final PropertyContext propertyContext;
         private final ControlTree result;
         private final boolean registerEvents;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        public CreateControlsListener(PipelineContext pipelineContext, ControlTree result, XFormsControl rootControl, Map serializedControlStateMap, boolean evaluateItemsets, boolean registerEvents) {
+        public CreateControlsListener(PropertyContext propertyContext, ControlTree result, XFormsControl rootControl, Map serializedControlStateMap, boolean evaluateItemsets, boolean registerEvents) {
 
             this.currentControlsContainer = rootControl;
 
             this.serializedControls = serializedControlStateMap;
             this.evaluateItemsets = evaluateItemsets;
-            this.pipelineContext = pipelineContext;
+            this.propertyContext = propertyContext;
             this.result = result;
             this.registerEvents = registerEvents;
         }
@@ -574,7 +571,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            control.setBindingContext(pipelineContext, currentBindingContext);
+            control.setBindingContext(propertyContext, currentBindingContext);
 
             // Control type-specific handling
             if (control instanceof XFormsSelectControl || control instanceof XFormsSelect1Control) {
@@ -582,7 +579,7 @@ public class ControlTree implements Cloneable {
                 final XFormsSelect1Control select1Control = ((XFormsSelect1Control) control);
                 // Evaluate itemsets only if specified (case of restoring dynamic state)
                 if (evaluateItemsets)
-                    select1Control.getItemset(pipelineContext, false);
+                    select1Control.getItemset(propertyContext, false);
             }
 
             // Index this control
@@ -611,11 +608,11 @@ public class ControlTree implements Cloneable {
         }
 
         public void endVisitControl(Element controlElement, String effectiveControlId) {
-            final XFormsControl control = (XFormsControl) result.effectiveIdsToControls.get(effectiveControlId);
+            final XFormsControl control = result.effectiveIdsToControls.get(effectiveControlId);
             if (control instanceof XFormsContainerControl) {
                 // Notify container controls that all children have been added
                 final XFormsContainerControl containerControl = (XFormsContainerControl) control;
-                containerControl.childrenAdded(pipelineContext);
+                containerControl.childrenAdded(propertyContext);
 
                 // Go back up to parent
                 currentControlsContainer = currentControlsContainer.getParent();
@@ -633,7 +630,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            repeatIterationControl.setBindingContext(pipelineContext, currentBindingContext);
+            repeatIterationControl.setBindingContext(propertyContext, currentBindingContext);
 
             // Index this control
             // NOTE: Must do after setting the context, so that relevance can be properly determined

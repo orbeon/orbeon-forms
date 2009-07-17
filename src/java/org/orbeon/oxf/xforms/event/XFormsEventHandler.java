@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represent an XForms event handler.
  */
 public interface XFormsEventHandler {
 
-    public boolean isBubblingPhase();
-    public boolean isPropagate();
-    public boolean isPerformDefaultAction();
+    boolean isBubblingPhase();
+    boolean isPropagate();
+    boolean isPerformDefaultAction();
 
-    public String[] getObserversStaticIds();
-    public boolean isMatchEventName(String eventName);
-    public boolean isMatchTarget(String targetId);
+    String[] getObserversStaticIds();
+    boolean isMatchEventName(String eventName);
+    boolean isMatchTarget(String targetId);
 
-    public void handleEvent(PipelineContext pipelineContext, XBLContainer container,
-                            XFormsEventObserver eventObserver, XFormsEvent event);
+    void handleEvent(PropertyContext propertyContext, XBLContainer container,
+                     XFormsEventObserver eventObserver, XFormsEvent event);
 }

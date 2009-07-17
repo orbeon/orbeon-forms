@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.itemset.Itemset;
@@ -23,6 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
@@ -44,26 +44,26 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * o Itemset values which are in the list of tokens are merged with the bound control's value.
      * o Itemset values which are not in the list of tokens are removed from the bound control's value.
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext
      * @param value             list of tokens from the UI
      * @param type              should probably be null
      * @param filesElement
      */
     @Override
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
 
-        final String controlValue = getValue(pipelineContext);
+        final String controlValue = getValue(propertyContext);
 
         // Actual new value to store
         final String newValue;
         {
             // All items
-            final Itemset itemset = getItemset(pipelineContext, true);
+            final Itemset itemset = getItemset(propertyContext, true);
             // Current values in the instance
-            final Map<String, String> instanceValues = tokenize(pipelineContext, controlValue, false);
+            final Map<String, String> instanceValues = tokenize(propertyContext, controlValue, false);
 
             // Values currently selected in the UI
-            final Map<String, String> uiValues = tokenize(pipelineContext, value, isEncryptItemValues());
+            final Map<String, String> uiValues = tokenize(propertyContext, value, isEncryptItemValues());
 
             // Iterate over all the items
             final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
@@ -94,14 +94,14 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
                 }
             }
 
@@ -120,24 +120,24 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         // "newValue" is created so as to ensure that if a value is NOT in the itemset AND we are a closed selection
         // then we do NOT store the value in instance.
         // NOTE: At the moment we don't support open selection here anyway
-        super.storeExternalValue(pipelineContext, newValue, type, filesElement);
+        super.storeExternalValue(propertyContext, newValue, type, filesElement);
     }
 
     @Override
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(pipelineContext);
+        final String internalValue = getValue(propertyContext);
         final String updatedValue;
         if (internalValue == null || "".equals(internalValue)) {
             // Keep null or ""
             updatedValue = internalValue;
         } else {
             // Values in the itemset
-            final Itemset itemset = getItemset(pipelineContext, true);
+            final Itemset itemset = getItemset(propertyContext, true);
             if (itemset != null) {
 
                 // Current values in the instance
-                final Map<String, String> instanceValues = tokenize(pipelineContext, internalValue, false);
+                final Map<String, String> instanceValues = tokenize(propertyContext, internalValue, false);
 
                 // Actual value to return is the intersection of values in the instance and values in the itemset
                 final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
@@ -148,7 +148,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                         if (index > 0)
                             sb.append(' ');
 
-                        sb.append(currentItem.getExternalValue(pipelineContext));
+                        sb.append(currentItem.getExternalValue(propertyContext));
 
                         index++;
                     }
@@ -163,13 +163,13 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         setExternalValue(updatedValue);
     }
 
-    private static Map<String, String> tokenize(PipelineContext pipelineContext, String value, boolean decryptValues) {
+    private static Map<String, String> tokenize(PropertyContext propertyContext, String value, boolean decryptValues) {
         final Map<String, String> result = new HashMap<String, String>();
         if (value != null) {
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
                 final String token = st.nextToken();
                 // Keep value and decrypt if necessary
-                result.put(decryptValues ? XFormsItemUtils.decryptValue(pipelineContext, token) : token, "");
+                result.put(decryptValues ? XFormsItemUtils.decryptValue(propertyContext, token) : token, "");
             }
         }
         return result;

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 import java.util.HashMap;
@@ -35,8 +35,8 @@ import java.util.Map;
  */
 public class XFormsMessageAction extends XFormsAction {
 
-    private static final Map SUPPORTED_APPEARANCES = new HashMap();
-    private static final Map LOG_APPEARANCES = new HashMap();
+    private static final Map<QName, String> SUPPORTED_APPEARANCES = new HashMap<QName, String>();
+    private static final Map<QName, String> LOG_APPEARANCES = new HashMap<QName, String>();
 
     static {
         // Standard levels
@@ -53,7 +53,7 @@ public class XFormsMessageAction extends XFormsAction {
         SUPPORTED_APPEARANCES.putAll(LOG_APPEARANCES);
     }
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -76,7 +76,7 @@ public class XFormsMessageAction extends XFormsAction {
 
             // Get message value
             // TODO: In the future, we should support HTML
-            final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument,
+            final String messageValue = XFormsUtils.getElementValue(propertyContext, containingDocument,
                     actionInterpreter.getContextStack(), actionElement, false, null);
 
             if (LOG_APPEARANCES.get(levelQName) != null) {

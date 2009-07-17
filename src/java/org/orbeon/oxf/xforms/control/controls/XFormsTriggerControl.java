@@ -28,6 +28,7 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
         super(container, parent, element, name, id);
     }
 
+    @Override
     protected boolean isSupportHTMLHints() {
         return false;
     }

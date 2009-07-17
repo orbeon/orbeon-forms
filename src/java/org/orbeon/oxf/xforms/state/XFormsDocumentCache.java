@@ -33,7 +33,7 @@ public class XFormsDocumentCache {
     private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms.cache.documents";
     private static final int XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE = 10;
 
-    private static final Long CONSTANT_VALIDITY = new Long(0);
+    private static final Long CONSTANT_VALIDITY = (long) 0;
     private static final String CONTAINING_DOCUMENT_KEY_TYPE = XFORMS_DOCUMENT_CACHE_NAME;
 
     private static XFormsDocumentCache instance = null;

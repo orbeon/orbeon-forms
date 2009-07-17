@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.event;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +32,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final Element eventHandlerElement;
     private final String ancestorObserverStaticId;
 
-    private final Map eventNames;
+    private final Map<String, String> eventNames;
     private final boolean isAllEvents;
     private final String[] observerStaticIds;
-    private final Map targetStaticIds;
+    private final Map<String, String> targetStaticIds;
     //private final String handler;
     private final boolean isBubblingPhase;        // "true" means "default" (bubbling), "false" means "capture"
     private final boolean isPropagate;            // "true" means "continue", "false" means "stop"
@@ -96,10 +96,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Gather event names
         // NOTE: Supporting space-separated event names is an extension, which may make it into XML Events 2
-        final Map eventNames = new HashMap();
+        final Map<String, String> eventNames = new HashMap<String, String>();
         final String[] eventNamesArray = StringUtils.split(eventNamesAttribute);
-        for (int i = 0; i < eventNamesArray.length; i++) {
-            eventNames.put(eventNamesArray[i], "");
+        for (String anEventNamesArray: eventNamesArray) {
+            eventNames.put(anEventNamesArray, "");
         }
         // Special #all value catches all events
         if (eventNames.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null) {
@@ -115,10 +115,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         if (targets == null) {
             targetStaticIds = null;
         } else {
-            targetStaticIds = new HashMap();
+            targetStaticIds = new HashMap<String, String>();
             final String[] targetIdsArray = StringUtils.split(targets);
-            for (int i = 0; i < targetIdsArray.length; i++) {
-                targetStaticIds.put(targetIdsArray[i], "");
+            for (String aTargetIdsArray: targetIdsArray) {
+                targetStaticIds.put(aTargetIdsArray, "");
             }
         }
 
@@ -130,12 +130,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     /**
      * Execute the given event on this event handler.
      *
-     * @param pipelineContext       current pipeline context
+     * @param propertyContext
      * @param container             XBL container where observer is located
      * @param eventObserver         concrete event observer
      * @param event                 event
      */
-    public void handleEvent(PipelineContext pipelineContext, XBLContainer container,
+    public void handleEvent(PropertyContext propertyContext, XBLContainer container,
                             XFormsEventObserver eventObserver, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
 
@@ -146,12 +146,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             final XBLContainer nestedContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
 
             // Run action
-            new XFormsActionInterpreter(pipelineContext, nestedContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            new XFormsActionInterpreter(propertyContext, nestedContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId)
+                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
         } else {
             // Run normally
-            new XFormsActionInterpreter(pipelineContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            new XFormsActionInterpreter(propertyContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)
+                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
         }
     }
 
@@ -184,7 +184,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         return isAllEvents;
     }
 
-    public Map getEventNames() {
+    public Map<String, String> getEventNames() {
         return eventNames;
     }
 }

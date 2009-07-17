@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an xforms:case pseudo-control.
@@ -62,9 +62,11 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
 
     /**
      * Toggle to this case and dispatch events if this causes a change in selected cases.
+     *
+     * @param propertyContext
      */
-    public void toggle(PipelineContext pipelineContext) {
+    public void toggle(PropertyContext propertyContext) {
         final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
-        switchControl.setSelectedCase(pipelineContext, this);
+        switchControl.setSelectedCase(propertyContext, this);
     }
 }

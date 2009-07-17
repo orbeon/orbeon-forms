@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * Represents xforms:repeat iteration information.
@@ -57,15 +56,18 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
         }
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
+    @Override
+    protected void evaluate(PropertyContext propertyContext) {
         // Just get the MIPs, don't call super.evaluate(), since that would also try to get label, etc.
         getMIPsIfNeeded();
     }
 
+    @Override
     public boolean isStaticReadonly() {
         return false;
     }
 
+    @Override
     public String getType() {
         return null;
     }
@@ -73,16 +75,16 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     /**
      * Update this control's effective id and its descendants based on the parent's effective id.
      */
+    @Override
     public void updateEffectiveId() {
 
         // Update this iteration's effective id
         setEffectiveId(XFormsUtils.getIterationEffectiveId(getParent().getEffectiveId(), iterationIndex));
 
         // Update children
-        final List children = getChildren();
+        final List<XFormsControl> children = getChildren();
         if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
+            for (XFormsControl currentControl: children) {
                 currentControl.updateEffectiveId();
             }
         }

@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -32,7 +32,7 @@ public class TextReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // XForms 1.1: "If the replace attribute contains the value "text" and the
         // submission response conforms to an XML mediatype (as defined by the content type
@@ -56,7 +56,7 @@ public class TextReplacer extends BaseReplacer {
             // concludes after dispatching xforms-submit-error with appropriate context
             // information, including an error-type of resource-error."
             throw new XFormsSubmissionException(submission, "Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.getResponseMediaType(), "reading response body",
-                    new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
 
         // Find target location
@@ -64,7 +64,7 @@ public class TextReplacer extends BaseReplacer {
         if (submission.getTargetref() != null) {
             // Evaluate destination node
             final Object destinationObject
-                    = XPathCache.evaluateSingle(pipelineContext, p.xpathContext, p.refNodeInfo, submission.getTargetref());
+                    = XPathCache.evaluateSingle(propertyContext, p.xpathContext, p.refNodeInfo, submission.getTargetref());
 
             if (destinationObject instanceof NodeInfo) {
                 destinationNodeInfo = (NodeInfo) destinationObject;
@@ -75,7 +75,7 @@ public class TextReplacer extends BaseReplacer {
                     // then submission processing ends after dispatching the event
                     // xforms-submit-error with an error-type of target-error."
                     throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element or attribute for replace=\"text\".", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
             } else {
                 // Throw target-error
@@ -85,7 +85,7 @@ public class TextReplacer extends BaseReplacer {
                 // submission processing ends after dispatching the event
                 // xforms-submit-error with an error-type of target-error."
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to a node for replace=\"text\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(pipelineContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
         } else {
             // Handle default destination
@@ -93,9 +93,9 @@ public class TextReplacer extends BaseReplacer {
         }
 
         // Set value into the instance
-        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, submission, destinationNodeInfo, responseBody, null, false);
+        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, submission, destinationNodeInfo, responseBody, null, false);
 
         // Dispatch xforms-submit-done
-        dispatchSubmitDone(pipelineContext, connectionResult);
+        dispatchSubmitDone(propertyContext, connectionResult);
     }
 }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -32,39 +32,39 @@ import org.orbeon.saxon.om.Item;
  */
 public class XXFormsShowAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve all attributes as AVTs
-        final String dialogStaticId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
+        final String dialogStaticId = resolveAVT(actionInterpreter, propertyContext, actionElement, "dialog", true);
         final String effectiveNeighborId;
         {
-            final String neighborStaticId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
-            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborStaticId != null) ? resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), neighborStaticId, actionElement) : null);
+            final String neighborStaticId = resolveAVT(actionInterpreter, propertyContext, actionElement, "neighbor", true);
+            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborStaticId != null) ? resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), neighborStaticId, actionElement) : null);
             effectiveNeighborId = (effectiveNeighbor != null) ? effectiveNeighbor.getEffectiveId() : null;
         }
         final boolean constrainToViewport;
         {
-            final String constrain = resolveAVT(actionInterpreter, pipelineContext, actionElement, "constrain", false);
+            final String constrain = resolveAVT(actionInterpreter, propertyContext, actionElement, "constrain", false);
             constrainToViewport = !"false".equals(constrain);
         }
 
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-open event to dialog
             // TODO: use container.getObjectByEffectiveId() once XBLContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
+            final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventTarget, effectiveNeighborId, constrainToViewport);
-                addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-                eventTarget.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, newEvent);
+                addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
+                eventTarget.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
-                            new String[]{"dialog id", dialogStaticId});
+                            "dialog id", dialogStaticId);
             }
         }
     }

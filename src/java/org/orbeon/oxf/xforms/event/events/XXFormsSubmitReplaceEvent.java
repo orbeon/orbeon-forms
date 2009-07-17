@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.submission.SubmissionResult;
 
 public class XXFormsSubmitReplaceEvent extends XFormsEvent {
 
-    private final ConnectionResult connectionResult;
+    private final SubmissionResult submissionResult;
 
-    public XXFormsSubmitReplaceEvent(XFormsEventTarget targetObject, ConnectionResult connectionResult) {
+    public XXFormsSubmitReplaceEvent(XFormsEventTarget targetObject, SubmissionResult submissionResult) {
         super(XFormsEvents.XXFORMS_SUBMIT_REPLACE, targetObject, false, false);
-        this.connectionResult = connectionResult;
+        this.submissionResult = submissionResult;
     }
 
-    public ConnectionResult getConnectionResult() {
-        return connectionResult;
+    public SubmissionResult getSubmissionResult() {
+        return submissionResult;
     }
 }

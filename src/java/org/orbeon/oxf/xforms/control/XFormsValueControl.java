@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -42,14 +43,14 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void evaluate(PipelineContext pipelineContext) {
+    protected void evaluate(PropertyContext propertyContext) {
 
         // Set context and evaluate other aspects of the control if necessary
-        super.evaluate(pipelineContext);
+        super.evaluate(propertyContext);
 
         // Evaluate control values
-        getValue(pipelineContext);
-        getExternalValue(pipelineContext);
+        getValue(propertyContext);
+        getExternalValue(propertyContext);
     }
 
     @Override
@@ -60,7 +61,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         value = null;
     }
 
-    protected void evaluateValue(PipelineContext pipelineContext) {
+    protected void evaluateValue(PropertyContext propertyContext) {
         // Just get the value from the bound node
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null)
@@ -69,31 +70,32 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         setValue(XFormsInstance.getValueForNodeInfo(boundNode));
     }
 
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
         // By default, same as value
-        setExternalValue(getValue(pipelineContext));
+        setExternalValue(getValue(propertyContext));
     }
 
     /**
      * Notify the control that its value has changed due to external user interaction. The value passed is a value as
      * understood by the UI layer.
      *
+     * @param propertyContext
      * @param value             the new external value
      * @param filesElement      special filesElement construct for controls that need it
      */
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         // Set value into the instance
 
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, this, boundNode, value, type, false);
+        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, this, boundNode, value, type, false);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
     }
 
-    protected String getValueUseFormat(PipelineContext pipelineContext, String format) {
+    protected String getValueUseFormat(PropertyContext propertyContext, String format) {
 
         final String result;
         if (format == null) {
@@ -112,7 +114,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             }
 
             if (format != null) {
-                result = evaluateAsString(pipelineContext, getBoundNode(), format,
+                result = evaluateAsString(propertyContext, getBoundNode(), format,
                         prefixToURIMap, getContextStack().getCurrentVariables());
             } else {
                 result = null;
@@ -120,17 +122,19 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         } else {
             // Format value according to format attribute
-            result = evaluateAsString(pipelineContext, format);
+            result = evaluateAsString(propertyContext, format);
         }
         return result;
     }
 
     /**
      * Return the control's internal value.
+     *
+     * @param propertyContext
      */
-    public final String getValue(PipelineContext pipelineContext) {
+    public final String getValue(PropertyContext propertyContext) {
         if (!isValueEvaluated) {
-            evaluateValue(pipelineContext);
+            evaluateValue(propertyContext);
             isValueEvaluated = true;
         }
         return value;
@@ -138,10 +142,12 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.
+     *
+     * @param propertyContext
      */
-    public final String getExternalValue(PipelineContext pipelineContext) {
+    public final String getExternalValue(PropertyContext propertyContext) {
         if (!isExternalValueEvaluated) {
-            evaluateExternalValue(pipelineContext);
+            evaluateExternalValue(propertyContext);
             isExternalValueEvaluated = true;
         }
         return externalValue;

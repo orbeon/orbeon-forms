@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -23,6 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
+import org.orbeon.oxf.util.PropertyContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +75,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         setLocal(new XXFormsDialogControlLocal(initiallyVisible));
     }
 
+    @Override
     public boolean hasJavaScriptInitialization() {
         return true;
     }
@@ -116,7 +117,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getEventName())) {
             // Close the dialog
 
@@ -135,7 +136,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
             containingDocument.getControls().markDirtySinceLastRequest(false);
         }
-        super.performDefaultAction(pipelineContext, event);
+        super.performDefaultAction(propertyContext, event);
     }
 
     @Override
@@ -163,7 +164,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 element.attributeValue("neighbor")));
     }
 
-    public void updateContent(PipelineContext pipelineContext, boolean isVisible) {
+    public void updateContent(PropertyContext propertyContext, boolean isVisible) {
         final XFormsControls controls = containingDocument.getControls();
         final ControlTree currentControlTree = controls.getCurrentControlTree();
 
@@ -172,7 +173,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         if (isVisible) {
             // Became visible: create children
             if (children == null || children.size() == 0) {
-                currentControlTree.createSubTree(pipelineContext, this);
+                currentControlTree.createSubTree(propertyContext, this);
             }
         } else {
             // Became invisible: remove children

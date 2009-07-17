@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an xforms:textarea control.
@@ -44,16 +44,19 @@ public class XFormsTextareaControl extends XFormsValueControl {
         super(container, parent, element, name, id);
     }
 
+    @Override
     protected QName[] getExtensionAttributes() {
         return EXTENSION_ATTRIBUTES;
     }
 
+    @Override
     public boolean hasJavaScriptInitialization() {
         return "text/html".equals(getMediatype()) || AUTOSIZE_APPEARANCE.equals(getAppearance());
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
-        super.evaluate(pipelineContext);
+    @Override
+    protected void evaluate(PropertyContext propertyContext) {
+        super.evaluate(propertyContext);
     }
 
     // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript
@@ -65,7 +68,8 @@ public class XFormsTextareaControl extends XFormsValueControl {
      * For textareas with mediatype="text/html", we first clean the HTML with TagSoup, and then transform it with
      * a stylesheet that removes all unknown or dangerous content.
      */
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    @Override
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         if ("text/html".equals(getMediatype())) {
             XFormsServer.logger.debug("XForms - Cleaning HTML - before cleanup: " + value);
 
@@ -85,6 +89,6 @@ public class XFormsTextareaControl extends XFormsValueControl {
             }
             XFormsServer.logger.debug("XForms - Cleaning HTML - after XSLT cleanup:  " + value);
         }
-        super.storeExternalValue(pipelineContext, value, type, filesElement);
+        super.storeExternalValue(propertyContext, value, type, filesElement);
     }
 }

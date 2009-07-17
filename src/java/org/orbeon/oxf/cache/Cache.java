@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 
 import java.util.Iterator;
 
@@ -24,12 +24,12 @@ public interface Cache {
     public static final int EXPIRATION_LAST_MODIFIED = -2;
 
     public String getCacheName();
-    public void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object);
-    public void remove(PipelineContext pipelineContext, CacheKey key);
-    public int removeAll(PipelineContext pipelineContext);
-    public Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity);
-    public Iterator iterateCacheKeys(PipelineContext pipelineContext);
-    public Iterator iterateCacheObjects(PipelineContext pipelineContext);
-    public void setMaxSize(PipelineContext pipelineContext, int maxSize);
-    public CacheStatistics getStatistics(PipelineContext pipelineContext);
+    public void add(PropertyContext propertyContext, CacheKey key, Object validity, Object object);
+    public void remove(PropertyContext propertyContext, CacheKey key);
+    public int removeAll(PropertyContext propertyContext);
+    public Object findValid(PropertyContext propertyContext, CacheKey key, Object validity);
+    public Iterator iterateCacheKeys(PropertyContext propertyContext);
+    public Iterator iterateCacheObjects(PropertyContext propertyContext);
+    public void setMaxSize(PropertyContext propertyContext, int maxSize);
+    public CacheStatistics getStatistics(PropertyContext propertyContext);
 }

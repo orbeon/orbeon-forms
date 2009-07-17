@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 
 import java.util.List;
 
@@ -26,26 +26,28 @@ public interface XFormsContainerControl {
      *
      * @param XFormsControl control
      */
-    public void addChild(XFormsControl XFormsControl);
+    void addChild(XFormsControl XFormsControl);
 
     /**
      * Get all the direct children controls.
      *
      * @return  List<XFormsControl>
      */
-    public List<XFormsControl> getChildren();
+    List<XFormsControl> getChildren();
 
     /**
      * Number of direct children control.
      *
      * @return  number
      */
-    public int getSize();
+    int getSize();
 
     /**
      * Notify container control that all its children have been added.
+     *
+     * @param propertyContext
      */
-    public void childrenAdded(PipelineContext pipelineContext);
+    void childrenAdded(PropertyContext propertyContext);
 
     /**
      * Update this container control's effective id, e.g. after a change of repeat iteration.

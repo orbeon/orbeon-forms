@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -29,22 +30,29 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 public abstract class BaseSubmission implements Submission {
 
     protected final XFormsModelSubmission submission;
     protected final XFormsContainingDocument containingDocument;
 
+    // Global thread pool
+    private static ExecutorService threadPool = Executors.newCachedThreadPool();
+
     protected BaseSubmission(XFormsModelSubmission submission) {
         this.submission = submission;
         this.containingDocument = submission.getContainingDocument();
     }
 
-    protected ExternalContext getExternalContext(PipelineContext pipelineContext) {
-        return (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    protected ExternalContext getExternalContext(PropertyContext propertyContext) {
+        return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
     }
 
-    protected URL getResolvedSubmissionURL(PipelineContext pipelineContext, ExternalContext externalContext, ExternalContext.Request request, String resolvedActionOrResource, String queryString) {
+    protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {
+
+        final ExternalContext.Request request = externalContext.getRequest();
+
         // Absolute URLs or absolute paths are allowed to a local servlet
         String resolvedURL;
 
@@ -53,7 +61,7 @@ public abstract class BaseSubmission implements Submission {
             resolvedURL = resolvedActionOrResource;
         } else {
             // Rewrite URL
-            resolvedURL = XFormsUtils.resolveServiceURL(pipelineContext, submission.getSubmissionElement(), resolvedActionOrResource,
+            resolvedURL = XFormsUtils.resolveServiceURL(propertyContext, submission.getSubmissionElement(), resolvedActionOrResource,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
 
             if (request.getContainerType().equals("portlet") && "resource".equals(submission.getUrlType()) && !NetUtils.urlHasProtocol(resolvedURL)) {
@@ -69,18 +77,18 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Evaluate the <xforms:header> elements children of <xforms:submission>.
      *
-     * @param pipelineContext   pipeline context
+     * @param propertyContext   pipeline context
      * @param contextStack      context stack set to enclosing <xforms:submission>
      * @return                  LinkedHashMap<String headerName, String[] headerValues>, or null if no header elements
      */
-    protected Map<String, String[]> evaluateHeaders(PipelineContext pipelineContext, XFormsContextStack contextStack) {
+    protected Map<String, String[]> evaluateHeaders(PropertyContext propertyContext, XFormsContextStack contextStack) {
         final List<Element> headerElements = Dom4jUtils.elements(submission.getSubmissionElement(), XFormsConstants.XFORMS_HEADER_QNAME);
         if (headerElements.size() > 0) {
             final Map<String, String[]> headerNameValues = new LinkedHashMap<String, String[]>();
 
             // Iterate over all <xforms:header> elements
             for (Element currentHeaderElement: headerElements) {
-                contextStack.pushBinding(pipelineContext, currentHeaderElement);
+                contextStack.pushBinding(propertyContext, currentHeaderElement);
                 final XFormsContextStack.BindingContext currentHeaderBindingContext = contextStack.getCurrentBindingContext();
                 if (currentHeaderBindingContext.isNewBind()) {
                     // This means there was @nodeset or @bind so we must iterate
@@ -90,13 +98,13 @@ public abstract class BaseSubmission implements Submission {
                         // Push all iterations in turn
                         for (int position = 1; position <= currentSize; position++) {
                             contextStack.pushIteration(position);
-                            handleHeaderElement(pipelineContext, contextStack, headerNameValues, currentHeaderElement);
+                            handleHeaderElement(propertyContext, contextStack, headerNameValues, currentHeaderElement);
                             contextStack.popBinding();
                         }
                     }
                 } else {
                     // This means there is just a single header
-                    handleHeaderElement(pipelineContext, contextStack, headerNameValues, currentHeaderElement);
+                    handleHeaderElement(propertyContext, contextStack, headerNameValues, currentHeaderElement);
                 }
                 contextStack.popBinding();
             }
@@ -110,20 +118,20 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Evaluate a single <xforms:header> element. It may have a node-set binding.
      *
-     * @param pipelineContext       pipeline context
+     * @param propertyContext       pipeline context
      * @param contextStack          context stack set to <xforms:header> (or element iteration)
      * @param headerNameValues      LinkedHashMap<String headerName, String[] headerValues> to update
      * @param currentHeaderElement  <xforms:header> element to evaluate
      */
-    private void handleHeaderElement(PipelineContext pipelineContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues, Element currentHeaderElement) {
+    private void handleHeaderElement(PropertyContext propertyContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues, Element currentHeaderElement) {
         final String headerName;
         {
             final Element headerNameElement = currentHeaderElement.element("name");
             if (headerNameElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <name> child element of <header> element", "processing <header> elements");
 
-            contextStack.pushBinding(pipelineContext, headerNameElement);
-            headerName = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, headerNameElement, false, null);
+            contextStack.pushBinding(propertyContext, headerNameElement);
+            headerName = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, headerNameElement, false, null);
             contextStack.popBinding();
         }
 
@@ -132,11 +140,96 @@ public abstract class BaseSubmission implements Submission {
             final Element headerValueElement = currentHeaderElement.element("value");
             if (headerValueElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <value> child element of <header> element", "processing <header> elements");
-            contextStack.pushBinding(pipelineContext, headerValueElement);
-            headerValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, contextStack, headerValueElement, false, null);
+            contextStack.pushBinding(propertyContext, headerValueElement);
+            headerValue = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, headerValueElement, false, null);
             contextStack.popBinding();
         }
 
         StringUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
+    }
+
+    /**
+     * Submit the Callable for synchronous or asynchronous execution.
+     *
+     * @return ConnectionResult or null if asynchronous
+     */
+    protected SubmissionResult submitCallable(XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, final Callable<SubmissionResult> callable) throws Exception {
+        if (p2.isAsyncSubmission) {
+
+            // This is probably a temporary setting: we run replace="none" in the foreground later, and
+            // replace="instance|text" in the background.
+            final boolean isRunInBackground = !p.isReplaceNone;
+
+            if (isRunInBackground) {
+                // Submission runs immediately in a separate thread
+
+                final Future<SubmissionResult> future = threadPool.submit(callable);
+
+                // Tell XFCD that we have one more async submission
+                containingDocument.addAsynchronousSubmission(future, submission.getEffectiveId(), true);
+
+            } else {
+                // Submission will run after response is sent to the client
+
+                // Tell XFCD that we have one more async submission
+                final Future<SubmissionResult> future = new Future<SubmissionResult>() {
+
+                    private boolean isDone;
+                    private boolean isCanceled;
+
+                    private SubmissionResult result;
+
+                    public boolean cancel(boolean b) {
+                        if (isDone)
+                            return false;
+                        isCanceled = true;
+                        return true;
+                    }
+
+                    public boolean isCancelled() {
+                        return isCanceled;
+                    }
+
+                    public boolean isDone() {
+                        return isDone;
+                    }
+
+                    public SubmissionResult get() throws InterruptedException, ExecutionException {
+                        if (isCanceled)
+                            throw new CancellationException();
+
+                        if (!isDone) {
+                            try {
+                                result = callable.call();
+                            } catch (Exception e) {
+                                throw new ExecutionException(e);
+                            }
+
+                            isDone = true;
+                        }
+
+                        return result;
+                    }
+
+                    public SubmissionResult get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+                        return get();
+                    }
+                };
+
+                containingDocument.addAsynchronousSubmission(future, submission.getEffectiveId(), false);
+
+                // NOTE: In this very basic level of support, we don't support
+                // xforms-submit-done / xforms-submit-error handlers
+
+                // TODO: Do something with result, e.g. log?
+                // final ConnectionResult connectionResult = ...
+            }
+
+            // Tell caller he doesn't need to do anything
+            return null;
+        } else {
+            // Just run it now
+            return callable.call();
+        }
     }
 }

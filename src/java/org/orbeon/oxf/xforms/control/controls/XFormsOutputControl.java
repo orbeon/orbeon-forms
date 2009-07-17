@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -67,6 +68,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         fileInfo = new FileInfo(this, getContextStack(), element);
     }
 
+    @Override
     protected QName[] getExtensionAttributes() {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()))
             return DOWNLOAD_APPEARANCE_EXTENSION_ATTRIBUTES;
@@ -74,21 +76,24 @@ public class XFormsOutputControl extends XFormsValueControl {
             return null;
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
-        super.evaluate(pipelineContext);
+    @Override
+    protected void evaluate(PropertyContext propertyContext) {
+        super.evaluate(propertyContext);
 
-        getState(pipelineContext);
-        getFileMediatype(pipelineContext);
-        getFileName(pipelineContext);
-        getFileSize(pipelineContext);
+        getState(propertyContext);
+        getFileMediatype(propertyContext);
+        getFileName(propertyContext);
+        getFileSize(propertyContext);
     }
 
+    @Override
     public void markDirty() {
         super.markDirty();
         fileInfo.markDirty();
     }
 
-    protected void evaluateValue(PipelineContext pipelineContext) {
+    @Override
+    protected void evaluateValue(PropertyContext propertyContext) {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
@@ -100,24 +105,27 @@ public class XFormsOutputControl extends XFormsValueControl {
         } else {
             // Value comes from the XPath expression within the value attribute
 
-            value = evaluateAsString(pipelineContext, valueAttribute);
+            value = evaluateAsString(propertyContext, valueAttribute);
         }
         setValue((value != null) ? value : "");
     }
 
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+    @Override
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(pipelineContext);
+        final String internalValue = getValue(propertyContext);
         final String updatedValue;
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
-            final String dynamicMediatype = fileInfo.getFileMediatype(pipelineContext);
+            final String dynamicMediatype = fileInfo.getFileMediatype(propertyContext);
             // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
+            // TODO: cast to PipelineContext
+            updatedValue = proxyValueIfNeeded((PipelineContext) propertyContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
             // Use dummy image as default value so that client always has something to load
-            updatedValue = proxyValueIfNeeded(pipelineContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
+            // TODO: cast to PipelineContext
+            updatedValue = proxyValueIfNeeded((PipelineContext) propertyContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -125,7 +133,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Other mediatypes
             if (valueAttribute == null) {
                 // There is a single-node binding, so the format may be used
-                final String formattedValue = getValueUseFormat(pipelineContext, format);
+                final String formattedValue = getValueUseFormat(propertyContext, format);
                 updatedValue = (formattedValue != null) ? formattedValue : internalValue;
             } else {
                 // There is a @value attribute, don't use format
@@ -168,6 +176,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         return updatedValue;
     }
 
+    @Override
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String externalValue = getExternalValue(pipelineContext);
@@ -197,6 +206,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         return valueAttribute;
     }
 
+    @Override
     public String getType() {
         // No type information is returned when there is a value attribute
 
@@ -206,32 +216,32 @@ public class XFormsOutputControl extends XFormsValueControl {
         return (valueAttribute == null) ? super.getType() : null;
     }
 
-    public String getState(PipelineContext pipelineContext) {
-        return fileInfo.getState(pipelineContext);
+    public String getState(PropertyContext propertyContext) {
+        return fileInfo.getState(propertyContext);
     }
 
-    public String getFileMediatype(PipelineContext pipelineContext) {
-        return fileInfo.getFileMediatype(pipelineContext);
+    public String getFileMediatype(PropertyContext propertyContext) {
+        return fileInfo.getFileMediatype(propertyContext);
     }
 
-    public String getFileName(PipelineContext pipelineContext) {
-        return fileInfo.getFileName(pipelineContext);
+    public String getFileName(PropertyContext propertyContext) {
+        return fileInfo.getFileName(propertyContext);
     }
 
-    public String getFileSize(PipelineContext pipelineContext) {
-        return fileInfo.getFileSize(pipelineContext);
+    public String getFileSize(PropertyContext propertyContext) {
+        return fileInfo.getFileSize(propertyContext);
     }
 
-    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
-        fileInfo.setMediatype(pipelineContext, mediatype);
+    public void setMediatype(PropertyContext propertyContext, String mediatype) {
+        fileInfo.setMediatype(propertyContext, mediatype);
     }
 
-    public void setFilename(PipelineContext pipelineContext, String filename) {
-        fileInfo.setFilename(pipelineContext, filename);
+    public void setFilename(PropertyContext propertyContext, String filename) {
+        fileInfo.setFilename(propertyContext, filename);
     }
 
-    public void setSize(PipelineContext pipelineContext, String size) {
-        fileInfo.setSize(pipelineContext, size);
+    public void setSize(PropertyContext propertyContext, String size) {
+        fileInfo.setSize(propertyContext, size);
     }
 
     public static String getExternalValue(PipelineContext pipelineContext, XFormsOutputControl control, String mediatypeValue) {
@@ -247,6 +257,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         }
     }
 
+    @Override
     public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
         final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) other;
         final XFormsOutputControl outputControlInfo2 = this;
@@ -264,6 +275,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         return added;
     }
 
+    @Override
     public Object clone() {
         final XFormsOutputControl cloned = (XFormsOutputControl) super.clone();
         // NOTE: this keeps old refs to control/contextStack, is it ok?

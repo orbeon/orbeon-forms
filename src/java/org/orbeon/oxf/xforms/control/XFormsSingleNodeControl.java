@@ -14,18 +14,18 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.Item;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
@@ -66,10 +66,10 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
 
         // Keep binding context
-        super.setBindingContext(pipelineContext, bindingContext);
+        super.setBindingContext(propertyContext, bindingContext);
 
         // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
         if (bindingContext.isNewBind())
@@ -135,8 +135,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
                 final FastStringBuffer sb = new FastStringBuffer(20);
 
-                for (Iterator iterator = customMIPs.entrySet().iterator(); iterator.hasNext();) {
-                    final Map.Entry entry = (Map.Entry) iterator.next();
+                for (Object o: customMIPs.entrySet()) {
+                    final Map.Entry entry = (Map.Entry) o;
                     final String name = (String) entry.getKey();
                     final String value = (String) entry.getValue();
 
@@ -185,8 +185,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected void evaluate(PipelineContext pipelineContext) {
-        super.evaluate(pipelineContext);
+    protected void evaluate(PropertyContext propertyContext) {
+        super.evaluate(propertyContext);
         getMIPsIfNeeded();
     }
 
@@ -306,7 +306,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         getMIPsIfNeeded();
         other.getMIPsIfNeeded();
 
-        // Stanard MIPs
+        // Standard MIPs
         if (readonly != other.readonly)
             return false;
         if (required != other.required)

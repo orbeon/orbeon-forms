@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -36,7 +36,6 @@ import org.orbeon.saxon.value.BooleanValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ public class XFormsInsertAction extends XFormsAction {
     public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "no-index-adjustment");
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -110,7 +109,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                 // origin attribute in the insert context."
 
-                originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
+                originObjects = XPathCache.evaluate(propertyContext, insertContextNodeInfo,
                         originAttribute, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(),
                         contextStack.getFunctionContext(),
@@ -141,7 +140,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // position is 1."
 
                 // "b. The return value is processed according to the rules of the XPath function round()"
-                final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
+                final String insertionIndexString = XPathCache.evaluateAsString(propertyContext,
                         collectionToBeUpdated, 1,
                         "round(" + atAttribute + ")", actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
@@ -164,10 +163,10 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(pipelineContext, containingDocument, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex, true, true);
+        doInsert(propertyContext, containingDocument, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex, true, true);
     }
 
-    public static List doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute,
+    public static List doInsert(PropertyContext propertyContext, XFormsContainingDocument containingDocument, String positionAttribute,
                                 List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
@@ -216,15 +215,13 @@ public class XFormsInsertAction extends XFormsAction {
                 sourceNodes = new ArrayList<Node>(originItems.size()); // set to max possible size
                 clonedNodesTemp = new ArrayList<Node>(originItems.size());
 
-                for (Iterator i = originItems.iterator(); i.hasNext();) {
-                    final Object currentObject = i.next();
-
+                for (final Object currentObject: originItems) {
                     if (currentObject instanceof NodeInfo) {
                         // This is the regular case covered by XForms 1.1 / XPath 1.0
 
                         // NOTE: Don't clone nodes if doClone == false
                         final Node sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject, CANNOT_INSERT_READONLY_MESSAGE);
-                        final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone() : sourceNode;
+                        final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Element) sourceNode).createCopy() : (Node) sourceNode.clone() : sourceNode;
 
                         sourceNodes.add(sourceNode);
                         clonedNodesTemp.add(clonedNode);
@@ -245,7 +242,7 @@ public class XFormsInsertAction extends XFormsAction {
 
             // Remove instance data from cloned nodes and perform Document node adjustment
             for (int i = 0; i < clonedNodesTemp.size(); i++) {
-                final Node clonedNodeTemp = (Node) clonedNodesTemp.get(i);
+                final Node clonedNodeTemp = clonedNodesTemp.get(i);
 
                 if (clonedNodeTemp instanceof Element) {
                     // Element node
@@ -305,8 +302,7 @@ public class XFormsInsertAction extends XFormsAction {
             // Normalize text nodes if needed to respect XPath 1.0 constraint
             {
                 boolean hasTextNode = false;
-                for (int i = 0; i < clonedNodes.size(); i++) {
-                    final Node clonedNode = (Node) clonedNodes.get(i);
+                for (Node clonedNode: clonedNodes) {
                     hasTextNode |= clonedNode != null && clonedNode.getNodeType() == Node.TEXT_NODE;
                 }
                 if (hasTextNode)
@@ -375,8 +371,7 @@ public class XFormsInsertAction extends XFormsAction {
                     boolean hasTextNode = false;
                     int addIndex = 0;
                     insertedNodes = new ArrayList<Node>(clonedNodes.size());
-                    for (int i = 0; i < clonedNodes.size(); i++) {
-                        final Node clonedNode = (Node) clonedNodes.get(i);
+                    for (Node clonedNode: clonedNodes) {
 
                         if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
                             if (!(clonedNode instanceof Attribute || clonedNode instanceof Namespace)) {
@@ -389,10 +384,9 @@ public class XFormsInsertAction extends XFormsAction {
                                 // We never insert attributes or namespace nodes as siblings
                                 if (XFormsServer.logger.isDebugEnabled())
                                     containingDocument.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
-                                            new String[] {
                                                     "type", clonedNode.getNodeTypeName(),
                                                     "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
-                                            } );
+                                            );
                             }
                         }
                     }
@@ -412,8 +406,8 @@ public class XFormsInsertAction extends XFormsAction {
         if (XFormsServer.logger.isDebugEnabled()) {
             if (didInsertNodes)
                 containingDocument.logDebug("xforms:insert", "inserted nodes",
-                        new String[] { "count", Integer.toString(insertedNodes.size()), "instance",
-                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null });
+                        "count", Integer.toString(insertedNodes.size()), "instance",
+                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
             else
                 containingDocument.logDebug("xforms:insert", "no node inserted");
         }
@@ -442,13 +436,13 @@ public class XFormsInsertAction extends XFormsAction {
 //                }
 
                 insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
-                for (Iterator i = insertedNodes.iterator(); i.hasNext();)
-                    insertedNodeInfos.add(documentWrapper.wrap(i.next()));
+                for (Object insertedNode: insertedNodes)
+                    insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
             } else {
                 insertedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
             }
 
-            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext,
+            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
                     new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
                             positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
 
@@ -484,8 +478,7 @@ public class XFormsInsertAction extends XFormsAction {
 
 //            int attributeIndex = 0;
             int otherNodeIndex = 0;
-            for (int i = 0; i < clonedNodes.size(); i++) {
-                final Node clonedNode = (Node) clonedNodes.get(i);
+            for (Node clonedNode: clonedNodes) {
 
                 if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
                     if (clonedNode instanceof Attribute) {
@@ -494,8 +487,8 @@ public class XFormsInsertAction extends XFormsAction {
                         final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
                         if (existingAttribute != null)
                             insertContextElement.remove(existingAttribute);
-    //                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
-    //                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
+                        //                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
+                        //                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
 
                         // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but the
                         // XForms spec shouldn't rely on attribute order. We could try to keep the order, but it is harder
@@ -520,9 +513,7 @@ public class XFormsInsertAction extends XFormsAction {
 
             // "If there is more than one cloned node to insert, only the first node that does not cause a conflict is
             // considered."
-            for (int i = 0; i < clonedNodes.size(); i++) {
-                final Node clonedNode = (Node) clonedNodes.get(i);
-
+            for (Node clonedNode: clonedNodes) {
                 // Only an element can be inserted at the root of an instance
                 if (clonedNode instanceof Element) {
                     insertContextDocument.setRootElement((Element) clonedNode);

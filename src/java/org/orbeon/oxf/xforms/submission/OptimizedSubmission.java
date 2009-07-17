@@ -14,20 +14,32 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import java.net.URI;
 import java.util.Map;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 /**
  * Optimized submission doesn't issue HTTP requests but goes through the Servlet API.
  */
 public class OptimizedSubmission extends BaseSubmission {
+
+    // TODO: harmonize with regular HTTP submission headers configuration (property)
+    public static String[] MINIMAL_HEADERS_TO_FORWARD = { "cookie", "authorization" };
+    public static String[] STANDARD_HEADERS_TO_FORWARD = { "cookie", "authorization", "user-agent"};
 
     public OptimizedSubmission(XFormsModelSubmission submission) {
         super(submission);
@@ -38,10 +50,10 @@ public class OptimizedSubmission extends BaseSubmission {
      *
      * Log a lot of stuff for development, as it is not always obvious why we pick an optimized vs. regular submission.
      */
-    public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = getExternalContext(pipelineContext).getRequest();
+        final ExternalContext.Request request = getExternalContext(propertyContext).getRequest();
 
         final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
         if (isDebugEnabled) {
@@ -124,7 +136,7 @@ public class OptimizedSubmission extends BaseSubmission {
         return true;
     }
 
-    public ConnectionResult connect(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+    public ConnectionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
         // access the resource, but instead uses servlet forward/include for servlets, or a local
         // mechanism for portlets.
@@ -153,14 +165,14 @@ public class OptimizedSubmission extends BaseSubmission {
         // simulates a request from the browser! Useful in particular when the target URL renders XForms
         // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
         // element.
-        final String[] headersToForward = p.isReplaceAll ? XFormsSubmissionUtils.STANDARD_HEADERS_TO_FORWARD : XFormsSubmissionUtils.MINIMAL_HEADERS_TO_FORWARD;
+        final String[] headersToForward = p.isReplaceAll ? STANDARD_HEADERS_TO_FORWARD : MINIMAL_HEADERS_TO_FORWARD;
         // TODO: Harmonize with HTTP submission handling of headers
 
         // Evaluate headers if any
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(pipelineContext, p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
 
         final ConnectionResult connectionResult
-                = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, getExternalContext(pipelineContext),
+                = openOptimizedConnection(propertyContext, getExternalContext(propertyContext),
                 containingDocument, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission, p.actualHttpMethod,
                 resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
@@ -170,5 +182,192 @@ public class OptimizedSubmission extends BaseSubmission {
             containingDocument.setGotSubmissionReplaceAll();
 
         return connectionResult;
+    }
+
+    /**
+     * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
+     */
+    public static ConnectionResult openOptimizedConnection(PropertyContext propertyContext, ExternalContext externalContext,
+                                                           XFormsContainingDocument containingDocument,
+                                                           XFormsModelSubmission xformsModelSubmission,
+                                                           String httpMethod, final String resource, boolean isNorewrite, String mediatype,
+                                                           byte[] messageBody, String queryString,
+                                                           boolean isReplaceAll, String[] headerNames,
+                                                           Map<String, String[]> customHeaderNameValues) {
+
+        // NOTE: This code does custom rewriting of the path on the action, taking into account whether
+        // the page was produced through a filter in separate deployment or not.
+        final boolean isContextRelative;
+        final String effectiveAction;
+        if (!isNorewrite) {
+            // Must rewrite
+            if (!containingDocument.getStaticState().isSeparateDeployment()) {
+                // We are not in separate deployment, so keep path relative to the current servlet context
+                isContextRelative = true;
+                effectiveAction = resource;
+            } else {
+                // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
+                final String contextPath = containingDocument.getStaticState().getRequestContextPath();
+                isContextRelative = false;
+                effectiveAction = contextPath + resource;
+            }
+        } else {
+            // Must not rewrite anyway, so mark path as not relative to the current context
+            isContextRelative = false;
+            effectiveAction = resource;
+        }
+
+        return openOptimizedConnection(propertyContext, externalContext, containingDocument.getResponse(),
+                                xformsModelSubmission, httpMethod, effectiveAction, isContextRelative, mediatype,
+                                messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues);
+    }
+
+    /**
+     * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
+     */
+    private static ConnectionResult openOptimizedConnection(PropertyContext propertyContext, ExternalContext externalContext,
+                                                           ExternalContext.Response response,
+                                                           XFormsModelSubmission xformsModelSubmission,
+                                                           String httpMethod, final String resource, boolean isContextRelative, String mediatype,
+                                                           byte[] messageBody, String queryString,
+                                                           final boolean isReplaceAll, String[] headerNames,
+                                                           Map<String, String[]> customHeaderNameValues) {
+
+        // Action must be an absolute path
+        if (!resource.startsWith("/"))
+            throw new OXFException("Action does not start with a '/': " + resource);
+
+        final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
+        try {
+
+            // Get dispatcher
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(resource, isContextRelative);
+            final boolean isDefaultContext = requestDispatcher.isDefaultContext();
+
+            // Case of empty body
+            if (messageBody == null)
+                messageBody = new byte[0];
+
+            // Destination context path is the context path of the current request, or the context path implied by the new URI
+            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
+
+            // Create requestAdapter depending on method
+            final ForwardExternalContextRequestWrapper requestAdapter;
+            final String effectiveResourceURI;
+            final String rootAdjustedResourceURI;
+            {
+                if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
+                    // Simulate a POST or PUT
+                    effectiveResourceURI = resource;
+
+                    if (XFormsServer.logger.isDebugEnabled())
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
+                            "body", new String(messageBody, "UTF-8"));
+
+                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                    if (rootAdjustedResourceURI == null)
+                        throw new OXFException("Action must start with a servlet context path: " + resource);
+
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
+                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, customHeaderNameValues);
+                } else {
+                    // Simulate a GET or DELETE
+                    {
+                        final StringBuffer updatedActionStringBuffer = new StringBuffer(resource);
+                        if (queryString != null) {
+                            if (resource.indexOf('?') == -1)
+                                updatedActionStringBuffer.append('?');
+                            else
+                                updatedActionStringBuffer.append('&');
+                            updatedActionStringBuffer.append(queryString);
+                        }
+                        effectiveResourceURI = updatedActionStringBuffer.toString();
+                    }
+
+                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                    if (rootAdjustedResourceURI == null)
+                        throw new OXFException("Action must start with a servlet context path: " + resource);
+
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
+                            rootAdjustedResourceURI, httpMethod, headerNames, customHeaderNameValues);
+                }
+            }
+
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
+                            "method", httpMethod,
+                            "mediatype", mediatype,
+                            "context path", destinationContextPath,
+                            "effective resource URI (original)", effectiveResourceURI,
+                            "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
+
+            // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
+            final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response != null ? response : externalContext.getResponse();
+
+            final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
+                @Override
+                public void close() {
+                    if (getResponseInputStream() != null) {
+                        // Case of !isReplaceAll where we read from the response
+                        try {
+                            getResponseInputStream().close();
+                        } catch (IOException e) {
+                            throw new OXFException("Exception while closing input stream for resource: " + resource);
+                        }
+                    } else {
+                        // Case of isReplaceAll where forwarded resource writes to the response directly
+
+                        // Try to obtain, flush and close the stream to work around WebSphere issue
+                        try {
+                            final OutputStream os = effectiveResponse.getOutputStream();
+                            os.flush();
+                            os.close();
+                        } catch (IllegalStateException e) {
+                            XFormsServer.logger.debug("IllegalStateException caught while closing OutputStream after forward");
+                            try {
+                                final PrintWriter writer = effectiveResponse.getWriter();
+                                writer.flush();
+                                writer.close();
+                            } catch (IllegalStateException f) {
+                                XFormsServer.logger.debug("IllegalStateException caught while closing Writer after forward");
+                            } catch (IOException f) {
+                                XFormsServer.logger.debug("IOException caught while closing Writer after forward");
+                            }
+                        } catch (IOException e) {
+                            XFormsServer.logger.debug("IOException caught while closing OutputStream after forward");
+                        }
+                    }
+                }
+            };
+            if (isReplaceAll) {
+                // "the event xforms-submit-done is dispatched"
+                if (xformsModelSubmission != null)
+                    xformsModelSubmission.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
+                            new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
+                // Just forward the reply to the response
+                requestDispatcher.forward(requestAdapter, effectiveResponse);
+                connectionResult.dontHandleResponse = true;
+            } else {
+                // We must intercept the reply
+                final ResponseAdapter responseAdapter = new ResponseAdapter(externalContext.getNativeResponse());
+                requestDispatcher.include(requestAdapter, responseAdapter);
+
+                // Get response information that needs to be forwarded
+
+                // NOTE: Here, the resultCode is not propagated from the included resource
+                // when including Servlets. Similarly, it is not possible to obtain the
+                // included resource's content type or headers. Because of this we should not
+                // use an optimized submission from within a servlet.
+                connectionResult.statusCode = responseAdapter.getResponseCode();
+                connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
+                connectionResult.setResponseInputStream(responseAdapter.getInputStream());
+                connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
+                connectionResult.setLastModified(null);
+            }
+
+            return connectionResult;
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
     }
 }

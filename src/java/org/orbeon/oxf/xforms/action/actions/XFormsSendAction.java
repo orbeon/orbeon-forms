@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -26,13 +25,14 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.10 The send Element
  */
 public class XFormsSendAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContextt) {
 
@@ -47,18 +47,18 @@ public class XFormsSendAction extends XFormsAction {
         final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, submissionId, true);
+            resolvedSubmissionStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, submissionId, true);
             if (resolvedSubmissionStaticId == null)
                 return;
         }
 
         // Find actual target
-        final Object submission = resolveEffectiveObject(actionInterpreter, pipelineContext, eventObserver, resolvedSubmissionStaticId, actionElement);
+        final Object submission = resolveEffectiveObject(actionInterpreter, propertyContext, eventObserver, resolvedSubmissionStaticId, actionElement);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent((XFormsEventTarget) submission);
-            addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
-            container.dispatchEvent(pipelineContext, newEvent);
+            addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
+            container.dispatchEvent(propertyContext, newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

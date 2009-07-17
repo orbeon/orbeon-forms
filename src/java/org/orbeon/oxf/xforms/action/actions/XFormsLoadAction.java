@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -29,7 +29,7 @@ import org.orbeon.saxon.om.NodeInfo;
  * 10.1.8 The load Element
  */
 public class XFormsLoadAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -39,16 +39,16 @@ public class XFormsLoadAction extends XFormsAction {
 
         final String showAttribute;
         {
-            final String rawShowAttribute = resolveAVT(actionInterpreter, pipelineContext, actionElement, "show", false);
+            final String rawShowAttribute = resolveAVT(actionInterpreter, propertyContext, actionElement, "show", false);
             showAttribute = (rawShowAttribute == null) ? "replace" : rawShowAttribute;
             if (!("replace".equals(showAttribute) || "new".equals(showAttribute)))
                 throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
         }
         final boolean doReplace = "replace".equals(showAttribute);
-        final String target = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME, false);
-        final String urlType = resolveAVT(actionInterpreter, pipelineContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME, false);
+        final String target = resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME, false);
+        final String urlType = resolveAVT(actionInterpreter, propertyContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME, false);
         final boolean urlNorewrite = XFormsUtils.resolveUrlNorewrite(actionElement);
-        final boolean isShowProgress = !"false".equals(resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false));
+        final boolean isShowProgress = !"false".equals(resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false));
 
         // "If both are present, the action has no effect."
         final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
@@ -61,10 +61,9 @@ public class XFormsLoadAction extends XFormsAction {
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNodeInfo(currentNode);
                 final String encodedValue = XFormsUtils.encodeHRRI(value, true);
-                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
+                resolveLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
-                return;
             }
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else if (resourceAttributeValue != null) {
@@ -75,9 +74,9 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
 
             // Resolve AVT
-            final String resolvedResource = resolveAVT(actionInterpreter, pipelineContext, actionElement, "resource", false);
+            final String resolvedResource = resolveAVT(actionInterpreter, propertyContext, actionElement, "resource", false);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
-            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
+            resolveLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance
@@ -86,7 +85,7 @@ public class XFormsLoadAction extends XFormsAction {
         }
     }
 
-    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
+    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
                                           Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite, boolean isShowProgress) {
 
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
@@ -97,10 +96,10 @@ public class XFormsLoadAction extends XFormsAction {
         } else {
             // URL must be resolved
             if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
-                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, pipelineContext, currentElement, value, false);
+                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, propertyContext, currentElement, value, false);
             } else {
                 // Just a resource URL
-                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value,
+                externalURL = XFormsUtils.resolveResourceURL(propertyContext, currentElement, value,
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             }
         }

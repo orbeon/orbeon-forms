@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -33,14 +33,14 @@ public class EchoSubmission extends BaseSubmission {
         super(submission);
     }
 
-    public boolean isMatch(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match for replace="instance|none" and the submission resource starts with "test:"
         return (p.isReplaceInstance || p.isReplaceNone) && p2.resolvedActionOrResource.startsWith("test:");
     }
 
-    public ConnectionResult connect(PipelineContext pipelineContext, XFormsModelSubmission.SubmissionParameters p,
+    public ConnectionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws IOException {
         if (sp.messageBody == null) {
             // Not sure when this can happen, but it can't be good

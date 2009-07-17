@@ -43,7 +43,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
         // Get parameters
         final Item item = argument[0].evaluateItem(xpathContext);
         final String excludeResultPrefixes = argument.length >= 2 ? argument[1].evaluateAsString(xpathContext) : null;
-        final boolean readonly = argument.length >= 3 ? ExpressionTool.effectiveBooleanValue(argument[2].iterate(xpathContext)) : false;
+        final boolean readonly = argument.length >= 3 && ExpressionTool.effectiveBooleanValue(argument[2].iterate(xpathContext));
 
         // Make sure it is a NodeInfo
         if (!(item instanceof NodeInfo)) {

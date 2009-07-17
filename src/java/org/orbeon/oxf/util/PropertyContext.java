@@ -11,15 +11,23 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.submission;
+package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.PropertyContext;
+public interface PropertyContext {
 
-import java.io.IOException;
+    /**
+     * Set an attribute.
+     *
+     * @param key the attribute key
+     * @param o   the attribute value to associate with the key
+     */
+    void setAttribute(Object key, Object o);
 
-public interface Replacer {
-    void replace(PropertyContext propertyContext, ConnectionResult connectionResult,
-                 XFormsModelSubmission.SubmissionParameters p,
-                 XFormsModelSubmission.SecondPassParameters p2) throws IOException;
+    /**
+     * Get an attribute.
+     *
+     * @param key the attribute key
+     * @return the attribute value, null if there is no attribute with the given key
+     */
+    Object getAttribute(Object key);
 }

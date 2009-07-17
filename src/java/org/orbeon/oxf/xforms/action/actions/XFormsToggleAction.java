@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -24,13 +23,14 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 9.2.3 The toggle Element
  */
 public class XFormsToggleAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -44,13 +44,13 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseStaticId;
         if (bindingContext.getSingleNode() != null) {
-            caseStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, caseAttribute, true);
+            caseStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, caseAttribute, true);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
             caseStaticId = caseAttribute;
         }
 
-        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), caseStaticId, actionElement);
+        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), caseStaticId, actionElement);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
             if (!caseControl.isSelected()) {
@@ -59,14 +59,14 @@ public class XFormsToggleAction extends XFormsAction {
                 // Actually toogle the xforms:case
                 final XFormsControls controls = containingDocument.getControls();
                 controls.markDirtySinceLastRequest(false);
-                caseControl.toggle(pipelineContext);// this will dispatch events
+                caseControl.toggle(propertyContext);// this will dispatch events
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:toggle", "case does not refer to an existing xforms:case element, ignoring action",
-                        new String[] { "case id", caseStaticId } );
+                        "case id", caseStaticId);
         }
     }
 }

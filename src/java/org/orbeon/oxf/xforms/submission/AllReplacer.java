@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 import java.io.IOException;
@@ -33,13 +33,13 @@ public class AllReplacer extends BaseReplacer {
 
     //private void doReplaceAll(PipelineContext pipelineContext, ConnectionResult connectionResult, boolean deferredSubmissionSecondPassReplaceAll) throws IOException {
 
-    public void replace(PipelineContext pipelineContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
 
         // "the event xforms-submit-done may be dispatched"
         if (!p.isDeferredSubmissionSecondPassReplaceAll) // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-            dispatchSubmitDone(pipelineContext, connectionResult);
+            dispatchSubmitDone(propertyContext, connectionResult);
 
         // Remember that we got a submission producing output
         containingDocument.setGotSubmissionReplaceAll();

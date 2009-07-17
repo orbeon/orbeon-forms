@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -25,13 +24,14 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.6 The refresh Element
  */
 public class XFormsRefreshAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -46,6 +46,6 @@ public class XFormsRefreshAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().refresh = true;
-        container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+        container.dispatchEvent(propertyContext, new XFormsRefreshEvent(model));
     }
 }

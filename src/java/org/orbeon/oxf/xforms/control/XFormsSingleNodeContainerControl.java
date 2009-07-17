@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeControl implements XFormsContainerControl {
@@ -53,11 +52,10 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
     @Override
     public void updateEffectiveId() {
         super.updateEffectiveId();
-        final List children = getChildren();
-        if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
-                currentControl.updateEffectiveId();
+        final List<XFormsControl> children = getChildren();
+        if (children != null) {
+            for (XFormsControl child: children) {
+                child.updateEffectiveId();
             }
         }
     }
@@ -71,8 +69,7 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
-            for (Iterator<XFormsControl> i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentChildControl = i.next();
+            for (final XFormsControl currentChildControl: children) {
                 final XFormsControl currentChildClone = (XFormsControl) currentChildControl.clone();
                 currentChildClone.setParent(cloned);
                 cloned.children.add(currentChildClone);
@@ -82,17 +79,16 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         return cloned;
     }
 
-    public void childrenAdded(PipelineContext pipelineContext) {
+    public void childrenAdded(PropertyContext propertyContext) {
         // For subclasses
     }
 
     @Override
-    public void iterationRemoved(PipelineContext pipelineContext) {
-        final List children = getChildren();
-        if (children != null && children.size() > 0) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentControl = (XFormsControl) i.next();
-                currentControl.iterationRemoved(pipelineContext);
+    public void iterationRemoved(PropertyContext propertyContext) {
+        final List<XFormsControl> children = getChildren();
+        if (children != null) {
+            for (XFormsControl child: children) {
+                child.iterationRemoved(propertyContext);
             }
         }
     }

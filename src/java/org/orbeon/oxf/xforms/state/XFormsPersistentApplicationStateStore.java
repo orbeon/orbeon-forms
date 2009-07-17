@@ -36,7 +36,6 @@ import org.xmldb.api.modules.XMLResource;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -162,6 +161,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         return "global application";
     }
 
+    @Override
     public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId, boolean isInitialEntry) {
 
         // Do the operation
@@ -193,6 +193,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // NOTE: The super() method doesn't do anything
+    @Override
     protected void persistEntry(StoreEntry storeEntry) {
 
         if (XFormsStateManager.logger.isDebugEnabled()) {
@@ -216,6 +217,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // NOTE: This calls super() and handles session information
+    @Override
     protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId, String previousKey) {
 
         // Actually add
@@ -233,6 +235,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // This calls super() and handles session information
+    @Override
     protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
 
         // Actually remove
@@ -241,9 +244,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         // Remove the session id -> key mappings related to this entry
         final StoreEntry existingStoreEntry = (StoreEntry) existingListEntry.element;
         if (existingStoreEntry.sessionIds.size() > 0) {
-            for (Iterator i = existingStoreEntry.sessionIds.keySet().iterator(); i.hasNext();) {
-                final String currentSessionId = (String) i.next();
-
+            for (String currentSessionId: existingStoreEntry.sessionIds.keySet()) {
                 final Map<String, Object> sessionMap = sessionToKeysMap.get(currentSessionId);
                 if (sessionMap != null) {
                     sessionMap.remove(existingStoreEntry.key);
@@ -283,8 +284,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             final int storeSizeBeforeExpire = getCurrentStoreSize();
             int expiredCount = 0;
             if (sessionMap.size() > 0) {
-                for (Iterator<String> i = sessionMap.keySet().iterator(); i.hasNext();) {
-                    final String currentKey = i.next();
+                for (final String currentKey: sessionMap.keySet()) {
                     final CacheLinkedList.ListEntry currentListEntry = findEntry(currentKey);
                     final StoreEntry currentStoreEntry = (StoreEntry) currentListEntry.element;
 
@@ -426,10 +426,9 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         sb.append("</value>");
 
         // Store the session ids if any
-        final Map sessionIds = storeEntry.sessionIds;
+        final Map<String, String> sessionIds = storeEntry.sessionIds;
         if (sessionIds != null && sessionIds.size() > 0) {
-            for (Iterator i = sessionIds.keySet().iterator(); i.hasNext();) {
-                final String currentSessionId = (String) i.next();
+            for (final String currentSessionId: sessionIds.keySet()) {
                 sb.append("<session-id>");
                 sb.append(currentSessionId);
                 sb.append("</session-id>");
@@ -452,6 +451,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // NOTE: The super() method doesn't do anything
+    @Override
     protected String findPersistedEntry(String key) {
 
         if (XFormsStateManager.logger.isDebugEnabled()) {
@@ -512,12 +512,11 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         final Element rootElement = document.getRootElement();
 
         final String value = rootElement.element("value").getStringValue();
-        final boolean isPinned = new Boolean(rootElement.element("pinned").getStringValue()).booleanValue();
+        final boolean isPinned = Boolean.valueOf(rootElement.element("pinned").getStringValue());
         final Map<String, String> sessionIdsMap = new HashMap<String, String>();
         {
-            final List sessionIdsList = rootElement.elements("session-id");
-            for (Iterator i = sessionIdsList.iterator(); i.hasNext();) {
-                final Element currentElement = (Element) i.next();
+            final List<Element> sessionIdsList = rootElement.elements("session-id");
+            for (Element currentElement: sessionIdsList) {
                 final String currentSessionId = currentElement.getStringValue();
                 sessionIdsMap.put(currentSessionId, "");
             }
@@ -565,6 +564,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
         }
 
+        @Override
         protected void storeResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, String document) {
             super.storeResource(pipelineContext, datasource, collectionName, createCollection, resourceName, document);
         }

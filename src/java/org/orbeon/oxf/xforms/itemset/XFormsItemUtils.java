@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.itemset;
 import org.dom4j.Element;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -32,12 +32,12 @@ import java.util.*;
  */
 public class XFormsItemUtils {
 
-    public static String encryptValue(PipelineContext pipelineContext, String value) {
-        return SecureUtils.encrypt(pipelineContext, XFormsProperties.getXFormsPassword(), value);
+    public static String encryptValue(PropertyContext propertyContext, String value) {
+        return SecureUtils.encrypt(propertyContext, XFormsProperties.getXFormsPassword(), value);
     }
 
-    public static String decryptValue(PipelineContext pipelineContext, String value) {
-        return SecureUtils.decryptAsString(pipelineContext, XFormsProperties.getXFormsPassword(), value);
+    public static String decryptValue(PropertyContext propertyContext, String value) {
+        return SecureUtils.decryptAsString(propertyContext, XFormsProperties.getXFormsPassword(), value);
     }
 
     /**
@@ -75,12 +75,12 @@ public class XFormsItemUtils {
     /**
      * Evaluate the itemset for a given xforms:select or xforms:select1 control.
      *
-     * @param pipelineContext       current pipeline context
+     * @param propertyContext
      * @param select1Control        control to evaluate
      * @param setBinding            whether this method must set the evaluation binding (false if it is already set)
      * @return                      Itemset
      */
-    public static Itemset evaluateItemset(final PipelineContext pipelineContext, final XFormsSelect1Control select1Control, boolean setBinding) {
+    public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control, boolean setBinding) {
 
         final XBLContainer container = select1Control.getXBLContainer();
 
@@ -121,12 +121,12 @@ public class XFormsItemUtils {
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:label element.", select1Control.getLocationData());
-                    final String label = XFormsUtils.getChildElementValue(pipelineContext, container, labelElement, false, null);
+                    final String label = XFormsUtils.getChildElementValue(propertyContext, container, labelElement, false, null);
 
                     final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                     if (valueElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
-                    final String value = XFormsUtils.getChildElementValue(pipelineContext, container, valueElement, false, null);
+                    final String value = XFormsUtils.getChildElementValue(propertyContext, container, valueElement, false, null);
 
                     // TODO: must filter attributes on element.attributes()
                     currentContainer.addChildItem(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
@@ -134,7 +134,7 @@ public class XFormsItemUtils {
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
 
-                    contextStack.pushBinding(pipelineContext, element);
+                    contextStack.pushBinding(propertyContext, element);
                     {
                         final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
@@ -170,11 +170,11 @@ public class XFormsItemUtils {
                                             if (labelElement == null)
                                                 throw new ValidationException("xforms:itemset element must contain one xforms:label element.", select1Control.getLocationData());
 
-                                            label = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                                            label = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                                         }
                                         {
                                             final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                            valueCopyElement = (element != null)
+                                            valueCopyElement = (valueElement != null)
                                                     ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
                                         }
                                         if (valueCopyElement == null)
@@ -207,7 +207,7 @@ public class XFormsItemUtils {
                                         if (valueCopyElement.getName().equals("value")) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
-                                            final String value = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
+                                            final String value = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
 
                                             // NOTE: At this point, if the value is null, we should consider the item
                                             // non-relevant if it is a leaf item. But we don't yet know if this item is
@@ -236,7 +236,7 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getChildElementValue(pipelineContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                        final String label = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
 
                         // TODO: must filter attributes on element.attributes()
                         final Item newContainer = new Item(isEncryptItemValues, element.attributes(), label, null);

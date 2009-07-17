@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -34,7 +34,7 @@ import org.orbeon.saxon.om.NodeInfo;
  * 9.3.7 The setindex Element
  */
 public class XFormsSetindexAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -48,14 +48,14 @@ public class XFormsSetindexAction extends XFormsAction {
         if (currentSingleNode == null)
             return;
 
-        final String indexString = XPathCache.evaluateAsString(pipelineContext,
+        final String indexString = XPathCache.evaluateAsString(propertyContext,
                 actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
                 "number(" + indexXPath + ")", actionInterpreter.getNamespaceMappings(actionElement),
                 contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                 contextStack.getFunctionContext(), null,
                 (LocationData) actionElement.getData());
 
-        containingDocument.logDebug("xforms:setindex", "setting index", new String[] { "index", indexString });
+        containingDocument.logDebug("xforms:setindex", "setting index", "index", indexString);
 
         executeSetindexAction(containingDocument, actionInterpreter.getXBLContainer(), repeatId, indexString);
     }
@@ -76,7 +76,7 @@ public class XFormsSetindexAction extends XFormsAction {
 
                 if (XFormsServer.logger.isDebugEnabled()) {
                     containingDocument.logDebug("repeat", "setting index upon xforms:setfocus",
-                            new String[] { "new index", Integer.toString(newRepeatIndex)});
+                            "new index", Integer.toString(newRepeatIndex));
                 }
 
                 repeatControl.setIndex(newRepeatIndex);
@@ -90,7 +90,7 @@ public class XFormsSetindexAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action",
-                        new String[] { "repeat id", repeatStaticId } );
+                        "repeat id", repeatStaticId);
         }
     }
 }

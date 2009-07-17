@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -270,7 +270,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public NodeInfo getInstanceRootElementInfo() {
-        return (NodeInfo) XFormsUtils.getChildrenElements(documentInfo).get(0);
+        return XFormsUtils.getChildrenElements(documentInfo).get(0);
     }
 
     public String getSourceURI() {
@@ -316,14 +316,14 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param containingDocument    containing document (for event dispatch), null if no events requested
-     * @paran eventTarget           event target (for event dispatch), null if no events requested
+     * @param eventTarget           event target (for event dispatch), null if no events requested
      * @param nodeInfo              element or attribute NodeInfo to update
      * @param newValue              value to set
      * @param type                  type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNodeInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+    public static void setValueForNodeInfo(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
                                      XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
@@ -333,22 +333,22 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
             // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
             if (!Dom4jUtils.isSimpleContent(node)) {
-                containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(eventTarget));
+                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(eventTarget));
                 return;
             }
         }
-        setValueForNode(pipelineContext, node, newValue, type);
+        setValueForNode(propertyContext, node, newValue, type);
     }
 
     /**
      * Set a value on the instance using a Node and a value.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext
      * @param node              element or attribute Node to update
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type) {
+    public static void setValueForNode(PropertyContext propertyContext, Node node, String newValue, String type) {
 
         // Convert value based on types if possible
         if (type != null) {
@@ -356,11 +356,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
             if (nodeType != null && !nodeType.equals(type)) {
                 // There is a different type already, do a conversion
-                newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, nodeType);
+                newValue = XFormsUtils.convertUploadTypes(propertyContext, newValue, type, nodeType);
             } else if (nodeType == null) {
                 // There is no type, convert to default type
                 if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                    newValue = XFormsUtils.convertUploadTypes(propertyContext, newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
             }
         }
 
@@ -472,7 +472,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 addMIPInfo(attributeEement, attribute);
             }
 
-            private final void addMIPInfo(Element parentInfoElement, Node node) {
+            private void addMIPInfo(Element parentInfoElement, Node node) {
                 parentInfoElement.addAttribute("readonly", Boolean.toString(InstanceData.getInheritedReadonly(node)));
                 parentInfoElement.addAttribute("relevant", Boolean.toString(InstanceData.getInheritedRelevant(node)));
                 parentInfoElement.addAttribute("required", Boolean.toString(InstanceData.getRequired(node)));
@@ -500,12 +500,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return getModel(container.getContainingDocument());
     }
 
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
             // Invalidate instance if it is cached
             if (cache) {
-                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI, null, handleXInclude);
+                XFormsServerSharedInstancesCache.instance().remove(propertyContext, sourceURI, null, handleXInclude);
             } else {
                 XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
             }
@@ -515,11 +515,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Action run when the event reaches the target.
      *
-     * @param pipelineContext       pipeline context
+     * @param propertyContext
      * @param container             container
      * @param event                 event being dispatched
      */
-    public void performTargetAction(final PipelineContext pipelineContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(final PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // New nodes were just inserted
@@ -539,7 +539,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
                 // Find affected repeats and update their node-sets and indexes
                 final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodeset(pipelineContext, controls, insertedNodeInfos);
+                updateRepeatNodeset(propertyContext, controls, insertedNodeInfos);
             }
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
             // New nodes were just deleted
@@ -550,12 +550,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (didDeleteNodes) {
                 // Find affected repeats and update them
                 final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodeset(pipelineContext, controls, null);
+                updateRepeatNodeset(propertyContext, controls, null);
             }
         }
     }
 
-    private void updateRepeatNodeset(PipelineContext pipelineContext, XFormsControls controls, List<Item> insertedNodeInfos) {
+    private void updateRepeatNodeset(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
@@ -573,7 +573,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     // Only update controls within the same container as the instance OR in descendant containers
                     if (repeatControlPrefix.startsWith(instancePrefix)) {
                         // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is no longer needed
-                        newRepeatControl.updateNodeset(pipelineContext, insertedNodeInfos);
+                        newRepeatControl.updateNodeset(propertyContext, insertedNodeInfos);
                     }
                 }
             }

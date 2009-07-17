@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -24,6 +23,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an xforms:submit control.
@@ -33,7 +33,8 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
         super(container, parent, element, name, id);
     }
 
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+    @Override
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         // Do the default stuff upon receiving a DOMActivate event
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(event.getEventName())) {
 
@@ -46,7 +47,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             final Object object = getXBLContainer().getObjectByEffectiveId(submissionId);// xxx fix not effective
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                submission.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
+                submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsSubmitEvent(submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -55,6 +56,6 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                             "submission id", submissionId);
             }
         }
-        super.performDefaultAction(pipelineContext, event);
+        super.performDefaultAction(propertyContext, event);
     }
 }

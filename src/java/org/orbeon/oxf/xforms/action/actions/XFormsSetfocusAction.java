@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -25,13 +24,14 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.7 The setfocus Element
  */
 public class XFormsSetfocusAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -45,21 +45,21 @@ public class XFormsSetfocusAction extends XFormsAction {
         final String resolvedControlStaticId;
         {
             // Resolve AVT
-            resolvedControlStaticId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, controlIdAttributeValue, true);
+            resolvedControlStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, controlIdAttributeValue, true);
             if (resolvedControlStaticId == null)
                 return;
         }
 
-        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventObserver.getEffectiveId(), resolvedControlStaticId, actionElement);
+        final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), resolvedControlStaticId, actionElement);
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
-            containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
+            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setfocus", "control does not refer to an existing control element, ignoring action",
-                        new String[] { "control id", resolvedControlStaticId } );
+                        "control id", resolvedControlStaticId);
         }
     }
 }

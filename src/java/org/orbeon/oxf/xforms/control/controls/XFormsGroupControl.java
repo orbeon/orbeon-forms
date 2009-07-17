@@ -31,6 +31,7 @@ public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
         super(container, parent, element, name, id);
     }
 
+    @Override
     public String getType() {
         return null;
     }

@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Control that represents a custom components.
@@ -46,26 +46,26 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void setBindingContext(PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
         final boolean isNewBinding = getBindingContext() == null;
         final boolean isNodesetChange = isNewBinding|| !compareNodesets(getBindingContext().getNodeset(), bindingContext.getNodeset());
 
         // Set/update binding context on control
-        super.setBindingContext(pipelineContext, bindingContext);
+        super.setBindingContext(propertyContext, bindingContext);
 
         nestedContainer.setBindingContext(bindingContext);
-        nestedContainer.getContextStack().resetBindingContext(pipelineContext);
+        nestedContainer.getContextStack().resetBindingContext(propertyContext);
 
         // Set/update binding context on container
         if (isNewBinding) {
             // Control is newly bound
 
-            if (containingDocument.isRestoringDynamicState(pipelineContext)) {
+            if (containingDocument.isRestoringDynamicState(propertyContext)) {
                 // Restore models
-                nestedContainer.restoreModelsState(pipelineContext);
+                nestedContainer.restoreModelsState(propertyContext);
             } else {
                 // Start models initialization
-                nestedContainer.initializeModels(pipelineContext, new String[] {
+                nestedContainer.initializeModels(propertyContext, new String[] {
                         XFormsEvents.XFORMS_MODEL_CONSTRUCT,
                         XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
                 });
@@ -78,12 +78,12 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void childrenAdded(PipelineContext pipelineContext) {
-        super.childrenAdded(pipelineContext);
+    public void childrenAdded(PropertyContext propertyContext) {
+        super.childrenAdded(propertyContext);
 
         if (isInitializeModels) {
             // End models initialization
-            nestedContainer.initializeModels(pipelineContext, new String[] {
+            nestedContainer.initializeModels(propertyContext, new String[] {
                     XFormsEvents.XFORMS_READY,
                     XFormsEvents.XXFORMS_READY  // custom initialization event
             });
@@ -108,11 +108,11 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void iterationRemoved(PipelineContext pipelineContext) {
+    public void iterationRemoved(PropertyContext propertyContext) {
         // Inform descendants
-        super.iterationRemoved(pipelineContext);
+        super.iterationRemoved(propertyContext);
 
         // Destroy container and models if any
-        nestedContainer.destroy(pipelineContext);
+        nestedContainer.destroy(propertyContext);
     }
 }

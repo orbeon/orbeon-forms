@@ -73,8 +73,8 @@ public class NetUtils {
 
     static {
         // Set timezone to GMT as required for HTTP headers
-        for (int i = 0; i < dateHeaderFormats.length; i++)
-            dateHeaderFormats[i].setTimeZone(gmtZone);
+        for (SimpleDateFormat dateHeaderFormat: dateHeaderFormats)
+            dateHeaderFormat.setTimeZone(gmtZone);
 
         final String notEqNorAmpChar = "[^=&]";
         final String token = notEqNorAmpChar+ "+";
@@ -84,9 +84,9 @@ public class NetUtils {
     }
 
     public static long getDateHeader(String stringValue) throws ParseException {
-        for (int i = 0; i < dateHeaderFormats.length; i++) {
+        for (SimpleDateFormat dateHeaderFormat: dateHeaderFormats) {
             try {
-                Date date = dateHeaderFormats[i].parse(stringValue);
+                Date date = dateHeaderFormat.parse(stringValue);
                 return date.getTime();
             } catch (Exception e) {// used to be ParseException, but NumberFormatException may be thrown as well
                 // Ignore and try next
@@ -190,7 +190,7 @@ public class NetUtils {
     public static Long getLastModifiedAsLong(URL url) throws IOException {
         final long connectionLastModified = getLastModified(url);
         // Zero and negative values often have a special meaning, make sure to normalize here
-        return connectionLastModified <= 0 ? null : new Long(connectionLastModified);
+        return connectionLastModified <= 0 ? null : connectionLastModified;
     }
 
     /**
@@ -225,7 +225,7 @@ public class NetUtils {
     public static Long getLastModifiedAsLong(URLConnection urlConnection) {
         final long connectionLastModified = getLastModified(urlConnection);
         // Zero and negative values often have a special meaning, make sure to normalize here
-        return connectionLastModified <= 0 ? null : new Long(connectionLastModified);
+        return connectionLastModified <= 0 ? null : connectionLastModified;
     }
 
     /**
@@ -278,7 +278,7 @@ public class NetUtils {
 
     public static String getContentTypeCharset(String contentType) {
         final Map<String, String> parameters = getContentTypeParameters(contentType);
-        return (String) ((parameters == null) ? null : parameters.get("charset"));
+        return (parameters == null) ? null : parameters.get("charset");
     }
 
     public static Map<String, String> getContentTypeParameters(String contentType) {
@@ -394,11 +394,10 @@ public class NetUtils {
         final FastStringBuffer sb = new FastStringBuffer(100);
         boolean first = true;
         try {
-            for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-                final String name = (String) i.next();
+            for (Object o: parameters.keySet()) {
+                final String name = (String) o;
                 final Object[] values = (Object[]) parameters.get(name);
-                for (int j = 0; j < values.length; j++) {
-                    final Object currentValue = values[j];
+                for (final Object currentValue: values) {
                     if (currentValue instanceof String) {
                         if (!first)
                             sb.append('&');
@@ -457,11 +456,10 @@ public class NetUtils {
         final FastStringBuffer redirectURL = new FastStringBuffer(pathInfo);
         if (parameters != null) {
             boolean first = true;
-            for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-                final String name = (String) i.next();
+            for (Object o: parameters.keySet()) {
+                final String name = (String) o;
                 final Object[] values = (Object[]) parameters.get(name);
-                for (int j = 0; j < values.length; j++) {
-                    final Object currentValue = values[j];
+                for (final Object currentValue: values) {
                     if (currentValue instanceof String) {
                         redirectURL.append(first ? "?" : "&");
                         redirectURL.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
@@ -934,6 +932,7 @@ public class NetUtils {
      *
      * @param pipelineContext   PipelineContext to obtain session
      * @param uri               server URI to transform
+     * @param filename
      * @param contentType       type of the content referred to by the URI, or null if unknown
      * @param lastModified      last modification timestamp
      * @return                  client URI
@@ -1000,11 +999,9 @@ public class NetUtils {
             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                 public void contextDestroyed(boolean success) {
                     if (uploadParameterMap != null) {
-                        for (Iterator<String> i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
-                            final String name = i.next();
-                            final Object values[] = (Object[]) uploadParameterMap.get(name);
-                            for (int j = 0; j < values.length; j++) {
-                                final Object currentValue = values[j];
+                        for (final String name: uploadParameterMap.keySet()) {
+                            final Object values[] = uploadParameterMap.get(name);
+                            for (final Object currentValue: values) {
                                 if (currentValue instanceof FileItem) {
                                     final FileItem fileItem = (FileItem) currentValue;
                                     fileItem.delete();
@@ -1051,8 +1048,8 @@ public class NetUtils {
 
             // Parse the request and add file information
             try {
-                for (Iterator i = upload.parseRequest(requestContext).iterator(); i.hasNext();) {
-                    final FileItem fileItem = (FileItem) i.next();
+                for (Object o: upload.parseRequest(requestContext)) {
+                    final FileItem fileItem = (FileItem) o;
                     // Add value to existing values if any
                     if (fileItem.isFormField()) {
                         // Simple form field

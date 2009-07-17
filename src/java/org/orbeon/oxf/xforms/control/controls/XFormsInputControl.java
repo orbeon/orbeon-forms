@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.CalendarValue;
@@ -52,12 +53,14 @@ public class XFormsInputControl extends XFormsValueControl {
         super(container, parent, element, name, id);
     }
 
+    @Override
     protected QName[] getExtensionAttributes() {
         return EXTENSION_ATTRIBUTES;
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
-        super.evaluate(pipelineContext);
+    @Override
+    protected void evaluate(PropertyContext propertyContext) {
+        super.evaluate(propertyContext);
     }
 
     public String getSize() {
@@ -72,9 +75,10 @@ public class XFormsInputControl extends XFormsValueControl {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
     }
 
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+    @Override
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(pipelineContext);
+        final String internalValue = getValue(propertyContext);
         final String updatedValue;
 
         final String typeName = getBuiltinTypeName();
@@ -99,9 +103,10 @@ public class XFormsInputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    @Override
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         // Store after converting
-        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type, filesElement);
+        super.storeExternalValue(propertyContext, convertFromExternalValue(value), type, filesElement);
     }
 
     private String convertFromExternalValue(String externalValue) {
@@ -141,7 +146,7 @@ public class XFormsInputControl extends XFormsValueControl {
 
                     if (datePart.length() == 0 && timePart.length() == 0) {
                         // Special case of empty parts
-                        externalValue = "";;
+                        externalValue = "";
                     } else {
                         // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
                         final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
@@ -173,8 +178,7 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     private static String parse(Perl5MatchProcessor matcher, ParsePattern[] patterns, String value) {
-        for (int i = 0; i < patterns.length; i++) {
-            final ParsePattern currentPattern = patterns[i];
+        for (final ParsePattern currentPattern: patterns) {
             final MatchProcessor.Result result = matcher.match(currentPattern.getRe(), value);
             if (result.matches) {
                 // Pattern matches

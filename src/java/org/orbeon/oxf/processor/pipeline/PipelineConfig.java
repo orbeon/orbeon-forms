@@ -17,11 +17,10 @@ package org.orbeon.oxf.processor.pipeline;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.util.NullFriendlyStringComparator;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorInput;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Encapsulates the "configuration" of a pipeline: contains references to
@@ -31,34 +30,34 @@ import java.util.Map;
 public class PipelineConfig {
 
     // Maps: (String inputParamName) -> (List[InternalTopOutput internalTopOutput])
-    private Map nameToTopOuputMap = new HashMap();
+    private Map<String, List<PipelineProcessor.InternalTopOutput>> nameToTopOuputMap = new HashMap<String, List<PipelineProcessor.InternalTopOutput>>();
     // Maps: (String outputParamName) -> (ProcessorInput internalBottonInput)
-    private Map nameToBottomInputMap = new HashMap();
+    private Map<String, ProcessorInput> nameToBottomInputMap = new HashMap<String, ProcessorInput>();
     // All internal processors
-    private List processors = new ArrayList();
+    private List<Processor> processors = new ArrayList<Processor>();
     // List of Processor objects: we have to call their start() method
-    private List processorsToStart = new ArrayList();
+    private List<Processor> processorsToStart = new ArrayList<Processor>();
     
-    private java.util.TreeMap outnameToBreakpointKey 
-        = new java.util.TreeMap( NullFriendlyStringComparator.instance );
+    private TreeMap<String,BreakpointKey> outnameToBreakpointKey
+        = new java.util.TreeMap<String, BreakpointKey>( NullFriendlyStringComparator.instance );
     
     void setOutputBreakpointKey( final String nm, final BreakpointKey bptKey ) {
         outnameToBreakpointKey.put( nm, bptKey );
     }
     BreakpointKey getOutputBreakpointKey( final String nm ) {
-        return ( BreakpointKey )outnameToBreakpointKey.get( nm );
+        return outnameToBreakpointKey.get( nm );
     }
 
     public void declareTopOutput(String name, PipelineProcessor.InternalTopOutput topOutput) {
-        List outputsForName = (List) nameToTopOuputMap.get(name);
+        List<PipelineProcessor.InternalTopOutput> outputsForName = nameToTopOuputMap.get(name);
         if (outputsForName == null) {
-            outputsForName = new ArrayList();
+            outputsForName = new ArrayList<PipelineProcessor.InternalTopOutput>();
             nameToTopOuputMap.put(name, outputsForName);
         }
         outputsForName.add(topOutput);
     }
 
-    public Map getNameToOutputMap() {
+    public Map<String, List<PipelineProcessor.InternalTopOutput>> getNameToOutputMap() {
         return nameToTopOuputMap;
     }
 
@@ -68,7 +67,7 @@ public class PipelineConfig {
         nameToBottomInputMap.put(name, bottomInput);
     }
 
-    public Map getNameToInputMap() {
+    public Map<String, ProcessorInput> getNameToInputMap() {
         return nameToBottomInputMap;
     }
 
@@ -76,7 +75,7 @@ public class PipelineConfig {
         processors.add(processor);
     }
 
-    public List getProcessors() {
+    public List<Processor> getProcessors() {
         return processors;
     }
 
@@ -84,7 +83,7 @@ public class PipelineConfig {
         processorsToStart.add(processor);
     }
 
-    public List getProcessorsToStart() {
+    public List<Processor> getProcessorsToStart() {
         return processorsToStart;
     }
 }

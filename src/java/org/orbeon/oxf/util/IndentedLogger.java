@@ -61,6 +61,12 @@ public class IndentedLogger {
         this.logIndentLevel = logIndentLevel;
     }
 
+    public IndentedLogger(IndentedLogger indentedLogger) {
+        this.logger = indentedLogger.logger;
+        this.prefix = indentedLogger.prefix;
+        this.logIndentLevel = indentedLogger.logIndentLevel;
+    }
+
     public int getLogIndentLevel() {
         return logIndentLevel;
     }

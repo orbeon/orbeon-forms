@@ -63,7 +63,7 @@ public abstract class XFormsEvent implements Cloneable {
     private boolean bubbles;
     private boolean cancelable;
 
-    private Map customAttributes;
+    private Map<String, SequenceExtent> customAttributes;
 
     private LocationData locationData;
 
@@ -100,7 +100,7 @@ public abstract class XFormsEvent implements Cloneable {
 
     public void setAttribute(String name, SequenceExtent value) {
         if (customAttributes == null)
-            customAttributes = new HashMap();
+            customAttributes = new HashMap<String, SequenceExtent>();
         customAttributes.put(name, value);
     }
 
@@ -129,7 +129,7 @@ public abstract class XFormsEvent implements Cloneable {
             return new ListIterator(Collections.singletonList(BooleanValue.get(cancelable)));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
-            return ((SequenceExtent) customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+            return (customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

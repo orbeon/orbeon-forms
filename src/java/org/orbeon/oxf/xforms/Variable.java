@@ -3,8 +3,8 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -49,7 +49,7 @@ public class Variable {
 //            throw new ValidationException("xxforms:variable or exforms:variable element must have a \"select\" attribute", getLocationData());
     }
 
-    private void evaluate(PipelineContext pipelineContext, boolean useCache) {
+    private void evaluate(PropertyContext pipelineContext, boolean useCache) {
 
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
@@ -80,7 +80,7 @@ public class Variable {
         return variableName;
     }
 
-    public ValueRepresentation getVariableValue(PipelineContext pipelineContext, boolean useCache) {
+    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, boolean useCache) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;

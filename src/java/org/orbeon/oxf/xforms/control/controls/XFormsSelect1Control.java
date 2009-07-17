@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
@@ -130,11 +131,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
     /**
      * Get this control's itemset.
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext
      * @param setBinding        whether to set the current binding on the control first
      * @return                  itemset
      */
-    public Itemset getItemset(PipelineContext pipelineContext, boolean setBinding) {
+    public Itemset getItemset(PropertyContext propertyContext, boolean setBinding) {
         try {
             // Non-relevant control does not return an itemset
             final NodeInfo boundNode = getBoundNode();
@@ -147,14 +148,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
                 Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
                 if (constantItemset == null) {
-                    constantItemset = XFormsItemUtils.evaluateItemset(pipelineContext, XFormsSelect1Control.this, setBinding);
+                    constantItemset = XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this, setBinding);
                     containingDocument.getControls().setConstantItems(getPrefixedId(), constantItemset);
                 }
                 return constantItemset;
             } else {
                 // Items are stored in the control
                 if (itemset == null) {
-                    itemset = XFormsItemUtils.evaluateItemset(pipelineContext, XFormsSelect1Control.this, setBinding);
+                    itemset = XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this, setBinding);
                 }
                 return itemset;
             }
@@ -204,8 +205,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
-        final String internalValue = getValue(pipelineContext);
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
+        final String internalValue = getValue(propertyContext);
         final String updatedValue;
 
         if (internalValue == null || "".equals(internalValue)) {
@@ -216,7 +217,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // NOTE: We could in the future check that the value is in fact part of the itemset first, and send a blank value otherwise..
             if (isEncryptItemValues()) {
                 // For closed selection, values sent to client must be encrypted
-                updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
+                updatedValue = XFormsItemUtils.encryptValue(propertyContext, internalValue);
             } else {
                 // For open selection, values sent to client are the internal values
                 updatedValue = internalValue;
@@ -226,20 +227,20 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
 
             // Decrypt incoming value. With open selection, values are sent to the client.
             if (isEncryptItemValues())
-                value = XFormsItemUtils.decryptValue(pipelineContext, value);
+                value = XFormsItemUtils.decryptValue(propertyContext, value);
 
             // Current control value
-            final String controlValue = getValue(pipelineContext);
+            final String controlValue = getValue(propertyContext);
 
             // Iterate over all the items
-            final Itemset itemset = getItemset(pipelineContext, true);
+            final Itemset itemset = getItemset(propertyContext, true);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
             if (itemset != null) {
@@ -268,25 +269,25 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(pipelineContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
                 }
             }
 
             if (hasSelectedItem || isOpenSelection()) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
-                super.storeExternalValue(pipelineContext, value, type, filesElement);
+                super.storeExternalValue(propertyContext, value, type, filesElement);
             }
         } else {
             // Forward to superclass
-            super.storeExternalValue(pipelineContext, value, type, filesElement);
+            super.storeExternalValue(propertyContext, value, type, filesElement);
         }
     }
 
@@ -309,48 +310,47 @@ public class XFormsSelect1Control extends XFormsValueControl {
 ////        return false;
 //    }
 
-    /**
-     * Represents xforms:itemset information.
-     *
-     * TODO: Work in progress for dependencies?
-     */
-    public static class ItemsetInfo {
-        private String id;
-        private String label;
-        private String value;
-
-        private NodeInfo nodeInfo;
-
-        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
-            this.id = id;
-            this.label = label;
-            this.value = value;
-            this.nodeInfo = nodeInfo;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public NodeInfo getNodeInfo() {
-            return nodeInfo;
-        }
-
-        public boolean equals(Object obj) {
-            if (obj == null || !(obj instanceof ItemsetInfo))
-                return false;
-
-            final ItemsetInfo other = (ItemsetInfo) obj;
-            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
-        }
-    }
-
+//    /**
+//     * Represents xforms:itemset information.
+//     *
+//     * TODO: Work in progress for dependencies?
+//     */
+//    public static class ItemsetInfo {
+//        private String id;
+//        private String label;
+//        private String value;
+//
+//        private NodeInfo nodeInfo;
+//
+//        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
+//            this.id = id;
+//            this.label = label;
+//            this.value = value;
+//            this.nodeInfo = nodeInfo;
+//        }
+//
+//        public String getId() {
+//            return id;
+//        }
+//
+//        public String getLabel() {
+//            return label;
+//        }
+//
+//        public String getValue() {
+//            return value;
+//        }
+//
+//        public NodeInfo getNodeInfo() {
+//            return nodeInfo;
+//        }
+//
+//        public boolean equals(Object obj) {
+//            if (obj == null || !(obj instanceof ItemsetInfo))
+//                return false;
+//
+//            final ItemsetInfo other = (ItemsetInfo) obj;
+//            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
+//        }
+//    }
 }

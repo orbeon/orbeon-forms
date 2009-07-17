@@ -15,18 +15,19 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
@@ -35,7 +36,6 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Iterator;
 
 /**
  * Represents an xforms:upload control.
@@ -52,15 +52,17 @@ public class XFormsUploadControl extends XFormsValueControl {
         fileInfo = new FileInfo(this, getContextStack(), element);
     }
 
-    protected void evaluate(PipelineContext pipelineContext) {
-        super.evaluate(pipelineContext);
+    @Override
+    protected void evaluate(PropertyContext propertyContext) {
+        super.evaluate(propertyContext);
 
-        getState(pipelineContext);
-        getFileMediatype(pipelineContext);
-        getFileName(pipelineContext);
-        getFileSize(pipelineContext);
+        getState(propertyContext);
+        getFileMediatype(propertyContext);
+        getFileName(propertyContext);
+        getFileSize(propertyContext);
     }
 
+    @Override
     public void markDirty() {
         super.markDirty();
         fileInfo.markDirty();
@@ -82,15 +84,15 @@ public class XFormsUploadControl extends XFormsValueControl {
      *     </parameter>
      *   </xxforms:files>
      *
-     * @param pipelineContext       current pipeline context
+     * @param propertyContext
      * @param containingDocument    containing document
      * @param filesElement          xxforms:files element
      * @param forControl            control to handle, null for all controls specified
-     * @param handleTemporaryFiles  whether to set listners for file deletion
+     * @param handleTemporaryFiles  whether to set listeners for file deletion
      */
-    public static void handleFileElement(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element filesElement, XFormsUploadControl forControl, boolean handleTemporaryFiles) {
-        for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
-            final Element parameterElement = (Element) i.next();
+    public static void handleFileElement(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element filesElement, XFormsUploadControl forControl, boolean handleTemporaryFiles) {
+        for (Object o: filesElement.elements()) {
+            final Element parameterElement = (Element) o;
             final String name = parameterElement.element("name").getTextTrim();
 
             final XFormsUploadControl uploadControl = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(name);
@@ -123,40 +125,41 @@ public class XFormsUploadControl extends XFormsValueControl {
                 final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));
 
                 // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-                uploadControl.setExternalValue(pipelineContext, value, paramValueType, handleTemporaryFiles);
+                uploadControl.setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
 
                 // Handle filename, mediatype and size if necessary
-                uploadControl.setFilename(pipelineContext, filename);
-                uploadControl.setMediatype(pipelineContext, mediatype);
-                uploadControl.setSize(pipelineContext, size);
+                uploadControl.setFilename(propertyContext, filename);
+                uploadControl.setMediatype(propertyContext, mediatype);
+                uploadControl.setSize(propertyContext, size);
             }
         }
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type, Element filesElement) {
+    @Override
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         if (XFormsProperties.isNoscript(containingDocument) && filesElement != null) {
             // Must handle file elements
-            XFormsUploadControl.handleFileElement(pipelineContext, containingDocument, filesElement, this, true);// seems reasonable to set handleTemporaryFiles = true
+            XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, this, true);// seems reasonable to set handleTemporaryFiles = true
         } else {
             // Set value and handle temporary files
-            setExternalValue(pipelineContext, value, type, true);
+            setExternalValue(propertyContext, value, type, true);
 
             // If the value is being cleared, also clear the metadata
             if (value.equals("")) {
-                setFilename(pipelineContext, "");
-                setMediatype(pipelineContext, "");
-                setSize(pipelineContext, "");
+                setFilename(propertyContext, "");
+                setMediatype(propertyContext, "");
+                setSize(propertyContext, "");
             }
         }
     }
 
-    private void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles) {
+    private void setExternalValue(PropertyContext propertyContext, String value, String type, boolean handleTemporaryFiles) {
 
-        final String oldValue = getValue(pipelineContext);
+        final String oldValue = getValue(propertyContext);
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
-            getXBLContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+            getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(this));
         }
 
         try {
@@ -169,8 +172,9 @@ public class XFormsUploadControl extends XFormsValueControl {
                         final boolean success = file.delete();
                         try {
                             final String message = success ? "deleted temporary file upon upload" : "could not delete temporary file upon upload";
-                            containingDocument.logDebug("upload", message, new String[] { "path", file.getCanonicalPath() });
+                            containingDocument.logDebug("upload", message, "path", file.getCanonicalPath());
                         } catch (IOException e) {
+                            // NOP
                         }
                     }
                 }
@@ -188,13 +192,14 @@ public class XFormsUploadControl extends XFormsValueControl {
                     final boolean success = oldFile.renameTo(newFile);
                     try {
                         final String message = success ? "renamed temporary file upon upload" : "could not rename temporary file upon upload";
-                        containingDocument.logDebug("upload", message, new String[] { "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath() });
+                        containingDocument.logDebug("upload", message, "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath());
                     } catch (IOException e) {
+                        // NOP
                     }
                     // Try to delete the file on exit and on session termination
                     {
                         newFile.deleteOnExit();
-                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                         final ExternalContext.Session session = externalContext.getSession(false);
                         if (session != null) {
                             session.addListener(new ExternalContext.Session.SessionListener() {
@@ -202,14 +207,15 @@ public class XFormsUploadControl extends XFormsValueControl {
                                     final boolean success = newFile.delete();
                                     try {
                                         final String message = success ? "deleted temporary file upon session destruction" : "could not delete temporary file upon session destruction";
-                                        containingDocument.logDebug("upload", message, new String[] { "file", newFile.getCanonicalPath() });
+                                        containingDocument.logDebug("upload", message, "file", newFile.getCanonicalPath());
                                     } catch (IOException e) {
+                                        // NOP
                                     }
                                 }
                             });
                         } else {
                             containingDocument.logDebug("upload", "no existing session found so cannot register temporary file deletion upon session destruction",
-                                    new String[] { "file", newFile.getCanonicalPath() });
+                                    "file", newFile.getCanonicalPath());
                         }
                     }
                     newValue = newFile.toURI().toString();
@@ -221,40 +227,41 @@ public class XFormsUploadControl extends XFormsValueControl {
             }
 
             // Call the super method
-            super.storeExternalValue(pipelineContext, newValue, type, null);
+            super.storeExternalValue(propertyContext, newValue, type, null);
         } catch (Exception e) {
             throw new ValidationException(e, getLocationData());
         }
     }
 
-    public String getState(PipelineContext pipelineContext) {
-        return fileInfo.getState(pipelineContext);
+    public String getState(PropertyContext propertyContext) {
+        return fileInfo.getState(propertyContext);
     }
 
-    public String getFileMediatype(PipelineContext pipelineContext) {
-        return fileInfo.getFileMediatype(pipelineContext);
+    public String getFileMediatype(PropertyContext propertyContext) {
+        return fileInfo.getFileMediatype(propertyContext);
     }
 
-    public String getFileName(PipelineContext pipelineContext) {
-        return fileInfo.getFileName(pipelineContext);
+    public String getFileName(PropertyContext propertyContext) {
+        return fileInfo.getFileName(propertyContext);
     }
 
-    public String getFileSize(PipelineContext pipelineContext) {
-        return fileInfo.getFileSize(pipelineContext);
+    public String getFileSize(PropertyContext propertyContext) {
+        return fileInfo.getFileSize(propertyContext);
     }
 
-    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
-        fileInfo.setMediatype(pipelineContext, mediatype);
+    public void setMediatype(PropertyContext propertyContext, String mediatype) {
+        fileInfo.setMediatype(propertyContext, mediatype);
     }
 
-    public void setFilename(PipelineContext pipelineContext, String filename) {
-        fileInfo.setFilename(pipelineContext, filename);
+    public void setFilename(PropertyContext propertyContext, String filename) {
+        fileInfo.setFilename(propertyContext, filename);
     }
 
-    public void setSize(PipelineContext pipelineContext, String size) {
-        fileInfo.setSize(pipelineContext, size);
+    public void setSize(PropertyContext propertyContext, String size) {
+        fileInfo.setSize(propertyContext, size);
     }
 
+    @Override
     public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsUploadControl))
@@ -277,6 +284,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         return super.equalsExternal(pipelineContext, obj);
     }
 
+    @Override
     public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
 
         final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) other;
@@ -372,42 +380,42 @@ class FileInfo implements Cloneable {
         isFilenameEvaluated = false;
     }
 
-    public String getState(PipelineContext pipelineContext) {
+    public String getState(PropertyContext propertyContext) {
         if (!isStateEvaluated) {
-            final boolean isEmpty = control.getValue(pipelineContext) == null || control.getValue(pipelineContext).length() == 0;
+            final boolean isEmpty = control.getValue(propertyContext) == null || control.getValue(propertyContext).length() == 0;
             state = isEmpty ? "empty" : "file";
             isStateEvaluated = true;
         }
         return state;
     }
 
-    public String getFileMediatype(PipelineContext pipelineContext) {
+    public String getFileMediatype(PropertyContext propertyContext) {
         if (!isMediatypeEvaluated) {
-            mediatype = (mediatypeElement == null) ? null : getInfoValue(pipelineContext, mediatypeElement);
+            mediatype = (mediatypeElement == null) ? null : getInfoValue(propertyContext, mediatypeElement);
             isMediatypeEvaluated = true;
         }
         return mediatype;
     }
 
-    public String getFileName(PipelineContext pipelineContext) {
+    public String getFileName(PropertyContext propertyContext) {
         if (!isFilenameEvaluated) {
-            filename = (filenameElement == null) ? null : getInfoValue(pipelineContext, filenameElement);
+            filename = (filenameElement == null) ? null : getInfoValue(propertyContext, filenameElement);
             isFilenameEvaluated = true;
         }
         return filename;
     }
 
-    public String getFileSize(PipelineContext pipelineContext) {
+    public String getFileSize(PropertyContext propertyContext) {
         if (!isSizeEvaluated) {
-            size = (sizeElement == null) ? null : getInfoValue(pipelineContext, sizeElement);
+            size = (sizeElement == null) ? null : getInfoValue(propertyContext, sizeElement);
             isSizeEvaluated = true;
         }
         return size;
     }
 
-    private String getInfoValue(PipelineContext pipelineContext, Element element) {
+    private String getInfoValue(PropertyContext propertyContext, Element element) {
         contextStack.setBinding(control);
-        contextStack.pushBinding(pipelineContext, element);
+        contextStack.pushBinding(propertyContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode == null) {
             return null;
@@ -418,11 +426,11 @@ class FileInfo implements Cloneable {
         }
     }
 
-    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
-        setInfoValue(pipelineContext, mediatypeElement, mediatype);
+    public void setMediatype(PropertyContext propertyContext, String mediatype) {
+        setInfoValue(propertyContext, mediatypeElement, mediatype);
     }
 
-    public void setFilename(PipelineContext pipelineContext, String filename) {
+    public void setFilename(PropertyContext propertyContext, String filename) {
         // Depending on web browsers, the filename may contain a path or not.
 
         // Normalize below to just the file name.
@@ -430,22 +438,22 @@ class FileInfo implements Cloneable {
         final int index = normalized.lastIndexOf('/');
         final String justFileName = (index == -1) ? normalized : normalized.substring(index + 1);
 
-        setInfoValue(pipelineContext, filenameElement, justFileName);
+        setInfoValue(propertyContext, filenameElement, justFileName);
     }
 
-    public void setSize(PipelineContext pipelineContext, String size) {
-        setInfoValue(pipelineContext, sizeElement, size);
+    public void setSize(PropertyContext propertyContext, String size) {
+        setInfoValue(propertyContext, sizeElement, size);
     }
 
-    private void setInfoValue(PipelineContext pipelineContext, Element element, String value) {
+    private void setInfoValue(PropertyContext propertyContext, Element element, String value) {
         if (element == null || value == null)
             return;
 
         contextStack.setBinding(control);
-        contextStack.pushBinding(pipelineContext, element);
+        contextStack.pushBinding(propertyContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(pipelineContext, control.getXBLContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
+            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
             contextStack.popBinding();
         }
     }

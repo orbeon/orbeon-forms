@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an extension xxforms:attribute control.
@@ -52,20 +53,23 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         this.valueAttribute = avtExpression;
     }
 
-    protected void evaluateValue(final PipelineContext pipelineContext) {
+    @Override
+    protected void evaluateValue(final PropertyContext propertyContext) {
         // Value comes from the AVT value attribute
-        final String rawValue = evaluateAvt(pipelineContext, valueAttribute);
+        final String rawValue = evaluateAvt(propertyContext, valueAttribute);
         super.setValue((rawValue != null) ? rawValue : "");
     }
 
+    @Override
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         // Rewrite URI attribute if needed
         return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getXBLContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue(pipelineContext));
     }
 
-    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+    @Override
+    protected void evaluateExternalValue(PropertyContext propertyContext) {
         // Determine attribute value
-        setExternalValue(getExternalValueHandleSrc(getValue(pipelineContext), nameAttribute));
+        setExternalValue(getExternalValueHandleSrc(getValue(propertyContext), nameAttribute));
     }
 
     public String getNameAttribute() {

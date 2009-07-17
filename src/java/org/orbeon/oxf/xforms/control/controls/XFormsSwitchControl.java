@@ -15,15 +15,14 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,8 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         setLocal(new XFormsSwitchControlLocal());
     }
 
-    public void childrenAdded(PipelineContext pipelineContext) {
+    @Override
+    public void childrenAdded(PropertyContext propertyContext) {
 
         if (getSize() == 0) {
             throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());
@@ -66,9 +66,9 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             // Selected case id was restored from serialization
             // TODO: ideally, selected case id would be made available while sub-tree is created, so that
             // xxforms:case() function would work for nested bindings
-            final List children = getChildren();
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsCaseControl currentCaseControl = (XFormsCaseControl) i.next();
+            final List<XFormsControl> children = getChildren();
+            for (XFormsControl child: children) {
+                final XFormsCaseControl currentCaseControl = (XFormsCaseControl) child;
                 if (currentCaseControl.getId().equals(restoredCaseId)) {
                     // NOTE: Don't use setSelectedCase() as we don't want to cause initialLocal != currentLocal
                     final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
@@ -91,7 +91,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     /**
      * Set the currently selected case.
      */
-    public void setSelectedCase(PipelineContext pipelineContext, XFormsCaseControl caseControl) {
+    public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControl) {
 
         if (caseControl.getParent() != this)
             throw new OXFException("xforms:case is not child of current xforms:switch.");
@@ -102,15 +102,15 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         final boolean isChanging = previouslySelectedCaseControl != caseControl;
         localForUpdate.selectedCaseControl = caseControl;
 
-        if (isChanging && pipelineContext != null) {
+        if (isChanging && propertyContext != null) {
             // "This action adjusts all selected attributes on the affected cases to reflect the new state, and then
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(pipelineContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
+            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
 
             // "2. Dispatching an xform-select event to the case to be selected."
-            caseControl.getXBLContainer().dispatchEvent(pipelineContext, new XFormsSelectEvent(caseControl));
+            caseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsSelectEvent(caseControl));
         }
     }
 
@@ -129,9 +129,9 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     }
 
     private XFormsCaseControl findSelectedCase() {
-        final List children = getChildren();
-        for (Iterator i = children.iterator(); i.hasNext();) {
-            final XFormsCaseControl currentCaseControl = (XFormsCaseControl) i.next();
+        final List<XFormsControl> children = getChildren();
+        for (XFormsControl child: children) {
+            final XFormsCaseControl currentCaseControl = (XFormsCaseControl) child;
             if (currentCaseControl.isDefaultSelected()) {
                 // Found first case with selected="true"
                 return currentCaseControl;

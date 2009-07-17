@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -104,20 +105,20 @@ public class XFormsControls implements XFormsObjectResolver {
      * TODO: this is called in XFormsContainingDocument.prepareForExternalEventsSequence() but it is not really an
      * initialization in that case.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext
      */
-    public void initialize(PipelineContext pipelineContext) {
-        initializeState(pipelineContext, false);
+    public void initialize(PropertyContext propertyContext) {
+        initializeState(propertyContext, false);
     }
 
     /**
      * Initialize the controls if needed, passing initial state information. This is called if the state of the engine
      * needs to be rebuilt.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param propertyContext
      * @param evaluateItemsets      whether to evaluateItemsets (for dynamic state restoration)
      */
-    public void initializeState(PipelineContext pipelineContext, boolean evaluateItemsets) {
+    public void initializeState(PropertyContext propertyContext, boolean evaluateItemsets) {
 
         final XFormsStaticState staticState = containingDocument.getStaticState();
         if (staticState != null && staticState.getControlsDocument() != null) {
@@ -140,7 +141,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentControlTree = initialControlTree = new ControlTree(XFormsProperties.isNoscript(containingDocument));
 
                 // Initialize new control tree
-                currentControlTree.initialize(pipelineContext, containingDocument, rootContainer, evaluateItemsets);
+                currentControlTree.initialize(propertyContext, containingDocument, rootContainer, evaluateItemsets);
             }
 
             // We are now clean
@@ -148,7 +149,7 @@ public class XFormsControls implements XFormsObjectResolver {
             initialControlTree.markBindingsClean();
         }
 
-        rootContainer.getContextStack().resetBindingContext(pipelineContext);// not sure we actually need to do this
+        rootContainer.getContextStack().resetBindingContext(propertyContext);// not sure we actually need to do this
 
         initialized = true;
     }
@@ -167,8 +168,8 @@ public class XFormsControls implements XFormsObjectResolver {
                 if (nameValues != null) {
                     final Element controlElement = controlsElement.addElement("control");
                     controlElement.addAttribute("effective-id", control.getEffectiveId());
-                    for (Iterator i = nameValues.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                    for (Object o: nameValues.entrySet()) {
+                        final Map.Entry currentEntry = (Map.Entry) o;
                         controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
                     }
                 }
@@ -211,11 +212,11 @@ public class XFormsControls implements XFormsObjectResolver {
      *
      * WARNING: The binding context must be set to the current iteration before calling.
      *
-     * @param pipelineContext   pipeline context
+     * @param propertyContext
      * @param repeatControl     repeat control
      * @param iterationIndex    new iteration to repeat (1..repeat size + 1)
      */
-    public XFormsRepeatIterationControl createRepeatIterationTree(final PipelineContext pipelineContext, XFormsContextStack.BindingContext bindingContext,
+    public XFormsRepeatIterationControl createRepeatIterationTree(final PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext,
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences())
@@ -223,7 +224,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
         final XFormsRepeatIterationControl repeatIterationControl;
         containingDocument.startHandleOperation("controls", "adding iteration");
-        repeatIterationControl = currentControlTree.createRepeatIterationTree(pipelineContext, bindingContext, repeatControl, iterationIndex);
+        repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, bindingContext, repeatControl, iterationIndex);
         containingDocument.endHandleOperation();
 
         return repeatIterationControl;
@@ -242,8 +243,8 @@ public class XFormsControls implements XFormsObjectResolver {
             final Map effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
             // Evaluate all controls
             if (effectiveIdsToControls != null) {
-                for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                for (Object o: effectiveIdsToControls.entrySet()) {
+                    final Map.Entry currentEntry = (Map.Entry) o;
                     final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
                     currentControl.evaluateIfNeeded(pipelineContext);
                 }
@@ -293,8 +294,10 @@ public class XFormsControls implements XFormsObjectResolver {
 
     /**
      * Rebuild the controls tree bindings if needed.
+     *
+     * @param propertyContext
      */
-    public boolean updateControlBindingsIfNeeded(final PipelineContext pipelineContext) {
+    public boolean updateControlBindingsIfNeeded(final PropertyContext propertyContext) {
 
         if (!initialized) {
             return false;
@@ -309,15 +312,15 @@ public class XFormsControls implements XFormsObjectResolver {
             cloneInitialStateIfNeeded();
 
             containingDocument.startHandleOperation("controls", "updating bindings");
-            final UpdateBindingsListener listener = new UpdateBindingsListener(pipelineContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch());
+            final UpdateBindingsListener listener = new UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch());
             {
                 // Visit all controls and update their bindings
-                visitControlElementsHandleRepeat(pipelineContext, containingDocument, rootContainer, listener);
+                visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
             }
-            containingDocument.endHandleOperation(new String[] {
+            containingDocument.endHandleOperation(
                     "controls updated", Integer.toString(listener.getUpdateCount()),
                     "repeat iterations", Integer.toString(listener.getIterationCount())
-            });
+            );
 
 //            final int ITERATIONS = 1;
 //            for (int k = 0; k < ITERATIONS; k++) {
@@ -380,16 +383,16 @@ public class XFormsControls implements XFormsObjectResolver {
     /**
      * Visit all the controls elements by following repeats to allow creating the actual control.
      */
-    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, ControlElementVisitorListener controlElementVisitorListener) {
-        rootContainer.getContextStack().resetBindingContext(pipelineContext);
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, ControlElementVisitorListener controlElementVisitorListener) {
+        rootContainer.getContextStack().resetBindingContext(propertyContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
 
-        visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+        visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), rootContainer, rootElement, "", "");
     }
 
-    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsRepeatControl enclosingRepeatControl, int iterationIndex, XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl, int iterationIndex, ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsContainingDocument containingDocument = enclosingRepeatControl.getXBLContainer().getContainingDocument();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
@@ -400,14 +403,14 @@ public class XFormsControls implements XFormsObjectResolver {
         contextStack.pushIteration(iterationIndex);
 
         // Start visiting children of the xforms:repeat element
-        final Element repeatControlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getPrefixedId())).getElement();
-        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+        final Element repeatControlElement = containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getPrefixedId()).getElement();
+        XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
                 XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)));
     }
 
-    public static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, XFormsContainerControl containerControl, XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainerControl containerControl, ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsControl control = (XFormsControl) containerControl;
         final XFormsContainingDocument containingDocument = control.getXBLContainer().getContainingDocument();
@@ -418,20 +421,20 @@ public class XFormsControls implements XFormsObjectResolver {
         contextStack.setBinding(control);
 
         // Start visiting children of the xforms:repeat element
-        XFormsControls.visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+        XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), control.getXBLContainer(), control.getControlElement(),
                 XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
                 XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
     }
 
-    private static void visitControlElementsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
+    private static void visitControlElementsHandleRepeat(PropertyContext propertyContext, ControlElementVisitorListener controlElementVisitorListener,
                                                     boolean isOptimizeRelevance, XFormsStaticState staticState, XBLContainer currentContainer,
                                                     Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
         final XFormsContextStack currentContextStack = currentContainer.getContextStack();
-        for (Iterator i = containerElement.elements().iterator(); i.hasNext();) {
-            final Element currentControlElement = (Element) i.next();
+        for (Object o: containerElement.elements()) {
+            final Element currentControlElement = (Element) o;
             final String currentControlURI = currentControlElement.getNamespaceURI();
             final String currentControlName = currentControlElement.getName();
 
@@ -441,7 +444,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
             if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
-                currentContextStack.pushBinding(pipelineContext, currentControlElement);
+                currentContextStack.pushBinding(propertyContext, currentControlElement);
 
                 // Visit xforms:repeat element
                 controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
@@ -464,7 +467,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 // When updating controls, the callee has the option of disabling recursion into an
                                 // iteration. This is used for handling new iterations.
                                 final String newIdPostfix = idPostfix.equals("") ? Integer.toString(iterationIndex) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex);
-                                visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                                         staticState, currentContainer, currentControlElement, idPrefix, newIdPostfix);
                             }
                             controlElementVisitorListener.endRepeatIteration(iterationIndex);
@@ -477,7 +480,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentContextStack.popBinding();
             } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
-                currentContextStack.pushBinding(pipelineContext, currentControlElement);
+                currentContextStack.pushBinding(propertyContext, currentControlElement);
                 final XFormsControl newControl = controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
                 final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
@@ -492,15 +495,15 @@ public class XFormsControls implements XFormsObjectResolver {
                     if (TESTING_DIALOG_OPTIMIZATION && newControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
                         // Visit dialog children only if dialog is visible
                         if (((XXFormsDialogControl) newControl).isVisible()) {
-                            visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                                     staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
                         }
                     } else {
                         if (!isOptimizeRelevance
                                 || (!currentBindingContext.isNewBind()
-                                     || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
+                                || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
-                            visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                                     staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
                         }
                     }
@@ -509,7 +512,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentContextStack.popBinding();
             } else if (XFormsControlFactory.isCoreControl(currentControlURI, currentControlName)) {
                 // Handle leaf control
-                currentContextStack.pushBinding(pipelineContext, currentControlElement);
+                currentContextStack.pushBinding(propertyContext, currentControlElement);
                 controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 currentContextStack.popBinding();
@@ -521,7 +524,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
+                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
 
                 variablesCount++;
             } else if (staticState.getXblBindings().isComponent(currentControlElement.getQName())) {
@@ -532,7 +535,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Recurse into the shadow component tree
                 final Element shadowTreeDocumentElement = staticState.getXblBindings().getCompactShadowTree(idPrefix + staticControlId);
-                visitControlElementsHandleRepeat(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                         staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
@@ -598,15 +601,15 @@ public class XFormsControls implements XFormsObjectResolver {
 
     private static class UpdateBindingsListener implements ControlElementVisitorListener {
 
-        private final PipelineContext pipelineContext;
+        private final PropertyContext propertyContext;
         private final Map effectiveIdsToControls;
         private final Map<String, EventSchedule> eventsToDispatch;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        private UpdateBindingsListener(PipelineContext pipelineContext, Map effectiveIdsToControls, Map<String, EventSchedule> eventsToDispatch) {
-            this.pipelineContext = pipelineContext;
+        private UpdateBindingsListener(PropertyContext propertyContext, Map effectiveIdsToControls, Map<String, EventSchedule> eventsToDispatch) {
+            this.propertyContext = propertyContext;
             this.effectiveIdsToControls = effectiveIdsToControls;
             this.eventsToDispatch = eventsToDispatch;
         }
@@ -667,32 +670,32 @@ public class XFormsControls implements XFormsObjectResolver {
                 final List<Item> newRepeatNodeset = newBindingContext.getNodeset();
 
                 // Set new current binding for control element
-                control.setBindingContext(pipelineContext, newBindingContext);
+                control.setBindingContext(propertyContext, newBindingContext);
 
                 // Update iterations
-                final List newIterations = ((XFormsRepeatControl) control).updateIterations(pipelineContext, oldRepeatNodeset, newRepeatNodeset, null);
+                final List newIterations = ((XFormsRepeatControl) control).updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, null);
 
                 // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
-                for (Iterator i = newIterations.iterator(); i.hasNext();) {
-                    final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl)i.next();
+                for (Object newIteration: newIterations) {
+                    final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) newIteration;
                     newIterationsMap.put(repeatIterationControl.getEffectiveId(), repeatIterationControl);
                 }
             } else if (TESTING_DIALOG_OPTIMIZATION && control instanceof XXFormsDialogControl) {// TODO: TESTING DIALOG OPTIMIZATION
                 // Handle dialog
                 // TODO: handle this through inheritance
 
-                control.setBindingContext(pipelineContext, newBindingContext);
+                control.setBindingContext(propertyContext, newBindingContext);
 
                 final XXFormsDialogControl dialogControl = (XXFormsDialogControl) control;
                 final boolean isVisible = dialogControl.isVisible();
-                dialogControl.updateContent(pipelineContext, isVisible);
+                dialogControl.updateContent(propertyContext, isVisible);
 
             } else {
                 // Handle all other controls
                 // TODO: handle other container controls
 
                 // Set new current binding for control element
-                control.setBindingContext(pipelineContext, newBindingContext);
+                control.setBindingContext(propertyContext, newBindingContext);
             }
 
             // Mark the control as dirty so it gets reevaluated
@@ -735,7 +738,7 @@ public class XFormsControls implements XFormsObjectResolver {
         }
     }
     
-    public void doRefresh(final PipelineContext pipelineContext, XFormsModel model) {
+    public void doRefresh(final PropertyContext propertyContext, XFormsModel model) {
         // "1. All UI bindings should be reevaluated as necessary."
 
         // "2. A node can be changed by confirmed user input to a form control, by
@@ -765,10 +768,10 @@ public class XFormsControls implements XFormsObjectResolver {
             return;
         }
 
-        containingDocument.startHandleOperation("model", "performing refresh", new String[] { "model id", model.getEffectiveId() });
+        containingDocument.startHandleOperation("model", "performing refresh", "model id", model.getEffectiveId());
 
         // Update control bindings if needed
-        updateControlBindingsIfNeeded(pipelineContext);
+        updateControlBindingsIfNeeded(propertyContext);
 
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
         // types of events below.
@@ -816,7 +819,7 @@ public class XFormsControls implements XFormsObjectResolver {
                     // iterations if they are bound.
 
                     final String effectiveId = control.getEffectiveId();
-                    final EventSchedule existingEventSchedule = (relevantBindingEvents == null) ? null : (EventSchedule) relevantBindingEvents.get(effectiveId);
+                    final EventSchedule existingEventSchedule = (relevantBindingEvents == null) ? null : relevantBindingEvents.get(effectiveId);
 
                     // Allow dispatching value change to:
                     // o relevant control
@@ -1024,39 +1027,39 @@ public class XFormsControls implements XFormsObjectResolver {
                     final XBLContainer container = xformsControl.getXBLContainer();
 
                     if (isAllowSendingValueChangedEvents && (type & EventSchedule.VALUE) != 0) {
-                        container.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(xformsControl));
+                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(xformsControl));
                     }
                     if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
                         if (isAllowSendingRequiredEvents && (type & EventSchedule.REQUIRED) != 0) {
                             final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                             if (currentRequiredState) {
-                                container.dispatchEvent(pipelineContext, new XFormsRequiredEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
                             } else {
-                                container.dispatchEvent(pipelineContext, new XFormsOptionalEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
                             }
                         }
                         if (isAllowSendingRelevantEvents && (type & EventSchedule.RELEVANT) != 0) {
                             final boolean currentRelevantState = InstanceData.getInheritedRelevant(currentNodeInfo);
                             if (currentRelevantState) {
-                                container.dispatchEvent(pipelineContext, new XFormsEnabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
                             } else {
-                                container.dispatchEvent(pipelineContext, new XFormsDisabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
                             }
                         }
                         if (isAllowSendingReadonlyEvents && (type & EventSchedule.READONLY) != 0) {
                             final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                             if (currentReadonlyState) {
-                                container.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
                             } else {
-                                container.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
                             }
                         }
                         if (isAllowSendingValidEvents && (type & EventSchedule.VALID) != 0) {
                             final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                             if (currentValidState) {
-                                container.dispatchEvent(pipelineContext, new XFormsValidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
                             } else {
-                                container.dispatchEvent(pipelineContext, new XFormsInvalidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
                             }
                         }
                     }
@@ -1086,47 +1089,47 @@ public class XFormsControls implements XFormsObjectResolver {
                                 final XBLContainer container = xformsControl.getXBLContainer();
 
                                 if (isAllowSendingRelevantEvents) {
-                                    container.dispatchEvent(pipelineContext, new XFormsEnabledEvent(xformsControl));
+                                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
                                 }
 
                                 // Also send other MIP events
                                 if (isAllowSendingRequiredEvents) {
                                     final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                                     if (currentRequiredState) {
-                                        container.dispatchEvent(pipelineContext, new XFormsRequiredEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
                                     } else {
-                                        container.dispatchEvent(pipelineContext, new XFormsOptionalEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingReadonlyEvents) {
                                     final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                                     if (currentReadonlyState) {
-                                        container.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
                                     } else {
-                                        container.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingValidEvents) {
                                     final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                                     if (currentValidState) {
-                                        container.dispatchEvent(pipelineContext, new XFormsValidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
                                     } else {
-                                        container.dispatchEvent(pipelineContext, new XFormsInvalidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
                                     }
                                 }
                             }
                         } else {
                             // The control is not bound to a node
-                            sendDefaultEventsForDisabledControl(pipelineContext, xformsControl,
+                            sendDefaultEventsForDisabledControl(propertyContext, xformsControl,
                                     isAllowSendingRequiredEvents, isAllowSendingRelevantEvents, isAllowSendingReadonlyEvents, isAllowSendingValidEvents);
                         }
                     } else {
                         // The control no longer exists
                         if (eventSchedule.getXFormsControl() != null) {
                             // In this case, we get a reference to the "old" control
-                            sendDefaultEventsForDisabledControl(pipelineContext, eventSchedule.getXFormsControl(),
+                            sendDefaultEventsForDisabledControl(propertyContext, eventSchedule.getXFormsControl(),
                                     isAllowSendingRequiredEvents, isAllowSendingRelevantEvents, isAllowSendingReadonlyEvents, isAllowSendingValidEvents);
                         }
                     }
@@ -1134,7 +1137,7 @@ public class XFormsControls implements XFormsObjectResolver {
             }
         } else {
             // No UI events to send because there is no event handlers for any of them
-            containingDocument.logDebug("model", "refresh skipping sending of UI events because no listener was found", new String[] { "model id", model.getEffectiveId() });
+            containingDocument.logDebug("model", "refresh skipping sending of UI events because no listener was found", "model id", model.getEffectiveId());
 
             // NOTE: We clear for all models, as we are processing refresh events for all models here. This may have to be changed in the future.
             containingDocument.synchronizeInstanceDataEventState();
@@ -1148,7 +1151,7 @@ public class XFormsControls implements XFormsObjectResolver {
         containingDocument.endHandleOperation();
     }
 
-    private void sendDefaultEventsForDisabledControl(PipelineContext pipelineContext, XFormsControl xformsControl,
+    private void sendDefaultEventsForDisabledControl(PropertyContext propertyContext, XFormsControl xformsControl,
                                                      boolean isAllowSendingRequiredEvents, boolean isAllowSendingRelevantEvents,
                                                      boolean isAllowSendingReadonlyEvents, boolean isAllowSendingValidEvents) {
 
@@ -1156,17 +1159,17 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Control is disabled
         if (isAllowSendingRelevantEvents)
-            container.dispatchEvent(pipelineContext, new XFormsDisabledEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
 
         // Send events for default MIP values
         if (isAllowSendingRequiredEvents)
-            container.dispatchEvent(pipelineContext, new XFormsOptionalEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
 
         if (isAllowSendingReadonlyEvents)
-            container.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
 
         if (isAllowSendingValidEvents)
-            container.dispatchEvent(pipelineContext, new XFormsValidEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
     }
 
     public static class EventSchedule {

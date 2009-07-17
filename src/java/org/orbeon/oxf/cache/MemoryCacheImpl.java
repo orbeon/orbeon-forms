@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.apache.commons.collections.iterators.TransformIterator;
 import org.apache.commons.collections.Transformer;
 
@@ -70,9 +70,9 @@ public class MemoryCacheImpl implements Cache {
         public void incrementExpirationCount() { expirationCount++; }
     };
 
-    public synchronized void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object) {
+    public synchronized void add(PropertyContext propertyContext, CacheKey key, Object validity, Object object) {
         if (key == null || validity == null || maxSize == 0) return;
-        final MemoryCacheStatistics statistics = (pipelineContext != null) ? (MemoryCacheStatistics) getStatistics(pipelineContext) : null;
+        final MemoryCacheStatistics statistics = (propertyContext != null) ? (MemoryCacheStatistics) getStatistics(propertyContext) : null;
         if (statistics != null)
             statistics.incrementAddCount();
         CacheEntry entry = keyToEntryMap.get(key);
@@ -102,7 +102,7 @@ public class MemoryCacheImpl implements Cache {
         }
     }
 
-    public synchronized void remove(PipelineContext context, CacheKey key) {
+    public synchronized void remove(PropertyContext propertyContext, CacheKey key) {
         final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null) {
             keyToEntryMap.remove(key);
@@ -111,7 +111,7 @@ public class MemoryCacheImpl implements Cache {
         }
     }
 
-    public synchronized int removeAll(PipelineContext pipelineContext) {
+    public synchronized int removeAll(PropertyContext propertyContext) {
         final int previousSize = currentSize;
         keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
         linkedList = new CacheLinkedList();
@@ -119,13 +119,13 @@ public class MemoryCacheImpl implements Cache {
         return previousSize;
     }
 
-    public synchronized Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity) {
+    public synchronized Object findValid(PropertyContext propertyContext, CacheKey key, Object validity) {
 
         CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
             // Place in first position and return
-            if (pipelineContext != null)
-                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementHitsCount();
+            if (propertyContext != null)
+                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
                 linkedList.remove(entry.listEntry);
                 entry.listEntry = linkedList.addFirst(entry);
@@ -133,13 +133,13 @@ public class MemoryCacheImpl implements Cache {
             return entry.object;
         } else {
             // Not latest validity
-            if (pipelineContext != null)
-                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementMissCount();
+            if (propertyContext != null)
+                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementMissCount();
             return null;
         }
     }
 
-    public synchronized Object findValidWithExpiration(PipelineContext pipelineContext, CacheKey key, long expiration) {
+    public synchronized Object findValidWithExpiration(PropertyContext propertyContext, CacheKey key, long expiration) {
 
         Object result = null;
         CacheEntry entry = keyToEntryMap.get(key);
@@ -157,34 +157,34 @@ public class MemoryCacheImpl implements Cache {
 
         if (result != null) {
             // Place in first position and return
-            if (pipelineContext != null)
-                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementHitsCount();
+            if (propertyContext != null)
+                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
                 linkedList.remove(entry.listEntry);
                 entry.listEntry = linkedList.addFirst(entry);
             }
         } else {
             // Cache miss
-            if (pipelineContext != null)
-                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementMissCount();
+            if (propertyContext != null)
+                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementMissCount();
         }
         return result;
     }
 
-    public synchronized void setMaxSize(PipelineContext context, int maxSize) {
+    public synchronized void setMaxSize(PropertyContext propertyContext, int maxSize) {
         if (maxSize != this.maxSize) {
             // Decrease size if necessary
             while(currentSize > maxSize)
-                remove(context, ((CacheEntry) linkedList.getLast()).key);
+                remove(propertyContext, ((CacheEntry) linkedList.getLast()).key);
             this.maxSize = maxSize;
         }
     }
 
-    public Iterator iterateCacheKeys(PipelineContext context) {
+    public Iterator iterateCacheKeys(PropertyContext propertyContext) {
         return keyToEntryMap.keySet().iterator();
     }
 
-    public Iterator iterateCacheObjects(PipelineContext context) {
+    public Iterator iterateCacheObjects(PropertyContext propertyContext) {
         return new TransformIterator(keyToEntryMap.keySet().iterator(), new Transformer() {
             public Object transform(Object o) {
                 return (keyToEntryMap.get(o)).object;
@@ -192,11 +192,11 @@ public class MemoryCacheImpl implements Cache {
         });
     }
 
-    public synchronized CacheStatistics getStatistics(PipelineContext pipelineContext) {
-        MemoryCacheStatistics statistics = (MemoryCacheStatistics) pipelineContext.getAttribute(statisticsContextKey);
+    public synchronized CacheStatistics getStatistics(PropertyContext propertyContext) {
+        MemoryCacheStatistics statistics = (MemoryCacheStatistics) propertyContext.getAttribute(statisticsContextKey);
         if (statistics == null) {
             statistics = new MemoryCacheStatistics();
-            pipelineContext.setAttribute(statisticsContextKey, statistics);
+            propertyContext.setAttribute(statisticsContextKey, statistics);
         }
 
         return statistics;

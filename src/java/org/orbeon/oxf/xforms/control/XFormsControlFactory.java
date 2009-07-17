@@ -218,7 +218,7 @@ public class XFormsControlFactory {
         final String controlName = element.getName();
 
         // First try built-in controls
-        Factory factory = (Factory) nameToClassMap.get(element.getQName());
+        Factory factory = nameToClassMap.get(element.getQName());
 
         // Then try custom components
         if (factory == null)
@@ -232,22 +232,22 @@ public class XFormsControlFactory {
     }
 
     public static boolean isValueControl(String controlURI, String controlName) {
-        final String uri = (String) CORE_VALUE_CONTROLS.get(controlName);
+        final String uri = CORE_VALUE_CONTROLS.get(controlName);
         return controlURI.equals(uri);
     }
 
     public static boolean isContainerControl(String controlURI, String controlName) {
-        final String uri = (String) CONTAINER_CONTROLS.get(controlName);
+        final String uri = CONTAINER_CONTROLS.get(controlName);
         return controlURI.equals(uri);
     }
 
     public static boolean isCoreControl(String controlURI, String controlName) {
-        final String uri = (String) CORE_CONTROLS.get(controlName);
+        final String uri = CORE_CONTROLS.get(controlName);
         return controlURI.equals(uri);
     }
 
     public static boolean isBuiltinControl(String controlURI, String controlName) {
-        final String uri = (String) BUILTIN_CONTROLS.get(controlName);
+        final String uri = BUILTIN_CONTROLS.get(controlName);
         return controlURI.equals(uri);
     }
 

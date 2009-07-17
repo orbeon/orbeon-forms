@@ -21,8 +21,8 @@ import java.util.List;
  * Represents event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
  */
 public interface XFormsEventObserver extends XFormsEventTarget {
-    public String getId();
-    public String getEffectiveId();
-    public List getEventHandlers(XBLContainer container);
-    public XFormsEventObserver getParentEventObserver(XBLContainer container);
+    String getId();
+    String getEffectiveId();
+    List getEventHandlers(XBLContainer container);
+    XFormsEventObserver getParentEventObserver(XBLContainer container);
 }

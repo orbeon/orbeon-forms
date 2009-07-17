@@ -17,7 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.XPathCache;
@@ -144,8 +147,8 @@ public class XBLBindings {
                         {
                             final List resourcesElements = currentBindingElement.elements(XFormsConstants.XBL_RESOURCES_QNAME);
                             if (resourcesElements != null) {
-                                for (Iterator k = resourcesElements.iterator(); k.hasNext();) {
-                                    final Element currentResourcesElement = (Element) k.next();
+                                for (Object resourcesElement: resourcesElements) {
+                                    final Element currentResourcesElement = (Element) resourcesElement;
                                     final List<Element> styleElements = Dom4jUtils.elements(currentResourcesElement, XFormsConstants.XBL_STYLE_QNAME);
                                     if (styleElements != null && styleElements.size() > 0) {
                                         if (xblStyles == null) {
@@ -162,7 +165,7 @@ public class XBLBindings {
             }
 
             XFormsContainingDocument.logDebugStatic("static state", "created top-level XBL documents",
-                    new String[] { "xbl:xbl count", Integer.toString(xblCount), "xbl:binding count", Integer.toString(xblBindingCount)});
+                    "xbl:xbl count", Integer.toString(xblCount), "xbl:binding count", Integer.toString(xblBindingCount));
         }
     }
 
@@ -185,7 +188,7 @@ public class XBLBindings {
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
                                        FastStringBuffer repeatHierarchyStringBuffer, Stack<String> repeatAncestorsStack) {
         if (xblComponentBindings != null) {
-            final Element bindingElement = (Element) xblComponentBindings.get(controlElement.getQName());
+            final Element bindingElement = xblComponentBindings.get(controlElement.getQName());
             if (bindingElement != null) {
                 // A custom component is bound to this element
 
@@ -206,7 +209,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic("static state", "registered XBL implementation model documents", new String[] { "count", Integer.toString(implementationModelDocuments.size()) });
+                            XFormsContainingDocument.logDebugStatic("static state", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
                         }
                     }
 
@@ -218,7 +221,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic("static state", "created and registered XBL template model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
+                            XFormsContainingDocument.logDebugStatic("static state", "created and registered XBL template model documents", "count", Integer.toString(extractedModels.size()));
                         }
                     }
 
@@ -237,7 +240,7 @@ public class XBLBindings {
 
                     // Gather xbl:handlers/xbl:handler attached to bound node
                     if (xblHandlers != null) {
-                        final List<Element> handlerElements = (List<Element>) xblHandlers.get(controlElement.getQName());
+                        final List<Element> handlerElements = xblHandlers.get(controlElement.getQName());
                         if (handlerElements != null) {
                             for (Element currentHandlerElement: handlerElements) {
                                 // Register xbl:handler as an action handler
@@ -289,7 +292,7 @@ public class XBLBindings {
                     // Handle xbl:content
 
                     final boolean isXBLContent = element.getQName().equals(XFormsConstants.XBL_CONTENT_QNAME);
-                    final List resultingNodes;
+                    final List<Node> resultingNodes;
                     if (isXBLContent) {
                         final String includesAttribute = element.attributeValue("includes");
                         final List<Node> contentToInsert;
@@ -321,8 +324,8 @@ public class XBLBindings {
                             if (elements.size() > 0) {
                                 // Clone all the resulting elements
                                 contentToInsert = new ArrayList<Node>(elements.size());
-                                for (Iterator i = elements.iterator(); i.hasNext();) {
-                                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                                for (Object o: elements) {
+                                    final NodeInfo currentNodeInfo = (NodeInfo) o;
                                     final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
                                     contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
@@ -345,7 +348,7 @@ public class XBLBindings {
                         resultingNodes = contentToInsert;
                     } else {
                         // Element is simply kept
-                        resultingNodes = Collections.singletonList(element);
+                        resultingNodes = Collections.singletonList((Node) element);
                     }
 
                     // Handle attribute forwarding
@@ -428,12 +431,12 @@ public class XBLBindings {
                         final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                         // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                        final List nodes = XPathCache.evaluate(pipelineContext, boundElementInfo, xxblAttrString, Dom4jUtils.getNamespaceContext(element),
+                        final List nodeInfos = XPathCache.evaluate(pipelineContext, boundElementInfo, xxblAttrString, Dom4jUtils.getNamespaceContext(element),
                                 null, null, null, null, null);// TODO: locationData
 
-                        if (nodes.size() > 0) {
-                            for (Iterator i = nodes.iterator(); i.hasNext();) {
-                                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                        if (nodeInfos.size() > 0) {
+                            for (Object nodeInfo: nodeInfos) {
+                                final NodeInfo currentNodeInfo = (NodeInfo) nodeInfo;
                                 if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
                                     // This is an attribute
                                     final Attribute currentAttribute = (Attribute) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
@@ -484,10 +487,9 @@ public class XBLBindings {
 //                    }
                 }
 
-                private final void setAttribute(List nodes, QName attributeQName, String attributeValue) {
+                private void setAttribute(List<Node> nodes, QName attributeQName, String attributeValue) {
                     if (nodes != null && nodes.size() > 0) {
-                        for (Iterator i = nodes.iterator(); i.hasNext();) {
-                            final Node node = (Node) i.next();
+                        for (final Node node: nodes) {
                             if (node instanceof Element) {
                                 ((Element) node).addAttribute(attributeQName, attributeValue);
                             }
@@ -495,12 +497,11 @@ public class XBLBindings {
                     }
                 }
 
-                private final void setText(List nodes, String value) {
+                private void setText(List<Node> nodes, String value) {
                     if (nodes != null && nodes.size() > 0) {
-                        for (Iterator i = nodes.iterator(); i.hasNext();) {
-                            final Node node = (Node) i.next();
+                        for (final Node node: nodes) {
                             if (node instanceof Element) {
-                                ((Element) node).setText(value);
+                                node.setText(value);
                             }
                         }
                     }
@@ -512,14 +513,14 @@ public class XBLBindings {
             }, true);
 
             // Annotate tree
-            final Document annotedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
+            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 XFormsContainingDocument.logDebugStatic("static state", "annotated shadow tree",
-                        new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotedShadowTreeDocument) });
+                        "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotatedShadowTreeDocument));
             }
 
-            return annotedShadowTreeDocument;
+            return annotatedShadowTreeDocument;
         } else {
             return null;
         }
@@ -610,6 +611,7 @@ public class XBLBindings {
      * Filter a shadow tree document to keep only XForms controls. This does not modify the input document.
      *
      * @param fullShadowTree    full shadow tree document
+     * @param boundElement
      * @return                  compact shadow tree document
      */
     private static Document filterShadowTree(Document fullShadowTree, Element boundElement) {
@@ -627,7 +629,7 @@ public class XBLBindings {
 
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsContainingDocument.logDebugStatic("static state", "compact shadow tree",
-                    new String[] { "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(compactShadowTree) });
+                    "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(compactShadowTree));
         }
 
         return compactShadowTree;
@@ -719,7 +721,7 @@ public class XBLBindings {
      * @return      control factory, or null
      */
     public XFormsControlFactory.Factory getComponentFactory(QName qName) {
-        return (xblComponentsFactories == null) ? null : (XFormsControlFactory.Factory) xblComponentsFactories.get(qName);
+        return (xblComponentsFactories == null) ? null : xblComponentsFactories.get(qName);
     }
 
     /**
@@ -729,7 +731,7 @@ public class XBLBindings {
      * @return                      full expanded shadow tree, or null
      */
     public Element getFullShadowTree(String controlPrefixedId) {
-        return (xblFullShadowTrees == null) ? null : ((Document) xblFullShadowTrees.get(controlPrefixedId)).getRootElement();
+        return (xblFullShadowTrees != null) ? xblFullShadowTrees.get(controlPrefixedId).getRootElement() : null;
     }
 
     /**
@@ -739,7 +741,7 @@ public class XBLBindings {
      * @return                      compact expanded shadow tree, or null
      */
     public Element getCompactShadowTree(String controlPrefixedId) {
-        return (xblCompactShadowTrees == null) ? null : ((Document) xblCompactShadowTrees.get(controlPrefixedId)).getRootElement();
+        return (xblCompactShadowTrees == null) ? null : xblCompactShadowTrees.get(controlPrefixedId).getRootElement();
     }
 
     /**
@@ -749,7 +751,7 @@ public class XBLBindings {
      * @return                      binding id or null if not found
      */
     public String getBindingId(String controlPrefixedId) {
-        return (xblBindingIds == null) ? null : (String) xblBindingIds.get(controlPrefixedId);
+        return (xblBindingIds == null) ? null : xblBindingIds.get(controlPrefixedId);
     }
 
     /**

@@ -41,14 +41,14 @@ public class PooledXPathExpression {
     private Configuration configuration;
     private SlotManager stackFrameMap;
     private ObjectPool pool;
-    private Map variables;
+    private Map<String, Variable> variables;
 
     // Dynamic context
     private Map<String, ValueRepresentation> variableToValueMap;
     private List contextItems;
     private int contextPosition;
 
-    public PooledXPathExpression(Expression expression, ObjectPool pool, IndependentContext context, Map variables) {
+    public PooledXPathExpression(Expression expression, ObjectPool pool, IndependentContext context, Map<String, Variable> variables) {
         this.expression = expression;
         this.pool = pool;
         this.configuration = context.getConfiguration();
@@ -250,7 +250,7 @@ public class PooledXPathExpression {
         throw new OXFException("NIY");
     }
 
-    private final void prepareContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
+    private void prepareContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
 
         // Pass function context to controller
         xpathContext.getController().setUserData("", this.getClass().getName(), functionContext);
@@ -262,10 +262,9 @@ public class PooledXPathExpression {
 
         // Set variable values if any
         if (variableToValueMap != null) {
-            for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry entry = (Map.Entry) i.next();
-                final String name = (String) entry.getKey();
-                final Variable variable = (Variable) entry.getValue();
+            for (Map.Entry<String, Variable> entry: variables.entrySet()) {
+                final String name = entry.getKey();
+                final Variable variable = entry.getValue();
 
                 final ValueRepresentation object = variableToValueMap.get(name);
                 if (object != null) {

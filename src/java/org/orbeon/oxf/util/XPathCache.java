@@ -302,7 +302,7 @@ public class XPathCache {
 
         try {
             // Find pool from cache
-            final Long validity = new Long(0);
+            final Long validity = (long) 0;
             final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME, XPATH_CACHE_DEFAULT_SIZE);
             final FastStringBuffer cacheKeyString = new FastStringBuffer(xpathString);
             {
@@ -323,8 +323,7 @@ public class XPathCache {
 
                     if (prefixToURIMap != null) {
                         final Map<String, String> sortedMap = (prefixToURIMap instanceof TreeMap) ? prefixToURIMap : new TreeMap<String, String>(prefixToURIMap);// this should make sure we always get the keys in the same order
-                        for (Iterator i = sortedMap.entrySet().iterator(); i.hasNext();) {
-                            final Map.Entry currentEntry = (Map.Entry) i.next();
+                        for (Map.Entry currentEntry: sortedMap.entrySet()) {
                             cacheKeyString.append('|');
                             cacheKeyString.append((String) currentEntry.getKey());
                             cacheKeyString.append('=');
@@ -342,8 +341,7 @@ public class XPathCache {
                 if (variableToValueMap != null && variableToValueMap.size() > 0) {
                     // There are some variables in scope. They must be part of the key
                     // TODO: Put this in static state as this can be determined statically once and for all
-                    for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
-                        final String variableName = (String) i.next();
+                    for (final String variableName: variableToValueMap.keySet()) {
                         cacheKeyString.append('|');
                         cacheKeyString.append(variableName);
                     }
@@ -475,17 +473,15 @@ public class XPathCache {
 
             // Declare namespaces
             if (prefixToURIMap != null) {
-                for (Iterator i = prefixToURIMap.keySet().iterator(); i.hasNext();) {
-                    String prefix = (String) i.next();
-                    independentContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
+                for (final String prefix: prefixToURIMap.keySet()) {
+                    independentContext.declareNamespace(prefix, prefixToURIMap.get(prefix));
                 }
             }
 
             // Declare variables (we don't use the values here, just the names)
             final Map<String, Variable> variables = new HashMap<String, Variable>();
             if (variableNames != null) {
-                for (Iterator i = variableNames.iterator(); i.hasNext();) {
-                    final String name = (String) i.next();
+                for (final String name: variableNames) {
                     final Variable variable = independentContext.declareVariable(name);
                     variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
                     variables.put(name, variable);
@@ -564,13 +560,13 @@ public class XPathCache {
 
                 // TODO: For now only play with XForms expressions. But should decide probably based on flag?
                 if (false && functionLibrary == XFormsContainingDocument.getFunctionLibrary()) {
-                    final List instances = analyzeExpression(expression, xpathString);
-                    if (instances == null)
+                    final List<String> instanceIds = analyzeExpression(expression, xpathString);
+                    if (instanceIds == null)
                         logger.info("  XXX EXPRESSION DEPENDS ON MORE THAN INSTANCES: " + xpathString);
                     else {
                         logger.info("  XXX EXPRESSION DEPENDS ON INSTANCES: " + xpathString);
-                        for (Iterator i = instances.iterator(); i.hasNext();) {
-                            logger.info("    instance: " + i.next());
+                        for (String instanceId: instanceIds) {
+                            logger.info("    instance: " + instanceId);
                         }
                     }
                 }
@@ -589,7 +585,7 @@ public class XPathCache {
         }
     }
 
-    private static List analyzeExpression(Expression expression, String xpathString) {
+    private static List<String> analyzeExpression(Expression expression, String xpathString) {
         if (expression instanceof ComputedExpression) {
             try {
                 final PathMap pathmap = new PathMap((ComputedExpression) expression, new Configuration());
@@ -622,9 +618,7 @@ public class XPathCache {
                 final List<String> instancesList = new ArrayList<String>();
 
                 final PathMap.PathMapRoot[] roots = pathmap.getPathMapRoots();
-                for (int i = 0; i < roots.length; i++) {
-                    final PathMap.PathMapRoot root = roots[i];
-
+                for (final PathMap.PathMapRoot root: roots) {
                     final Expression rootExpression = root.getRootExpression();
 
                     if (rootExpression instanceof Instance || rootExpression instanceof XXFormsInstance) {

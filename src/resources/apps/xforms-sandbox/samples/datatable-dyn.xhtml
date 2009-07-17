@@ -46,7 +46,7 @@
 
         <h1>Using the datatable widget (new generation)</h1>
 
-        <p>A first table with explicit labels. The first two colums are sortable and resizeable and
+        <p>A table with explicit labels. The first two colums are sortable and resizeable and
             the first one is a number. The labels are defined separately in a thead element.</p>
         <fr:datatable-dyn id="table-repeat1">
             <thead>
@@ -72,28 +72,6 @@
                 </xforms:repeat>
             </tbody>
         </fr:datatable-dyn>
-
-        <p>Another table with implicit labels. All the colums are sortable and resizeable and the
-            first one is a number. The labels are defined as xforms labels.</p>
-        <!--<fr:datatable-dyn id="table-repeat2">
-            <tr repeat-nodeset="record">
-                <td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
-                    <xforms:output ref="AAA">
-                        <xforms:label>AAA (imp)</xforms:label>
-                    </xforms:output>
-                </td>
-                <td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="BBB">
-                        <xforms:label>BBB (imp)</xforms:label>
-                    </xforms:output>
-                </td>
-                <td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="CCC">
-                         <xforms:label>CCC (imp)</xforms:label>
-                    </xforms:output>
-                </td>
-            </tr>
-        </fr:datatable-dyn>-->
 
     </body>
 </html>

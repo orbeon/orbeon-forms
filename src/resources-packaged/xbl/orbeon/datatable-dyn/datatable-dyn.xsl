@@ -32,6 +32,31 @@
         <parameter>loading</parameter>
     </xsl:variable>
 
+    <xsl:variable name="numberTypes">
+        <type>xs:decimal</type>
+        <type>xs:integer</type>
+        <type>xs:nonPositiveInteger</type>
+        <type>xs:negativeInteger</type>
+        <type>xs:long</type>
+        <type>xs:int</type>
+        <type>xs:short</type>
+        <type>xs:byte</type>
+        <type>xs:nonNegativeInteger</type>
+        <type>xs:unsignedLong</type>
+        <type>xs:unsignedInt</type>
+        <type>xs:unsignedShort</type>
+        <type>xs:unsignedByte</type>
+        <type>xs:positiveInteger</type>
+    </xsl:variable>
+    <xsl:variable name="numberTypesEnumeration">
+        <xsl:for-each select="$numberTypes/*">
+            <xsl:if test="position() >1">,</xsl:if>
+            <xsl:text>resolve-QName('</xsl:text>
+            <xsl:value-of select="."/>
+            <xsl:text>',..)</xsl:text>
+        </xsl:for-each>
+    </xsl:variable>
+
 
     <!-- Set some variables that will dictate the geometry of the widget -->
     <xsl:variable name="scrollH" select="/*/@scrollable = ('horizontal', 'both') and /*/@width"/>
@@ -83,6 +108,8 @@
                                 <xsl:attribute name="index"/>
                                 <xsl:attribute name="currentSortOrder"/>
                                 <xsl:attribute name="nextSortOrder"/>
+                                <xsl:attribute name="type"/>
+                                <xsl:attribute name="pathToFirstNode"/>
                                 <xsl:copy-of select="@*"/>
                             </xsl:copy>
                         </xsl:for-each>
@@ -94,7 +121,19 @@
                 <xforms:bind nodeset="//column/@currentSortOrder"
                     calculate="if (../@index = /*/@currentSortColumn) then . else 'none'"/>
                 <xforms:bind nodeset="//column/@nextSortOrder"
-                    calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"
+                    calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"/>
+                <xforms:bind nodeset="//column/@pathToFirstNode"
+                    calculate="concat('xxforms:component-context()/({/*/xhtml:tbody/xforms:repeat/@nodeset})[1]/', ../@sortKey)"/>
+                <xforms:bind nodeset="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
+                <xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
+                    calculate="for $value in xxforms:evaluate(../@pathToFirstNode)
+                        return if ($value instance of node())
+                        then if (xxforms:type($value) = ({$numberTypesEnumeration}))
+                            then 'number'
+                            else 'text'
+                        else if ($value instance of xs:decimal)
+                            then 'number'
+                            else 'text'"
                 />
             </xforms:model>
 
@@ -104,7 +143,7 @@
                 select="instance('datatable-instance')/@currentSortColumn"/>
 
 
-            <!--<xhtml:div style="border:thin solid black">
+            <xhtml:div style="border:thin solid black">
                 <xhtml:h3>Local instance:</xhtml:h3>
                 <xforms:group model="datatable-model" instance="datatable-instance">
                     <xhtml:p>columns</xhtml:p>
@@ -136,7 +175,7 @@
                         </xhtml:ul>
                     </xforms:repeat>
                 </xforms:group>
-            </xhtml:div>-->
+            </xhtml:div>
 
             <xsl:if test="$hasLoadingFeature">
                 <xxforms:variable name="loading" xbl:attr="select=loading"/>
@@ -222,11 +261,6 @@
                 <xhtml:span class="yui-dt-label">
                     <xsl:choose>
                         <xsl:when test="@fr:sortable = 'true'">
-                            <!-- <xxforms:variable name="myCurrentSortOrder"
-                                select="if ($currentSortColumn = $columnDesc/@index) then $currentSortOrder else 'none'"/>
-                            <xxforms:variable name="myNextSortOrder"
-                                select="if ($myCurrentSortOrder = 'ascending') then 'descending' else 'ascending'"/>-->
-                            <!--<xforms:output value="$myCurrentSortOrder"/>/<xforms:output value="$myNextSortOrder"/>-->
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>
                                     <xsl:apply-templates select="node()"/>
@@ -234,7 +268,6 @@
                                 <xforms:hint>Click to sort <xforms:output
                                         value="$columnDesc/@nextSortOrder"/></xforms:hint>
                                 <xforms:action ev:event="DOMActivate">
-                                    <!-- <xxforms:script> alert('ping');</xxforms:script>-->
                                     <xforms:setvalue ref="$columnDesc/@currentSortOrder"
                                         value="$columnDesc/@nextSortOrder"/>
                                     <xforms:setvalue ref="$currentSortColumn"
@@ -303,8 +336,11 @@
                                 xxforms:attribute('sortKey', concat( '(',  $columnSet/@nodeset, ')[', $position , ']/', $columnSet/@sortKey)),
                                 xxforms:attribute('currentSortOrder', ''),
                                 xxforms:attribute('nextSortOrder', ''),
+                                xxforms:attribute('type', ''),
+                                xxforms:attribute('pathToFirstNode', ''),
                                 $columnSet/@fr:sortable,
-                                $columnSet/@fr:resizeable
+                                $columnSet/@fr:resizeable,
+                                $columnSet/@fr:sortType
                                 ))"
                         if="not($columnSet/column[@position = $position])
                            "
@@ -326,21 +362,22 @@
     </xsl:template>
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat">
-        <xxforms:variable name="sort" model="datatable-model" select="."/>
-        <xxforms:variable name="key" model="datatable-model"
-            select="key[position() = $sort/@currentId]"/>
-        <xforms:repeat nodeset="{@nodeset}">
-            <!-- <xsl:attribute name="nodeset">
+        <xxforms:variable name="currentSortColumnIndex" model="datatable-model"
+            select="@currentSortColumn"/>
+        <xxforms:variable name="currentSortColumn" model="datatable-model"
+            select="(//column)[@index=$currentSortColumnIndex]"/>
+        <xforms:repeat>
+            <xsl:attribute name="nodeset">
                 <xsl:if test="$paginated">(</xsl:if>
-                <xsl:text>if ($sort/@currentId = -1 or $sort/@currentOrder = '') then </xsl:text>
+                <xsl:text>if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') then </xsl:text>
                 <xsl:value-of select="@nodeset"/>
                 <xsl:text> else exf:sort(</xsl:text>
                 <xsl:value-of select="@nodeset"/>
-                <xsl:text>, $key , $key/@type, $sort/@currentOrder)</xsl:text>
+                <xsl:text>, $currentSortColumn/@sortKey , $currentSortColumn/@type, $currentSortColumn/@currentSortOrder)</xsl:text>
                 <xsl:if test="$paginated">)[position() >= ($page - 1) * <xsl:value-of
                         select="$rowsPerPage"/> + 1 and position() &lt;= $page * <xsl:value-of
                         select="$rowsPerPage"/>]</xsl:if>
-                        </xsl:attribute>-->
+            </xsl:attribute>
             <xsl:apply-templates select="@*[not(name()='nodeset')]|node()"/>
         </xforms:repeat>
     </xsl:template>
@@ -423,7 +460,7 @@
         <xsl:variable name="sortKey">
             <xsl:apply-templates select="$body" mode="sortKey"/>
         </xsl:variable>
-        <column sortKey="{$sortKey}" xmlns="">
+        <column sortKey="{$sortKey}" type="" xmlns="">
             <xsl:copy-of select="@*"/>
             <header>
                 <xsl:copy-of select="."/>
@@ -448,7 +485,6 @@
         </xsl:variable>
         <columnSet sortKey="{$sortKey}" xmlns="">
             <xsl:copy-of select="$body/@nodeset|xhtml:th/@*"/>
-
             <header>
                 <xsl:copy-of select="."/>
             </header>
@@ -464,10 +500,11 @@
 
     <xsl:variable name="fakeColumn">
         <header xmlns="">
-            <xhtml:th class="fr-datatable-columnset-loading-indicator">&#160;...&#160;</xhtml:th>
+            <xhtml:th class="fr-datatable-columnset-loading-indicator"
+                >&#160;...&#160;</xhtml:th>
         </header>
     </xsl:variable>
-    
+
     <xsl:template match="columnSet" mode="loadingIndicator">
         <xsl:apply-templates select="$fakeColumn/header/xhtml:th"/>
     </xsl:template>

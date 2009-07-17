@@ -15,14 +15,13 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
 
 /**
  * Regular remote submission going through a protocol handler.
@@ -38,7 +37,7 @@ public class RegularSubmission extends BaseSubmission {
         return true;
     }
 
-    public ConnectionResult connect(PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         final ExternalContext externalContext = getExternalContext(propertyContext);
@@ -89,7 +88,7 @@ public class RegularSubmission extends BaseSubmission {
         };
 
         // Submit the callable
-        final SubmissionResult result = submitCallable(p, p2, callable);
-        return (result != null) ? result.getConnectionResult() : null;
+        // This returns null if the execution is asynchronous
+        return submitCallable(p, p2, callable);
     }
 }

@@ -283,23 +283,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             final SubmissionParameters p = new SubmissionParameters(propertyContext, eventName);
             final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
             final SubmissionResult submissionResult = replaceEvent.getSubmissionResult();
-            try {
-                try {
-                    // Process the different types of response
-                    if (submissionResult.getConnectionResult() != null)
-                        handleResponse(propertyContext, submissionResult.getConnectionResult(), p, p2);
-                    else
-                        handleResponse(propertyContext, submissionResult.getInstance(), p2);
-                } finally {
-                    // Clean-up connection
-                    if (submissionResult != null && submissionResult.getConnectionResult() != null) {
-                        submissionResult.getConnectionResult().close();
-                    }
-                }
-            } catch (Throwable throwable) {
-                // Any exception will cause an error event to be dispatched
-                sendSubmitError(propertyContext, p2.resolvedActionOrResource, throwable);
-            }
+            handleSubmissionResult(propertyContext, p, p2, submissionResult);
 
         } else if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
@@ -437,24 +421,24 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 /* ***** Execute submission ************************************************************************* */
 
                 // Result information
-                ConnectionResult connectionResult = null;
+                SubmissionResult submissionResult = null;
                 final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
                 try {
                     // Iterate through submissions and run the first match
                     for (Submission submission: submissions) {
                         if (submission.isMatch(propertyContext, p, p2, sp)) {
-                            connectionResult = submission.connect(propertyContext, p, p2, sp);
+                            submissionResult = submission.connect(propertyContext, p, p2, sp);
                             break;
                         }
                     }
 
                     /* ***** Submission response ******************************************************************** */
-                    handleResponse(propertyContext, connectionResult, p, p2);
+                    handleSubmissionResult(propertyContext, p, p2, submissionResult);
                 } finally {
                     // Clean-up connection
-                    if (connectionResult != null) {
-                        connectionResult.close();
+                    if (submissionResult != null) {
+                        submissionResult.close();
                     }
                     // Log time spent in submission if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -484,6 +468,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
+        }
+    }
+
+    private void handleSubmissionResult(PropertyContext propertyContext, SubmissionParameters p, SecondPassParameters p2, SubmissionResult submissionResult) {
+        if (submissionResult != null) {
+            try {
+                try {
+                    // Process the different types of response
+                    if (submissionResult.getConnectionResult() != null)
+                        handleResponse(propertyContext, submissionResult.getConnectionResult(), p, p2);
+                    else
+                        handleResponse(propertyContext, submissionResult.getInstance(), p2);
+                } finally {
+                    // Clean-up connection
+                    if (submissionResult != null && submissionResult.getConnectionResult() != null) {
+                        submissionResult.getConnectionResult().close();
+                    }
+                }
+            } catch (Throwable throwable) {
+                // Any exception will cause an error event to be dispatched
+                sendSubmitError(propertyContext, p2.resolvedActionOrResource, throwable);
+            }
         }
     }
 

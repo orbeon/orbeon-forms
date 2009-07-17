@@ -35,4 +35,10 @@ public class SubmissionResult {
     public XFormsInstance getInstance() {
         return instance;
     }
+
+    public void close() {
+        if (connectionResult != null) {
+            connectionResult.close();
+        }
+    }
 }

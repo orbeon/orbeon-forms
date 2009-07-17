@@ -14,7 +14,6 @@
 
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.PropertyContext;
 
 /**
@@ -27,8 +26,8 @@ public interface Submission {
                     XFormsModelSubmission.SecondPassParameters p2,
                     XFormsModelSubmission.SerializationParameters sp);
 
-    ConnectionResult connect(PropertyContext propertyContext,
-                    XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp) throws Exception;
+    SubmissionResult connect(PropertyContext propertyContext,
+                     XFormsModelSubmission.SubmissionParameters p,
+                     XFormsModelSubmission.SecondPassParameters p2,
+                     XFormsModelSubmission.SerializationParameters sp) throws Exception;
 }

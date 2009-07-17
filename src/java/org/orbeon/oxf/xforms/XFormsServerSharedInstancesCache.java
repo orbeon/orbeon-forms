@@ -50,9 +50,25 @@ public class XFormsServerSharedInstancesCache {
         return instance;
     }
 
+    public XFormsInstance findConvertNoLoad(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
+                                            String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
+                                            boolean handleXInclude) {
+
+        // Try to find in cache
+        final ReadonlyXFormsInstance existingInstance
+                = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude);
+        if (existingInstance != null) {
+            // Found from the cache
+
+            return convert(indentedLogger, isReadonly, existingInstance);
+        } else {
+            return null;
+        }
+    }
+
     public XFormsInstance findConvert(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
-                                     String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
-                                     boolean handleXInclude, long timeToLive, String validation, Loader loader) {
+                                      String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
+                                      boolean handleXInclude, long timeToLive, String validation, Loader loader) {
 
         final ReadonlyXFormsInstance tempReadonlyInstance;
         {
@@ -83,6 +99,10 @@ public class XFormsServerSharedInstancesCache {
             }
         }
 
+        return convert(indentedLogger, isReadonly, tempReadonlyInstance);
+    }
+
+    private XFormsInstance convert(IndentedLogger indentedLogger, boolean isReadonly, ReadonlyXFormsInstance tempReadonlyInstance) {
         final XFormsInstance newInstance;
         if (isReadonly) {
             // Keep readonly instance
@@ -97,7 +117,6 @@ public class XFormsServerSharedInstancesCache {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug(LOG_TYPE, "returning read-write cached instance", "instance", newInstance.getEffectiveId());
         }
-
         return newInstance;
     }
 

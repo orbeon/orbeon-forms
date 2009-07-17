@@ -40,7 +40,7 @@ public class EchoSubmission extends BaseSubmission {
         return (p.isReplaceInstance || p.isReplaceNone) && p2.resolvedActionOrResource.startsWith("test:");
     }
 
-    public ConnectionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws IOException {
         if (sp.messageBody == null) {
             // Not sure when this can happen, but it can't be good
@@ -66,7 +66,6 @@ public class EchoSubmission extends BaseSubmission {
         connectionResult.dontHandleResponse = false;
         connectionResult.setResponseInputStream(new ByteArrayInputStream(sp.messageBody));
 
-        return connectionResult;
-
+        return new SubmissionResult(connectionResult);
     }
 }

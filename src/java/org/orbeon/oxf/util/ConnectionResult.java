@@ -151,6 +151,7 @@ public class ConnectionResult {
                 try {
                     reader.close();
                 } catch (Exception e) {
+                    // NOP
                 }
             }
         } else if (XMLUtils.isXMLMediatype(getResponseMediaType())) {
@@ -164,6 +165,7 @@ public class ConnectionResult {
                 try {
                     reader.close();
                 } catch (Exception e) {
+                    // NOP
                 }
             }
         } else {

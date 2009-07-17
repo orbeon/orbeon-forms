@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
@@ -49,7 +49,7 @@ public class CacheableSubmission extends BaseSubmission {
         return p2.resolvedXXFormsCache;
     }
 
-    public ConnectionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
@@ -90,60 +90,67 @@ public class CacheableSubmission extends BaseSubmission {
         // Create new logger as the submission might be asynchronous
         final IndentedLogger submissionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
 
-        // Create callable
-        final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
-            public SubmissionResult call() {
+        // Try from cache first
+        final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
+                submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                handleXInclude);
 
-                return new SubmissionResult(XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
-                        absoluteResolvedURLString, requestBodyHash, isReadonly, handleXInclude, timeToLive, validation,
-                        new XFormsServerSharedInstancesCache.Loader() {
-                            public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
+        if (cacheResult != null) {
+            // Result was immediately available, so return it right away
+            // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
+            return new SubmissionResult(cacheResult);
+        } else {
+            // Create callable for synchronous or asynchronous loading
+            final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
+                public SubmissionResult call() {
+                    return new SubmissionResult(XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
+                            absoluteResolvedURLString, requestBodyHash, isReadonly, handleXInclude, timeToLive, validation,
+                            new XFormsServerSharedInstancesCache.Loader() {
+                                public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,
+                                                                   String modelEffectiveId, String instanceSourceURI,
+                                                                   boolean handleXInclude, long timeToLive, String validation) {
 
-                                // Call regular submission
-                                ConnectionResult connectionResult = null;
-                                try {
-                                    // Run regular submission but force synchronous execution
-                                    connectionResult = new RegularSubmission(submission) {
-                                        @Override
-                                        protected boolean isAsyncSubmission(XFormsModelSubmission.SecondPassParameters p2) {
-                                            return false;
+                                    // Call regular submission
+                                    SubmissionResult submissionResult = null;
+                                    try {
+                                        // Run regular submission but force synchronous execution
+                                        submissionResult = new RegularSubmission(submission) {
+                                            @Override
+                                            protected boolean isAsyncSubmission(XFormsModelSubmission.SecondPassParameters p2) {
+                                                return false;
+                                            }
+                                        }.connect(propertyContext, p, p2, sp);
+
+                                        final ConnectionResult connectionResult = submissionResult.getConnectionResult();
+
+                                        // Handle connection errors
+                                        if (connectionResult.statusCode != 200) {
+                                            submissionResult.close();
+                                            throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
                                         }
-                                    }.connect(propertyContext, p, p2, sp);
+                                        // Read into TinyTree
+                                        // TODO: Handle validating?
+                                        final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
 
-                                    // Handle connection errors
-                                    if (connectionResult.statusCode != 200) {
-                                        connectionResult.close();
-                                        throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
+                                        // Create new shared instance
+                                        return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
+                                                p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude);
+                                    } catch (Exception e) {
+                                        throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
+                                    } finally {
+                                        // Clean-up
+                                        if (submissionResult != null)
+                                            submissionResult.close();
                                     }
-                                    // Read into TinyTree
-                                    // TODO: Handle validating?
-                                    final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
-
-                                    // Create new shared instance
-                                    return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                            p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude);
-                                } catch (Exception e) {
-                                    throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
-                                } finally {
-                                    // Clean-up
-                                    if (connectionResult != null)
-                                        connectionResult.close();
                                 }
-                            }
-                        }));
-            }
-        };
+                            }));
+                }
+            };
 
-        // Submit the callable
-        // This returns null if the execution is asynchronous
-        final SubmissionResult submissionResult = submitCallable(p, p2, callable);
-
-        // Process response right away if possible
-        if (submissionResult != null)
-            submission.handleResponse(propertyContext, submissionResult.getInstance(), p2);
-
-        // Tell caller he doesn't need to do anything
-        return null;
+            // Submit the callable
+            // This returns null if the execution is asynchronous
+            return submitCallable(p, p2, callable);
+        }
     }
 
     private XFormsInstance checkInstanceToUpdate(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p) {

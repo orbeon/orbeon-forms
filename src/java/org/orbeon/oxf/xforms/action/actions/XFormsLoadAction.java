@@ -61,7 +61,7 @@ public class XFormsLoadAction extends XFormsAction {
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNodeInfo(currentNode);
                 final String encodedValue = XFormsUtils.encodeHRRI(value, true);
-                resolveLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
+                resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
             }
@@ -76,7 +76,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Resolve AVT
             final String resolvedResource = resolveAVT(actionInterpreter, propertyContext, actionElement, "resource", false);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
-            resolveLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
+            resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance
@@ -85,8 +85,9 @@ public class XFormsLoadAction extends XFormsAction {
         }
     }
 
-    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
-                                          Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite, boolean isShowProgress) {
+    public static String resolveStoreLoadValue(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
+                                               Element currentElement, boolean doReplace, String value, String target,
+                                               String urlType, boolean urlNorewrite, boolean isShowProgress) {
 
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
         final String externalURL;

@@ -136,7 +136,7 @@ public class OptimizedSubmission extends BaseSubmission {
         return true;
     }
 
-    public ConnectionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
         // access the resource, but instead uses servlet forward/include for servlets, or a local
         // mechanism for portlets.
@@ -181,7 +181,7 @@ public class OptimizedSubmission extends BaseSubmission {
         if (connectionResult.dontHandleResponse)
             containingDocument.setGotSubmissionReplaceAll();
 
-        return connectionResult;
+        return new SubmissionResult(connectionResult);
     }
 
     /**

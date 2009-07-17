@@ -91,7 +91,8 @@ public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
         if (isConcreteControl && !hasLabel)
             throw new ValidationException("Missing label on xforms:trigger element.", triggerControl.getLocationData());
 
-        final String labelValue = handlerContext.isTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
+        final String labelValue = ! handlerContext.isTemplate() && isConcreteControl && triggerControl.getLabel(pipelineContext) != null
+                ? triggerControl.getLabel(pipelineContext) : "";
 
         final AttributesImpl newAttributes;
         if (handlerContext.isNewXHTMLLayout()) {

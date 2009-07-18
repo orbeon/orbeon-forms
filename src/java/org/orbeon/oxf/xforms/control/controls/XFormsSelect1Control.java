@@ -131,7 +131,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     /**
      * Get this control's itemset.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param setBinding        whether to set the current binding on the control first
      * @return                  itemset
      */

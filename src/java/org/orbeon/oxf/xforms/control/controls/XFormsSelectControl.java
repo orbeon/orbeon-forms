@@ -44,7 +44,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * o Itemset values which are in the list of tokens are merged with the bound control's value.
      * o Itemset values which are not in the list of tokens are removed from the bound control's value.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param value             list of tokens from the UI
      * @param type              should probably be null
      * @param filesElement
@@ -164,7 +164,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
     }
 
     private static Map<String, String> tokenize(PropertyContext propertyContext, String value, boolean decryptValues) {
-        final Map<String, String> result = new HashMap<String, String>();
+        final Map<String, String> result = new LinkedHashMap<String, String>();
         if (value != null) {
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
                 final String token = st.nextToken();

@@ -93,7 +93,7 @@ public class ConnectionResult {
     public void forwardHeaders(ExternalContext.Response response) {
         if (responseHeaders != null) {
             for (Map.Entry<String, List<String>> currentEntry: responseHeaders.entrySet()) {
-                final String headerName = (String) currentEntry.getKey();
+                final String headerName = currentEntry.getKey();
                 if (headerName != null) {
                     // NOTE: Values could be a String in the past, but that shouldn't be the case anymore!
                     final List<String> headerValues = currentEntry.getValue();

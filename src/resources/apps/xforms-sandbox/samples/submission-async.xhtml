@@ -49,29 +49,40 @@
                 <text/>
             </xforms:instance>
             
-            <xforms:instance id="instance-result">
-                <text/>
+            <xforms:instance id="instance-result-1">
+                <dummy/>
+            </xforms:instance>
+            
+            <xforms:instance id="instance-result-2">
+                <dummy/>
             </xforms:instance>
 
-            <xforms:submission id="submission-replace-none" mode="asynchronous"
+            <xforms:submission id="replace-none" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
                 replace="none"/>
 
-            <xforms:submission id="submission-replace-text" mode="asynchronous"
+            <xforms:submission id="replace-text" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
                 replace="text" targetref="instance('text-result')"/>
 
-            <xforms:submission id="submission-replace-instance" mode="asynchronous"
+            <xforms:submission id="replace-instance-1" mode="asynchronous"
                 method="get" resource="http://www.orbeon.com/ops/xforms-sandbox/service/zip-states"
-                serialization="none" xxforms:cache="true"
-                replace="instance" targetref="instance('instance-result')"/>
+                serialization="none" xxforms:cache="false"
+                replace="instance" targetref="instance('instance-result-1')">
+                <xforms:send ev:event="xforms-submit-done" submission="replace-instance-2"/>
+            </xforms:submission>
+
+            <xforms:submission id="replace-instance-2" mode="asynchronous"
+                method="get" resource="http://www.orbeon.com/ops/xforms-sandbox/service/zip-states"
+                serialization="none" xxforms:cache="false"
+                replace="instance" targetref="instance('instance-result-2')"/>
 
             <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:send submission="submission-replace-none"/>
-                <xforms:send submission="submission-replace-text"/>
-                <xforms:send submission="submission-replace-instance"/>
+                <xforms:send submission="replace-none"/>
+                <xforms:send submission="replace-text"/>
+                <xforms:send submission="replace-instance-1"/>
                 <xxforms:join-submissions/>
             </xforms:action>
 
@@ -79,15 +90,15 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:submit submission="submission-replace-none">
+        <xforms:submit submission="replace-none">
             <xforms:label>Test replace="none"</xforms:label>
         </xforms:submit>
 
-        <xforms:submit submission="submission-replace-text">
+        <xforms:submit submission="replace-text">
             <xforms:label>Test replace="text"</xforms:label>
         </xforms:submit>
 
-        <xforms:submit submission="submission-replace-instance">
+        <xforms:submit submission="replace-instance-1">
             <xforms:label>Test replace="instance"</xforms:label>
         </xforms:submit>
 

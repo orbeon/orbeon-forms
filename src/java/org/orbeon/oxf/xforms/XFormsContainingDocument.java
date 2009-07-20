@@ -1471,7 +1471,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Whether the containing document is in a phase of restoring the dynamic state.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @return                  true iif restore is in process
      */
     public boolean isRestoringDynamicState(PropertyContext propertyContext) {

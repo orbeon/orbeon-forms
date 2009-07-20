@@ -58,6 +58,20 @@
     <module2copyright>
       <element module="All" copyright="Orbeon LGPL" />
     </module2copyright>
+    <LanguageOptions name="HTML">
+      <option name="fileTypeOverride" value="3" />
+      <option name="relativeBefore" value="true" />
+      <option name="addBlankAfter" value="false" />
+      <option name="fileLocation" value="1" />
+      <option name="block" value="true" />
+      <option name="separateBefore" value="false" />
+      <option name="separateAfter" value="false" />
+      <option name="prefixLines" value="false" />
+      <option name="lenBefore" value="80" />
+      <option name="lenAfter" value="80" />
+      <option name="box" value="false" />
+      <option name="filler" value=" " />
+    </LanguageOptions>
     <LanguageOptions name="XML">
       <option name="fileTypeOverride" value="3" />
       <option name="relativeBefore" value="true" />
@@ -116,157 +130,23 @@
     <option name="OPEN_IN_BROWSER" value="false" />
     <option name="OUTPUT_DIRECTORY" />
   </component>
-  <component name="FacetAutodetectingManager">
-    <autodetection-disabled>
-      <facet-type id="web">
-        <modules>
-          <module name="Amnesty" />
-          <module name="Common" />
-          <module name="Orbeon" />
-          <module name="dom4j-1.6.1">
-            <files>
-              <file url="file://$PROJECT_DIR$/../dom4j-1.6.1/xml/web.xml" />
-            </files>
-          </module>
-          <module name="xforms-alone.war" />
-          <module name="CSC WMS">
-            <files>
-              <file url="file://$PROJECT_DIR$/../Internal/Common/projects/CSC/WMS/wars/WMS/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="ORI" />
-          <module name="Teleflex Contracts" />
-          <module name="Teleflex Inter Company" />
-          <module name="Teleflex PMP" />
-          <module name="Mascagni" />
-          <module name="Etat de Vaud Proto" />
-          <module name="MSV" />
-          <module name="Orbeon Web Site" />
-          <module name="Tomcat" />
-          <module name="apache-tomcat-5.5.27-src" />
-          <module name="CRIX" />
-          <module name="apache-tomcat-6.0.18-src" />
-          <module name="Etat de Vaud eForms" />
-          <module name="Apache Sling" />
-          <module name="eXist">
-            <files>
-              <file url="file://$PROJECT_DIR$/../eXist-1.2.4/webapp/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="LogicBlox">
-            <files>
-              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/LbContainer-portlet/docroot/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/orbeon-war/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../LogicBlox/logicblox/trunk/tmp/target/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="CRV">
-            <files>
-              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/crv_dmz/src/main/webapp/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/crv_inside/src/main/webapp/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/CRV/exist_webapp/src/main/webapp/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/appserv/test-config/crv-dmz/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk/appserv/test-config/crv-inside/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="talentManagement">
-            <files>
-              <file url="file://$PROJECT_DIR$/../Teleflex/talentManagement/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="tmUtilities">
-            <files>
-              <file url="file://$PROJECT_DIR$/../Teleflex/tmUtilities/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="of-erik">
-            <files>
-              <file url="file://$PROJECT_DIR$/build/iarq-war/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/build/separate-war/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="Orbeon Forms">
-            <files>
-              <file url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/web.xml" />
-            </files>
-          </module>
-          <module name="apache-tomcat-5.5.27">
-            <files>
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/conf/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/server/webapps/host-manager/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/server/webapps/manager/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/ROOT/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/balancer/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/jsp-examples/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/servlets-examples/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/tomcat-docs/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/tomcat-docs/appdev/sample/web/WEB-INF/web.xml" />
-              <file url="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/webapps/webdav/WEB-INF/web.xml" />
-            </files>
-          </module>
-        </modules>
-      </facet-type>
-      <facet-type id="struts">
-        <modules>
-          <module name="Orbeon 3.0.x">
-            <files>
-              <file url="file://$PROJECT_DIR$/../orbeon301/descriptors/examples/web/struts-config.xml" />
-            </files>
-          </module>
-          <module name="CSC WMS" />
-          <module name="Common" />
-          <module name="Orbeon" />
-          <module name="apache-tomcat-5.5.27-src" />
-        </modules>
-      </facet-type>
-      <facet-type id="jsf">
-        <modules>
-          <module name="Orbeon 3.0.x">
-            <files>
-              <file url="file://$PROJECT_DIR$/../orbeon301/src/java/org/orbeon/faces/components/demo/conf/faces-config.xml" />
-              <file url="file://$PROJECT_DIR$/../orbeon301/src/java/org/orbeon/faces/example/conf/faces-config.xml" />
-            </files>
-          </module>
-          <module name="Common" />
-        </modules>
-      </facet-type>
-      <facet-type id="javaeeApplication">
-        <modules>
-          <module name="Common" />
-          <module name="Orbeon" />
-          <module name="of-erik">
-            <files>
-              <file url="file://$PROJECT_DIR$/src/resources-packaged/ops/fckeditor.2.6/_samples/adobeair/application.xml" />
-            </files>
-          </module>
-        </modules>
-      </facet-type>
-      <facet-type id="Spring">
-        <modules>
-          <module name="Common" />
-        </modules>
-      </facet-type>
-    </autodetection-disabled>
-  </component>
   <component name="IdProvider" IDEtalkID="11F1F6BCFCEF250CF8C992303A792A29" />
   <component name="InspectionProjectProfileManager">
     <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
-    <scopes />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
     <profiles>
       <profile version="1.0" is_locked="false">
         <option name="myName" value="Project Default" />
         <option name="myLocal" value="false" />
-        <inspection_tool class="MethodNameWithMistakes" enabled="false" level="INFO" enabled_by_default="false" />
       </profile>
     </profiles>
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
-      <item index="1" class="java.lang.String" itemvalue="INFO" />
-      <item index="2" class="java.lang.String" itemvalue="WARNING" />
-      <item index="3" class="java.lang.String" itemvalue="ERROR" />
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="MISSPELLED" />
+      <item index="1" class="java.lang.String" itemvalue="SERVER PROBLEM" />
+      <item index="2" class="java.lang.String" itemvalue="INFO" />
+      <item index="3" class="java.lang.String" itemvalue="WARNING" />
+      <item index="4" class="java.lang.String" itemvalue="ERROR" />
     </list>
   </component>
   <component name="JavacSettings">
@@ -438,11 +318,21 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Orbeon Forms.iml" filepath="$PROJECT_DIR$/Orbeon Forms.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../apache-tomcat-5.5.27/apache-tomcat-5.5.27.iml" filepath="$PROJECT_DIR$/../apache-tomcat-5.5.27/apache-tomcat-5.5.27.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/classes" />
+  </component>
+  <component name="ProjectWordList">
+    <option name="words">
+      <set>
+        <option value="Approximative" />
+        <option value="Bookcast" />
+        <option value="JDOM" />
+        <option value="Uncomment" />
+        <option value="filesystem" />
+      </set>
+    </option>
   </component>
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
@@ -458,115 +348,8 @@
     <option name="GENERATE_IIOP_STUBS" value="false" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
-  <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$/../../Documents/Repository/Adina/war/WEB-INF/resources/apps">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="http://adina.bruchez.org/svn/Adina/war/WEB-INF/resources/apps" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../../Documents/Repository/Mascagni">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="http://adina.bruchez.org/svn/Mascagni" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../CRIX/rfd/trunk">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchUrls">
-                <list>
-                  <option value="https://orbeon.svn.beanstalkapp.com/rfd/branches" />
-                  <option value="https://orbeon.svn.beanstalkapp.com/rfd/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="https://orbeon.svn.beanstalkapp.com/rfd/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../Etat de Vaud eForms/trunk">
-          <value>
-            <SvnBranchConfiguration />
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../Internal/Common">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Common" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../Internal/Common/oss-site">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Common/oss-site" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../Internal/Private">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="https://www.orbeon.com/svn/orbeon/Private" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../LogicBlox/logicblox">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="https://orbeon.svn.beanstalkapp.com/logicblox" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../Minnesota/SVN-CV/proptax/trunk">
-          <value>
-            <SvnBranchConfiguration />
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../ORI">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchUrls">
-                <list>
-                  <option value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/branches" />
-                  <option value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="https://subversion.cru.fr/ori-workflow/ori-oai-md-editor/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/../eXist-1.2.4">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="trunkUrl" value="https://exist.svn.sourceforge.net/svnroot/exist/releases/eXist-1.2.4" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
-  </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
-    <mapping directory="$PROJECT_DIR$/../../Desktop/git-repository" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../Documents/Repository/Adina/war/WEB-INF/resources/apps" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../../Documents/Repository/Mascagni" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../Etat de Vaud eForms/trunk" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../Internal/Common/oss-site" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../Internal/Private" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../LogicBlox/logicblox" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../Teleflex/talentManagement" vcs="" />
-    <mapping directory="$PROJECT_DIR$/../Teleflex/tmUtilities" vcs="" />
-    <mapping directory="$PROJECT_DIR$/../W3C XForms Test Suite" vcs="CVS" />
-    <mapping directory="$PROJECT_DIR$/../eXist-1.2.4" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../eXist-stable-1.2" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$" vcs="CVS" />
-    <mapping directory="$PROJECT_DIR$/../saxon" vcs="CVS" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="com.intellij.jsf.UserDefinedFacesConfigs">

@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.dom4j.TypedDocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -119,8 +120,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (xmlString.length() > 0) {
                 // Instance document is available in serialized form
                 if (!readonly) {
-                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                    // Make a typed document wrapper
+                    documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
                 } else {
+                    // Just use TinyTree as is
                     documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
                 }
             } else {
@@ -137,7 +140,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI,
                           String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelEffectiveId, instanceStaticId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
+        // NOTE: Make a typed document wrapper
+        this(modelEffectiveId, instanceStaticId, new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
                 instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude);
     }
 
@@ -277,10 +281,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return sourceURI;
     }
 
-    public boolean isHasUsername() {
-        return username != null;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -316,7 +316,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param containingDocument    containing document (for event dispatch), null if no events requested
      * @param eventTarget           event target (for event dispatch), null if no events requested
      * @param nodeInfo              element or attribute NodeInfo to update
@@ -343,7 +343,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Set a value on the instance using a Node and a value.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param node              element or attribute Node to update
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
@@ -439,7 +439,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * This prints the instance with extra annotation attributes to System.out. For debug only.
      */
-    public void readOut() {
+    public void debugReadOut() {
         final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
         th.setResult(new StreamResult(System.out));
         read(th);
@@ -448,7 +448,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * This allows dumping all the current MIPs applying to this instance.
      */
-    public void logMIPs() {
+    public void debugLogMIPs() {
 
         final Document result = Dom4jUtils.createDocument();
 
@@ -466,10 +466,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             }
 
             public final void visit(Attribute attribute) {
-                final Element attributeEement = currentElement.addElement("attribute");
-                attributeEement.addAttribute("qname", attribute.getQualifiedName());
-                attributeEement.addAttribute("namespace-uri", attribute.getNamespaceURI());
-                addMIPInfo(attributeEement, attribute);
+                final Element attributeElement = currentElement.addElement("attribute");
+                attributeElement.addAttribute("qname", attribute.getQualifiedName());
+                attributeElement.addAttribute("namespace-uri", attribute.getNamespaceURI());
+                addMIPInfo(attributeElement, attribute);
             }
 
             private void addMIPInfo(Element parentInfoElement, Node node) {
@@ -515,7 +515,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Action run when the event reaches the target.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param container             container
      * @param event                 event being dispatched
      */

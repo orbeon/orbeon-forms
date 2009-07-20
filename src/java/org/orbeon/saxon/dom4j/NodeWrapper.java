@@ -128,11 +128,11 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     /**
     * Get the typed value of the item
     */
-    public SequenceIterator getTypedValue() {
+    public SequenceIterator getTypedValue() throws XPathException {
         return SingletonIterator.makeIterator((AtomicValue)atomize());
     }
 
-    public Value atomize() {
+    public Value atomize() throws XPathException {
         switch (getNodeKind()) {
             case Type.COMMENT:
             case Type.PROCESSING_INSTRUCTION:

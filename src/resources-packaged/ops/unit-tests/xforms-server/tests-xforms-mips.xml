@@ -698,13 +698,13 @@
                                             <xforms:setvalue ref="@nodetype" value="xxforms:type(context())"/>
                                         </xforms:action>
 
+                                        <xforms:setvalue ref="*[1]/@valuetype" value="xxforms:type('Lucy')"/>
                                         <xforms:setvalue ref="*[2]/@valuetype" value="xxforms:type(35)"/>
                                         <xforms:setvalue ref="*[3]/@valuetype" value="xxforms:type(false())"/>
                                         <xforms:setvalue ref="*[4]/@valuetype" value="xxforms:type(xs:date('1980-01-01'))"/>
                                         <xforms:setvalue ref="*[5]/@valuetype" value="xxforms:type(xs:time('12:00:00'))"/>
                                         <xforms:setvalue ref="*[6]/@valuetype" value="xxforms:type(12E1)"/>
                                         <xforms:setvalue ref="*[7]/@valuetype" value="xxforms:type('Lucy')"/>
-                                        <xforms:setvalue ref="*[8]/@valuetype" value="xxforms:type('Lucy')"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -725,7 +725,7 @@
                         <instances>
                             <instance id="values" model-id="form-model">
                                 <values xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                                    <value nodetype="" valuetype="">Lucy</value>
+                                    <value nodetype="" valuetype="xs:string">Lucy</value>
                                     <value xsi:type="xs:integer" nodetype="integer" valuetype="xs:integer">35</value>
                                     <value xsi:type="xs:boolean" nodetype="boolean" valuetype="xs:boolean">false</value>
                                     <value xsi:type="xs:date" nodetype="date" valuetype="xs:date">1980-01-01</value>
@@ -739,6 +739,83 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Test type annotations" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="form-model" xxforms:state-handling="client">
+                                    <xforms:instance id="values">
+                                        <values xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                            <value>Lucy</value>
+                                            <value xsi:type="xs:integer">35</value>
+                                            <value xsi:type="xs:boolean">false</value>
+                                            <value xsi:type="xs:date">1980-01-01</value>
+                                            <value xsi:type="xs:time">12:00:00</value>
+                                            <value xsi:type="xs:double">12.5E0</value>
+                                            <value xsi:type="xs:string">Lucy</value>
+                                        </values>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:output id="output-string" value="value[1]"/>
+                                <xforms:output id="output-integer" value="value[2] + 1"/>
+                                <xforms:output id="output-boolean" value="false() != value[3]"/>
+                                <xforms:output id="output-date" value="value[4] + xdt:dayTimeDuration('P1D')"/>
+                                <xforms:output id="output-time" value="value[5] + xs:dayTimeDuration('PT10H30M')"/>
+                                <xforms:output id="output-double" value="value[6] + .5"/>
+                                <xforms:output id="output-string-2" value="value[7]"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="values" model-id="form-model">
+                                <values xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <value>Lucy</value>
+                                    <value xsi:type="xs:integer">35</value>
+                                    <value xsi:type="xs:boolean">false</value>
+                                    <value xsi:type="xs:date">1980-01-01</value>
+                                    <value xsi:type="xs:time">12:00:00</value>
+                                    <value xsi:type="xs:double">12.5E0</value>
+                                    <value xsi:type="xs:string">Lucy</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-string">Lucy</xxf:control>
+                        <xxf:control id="output-integer">36</xxf:control>
+                        <xxf:control id="output-boolean">false</xxf:control>
+                        <xxf:control id="output-date">1980-01-02</xxf:control>
+                        <xxf:control id="output-time">22:30:00</xxf:control>
+                        <xxf:control id="output-double">13</xxf:control>
+                        <xxf:control id="output-string-2">Lucy</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -3456,7 +3456,7 @@ ORBEON.widgets.YUICalendar = function() {
             // Get language from html/@lang
             var lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang");
             // If not language is set there, use English
-            if (lang == null)
+            if (lang == null || lang == "")
                 lang = "en";
             // Just keep first 2 letters (fr_FR becomes fr)
             lang = lang.substring(0, 2);

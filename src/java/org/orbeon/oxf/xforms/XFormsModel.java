@@ -29,8 +29,8 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.submission.OptimizedSubmission;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -311,12 +311,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
         final XFormsInstance newInstance;
         {
-            if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI, username, password, cached, timeToLive, validation, handleXInclude);
-            else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, cached, timeToLive, validation, handleXInclude);
-            else
+            if (instanceDocument instanceof Document) {
+                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
+                        username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+            } else if (instanceDocument instanceof DocumentInfo) {
+                newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
+                        username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+            } else {
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
+            }
         }
         instances.set(instancePosition, newInstance);
 
@@ -396,7 +399,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Restore the state of the model when the model object was just recreated.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public void restoreState(PropertyContext propertyContext) {
         // Ensure schema are loaded
@@ -448,7 +451,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Restore all the instances serialized as children of the given container element.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     private void restoreInstances(PropertyContext propertyContext) {
 
@@ -637,8 +640,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             // NOTE: No XInclude supported to read instances with @src for now
             final XFormsInstance cachedInstance
-                    = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, containingDocument.getIndentedLogger(), newInstance.getId(), newInstance.getEffectiveModelId(),
-                        newInstance.getSourceURI(), null, readonlyHint, false, newInstance.getTimeToLive(), newInstance.getValidation(), INSTANCE_LOADER);
+                    = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, containingDocument.getIndentedLogger(),
+                        newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), null, readonlyHint, false,
+                        XFormsProperties.isExposeXPathTypes(containingDocument), newInstance.getTimeToLive(), newInstance.getValidation(), INSTANCE_LOADER);
 
             setInstance(cachedInstance, newInstance.isReplaced());
         } else {
@@ -751,8 +755,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // NOTE: No XInclude supported to read instances with @src for now
                 final XFormsInstance sharedXFormsInstance
-                        = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, containingDocument.getIndentedLogger(), instanceStaticId, effectiveId,
-                            absoluteResolvedURLString, null, readonlyHint, false, xxformsTimeToLive, xxformsValidation, INSTANCE_LOADER);
+                        = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, containingDocument.getIndentedLogger(),
+                            instanceStaticId, effectiveId,
+                            absoluteResolvedURLString, null, readonlyHint, false, XFormsProperties.isExposeXPathTypes(containingDocument),
+                            xxformsTimeToLive, xxformsValidation, INSTANCE_LOADER);
 
                 setInstance(sharedXFormsInstance, false);
             } else {
@@ -816,7 +822,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // TODO: Handle validating?
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
                 return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                        null, null, true, timeToLive, validation, handleXInclude);
+                        null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } catch (Exception e) {
                 throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
             } finally {
@@ -1056,7 +1062,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Handle an updated instance after a submission with instance replacement/update.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param updatedInstance   instance to replace or update (can be new instance object or existing one)
      * @param updatedTreeRoot   root of the tree which was updated (can be root element or another element)
      */

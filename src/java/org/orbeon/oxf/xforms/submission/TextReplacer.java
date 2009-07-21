@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -41,6 +41,7 @@ public class TextReplacer extends BaseReplacer {
         // content of the replacement target node."
 
         // Get response body
+// TODO: move this code somewhere else so it can be used by async submissions
         final String responseBody = connectionResult.getTextResponseBody();
         if (responseBody == null) {
             // This is a binary result

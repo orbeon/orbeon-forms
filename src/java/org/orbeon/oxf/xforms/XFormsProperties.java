@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.saxon.om.FastStringBuffer;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,6 +57,7 @@ public class XFormsProperties {
     private static final String OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
+    private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
     private static final String PLAIN_VALUE_CHANGE_PROPERTY = "server.events.plain-value-change";
     private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
     private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
@@ -139,13 +140,13 @@ public class XFormsProperties {
 
         public PropertyDefinition(String name, boolean defaultValue, boolean propagateToClient) {
             this.name = name;
-            this.defaultValue = new Boolean(defaultValue);
+            this.defaultValue = defaultValue;
             isPropagateToClient = propagateToClient;
         }
 
         public PropertyDefinition(String name, int defaultValue, boolean propagateToClient) {
             this.name = name;
-            this.defaultValue = new Integer(defaultValue);
+            this.defaultValue = defaultValue;
             isPropagateToClient = propagateToClient;
         }
 
@@ -165,7 +166,7 @@ public class XFormsProperties {
             if (getDefaultValue() instanceof Integer) {
                 return new Integer(value);
             } else if (getDefaultValue() instanceof Boolean) {
-                return new Boolean(value);
+                return Boolean.valueOf(value);
             } else {
                 return value;
             }
@@ -190,6 +191,7 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
+            new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(PLAIN_VALUE_CHANGE_PROPERTY, false, false),
             new PropertyDefinition(INITIAL_REFRESH_EVENTS_PROPERTY, true, false),
             new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
@@ -245,8 +247,7 @@ public class XFormsProperties {
     private static final Map<Object, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;
     static {
         final Map<Object, PropertyDefinition> tempMap = new HashMap<Object, PropertyDefinition>();
-        for (int i = 0; i < SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS.length; i++) {
-            final PropertyDefinition propertyDefinition = SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS[i];
+        for (final PropertyDefinition propertyDefinition: SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS) {
             tempMap.put(propertyDefinition.name, propertyDefinition);
         }
         SUPPORTED_DOCUMENT_PROPERTIES = Collections.unmodifiableMap(tempMap);
@@ -318,32 +319,32 @@ public class XFormsProperties {
 
     public static boolean isCacheDocument() {
         return Properties.instance().getPropertySet().getBoolean
-                (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT).booleanValue();
+                (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT);
     }
 
     public static int getSessionStoreSize() {
         return Properties.instance().getPropertySet().getInteger
-                (CACHE_SESSION_SIZE_PROPERTY, CACHE_SESSION_SIZE_DEFAULT).intValue();
+                (CACHE_SESSION_SIZE_PROPERTY, CACHE_SESSION_SIZE_DEFAULT);
     }
 
     public static int getApplicationStateStoreSize() {
         return Properties.instance().getPropertySet().getInteger
-                (STORE_APPLICATION_SIZE_PROPERTY, STORE_APPLICATION_SIZE_DEFAULT).intValue();
+                (STORE_APPLICATION_SIZE_PROPERTY, STORE_APPLICATION_SIZE_DEFAULT);
     }
 
     public static int getApplicationCacheSize() {
         return Properties.instance().getPropertySet().getInteger
-                (CACHE_APPLICATION_SIZE_PROPERTY, CACHE_APPLICATION_SIZE_DEFAULT).intValue();
+                (CACHE_APPLICATION_SIZE_PROPERTY, CACHE_APPLICATION_SIZE_DEFAULT);
     }
 
     public static boolean isGZIPState() {
         return Properties.instance().getPropertySet().getBoolean
-                (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT).booleanValue();
+                (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT);
     }
 
     public static boolean isAjaxTest() {
         return Properties.instance().getPropertySet().getBoolean
-                (TEST_AJAX_PROPERTY, TEST_AJAX_DEFAULT).booleanValue();
+                (TEST_AJAX_PROPERTY, TEST_AJAX_DEFAULT);
     }
 
     public static String getStoreUsername() {
@@ -368,12 +369,12 @@ public class XFormsProperties {
 
     public static boolean isHostLanguageAVTs() {
         return Properties.instance().getPropertySet().getBoolean
-                (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT).booleanValue();
+                (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT);
     }
 
     public static boolean isCacheCombinedResources() {
         return Properties.instance().getPropertySet().getBoolean
-                (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT).booleanValue();
+                (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
     }
 
     public static String getStateHandling(XFormsContainingDocument containingDocument) {
@@ -499,6 +500,10 @@ public class XFormsProperties {
 
     public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName) {
         return getStringProperty(containingDocument, TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName);
+    }
+
+    public static boolean isExposeXPathTypes(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, EXPOSE_XPATH_TYPES_PROPERTY);
     }
 
     /**

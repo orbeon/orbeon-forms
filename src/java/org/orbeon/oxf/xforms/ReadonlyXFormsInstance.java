@@ -1,22 +1,22 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Element;
 import org.dom4j.Document;
-import org.orbeon.saxon.om.DocumentInfo;
+import org.dom4j.Element;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.saxon.om.DocumentInfo;
 
 /**
  * XFormsInstance that can be shared among multiple users. It must be passed a DocumentInfo and it is not possible to
@@ -29,8 +29,8 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
     }
 
     public ReadonlyXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
-                                String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
-        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude);
+                                String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
+        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
     public void synchronizeInstanceDataEventState() {
@@ -45,6 +45,6 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
     public XFormsInstance createMutableInstance() {
         final Document mutableDocument = TransformerUtils.tinyTreeToDom4j2(getDocumentInfo());
         return new XFormsInstance(modelEffectiveId, instanceStaticId, mutableDocument, getSourceURI(), getUsername(), getPassword(),
-                isCache(), getTimeToLive(), getValidation(), isHandleXInclude());
+                isCache(), getTimeToLive(), getValidation(), isHandleXInclude(), isExposeXPathTypes());
     }
 }

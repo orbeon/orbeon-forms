@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -52,11 +52,11 @@ public class XFormsServerSharedInstancesCache {
 
     public XFormsInstance findConvertNoLoad(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
                                             String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
-                                            boolean handleXInclude) {
+                                            boolean handleXInclude, boolean exposeXPathTypes) {
 
         // Try to find in cache
         final ReadonlyXFormsInstance existingInstance
-                = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude);
+                = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
         if (existingInstance != null) {
             // Found from the cache
 
@@ -68,13 +68,13 @@ public class XFormsServerSharedInstancesCache {
 
     public XFormsInstance findConvert(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
                                       String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
-                                      boolean handleXInclude, long timeToLive, String validation, Loader loader) {
+                                      boolean handleXInclude, boolean exposeXPathTypes, long timeToLive, String validation, Loader loader) {
 
         final ReadonlyXFormsInstance tempReadonlyInstance;
         {
             // Try to find in cache
             final ReadonlyXFormsInstance existingInstance
-                    = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude);
+                    = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
             if (existingInstance != null) {
                 // Found from the cache
                 tempReadonlyInstance = existingInstance;
@@ -136,7 +136,9 @@ public class XFormsServerSharedInstancesCache {
     }
 
     private synchronized ReadonlyXFormsInstance findInCache(PropertyContext propertyContext, IndentedLogger indentedLogger,
-                                                            String instanceStaticId, String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
+                                                            String instanceStaticId, String modelEffectiveId, String instanceSourceURI,
+                                                            String requestBodyHash, boolean handleXInclude, boolean exposeXPathTypes) {
+
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
 
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
@@ -169,7 +171,7 @@ public class XFormsServerSharedInstancesCache {
             // Return a copy because id, etc. can be different
             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, readonlyInstance.getDocumentInfo(),
                         instanceSourceURI, null, null, readonlyInstance.isCache(), readonlyInstance.getTimeToLive(),
-                    readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude());
+                    readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude(), exposeXPathTypes);
         } else {
             // Not found
             return null;

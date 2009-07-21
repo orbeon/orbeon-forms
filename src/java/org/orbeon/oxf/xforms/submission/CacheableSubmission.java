@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -94,7 +95,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Try from cache first
         final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
                 submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
-                handleXInclude);
+                handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
 
         if (cacheResult != null) {
             // Result was immediately available, so return it right away
@@ -104,8 +105,9 @@ public class CacheableSubmission extends BaseSubmission {
             // Create callable for synchronous or asynchronous loading
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
                 public SubmissionResult call() {
-                    return new SubmissionResult(submissionEffectiveId, XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
-                            absoluteResolvedURLString, requestBodyHash, isReadonly, handleXInclude, timeToLive, validation,
+                    return new SubmissionResult(submissionEffectiveId, XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
+                                submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                                handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
                                 public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,
                                                                    String modelEffectiveId, String instanceSourceURI,
@@ -135,7 +137,8 @@ public class CacheableSubmission extends BaseSubmission {
 
                                         // Create new shared instance
                                         return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude);
+                                                p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude,
+                                                XFormsProperties.isExposeXPathTypes(containingDocument));
                                     } catch (Exception e) {
                                         throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
                                     } finally {

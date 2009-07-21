@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -73,6 +73,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private String password;
     private String validation;
     private boolean handleXInclude;
+    private boolean exposeXPathTypes;
 
     /**
      * Whether the instance was ever replaced. This is useful so that we know whether we can use an instance from the
@@ -109,6 +110,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.password = containerElement.attributeValue("password");
         this.validation = containerElement.attributeValue("validation");
         this.handleXInclude = "true".equals(containerElement.attributeValue("xinclude"));
+        this.exposeXPathTypes = "true".equals(containerElement.attributeValue("types"));
 
         this.replaced = "true".equals(containerElement.attributeValue("replaced"));
 
@@ -120,8 +122,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (xmlString.length() > 0) {
                 // Instance document is available in serialized form
                 if (!readonly) {
-                    // Make a typed document wrapper
-                    documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                    if (exposeXPathTypes) {
+                        // Make a typed document wrapper
+                        documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                    } else {
+                        // Make a non-typed document wrapper
+                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                    }
                 } else {
                     // Just use TinyTree as is
                     documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
@@ -138,15 +145,18 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI,
-                          String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
+                          String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         // NOTE: Make a typed document wrapper
-        this(modelEffectiveId, instanceStaticId, new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
-                instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude);
+        this(modelEffectiveId, instanceStaticId,
+                exposeXPathTypes
+                        ? new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration())
+                        : new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
+                instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
     protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
-                             String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude) {
+                             String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
 
         if (cache && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:cache=\"true\".");
@@ -164,6 +174,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.password = password;
         this.validation = validation;
         this.handleXInclude = handleXInclude;
+        this.exposeXPathTypes = exposeXPathTypes;
 
         this.documentInfo = instanceDocumentInfo;
     }
@@ -202,6 +213,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             instanceElement.addAttribute("validation", validation);
         if (handleXInclude)
             instanceElement.addAttribute("xinclude", "true");
+        if (exposeXPathTypes)
+            instanceElement.addAttribute("types", "true");
 
         if (replaced)
             instanceElement.addAttribute("replaced", "true");
@@ -295,6 +308,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public boolean isHandleXInclude() {
         return handleXInclude;
+    }
+
+    public boolean isExposeXPathTypes() {
+        return exposeXPathTypes;
     }
 
     public boolean isReplaced() {

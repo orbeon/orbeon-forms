@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.submission;
 import org.dom4j.Document;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
@@ -93,6 +90,38 @@ public class InstanceReplacer extends BaseReplacer {
                             new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
 
+                // Serialize response
+// TODO: move this code somewhere else so it can be used by async submissions
+                final Object resultingDocument;
+                try {
+                    // Create resulting instance whether entire instance is replaced or not, because this:
+                    // 1. Wraps a Document within a DocumentInfo if needed
+                    // 2. Performs text nodes adjustments if needed
+                    if (!p2.resolvedXXFormsReadonly) {
+                        // Resulting instance must not be read-only
+
+                        // TODO: What about configuring validation? And what default to choose?
+                        resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, p2.resolvedXXFormsHandleXInclude);
+
+                        if (XFormsServer.logger.isDebugEnabled())
+                            containingDocument.logDebug("submission", "replacing instance with mutable instance",
+                                "instance", updatedInstance.getEffectiveId());
+                    } else {
+                        // Resulting instance must be read-only
+
+                        // TODO: What about configuring validation? And what default to choose?
+                        // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
+                        resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, p2.resolvedXXFormsHandleXInclude);
+
+                        if (XFormsServer.logger.isDebugEnabled())
+                            containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                                "instance", updatedInstance.getEffectiveId());
+                    }
+                } catch (Exception e) {
+                    throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
+                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
+                }
+
                 // Obtain root element to insert
                 final NodeInfo newDocumentRootElement;
                 final XFormsInstance newInstance;
@@ -103,32 +132,23 @@ public class InstanceReplacer extends BaseReplacer {
                     if (!p2.resolvedXXFormsReadonly) {
                         // Resulting instance must not be read-only
 
-                        // TODO: What about configuring validation? And what default to choose?
-                        final Document resultingInstanceDocument
-                                = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, p2.resolvedXXFormsHandleXInclude);
-
                         if (XFormsServer.logger.isDebugEnabled())
                             containingDocument.logDebug("submission", "replacing instance with mutable instance",
                                 "instance", updatedInstance.getEffectiveId());
 
                         newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                                resultingInstanceDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
-                                false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude);
+                                (Document) resultingDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
+                                false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                     } else {
                         // Resulting instance must be read-only
-
-                        // TODO: What about configuring validation? And what default to choose?
-                        // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                        final DocumentInfo resultingInstanceDocument
-                                = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, p2.resolvedXXFormsHandleXInclude);
 
                         if (XFormsServer.logger.isDebugEnabled())
                             containingDocument.logDebug("submission", "replacing instance with read-only instance",
                                 "instance", updatedInstance.getEffectiveId());
 
                         newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                                resultingInstanceDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
-                                false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude);
+                                (DocumentInfo) resultingDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
+                                false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                     }
                     newDocumentRootElement = newInstance.getInstanceRootElementInfo();
                 } catch (Exception e) {

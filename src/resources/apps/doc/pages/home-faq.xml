@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <document>
     <header>
         <title>Orbeon Forms FAQ</title>
@@ -172,30 +169,20 @@
             <section added="2007-01-06">
                 <title>Where do I find the source code?</title>
                 <p>
-                    In the OW2 CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
-                    page</a> provides the instructions to retrieve it. You can also <a
-                    href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
-                    web browser.
-                </p>
-                <p>
-                    Use the <code>orbeon</code> CVS module for Orbeon Forms proper, and the <code>saxon</code> CVS
-                    module for the Saxon source code (which sometimes contains fixes against the latest released
-                    Saxon).
+                    Since July 2009, the source code has migrated from the older CVS repository to the git repository
+                    on github. More information on the wiki: <a
+                    href="http://wiki.orbeon.com/forms/doc/contributor-guide/orbeon-source-code-repository">Orbeon
+                    Source Code Repository</a>.
                 </p>
             </section>
             <a name="source-code-version"/>
             <section added="2007-02-19">
                 <title>Where do I find the source code for a particular release of Orbeon Forms?</title>
                 <p>
-                    It's easy: each Orbeon Forms release is tagged with a version number including a time stamp. Say you
-                    downloaded the binary release <code>orbeon-3.6.0.200712061930.zip</code> or
-                    <code>orbeon-dev-post-3.7.1.200907140655.zip</code>. From there, you infer the following CVS tags:
-                    <code>TAG_OPS_3_6_0_200712061930</code> or <code>TAG_OPS_dev_post_3_7_1_200907140655</code>. You
-                    then get the source code from CVS using:
+                    More information on the wiki: <a
+                    href="http://wiki.orbeon.com/forms/doc/contributor-guide/orbeon-source-code-repository">Orbeon
+                    Source Code Repository</a>.
                 </p>
-                <xml-source>
-                    cvs -z3 -d:pserver:anonymous@cvs.forge.objectweb.org:/cvsroot/ops co -r TAG_OPS_3_6_0_200712061930 orbeon
-                </xml-source>
             </section>
             <a name="issue-fixing"/>
             <section added="2007-06-22">
@@ -404,27 +391,26 @@
             <section added="2008-03-01">
                 <title>What's going on with development?</title>
                 <p>
-                    Orbeon developers often talk about Orbeon Forms development in the <a
-                    href="#mailing-list">mailing-list</a> and on the <a href="http://www.orbeon.com/blog/">XForms
-                    Everywhere blog</a>.
-                </p>
-                <p>
-                    There is also a mailing-list for CVS commits:
+                    You can find information about the latest Orbeon Forms development on:
                 </p>
                 <ul>
                     <li>
-                        <a href="http://www.ow2.org/wws/arc/ops-commits">Home of the ops-commits mailing-list</a>
+                        <a href="http://twitter.com/orbeon">Twitter</a>
                     </li>
                     <li>
-                        <a href="http://mail-archive.ow2.org/ops-commits/index.html">ops-commits mailing-list archive</a>
+                        <a href="#mailing-list">the ops-users mailing-list</a>
                     </li>
                     <li>
-                        <a href="http://mailbucket.org/ops-commits.xml">RSS feed of ops-commits</a> (at mailbucket)
+                        <a href="http://www.orbeon.com/blog/">the XForms Everywhere blog</a>
                     </li>
                     <li>
-                        <a href="http://mailbucket.org/simple/ops-commits">Last entries of ops-commits</a> (at mailbucket)
+                        <a href="http://wiki.orbeon.com/forms/">the wiki</a>
                     </li>
                 </ul>
+                <p>
+                    In addition, the entire list of commits is <a
+                    href="http://github.com/orbeon/orbeon-forms/commits/">available on github</a>.
+                </p>
             </section>
         </section>
         <a name="form-builder"/>

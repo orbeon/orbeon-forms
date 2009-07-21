@@ -348,6 +348,7 @@ public class XFormsModelSchemaValidator {
                 return false;
         }
 
+        // TODO: MSV doesn't allow getting the type if validity check fails. However, we would like to obtain datatype validity in XForms.
         if (!childAcceptor.isAcceptState(null)) {
             if (isReportErrors) {
                 childAcceptor.isAcceptState(stringRef);

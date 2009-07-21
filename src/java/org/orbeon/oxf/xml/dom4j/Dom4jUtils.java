@@ -20,17 +20,17 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import java.io.*;
-import java.util.*;
 import java.net.URL;
+import java.util.*;
 
 /**
  * Collection of util routines for working with DOM4J.  In particular offers many methods found
@@ -43,7 +43,7 @@ public class Dom4jUtils {
 
     /**
      * 03/30/2005 d : Currently DOM4J doesn't really support read only documents.  ( No real
-     * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENt should be made a
+     * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENT should be made a
      * read only document.
      */
     public static final Document NULL_DOCUMENT;
@@ -139,7 +139,7 @@ public class Dom4jUtils {
                 break;
             }
             case Node.TEXT_NODE: {
-                ret = ((Text) node).getText();
+                ret = node.getText();
                 break;
             }
             default :
@@ -295,7 +295,7 @@ public class Dom4jUtils {
         } else if (o instanceof String)
             buff.append((String) o);
         else if (o instanceof Number)
-            buff.append((Number) o);
+            buff.append(o);
         else
             throw new OXFException("Should never happen");
         return buff.toString();
@@ -325,9 +325,9 @@ public class Dom4jUtils {
                             final Text previousNodeText = (Text) previousNode;
                             if (sb == null)
                                 sb = new StringBuffer(previousNodeText.getText());
-                            sb.append(((Text) currentNode).getText());
+                            sb.append(currentNode.getText());
                             nodesToDetatch.add(currentNode);
-                        } else if (previousNode instanceof Text && !(currentNode instanceof Text)) {
+                        } else if (previousNode instanceof Text) {
                             // Update node if needed
                             if (sb != null) {
                                 previousNode.setText(sb.toString());
@@ -740,7 +740,7 @@ public class Dom4jUtils {
     public static LocationData getLocationData(final int depth, boolean isDebug) {
         // Enable this with a property for debugging only, as it is time consuming
         if (!isDebug && !org.orbeon.oxf.properties.Properties.instance().getPropertySet()
-                .getBoolean("oxf.debug.enable-java-location-data", false).booleanValue())
+                .getBoolean("oxf.debug.enable-java-location-data", false))
             return null;
 
         // Compute stack trace and extract useful information

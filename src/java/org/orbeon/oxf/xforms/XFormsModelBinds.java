@@ -19,8 +19,8 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -113,7 +113,7 @@ public class XFormsModelBinds {
     /**
      * Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public void rebuild(PropertyContext propertyContext) {
 
@@ -142,7 +142,7 @@ public class XFormsModelBinds {
     /**
      * Apply calculate binds.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public void applyCalculateBinds(final PropertyContext propertyContext) {
 
@@ -214,6 +214,7 @@ public class XFormsModelBinds {
      * Apply validation binds
      *
      * @param propertyContext   current PropertyContext
+     * @param invalidInstances
      */
     public void applyValidationBinds(final PropertyContext propertyContext, final Map<String, String> invalidInstances) {
 
@@ -295,6 +296,7 @@ public class XFormsModelBinds {
      *     }
      * };
      *
+     * @param containingDocument
      * @return  JSON string
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
@@ -526,6 +528,9 @@ public class XFormsModelBinds {
 
     /**
      * Iterate over all binds and for each one do the callback.
+     *
+     * @param propertyContext   current context
+     * @param bindRunner
      */
     private void iterateBinds(PropertyContext propertyContext, BindRunner bindRunner) {
         // Iterate over top-level binds
@@ -1100,10 +1105,6 @@ public class XFormsModelBinds {
 
         public String getXXFormsDefault() {
             return bindElement.attributeValue(XFormsConstants.XXFORMS_DEFAULT_QNAME);
-        }
-
-        public String getXXFormsExternalize() {
-            return bindElement.attributeValue(XFormsConstants.XXFORMS_EXTERNALIZE_QNAME);
         }
 
         public Map<String, String> getCustomMips() {

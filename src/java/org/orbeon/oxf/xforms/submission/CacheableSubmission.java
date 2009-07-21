@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
@@ -72,6 +72,7 @@ public class CacheableSubmission extends BaseSubmission {
         }
 
         // Parameters to callable
+        final String submissionEffectiveId = submission.getEffectiveId();
         final String instanceStaticId;
         final String modelEffectiveId;
         final String validation;
@@ -98,12 +99,12 @@ public class CacheableSubmission extends BaseSubmission {
         if (cacheResult != null) {
             // Result was immediately available, so return it right away
             // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
-            return new SubmissionResult(cacheResult);
+            return new SubmissionResult(submissionEffectiveId, cacheResult);
         } else {
             // Create callable for synchronous or asynchronous loading
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
                 public SubmissionResult call() {
-                    return new SubmissionResult(XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
+                    return new SubmissionResult(submissionEffectiveId, XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, submissionLogger, instanceStaticId, modelEffectiveId,
                             absoluteResolvedURLString, requestBodyHash, isReadonly, handleXInclude, timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
                                 public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,

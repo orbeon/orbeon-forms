@@ -17,15 +17,22 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.XFormsInstance;
 
 public class SubmissionResult {
+    private String submissionEffectiveId;
     private ConnectionResult connectionResult;
     private XFormsInstance instance;
 
-    public SubmissionResult(ConnectionResult connectionResult) {
+    public SubmissionResult(String submissionEffectiveId, ConnectionResult connectionResult) {
+        this.submissionEffectiveId = submissionEffectiveId;
         this.connectionResult = connectionResult;
     }
 
-    public SubmissionResult(XFormsInstance instance) {
+    public SubmissionResult(String submissionEffectiveId, XFormsInstance instance) {
+        this.submissionEffectiveId = submissionEffectiveId;
         this.instance = instance;
+    }
+
+    public String getSubmissionEffectiveId() {
+        return submissionEffectiveId;
     }
 
     public ConnectionResult getConnectionResult() {

@@ -1,15 +1,15 @@
-<!--~
-  ~ Copyright (C) 2009 Orbeon, Inc.
-  ~
-  ~ This program is free software; you can redistribute it and/or modify it under the terms of the
-  ~ GNU Lesser General Public License as published by the Free Software Foundation; either version
-  ~ 2.1 of the License, or (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  ~ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  ~ See the GNU Lesser General Public License for more details.
-  ~
-  ~ The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -57,6 +57,14 @@
                 <dummy/>
             </xforms:instance>
 
+            <xforms:instance id="instance-delays">
+                <delays>
+                    <delay/>
+                    <delay/>
+                    <delay/>
+                </delays>
+            </xforms:instance>
+
             <xforms:submission id="replace-none" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
@@ -78,6 +86,11 @@
                 method="get" resource="http://www.orbeon.com/ops/xforms-sandbox/service/zip-states"
                 serialization="none" xxforms:cache="false"
                 replace="instance" targetref="instance('instance-result-2')"/>
+
+            <xforms:submission id="replace-delay" mode="asynchronous"
+                method="get" resource="/xforms-sandbox/service/sleep?delay={event('my-delay')}"
+                serialization="none"
+                replace="instance" targetref="instance('instance-delays')/delay[. = '']"/>
 
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:send submission="replace-none"/>
@@ -101,6 +114,24 @@
         <xforms:submit submission="replace-instance-1">
             <xforms:label>Test replace="instance"</xforms:label>
         </xforms:submit>
+
+        <xforms:trigger>
+            <xforms:label>Test order of responses</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <!-- Clear values -->
+                <xforms:setvalue xxforms:iterate="instance('instance-delays')/*" ref="."/>
+                <!-- Send submission in reverse order of expected responses -->
+                <xforms:send submission="replace-delay">
+                    <xxforms:context name="my-delay" select="5"/>
+                </xforms:send>
+                <xforms:send submission="replace-delay">
+                    <xxforms:context name="my-delay" select="3"/>
+                </xforms:send>
+                <xforms:send submission="replace-delay">
+                    <xxforms:context name="my-delay" select="1"/>
+                </xforms:send>
+            </xforms:action>
+        </xforms:trigger>
 
         <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 

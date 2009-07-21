@@ -47,9 +47,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * Represents an XForms model submission instance.
@@ -79,7 +79,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String targetref;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
     private String avtMode;
 
-    private String avtVersion;
+    private String avtVersion;  
     private String avtEncoding;
     private String avtMediatype;
     private String avtIndent;

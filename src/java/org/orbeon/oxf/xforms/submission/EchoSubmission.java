@@ -66,6 +66,6 @@ public class EchoSubmission extends BaseSubmission {
         connectionResult.dontHandleResponse = false;
         connectionResult.setResponseInputStream(new ByteArrayInputStream(sp.messageBody));
 
-        return new SubmissionResult(connectionResult);
+        return new SubmissionResult(submission.getEffectiveId(), connectionResult);
     }
 }

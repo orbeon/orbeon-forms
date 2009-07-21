@@ -47,7 +47,7 @@ import org.orbeon.saxon.value.SequenceExtent;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Represents an XForms containing document.
@@ -476,26 +476,84 @@ public class XFormsContainingDocument extends XBLContainer {
     private static class AsynchronousSubmission {
         public Future<SubmissionResult> future;
         public String submissionEffectiveId;
-        public boolean isBackground;
 
-        public AsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId, boolean isBackground) {
+        public AsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId) {
             this.future = future;
             this.submissionEffectiveId = submissionEffectiveId;
-            this.isBackground = isBackground;
         }
     }
 
-    public void addAsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId, boolean isBackground) {
+    // Global thread pool
+    private static ExecutorService threadPool = Executors.newCachedThreadPool();
+
+    // See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/ExecutorCompletionService.html
+    private CompletionService<SubmissionResult> completionService = new ExecutorCompletionService<SubmissionResult>(threadPool);
+
+    public void addAsynchronousSubmission(final Callable<SubmissionResult> callable, String submissionEffectiveId, boolean isBackground) {
 
         // Add submission future
         if (isBackground) {
+            // Background async submission
+            final Future<SubmissionResult> future = completionService.submit(callable);
+
             if (backgroundAsynchronousSubmissions == null)
                 backgroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-            backgroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
+            backgroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId));
         } else {
+            // Foreground async submission
+            final Future<SubmissionResult> future = new Future<SubmissionResult>() {
+
+                private boolean isDone;
+                private boolean isCanceled;
+
+                private SubmissionResult result;
+
+                public boolean cancel(boolean b) {
+                    if (isDone)
+                        return false;
+                    isCanceled = true;
+                    return true;
+                }
+
+                public boolean isCancelled() {
+                    return isCanceled;
+                }
+
+                public boolean isDone() {
+                    return isDone;
+                }
+
+                public SubmissionResult get() throws InterruptedException, ExecutionException {
+                    if (isCanceled)
+                        throw new CancellationException();
+
+                    if (!isDone) {
+                        try {
+                            result = callable.call();
+                        } catch (Exception e) {
+                            throw new ExecutionException(e);
+                        }
+
+                        isDone = true;
+                    }
+
+                    return result;
+                }
+
+                public SubmissionResult get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+                    return get();
+                }
+            };
+
             if (foregroundAsynchronousSubmissions == null)
                 foregroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-            foregroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId, isBackground));
+            foregroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId));
+
+            // NOTE: In this very basic level of support, we don't support
+            // xforms-submit-done / xforms-submit-error handlers
+
+            // TODO: Do something with result, e.g. log?
+            // final ConnectionResult connectionResult = ...
         }
     }
 
@@ -517,31 +575,28 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private void processBackgroundAsynchronousSubmissionsBatch(PropertyContext propertyContext) {
 
-        // Get then reset current list and reset
+        // Get then reset current batch list
         final List<AsynchronousSubmission> submissionsToProcess = backgroundAsynchronousSubmissions;
         backgroundAsynchronousSubmissions = null;
 
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
-
         startHandleOperation(LOG_TYPE, "processing background asynchronous submissions");
         int count = 0;
         try {
-            for (Iterator<AsynchronousSubmission> i = submissionsToProcess.iterator(); i.hasNext(); count++) {
-                final AsynchronousSubmission asyncSubmission = i.next();
+            final int size = submissionsToProcess.size();
+            for (; count < size; count++) {
                 try {
-                    // Submission was already started. We wait to get its result
-                    final SubmissionResult result = asyncSubmission.future.get();
+                    // Handle next completed task
+                    final SubmissionResult result = completionService.take().get();
 
                     // Process response by dispatching an event to the submission
-                    final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(asyncSubmission.submissionEffectiveId);
+                    final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
                     submission.getXBLContainer(this).dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(submission, result));
 
                 } catch (Exception e) {
                     // Something bad happened
                     throw new OXFException(e);
                 }
-                // Remove submission from list of submission so we can gc the Runnable
-                i.remove();
             }
         } finally {
             endHandleOperation("count", Integer.toString(count));
@@ -549,7 +604,7 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public void processForegroundAsynchronousSubmissions() {
-        // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
+        // NOTE: See http://wiki.orbeon.com/forms/doc/developer-guide/asynchronous-submissions
         if (hasForegroundAsynchronousSubmissions()) {
             startHandleOperation(LOG_TYPE, "processing foreground asynchronous submissions");
             int count = 0;
@@ -787,7 +842,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Tell the client that focus must be changed to the given effective control id.
      *
-     * This can be called several times, but only the last controld id is remembered.
+     * This can be called several times, but only the last control id is remembered.
      *
      * @param effectiveControlId
      */

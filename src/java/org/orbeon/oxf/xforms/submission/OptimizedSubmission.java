@@ -13,24 +13,24 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.xml.XMLUtils;
 
-import java.net.URI;
-import java.util.Map;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * Optimized submission doesn't issue HTTP requests but goes through the Servlet API.
@@ -181,7 +181,7 @@ public class OptimizedSubmission extends BaseSubmission {
         if (connectionResult.dontHandleResponse)
             containingDocument.setGotSubmissionReplaceAll();
 
-        return new SubmissionResult(connectionResult);
+        return new SubmissionResult(submission.getEffectiveId(), connectionResult);
     }
 
     /**

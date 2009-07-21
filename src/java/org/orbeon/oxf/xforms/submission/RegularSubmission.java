@@ -68,6 +68,8 @@ public class RegularSubmission extends BaseSubmission {
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
 
+        final String submissionEffectiveId = submission.getEffectiveId();
+
         // Pack external call into a Runnable so it can be run:
         // o now and synchronously
         // o now and asynchronously
@@ -80,7 +82,7 @@ public class RegularSubmission extends BaseSubmission {
                 // NOTE: If the submission was truly asynchronous, we should not touch ExternalContext either.
                 // But currently, since the submission actually runs at the end of a request, we do have access to
                 // ExternalContext, so we still use it.
-                return new SubmissionResult(new Connection().open(externalContext, connectionLogger, logBody,
+                return new SubmissionResult(submissionEffectiveId, new Connection().open(externalContext, connectionLogger, logBody,
                         p.actualHttpMethod, absoluteResolvedURL, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders));

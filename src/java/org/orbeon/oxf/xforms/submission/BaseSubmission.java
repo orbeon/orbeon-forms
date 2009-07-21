@@ -30,15 +30,12 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
 
 public abstract class BaseSubmission implements Submission {
 
     protected final XFormsModelSubmission submission;
     protected final XFormsContainingDocument containingDocument;
-
-    // Global thread pool
-    private static ExecutorService threadPool = Executors.newCachedThreadPool();
 
     protected BaseSubmission(XFormsModelSubmission submission) {
         this.submission = submission;
@@ -160,70 +157,8 @@ public abstract class BaseSubmission implements Submission {
             // replace="instance|text" in the background.
             final boolean isRunInBackground = !p.isReplaceNone;
 
-            if (isRunInBackground) {
-                // Submission runs immediately in a separate thread
-
-                final Future<SubmissionResult> future = threadPool.submit(callable);
-
-                // Tell XFCD that we have one more async submission
-                containingDocument.addAsynchronousSubmission(future, submission.getEffectiveId(), true);
-
-            } else {
-                // Submission will run after response is sent to the client
-
-                // Tell XFCD that we have one more async submission
-                final Future<SubmissionResult> future = new Future<SubmissionResult>() {
-
-                    private boolean isDone;
-                    private boolean isCanceled;
-
-                    private SubmissionResult result;
-
-                    public boolean cancel(boolean b) {
-                        if (isDone)
-                            return false;
-                        isCanceled = true;
-                        return true;
-                    }
-
-                    public boolean isCancelled() {
-                        return isCanceled;
-                    }
-
-                    public boolean isDone() {
-                        return isDone;
-                    }
-
-                    public SubmissionResult get() throws InterruptedException, ExecutionException {
-                        if (isCanceled)
-                            throw new CancellationException();
-
-                        if (!isDone) {
-                            try {
-                                result = callable.call();
-                            } catch (Exception e) {
-                                throw new ExecutionException(e);
-                            }
-
-                            isDone = true;
-                        }
-
-                        return result;
-                    }
-
-                    public SubmissionResult get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-                        return get();
-                    }
-                };
-
-                containingDocument.addAsynchronousSubmission(future, submission.getEffectiveId(), false);
-
-                // NOTE: In this very basic level of support, we don't support
-                // xforms-submit-done / xforms-submit-error handlers
-
-                // TODO: Do something with result, e.g. log?
-                // final ConnectionResult connectionResult = ...
-            }
+            // Tell XFCD that we have one more async submission
+            containingDocument.addAsynchronousSubmission(callable, submission.getEffectiveId(), isRunInBackground);
 
             // Tell caller he doesn't need to do anything
             return null;

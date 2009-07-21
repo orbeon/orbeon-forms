@@ -13,18 +13,17 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.dom4j.Element;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.Item;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Constants useful for the XForms engine. 
@@ -251,7 +250,6 @@ public class XFormsConstants {
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OFFLINE_QNAME = new QName("offline", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);

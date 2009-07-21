@@ -1,3 +1,16 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <component name="CopyrightManager">
   <settings default="">
     <module2copyright>
@@ -20,7 +33,7 @@
     <LanguageOptions name="XML">
       <option name="fileTypeOverride" value="3" />
       <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
+      <option name="addBlankAfter" value="false" />
       <option name="fileLocation" value="1" />
       <option name="block" value="true" />
       <option name="separateBefore" value="false" />

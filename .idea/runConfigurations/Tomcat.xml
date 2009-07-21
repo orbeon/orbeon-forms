@@ -1,0 +1,33 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Tomcat" type="Remote" factoryName="Remote">
+    <option name="USE_SOCKET_TRANSPORT" value="true" />
+    <option name="SERVER_MODE" value="false" />
+    <option name="SHMEM_ADDRESS" value="javadebug" />
+    <option name="HOST" value="localhost" />
+    <option name="PORT" value="61155" />
+    <RunnerSettings RunnerId="Debug">
+      <option name="DEBUG_PORT" value="61155" />
+      <option name="TRANSPORT" value="0" />
+      <option name="LOCAL" value="false" />
+    </RunnerSettings>
+    <ConfigurationWrapper RunnerId="Debug" />
+    <method>
+      <option name="AntTarget" enabled="false" />
+      <option name="Make" enabled="false" />
+      <option name="Maven.BeforeRunTask" enabled="false" />
+    </method>
+  </configuration>
+</component>

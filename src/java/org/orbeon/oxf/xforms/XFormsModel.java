@@ -879,6 +879,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // TODO: Handle validating and XInclude!
 
                 // Read result as XML
+                // TODO: use submission code
                 if (!isReadonlyHint) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                 } else {
@@ -935,6 +936,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: Handle validating and handleXInclude!
 
             // Read result as XML
+            // TODO: use submission code
             if (!isReadonlyHint) {
                 instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
             } else {

@@ -31,6 +31,10 @@ public class AllReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
+    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+        // NOP
+    }
+
     //private void doReplaceAll(PipelineContext pipelineContext, ConnectionResult connectionResult, boolean deferredSubmissionSecondPassReplaceAll) throws IOException {
 
     public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {

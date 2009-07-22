@@ -151,7 +151,7 @@ public abstract class BaseSubmission implements Submission {
      * @return ConnectionResult or null if asynchronous
      */
     protected SubmissionResult submitCallable(XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, final Callable<SubmissionResult> callable) throws Exception {
-        if (isAsyncSubmission(p2)) {
+        if (p2.isAsynchronous) {
 
             // This is probably a temporary setting: we run replace="none" in the foreground later, and
             // replace="instance|text" in the background.
@@ -166,10 +166,5 @@ public abstract class BaseSubmission implements Submission {
             // Just run it now
             return callable.call();
         }
-    }
-
-    // This method is here just so that CacheableSubmission can override it
-    protected boolean isAsyncSubmission(XFormsModelSubmission.SecondPassParameters p2) {
-        return p2.isAsyncSubmission;
     }
 }

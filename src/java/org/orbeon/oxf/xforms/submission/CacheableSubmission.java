@@ -25,10 +25,12 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
@@ -39,6 +41,27 @@ import java.util.concurrent.Callable;
  */
 public class CacheableSubmission extends BaseSubmission {
 
+    private static final ConnectionResult CONSTANT_CONNECTION_RESULT;
+    static {
+        CONSTANT_CONNECTION_RESULT = new ConnectionResult(null) {
+            @Override
+            public boolean hasContent() {
+                return true;
+            }
+        };
+        CONSTANT_CONNECTION_RESULT.statusCode = 200;
+        CONSTANT_CONNECTION_RESULT.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
+        CONSTANT_CONNECTION_RESULT.setLastModified(null);
+        CONSTANT_CONNECTION_RESULT.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
+        CONSTANT_CONNECTION_RESULT.dontHandleResponse = false;
+        try {
+            CONSTANT_CONNECTION_RESULT.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
+        } catch (IOException e) {
+            // Should not happen
+            throw new OXFException(e);
+        }
+    }
+
     public CacheableSubmission(XFormsModelSubmission submission) {
         super(submission);
     }
@@ -46,8 +69,8 @@ public class CacheableSubmission extends BaseSubmission {
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        // Match if the submission has xxforms:cache="true"
-        return p2.resolvedXXFormsCache;
+        // Match if the submission has replace="instance" and xxforms:cache="true"
+        return p.isReplaceInstance && p2.resolvedXXFormsCache;
     }
 
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
@@ -92,6 +115,11 @@ public class CacheableSubmission extends BaseSubmission {
         // Create new logger as the submission might be asynchronous
         final IndentedLogger submissionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
 
+        // Obtain replacer
+        // Pass a pseudo connection result which contains information used by getReplacer()
+        // We know that we will get an InstanceReplacer
+        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(propertyContext, CONSTANT_CONNECTION_RESULT, p);
+
         // Try from cache first
         final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
                 submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
@@ -100,12 +128,18 @@ public class CacheableSubmission extends BaseSubmission {
         if (cacheResult != null) {
             // Result was immediately available, so return it right away
             // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
-            return new SubmissionResult(submissionEffectiveId, cacheResult);
+
+            // Here we cheat a bit: instead of calling generically deserialize(), we directly set the instance document
+            replacer.setInstance(cacheResult);
+
+            // Return result
+            return new SubmissionResult(submissionEffectiveId, replacer, CONSTANT_CONNECTION_RESULT);
         } else {
             // Create callable for synchronous or asynchronous loading
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
                 public SubmissionResult call() {
-                    return new SubmissionResult(submissionEffectiveId, XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
+                    try {
+                        final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
                                 submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
@@ -116,44 +150,71 @@ public class CacheableSubmission extends BaseSubmission {
                                     // Call regular submission
                                     SubmissionResult submissionResult = null;
                                     try {
-                                        // Run regular submission but force synchronous execution
-                                        submissionResult = new RegularSubmission(submission) {
-                                            @Override
-                                            protected boolean isAsyncSubmission(XFormsModelSubmission.SecondPassParameters p2) {
-                                                return false;
-                                            }
-                                        }.connect(propertyContext, p, p2, sp);
+                                        // Run regular submission but force synchronous execution and readonly result
+                                        final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
+                                        submissionResult = new RegularSubmission(submission).connect(propertyContext, p, updatedP2, sp);
 
-                                        final ConnectionResult connectionResult = submissionResult.getConnectionResult();
+                                        // Check if the connection returned a throwable
+                                        final Throwable throwable = submissionResult.getThrowable();
+                                        if (throwable != null) {
+                                            // Propagate
+                                            throw new ThrowableWrapper(throwable, submissionResult.getConnectionResult());
+                                        } else {
+                                            // There was no throwable
+                                            // We know that RegularSubmission returns a Replacer with an instance document
+                                            final DocumentInfo documentInfo = (DocumentInfo) ((InstanceReplacer) submissionResult.getReplacer()).getResultingDocument();
 
-                                        // Handle connection errors
-                                        if (connectionResult.statusCode != 200) {
-                                            submissionResult.close();
-                                            throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
+                                            // Create new shared instance
+                                            return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
+                                                    updatedP2.resolvedXXFormsUsername, updatedP2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude,
+                                                    XFormsProperties.isExposeXPathTypes(containingDocument));
                                         }
-                                        // Read into TinyTree
-                                        // TODO: Handle validating?
-                                        final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
-
-                                        // Create new shared instance
-                                        return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude,
-                                                XFormsProperties.isExposeXPathTypes(containingDocument));
-                                    } catch (Exception e) {
-                                        throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
-                                    } finally {
-                                        // Clean-up
-                                        if (submissionResult != null)
-                                            submissionResult.close();
+                                    } catch (ThrowableWrapper throwableWrapper) {
+                                        // In case we just threw it above, just propagate
+                                        throw throwableWrapper;
+                                    } catch (Throwable throwable) {
+                                        // Exceptions are handled further down
+                                        throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.getConnectionResult() : null);
                                     }
                                 }
-                            }));
+                            });
+
+                        // Here we cheat a bit: instead of calling generically deserialize(), we directly set the DocumentInfo
+                        replacer.setInstance(newInstance);
+
+                        // Return result
+                        return new SubmissionResult(submissionEffectiveId, replacer, CONSTANT_CONNECTION_RESULT);
+                    } catch (ThrowableWrapper throwableWrapper) {
+                        // The ThrowableWrapper was thrown within the inner load() method above
+                        return new SubmissionResult(submissionEffectiveId, throwableWrapper.getThrowable(), throwableWrapper.getConnectionResult());
+                    } catch (Throwable throwable) {
+                        // Any other throwable
+                        return new SubmissionResult(submissionEffectiveId, throwable, null);
+                    }
                 }
             };
 
             // Submit the callable
             // This returns null if the execution is asynchronous
             return submitCallable(p, p2, callable);
+        }
+    }
+
+    private static class ThrowableWrapper extends RuntimeException {
+        final Throwable throwable;
+        final ConnectionResult connectionResult;
+
+        private ThrowableWrapper(Throwable throwable, ConnectionResult connectionResult) {
+            this.throwable = throwable;
+            this.connectionResult = connectionResult;
+        }
+
+        public Throwable getThrowable() {
+            return throwable;
+        }
+
+        public ConnectionResult getConnectionResult() {
+            return connectionResult;
         }
     }
 

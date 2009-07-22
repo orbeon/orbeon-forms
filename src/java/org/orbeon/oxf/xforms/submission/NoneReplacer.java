@@ -26,6 +26,10 @@ public class NoneReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
+    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+        // NOP
+    }
+
     public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // Just notify that processing is terminated by dispatching xforms-submit-done
         dispatchSubmitDone(propertyContext, connectionResult);

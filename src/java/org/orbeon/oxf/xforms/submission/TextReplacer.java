@@ -28,8 +28,14 @@ import java.io.IOException;
  */
 public class TextReplacer extends BaseReplacer {
 
+    private String responseBody;
+
     public TextReplacer(XFormsModelSubmission submission, XFormsContainingDocument containingDocument) {
         super(submission, containingDocument);
+    }
+
+    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+        responseBody = connectionResult.getTextResponseBody();
     }
 
     public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
@@ -40,9 +46,6 @@ public class TextReplacer extends BaseReplacer {
         // specifier of text/*), then the response data is encoded as text and replaces the
         // content of the replacement target node."
 
-        // Get response body
-// TODO: move this code somewhere else so it can be used by async submissions
-        final String responseBody = connectionResult.getTextResponseBody();
         if (responseBody == null) {
             // This is a binary result
 

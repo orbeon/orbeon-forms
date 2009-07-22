@@ -60,7 +60,7 @@ public class OptimizedSubmission extends BaseSubmission {
             containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
                 "resource", p2.resolvedActionOrResource, "noscript", Boolean.toString(p.isNoscript),
                 "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
-                "is asynchronous", Boolean.toString(p2.isAsyncSubmission),
+                "is asynchronous", Boolean.toString(p2.isAsynchronous),
                 "container type", request.getContainerType(), "norewrite", Boolean.toString(submission.isURLNorewrite()),
                 "url type", submission.getUrlType(),
                 "local-submission-forward", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)),
@@ -85,7 +85,7 @@ public class OptimizedSubmission extends BaseSubmission {
         }
 
         // For now, we don't handle optimized async; could be optimized in the future
-        if (p2.isAsyncSubmission) {
+        if (p2.isAsynchronous) {
             if (isDebugEnabled)
                 containingDocument.logDebug("submission", "skipping optimized submission",
                         "reason", "asynchronous mode is not supported yet");
@@ -136,7 +136,7 @@ public class OptimizedSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
         // access the resource, but instead uses servlet forward/include for servlets, or a local
         // mechanism for portlets.
@@ -177,11 +177,22 @@ public class OptimizedSubmission extends BaseSubmission {
                 resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
-        // This means we got a submission with replace="all"
-        if (connectionResult.dontHandleResponse)
+        if (connectionResult.dontHandleResponse) {
+            // This means we got a submission with replace="all"
             containingDocument.setGotSubmissionReplaceAll();
 
-        return new SubmissionResult(submission.getEffectiveId(), connectionResult);
+            // Caller has nothing to do
+            return null;
+        } else {
+            // Obtain replacer
+            final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+
+            // Deserialize
+            replacer.deserialize(propertyContext, connectionResult, p, p2);
+
+            // Return result
+            return new SubmissionResult(submission.getEffectiveId(), replacer, connectionResult);
+        }
     }
 
     /**

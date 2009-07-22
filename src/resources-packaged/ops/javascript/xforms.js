@@ -2888,6 +2888,9 @@ ORBEON.xforms.Events = {
             var label = target.nextSibling;
             while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
             var control = ORBEON.util.Dom.getElementById(label.htmlFor);
+            // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+            if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
             var form = ORBEON.xforms.Controls.getForm(control);
 
             if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {

@@ -12,7 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -120,7 +120,7 @@
                     for $value in xs:integer(../value) return
                         ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                         'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')[$value]"/>
-            </xforms:bind> 
+            </xforms:bind>
             <xforms:bind nodeset="instance('countries-instance')/@letter"
                 calculate="instance('instance')/range/letter"/>
             <xforms:bind nodeset="instance('country-details-instance')/@us-code"
@@ -246,6 +246,7 @@
                                 <xforms:label ref="label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
+                            <xforms:help>Click on a checkbox</xforms:help>
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
@@ -255,6 +256,7 @@
                                 <xforms:label ref="label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
+                            <xforms:help>Select one item from the list</xforms:help>
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
@@ -264,6 +266,7 @@
                                 <xforms:label ref="label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
+                            <xforms:help>Select one item in the drop-down</xforms:help>
                         </xforms:select1>
                     </xhtml:p>
                 </xforms:group>
@@ -276,6 +279,7 @@
                                 <xforms:label ref="label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
+                            <xforms:help>Check as many checkboxes as you want</xforms:help>
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
@@ -285,6 +289,7 @@
                                 <xforms:label ref="label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
+                            <xforms:help>Select as many items form the list as you want</xforms:help>
                         </xforms:select>
                     </xhtml:p>
                 </xforms:group>

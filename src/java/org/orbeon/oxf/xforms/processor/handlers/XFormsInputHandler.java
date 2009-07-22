@@ -1,23 +1,23 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -121,9 +121,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                         // Main input field
                         {
-                            final String inputIdName = effectiveId + "$xforms-input-1";// do as if this was in a component, noscript has to handle that
-                            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-//                            final String inputIdName = XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
+                            final String inputIdName = getFirstInputEffectiveId(effectiveId);// do as if this was in a component, noscript has to handle that
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
@@ -183,9 +181,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // NOTE: In the future, we probably want to do this as an XBL component
                         if (isDateTime) {
 
-                            final String inputIdName = effectiveId + "$xforms-input-2";// do as if this was in a component, noscript has to handle that
-                            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-//                            final String inputIdName = XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
+                            final String inputIdName = getSecondInputEffectiveId(effectiveId);// do as if this was in a component, noscript has to handle that
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
@@ -237,5 +233,39 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             if (!handlerContext.isNewXHTMLLayout())
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
+    }
+
+    private String getFirstInputEffectiveId(String effectiveId) {
+
+        // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+//        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
+        return effectiveId + "$xforms-input-1";
+    }
+
+    private String getSecondInputEffectiveId(String effectiveId) {
+
+        // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+//        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
+        return effectiveId + "$xforms-input-2";
+    }
+
+    @Override
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "label", xformsControl, isTemplate);
+    }
+
+    @Override
+    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "alert", xformsControl, isTemplate);
+    }
+
+    @Override
+    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "hint", xformsControl, isTemplate);
+    }
+
+    @Override
+    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "help", xformsControl, isTemplate);
     }
 }

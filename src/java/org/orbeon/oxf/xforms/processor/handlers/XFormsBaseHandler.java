@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -93,7 +93,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     public void handleMIPClasses(FastStringBuffer sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId)).hasBinding();
+        final boolean hasBinding = containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId).hasBinding();
         if (hasBinding) {
             if (xformsControl != null) {
                 // The case of a concrete control
@@ -323,7 +323,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return xformsControl != null && xformsControl.isStaticReadonly();
     }
 
-    protected void handleLabelHintHelpAlert(String forEffectiveId, String lhhaType, XFormsSingleNodeControl control, boolean isTemplate) throws SAXException {
+    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, String lhhaType, XFormsSingleNodeControl control, boolean isTemplate) throws SAXException {
 
         final boolean isHint = lhhaType.equals("hint");
         final boolean isAlert = lhhaType.equals("alert");
@@ -369,7 +369,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // Statically obtain attributes information
             final XFormsStaticState staticState = containingDocument.getStaticState();
             final Element lhhaElement;
-            final String forPrefixedId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId);
+            final String forPrefixedId = XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
                 lhhaElement = staticState.getLabelElement(forPrefixedId);
@@ -468,7 +468,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 final String helpImageClasses = classes.toString();
 
                 final AttributesImpl imgAttributes = new AttributesImpl();
-                imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, forEffectiveId + "-help-image");
+                imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlEffectiveId + "-help-image");
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
@@ -491,29 +491,30 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
                 final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
                 if (newAttributes != null) {
-                    outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
+                    outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId, forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
                 }
             }
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String forEffectiveId, String lhhaType, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId, String forEffectiveId, String lhhaType, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
 
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
-        if (lhhaType != null) {
+        if (lhhaType != null && controlEffectiveId != null) {
             // E.g. foo$bar.1-2-3 -> foo$bar-alert.1-2-3
 //            final String newId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId) + "-" + lhhaType + XFormsUtils.getEffectiveIdSuffixWithSeparator(forEffectiveId);
 //            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id",  newId);
 
             // E.g. foo$bar.1-2-3 -> foo$bar.1-2-3-alert
-            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", forEffectiveId + "-" + lhhaType);
+            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", controlEffectiveId + "-" + lhhaType);
         } else {
             newAttribute = new AttributesImpl(attributes);
         }
 
-        // Add @for attribute
-        newAttribute.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
+        // Add @for attribute if specified
+        if (forEffectiveId != null)
+            newAttribute.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
@@ -542,8 +543,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {
-        for (int i = 0; i < sourceAttributeLocalNames.length; i++) {
-            final String attributeName = sourceAttributeLocalNames[i];
+        for (final String attributeName: sourceAttributeLocalNames) {
             final String attributeValue = sourceAttributes.getValue(sourceNamespaceURI, attributeName);
             if (attributeValue != null)
                 destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);

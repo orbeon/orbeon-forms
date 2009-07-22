@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -18,13 +18,13 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.Item;
-import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.ItemsetListener;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -123,13 +123,6 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final Itemset itemset = XFormsSelect1Control.getInitialItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
 
         outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, itemset, isMany, isFull);
-    }
-
-    @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
-        if (isStaticReadonly(xformsControl) || !isFull || !handlerContext.isNoScript())
-            super.handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
     }
 
     public void outputContent(Attributes attributes, String staticId, String effectiveId, String uri, String localname,
@@ -558,7 +551,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
             final String label = item.getLabel();
             reusableAttributes.clear();
-            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, "label", "label", label, false);// TODO: may be HTML for full appearance
+            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, "label", "label", label, false);// TODO: may be HTML for full appearance
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -586,5 +579,32 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (label != null)
             contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);
+    }
+
+    @Override
+    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        if (isStaticReadonly(xformsControl) || !isFull || !handlerContext.isNoScript()) {
+            // In noscript mode for full items, this is handled by fieldset/legend
+            // We don't put a @for attribute so that selecting the main label doesn't select the item
+            handleLabelHintHelpAlert(effectiveId, isFull ? null : effectiveId, "label", xformsControl, isTemplate);
+        }
+    }
+
+    @Override
+    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        // We don't put a @for attribute so that selecting the main label doesn't select the item
+        handleLabelHintHelpAlert(effectiveId, isFull ? null : effectiveId, "alert", xformsControl, isTemplate);
+    }
+
+    @Override
+    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        // We don't put a @for attribute so that selecting the main label doesn't select the item
+        handleLabelHintHelpAlert(effectiveId, isFull ? null : effectiveId, "hint", xformsControl, isTemplate);
+    }
+
+    @Override
+    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        // We don't put a @for attribute so that selecting the main label doesn't select the item
+        handleLabelHintHelpAlert(effectiveId, isFull ? null : effectiveId, "help", xformsControl, isTemplate);
     }
 }

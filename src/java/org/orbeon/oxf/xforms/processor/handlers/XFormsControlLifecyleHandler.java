@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.QName;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -64,6 +64,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return prefixedId;
     }
 
+    @Override
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         staticId = handlerContext.getId(attributes);
@@ -171,14 +172,13 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         }
     }
 
+    @Override
     public void end(String uri, String localname, String qName) throws SAXException {
         // Process everything after the control has been shown
         if (endConfig != null) {
             final boolean isTemplate = handlerContext.isTemplate();
 
-            for (int i = 0; i < endConfig.length; i++) {
-                final String current = endConfig[i];
-
+            for (final String current: endConfig) {
                 if ("control".equals(current)) {
                     // Handle control
                     handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
@@ -211,27 +211,27 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         }
     }
 
-    private final boolean hasLocalLabel() {
+    private boolean hasLocalLabel() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
         return hasLocalElement(staticState, staticState.getLabelElement(prefixedId));
     }
 
-    private final boolean hasLocalHint() {
+    private boolean hasLocalHint() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
         return hasLocalElement(staticState, staticState.getHintElement(prefixedId));
     }
 
-    private final boolean hasLocalHelp() {
+    private boolean hasLocalHelp() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
         return hasLocalElement(staticState, staticState.getHelpElement(prefixedId));
     }
 
-    private final boolean hasLocalAlert() {
+    private boolean hasLocalAlert() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
         return hasLocalElement(staticState, staticState.getAlertElement(prefixedId));
     }
 
-    private final boolean hasLocalElement(XFormsStaticState staticState, Element lhhaElement) {
+    private boolean hasLocalElement(XFormsStaticState staticState, Element lhhaElement) {
         if (lhhaElement == null)
             return false;
 
@@ -259,22 +259,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, "label", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, effectiveId, "label", xformsControl, isTemplate);
     }
 
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, effectiveId, "alert", xformsControl, isTemplate);
     }
 
     protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, effectiveId, "hint", xformsControl, isTemplate);
     }
 
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, "help", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, effectiveId, "help", xformsControl, isTemplate);
     }
 
     // Must be overridden by subclasses

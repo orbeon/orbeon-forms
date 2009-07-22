@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
   <settings default="">
     <module2copyright>
-      <element module="All" copyright="Orbeon LGPL" />
+      <element module="Source files" copyright="Orbeon LGPL" />
     </module2copyright>
     <LanguageOptions name="HTML">
       <option name="fileTypeOverride" value="3" />

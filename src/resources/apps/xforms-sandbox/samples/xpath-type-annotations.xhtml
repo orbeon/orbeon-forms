@@ -1,0 +1,62 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:foo="http://orbeon.org/oxf/xml/foo"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
+
+    <xhtml:head>
+        <xhtml:title>XPath type annotations</xhtml:title>
+        <xforms:model xxforms:expose-xpath-types="true">
+            <xforms:instance id="values">
+                <values>
+                    <value nodetype="" valuetype="">Lucy</value>
+                    <value xsi:type="xs:integer" nodetype="" valuetype="">35</value>
+                    <value xsi:type="xs:boolean" nodetype="" valuetype="">false</value>
+                    <value xsi:type="xs:date" nodetype="" valuetype="">1980-01-01</value>
+                    <value xsi:type="xs:time" nodetype="" valuetype="">12:00:00</value>
+                    <value xsi:type="xs:double" nodetype="" valuetype="">12E1</value>
+                    <value xsi:type="xs:string" nodetype="" valuetype="">Lucy</value>
+                </values>
+            </xforms:instance>
+
+            <xforms:bind nodeset="value[8]" type="xs:integer"/>
+
+            <xforms:action ev:event="xforms-ready">
+
+                <xforms:action xxforms:iterate="*">
+                    <xforms:setvalue ref="@nodetype" value="xxforms:type(context())"/>
+                </xforms:action>
+
+                <xforms:setvalue ref="*[1]/@valuetype" value="xxforms:type('Lucy')"/>
+                <xforms:setvalue ref="*[2]/@valuetype" value="xxforms:type(35)"/>
+                <xforms:setvalue ref="*[3]/@valuetype" value="xxforms:type(false())"/>
+                <xforms:setvalue ref="*[4]/@valuetype" value="xxforms:type(xs:date('1980-01-01'))"/>
+                <xforms:setvalue ref="*[5]/@valuetype" value="xxforms:type(xs:time('12:00:00'))"/>
+                <xforms:setvalue ref="*[6]/@valuetype" value="xxforms:type(12E1)"/>
+                <xforms:setvalue ref="*[7]/@valuetype" value="xxforms:type('Lucy')"/>
+            </xforms:action>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:output value="value[4] + xdt:dayTimeDuration('P1D')"/>
+
+    </xhtml:body>
+</xhtml:html>

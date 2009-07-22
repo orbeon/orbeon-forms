@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="windows-1252"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -12,7 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:saxon="http://saxon.sf.net/"

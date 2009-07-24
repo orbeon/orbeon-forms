@@ -3454,6 +3454,43 @@ ORBEON.widgets.YUICalendar = function() {
                 // Listeners on calendar events
                 yuiCalendar.renderEvent.subscribe(setupListeners, yuiCalendar, true);
                 yuiCalendar.selectEvent.subscribe(dateSelected, yuiCalendar, true);
+
+                // Listener on render event to add our year navigator
+                window.yuiCalendar = yuiCalendar;
+                yuiCalendar.renderEvent.subscribe(function() {
+                    // Add "previous year" link
+                    var monthLeft = YAHOO.util.Dom.getElementsByClassName("calnavleft", null, calendarDiv)[0];
+                    var yearLeft = document.createElement("a");
+                    yearLeft.innerHTML = "Previous Year";
+                    yearLeft.href = "#";
+                    YAHOO.util.Dom.addClass(yearLeft, "calyearleft");
+                    YAHOO.util.Dom.insertBefore(yearLeft, monthLeft);
+                    YAHOO.util.Event.addListener(yearLeft, "click", function(event) {
+                        YAHOO.util.Event.preventDefault(event);
+                        // See comment in calendar.js doPreviousMonthNav() regarding the setTimeout()
+                        setTimeout(function() {
+                            yuiCalendar.previousYear();
+                            var newYearLeft = YAHOO.util.Dom.getElementsByClassName("calyearleft", "a", calendarDiv);
+                            if (newYearLeft && newYearLeft[0]) newYearLeft[0].focus();
+                        }, 0);
+                    });
+                    // Add "following year" link
+                    var monthRight = YAHOO.util.Dom.getElementsByClassName("calnavright", null, calendarDiv)[0];
+                    var yearRight = document.createElement("a");
+                    yearRight.innerHTML = "Next Year";
+                    yearRight.href = "#";
+                    YAHOO.util.Dom.addClass(yearRight, "calyearright");
+                    YAHOO.util.Dom.insertBefore(yearRight, monthRight);
+                    YAHOO.util.Event.addListener(yearRight, "click", function(event) {
+                        YAHOO.util.Event.preventDefault(event);
+                        // See comment in calendar.js doPreviousMonthNav() regarding the setTimeout()
+                        setTimeout(function() {
+                            yuiCalendar.nextYear();
+                            var newYearRight = YAHOO.util.Dom.getElementsByClassName("calyearright", "a", calendarDiv);
+                            if (newYearRight && newYearRight[0]) newYearRight[0].focus();
+                        }, 0);
+                    });
+                });
             }
 
             // Get language from html/@lang

@@ -246,6 +246,45 @@ a.xforms-readonly { color: gray; cursor: default }
         { border-color: orange }
 */
 
+#orbeon-calendar-div .yui-calendar .calheader {
+    padding-top: .3em;
+}
+#orbeon-calendar-div .yui-calendar .calnavleft {
+    top: 7px;
+}
+#orbeon-calendar-div .yui-calendar .calyearleft {
+    overflow: hidden;
+	position: absolute;
+	text-indent: -10000em;
+    z-index: 1;
+    background: transparent url(../../ops/images/xforms/calendar-left-double.png) no-repeat scroll;
+    bottom:0;
+	cursor: pointer;
+    height: 15px;
+    left: -10px;
+    margin-left: 0.4em;
+	top: -7px;
+	width: 25px;
+}
+#orbeon-calendar-div .yui-calendar .calnavright {
+    top: 7px;
+}
+#orbeon-calendar-div .yui-calendar .calyearright {
+    overflow: hidden;
+	position: absolute;
+	text-indent: -10000em;
+    z-index: 1;
+    background: transparent url(../../ops/images/xforms/calendar-right-double.png) no-repeat scroll;
+    bottom:0;
+	cursor: pointer;
+    height: 15px;
+    right: -10px;
+    margin-right: 0.4em;
+	top: -7px;
+	width: 25px;
+}
+
+
 /* ***** Repeats **************************************************************************************************** */
 
 .xforms-repeat-selected-item-1 {

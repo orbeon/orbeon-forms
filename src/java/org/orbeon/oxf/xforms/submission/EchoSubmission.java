@@ -36,7 +36,7 @@ public class EchoSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match for replace="instance|none" and the submission resource starts with "test:"
-        return (p.isReplaceInstance || p.isReplaceNone) && p2.resolvedActionOrResource.startsWith("test:");
+        return (p.isReplaceInstance || p.isReplaceNone) && p2.actionOrResource.startsWith("test:");
     }
 
     public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,

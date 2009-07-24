@@ -593,9 +593,9 @@ public class XFormsContainingDocument extends XBLContainer {
                     final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
                     submission.getXBLContainer(this).dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(submission, result));
 
-                } catch (Exception e) {
+                } catch (Throwable throwable) {
                     // Something bad happened
-                    throw new OXFException(e);
+                    throw new OXFException(throwable);
                 }
             }
         } finally {
@@ -617,9 +617,9 @@ public class XFormsContainingDocument extends XBLContainer {
 
                         // NOTE: We do not process the response at all
 
-                    } catch (Exception e) {
+                    } catch (Throwable throwable) {
                         // Something happened but we swallow the exception and keep going
-                        XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
+                        XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", throwable);
                     }
                     // Remove submission from list of submission so we can gc the Runnable
                     i.remove();

@@ -48,7 +48,7 @@ public class InstanceReplacer extends BaseReplacer {
         // Deserialize here so it can run in parallel
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // XML media type
-            resultingDocument = deserializeInstance(propertyContext, p2.resolvedXXFormsReadonly, p2.resolvedXXFormsHandleXInclude, connectionResult);
+            resultingDocument = deserializeInstance(propertyContext, p2.isReadonly, p2.isHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
@@ -130,7 +130,7 @@ public class InstanceReplacer extends BaseReplacer {
 
             // Whether the destination node is the root element of an instance
             final boolean isDestinationRootElement = updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo);
-            if (p2.resolvedXXFormsReadonly && !isDestinationRootElement) {
+            if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
                         new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
@@ -143,7 +143,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // Create resulting instance whether entire instance is replaced or not, because this:
                 // 1. Wraps a Document within a DocumentInfo if needed
                 // 2. Performs text nodes adjustments if needed
-                if (!p2.resolvedXXFormsReadonly) {
+                if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
                     if (XFormsServer.logger.isDebugEnabled())
@@ -151,8 +151,8 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (Document) resultingDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
-                            false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                            (Document) resultingDocument, connectionResult.resourceURI, p2.username, p2.password,
+                            p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 } else {
                     // Resulting instance must be read-only
 
@@ -161,8 +161,8 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
-                            false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, p2.username, p2.password,
+                            p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 }
                 newDocumentRootElement = newInstance.getInstanceRootElementInfo();
             }

@@ -360,12 +360,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Compute parameters only needed during second pass
                 final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
-                resolvedActionOrResource = p2.resolvedActionOrResource; // in case of exception
+                resolvedActionOrResource = p2.actionOrResource; // in case of exception
 
                 /* ***** Serialization ****************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(p2.resolvedSerialization, p.resolvedMethod);
+                final String requestedSerialization = getRequestedSerialization(p2.serialization, p.resolvedMethod);
 
                 final Document documentToSubmit;
                 if (serialize) {
@@ -490,11 +490,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         replacer.replace(propertyContext, submissionResult.getConnectionResult(), p, p2);
 
                 } finally {
-                    // Clean-up connection
-                    final ConnectionResult connectionResult = submissionResult.getConnectionResult();
-                    if (connectionResult != null) {
-                        connectionResult.close();
-                    }
+                    // Clean-up result
+                    submissionResult.close();
                 }
             } catch (Throwable throwable) {
                 // Any exception will cause an error event to be dispatched
@@ -730,20 +727,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // This mostly consists of AVTs that can be evaluated only during the second pass of the submission
 
-        final String resolvedActionOrResource;
-        final String resolvedSerialization;
-        final String resolvedMode;
-        final String resolvedVersion;
-        final String resolvedEncoding;
-        final String resolvedSeparator;
-        final boolean resolvedIndent;
-        final boolean resolvedOmitxmldeclaration;
-        final Boolean resolvedStandalone;
-        final String resolvedXXFormsUsername;
-        final String resolvedXXFormsPassword;
-        final boolean resolvedXXFormsReadonly;
-        final boolean resolvedXXFormsCache;
-        final boolean resolvedXXFormsHandleXInclude;
+        final String actionOrResource;
+        final String serialization;
+        final String mode;
+        final String version;
+        final String encoding;
+        final String separator;
+        final boolean indent;
+        final boolean omitxmldeclaration;
+        final Boolean standalone;
+        final String username;
+        final String password;
+        final boolean isReadonly;
+        final boolean isCache;
+        final long timeToLive;
+        final boolean isHandleXInclude;
 
         final boolean isAsynchronous;
 
@@ -755,58 +753,59 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
                             "resolving resource URI");
                 }
-                resolvedActionOrResource = XFormsUtils.encodeHRRI(temp, true);
+                actionOrResource = XFormsUtils.encodeHRRI(temp, true);
             }
 
-            resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);
-            resolvedMode = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtMode);
-            resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtVersion);
-            resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtEncoding);
-            resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSeparator);
+            serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);
+            mode = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtMode);
+            version = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtVersion);
+            encoding = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtEncoding);
+            separator = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSeparator);
 
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtIndent);
-                resolvedIndent = Boolean.valueOf(temp);
+                indent = Boolean.valueOf(temp);
             }
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtOmitxmldeclaration);
-                resolvedOmitxmldeclaration = Boolean.valueOf(temp);
+                omitxmldeclaration = Boolean.valueOf(temp);
             }
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtStandalone);
-                resolvedStandalone = (temp != null) ? Boolean.valueOf(temp) : null;
+                standalone = (temp != null) ? Boolean.valueOf(temp) : null;
             }
 
-            resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
-            resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            username = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
+            password = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
-                resolvedXXFormsReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
+                isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
             }
 
             if (avtXXFormsCache != null) {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsCache);
                 // New attribute
-                resolvedXXFormsCache = Boolean.valueOf(temp);
+                isCache = Boolean.valueOf(temp);
             } else {
                 // For backward compatibility
-                resolvedXXFormsCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsShared));
+                isCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsShared));
             }
 
+            timeToLive = XFormsInstance.getTimeToLive(getSubmissionElement());
 
             // Default is "false" for security reasons
             final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsHandleXInclude);
-            resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude);
+            isHandleXInclude = Boolean.valueOf(tempHandleXInclude);
 
             // Check read-only and cache hints
-            if (resolvedXXFormsCache) {
+            if (isCache) {
                 if (!(p.actualHttpMethod.equals("GET") || p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")))
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with method=\"get|post|put\".",
                             "checking read-only and shared hints");
                 if (!p.isReplaceInstance)
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with replace=\"instance\".",
                             "checking read-only and shared hints");
-            } else if (resolvedXXFormsReadonly) {
+            } else if (isReadonly) {
                 if (!p.isReplaceInstance)
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
                             "checking read-only and shared hints");
@@ -814,7 +813,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             // Get async/sync
             // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
-            final boolean isRequestedAsynchronousMode = "asynchronous".equals(resolvedMode);
+            final boolean isRequestedAsynchronousMode = "asynchronous".equals(mode);
             isAsynchronous = !p.isReplaceAll && isRequestedAsynchronousMode;
             if (isRequestedAsynchronousMode && p.isReplaceAll) {
                 // For now we don't support replace="all"
@@ -823,22 +822,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
 
         protected SecondPassParameters(SecondPassParameters other, boolean isAsynchronous, boolean isReadonly) {
-            this.resolvedActionOrResource = other.resolvedActionOrResource;
-            this.resolvedSerialization = other.resolvedSerialization;
-            this.resolvedVersion = other.resolvedVersion;
-            this.resolvedEncoding = other.resolvedEncoding;
-            this.resolvedSeparator = other.resolvedSeparator;
-            this.resolvedIndent = other.resolvedIndent;
-            this.resolvedOmitxmldeclaration = other.resolvedOmitxmldeclaration;
-            this.resolvedStandalone = other.resolvedStandalone;
-            this.resolvedXXFormsUsername = other.resolvedXXFormsUsername;
-            this.resolvedXXFormsPassword = other.resolvedXXFormsPassword;
-            this.resolvedXXFormsCache = other.resolvedXXFormsCache;
-            this.resolvedXXFormsHandleXInclude = other.resolvedXXFormsHandleXInclude;
+            this.actionOrResource = other.actionOrResource;
+            this.serialization = other.serialization;
+            this.version = other.version;
+            this.encoding = other.encoding;
+            this.separator = other.separator;
+            this.indent = other.indent;
+            this.omitxmldeclaration = other.omitxmldeclaration;
+            this.standalone = other.standalone;
+            this.username = other.username;
+            this.password = other.password;
+            this.isCache = other.isCache;
+            this.timeToLive = other.timeToLive;
+            this.isHandleXInclude = other.isHandleXInclude;
 
-            this.resolvedMode = isAsynchronous ? "asynchronous" : "synchronous";
+            this.mode = isAsynchronous ? "asynchronous" : "synchronous";
             this.isAsynchronous = isAsynchronous;
-            this.resolvedXXFormsReadonly = isReadonly;
+            this.isReadonly = isReadonly;
         }
 
         public SecondPassParameters amend(boolean isAsynchronous, boolean isReadonly){
@@ -869,10 +869,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Perform "application/x-www-form-urlencoded" serialization
                     if (p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")) {
                         queryString = null;
-                        messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.resolvedSeparator).getBytes("UTF-8");// the resulting string is already ASCII in fact
+                        messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8");// the resulting string is already ASCII in fact
                         defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
                     } else {
-                        queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.resolvedSeparator);
+                        queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator);
                         messageBody = null;
                         defaultMediatypeForSerialization = null;
                     }
@@ -881,7 +881,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     try {
                         final Transformer identity = TransformerUtils.getIdentityTransformer();
                         TransformerUtils.applyOutputProperties(identity,
-                                "xml", p2.resolvedVersion, null, null, p2.resolvedEncoding, p2.resolvedOmitxmldeclaration, p2.resolvedStandalone, p2.resolvedIndent, 4);
+                                "xml", p2.version, null, null, p2.encoding, p2.omitxmldeclaration, p2.standalone, p2.indent, 4);
 
                         // TODO: use cdata-section-elements
 

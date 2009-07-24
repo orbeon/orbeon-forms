@@ -58,7 +58,7 @@ public class OptimizedSubmission extends BaseSubmission {
         final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
         if (isDebugEnabled) {
             containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
-                "resource", p2.resolvedActionOrResource, "noscript", Boolean.toString(p.isNoscript),
+                "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
                 "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
                 "is asynchronous", Boolean.toString(p2.isAsynchronous),
                 "container type", request.getContainerType(), "norewrite", Boolean.toString(submission.isURLNorewrite()),
@@ -69,10 +69,10 @@ public class OptimizedSubmission extends BaseSubmission {
         }
 
         // Absolute URL is not optimized
-        if (NetUtils.urlHasProtocol(p2.resolvedActionOrResource)) {
+        if (NetUtils.urlHasProtocol(p2.actionOrResource)) {
             if (isDebugEnabled)
                 containingDocument.logDebug("submission", "skipping optimized submission",
-                        "reason", "resource URL has protocol", "resource", p2.resolvedActionOrResource);
+                        "reason", "resource URL has protocol", "resource", p2.actionOrResource);
             return false;
         }
 
@@ -152,7 +152,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(submission.getSubmissionElement(), p2.resolvedActionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(submission.getSubmissionElement(), p2.actionOrResource);
 
         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission

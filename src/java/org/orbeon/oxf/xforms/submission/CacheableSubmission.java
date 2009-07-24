@@ -41,27 +41,6 @@ import java.util.concurrent.Callable;
  */
 public class CacheableSubmission extends BaseSubmission {
 
-    private static final ConnectionResult CONSTANT_CONNECTION_RESULT;
-    static {
-        CONSTANT_CONNECTION_RESULT = new ConnectionResult(null) {
-            @Override
-            public boolean hasContent() {
-                return true;
-            }
-        };
-        CONSTANT_CONNECTION_RESULT.statusCode = 200;
-        CONSTANT_CONNECTION_RESULT.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
-        CONSTANT_CONNECTION_RESULT.setLastModified(null);
-        CONSTANT_CONNECTION_RESULT.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
-        CONSTANT_CONNECTION_RESULT.dontHandleResponse = false;
-        try {
-            CONSTANT_CONNECTION_RESULT.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
-        } catch (IOException e) {
-            // Should not happen
-            throw new OXFException(e);
-        }
-    }
-
     public CacheableSubmission(XFormsModelSubmission submission) {
         super(submission);
     }
@@ -70,7 +49,7 @@ public class CacheableSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match if the submission has replace="instance" and xxforms:cache="true"
-        return p.isReplaceInstance && p2.resolvedXXFormsCache;
+        return p.isReplaceInstance && p2.isCache;
     }
 
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
@@ -83,7 +62,7 @@ public class CacheableSubmission extends BaseSubmission {
         final String absoluteResolvedURLString;
         {
             final ExternalContext externalContext = getExternalContext(propertyContext);
-            final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.resolvedActionOrResource, sp.queryString);
+            final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.actionOrResource, sp.queryString);
             absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
         }
 
@@ -108,9 +87,9 @@ public class CacheableSubmission extends BaseSubmission {
             modelEffectiveId = updatedInstance.getEffectiveModelId();
             validation = updatedInstance.getValidation();
         }
-        final boolean isReadonly = p2.resolvedXXFormsReadonly;
-        final boolean handleXInclude = p2.resolvedXXFormsHandleXInclude;
-        final long timeToLive = XFormsInstance.getTimeToLive(submission.getSubmissionElement());
+        final boolean isReadonly = p2.isReadonly;
+        final boolean handleXInclude = p2.isHandleXInclude;
+        final long timeToLive = p2.timeToLive;
 
         // Create new logger as the submission might be asynchronous
         final IndentedLogger submissionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
@@ -118,7 +97,8 @@ public class CacheableSubmission extends BaseSubmission {
         // Obtain replacer
         // Pass a pseudo connection result which contains information used by getReplacer()
         // We know that we will get an InstanceReplacer
-        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(propertyContext, CONSTANT_CONNECTION_RESULT, p);
+        final ConnectionResult connectionResult = createPseudoConnectionResult(absoluteResolvedURLString);
+        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(propertyContext, connectionResult, p);
 
         // Try from cache first
         final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
@@ -133,7 +113,7 @@ public class CacheableSubmission extends BaseSubmission {
             replacer.setInstance(cacheResult);
 
             // Return result
-            return new SubmissionResult(submissionEffectiveId, replacer, CONSTANT_CONNECTION_RESULT);
+            return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
         } else {
             // Create callable for synchronous or asynchronous loading
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
@@ -166,7 +146,7 @@ public class CacheableSubmission extends BaseSubmission {
 
                                             // Create new shared instance
                                             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                    updatedP2.resolvedXXFormsUsername, updatedP2.resolvedXXFormsPassword, true, timeToLive, validation, handleXInclude,
+                                                    updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
                                                     XFormsProperties.isExposeXPathTypes(containingDocument));
                                         }
                                     } catch (ThrowableWrapper throwableWrapper) {
@@ -183,7 +163,7 @@ public class CacheableSubmission extends BaseSubmission {
                         replacer.setInstance(newInstance);
 
                         // Return result
-                        return new SubmissionResult(submissionEffectiveId, replacer, CONSTANT_CONNECTION_RESULT);
+                        return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
                     } catch (ThrowableWrapper throwableWrapper) {
                         // The ThrowableWrapper was thrown within the inner load() method above
                         return new SubmissionResult(submissionEffectiveId, throwableWrapper.getThrowable(), throwableWrapper.getConnectionResult());
@@ -246,5 +226,26 @@ public class CacheableSubmission extends BaseSubmission {
             submission.getContainingDocument().logDebug("submission", "using instance from application shared instance cache",
                     "instance", updatedInstance.getEffectiveId());
         return updatedInstance;
+    }
+
+    private ConnectionResult createPseudoConnectionResult(String resourceURI) {
+        final ConnectionResult connectionResult = new ConnectionResult(resourceURI) {
+            @Override
+            public boolean hasContent() {
+                return true;
+            }
+        };
+        connectionResult.statusCode = 200;
+        connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
+        connectionResult.setLastModified(null);
+        connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
+        connectionResult.dontHandleResponse = false;
+        try {
+            connectionResult.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
+        } catch (IOException e) {
+            // Should not happen
+            throw new OXFException(e);
+        }
+        return connectionResult;
     }
 }

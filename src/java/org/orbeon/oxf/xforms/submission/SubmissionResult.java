@@ -50,6 +50,11 @@ public class SubmissionResult {
         return connectionResult;
     }
 
+    /**
+     * Close the result once everybody is done with it.
+     *
+     * This can be overridden by specific subclasses.
+     */
     public void close() {
         if (connectionResult != null) {
             connectionResult.close();

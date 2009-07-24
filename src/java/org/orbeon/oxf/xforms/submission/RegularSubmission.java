@@ -43,7 +43,7 @@ public class RegularSubmission extends BaseSubmission {
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         final ExternalContext externalContext = getExternalContext(propertyContext);
-        final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.resolvedActionOrResource, sp.queryString);
+        final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.actionOrResource, sp.queryString);
 
         // Gather remaining information to process the request
         final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
@@ -83,7 +83,7 @@ public class RegularSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
-                        p.actualHttpMethod, absoluteResolvedURL, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
+                        p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders);
 

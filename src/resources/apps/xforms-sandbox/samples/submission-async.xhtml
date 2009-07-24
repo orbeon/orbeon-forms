@@ -65,6 +65,25 @@
                 </delays>
             </xforms:instance>
 
+            <!-- Response information -->
+            <xforms:instance id="instance-response">
+                <response>
+                    <error-type/>
+                    <status-code/>
+                    <response-body/>
+                </response>
+            </xforms:instance>
+
+            <!-- Clear before submitting -->
+            <xforms:setvalue ev:event="xforms-submit" xxforms:iterate="instance('instance-response')/*" ref="."/>
+
+            <!-- Fill-out response info -->
+            <xforms:action ev:event="xforms-submit-done xforms-submit-error" context="instance('instance-response')">
+                <xforms:setvalue ref="error-type" value="event('error-type')"/>
+                <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
+                <xforms:setvalue ref="response-body" value="event('response-body')"/>
+            </xforms:action>
+
             <xforms:submission id="replace-none" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
@@ -99,7 +118,29 @@
                 <xxforms:join-submissions/>
             </xforms:action>
 
+            <!-- Test 404 -->
+            <xforms:submission id="not-found-submission" mode="asynchronous"
+                method="get" resource="http://example.org/this/must/not/exist"
+                serialization="none" replace="instance" targetref="instance('instance-result-1')">
+            </xforms:submission>
+
+            <!-- Test text parsing error -->
+            <xforms:submission id="bad-text-submission" mode="asynchronous"
+                method="get" resource="http://www.orbeon.com/images/form-runner-250.png"
+                serialization="none" replace="text" targetref="instance('instance-result-1')">
+            </xforms:submission>
+
+            <!-- Test XML parsing error -->
+            <xforms:submission id="bad-xml-submission" mode="asynchronous"
+                method="get" resource="/xforms-sandbox/service/bad-xml"
+                serialization="none" replace="instance" targetref="instance('instance-result-1')">
+            </xforms:submission>
+
         </xforms:model>
+        <xhtml:style type="text/css">
+            .response .xforms-label { font-weight: bold }
+            .response .xforms-output { background-color: #ccc }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
@@ -113,6 +154,18 @@
 
         <xforms:submit submission="replace-instance-1">
             <xforms:label>Test replace="instance"</xforms:label>
+        </xforms:submit>
+
+        <xforms:submit submission="not-found-submission">
+            <xforms:label>Test non-existing site</xforms:label>
+        </xforms:submit>
+
+        <xforms:submit submission="bad-text-submission">
+            <xforms:label>Test binary response for replace="text"</xforms:label>
+        </xforms:submit>
+
+        <xforms:submit submission="bad-xml-submission">
+            <xforms:label>Test XML parse error for replace="instance"</xforms:label>
         </xforms:submit>
 
         <xforms:trigger>
@@ -132,6 +185,22 @@
                 </xforms:send>
             </xforms:action>
         </xforms:trigger>
+
+        <xhtml:hr/>
+
+        <xforms:group context="instance('instance-response')" class="response">
+            <xforms:output ref="error-type">
+                <xforms:label>Error type</xforms:label>
+            </xforms:output>
+            <xhtml:br/>
+            <xforms:output ref="status-code">
+                <xforms:label>Status code</xforms:label>
+            </xforms:output>
+            <xhtml:br/>
+            <xforms:output ref="response-body">
+                <xforms:label>Response body</xforms:label>
+            </xforms:output>
+        </xforms:group>
 
         <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 

@@ -479,7 +479,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         replacer = submissionResult.getReplacer();
                     } else if (submissionResult.getThrowable() != null) {
                         // Propagate throwable, which might have come from a separate thread
-                        throw submissionResult.getThrowable();
+                        sendSubmitError(propertyContext, submissionResult.getThrowable(), submissionResult);
+                        replacer = null;
                     } else {
                         replacer = null;
                     }
@@ -497,9 +498,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
             } catch (Throwable throwable) {
                 // Any exception will cause an error event to be dispatched
-                sendSubmitError(propertyContext, p2.resolvedActionOrResource, throwable);
+                sendSubmitError(propertyContext, throwable, submissionResult);
             }
         }
+    }
+
+    private void sendSubmitError(PropertyContext propertyContext, Throwable throwable, SubmissionResult submissionResult) {
+        // Try to get error event from exception
+        XFormsSubmitErrorEvent submitErrorEvent = null;
+        if (throwable instanceof XFormsSubmissionException) {
+            final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
+            submitErrorEvent = submissionException.getSubmitErrorEvent();
+        }
+
+        // If no event obtained, create default event
+        if (submitErrorEvent == null) {
+            submitErrorEvent = new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this,
+                XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult());
+        }
+
+        // Dispatch event
+        submitErrorEvent.setThrowable(throwable);
+        container.dispatchEvent(propertyContext, submitErrorEvent);
     }
 
     private void sendSubmitError(PropertyContext propertyContext, String resolvedActionOrResource, Throwable throwable) {
@@ -1104,33 +1124,5 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
         }
         return documentToSubmit;
-    }
-
-    public Object deserializeInstance(boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
-        final Object resultingDocument;
-
-        // Create resulting instance whether entire instance is replaced or not, because this:
-        // 1. Wraps a Document within a DocumentInfo if needed
-        // 2. Performs text nodes adjustments if needed
-        if (!isReadonly) {
-            // Resulting instance must not be read-only
-
-            // TODO: What about configuring validation? And what default to choose?
-            resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
-
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("submission", "deserializing to mutable instance");
-        } else {
-            // Resulting instance must be read-only
-
-            // TODO: What about configuring validation? And what default to choose?
-            // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-            resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
-
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("submission", "deserializing to read-only instance");
-        }
-
-        return resultingDocument;
     }
 }

@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.net.URL;
 import java.util.Map;
@@ -53,18 +54,12 @@ public class RegularSubmission extends BaseSubmission {
         // element.
         final String newForwardSubmissionHeaders = p.isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
 
-        final IndentedLogger connectionLogger;
-        final boolean logBody;
-        if (XFormsModelSubmission.logger.isDebugEnabled()) {
-            // Create new indented logger just for the Connection object. This will log more stuff.
-            connectionLogger = new IndentedLogger(XFormsModelSubmission.logger, "XForms submission " + (p2.isAsynchronous ? "(asynchronous)" : "(synchronous)"),
-                    containingDocument.getIndentedLogger().getLogIndentLevel());
-            logBody = true;
-        } else {
-            // Create new logger as the submission might be asynchronous
-            connectionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
-            logBody = false;
-        }
+        // This will log more stuff
+        final boolean logBody = XFormsModelSubmission.logger.isDebugEnabled();
+
+        final IndentedLogger connectionLogger
+                = new IndentedLogger(logBody ? XFormsModelSubmission.logger : XFormsServer.logger, "XForms submission " + (p2.isAsynchronous ? "(asynchronous)" : "(synchronous)"),
+                    (p2.isAsynchronous && p.isReplaceNone) ? 1 : containingDocument.getIndentedLogger().getLogIndentLevel());
 
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);

@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
@@ -47,12 +48,45 @@ public class InstanceReplacer extends BaseReplacer {
         // Deserialize here so it can run in parallel
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // XML media type
-            resultingDocument = submission.deserializeInstance(p2.resolvedXXFormsReadonly, p2.resolvedXXFormsHandleXInclude, connectionResult);
+            resultingDocument = deserializeInstance(propertyContext, p2.resolvedXXFormsReadonly, p2.resolvedXXFormsHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
                     new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
+    }
+
+    private Object deserializeInstance(PropertyContext propertyContext, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
+        final Object resultingDocument;
+
+        // Create resulting instance whether entire instance is replaced or not, because this:
+        // 1. Wraps a Document within a DocumentInfo if needed
+        // 2. Performs text nodes adjustments if needed
+        try {
+            if (!isReadonly) {
+                // Resulting instance must not be read-only
+
+                // TODO: What about configuring validation? And what default to choose?
+                resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("submission", "deserializing to mutable instance");
+            } else {
+                // Resulting instance must be read-only
+
+                // TODO: What about configuring validation? And what default to choose?
+                // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
+                resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("submission", "deserializing to read-only instance");
+            }
+        } catch (Exception e) {
+            throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
+                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
+        }
+
+        return resultingDocument;
     }
 
     public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
@@ -105,7 +139,7 @@ public class InstanceReplacer extends BaseReplacer {
             // Obtain root element to insert
             final NodeInfo newDocumentRootElement;
             final XFormsInstance newInstance;
-            try {
+            {
                 // Create resulting instance whether entire instance is replaced or not, because this:
                 // 1. Wraps a Document within a DocumentInfo if needed
                 // 2. Performs text nodes adjustments if needed
@@ -131,9 +165,6 @@ public class InstanceReplacer extends BaseReplacer {
                             false, -1, updatedInstance.getValidation(), p2.resolvedXXFormsHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 }
                 newDocumentRootElement = newInstance.getInstanceRootElementInfo();
-            } catch (Exception e) {
-                throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
-                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
             }
 
             // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.

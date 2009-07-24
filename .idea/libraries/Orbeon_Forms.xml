@@ -5,7 +5,10 @@
       <root url="file://$PROJECT_DIR$/lib/oracle" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file:///Users/ebruchez/Orbeon/Saxon" />
+      <root url="file:///Users/ebruchez/Orbeon/Xerces/src" />
+    </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />
   </library>

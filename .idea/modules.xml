@@ -2,7 +2,10 @@
 <project relativePaths="false" version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Orbeon Forms.iml" filepath="$PROJECT_DIR$/Orbeon Forms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Orbeon Forms.iml" filepath="$PROJECT_DIR$/.idea/Orbeon Forms.iml" />
+      <module fileurl="file:///Users/ebruchez/Orbeon/Saxon/Saxon.iml" filepath="/Users/ebruchez/Orbeon/Saxon/Saxon.iml" />
+      <module fileurl="file:///Users/ebruchez/Orbeon/Xerces/Xerces.iml" filepath="/Users/ebruchez/Orbeon/Xerces/Xerces.iml" />
+      <module fileurl="file:///Users/ebruchez/Orbeon/Orbeon.com/orbeon.com.iml" filepath="/Users/ebruchez/Orbeon/Orbeon.com/orbeon.com.iml" />
     </modules>
   </component>
 </project>

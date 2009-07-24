@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project relativePaths="false" version="4">
+<project relativePaths="true" version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Orbeon.com" vcs="svn" />
@@ -7,4 +7,3 @@
     <mapping directory="$PROJECT_DIR$/../Xerces" vcs="Git" />
   </component>
 </project>
-

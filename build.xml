@@ -73,7 +73,6 @@
         <include name="tagsoup-1.2.jar"/>
         <include name="junit.jar"/>
         <include name="saxon-8_8_orbeon_20090617.jar"/>
-        <include name="joost-20030623_orbeon.jar"/>
         <include name="batik-all-1_6.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>
         <include name="fop-0_93.jar"/>

@@ -805,6 +805,7 @@
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="${project.name}.war"/>
             </zipfileset>
+            <zipfileset file="README.txt"/>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
             <zipfileset dir="${examples-cli-src.dir}" prefix="${prefix}/examples-cli"/>

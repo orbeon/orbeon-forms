@@ -324,7 +324,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 previousIsSimple = false;
 
                                 // List if statements where we add the new <p:choose>
-                                List statements;
+                                List<ASTStatement> statements;
                                 if (isFirst) {
                                     isFirst = false;
                                     statements = getStatements();
@@ -354,7 +354,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             if (canAddToPreviousWhen) {
                                 // Do not create new "when", add current condition to previous "when"
-                                final ASTWhen previousWhen = (ASTWhen) currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
+                                final ASTWhen previousWhen = currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
                                 previousWhen.setTest(previousWhen.getTest() + " or " + when.getTest());
                             } else {
                                 // Create new "when"
@@ -387,7 +387,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     if (notFoundPipeline != null || notFoundPageId != null) {
 
                         // Determine where we insert out statements
-                        List statementsList;
+                        List<ASTStatement> statementsList;
                         if (currentChoose == null) {
                             statementsList = getStatements();
                         } else {
@@ -477,9 +477,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
         // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
         // actually know what a "resource" is.
-        final List pathMatchers = pageFlow.getPathMatchers();
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            final List<URLRewriterUtils.PathMatcher> existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             if (existingFileInfos == null) {
                 // Set if we are the first
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
@@ -495,7 +495,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         pipelineProcessor.start(pipelineContext);
     }
 
-    private static void handleEpilogue(final String controllerContext, List statements, final String epilogueURL, final Element epilogueElement,
+    private static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
                                        final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
@@ -573,7 +573,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      * Handle <page>
      */
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
-                            List statementsList, final Element pageElement, final int pageNumber,
+                            List<ASTStatement> statementsList, final Element pageElement, final int pageNumber,
                             final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
                             final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance, final ASTOutput epilogueXFormsModel,
                             final Map<String, String> pageIdToPathInfo,
@@ -1595,9 +1595,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
     private static class PageFlow {
         private PipelineProcessor pipelineProcessor;
-        private List pathMatchers;
+        private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
-        public PageFlow(PipelineProcessor pipelineProcessor, List pathMatchers) {
+        public PageFlow(PipelineProcessor pipelineProcessor, List<URLRewriterUtils.PathMatcher> pathMatchers) {
             this.pipelineProcessor = pipelineProcessor;
             this.pathMatchers = pathMatchers;
         }
@@ -1606,7 +1606,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             return pipelineProcessor;
         }
 
-        public List getPathMatchers() {
+        public List<URLRewriterUtils.PathMatcher> getPathMatchers() {
             return pathMatchers;
         }
     }

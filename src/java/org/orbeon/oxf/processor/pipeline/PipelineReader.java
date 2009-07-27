@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline;
 
@@ -26,14 +26,14 @@ import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
 
 public class PipelineReader extends ProcessorImpl {
 
-    private static final Map PREFIXES = new HashMap();
+    private static final Map<String, String> PREFIXES = new HashMap<String, String>();
     private static Pattern IDENTIFIER;
     private static Pattern END;
     private static Pattern ID_REFERENCE;
@@ -51,7 +51,7 @@ public class PipelineReader extends ProcessorImpl {
         // Used for regexp pattern initialization
         Perl5Compiler compiler = new Perl5Compiler();
         String SEPARATOR_REGEXP = "[ \\t]*";
-        String IDENTIFIER_REGEXP = "[_A-Za-z][_A-Za-z\\-0-9.]*";;
+        String IDENTIFIER_REGEXP = "[_A-Za-z][_A-Za-z\\-0-9.]*";
 
         // Initialize regexp patterns
         try {
@@ -81,7 +81,7 @@ public class PipelineReader extends ProcessorImpl {
         Document pipelineDocument = readInputAsDOM4J(context, "pipeline");
 
         Element configElement = (Element) XPathUtils.selectSingleNode(pipelineDocument, "p:config | p:pipeline", PREFIXES);
-        List params = new ArrayList();
+        List<ASTParam> params = new ArrayList<ASTParam>();
 
         // Read params
         for (Iterator i = XPathUtils.selectIterator(configElement, "p:param", PREFIXES); i.hasNext();) {
@@ -104,9 +104,9 @@ public class PipelineReader extends ProcessorImpl {
         pipeline.getStatements().addAll(readStatements(configElement));
     }
 
-    private List readStatements(Element containerElement) {
+    private List<ASTStatement> readStatements(Element containerElement) {
 
-        List result = new ArrayList();
+        List<ASTStatement> result = new ArrayList<ASTStatement>();
         PatternMatcher matcher = new Perl5Matcher();
         for (Iterator i = containerElement.elementIterator(); i.hasNext();) {
             final Element element = (Element) i.next();
@@ -255,7 +255,7 @@ public class PipelineReader extends ProcessorImpl {
                 href = href.substring(matcher.getMatch().endOffset(0));
 
                 // Parse parameters
-                List hrefParameters = new ArrayList();
+                List<ASTHref> hrefParameters = new ArrayList<ASTHref>();
                 while (true) {
                     if (matcher.contains(href, FUNCTION_END)) {
                         // We are at the end of the function call

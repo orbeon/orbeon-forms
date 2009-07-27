@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.externalcontext;
 
@@ -17,7 +17,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 
@@ -26,18 +25,19 @@ public class ServletURLRewriter implements URLRewriter {
     private final PipelineContext pipelineContext;
     private final ExternalContext.Request request;
 
-    private List pathMatchers;
+    private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
     public ServletURLRewriter(PipelineContext pipelineContext, ExternalContext.Request request) {
         this.pipelineContext = pipelineContext;
         this.request = request;
     }
 
-    private List getPathMatchers() {
+    @SuppressWarnings("unchecked")
+    private List<URLRewriterUtils.PathMatcher> getPathMatchers() {
         if (pathMatchers == null) {
-            pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            pathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             if (pathMatchers == null)
-                pathMatchers = Collections.EMPTY_LIST;
+                pathMatchers = URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
         }
         return pathMatchers;
     }

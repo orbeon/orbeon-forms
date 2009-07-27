@@ -1,23 +1,23 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -169,7 +168,7 @@ public class ResourceServer extends ProcessorImpl {
         public static final int EXT_STATUS = 2;
 
         private int status = 0;
-        private StringBuffer buff = new StringBuffer();
+        private StringBuilder buff = new StringBuilder();
         private String name;
         private MimeTypeConfig mimeTypeConfig = new MimeTypeConfig();
 
@@ -231,7 +230,7 @@ public class ResourceServer extends ProcessorImpl {
     }
 
     private static class MimeTypeConfig {
-        private List patternToMimeTypes = new ArrayList();
+        private List<PatternToMimeType> patternToMimeTypes = new ArrayList<PatternToMimeType>();
 
         public void define(String pattern, String mimeType) {
             patternToMimeTypes.add(new PatternToMimeType(pattern.toLowerCase(), mimeType.toLowerCase()));
@@ -239,8 +238,7 @@ public class ResourceServer extends ProcessorImpl {
 
         public String getMimeType(String path) {
             path = path.toLowerCase();
-            for (Iterator i = patternToMimeTypes.iterator(); i.hasNext();) {
-                final PatternToMimeType patternToMimeType = (PatternToMimeType) i.next();
+            for (final PatternToMimeType patternToMimeType: patternToMimeTypes) {
                 if (patternToMimeType.matches(path))
                     return patternToMimeType.getMimeType();
             }

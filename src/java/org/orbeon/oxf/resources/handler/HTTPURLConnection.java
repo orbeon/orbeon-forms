@@ -1,31 +1,25 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.resources.handler;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringUtils;
 
 import java.io.IOException;
@@ -116,7 +110,7 @@ public class HTTPURLConnection extends URLConnection {
                 httpState = httpClient.getState();
             }
 
-            // Make authentification preemptive
+            // Make authentication preemptive
             if (userinfo != null || isAuthenticationRequestedWithUsername)
                 httpClient.getParams().setAuthenticationPreemptive(true);
 
@@ -124,7 +118,7 @@ public class HTTPURLConnection extends URLConnection {
             final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
             final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
 			if (proxyHost != null && proxyPort != null) {
-                httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort.intValue());
+                httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort);
 
 				// Proxy authentication
 				final String proxyUsername = Properties.instance().getPropertySet().getString(PROXY_USERNAME_PROPERTY);
@@ -172,20 +166,18 @@ public class HTTPURLConnection extends URLConnection {
 
             // Set all headers
             // NOTE: Do headers first so we can benefit from method.removeRequestHeader () and method.getRequestHeader() later
-            for (Iterator i = requestProperties.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String currentHeaderName = (String) currentEntry.getKey();
-                final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+            for (Map.Entry<String, String[]> currentEntry: requestProperties.entrySet()) {
+                final String currentHeaderName = currentEntry.getKey();
+                final String[] currentHeaderValues = currentEntry.getValue();
 
-                for (int j = 0; j < currentHeaderValues.length; j++) {
-                    final String currentHeaderValue = currentHeaderValues[j];
+                for (final String currentHeaderValue: currentHeaderValues) {
                     method.addRequestHeader(currentHeaderName, currentHeaderValue);
                 }
             }
 
             // If there is some user authentication specified so remove Authorization header if present
             if (userinfo != null || username != null) {
-                method.removeRequestHeader("Authorization");// header names are case-insensitive for comparison
+                method.removeRequestHeader(Connection.AUTHORIZATION_HEADER);// header names are case-insensitive for comparison
             }
 
             // Create request entity with body
@@ -278,7 +270,7 @@ public class HTTPURLConnection extends URLConnection {
     @Override
     public String getRequestProperty(String key) {
         // Not sure what should be returned so return the first value if any. But likely nobody is calling this method.
-        final String[] values = (String[]) requestProperties.get(key);
+        final String[] values = requestProperties.get(key);
         return (values == null) ? null : values[0];
     }
 

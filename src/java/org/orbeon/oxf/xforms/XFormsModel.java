@@ -808,7 +808,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    connectionLogger, logBody, "GET", sourceURL, null, null, null, null, null,
+                    connectionLogger, logBody, Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -867,7 +867,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 containingDocument.logDebug("model", "getting document from URI", "URI", absoluteResolvedURLString);
 
             final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
-                    "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
+                    Connection.Method.GET.name(), absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             try {

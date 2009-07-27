@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -21,12 +21,12 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -34,7 +34,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 import java.net.MalformedURLException;
@@ -56,7 +55,8 @@ public class XFormsURIResolver extends TransformerURIResolver {
     }
 
     public Source resolve(String href, String base) throws TransformerException {
-        return resolve(href, base, null, null, null);
+        // Use global definition for headers to forward
+        return resolve(href, base, null, null, Connection.getForwardHeaders());
     }
 
     public Source resolve(String href, String base, final String username, final String password, final String headersToForward) throws TransformerException {
@@ -150,20 +150,21 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler, String headersToForward) {
-        try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
-
-            final SAXResult saxResult = new SAXResult(contentHandler);
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(saxResult);
-
-            final XMLReader xmlReader = source.getXMLReader();
-            xmlReader.setContentHandler(identity);
-            xmlReader.parse(urlString);
-
-        } catch (Exception e) {
-            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
-        }
-    }
+    // This is currently not used
+//    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler, String headersToForward) {
+//        try {
+//            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
+//
+//            final SAXResult saxResult = new SAXResult(contentHandler);
+//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+//            identity.setResult(saxResult);
+//
+//            final XMLReader xmlReader = source.getXMLReader();
+//            xmlReader.setContentHandler(identity);
+//            xmlReader.parse(urlString);
+//
+//        } catch (Exception e) {
+//            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
+//        }
+//    }
 }

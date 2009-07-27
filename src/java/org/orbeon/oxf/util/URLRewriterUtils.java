@@ -51,7 +51,7 @@ public class URLRewriterUtils {
     public static final List<PathMatcher> EMPTY_PATH_MATCHER_LIST = Collections.emptyList();
 
     private static final PathMatcher MATCH_ALL_PATH_MATCHER;
-    private static final List MATCH_ALL_PATH_MATCHERS;
+    private static final List<URLRewriterUtils.PathMatcher> MATCH_ALL_PATH_MATCHERS;
 
     static {
         MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/*", null, null, true);
@@ -306,7 +306,7 @@ public class URLRewriterUtils {
         return (propertyString == null || propertyString.trim().length() == 0) ? null : propertyString.trim();
     }
 
-    public static List getMatchAllPathMatcher() {
+    public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {
         if (isResourcesVersioned()) {
             return MATCH_ALL_PATH_MATCHERS;
         } else {

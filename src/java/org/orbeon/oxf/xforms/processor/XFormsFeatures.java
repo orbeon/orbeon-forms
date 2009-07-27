@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -68,7 +68,7 @@ public class XFormsFeatures {
         private String[] controlAppearanceOrMediatypes;
 
         public FeatureConfig(String name) {
-            this(name, (String[]) null, (String[]) null);
+            this(name, null, (String[]) null);
         }
 
         public FeatureConfig(String name, String controlName) {
@@ -102,17 +102,17 @@ public class XFormsFeatures {
         public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
             if (controlAppearanceOrMediatypes != null && controlAppearanceOrMediatypes.length > 0) {
                 // Test by control name and appearance/mediatype
-                for (int i = 0; i < controlNames.length; i++) {
-                    for (int j = 0; j < controlAppearanceOrMediatypes.length; j++) {
-                        if (ResourceConfig.isInUse(appearancesMap, controlNames[i], controlAppearanceOrMediatypes[j])) {
+                for (final String controlName: controlNames) {
+                    for (final String controlAppearanceOrMediatype: controlAppearanceOrMediatypes) {
+                        if (ResourceConfig.isInUse(appearancesMap, controlName, controlAppearanceOrMediatype)) {
                             return true;
                         }
                     }
                 }
             } else {
                 // Test by control name only
-                for (int i = 0; i < controlNames.length; i++) {
-                    if (ResourceConfig.isInUse(appearancesMap, controlNames[i]))
+                for (final String controlName: controlNames) {
+                    if (ResourceConfig.isInUse(appearancesMap, controlName))
                         return true;
                 }
             }
@@ -120,10 +120,9 @@ public class XFormsFeatures {
         }
     }
 
-    private static Map featuresByIdMap = new HashMap();
+    private static Map<String, FeatureConfig> featuresByIdMap = new HashMap<String, FeatureConfig>();
     static {
-        for (int i = 0; i < features.length; i++) {
-            final FeatureConfig currentFeatureConfig = features[i];
+        for (final FeatureConfig currentFeatureConfig: features) {
             featuresByIdMap.put(currentFeatureConfig.getId(), currentFeatureConfig);
         }
     }
@@ -368,14 +367,14 @@ public class XFormsFeatures {
             return true;
         }
 
-        public boolean isInUseByFeatureMap(Map featureMap) {
+        public boolean isInUseByFeatureMap(Map<String, FeatureConfig> featureMap) {
             // Default to true but can be overridden
             final String[] featureNames = getFeatureNames();
             if (featureNames == null)
                 return true;
 
-            for (int i = 0; i < featureNames.length; i++) {
-                final FeatureConfig featureConfig = (FeatureConfig) featureMap.get(featureNames[i]);
+            for (final String featureName: featureNames) {
+                final FeatureConfig featureConfig = featureMap.get(featureName);
                 // At least one feature uses this resource
                 if (featureConfig != null)
                     return true;
@@ -456,8 +455,7 @@ public class XFormsFeatures {
 
             sb.append("xforms");
 
-            for (int i = 0; i < features.length; i++) {
-                final FeatureConfig currentFeature = features[i];
+            for (final FeatureConfig currentFeature: features) {
                 if (currentFeature.isInUse(containingDocument, appearancesMap)) {
                     sb.append('-');
                     sb.append(currentFeature.getId());
@@ -471,10 +469,9 @@ public class XFormsFeatures {
         }
     }
 
-    public static List getCSSResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
-        final List result = new ArrayList();
-        for (int i = 0; i < stylesheets.length; i++) {
-            final ResourceConfig resourceConfig = stylesheets[i];
+    public static List<ResourceConfig> getCSSResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
+        final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
+        for (final ResourceConfig resourceConfig: stylesheets) {
             if (resourceConfig.isInUse(containingDocument, appearancesMap)) {
                 // Only include stylesheet if needed
                 result.add(resourceConfig);
@@ -483,10 +480,9 @@ public class XFormsFeatures {
         return result;
     }
 
-    public static List getCSSResourcesByFeatureMap(Map featureMap) {
-        final List result = new ArrayList();
-        for (int i = 0; i < stylesheets.length; i++) {
-            final ResourceConfig resourceConfig = stylesheets[i];
+    public static List<ResourceConfig> getCSSResourcesByFeatureMap(Map<String, FeatureConfig> featureMap) {
+        final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
+        for (final ResourceConfig resourceConfig: stylesheets) {
             if (resourceConfig.isInUseByFeatureMap(featureMap)) {
                 // Only include stylesheet if needed
                 result.add(resourceConfig);
@@ -495,10 +491,9 @@ public class XFormsFeatures {
         return result;
     }
 
-    public static List getJavaScriptResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
-        final List result = new ArrayList();
-        for (int i = 0; i < scripts.length; i++) {
-            final ResourceConfig resourceConfig = scripts[i];
+    public static List<ResourceConfig> getJavaScriptResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
+        final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
+        for (final ResourceConfig resourceConfig: scripts) {
             if (resourceConfig.isInUse(containingDocument, appearancesMap)) {
                 // Only include script if needed
                 result.add(resourceConfig);
@@ -507,10 +502,9 @@ public class XFormsFeatures {
         return result;
     }
 
-    public static List getJavaScriptResourcesByFeatureMap(Map featureMap) {
-        final List result = new ArrayList();
-        for (int i = 0; i < scripts.length; i++) {
-            final ResourceConfig resourceConfig = scripts[i];
+    public static List<ResourceConfig> getJavaScriptResourcesByFeatureMap(Map<String, FeatureConfig> featureMap) {
+        final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
+        for (final ResourceConfig resourceConfig: scripts) {
             if (resourceConfig.isInUseByFeatureMap(featureMap)) {
                 // Only include script if needed
                 result.add(resourceConfig);
@@ -520,6 +514,6 @@ public class XFormsFeatures {
     }
 
     public static FeatureConfig getFeatureById(String featureId) {
-        return (FeatureConfig) featuresByIdMap.get(featureId);
+        return featuresByIdMap.get(featureId);
     }
 }

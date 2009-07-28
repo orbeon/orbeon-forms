@@ -473,7 +473,7 @@ span.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap }
 /* This is also used for PDF generation */
 @media print {
     /* Don't hide as there is no script running */
-    form.xforms-initially-hidden { display: block }
+    html body form.xforms-initially-hidden { display: block }
     .fr-header { display: none }
     .fr-shadow { display: none }
     .fr-bottom { display: none }

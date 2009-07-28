@@ -77,7 +77,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                 connectionResult.getResponseInputStream().close();
             } catch (Exception e) {
                 // Simply can't read the body
-                XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
                 return;
             }
 
@@ -93,7 +93,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     setBodyDocument(responseBody);
                     return;
                 } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
+                    XFormsServer.logger.warn("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
                     isXMLParseFailed = true;
                 } finally {
                     try {
@@ -122,7 +122,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                         }
                     }
                 } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                    XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
                 }
             } else {
                 // This is binary

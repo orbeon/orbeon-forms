@@ -107,20 +107,20 @@ public class XFormsResourceServer extends ProcessorImpl {
                         NetUtils.copyStream(is, os);
                         os.flush();
                     } catch (Exception e) {
-                        XFormsServer.logger.error("Exception copying stream", e);
+                        XFormsServer.logger.warn("Exception copying stream", e);
                     } finally {
                         if (is != null) {
                             try {
                                 is.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.error("Exception closing input stream", e);
+                                XFormsServer.logger.warn("Exception closing input stream", e);
                             }
                         }
                         if (os != null) {
                             try {
                                 os.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.error("Exception closing output stream", e);
+                                XFormsServer.logger.warn("Exception closing output stream", e);
                             }
                         }
                     }
@@ -237,7 +237,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     try {
                         os.close();
                     } catch (IOException e) {
-                        XFormsServer.logger.error("Exception closing output stream", e);
+                        XFormsServer.logger.warn("Exception closing output stream", e);
                     }
                 }
             }

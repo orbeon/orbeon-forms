@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -50,8 +50,8 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
@@ -409,7 +409,7 @@ public class XFormsUtils {
      * Get the value of a child element by pushing the context of the child element on the binding stack first, then
      * calling getElementValue() and finally popping the binding context.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param container             current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
@@ -787,7 +787,7 @@ public class XFormsUtils {
      * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
      * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param value             value to convert
      * @param currentType       current type as exploded QName
      * @param newType           new type as exploded QName
@@ -819,7 +819,7 @@ public class XFormsUtils {
      * Resolve a render or action URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
      * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
@@ -859,7 +859,7 @@ public class XFormsUtils {
     /**
      * Resolve a resource URL including xml:base resolution.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
@@ -919,7 +919,7 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param propertyContext
+     * @param propertyContext    current context
      * @param contextItems       context items
      * @param contextPosition    context position
      * @param variableToValueMap variables
@@ -944,7 +944,7 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param xpathContext      current XPath context
      * @param contextNode       context node for evaluation
      * @param attributeValue    attribute value

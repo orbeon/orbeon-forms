@@ -123,7 +123,7 @@
                 <xforms:bind nodeset="//column/@nextSortOrder"
                     calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"/>
                 <xforms:bind nodeset="//column/@pathToFirstNode"
-                    calculate="concat('xxforms:component-context()/({/*/xhtml:tbody/xforms:repeat/@nodeset})[1]/', ../@sortKey)"/>
+                    calculate="concat('xxforms:component-context()/({/*/xhtml:tbody/xforms:repeat/@nodeset})[1]/(', ../@sortKey, ')')"/>
                 <xforms:bind nodeset="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
                 <xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
                     calculate="for $value in xxforms:evaluate(../@pathToFirstNode)
@@ -426,7 +426,7 @@
         
     -->
 
-    <xsl:template match="*" mode="sortKey">
+    <xsl:template match="*" mode="sortKey" priority="-0.25">
         <xsl:apply-templates select="*" mode="sortKey"/>
     </xsl:template>
 
@@ -449,7 +449,7 @@
             datatable header (expecting either xhtml:th or xforms:repeat).</xsl:message>
     </xsl:template>
 
-    <xsl:template match="/*/xhtml:thead/xhtml:tr/xhtml:th" mode="columns">
+    <xsl:template match="/*/xhtml:thead/xhtml:tr/xhtml:th" mode="columns" priority="1">
         <xsl:variable name="position" select="count(preceding-sibling::*) + 1"/>
         <xsl:variable name="body"
             select="/*/xhtml:tbody/xforms:repeat/xhtml:tr/*[position() = $position]"/>
@@ -471,7 +471,7 @@
         </column>
     </xsl:template>
 
-    <xsl:template match="/*/xhtml:thead/xhtml:tr/xforms:repeat" mode="columns">
+    <xsl:template match="/*/xhtml:thead/xhtml:tr/xforms:repeat" mode="columns" priority="1">
         <xsl:variable name="position" select="count(preceding-sibling::*) + 1"/>
         <xsl:variable name="body"
             select="/*/xhtml:tbody/xforms:repeat/xhtml:tr/*[position() = $position]"/>

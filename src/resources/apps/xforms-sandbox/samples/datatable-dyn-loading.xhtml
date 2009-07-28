@@ -45,6 +45,7 @@
                     </record>
                 </instance>
             </xforms:instance>
+            <xforms:bind nodeset="instance('instance')/record/measure" type="xs:decimal"/>            
             <xforms:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
             <xxforms:script ev:event="xforms-model-construct-done">
@@ -85,7 +86,7 @@
                             </xhtml:td>
                         </xforms:repeat>
                         <xhtml:td>
-                            <xforms:output value="avg(measure)"/>
+                            <xforms:output value="if (measure) then avg(measure) cast as xs:decimal else 0"/>
                         </xhtml:td>
                     </xhtml:tr>
                 </xforms:repeat>

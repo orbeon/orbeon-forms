@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control;
 
@@ -17,8 +17,8 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -270,7 +270,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Get the value of a label, help, hint or alert related to this control.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)    @return                      string containing the result of the evaluation, null if evaluation failed
@@ -774,7 +774,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an attribute of the control as an AVT.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param attributeValue    value of the attribute
      * @return                  value of the AVT or null if cannot be computed
      */
@@ -817,7 +817,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param xpathString       XPath expression
      * @return                  value, or null if cannot be computed
      */
@@ -852,7 +852,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param contextItem           context item
      * @param xpathString           XPath expression
      * @param prefixToURIMap        namespace mappings to use

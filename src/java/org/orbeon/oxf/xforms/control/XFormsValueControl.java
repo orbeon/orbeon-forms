@@ -1,28 +1,28 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -79,8 +79,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * Notify the control that its value has changed due to external user interaction. The value passed is a value as
      * understood by the UI layer.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param value             the new external value
+     * @param type
      * @param filesElement      special filesElement construct for controls that need it
      */
     public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
@@ -130,7 +131,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the control's internal value.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public final String getValue(PropertyContext propertyContext) {
         if (!isValueEvaluated) {
@@ -143,7 +144,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the control's external value is the value as exposed to the UI layer.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public final String getExternalValue(PropertyContext propertyContext) {
         if (!isExternalValueEvaluated) {

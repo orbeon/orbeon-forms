@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -155,9 +155,9 @@ public class ImageServer extends ProcessorImpl {
                     result.quality = (qualityString == null) ? null : new Float(qualityString);
 
                     String useCacheString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/use-cache");
-                    result.useCache = (useCacheString == null) ? null : new Boolean(useCacheString);
+                    result.useCache = (useCacheString == null) ? null : Boolean.valueOf(useCacheString);
 
-                    result.transformCount = XPathUtils.selectIntegerValue(imageConfigDocument, "count(/image/transform)").intValue();
+                    result.transformCount = XPathUtils.selectIntegerValue(imageConfigDocument, "count(/image/transform)");
                     Object transforms = XPathUtils.selectObjectValue(imageConfigDocument, "/image/transform");
                     if (transforms != null && transforms instanceof Node)
                         transforms = Collections.singletonList(transforms);
@@ -168,14 +168,14 @@ public class ImageServer extends ProcessorImpl {
                 }
             });
 
-            final float quality = (imageConfig.quality == null) ? config.defaultQuality : imageConfig.quality.floatValue();
-            final boolean useCache = config.cacheDir != null && ((imageConfig.useCache == null) ? DEFAULT_USE_CACHE : imageConfig.useCache.booleanValue());
+            final float quality = (imageConfig.quality == null) ? config.defaultQuality : imageConfig.quality;
+            final boolean useCache = config.cacheDir != null && ((imageConfig.useCache == null) ? DEFAULT_USE_CACHE : imageConfig.useCache);
 
             URLConnection urlConnection = null;
             InputStream urlConnectionInputStream = null;
             try {
                 // Make sure the requested resource exists and is valid
-                URL newURL = null;
+                final URL newURL;
                 try {
                     newURL = URLFactory.createURL(config.imageDirectoryURL, imageConfig.urlString);
                     // Check if new URL is relative to image directory URL
@@ -205,7 +205,7 @@ public class ImageServer extends ProcessorImpl {
                 long lastModified = NetUtils.getLastModified(urlConnection);
 
                 // Cache handling
-                String cacheFileName = useCache ? computeCacheFileName(config.cachePathEncoding, imageConfig.urlString, (List) imageConfig.transforms) : null;
+                String cacheFileName = useCache ? computeCacheFileName(config.cachePathEncoding, imageConfig.urlString, (List<Element>) imageConfig.transforms) : null;
                 File cacheFile = useCache ? new File(config.cacheDir, cacheFileName) : null;
                 boolean cacheInvalid = !useCache || !cacheFile.exists() || lastModified == 0 || lastModified > cacheFile.lastModified() || cacheFile.length() == 0;
                 boolean mustProcess = cacheInvalid;
@@ -235,9 +235,9 @@ public class ImageServer extends ProcessorImpl {
                     OutputStream os = null;
                     try {
                         // Try to obtain decoded image from cache first
-                        Long cacheValidity = new Long(lastModified);
+                        Long cacheValidity = lastModified;
                         String cacheKey = "[" + newURL.toExternalForm() + "][" + cacheValidity + "]";
-                        BufferedImage img1 = null;
+                        BufferedImage img1;
                         // Decode one image at a time to try to minimize the memory impact
                         // NOTE: This should probably be configurable
                         synchronized (ImageServer.this) {
@@ -465,12 +465,11 @@ public class ImageServer extends ProcessorImpl {
         public OutputStream getOutputStream() throws IOException;
     }
 
-    private String computeCacheFileName(String type, String path, List nodes) {
+    private String computeCacheFileName(String type, String path, List<Element> nodes) {
         // Create digest document and digest
         Document document = new NonLazyUserDataDocument();
         Element rootElement = document.addElement("image");
-        for (Iterator i = nodes.iterator(); i.hasNext();) {
-            Element element = (Element) i.next();
+        for (Element element: nodes) {
             rootElement.add(element.createCopy());
         }
         String digest = NumberUtils.toHexString(Dom4jUtils.getDigest(document));
@@ -520,7 +519,7 @@ public class ImageServer extends ProcessorImpl {
         int currentHeight = img.getHeight(null);
 
         // There may be one drawing operation
-        List drawConfiguration = new ArrayList();
+        List<Node> drawConfiguration = new ArrayList<Node>();
 
         // Iterate through all transforms
         while (transformIterator.hasNext()) {
@@ -615,36 +614,35 @@ public class ImageServer extends ProcessorImpl {
         Graphics2D graphics = newImage.createGraphics();
         graphics.drawImage(filteredImg, null, null);
         // Check for drawing operation
-        for (Iterator drawConfigIterator = drawConfiguration.iterator(); drawConfigIterator.hasNext();) {
-            Node drawConfigNode = (Node) drawConfigIterator.next();
+        for (Node drawConfigNode: drawConfiguration) {
             for (Iterator i = XPathUtils.selectIterator(drawConfigNode, "rect | fill | line"); i.hasNext();) {
                 Node node = (Node) i.next();
                 String operation = XPathUtils.selectStringValueNormalize(node, "name()");
                 if ("rect".equals(operation)) {
-                    int x = XPathUtils.selectIntegerValue(node, "@x").intValue();
-                    int y = XPathUtils.selectIntegerValue(node, "@y").intValue();
-                    int width = XPathUtils.selectIntegerValue(node, "@width").intValue() - 1;
-                    int height = XPathUtils.selectIntegerValue(node, "@height").intValue() - 1;
+                    int x = XPathUtils.selectIntegerValue(node, "@x");
+                    int y = XPathUtils.selectIntegerValue(node, "@y");
+                    int width = XPathUtils.selectIntegerValue(node, "@width") - 1;
+                    int height = XPathUtils.selectIntegerValue(node, "@height") - 1;
                     Node colorNode = XPathUtils.selectSingleNode(node, "color");
                     if (colorNode != null) {
                         graphics.setColor(getColor(colorNode));
                     }
                     graphics.drawRect(x, y, width, height);
                 } else if ("fill".equals(operation)) {
-                    int x = XPathUtils.selectIntegerValue(node, "@x").intValue();
-                    int y = XPathUtils.selectIntegerValue(node, "@y").intValue();
-                    int width = XPathUtils.selectIntegerValue(node, "@width").intValue();
-                    int height = XPathUtils.selectIntegerValue(node, "@height").intValue();
+                    int x = XPathUtils.selectIntegerValue(node, "@x");
+                    int y = XPathUtils.selectIntegerValue(node, "@y");
+                    int width = XPathUtils.selectIntegerValue(node, "@width");
+                    int height = XPathUtils.selectIntegerValue(node, "@height");
                     Node colorNode = XPathUtils.selectSingleNode(node, "color");
                     if (colorNode != null) {
                         graphics.setColor(getColor(colorNode));
                     }
                     graphics.fillRect(x, y, width, height);
                 } else if ("line".equals(operation)) {
-                    int x1 = XPathUtils.selectIntegerValue(node, "@x1").intValue();
-                    int y1 = XPathUtils.selectIntegerValue(node, "@y1").intValue();
-                    int x2 = XPathUtils.selectIntegerValue(node, "@x2").intValue();
-                    int y2 = XPathUtils.selectIntegerValue(node, "@y2").intValue();
+                    int x1 = XPathUtils.selectIntegerValue(node, "@x1");
+                    int y1 = XPathUtils.selectIntegerValue(node, "@y1");
+                    int x2 = XPathUtils.selectIntegerValue(node, "@x2");
+                    int y2 = XPathUtils.selectIntegerValue(node, "@y2");
                     Node colorNode = XPathUtils.selectSingleNode(node, "color");
                     if (colorNode != null) {
                         graphics.setColor(getColor(colorNode));
@@ -691,6 +689,6 @@ public class ImageServer extends ProcessorImpl {
 
     private int selectIntValue(Node node, String expr, int def) {
         Integer integerValue = XPathUtils.selectIntegerValue(node, expr);
-        return (integerValue == null) ? def : integerValue.intValue();
+        return (integerValue == null) ? def : integerValue;
     }
 }

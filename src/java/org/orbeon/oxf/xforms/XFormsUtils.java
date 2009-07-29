@@ -125,7 +125,7 @@ public class XFormsUtils {
     // Use a Deflater pool as creating Deflaters is expensive
     final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
 
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
+    public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // Get SAXStore
@@ -153,10 +153,10 @@ public class XFormsUtils {
         }
 
         // Encode bytes
-        return encodeBytes(pipelineContext, bytes, encryptionPassword);
+        return encodeBytes(propertyContext, bytes, encryptionPassword);
     }
 
-    public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
+    public static String encodeBytes(PropertyContext propertyContext, byte[] bytesToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
             // Compress if needed
@@ -177,10 +177,10 @@ public class XFormsUtils {
                 // Perform encryption
                 if (gzipByteArray == null) {
                     // The data was not compressed above
-                    return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode);
+                    return "X1" + SecureUtils.encrypt(propertyContext, encryptionPassword, bytesToEncode);
                 } else {
                     // The data was compressed above
-                    return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
+                    return "X2" + SecureUtils.encrypt(propertyContext, encryptionPassword, gzipByteArray);
                 }
             } else {
                 // No encryption
@@ -676,13 +676,13 @@ public class XFormsUtils {
         }
     }
 
-    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML) {
-        return decodeXML(pipelineContext, encodedXML, XFormsProperties.getXFormsPassword());
+    public static Document decodeXML(PropertyContext propertyContext, String encodedXML) {
+        return decodeXML(propertyContext, encodedXML, XFormsProperties.getXFormsPassword());
     }
 
-    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+    public static Document decodeXML(PropertyContext propertyContext, String encodedXML, String encryptionPassword) {
 
-        final byte[] bytes = decodeBytes(pipelineContext, encodedXML, encryptionPassword);
+        final byte[] bytes = decodeBytes(propertyContext, encodedXML, encryptionPassword);
 
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
@@ -715,7 +715,7 @@ public class XFormsUtils {
 //        }
 //    }
 
-    public static byte[] decodeBytes(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
+    public static byte[] decodeBytes(PropertyContext propertyContext, String encoded, String encryptionPassword) {
         try {
             // Get raw text
             byte[] resultBytes;
@@ -727,12 +727,12 @@ public class XFormsUtils {
                 final byte[] gzipByteArray;
                 if (prefix.equals("X1")) {
                     // Encryption + uncompressed
-                    resultBytes1 = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
+                    resultBytes1 = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
                     gzipByteArray = null;
                 } else if (prefix.equals("X2")) {
                     // Encryption + compressed
                     resultBytes1 = null;
-                    gzipByteArray = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
+                    gzipByteArray = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
                 } else if (prefix.equals("X3")) {
                     // No encryption + uncompressed
                     resultBytes1 = Base64.decode(encodedString);

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006-2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -23,13 +23,14 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
@@ -121,22 +122,23 @@ public class XFormsStaticState {
      * Create static state object from a Document. This constructor is used when creating an initial static state upon
      * producing an XForms page.
      *
+     * @param propertyContext       current context
      * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards by the caller.
      * @param namespacesMap         Map<String staticId, Map<String prefix, String uri>> of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
-    public XFormsStaticState(PipelineContext pipelineContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
-        initialize(pipelineContext, staticStateDocument, namespacesMap, annotatedDocument, null);
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
+        initialize(propertyContext, staticStateDocument, namespacesMap, annotatedDocument, null);
     }
 
     /**
      * Create static state object from an encoded version. This constructor is used when restoring a static state from
      * a serialized form.
      *
-     * @param pipelineContext       current PipelineContext
+     * @param pipelineContext       current PropertyContext
      * @param encodedStaticState    encoded static state
      */
-    public XFormsStaticState(PipelineContext pipelineContext, String encodedStaticState) {
+    public XFormsStaticState(PropertyContext pipelineContext, String encodedStaticState) {
 
         // Decode encodedStaticState into staticStateDocument
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
@@ -160,12 +162,13 @@ public class XFormsStaticState {
      * o staticStateDocument, namespaceMap, and optional xhtmlDocument
      * o staticStateDocument and encodedStaticState
      *
+     * @param propertyContext       current context
      * @param staticStateDocument
      * @param encodedStaticState
      * @param namespacesMap
      * @param xhtmlDocument
      */
-    private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
+    private void initialize(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
                             SAXStore xhtmlDocument, String encodedStaticState) {
 
         XFormsContainingDocument.logDebugStatic("static state", "initializing");
@@ -226,7 +229,7 @@ public class XFormsStaticState {
         }
 
         // Extract controls, models and components documents
-        extractControlsModelsComponents(pipelineContext, staticStateElement);
+        extractControlsModelsComponents(propertyContext, staticStateElement);
 
         // Extract properties information
         extractProperties(staticStateElement);
@@ -255,7 +258,7 @@ public class XFormsStaticState {
                 }
             } else {
                 // Otherwise use matchers from the pipeline context
-                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PipelineContext.PATH_MATCHERS);
             }
         }
 
@@ -356,7 +359,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsModelsComponents(PipelineContext pipelineContext, Element staticStateElement) {
+    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
 
         final Configuration xpathConfiguration = new Configuration();
 
@@ -429,7 +432,7 @@ public class XFormsStaticState {
         modelDocuments.put(prefixedId, modelDocument);
     }
 
-    private void extractXFormsScripts(PipelineContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+    private void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
 
         // TODO: Not sure why we actually extract the scripts: we could just keep pointers on them, right? There is
         // probably not a notable performance if any at all, especially since this is needed at page generation time
@@ -483,10 +486,10 @@ public class XFormsStaticState {
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
      * return a serialized static state computed from models, instances, and XHTML documents.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param pipelineContext   current PropertyContext
      * @return                  serialized static sate
      */
-    public String getEncodedStaticState(PipelineContext pipelineContext) {
+    public String getEncodedStaticState(PropertyContext pipelineContext) {
 
         if (!initialized) {
 
@@ -748,7 +751,7 @@ public class XFormsStaticState {
      * @param pipelineContext   current pipeline context
      * @return                  true iif analysis was just performed in this call
      */
-    public synchronized boolean analyzeIfNecessary(final PipelineContext pipelineContext) {
+    public synchronized boolean analyzeIfNecessary(final PropertyContext pipelineContext) {
         if (!isAnalyzed) {
             controlTypes = new HashMap<String, Map<String, ControlInfo>>();
             eventNamesMap = new HashMap<String, String>();
@@ -787,7 +790,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractEventHandlers(PipelineContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
+    private void extractEventHandlers(PropertyContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
 
         // Register event handlers on any element which has an id or an observer attribute.
         // This also allows registering event handlers on XBL components. This follows the semantics of XML Events.
@@ -862,7 +865,7 @@ public class XFormsStaticState {
         return false;
     }
 
-    public void analyzeComponentTree(final PipelineContext pipelineContext, final Configuration xpathConfiguration,
+    public void analyzeComponentTree(final PropertyContext pipelineContext, final Configuration xpathConfiguration,
                                       final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
                                       final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
@@ -1137,7 +1140,7 @@ public class XFormsStaticState {
         }
     }
 
-    public static List<Document> extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
+    public static List<Document> extractNestedModels(PropertyContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
 
         final List<Document> result = new ArrayList<Document>();
 

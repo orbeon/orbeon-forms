@@ -65,7 +65,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param eventHandlerElement       event handler element (e.g. xbl:handler or xforms:action)
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      * @param isXBLHandler              whether the handler is an XBL handler (i.e. xbl:handler)
-     * @param observers                 space-separated list of observers, or null if parent element
+     * @param observersStaticIds        space-separated list of observers static ids, or null if parent element
      * @param eventNamesAttribute       space-separated list of event names
      * @param targets                   space-separated list of event targets
      * @param phase                     event phase ("capture" | "default", poss. more later as XBL has "capture" | "target" | "bubble" | "default-action")
@@ -73,7 +73,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param defaultAction             whether default action must run ("cancel" | "perform")
      */
     public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId, boolean isXBLHandler,
-                                  String observers, String eventNamesAttribute, String targets, String phase,
+                                  String observersStaticIds, String eventNamesAttribute, String targets, String phase,
                                   String propagate, String defaultAction) {
 
         this.eventHandlerElement = eventHandlerElement;
@@ -83,9 +83,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
         final Element parentElement = eventHandlerElement.getParent();
-        if (observers != null) {
+        if (observersStaticIds != null) {
             // ev:observer attribute specifies observers
-            observerStaticIds = StringUtils.split(observers);
+            observerStaticIds = StringUtils.split(observersStaticIds);
         } else if (parentElement != null && parentElement.attributeValue("id") != null) {
             // Observer is parent
             observerStaticIds = new String[] { parentElement.attributeValue("id")};

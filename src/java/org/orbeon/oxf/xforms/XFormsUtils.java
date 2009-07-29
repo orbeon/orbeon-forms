@@ -1380,6 +1380,7 @@ public class XFormsUtils {
                 final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
+                    @Override
                     protected XFormsContextStack getContextStack() {
                         return LHHAElementVisitorListener.this.contextStack;
                     }

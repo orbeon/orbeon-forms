@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -31,12 +31,12 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingContentHan
     private int level = 0;
     private int xformsInstanceLevel = -1;
 
-    private final Map namespaceMappings;
+    private final Map<String, Map<String, Object>> namespaceMappings;
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
 //    private final Map ids = new HashMap();
 
-    public XFormsNamespaceExtractorContentHandler(Map namespaceMappings) {
+    public XFormsNamespaceExtractorContentHandler(Map<String, Map<String, Object>> namespaceMappings) {
         this.namespaceMappings = namespaceMappings;
     }
 
@@ -60,7 +60,7 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingContentHan
 //                ids.put(idAttribute, "");
 
                 // Gather namespace information
-                final Map namespaces = new HashMap();
+                final Map<String, Object> namespaces = new HashMap<String, Object>();
                 for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
                     final String namespacePrefix = (String) e.nextElement();
                     if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))

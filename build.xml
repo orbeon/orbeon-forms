@@ -102,6 +102,8 @@
         <include name="flying-saucer-r8-core-renderer.jar"/>
         <include name="flying-saucer-r8-core-renderer-minimal.jar"/>
         <include name="flying-saucer-r8-itext-2_0_8.jar"/>
+        <include name="itext-bcmail-jdk14-138.jar"/>
+        <include name="itext-bcprov-jdk14-138.jar"/>
 
         <include name="barcode4j-1.0.jar"/>
 
@@ -290,7 +292,7 @@
         <jar destfile='${cli.jar.file}' compress='false'  >
           <manifest>
             <attribute name='Main-Class' value='org.orbeon.oxf.main.OPS' />
-            <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
+            <attribute name='Class-Path' value='lib/${jar.name} lib/${project.name}-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}' />
           </manifest>
         </jar>
 

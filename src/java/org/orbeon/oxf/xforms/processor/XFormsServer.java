@@ -135,7 +135,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
-            final Element eventElement = (Element) eventElements.get(0);
+            final Element eventElement = eventElements.get(0);
             final String eventName = eventElement.attributeValue("name");
             if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
 
@@ -221,7 +221,7 @@ public class XFormsServer extends ProcessorImpl {
         // Submission object. It should therefore be safe not to synchronize in this case. But do we want to take the
         // risk?
 
-//        final Object documentSyncronizationObject = (contentHandler != null) ? containingDocument : new Object();
+//        final Object documentSynchronizationObject = (contentHandler != null) ? containingDocument : new Object();
         synchronized (containingDocument) {
             try {
                 // Run events if any
@@ -910,7 +910,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                    List state1, List state2,
+                                    List<XFormsControl> state1, List<XFormsControl> state2,
                                     Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
                                     Map valueChangeControlIds) {
         containingDocument.startHandleOperation("XForms server", "computing differences");

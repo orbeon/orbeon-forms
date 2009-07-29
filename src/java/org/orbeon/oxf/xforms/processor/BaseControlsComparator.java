@@ -1,33 +1,35 @@
 /**
- *  Copyright (C) 2005-2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 
 public abstract class BaseControlsComparator implements ControlsComparator {
@@ -153,11 +155,9 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 );
             } else {
                 // This is a new switch (can happen with repeat), send all deselected to be sure
-                final List children = switchControl2.getChildren();
+                final List<XFormsControl> children = switchControl2.getChildren();
                 if (children != null && children.size() > 0) {
-                    for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControl caseControl = (XFormsControl) j.next();
-
+                    for (final XFormsControl caseControl: children) {
                         if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
                                     "id", caseControl.getEffectiveId(),
@@ -174,7 +174,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
 
         final String effectiveDialogId = dialogControl2.getEffectiveId();
 
-        final boolean previousVisible = (dialogControl1 != null) ? dialogControl1.wasVisible() : false;
+        final boolean previousVisible = (dialogControl1 != null) && dialogControl1.wasVisible();
         // NOTE: We only compare on isVisible as we don't support just changing the neighbor for now
         if (dialogControl1 == null || previousVisible != dialogControl2.isVisible()) {
 
@@ -194,8 +194,8 @@ public abstract class BaseControlsComparator implements ControlsComparator {
     // public for unit tests
     public static boolean diffCustomMIPs(AttributesImpl attributesImpl, XFormsSingleNodeControl xformsSingleNodeControl1,
                                      XFormsSingleNodeControl xformsSingleNodeControl2, boolean newlyVisibleSubtree, boolean doOutputElement) {
-        final Map customMIPs1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getCustomMIPs();
-        final Map customMIPs2 = xformsSingleNodeControl2.getCustomMIPs();
+        final Map<String, String> customMIPs1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getCustomMIPs();
+        final Map<String, String> customMIPs2 = xformsSingleNodeControl2.getCustomMIPs();
 
         if (newlyVisibleSubtree || !XFormsSingleNodeControl.compareCustomMIPs(customMIPs1, customMIPs2)) {
             // Custom MIPs changed
@@ -207,13 +207,12 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 final FastStringBuffer sb = new FastStringBuffer(100);
 
                 // Classes to remove
-                for (Iterator k = customMIPs1.entrySet().iterator(); k.hasNext();) {
-                    final Map.Entry entry = (Map.Entry) k.next();
-                    final String name = (String) entry.getKey();
-                    final String value = (String) entry.getValue();
+                for (final Map.Entry<String, String> entry: customMIPs1.entrySet()) {
+                    final String name = entry.getKey();
+                    final String value = entry.getValue();
 
                     // customMIPs2 may be null if the control becomes no longer bound
-                    final String newValue = (customMIPs2 == null) ? null : (String) customMIPs2.get(name);
+                    final String newValue = (customMIPs2 == null) ? null : customMIPs2.get(name);
                     if (newValue == null || !value.equals(newValue)) {
 
                         if (sb.length() > 0)
@@ -230,12 +229,11 @@ public abstract class BaseControlsComparator implements ControlsComparator {
                 // Classes to add
                 // customMIPs2 may be null if the control becomes no longer bound
                 if (customMIPs2 != null) {
-                    for (Iterator k = customMIPs2.entrySet().iterator(); k.hasNext();) {
-                        final Map.Entry entry = (Map.Entry) k.next();
-                        final String name = (String) entry.getKey();
-                        final String value = (String) entry.getValue();
+                    for (final Map.Entry<String, String> entry: customMIPs2.entrySet()) {
+                        final String name = entry.getKey();
+                        final String value = entry.getValue();
 
-                        final String oldValue = (String) customMIPs1.get(name);
+                        final String oldValue = customMIPs1.get(name);
                         if (oldValue == null || !value.equals(oldValue)) {
 
                             if (sb.length() > 0)

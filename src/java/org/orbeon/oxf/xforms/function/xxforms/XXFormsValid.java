@@ -40,7 +40,7 @@ public class XXFormsValid extends XFormsFunction {
 
         // Whether to recurse
         final Expression recurseExpression = (argument == null || argument.length < 2) ? null : argument[1];
-        final boolean recurse = (recurseExpression != null) ? ExpressionTool.effectiveBooleanValue(recurseExpression.iterate(xpathContext)) : false;
+        final boolean recurse = (recurseExpression != null) && ExpressionTool.effectiveBooleanValue(recurseExpression.iterate(xpathContext));
 
         // "If the node-set is empty then the function returns false."
         if (item == null || !(item instanceof NodeInfo))

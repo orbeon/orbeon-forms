@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
@@ -65,25 +65,25 @@ public class XXFormsCallXPL extends XFormsFunction {
             }
 
             // Get list of input names
-            final List inputNames = new ArrayList();
+            final List<String> inputNames = new ArrayList<String>();
             {
                 final Expression inputNamesExpression = argument[1];
                 final SequenceIterator i = inputNamesExpression.iterate(xpathContext);
 
                 Item currentItem;
-                while ((currentItem = (Item) i.next()) != null) {
+                while ((currentItem = i.next()) != null) {
                     inputNames.add(currentItem.getStringValue());
                 }
             }
 
             // Get list of input documents
-            final List inputNodeInfos = new ArrayList();
+            final List<Item> inputNodeInfos = new ArrayList<Item>();
             {
                 final Expression inputDocumentsExpression = argument[2];
                 final SequenceIterator i = inputDocumentsExpression.iterate(xpathContext);
 
                 Item currentItem;
-                while ((currentItem = (Item) i.next()) != null) {
+                while ((currentItem = i.next()) != null) {
                     inputNodeInfos.add(currentItem);
                 }
             }
@@ -93,13 +93,13 @@ public class XXFormsCallXPL extends XFormsFunction {
                         + ") must be equal to the length of the sequence of input nodes (" + inputNodeInfos.size() + ").");//getDisplayName()
 
             // Get list of output names
-            final List outputNames = new ArrayList();
+            final List<String> outputNames = new ArrayList<String>();
             {
                 final Expression inputNamesExpression = argument[3];
                 final SequenceIterator i = inputNamesExpression.iterate(xpathContext);
 
                 Item currentItem;
-                while ((currentItem = (Item) i.next()) != null) {
+                while ((currentItem = i.next()) != null) {
                     outputNames.add(currentItem.getStringValue());
                 }
             }
@@ -113,9 +113,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 
                     Iterator inputNodesIterator = inputNodeInfos.iterator();
-                    for (Iterator i = inputNames.iterator(); i.hasNext();) {
-                        final String inputName = (String) i.next();
-
+                    for (final String inputName: inputNames) {
                         final NodeInfo inputNodeInfo = (NodeInfo) inputNodesIterator.next();
 
                         if (!(inputNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE || inputNodeInfo.getNodeKind() == org.w3c.dom.Document.DOCUMENT_NODE))
@@ -141,7 +139,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                             processorDefinition.addInput(inputName, inputElement);
                         } else {
                             // Copy to dom4j
-                            
+
 //                            final DocumentInfo inputDocumentInfo = TransformerUtils.readTinyTree(inputNodeInfo);
 //                            processorDefinition.addInput(inputName, inputDocumentInfo);
 
@@ -176,29 +174,23 @@ public class XXFormsCallXPL extends XFormsFunction {
                     return EmptyIterator.getInstance();
                 } else {
                     // Create all outputs to read
-                    List outputs = new ArrayList(outputNames.size());
-                    for (Iterator i = outputNames.iterator(); i.hasNext();) {
-                        String outputName = (String) i.next();
-
+                    List<ProcessorOutput> outputs = new ArrayList<ProcessorOutput>(outputNames.size());
+                    for (String outputName: outputNames) {
                         ProcessorOutput output = processor.createOutput(outputName);
                         outputs.add(output);
                     }
 
                     // Connect all DOM serializers
-                    List domSerializers = new ArrayList(outputNames.size());
-                    for (Iterator i = outputs.iterator(); i.hasNext();) {
-                        ProcessorOutput output = (ProcessorOutput) i.next();
-
+                    List<DOMSerializer> domSerializers = new ArrayList<DOMSerializer>(outputNames.size());
+                    for (ProcessorOutput output: outputs) {
                         DOMSerializer domSerializer = new DOMSerializer();
                         PipelineUtils.connect(processor, output.getName(), domSerializer, "data");
                         domSerializers.add(domSerializer);
                     }
 
                     // Read all outputs in sequence
-                    List results = new ArrayList(outputNames.size());
-                    for (Iterator i = domSerializers.iterator(); i.hasNext();) {
-                        DOMSerializer domSerializer = (DOMSerializer) i.next();
-
+                    List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
+                    for (DOMSerializer domSerializer: domSerializers) {
                         domSerializer.start(pipelineContext);
                         results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null, new Configuration()));
                     }

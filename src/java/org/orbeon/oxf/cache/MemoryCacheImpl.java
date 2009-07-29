@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.util.PropertyContext;
-import org.apache.commons.collections.iterators.TransformIterator;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.iterators.TransformIterator;
+import org.orbeon.oxf.util.PropertyContext;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +68,7 @@ public class MemoryCacheImpl implements Cache {
         public void incrementMissCount() { missCount++; }
         public void incrementAddCount() { addCount++; }
         public void incrementExpirationCount() { expirationCount++; }
-    };
+    }
 
     public synchronized void add(PropertyContext propertyContext, CacheKey key, Object validity, Object object) {
         if (key == null || validity == null || maxSize == 0) return;
@@ -149,7 +149,7 @@ public class MemoryCacheImpl implements Cache {
                 result = entry.object;
             } else if (expiration != EXPIRATION_NO_CACHE) {
                 // Get last modified date
-                long lastModified = ((Long) entry.validity).longValue();
+                long lastModified = (Long) entry.validity;
                 if (System.currentTimeMillis() < lastModified + expiration)
                     result = entry.object;
             }
@@ -216,7 +216,7 @@ public class MemoryCacheImpl implements Cache {
             }
             return true;
         } else if (left instanceof Long && right instanceof Long) {
-            return ((Long) left).longValue() <= ((Long) right).longValue();
+            return (Long) left <= (Long) right;
         } else {
             return false;
         }

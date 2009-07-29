@@ -144,7 +144,7 @@ public abstract class XFormsEvent implements Cloneable {
 
     protected String getAttributeAsString(String name) {
         try {
-            final Item item = (Item) getAttribute(name).next();
+            final Item item = getAttribute(name).next();
             return (item != null) ? item.getStringValue() : null;
         } catch (XPathException e) {
             throw new OXFException(e);

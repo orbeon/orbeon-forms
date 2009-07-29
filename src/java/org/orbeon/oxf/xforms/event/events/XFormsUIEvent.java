@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.event.events;
 
@@ -122,9 +122,8 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
 
             if (parts.length > 0) {
-                final List tokens = new ArrayList(parts.length);
-                for (int i = 0; i < parts.length; i++) {
-                    final Integer currentIndex = parts[i];
+                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
+                for (final Integer currentIndex: parts) {
                     tokens.add(new StringValue(currentIndex.toString()));
                 }
                 return new ListIterator(tokens);
@@ -137,9 +136,8 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             final String[] parts = XFormsUtils.getEffectiveIdPrefixParts(effectiveTargetId);
 
             if (parts.length > 0) {
-                final List tokens = new ArrayList(parts.length);
-                for (int i = 0; i < parts.length; i++) {
-                    final String currentPart = parts[i];
+                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
+                for (final String currentPart: parts) {
                     tokens.add(new StringValue(currentPart));
                 }
                 return new ListIterator(tokens);

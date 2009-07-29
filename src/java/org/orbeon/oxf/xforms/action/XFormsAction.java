@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action;
 
@@ -42,7 +42,7 @@ public abstract class XFormsAction {
      * Add event context attributes based on nested xxforms:context elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param actionElement     action element
      * @param event             event to add context information to
      */
@@ -78,7 +78,7 @@ public abstract class XFormsAction {
      * Resolve the value of an attribute which may be an AVT.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeName     name of the attribute containing the value
      * @param isNamespace       whether to namespace the resulting value
@@ -97,7 +97,7 @@ public abstract class XFormsAction {
      * Resolve the value of an attribute which may be an AVT.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeName     QName of the attribute containing the value
      * @param isNamespace       whether to namespace the resulting value
@@ -116,7 +116,7 @@ public abstract class XFormsAction {
      * Resolve a value which may be an AVT.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeValue    raw value to resolve
      * @param isNamespace       whether to namespace the resulting value
@@ -160,7 +160,7 @@ public abstract class XFormsAction {
      * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param sourceEffectiveId effective id of the source action
      * @param targetStaticId    target to resolve
      * @param actionElement     current action element
@@ -185,7 +185,7 @@ public abstract class XFormsAction {
      * Resolve an object by passing the
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param eventObserver     event observer
      * @param objectStaticId    target to resolve
      * @param actionElement     current action element

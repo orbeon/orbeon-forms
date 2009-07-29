@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005-2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.helpers.AttributesImpl;
@@ -31,15 +32,15 @@ import java.util.Map;
 
 public class NewControlsComparator extends BaseControlsComparator {
 
-    public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Map valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
-    public void diff(List state1, List state2) {
+    public void diff(List<XFormsControl> state1, List<XFormsControl> state2) {
         diff(state1, state2, false);
     }
 
-    public void diff(List state1, List state2, boolean isWithinNewRepeatIteration) {
+    public void diff(List<XFormsControl> state1, List<XFormsControl> state2, boolean isWithinNewRepeatIteration) {
 
         // Normalize
         if (state1 != null && state1.size() == 0)
@@ -64,13 +65,13 @@ public class NewControlsComparator extends BaseControlsComparator {
         {
             final AttributesImpl attributesImpl = new AttributesImpl();
 
-            final Iterator leftIterator = (state1 == null) ? null : state1.iterator();
-            final Iterator rightIterator = (state2 == null) ? null : state2.iterator();
-            final Iterator leadingIterator = (rightIterator != null) ? rightIterator : leftIterator;
+            final Iterator<XFormsControl> leftIterator = (state1 == null) ? null : state1.iterator();
+            final Iterator<XFormsControl> rightIterator = (state2 == null) ? null : state2.iterator();
+            final Iterator<XFormsControl> leadingIterator = (rightIterator != null) ? rightIterator : leftIterator;
 
             while (leadingIterator.hasNext()) {
-                final XFormsControl xformsControl1 = (leftIterator == null) ? null : (XFormsControl) leftIterator.next();
-                final XFormsControl xformsControl2 = (rightIterator == null) ? null : (XFormsControl) rightIterator.next();
+                final XFormsControl xformsControl1 = (leftIterator == null) ? null : leftIterator.next();
+                final XFormsControl xformsControl2 = (rightIterator == null) ? null : rightIterator.next();
 
                 final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1;
 
@@ -306,8 +307,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                     final XFormsContainerControl containerControl1 = (XFormsContainerControl) xformsControl1;
                     final XFormsContainerControl containerControl2 = (XFormsContainerControl) xformsControl2;
 
-                    final List children1 = (containerControl1 == null) ? null : (containerControl1.getChildren() != null && containerControl1.getChildren().size() == 0) ? null : containerControl1.getChildren();
-                    final List children2 = (containerControl2 == null) ? null : (containerControl2.getChildren() != null && containerControl2.getChildren().size() == 0) ? null : containerControl2.getChildren();
+                    final List<XFormsControl> children1 = (containerControl1 == null) ? null : (containerControl1.getChildren() != null && containerControl1.getChildren().size() == 0) ? null : containerControl1.getChildren();
+                    final List<XFormsControl> children2 = (containerControl2 == null) ? null : (containerControl2.getChildren() != null && containerControl2.getChildren().size() == 0) ? null : containerControl2.getChildren();
 
                     if (isRepeatControl) {
 

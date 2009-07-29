@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.cache;
 
@@ -37,7 +37,7 @@ public class SoftCacheImpl {
 
     private int maximumSize;
     private String[] keyNames;
-    private HashMap keyNameToIndex;
+    private HashMap<String, Integer> keyNameToIndex;
 
     /*
      * Strong and soft caches.
@@ -51,8 +51,8 @@ public class SoftCacheImpl {
     protected static class EntryCache {
 
         private int keyNum;
-        private HashMap[] keyMaps;
-        private TreeMap[] maps;
+        private HashMap<Object, Key>[] keyMaps;
+        private TreeMap<Key, Object>[] maps;
 
         public EntryCache(int keyNum) {
             this.keyNum = keyNum;
@@ -60,8 +60,8 @@ public class SoftCacheImpl {
             maps = new TreeMap[keyNum];
 
             for (int i = 0; i < keyNum; i++) {
-                keyMaps[i] = new HashMap();
-                maps[i] = new TreeMap(Key.getComparator());
+                keyMaps[i] = new HashMap<Object, Key>();
+                maps[i] = new TreeMap<Key, Object>(Key.getComparator());
             }
         }
 
@@ -134,8 +134,8 @@ public class SoftCacheImpl {
         }
 
         public void applyOnKeys(Action action) {
-            for (Iterator i = keyMaps[0].keySet().iterator(); i.hasNext();) {
-                action.perform(i.next());
+            for (Object o: keyMaps[0].keySet()) {
+                action.perform(o);
             }
         }
 
@@ -170,11 +170,10 @@ public class SoftCacheImpl {
         }
 
         public String dump() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < keyNum; i++) {
                 int j = 0;
-                for (Iterator it = maps[i].keySet().iterator(); it.hasNext();) {
-                    Object key = it.next();
+                for (Object key: maps[i].keySet()) {
                     sb.append("Key[" + j++ + "]="
                             + ((Key) key).getKey()
                             + ", element="
@@ -238,11 +237,11 @@ public class SoftCacheImpl {
             return hash;
         }
 
-        protected static class Comparator implements java.util.Comparator {
-            public int compare(Object o1, Object o2) {
+        protected static class Comparator implements java.util.Comparator<Key> {
+            public int compare(Key o1, Key o2) {
                 if (o1 == null || o2 == null) return -1;// what else?
-                int order1 = ((Key) o1).getOrder();
-                int order2 = ((Key) o2).getOrder();
+                int order1 = o1.getOrder();
+                int order2 = o2.getOrder();
 
                 if (order1 == order2)
                     return 0;
@@ -303,12 +302,12 @@ public class SoftCacheImpl {
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer();
-            sb.append("(" + strongSize);
-            sb.append(", " + softSize);
-            sb.append(", " + movedToSoft);
-            sb.append(", " + movedToStrong);
-            sb.append(", " + collectedSoft + ")");
+            StringBuilder sb = new StringBuilder();
+            sb.append("(").append(strongSize);
+            sb.append(", ").append(softSize);
+            sb.append(", ").append(movedToSoft);
+            sb.append(", ").append(movedToStrong);
+            sb.append(", ").append(collectedSoft).append(")");
             return sb.toString();
         }
     }
@@ -398,9 +397,9 @@ public class SoftCacheImpl {
         this.keyNames = keyNames;
 
         // Map key names to key indices
-        keyNameToIndex = new HashMap();
+        keyNameToIndex = new HashMap<String, Integer>();
         for (int i = 0; i < keyNames.length; i++)
-            keyNameToIndex.put(keyNames[i], new Integer(i));
+            keyNameToIndex.put(keyNames[i], i);
 
         // Create entry caches
         strongCache = new EntryCache(keyNames.length);
@@ -619,7 +618,7 @@ public class SoftCacheImpl {
     }
 
     protected int getKeyIndex(String keyName) {
-        return ((Integer) keyNameToIndex.get(keyName)).intValue();
+        return keyNameToIndex.get(keyName);
     }
 
     protected String[] getKeyNames() {
@@ -649,7 +648,7 @@ public class SoftCacheImpl {
     private static String arrayToString(Object[] array) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < array.length; i++)
-            sb.append("[element[" + i + "]=" + array[i] + "]");
+            sb.append("[element[").append(i).append("]=").append(array[i]).append("]");
         return sb.toString();
     }
 

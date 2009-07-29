@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005-2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -17,12 +17,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.helpers.AttributesImpl;
@@ -39,7 +39,7 @@ public class OldControlsComparator extends BaseControlsComparator {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
-    public void diff(List state1, List state2) {
+    public void diff(List<XFormsControl> state1, List<XFormsControl> state2) {
 
         // Normalize
         if (state1 != null && state1.size() == 0)
@@ -57,10 +57,10 @@ public class OldControlsComparator extends BaseControlsComparator {
         }
 
         final AttributesImpl attributesImpl = new AttributesImpl();
-        final Iterator j = (state1 == null) ? null : state1.iterator();
-        for (Iterator i = state2.iterator(); i.hasNext();) {
-            final XFormsControl xformsControl1 = (state1 == null) ? null : (XFormsControl) j.next();
-            final XFormsControl xformsControl2 = (XFormsControl) i.next();
+        final Iterator<XFormsControl> j = (state1 == null) ? null : state1.iterator();
+        for (Object aState2 : state2) {
+            final XFormsControl xformsControl1 = (state1 == null) ? null : j.next();
+            final XFormsControl xformsControl2 = (XFormsControl) aState2;
 
             // 1: Check current control
             if (xformsControl2 instanceof XFormsSingleNodeControl) {
@@ -70,7 +70,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                 final XFormsSingleNodeControl xformsSingleNodeControl2 = (XFormsSingleNodeControl) xformsControl2;
 
                 if (!(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
-                            && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
+                        && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
                     // Output diffs between controlInfo1 and controlInfo2
                     final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
                     if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)) {
@@ -207,10 +207,10 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
 
                                 // Check if a "display-value" attribute must be added
-    //                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-    //                            if (displayValue != null) {
-    //                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-    //                            }
+                                //                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
+                                //                            if (displayValue != null) {
+                                //                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
+                                //                            }
 
                                 // Create element with text value
                                 final String value;
@@ -341,8 +341,8 @@ public class OldControlsComparator extends BaseControlsComparator {
                 final XFormsContainerControl containerControl1 = (XFormsContainerControl) xformsControl1;
                 final XFormsContainerControl containerControl2 = (XFormsContainerControl) xformsControl2;
 
-                final List children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
-                final List children2 = (containerControl2.getChildren() == null) ? Collections.EMPTY_LIST : containerControl2.getChildren();
+                final List<XFormsControl> children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
+                final List<XFormsControl> children2 = (containerControl2.getChildren() == null) ? Collections.<XFormsControl>emptyList() : containerControl2.getChildren();
 
                 // Repeat grouping control
                 if (xformsControl2 instanceof XFormsRepeatControl && children1 != null) {

@@ -33,4 +33,6 @@
 
 .fr-datatable-scrollbar-space {
     width: 20px;
+    background: transparent !important;
+    border: none;
 }

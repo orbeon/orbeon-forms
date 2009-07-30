@@ -188,7 +188,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
             var colResizer = null;
             if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
                 colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
-                this.colResizers[ this.colResizers.length] = colResizer;
+                this.colResizers[j] = colResizer;
             }
 
             var width = (columnWidths[j] - 20) + 'px';
@@ -300,6 +300,7 @@ ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
             var div = divs[0];
             if (div != undefined && div.style.width != "") {
                 var width = div.style.width;
+                var styles =[div.style];
                 for (var irow = 0; irow < this.bodyRows.length; irow++) {
                     var row = this.bodyRows[irow];
                     if (row.cells.length > icol) {
@@ -309,9 +310,14 @@ ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
                             var cellDiv = cellDivs[0];
                             if (cellDiv != undefined) {
                                 cellDiv.style.width = width;
+                                styles[styles.length] = cellDiv.style;
                             }
                         }
                     }
+                }
+                var colResizer = this.colResizers[icol];
+                if (colResizer != undefined) {
+                    colResizer.setStyleArray(styles);
                 }
             }
         }

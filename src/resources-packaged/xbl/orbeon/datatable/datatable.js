@@ -171,15 +171,6 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		this.container.appendChild(this.bodyContainer);
 		this.bodyContainer.appendChild(this.table);
 
-		// Add a dummy div with the same width as the table so that the scrollbar appears when the body is empty
-
-		var widthControlDiv = document.createElement('div');
-		//widthControlDiv.style.width = this.tableWidth + 'px';
-		widthControlDiv.innerHTML = '&#xa0;';
-		YAHOO.util.Dom.addClass(widthControlDiv, 'fr-datatable-width-control');
-		this.bodyContainer.appendChild(widthControlDiv);
-
-
 	}
 
 	this.width = this.container.clientWidth;
@@ -231,9 +222,12 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
                 for (var k = 0; k < this.bodyRows.length; k++) {
                     row = this.bodyRows[k];
                     if (row.cells.length > j && ! YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
-                        style = YAHOO.util.Selector.query('div', row.cells[j], true).style;
-                        style.width = width;
-                        styles[styles.length] = style;
+                        var div = YAHOO.util.Selector.query('div', row.cells[j], true);
+                        if (div != undefined) {
+                            style = div.style;
+                            style.width = width;
+                            styles[styles.length] = style;
+                        }
                     }
                 }
                 if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {

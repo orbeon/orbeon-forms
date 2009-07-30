@@ -16,7 +16,7 @@
     display: none
 }
 
-.yui-dt-table th, .yui-dt-table td {
+.datatable-cell-content {
     overflow:hidden;
 }
 

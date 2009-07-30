@@ -454,13 +454,13 @@ onDrag: function (ev) {
 	var newX = YAHOO.util.Event.getXY(ev)[0];
 	this.datatable.table.style.display = 'none';
 	var deltaX = newX - this.resizerX;
-	this.datatable.adjustWidth(deltaX, this.index);
 	this.resizerX = newX;
 	var width = this.width + deltaX;
 	var widthStyle = (width - 20) + 'px'; // TODO : determine 20 from
 	// padding
 	// If different and non null, try to set it
-	if (width > 0 && width != this.width) {
+	if (width > 20 && width != this.width) {
+        this.datatable.adjustWidth(deltaX, this.index);
 		if (this.rule) {
 			this.rule.style.width = widthStyle;
 		} else {

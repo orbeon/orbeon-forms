@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -1385,7 +1384,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
                     // insert performance was good from the get go.
                     // TODO: check above now that repeat/insert/delete has been improved
-                    event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
+                    event.setAttribute(XFormsConstants.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
                     // Dispatch event n times
                     final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
                     for (int j = 0; j < repeatCount; j++)

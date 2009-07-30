@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -43,7 +42,6 @@ import java.util.List;
  */
 public class XFormsInsertAction extends XFormsAction {
 
-    public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "no-index-adjustment");
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
@@ -455,7 +453,7 @@ public class XFormsInsertAction extends XFormsAction {
     private static boolean isAdjustIndexes(XFormsContainingDocument containingDocument) {
         final XFormsEvent currentEvent = containingDocument.getCurrentEvent();
         if (currentEvent != null) {// this will be null if we happen to be in a non-top-level container; won't fix now because this is a hack anyway
-            final SequenceIterator si = currentEvent.getAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT);
+            final SequenceIterator si = currentEvent.getAttribute(XFormsConstants.NO_INDEX_ADJUSTMENT);
             if (si != null) {
                 try {
                     final Item item = si.next();

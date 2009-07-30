@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -30,7 +29,6 @@ import java.util.Map;
  */
 public class XFormsConstants {
 
-    public static final List<Element> EMPTY_ELEMENT_LIST = Collections.emptyList();
     public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
     public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
 
@@ -300,6 +298,8 @@ public class XFormsConstants {
 
     public static final QName STATIC_STATE_SCRIPTS_QNAME = new QName("scripts");
     public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
+
+    public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XXFORMS_NAMESPACE_URI, "no-index-adjustment");
 
     private XFormsConstants() {
         // Disallow construction

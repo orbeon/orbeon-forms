@@ -130,6 +130,9 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+        } else if (XFormsConstants.NO_INDEX_ADJUSTMENT.equals(name)) {
+            // NOP (this is related to a temporary offline performance hack)
+            return EmptyIterator.getInstance();
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

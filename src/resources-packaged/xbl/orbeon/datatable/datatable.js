@@ -153,13 +153,17 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		this.table.replaceChild(tBody, YAHOO.util.Selector.query('tbody', this.table, true));
 
         // Add an intermediary div to the header to compensate the scroll bar width when needed
+        // also force the scrollbars when scrolling in both directions.
 
-        this.headerScrollContainer = document.createElement('div');
-        this.headerContainer.appendChild(this.headerScrollContainer);
-        this.headerContainer.removeChild(this.header);
-        this.headerScrollContainer.appendChild(this.header);
-        this.headerScrollWidth = this.tableWidth + 20;
-        this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
+        if (this.scrollV) {
+            this.headerScrollContainer = document.createElement('div');
+            this.headerContainer.appendChild(this.headerScrollContainer);
+            this.headerContainer.removeChild(this.header);
+            this.headerScrollContainer.appendChild(this.header);
+            this.headerScrollWidth = this.tableWidth + 20;
+            this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
+            this.bodyContainer.style.overflow="scroll";
+        }
 
 
 		// Do more resizing

@@ -296,6 +296,33 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 }
 
+ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
+    for (var icol = 0; icol < this.headerColumns.length; icol++) {
+        var headerColumn = this.headerColumns[icol];
+        var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
+        if (divs.length > 0) {
+            var div = divs[0];
+            if (div != undefined && div.style.width != "") {
+                var width = div.style.width;
+                for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                    var row = this.bodyRows[irow];
+                    if (row.cells.length > icol) {
+                        var cell = row.cells[icol];
+                        var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                        if (cellDivs.length > 0) {
+                            var cellDiv = cellDivs[0];
+                            if (cellDiv != undefined) {
+                                cellDiv.style.width = width;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
+
 ORBEON.widgets.datatable.scrollHandler = function (e) {
 	//alert('scrolling');                                                                                                                                             s
 	this.headerContainer.scrollLeft = this.bodyContainer.scrollLeft;
@@ -461,10 +488,15 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
 	// Initializes a datatable (called by xforms-enabled events)
 	var container = target.parentNode.parentNode;
 	var id = container.id;
-	if (ORBEON.widgets.datatable.datatables[id] == undefined && ! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
-		var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-		ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
-	}
+    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
+        if (ORBEON.widgets.datatable.datatables[id] == undefined) {
+            var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+            ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+        } else {
+            ORBEON.widgets.datatable.datatables[id].rewriteColumnsWidths();
+        }
+    }
+
 }
 
 // Comment/uncomment in normal/debug mode...

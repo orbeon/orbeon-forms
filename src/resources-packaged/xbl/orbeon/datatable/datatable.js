@@ -133,7 +133,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
 	// Split when needed
 
-    this.tableHeaderWidth = this.tableWidth;
+    this.headerScrollWidth = this.tableWidth;
 	if (this.headBodySplit) {
 
 		// Create a container for the body
@@ -152,16 +152,14 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		this.header.removeChild(tBody);
 		this.table.replaceChild(tBody, YAHOO.util.Selector.query('tbody', this.table, true));
 
-        // Add a div to the header to compensate the scroll bar width when needed
+        // Add an intermediary div to the header to compensate the scroll bar width when needed
 
-        if (this.scrollV) {
-            var cell = document.createElement('th');
-            YAHOO.util.Dom.addClass(cell, 'fr-datatable-scrollbar-space');
-            cell.innerHTML = '&#xa0;';
-            this.headerRow.appendChild(cell);
-            this.tableHeaderWidth = this.tableWidth + 20;
-            this.header.style.width = this.tableHeaderWidth + 'px';
-        }
+        this.headerScrollContainer = document.createElement('div');
+        this.headerContainer.appendChild(this.headerScrollContainer);
+        this.headerContainer.removeChild(this.header);
+        this.headerScrollContainer.appendChild(this.header);
+        this.headerScrollWidth = this.tableWidth + 20;
+        this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
 
 
 		// Do more resizing
@@ -291,9 +289,10 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 	if (! this.hasFixedWidthTable) {
 		this.tableWidth += deltaX;
-        this.tableHeaderWidth += deltaX;
+        this.headerScrollWidth += deltaX;
 		if (this.headBodySplit) {
-            YAHOO.util.Dom.setStyle(this.header, 'width', this.tableHeaderWidth + 'px');
+            YAHOO.util.Dom.setStyle(this.headerScrollContainer, 'width', this.headerScrollWidth + 'px');
+            YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
 			YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 		}
 	}
@@ -327,7 +326,7 @@ ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
 }
 
 ORBEON.widgets.datatable.scrollHandler = function (e) {
-	//alert('scrolling');                                                                                                                                             s
+	//alert('scrolling');
 	this.headerContainer.scrollLeft = this.bodyContainer.scrollLeft;
 }
 

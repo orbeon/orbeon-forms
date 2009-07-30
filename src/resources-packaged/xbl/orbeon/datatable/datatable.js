@@ -133,6 +133,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
 	// Split when needed
 
+    this.tableHeaderWidth = this.tableWidth;
 	if (this.headBodySplit) {
 
 		// Create a container for the body
@@ -158,7 +159,8 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
             YAHOO.util.Dom.addClass(cell, 'fr-datatable-scrollbar-space');
             cell.innerHTML = '&#xa0;';
             this.headerRow.appendChild(cell);
-            this.header.style.width = (this.tableWidth + 20) + 'px';
+            this.tableHeaderWidth = this.tableWidth + 20;
+            this.header.style.width = this.tableHeaderWidth + 'px';
         }
 
 
@@ -174,7 +176,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 		// Add a dummy div with the same width as the table so that the scrollbar appears when the body is empty
 
 		var widthControlDiv = document.createElement('div');
-		widthControlDiv.style.width = this.tableWidth + 'px';
+		//widthControlDiv.style.width = this.tableWidth + 'px';
 		widthControlDiv.innerHTML = '&#xa0;';
 		YAHOO.util.Dom.addClass(widthControlDiv, 'fr-datatable-width-control');
 		this.bodyContainer.appendChild(widthControlDiv);
@@ -289,8 +291,9 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 	if (! this.hasFixedWidthTable) {
 		this.tableWidth += deltaX;
-		YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
+        this.tableHeaderWidth += deltaX;
 		if (this.headBodySplit) {
+            YAHOO.util.Dom.setStyle(this.header, 'width', this.tableHeaderWidth + 'px');
 			YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 		}
 	}

@@ -16,7 +16,6 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:d="http://orbeon.org/oxf/xml/document"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

@@ -580,55 +580,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-<<<<<<< HEAD:src/java/org/orbeon/oxf/xforms/xbl/XBLContainer.java
     public void endOutermostActionHandler(PipelineContext pipelineContext) {
-=======
-    public void endOutermostActionHandler(PropertyContext propertyContext) {
-        // Below we split RRR and Refresh in order to reduce the number of refreshes performed
-
-        // This is fun. Say you have a single model requiring RRRR and you get here the first time:
-        //
-        // * Model's rebuildRecalculateRevalidateIfNeeded() runs
-        // * Its rebuild runs
-        // * That dispatches xforms-rebuild as an outer event
-        // * The current method is then called again recursively
-        // * So RRR runs, recursively, then comes back here
-        //
-        // We do not want to run refresh just after coming back from rebuildRecalculateRevalidateIfNeeded(), otherwise
-        // because of recursion you might have RRR, then refresh, refresh again, instead of RRR, refresh, RRR, refresh,
-        // etc. So:
-        //
-        // * We first exhaust the possibility for RRR globally
-        // * Then we run refresh if possible
-        // * Then we check again, as refresh events might have changed things
-        //
-        // TODO: We might want to implement some code to detect excessive loops/recursion 
-
-        while (needRebuildRecalculateRevalidate() || containingDocument.getControls().isRequireRefresh()) {
-            while (needRebuildRecalculateRevalidate())
-                rebuildRecalculateRevalidateIfNeeded(propertyContext);
-
-            refreshIfNeeded(propertyContext);
-        }
-    }
-
-    private boolean needRebuildRecalculateRevalidate() {
-        for (XFormsModel currentModel: models) {
-            if (currentModel.needRebuildRecalculateRevalidate())
-                return true;
-        }
-        // Recurse into children containers
-        if (childrenXBLContainers != null) {
-            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
-                if (currentContainer.needRebuildRecalculateRevalidate())
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
->>>>>>> f8807fa... Method is best private.:src/java/org/orbeon/oxf/xforms/xbl/XBLContainer.java
         // Handle this container
         for (XFormsModel currentModel: models) {
             currentModel.endOutermostActionHandler(pipelineContext);

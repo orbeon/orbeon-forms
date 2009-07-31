@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -126,7 +127,8 @@ public class XFormsSetvalueAction extends XFormsAction {
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
                 // Dispatch extension event to instance
-                modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XXFormsValueChanged(modifiedInstance));
+                final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
+                modifiedContainer.dispatchEvent(propertyContext, new XXFormsValueChanged(modifiedInstance));
 
                 if (!isCalculate) {
                     // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
@@ -136,7 +138,7 @@ public class XFormsSetvalueAction extends XFormsAction {
                     final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
                     deferredActionContext.recalculate = true;
                     deferredActionContext.revalidate = true;
-                    deferredActionContext.refresh = true;
+                    modifiedContainer.requireRefresh();
                 }
             }
 

@@ -16,12 +16,8 @@
     display: none
 }
 
-.yui-dt-table th, .yui-dt-table td {
+.datatable-cell-content {
     overflow:hidden;
-}
-
-.fr-datatable-width-control {
-    height: 20px;
 }
 
 .fr-datatable-is-loading { 
@@ -29,8 +25,4 @@
     url(../../../ops/images/xforms/processing.gif); 
     height: 50px; background-position: center;
     background-repeat: no-repeat; 
-}
-
-.fr-datatable-scrollbar-space {
-    width: 20px;
 }

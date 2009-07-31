@@ -448,7 +448,7 @@
 
     <xsl:template name="yui-dt-liner">
         <xsl:param name="position"/>
-        <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
+        <xhtml:div class="yui-dt-liner datatable-cell-content dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
             <xhtml:span class="yui-dt-label">
                 <xsl:choose>
                     <xsl:when test="@fr:sortable = 'true' and $sortAndPaginationMode='external'">
@@ -555,8 +555,8 @@
     <xsl:template match="xforms:repeat" mode="YUI">
         <xxforms:variable name="sort" model="datatable" select="."/>
         <xxforms:variable name="key" model="datatable" select="key[position() = $sort/@currentId]"/>
-        <xforms:repeat id="fr-datatable-repeat">
-            <xsl:attribute name="nodeset">
+        <xxforms:variable name="nodeset">
+            <xsl:attribute name="select">
                 <xsl:choose>
                     <xsl:when test="$sortAndPaginationMode='external'">
                         <xsl:value-of select="@nodeset"/>
@@ -574,8 +574,15 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
+        </xxforms:variable>
+        <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
             <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
         </xforms:repeat>
+        <xforms:group ref=".[not($nodeset)]">
+            <xhtml:tr>
+                <xhtml:td>&#xa0;</xhtml:td>
+            </xhtml:tr>
+        </xforms:group>
     </xsl:template>
 
     <xsl:template match="xhtml:tr" mode="YUI">
@@ -605,7 +612,7 @@
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <xhtml:div class="yui-dt-liner dt-{$id}-col-{count(preceding-sibling::xhtml:td) + 1}">
+            <xhtml:div class="yui-dt-liner datatable-cell-content dt-{$id}-col-{count(preceding-sibling::xhtml:td) + 1}">
                 <xsl:apply-templates select="node()" mode="YUI"/>
             </xhtml:div>
         </xhtml:td>

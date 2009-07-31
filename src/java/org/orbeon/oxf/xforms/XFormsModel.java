@@ -1053,12 +1053,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doRefresh(PropertyContext propertyContext) {
-
-        // Only refresh if needed
-        if (deferredActionContext.refresh) {
-            containingDocument.getControls().doRefresh(propertyContext, this);
-        }
-        // NOTE: deferredActionContext.refresh is set to false in refreshDone()
+        getXBLContainer().refreshIfNeeded(propertyContext);
     }
 
     /**
@@ -1152,17 +1147,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private final DeferredActionContext deferredActionContext = new DeferredActionContext();
 
-    public static class DeferredActionContext {
+    public class DeferredActionContext {
         public boolean rebuild;
         public boolean recalculate;
         public boolean revalidate;
-        public boolean refresh;
 
         public void setAllDeferredFlags(boolean value) {
             rebuild = value;
             recalculate = value;
             revalidate = value;
-            refresh = value;
+            if (value)
+                getXBLContainer().requireRefresh();
         }
     }
 
@@ -1174,16 +1169,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.setAllDeferredFlags(value);
     }
 
-    public void refreshDone() {
-        deferredActionContext.refresh = false;
-    }
-
     public void startOutermostActionHandler() {
         // NOP now that deferredActionContext is always created
     }
 
-    public void endOutermostActionHandler(PipelineContext pipelineContext) {
+    public boolean needRebuildRecalculateRevalidate() {
+        return deferredActionContext.rebuild || deferredActionContext.recalculate || deferredActionContext.revalidate;
+    }
 
+    public void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
         // NOTE: We used to clear deferredActionContext , but this caused events to be dispatched in a different
@@ -1191,23 +1185,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         if (currentDeferredActionContext.rebuild) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
+            container.dispatchEvent(propertyContext, new XFormsRebuildEvent(this));
+            containingDocument.endOutermostActionHandler(propertyContext);
         }
         if (currentDeferredActionContext.recalculate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
+            container.dispatchEvent(propertyContext, new XFormsRecalculateEvent(this));
+            containingDocument.endOutermostActionHandler(propertyContext);
         }
         if (currentDeferredActionContext.revalidate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
-        }
-        if (currentDeferredActionContext.refresh) {
-            containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
+            container.dispatchEvent(propertyContext, new XFormsRevalidateEvent(this));
+            containingDocument.endOutermostActionHandler(propertyContext);
         }
     }
 

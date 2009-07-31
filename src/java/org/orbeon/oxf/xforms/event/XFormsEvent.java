@@ -56,7 +56,7 @@ public abstract class XFormsEvent implements Cloneable {
 //    const unsigned short      AT_TARGET                      = 2;
 //    const unsigned short      BUBBLING_PHASE                 = 3;
 
-    private XFormsEvent originalEvent;  // original event (for retargetted event)
+    private XFormsEvent originalEvent;  // original event (for retargeted event)
 
     private String eventName;
     private XFormsEventTarget targetObject;

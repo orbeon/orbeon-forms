@@ -618,7 +618,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return false;
     }
 
-    public void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
+    private void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
         // Handle this container
         for (XFormsModel currentModel: models) {
             currentModel.rebuildRecalculateRevalidateIfNeeded(propertyContext);

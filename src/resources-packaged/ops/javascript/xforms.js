@@ -791,6 +791,10 @@ ORBEON.util.DateTime = {
     ],
 
     _dateParsePatterns: [
+
+        // NOTE: Date() months are 0-based
+        // Create date in one shot when possible, because if you set year, then month, then day, sometimes the result is incorrect!
+
         // Today
         {   re: /^tod/i,
             handler: function() {
@@ -824,39 +828,25 @@ ORBEON.util.DateTime = {
         // 4th Jan
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // 4th Jan 2003
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // Jan 4th
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
-                d.setDate(parseInt(bits[2], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // Jan 4th 2003
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setDate(parseInt(bits[2], 10));
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // next Tuesday - this is suspect due to weird meaning of "next"
@@ -882,14 +872,11 @@ ORBEON.util.DateTime = {
         // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
         {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
+                var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
-                    d.setDate(parseInt(bits[1], 10));
+                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 } else {
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
-                    d.setDate(parseInt(bits[2], 10));
+                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 }
                 return d;
             }
@@ -897,13 +884,11 @@ ORBEON.util.DateTime = {
         // mm/dd (American style without year) or dd/mm (European style without year)
         {   re: /^(\d{1,2})\/(\d{1,2})$/,
             handler: function(bits) {
-                var d = new Date();
+                var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d.setDate(parseInt(bits[2], 10));
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 } else {
-                    d.setDate(parseInt(bits[2], 10));
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 }
                 return d;
             }
@@ -911,21 +896,13 @@ ORBEON.util.DateTime = {
         // dd.mm.yyyy (Swiss style)
         {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
             }
         },
         // yyyy-mm-dd (ISO style)
         {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[1]));
-                d.setMonth(parseInt(bits[2], 10) - 1);
-                d.setDate(parseInt(bits[3], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
             }
         }
     ],

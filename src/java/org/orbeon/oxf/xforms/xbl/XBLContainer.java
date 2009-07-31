@@ -226,10 +226,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return contextStack;
     }
 
-    public XBLContainer getChildByEffectiveId(String staticId) {
-        return (childrenXBLContainers != null) ? childrenXBLContainers.get(staticId) : null;
-    }
-
     /**
      * Create and index models corresponding to this container's scope.
      */
@@ -581,7 +577,23 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public void endOutermostActionHandler(PropertyContext propertyContext) {
         // Below we split RRR and Refresh in order to reduce the number of refreshes performed
 
-        // This is fun: 
+        // This is fun. Say you have a single model requiring RRRR and you get here the first time:
+        //
+        // * Model's rebuildRecalculateRevalidateIfNeeded() runs
+        // * Its rebuild runs
+        // * That dispatches xforms-rebuild as an outer event
+        // * The current method is then called again recursively
+        // * So RRR runs, recursively, then comes back here
+        //
+        // We do not want to run refresh just after coming back from rebuildRecalculateRevalidateIfNeeded(), otherwise
+        // because of recursion you might have RRR, then refresh, refresh again, instead of RRR, refresh, RRR, refresh,
+        // etc. So:
+        //
+        // * We first exhaust the possibility for RRR globally
+        // * Then we run refresh if possible
+        // * Then we check again, as refresh events might have changed things
+        //
+        // TODO: We might want to implement some code to detect excessive loops/recursion 
 
         while (needRebuildRecalculateRevalidate() || containingDocument.getControls().isRequireRefresh()) {
             while (needRebuildRecalculateRevalidate())

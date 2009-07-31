@@ -2698,10 +2698,15 @@ ORBEON.xforms.Events = {
                 // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                 // do anything if there is no control found.
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
-                if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
-                    var message = ORBEON.xforms.Controls.getAlertMessage(control);
-                    YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                if (control) {
+                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                        control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
+                    if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                        var message = ORBEON.xforms.Controls.getAlertMessage(control);
+                        YAHOO.util.Dom.generateId(target);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                    }
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
                 // Minimal dialog: record more is back inside the dialog
@@ -2718,10 +2723,15 @@ ORBEON.xforms.Events = {
                     helpLabel = helpLabel.nextSibling;
                 // Get control
                 var control = ORBEON.util.Dom.getElementById(helpLabel.htmlFor);
-                if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
-                    var message = ORBEON.xforms.Controls.getHelpMessage(control);
-                    YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
+                if (control) {
+                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                        control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
+                    if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
+                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                        YAHOO.util.Dom.generateId(target);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
+                    }
                 }
             }
 

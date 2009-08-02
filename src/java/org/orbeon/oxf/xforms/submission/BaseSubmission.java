@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
 import java.net.URL;
@@ -142,7 +143,37 @@ public abstract class BaseSubmission implements Submission {
             contextStack.popBinding();
         }
 
-        StringUtils.addValueToStringArrayMap(headerNameValues, headerName, headerValue);
+        
+        final String combine;
+        {
+        	final String avtCombine = currentHeaderElement.attributeValue("combine", "append");
+        	combine = XFormsUtils.resolveAttributeValueTemplates(propertyContext, contextStack.getCurrentBindingContext().getNodeset(),
+        			contextStack.getCurrentBindingContext().getPosition(), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+        			contextStack.getFunctionContext(), containingDocument.getNamespaceMappings(currentHeaderElement), 
+        			(LocationData)currentHeaderElement.getData(), avtCombine);
+        	
+        	if (!("append".equals(combine) || "prepend".equals(combine) || "replace".equals(combine))) {
+        		throw new XFormsSubmissionException(submission, "Invalid value '" + combine + "' for attribute combine.", "processing <header> elements");
+        	}
+        }
+        
+        // add value to string Array Map respecting the optional combine attribute
+        final String[] currentValue = (String[]) headerNameValues.get(headerName);
+        if (currentValue == null || "replace".equals(combine)) {
+        	headerNameValues.put(headerName, new String[] { headerValue });
+        } else {
+            final String[] newValue = new String[currentValue.length + 1];
+            
+            if ("prepend".equals(combine)) {
+            	System.arraycopy(currentValue, 0, newValue, 1, currentValue.length);
+            	newValue[0] = headerValue;
+            }
+            else {
+            	System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
+            	newValue[currentValue.length] = headerValue;
+            }
+            headerNameValues.put(headerName, newValue);
+        }
     }
 
     /**

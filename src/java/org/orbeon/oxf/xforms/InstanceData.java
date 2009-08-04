@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004-2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -46,6 +46,7 @@ public class InstanceData {
     private static final boolean DEFAULT_READONLY = false;
     private static final boolean DEFAULT_REQUIRED = false;
     private static final boolean DEFAULT_VALID = true;
+    
     private static final String DEFAULT_CUSTOM = null;
 
     // All MIPs with their default values
@@ -56,13 +57,6 @@ public class InstanceData {
     private String type;
     private boolean valueValid = DEFAULT_VALID;
     private boolean constraint = DEFAULT_VALID;// TODO: we don't really need separate constraint information: valueValid is enough!
-
-    // Event handling state
-    private boolean valueChanged;
-    private boolean previousInheritedRelevantState = DEFAULT_RELEVANT;
-    private boolean previousInheritedReadonlyState = DEFAULT_READONLY;
-    private boolean previousRequiredState = DEFAULT_REQUIRED;
-    private boolean previousValidState = DEFAULT_VALID;
 
     private String invalidBindIds;
     private List<String> schemaErrors;
@@ -401,87 +395,6 @@ public class InstanceData {
             existingInstanceData.readonly = DEFAULT_READONLY;
             existingInstanceData.required = DEFAULT_REQUIRED;
         }
-    }
-
-    public static void clearInstanceDataEventState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
-        if (existingInstanceData != null) {
-            existingInstanceData.previousRequiredState = existingInstanceData.required;
-            existingInstanceData.previousInheritedRelevantState = getInheritedRelevant(nodeInfo);
-            existingInstanceData.previousInheritedReadonlyState = getInheritedReadonly(nodeInfo);
-            existingInstanceData.previousValidState = getValid(nodeInfo);
-            existingInstanceData.valueChanged = false;
-        }
-    }
-
-    public static boolean getPreviousInheritedRelevantState(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            return getPreviousInheritedRelevantState(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
-        } else if (nodeInfo != null) {
-            return DEFAULT_RELEVANT;
-        } else {
-            throw new OXFException("Cannot get relevant Model Item Property on null object.");
-        }
-    }
-
-    private static boolean getPreviousInheritedRelevantState(Node node) {
-        // Iterate this node and its parents. The node is non-relevant if it or any ancestor is non-relevant.
-        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
-            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-            final boolean currentInheritedRelevant = (currentInstanceData == null) ? DEFAULT_RELEVANT : currentInstanceData.previousInheritedRelevantState;
-            if (!currentInheritedRelevant)
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean getPreviousInheritedReadonlyState(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            return getPreviousInheritedReadonlyState(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
-        } else if (nodeInfo != null) {
-            return true;// Default for non-mutable nodes is to be read-only
-        } else {
-            throw new OXFException("Cannot get readonly Model Item Property on null object.");
-        }
-    }
-
-    private static boolean getPreviousInheritedReadonlyState(Node node) {
-        // Iterate this node and its parents. The node is readonly if it or any ancestor is readonly.
-        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
-            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-            final boolean currentInheritedReadonly = (currentInstanceData == null) ? DEFAULT_READONLY : currentInstanceData.previousInheritedReadonlyState;
-            if (currentInheritedReadonly)
-                return true;
-        }
-        return false;
-    }
-
-    public static boolean getPreviousRequiredState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_REQUIRED : existingInstanceData.previousRequiredState;
-    }
-
-    public static boolean getPreviousValidState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.previousValidState;
-    }
-
-    public static boolean isValueChanged(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData != null) && existingInstanceData.valueChanged;
-    }
-
-    public static boolean isValueChanged(Node node) {
-        final InstanceData existingInstanceData = getLocalInstanceData(node, false);
-        return (existingInstanceData != null) && existingInstanceData.valueChanged;
-    }
-
-    public static void markValueChanged(NodeInfo nodeInfo) {
-        getOrCreateInstanceData(nodeInfo).valueChanged = true;
-    }
-
-    public static void markValueChanged(Node node) {
-        getOrCreateInstanceData(node).valueChanged = true;
     }
 
     private static InstanceData getOrCreateInstanceData(NodeInfo nodeInfo) {

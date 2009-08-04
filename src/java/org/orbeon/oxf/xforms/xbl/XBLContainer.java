@@ -259,8 +259,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         initializeModels(pipelineContext, new String[] {
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT,
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE,
-                XFormsEvents.XFORMS_READY,
-                XFormsEvents.XXFORMS_READY  // custom initialization event
+                XFormsEvents.XFORMS_READY
         });
     }
 
@@ -642,11 +641,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         containingDocument.getControls().requireRefresh();
     }
 
-    public void refreshDone() {
-        // Delegate to controls
-        containingDocument.getControls().refreshDone();
-    }
-
     public void refreshIfNeeded(PropertyContext propertyContext) {
         // Delegate to controls
         containingDocument.getControls().refreshIfNeeded(propertyContext, this);
@@ -666,19 +660,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final Map<String, XBLContainer> tempMap = new LinkedHashMap<String, XBLContainer>(childrenXBLContainers);
             for (XBLContainer currentContainer: tempMap.values()) {
                 currentContainer.rebuildRecalculateIfNeeded(propertyContext);
-            }
-        }
-    }
-
-    public void synchronizeInstanceDataEventState() {
-        // Handle this container
-        for (XFormsModel currentModel: models) {
-            currentModel.synchronizeInstanceDataEventState();
-        }
-        // Recurse into children containers
-        if (childrenXBLContainers != null) {
-            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
-                currentContainer.synchronizeInstanceDataEventState();
             }
         }
     }

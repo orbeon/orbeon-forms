@@ -322,14 +322,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.replaced = replaced;
     }
 
-    public void synchronizeInstanceDataEventState() {
-        XFormsUtils.iterateInstanceData(this, new XFormsUtils.InstanceWalker() {
-            public void walk(NodeInfo nodeInfo) {
-                InstanceData.clearInstanceDataEventState(nodeInfo);
-            }
-        }, true);
-    }
-
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
@@ -382,31 +374,23 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
 
         // Set value
-        final String previousValue;
         if (node instanceof Element) {
             // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
-            final Element elementnode = (Element) node;
-            previousValue = elementnode.getStringValue();
-            elementnode.setText(newValue);
+            final Element elementNode = (Element) node;
+            elementNode.setText(newValue);
         } else if (node instanceof Attribute) {
             // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
             // value."
-            final Attribute attributenode = (Attribute) node;
-            previousValue = attributenode.getStringValue();
-            attributenode.setValue(newValue);
+            final Attribute attributeNode = (Attribute) node;
+            attributeNode.setValue(newValue);
         } else if (node instanceof Text) {
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
             final Text textNode = (Text) node;
-            previousValue = textNode.getStringValue();
             textNode.setText(newValue);
         } else {
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
         }
-
-        // Remember that the value has changed for this node if it has actually changed
-        if (!newValue.equals(previousValue))
-            InstanceData.markValueChanged(node);
     }
 
     public static String getValueForNodeInfo(NodeInfo nodeInfo) {
@@ -497,7 +481,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 final String type = InstanceData.getType(node);
                 parentInfoElement.addAttribute("type", (type == null) ? "" : type);
 //                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
-                parentInfoElement.addAttribute("value-changed", Boolean.toString(InstanceData.isValueChanged(node)));
             }
         });
 

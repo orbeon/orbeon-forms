@@ -1,24 +1,24 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
  * Control that represents a custom components.
@@ -82,11 +82,9 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         super.childrenAdded(propertyContext);
 
         if (isInitializeModels) {
-            // End models initialization
-            nestedContainer.initializeModels(propertyContext, new String[] {
-                    XFormsEvents.XFORMS_READY,
-                    XFormsEvents.XXFORMS_READY  // custom initialization event
-            });
+            // It doesn't seem to make much sense to dispatch xforms-ready to nested models. If we still did want to do
+            // that, we should do it once ALL controls have been initialized. But likely this is not a good idea
+            // either.
             isInitializeModels = false;
         }
     }

@@ -1195,6 +1195,17 @@ public class XFormsStaticState {
     }
 
     /**
+     * Returns whether there is any event handler registered anywhere in the controls for the given event name.
+     *
+     * @param eventName event name, like xforms-value-changed
+     * @return          true if there is a handler, false otherwise
+     */
+    public boolean hasHandlerForEvent(String eventName) {
+        // Check for #all as well as specific event
+        return eventNamesMap.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null || eventNamesMap.get(eventName) != null;
+    }
+
+    /**
      * Statically create and register an event handler.
      *
      * @param newEventHandlerImpl           event handler implementation

@@ -22,9 +22,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
@@ -36,9 +33,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Navigator;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.net.MalformedURLException;
@@ -416,8 +411,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (binds != null)
             binds.applyComputedExpressionBinds(propertyContext);
         doRevalidate(propertyContext);
-
-        synchronizeInstanceDataEventState();
     }
 
     /**
@@ -621,8 +614,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         doRebuild(propertyContext);
         doRecalculate(propertyContext);
         doRevalidate(propertyContext);
-
-        synchronizeInstanceDataEventState();
     }
 
     private void setInstanceLoadFromCacheIfNecessary(PropertyContext propertyContext, boolean readonlyHint, XFormsInstance newInstance, Element locationDataElement) {
@@ -956,14 +947,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // NOP
     }
 
-    public void synchronizeInstanceDataEventState() {
-        if (instances != null) {
-            for (XFormsInstance currentInstance: instances) {
-                currentInstance.synchronizeInstanceDataEventState();
-            }
-        }
-    }
-
     public void doRebuild(PropertyContext propertyContext) {
 
         // Rebuild bind tree only if needed.
@@ -1069,7 +1052,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Instance object might already be there, or might be a new one. In any case, instance needs to be marked as updated.
         setInstance(updatedInstance, true);
 
-        // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
         {
             final XFormsModel.DeferredActionContext deferredActionContext = getDeferredActionContext();
             deferredActionContext.rebuild = true;
@@ -1087,61 +1069,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly
             deferredActionContext.setAllDeferredFlags(true);
-
-            if (updatedInstance.isReadOnly()) {
-                // Read-only instance: replacing does not cause value change events at the moment, so we just set the
-                // flags but do not mark values as changed. Anyway, that event logic is broken, see below.
-
-                // NOP for now
-            } else {
-                // Read-write instance
-
-                // NOTE: Besides setting the flags, for read-write instances, we go through a marking process used for
-                // event dispatch. This process requires:
-                //
-                // o up-to-date control bindings, for 1) relevance handling and 2) type handling
-                // o which in turn requires RRR
-                //
-                // So we do perform RRR below, which clears the flags set above. This should be seen as temporary
-                // measure until we do proper (i.e. not like XForms 1.1 specifies!) UI event updates.
-
-                // Update control bindings if needed 
-                doRebuild(propertyContext);
-                doRecalculate(propertyContext);
-                doRevalidate(propertyContext);
-                xformsControls.updateControlBindingsIfNeeded(propertyContext);
-
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("model", "marking nodes for value change following instance replacement",
-                            "instance id", updatedInstance.getEffectiveId());
-
-                // Mark all nodes to which single-node controls are bound
-                xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-                    public void startVisitControl(XFormsControl control) {
-
-                        // Don't do anything if it's not a single node control
-                        // NOTE: We don't dispatch events to repeat iterations
-                        if (!(control instanceof XFormsSingleNodeControl && !(control instanceof XFormsRepeatIterationControl)))
-                            return;
-
-                        // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
-                        final NodeInfo boundNodeInfo = ((XFormsSingleNodeControl) control).getBoundNode();
-                        if (boundNodeInfo == null)
-                            return;
-
-                        // We only mark nodes in mutable documents
-                        if (!(boundNodeInfo instanceof NodeWrapper))
-                            return;
-
-                        // Mark node only if it is within the updated tree
-                        if (!Navigator.isAncestorOrSelf(updatedTreeRoot, boundNodeInfo))
-                            return;
-
-                        // Finally, mark node
-                        InstanceData.markValueChanged(boundNodeInfo);
-                    }
-                });
-            }
         }
     }
 

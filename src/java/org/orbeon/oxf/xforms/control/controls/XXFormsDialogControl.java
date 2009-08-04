@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -22,11 +22,11 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -178,7 +178,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         } else {
             // Became invisible: remove children
             if (children != null && children.size() > 0) {
-                currentControlTree.deindexSubtree(this, false, true);
+                currentControlTree.deindexSubtree(this, false);
                 this.setChildren(null);
             }
         }

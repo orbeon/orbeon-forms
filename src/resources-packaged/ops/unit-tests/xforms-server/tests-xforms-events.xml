@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="XForms Server" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="Controls nested within non-relevant markup do not get xforms-enabled" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <relevant/>
+                                            <non-relevant>
+                                                <nested-non-relevant/>
+                                            </non-relevant>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="non-relevant" relevant="false()"/>
+                                    <!-- Still, that node will be non-relevant because an ancestor is non-relevant -->
+                                    <xforms:bind nodeset="non-relevant/nested-non-relevant" relevant="true()"/>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group id="events-group">
+                                    <xforms:insert ev:event="xforms-enabled"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             ))"/>
+
+                                    <!-- Everything relevant -->
+                                    <xforms:group id="group-1-1">
+                                        <xforms:output id="output-1-1" value="''"/>
+                                        <xforms:output id="output-1-2" ref="relevant"/>
+                                        <xforms:group id="group-1-2">
+                                            <xforms:output id="output-1-3" value="''"/>
+                                            <xforms:output id="output-1-4" ref="relevant"/>
+                                        </xforms:group>
+                                    </xforms:group>
+
+                                    <!-- Nothing relevant -->
+                                    <xforms:group id="group-2-1" ref="()">
+                                        <xforms:output id="output-2-1" value="''"/>
+                                        <xforms:output id="output-2-2" ref="relevant"/>
+                                        <xforms:group id="group-2-2">
+                                            <xforms:output id="output-2-3" value="''"/>
+                                            <xforms:output id="output-2-4" ref="relevant"/>
+                                        </xforms:group>
+                                    </xforms:group>
+
+                                    <!-- Nested group non-relevant by binding to non-relevant node -->
+                                    <xforms:group id="group-3-1">
+                                        <xforms:output id="output-3-1" value="''"/>
+                                        <xforms:output id="output-3-2" ref="relevant"/>
+                                        <xforms:group id="group-3-2" ref="non-relevant/nested-non-relevant">
+                                            <xforms:output id="output-3-3" value="''"/>
+                                            <xforms:output id="output-3-4" ref="../../relevant"/><!-- this won't change anything -->
+                                        </xforms:group>
+                                    </xforms:group>
+
+                                    <!-- Nested group non-relevant by binding to no node -->
+                                    <xforms:group id="group-4-1">
+                                        <xforms:output id="output-4-1" value="''"/>
+                                        <xforms:output id="output-4-2" ref="relevant"/>
+                                        <xforms:group id="group-4-2" ref="()">
+                                            <xforms:output id="output-4-3" value="''"/>
+                                            <xforms:output id="output-4-4" ref="../relevant"/><!-- this won't change anything -->
+                                        </xforms:group>
+                                    </xforms:group>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <relevant/>
+                                    <non-relevant>
+                                        <nested-non-relevant/>
+                                    </non-relevant>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-enabled" target="events-group"/>
+                                    <event type="xforms-enabled" target="group-1-1"/>
+                                    <event type="xforms-enabled" target="output-1-1"/>
+                                    <event type="xforms-enabled" target="output-1-2"/>
+                                    <event type="xforms-enabled" target="group-1-2"/>
+                                    <event type="xforms-enabled" target="output-1-3"/>
+                                    <event type="xforms-enabled" target="output-1-4"/>
+                                    <event type="xforms-enabled" target="group-3-1"/>
+                                    <event type="xforms-enabled" target="output-3-1"/>
+                                    <event type="xforms-enabled" target="output-3-2"/>
+                                    <event type="xforms-enabled" target="group-4-1"/>
+                                    <event type="xforms-enabled" target="output-4-1"/>
+                                    <event type="xforms-enabled" target="output-4-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="group-2-1" relevant="false"/>
+                        <xxf:control id="output-2-1" relevant="false"/>
+                        <xxf:control id="output-2-2" relevant="false"/>
+                        <xxf:control id="group-2-2" relevant="false"/>
+                        <xxf:control id="output-2-3" relevant="false"/>
+                        <xxf:control id="output-2-4" relevant="false"/>
+                        <xxf:control id="group-3-2" relevant="false"/>
+                        <xxf:control id="output-3-3" relevant="false"/>
+                        <xxf:control id="output-3-4" relevant="false"/>
+                        <xxf:control id="group-4-2" relevant="false"/>
+                        <xxf:control id="output-4-3" relevant="false"/>
+                        <xxf:control id="output-4-4" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Value change event on group" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <value/>
+                                            <constant>constant</constant>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:setvalue ev:event="xforms-ready" ref="value">new</xforms:setvalue>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+
+
+                                <xforms:group id="events-group">
+                                    <xforms:insert ev:event="xforms-value-changed"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             ))"/>
+
+                                    <!-- Must not get event -->
+                                    <xforms:group id="group-1"/>
+                                    <!-- Must get event -->
+                                    <xforms:group id="group-2" ref="value"/>
+                                    <!-- Must not get event -->
+                                    <xforms:group id="group-3" ref="constant"/>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>new</value>
+                                    <constant>constant</constant>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-value-changed" target="group-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Value change event on switch" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <value/>
+                                            <constant>constant</constant>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:setvalue ev:event="xforms-ready" ref="value">new</xforms:setvalue>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+
+
+                                <xforms:group id="events-group">
+                                    <xforms:insert ev:event="xforms-value-changed"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             ))"/>
+
+                                    <!-- Must not get event -->
+                                    <xforms:switch id="switch-1">
+                                        <xforms:case id="case-1">Case 1</xforms:case>
+                                    </xforms:switch>
+                                    <!-- Must get event -->
+                                    <xforms:switch id="switch-2" ref="value">
+                                        <xforms:case id="case-2">Case 2</xforms:case>
+                                    </xforms:switch>
+                                    <!-- Must not get event -->
+                                    <xforms:switch id="switch-3" ref="constant">
+                                        <xforms:case id="case-3">Case 3</xforms:case>
+                                    </xforms:switch>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>new</value>
+                                    <constant>constant</constant>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-value-changed" target="switch-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="switch-1" case-id="case-1"/>
+                            <control effective-id="switch-2" case-id="case-2"/>
+                            <control effective-id="switch-3" case-id="case-3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case-1" visibility="visible"/>
+                        <xxf:div id="case-2" visibility="visible"/>
+                        <xxf:div id="case-3" visibility="visible"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Value change event on output" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <value/>
+                                            <constant>constant</constant>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:setvalue ev:event="xforms-ready" ref="value">new</xforms:setvalue>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+
+
+                                <xforms:group id="events-group">
+                                    <xforms:insert ev:event="xforms-value-changed"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             ))"/>
+
+                                    <xforms:output id="output-1" value="value"/>
+                                    <xforms:output id="output-2" ref="value"/>
+                                    <xforms:output id="output-3" value="constant"/>
+                                    <xforms:output id="output-4" ref="constant"/>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>new</value>
+                                    <constant>constant</constant>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-value-changed" target="output-1"/>
+                                    <event type="xforms-value-changed" target="output-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-1">new</xxf:control>
+                        <xxf:control id="output-2">new</xxf:control>
+                        <xxf:control id="output-3">constant</xxf:control>
+                        <xxf:control id="output-4">constant</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+
+
+</group>

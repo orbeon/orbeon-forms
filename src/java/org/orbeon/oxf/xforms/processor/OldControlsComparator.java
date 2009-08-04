@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Collections;
@@ -204,28 +205,9 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                                 // TODO: Output value only when changed
 
+                                // Output element
                                 final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                                // Check if a "display-value" attribute must be added
-                                //                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-                                //                            if (displayValue != null) {
-                                //                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-                                //                            }
-
-                                // Create element with text value
-                                final String value;
-                                if (xformsValueControl.isRelevant()) {
-                                    // NOTE: Not sure if it is still possible to have a null value when the control is relevant
-                                    final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                    value = (tempValue == null) ? "" : tempValue;
-                                } else {
-                                    value = "";
-                                }
-                                if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                                    ch.text(value);
-                                    ch.endElement();
-                                }
+                                outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control");
                             } else {
                                 // No value, just output element with no content (but there may be attributes)
                                 if (doOutputElement)
@@ -257,22 +239,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
                             }
 
+                            // Output element
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                            // Create element with text value
-                            final String value;
-                            if (xformsValueControl.isRelevant()) {
-                                // NOTE: Not sure if it is still possible to have a null value when the control is relevant
-                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                value = (tempValue == null) ? "" : tempValue;
-                            } else {
-                                value = "";
-                            }
-                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
-                                ch.text(value);
-                                ch.endElement();
-                            }
+                            outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
                         } else if (isTextControl) {
                             // Text control
                             final XXFormsTextControl txtControlInfo2 = (XXFormsTextControl) xformsSingleNodeControl2;
@@ -288,22 +257,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
                             }
 
+                            // Output element
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                            // Create element with text value
-                            final String value;
-                            if (xformsValueControl.isRelevant()) {
-                                // NOTE: Not sure if it is still possible to have a null value when the control is relevant
-                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                value = (tempValue == null) ? "" : tempValue;
-                            } else {
-                                value = "";
-                            }
-                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
-                                ch.text(value);
-                                ch.endElement();
-                            }
+                            outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
                         } else {
                             // Repeat iteration only handles relevance
 
@@ -422,6 +378,24 @@ public class OldControlsComparator extends BaseControlsComparator {
                     diff(children1, children2);
                 }
             }
+        }
+    }
+
+    private void outputElement(XFormsValueControl xformsValueControl, boolean doOutputElement, boolean isNewlyVisibleSubtree, Attributes attributesImpl, String elementName) {
+        // Create element with text value
+        final String value;
+        if (xformsValueControl.isRelevant()) {
+            // NOTE: Not sure if it is still possible to have a null value when the control is relevant
+            final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
+            value = (tempValue == null) ? "" : tempValue;
+        } else {
+            value = "";
+        }
+        if (doOutputElement || !isNewlyVisibleSubtree || !value.equals("")) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, elementName, attributesImpl);
+            if (value.length() > 0)
+                ch.text(value);
+            ch.endElement();
         }
     }
 }

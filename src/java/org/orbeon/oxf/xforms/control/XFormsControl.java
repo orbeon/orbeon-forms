@@ -561,10 +561,30 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         setRelevant(computeRelevant());
 
-        getLabel(propertyContext);
-        getHint(propertyContext);
-        getHelp(propertyContext);
-        getAlert(propertyContext);
+        if (isRelevant()) {
+            // Control is relevant
+            getLabel(propertyContext);
+            getHint(propertyContext);
+            getHelp(propertyContext);
+            getAlert(propertyContext);
+        } else {
+            // Control is not relevant
+            label = null;
+            isLabelEvaluated = true;
+            isHTMLLabel = false;
+
+            help = null;
+            isHelpEvaluated= true;
+            isHTMLHelp = false;
+
+            hint = null;
+            isHintEvaluated= true;
+            isHTMLHint = false;
+
+            alert = null;
+            isAlertEvaluated= true;
+            isHTMLAlert = false;
+        }
 
         if (!isRefresh) {
             // Sync values
@@ -591,7 +611,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
-            // Try to update xforms:repeat indices based on this
+            // Try to update xforms:repeat indexes based on this
             {
                 // Find current path through ancestor xforms:repeat elements, if any
                 final List<String> repeatIterationsToModify = new ArrayList<String>();
@@ -664,6 +684,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                  rewritten value
      */
     public String getEscapedHTMLValue(final PipelineContext pipelineContext, String rawValue) {
+
+        if (rawValue == null)
+            return null;
+
         // Quick check for the most common attributes, src and href. Ideally we should check more.
         final boolean needsRewrite = rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1;
         final String result;

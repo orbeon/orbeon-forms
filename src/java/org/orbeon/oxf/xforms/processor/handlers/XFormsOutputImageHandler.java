@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -59,7 +60,7 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
         // @src="..."
         // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
         final String srcValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
-        imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
+        imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue != null ? srcValue : XFormsConstants.DUMMY_IMAGE_URI);
         return imgAttributes;
     }
 }

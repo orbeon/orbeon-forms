@@ -25,6 +25,7 @@
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="tests-xpl.xml"/>
+
     <xi:include href="xforms-server/tests-xforms-server.xml"/>
     <xi:include href="xforms-server/tests-xforms-mips.xml"/>
     <xi:include href="xforms-server/tests-xforms-submission.xml"/>
@@ -32,6 +33,8 @@
     <xi:include href="xforms-server/tests-xforms-itemset.xml"/>
     <xi:include href="xforms-server/tests-xforms-layout.xml"/>
     <xi:include href="xforms-server/tests-xforms-repeat.xml"/>
+    <xi:include href="xforms-server/tests-xforms-events.xml"/>
+    
     <xi:include href="tests-qname-converter.xml"/>
     <xi:include href="tests-xupdate.xml"/>
     <xi:include href="tests-validation.xml"/>

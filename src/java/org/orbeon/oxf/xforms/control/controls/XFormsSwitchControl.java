@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
@@ -17,7 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -30,10 +30,8 @@ import java.util.Map;
  * Represents an xforms:switch container control.
  *
  * NOTE: This keep the "currently selected flag" for all children xforms:case.
- *
- * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
-public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
+public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     private transient String restoredCaseId;    // used by deserializeLocal() and childrenAdded()
 
@@ -83,13 +81,11 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
-    @Override
-    public String getType() {
-        return null;
-    }
-
     /**
      * Set the currently selected case.
+     *
+     * @param propertyContext   current context
+     * @param caseControl       case control to select
      */
     public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControl) {
 

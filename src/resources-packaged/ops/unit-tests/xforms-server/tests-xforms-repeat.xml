@@ -1105,9 +1105,9 @@
                     <xxf:control-values>
                         <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
                         <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="1"/>
-                        <xxf:control id="description-textarea·2-1" relevant="true"/>
+                        <xxf:control id="description-textarea·2-1" relevant="true" label="Condition:"/>
                         <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="2"/>
-                        <xxf:control id="description-textarea·2-2" relevant="true"/>
+                        <xxf:control id="description-textarea·2-2" relevant="true" label="Condition:"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
@@ -1198,5 +1198,84 @@
         </output>
     </test>
 
-</group>
+    <test description="Repeat iterations updating only at time of refresh" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
 
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance id="books-instance">
+                                        <books/>
+                                    </xforms:instance>
+                                    <xforms:instance id="templates">
+                                        <book xmlns="">
+                                            <title/>
+                                            <author/>
+                                        </book>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:insert context="." nodeset="book" origin="instance('templates')"/>
+                                        <xforms:setvalue ref="book[last()]/title" value="'T3'"/>
+                                        <xforms:setvalue ref="book[last()]/author" value="'A3'"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group ref=".[exists(book)]" id="my-group">
+                                <!--<xforms:group ref=".">-->
+                                    <xforms:repeat nodeset="book" id="my-repeat">
+                                        <xforms:output value="title" id="my-title"/>
+                                        <xforms:output value="author" id="my-author"/>
+                                    </xforms:repeat>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="books-instance" model-id="xf-1">
+                                <books>
+                                    <book>
+                                        <title>T3</title>
+                                        <author>A3</author>
+                                    </book>
+                                </books>
+                            </instance>
+                            <instance id="templates" model-id="xf-1">
+                                <book>
+                                    <title/>
+                                    <author/>
+                                </book>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-title·1">T3</xxf:control>
+                        <xxf:control id="my-author·1">A3</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+</group>

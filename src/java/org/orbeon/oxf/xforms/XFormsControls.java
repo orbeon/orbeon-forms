@@ -208,8 +208,10 @@ public class XFormsControls implements XFormsObjectResolver {
      * WARNING: The binding context must be set to the current iteration before calling.
      *
      * @param propertyContext   current context
+     * @param bindingContext    binding context set to the context of the new iteration
      * @param repeatControl     repeat control
-     * @param iterationIndex    new iteration to repeat (1..repeat size + 1)
+     * @param iterationIndex    new iteration index (1..repeat size + 1)
+     * @return                  newly created repeat iteration control
      */
     public XFormsRepeatIterationControl createRepeatIterationTree(final PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext,
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
@@ -219,7 +221,9 @@ public class XFormsControls implements XFormsObjectResolver {
 
         final XFormsRepeatIterationControl repeatIterationControl;
         containingDocument.startHandleOperation("controls", "adding iteration");
-        repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument, bindingContext, repeatControl, iterationIndex);
+        {
+            repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument, bindingContext, repeatControl, iterationIndex);
+        }
         containingDocument.endHandleOperation();
 
         return repeatIterationControl;
@@ -621,7 +625,7 @@ public class XFormsControls implements XFormsObjectResolver {
         // Iterate through controls and check the nodes they are bound to
         visitAllControls(new XFormsControlVisitorAdapter() {
             public void startVisitControl(XFormsControl control) {
-                if (ControlTree.allowDispatchRefreshEvents(control)) {// test here just to make smaller list
+                if (XFormsControl.supportsRefreshEvents(control)) {// test here just to make smaller list
                     eventsToDispatch.add(control.getEffectiveId());
                 }
             }
@@ -635,7 +639,7 @@ public class XFormsControls implements XFormsObjectResolver {
         for (final String controlEffectiveId: eventsToDispatch) {
             final XFormsControl control = currentControlTree.getControl(controlEffectiveId);
 
-            if (ControlTree.allowDispatchRefreshEvents(control)) {
+            if (XFormsControl.supportsRefreshEvents(control)) {
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
 
                 final boolean oldRelevantState = singleNodeControl.wasRelevant();

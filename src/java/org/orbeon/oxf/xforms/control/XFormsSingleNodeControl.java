@@ -111,6 +111,12 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return control != null && control.isRelevant();
     }
 
+    @Override
+    public boolean supportsRefreshEvents() {
+        // Single-node controls support refresh events
+        return true;
+    }
+
     public boolean isRequired() {
         getMIPsIfNeeded();
         return required;

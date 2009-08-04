@@ -280,7 +280,13 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
-            updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            // Update iterations
+            final List<XFormsRepeatIterationControl> newIterations = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            // Initialize all new iterations
+            final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
+            for (XFormsRepeatIterationControl newIteration: newIterations) {
+                currentControlTree.initializeRepeatIterationTree(propertyContext, containingDocument, newIteration);
+            }
         }
     }
 
@@ -329,14 +335,19 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     final XFormsRepeatIterationControl movedOrRemovedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
 
                     if (isRemoved) {
-                        if (isDebugEnabled)
-                            containingDocument.logDebug("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        if (isDebugEnabled) {
+                            containingDocument.startHandleOperation("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        }
 
                         // Dispatch destruction events
                         currentControlTree.dispatchDestructionEvents(propertyContext, containingDocument, movedOrRemovedIteration);
 
                         // Indicate to iteration that it is being removed
                         movedOrRemovedIteration.iterationRemoved(propertyContext);
+
+                        if (isDebugEnabled) {
+                            containingDocument.endHandleOperation();
+                        }
                     }
 
                     // Deindex old iteration
@@ -356,7 +367,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // This new node was not in the old nodeset so create a new one
 
                     if (isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
+                        containingDocument.startHandleOperation("repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
                     }
 
                     final XFormsContextStack contextStack = getXBLContainer().getContextStack();
@@ -365,6 +376,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     contextStack.popBinding();
 
                     newIterations.add(newIteration);
+
+                    if (isDebugEnabled) {
+                        containingDocument.endHandleOperation();
+                    }
                 } else {
                     // This new node was in the old nodeset so keep it
                     newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
@@ -480,7 +495,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 for (int i = 0; i < oldChildren.size(); i++) {
 
                     if (isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        containingDocument.startHandleOperation("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
                     }
 
                     final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
@@ -490,6 +505,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                     // Deindex old iteration
                     currentControlTree.deindexSubtree(removedIteration, true);
+                    if (isDebugEnabled) {
+                        containingDocument.endHandleOperation();
+                    }
                 }
             }
 

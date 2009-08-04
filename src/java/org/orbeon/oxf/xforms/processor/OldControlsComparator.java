@@ -214,10 +214,12 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                                 // Create element with text value
                                 final String value;
-                                {
-                                    // Value may become null when controls are unbound
+                                if (xformsValueControl.isRelevant()) {
+                                    // NOTE: Not sure if it is still possible to have a null value when the control is relevant
                                     final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                     value = (tempValue == null) ? "" : tempValue;
+                                } else {
+                                    value = "";
                                 }
                                 if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
@@ -259,10 +261,12 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                             // Create element with text value
                             final String value;
-                            {
-                                // Value may become null when controls are unbound
+                            if (xformsValueControl.isRelevant()) {
+                                // NOTE: Not sure if it is still possible to have a null value when the control is relevant
                                 final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
+                            } else {
+                                value = "";
                             }
                             if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
@@ -288,10 +292,12 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                             // Create element with text value
                             final String value;
-                            {
-                                // Value may become null when controls are unbound
+                            if (xformsValueControl.isRelevant()) {
+                                // NOTE: Not sure if it is still possible to have a null value when the control is relevant
                                 final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
+                            } else {
+                                value = "";
                             }
                             if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
                                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);

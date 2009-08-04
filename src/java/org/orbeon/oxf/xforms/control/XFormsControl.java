@@ -76,6 +76,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     private boolean isEvaluated;
 
+    // Relevance
+    private boolean relevant;
+    private boolean wasRelevant;
+
     // Optional extension attributes supported by the control
     private Map<QName, String> extensionAttributesValues;
 
@@ -175,6 +179,24 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public LocationData getLocationData() {
         return (controlElement != null) ? (LocationData) controlElement.getData() : null;
+    }
+
+    public boolean isRelevant() {
+        return relevant;
+    }
+
+    protected final void setRelevant(boolean relevant) {
+        this.relevant = relevant;
+    }
+
+    protected boolean computeRelevant() {
+        // If there is a parent, as it, otherwise we are top-level so say relevant by default
+        final XFormsControl parent = getParent();
+        return (parent == null) || parent.isRelevant();
+    }
+
+    public boolean wasRelevant() {
+        return wasRelevant;
     }
 
     public String getAlert(PropertyContext propertyContext) {
@@ -447,6 +469,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return true;
 
         // Compare only what matters
+
+        if (relevant != other.relevant)
+            return false;
+
         if (!XFormsUtils.compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
             return false;
         if (!XFormsUtils.compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
@@ -484,10 +510,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return bindingContext;
     }
 
-    public final void evaluateIfNeeded(PropertyContext propertyContext) {
+    public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
         if (!isEvaluated) {
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
-            evaluate(propertyContext);
+            evaluate(propertyContext, isRefresh);
 
             // Evaluate standard extension attributes
             evaluateExtensionAttributes(propertyContext, EXTENSION_ATTRIBUTES);
@@ -517,6 +543,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public void markDirty() {
+
+        // Keep previous values
+        wasRelevant = relevant;
+
+        // Clear everything
         isEvaluated = false;
         isLabelEvaluated = false;
         isHelpEvaluated = false;
@@ -526,11 +557,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             extensionAttributesValues.clear();
     }
 
-    protected void evaluate(PropertyContext propertyContext) {
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+
+        setRelevant(computeRelevant());
+
         getLabel(propertyContext);
         getHint(propertyContext);
         getHelp(propertyContext);
         getAlert(propertyContext);
+
+        if (!isRefresh) {
+            // Sync values
+            wasRelevant = relevant;
+        }
     }
 
     /**

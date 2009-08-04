@@ -628,13 +628,6 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
 
-            // Rebuild and evaluate controls if needed, before we compute the dynamic state
-            // NOTE: This is in case rebuilding controls modifies repeat indexes. We want the indexes to be included in the state further down.that
-            if (allEvents || containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {// TODO: Why do we rebuild anyway in case of allEvents?
-                xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
-            }
-
             // Get encoded state to send to the client (unless computing the list of offline events)
             if (!isOfflineEvents) {
                 // State ready to send to the client

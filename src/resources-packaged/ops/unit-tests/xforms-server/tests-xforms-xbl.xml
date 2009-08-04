@@ -180,7 +180,6 @@
                                         <fr:dropdown-date ref="." id="fr-dropdown-date">
                                             <xforms:label>Date: </xforms:label>
                                         </fr:dropdown-date>
-                                        <xhtml:hr/>
                                     </xforms:repeat>
 
                                     <xforms:trigger id="add-row-trigger">
@@ -218,17 +217,13 @@
                                 <events>
                                     <event type="xforms-enabled" target="component-group" indexes="2"/>
                                     <event type="xforms-enabled" target="component-result-group" indexes="2"/>
+                                    <event type="xforms-enabled" target="component-controls-group" indexes="2"/>
                                     <event type="xforms-enabled" target="year-select" indexes="2"/>
                                     <event type="xforms-enabled" target="month-select" indexes="2"/>
                                     <event type="xforms-enabled" target="day-select" indexes="2"/>
-                                    <!-- NOTE: We no longer dispatch events to repeat iterations -->
-                                    <!--<event type="xforms-enabled" target="date-repeat" indexes="2"/>-->
                                     <event type="xforms-value-changed" target="year-select" indexes="2"/>
-                                    <event type="xforms-enabled" target="year-select" indexes="2"/>
                                     <event type="xforms-value-changed" target="month-select" indexes="2"/>
-                                    <event type="xforms-enabled" target="month-select" indexes="2"/>
                                     <event type="xforms-value-changed" target="day-select" indexes="2"/>
-                                    <event type="xforms-enabled" target="day-select" indexes="2"/>
                                 </events>
                             </instance>
                             <instance id="date-instance" model-id="fr-dropdown-date$date-model·1">
@@ -777,16 +772,17 @@
                                         <xbl:template>
                                             <!-- Local model -->
                                             <xforms:model id="internal-model">
-                                                <!-- React upon xforms-ready so that the controls exist -->
-                                                <xforms:action ev:event="xforms-ready">
+                                            </xforms:model>
+                                            <!-- Local controls -->
+                                            <xforms:group id="internal-group">
+                                                <!-- React to creation of group -->
+                                                <xforms:action ev:event="xforms-enabled" ev:target="internal-group">
                                                     <!-- Simulate user click on all triggers -->
                                                     <xforms:dispatch name="DOMActivate" target="internal-trigger-1"/>
                                                     <xforms:dispatch name="DOMActivate" target="internal-trigger-2"/>
                                                     <xforms:dispatch name="DOMActivate" target="internal-trigger-3"/>
                                                 </xforms:action>
-                                            </xforms:model>
-                                            <!-- Local controls -->
-                                            <xforms:group id="internal-group">
+
                                                 <xforms:trigger id="internal-trigger-1">
                                                     <xforms:label>Dispatch outside</xforms:label>
                                                     <!-- Dispatch to bound node -->
@@ -856,6 +852,8 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
+                                    <event type="xforms-enabled" target="external-group" phase="bubbling" original-target="external-group" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-group" indexes="" original-indexes=""/>
                                     <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="bubbling" original-target="my-foobar" indexes="" original-indexes=""/>
@@ -864,6 +862,13 @@
                                     <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-2" indexes="" original-indexes=""/>
                                     <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-3" indexes="" original-indexes=""/>
                                     <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-3" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-group" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-1" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-2" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-2" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-3" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-3" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -995,8 +1000,8 @@
                                                         <record/>
                                                     </instance>
                                                 </xforms:instance>
-                                                <!-- Insert locally upon ready -->
-                                                <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+                                                <!-- Insert locally upon xforms-enabled of the group -->
+                                                <xforms:insert ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group" nodeset="instance('instance')/record" at="1"/>
                                             </xforms:model>
                                             <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
                                                 <xbl:content/>
@@ -1124,7 +1129,7 @@
                                                     <xforms:insert nodeset="instance('instance')/record"/>
                                                     <xforms:insert nodeset="instance('instance')/record"/>
                                                 </xforms:action>
-                                                <xforms:action ev:event="xforms-ready">
+                                                <xforms:action ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group">
                                                     <!-- Dispatch repeat focus to change the index back to 2 -->
                                                     <xforms:dispatch name="xxforms-repeat-focus" target="my-output" xxforms:repeat-indexes="2"/>
                                                 </xforms:action>
@@ -1478,9 +1483,12 @@
                             </instance>
                             <instance id="events" model-id="my-bar-1$model">
                                 <events>
-                                    <event type="my-event" target="my-bar-1" phase="bubbling" original-target="my-bar-1" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="my-event" target="my-bar-1" phase="bubbling" original-target="my-bar-1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                             <instance id="instance" model-id="my-bar-2$model">
@@ -1491,9 +1499,12 @@
                             </instance>
                             <instance id="events" model-id="my-bar-2$model">
                                 <events>
-                                    <event type="my-event" target="my-bar-2" phase="bubbling" original-target="my-bar-2" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
+                                    <event type="my-event" target="my-bar-2" phase="bubbling" original-target="my-bar-2" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
+                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -1749,6 +1760,11 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
+                                    <event observer="main-group" type="xforms-enabled" target="main-group" phase="bubbling" original-target="main-group" indexes=""/>
+                                    <event observer="fr-level3-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="fr-level2-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
                                     <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
@@ -1761,10 +1777,10 @@
                                     <event observer="fr-level1-binding" type="DOMFocusIn" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level3-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="fr-level3-binding" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="fr-level2-binding" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="fr-level1-binding" type="xforms-value-changed" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="main-group" type="xforms-value-changed" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                 </events>
                             </instance>
                             <instance id="main-instance" model-id="model">

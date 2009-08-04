@@ -1388,7 +1388,7 @@ public class XFormsUtils {
                 contextStack.pushBinding(pipelineContext, element);
                 {
                     outputControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
-                    outputControl.evaluateIfNeeded(pipelineContext);
+                    outputControl.evaluateIfNeeded(pipelineContext, false);
                 }
                 contextStack.popBinding();
 
@@ -1439,7 +1439,7 @@ public class XFormsUtils {
                             contextStack.pushBinding(pipelineContext, element);
                             {
                                 attributeControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
-                                attributeControl.evaluateIfNeeded(pipelineContext);
+                                attributeControl.evaluateIfNeeded(pipelineContext, false);
                             }
                             contextStack.popBinding();
 

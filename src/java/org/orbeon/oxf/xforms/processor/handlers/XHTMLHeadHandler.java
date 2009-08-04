@@ -1,19 +1,20 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.collections.map.CompositeMap;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
@@ -31,8 +32,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Element;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -68,7 +69,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         // Gather information about appearances of controls which use Script
         // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
         // TODO: This would probably be done better, and more correctly, based on statically-gathered information in XFormsStaticState
-        final Map javaScriptControlsAppearancesMap = new HashMap();
+        final Map<String, Map<String, List<String>>> javaScriptControlsAppearancesMap = new HashMap<String, Map<String, List<String>>>();
         {
             final XFormsControls xformsControls = containingDocument.getControls();
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
@@ -79,9 +80,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                     // future if some static readonly controls require JS initialization)
                     final boolean hasJavaScriptInitialization = control.hasJavaScriptInitialization() && !control.isStaticReadonly();
                     if (hasJavaScriptInitialization) {
-                        Map listForControlNameMap = (Map) javaScriptControlsAppearancesMap.get(controlName);
+                        Map<String, List<String>> listForControlNameMap = javaScriptControlsAppearancesMap.get(controlName);
                         if (listForControlNameMap == null) {
-                            listForControlNameMap = new HashMap();
+                            listForControlNameMap = new HashMap<String, List<String>>();
                             javaScriptControlsAppearancesMap.put(control.getName(), listForControlNameMap);
                         }
                         final String controlAppearanceOrMediatype;
@@ -90,9 +91,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                             controlAppearanceOrMediatype = (controlAppearance != null) ? controlAppearance : control.getMediatype();
                         }
 
-                        List idsForAppearanceOrMediatypeList = (List) listForControlNameMap.get(controlAppearanceOrMediatype);
+                        List<String> idsForAppearanceOrMediatypeList = listForControlNameMap.get(controlAppearanceOrMediatype);
                         if (idsForAppearanceOrMediatypeList == null) {
-                            idsForAppearanceOrMediatypeList = new ArrayList();
+                            idsForAppearanceOrMediatypeList = new ArrayList<String>();
                             listForControlNameMap.put(controlAppearanceOrMediatype, idsForAppearanceOrMediatypeList);
                         }
                         idsForAppearanceOrMediatypeList.add(control.getEffectiveId());
@@ -132,35 +133,33 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 if (isCacheCombinedResources) {
                     // Attempt to cache combined resources
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
-                    final List resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
+                    final List<XFormsFeatures.ResourceConfig> resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
                     XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
                 }
             } else {
-                for (Iterator i = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
-                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                for (final XFormsFeatures.ResourceConfig resourceConfig: XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap)) {
                     // Only include stylesheet if needed
                     attributesImpl.clear();
-                    final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css", "media", "all"  };
+                    final String[] attributesList = new String[]{"rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css", "media", "all"};
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                     helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
                 }
             }
 
             // XBL resources
-            final List xblStyles = containingDocument.getStaticState().getXblBindings().getXBLStyles();
+            final List<Element> xblStyles = containingDocument.getStaticState().getXblBindings().getXBLStyles();
             if (xblStyles != null) {
-                for (Iterator i = xblStyles.iterator(); i.hasNext();) {
-                    final Element styleElement = (Element) i.next();
+                for (final Element styleElement: xblStyles) {
                     attributesImpl.clear();
                     if (styleElement.attributeValue("src") != null) {
                         // xhtml:link
-                        final String[] attributesList = new String[] { "rel", "stylesheet", "href", styleElement.attributeValue("src"), "type", "text/css", "media", styleElement.attributeValue("media") };
+                        final String[] attributesList = new String[]{"rel", "stylesheet", "href", styleElement.attributeValue("src"), "type", "text/css", "media", styleElement.attributeValue("media")};
                         ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                         helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
                     } else {
                         // xhtml:style
-                        final String[] attributesList = new String[] { "rel", "stylesheet", "type", "text/css", "media", styleElement.attributeValue("media") };
+                        final String[] attributesList = new String[]{"rel", "stylesheet", "type", "text/css", "media", styleElement.attributeValue("media")};
                         ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "style", attributesImpl);
                         helper.text(styleElement.getText());
@@ -186,37 +185,35 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 if (isCacheCombinedResources) {
                     // Attempt to cache combined resources
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
-                    final List resources = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap);
+                    final List<XFormsFeatures.ResourceConfig> resources = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
                     XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, false, isMinimal);
                 }
 
             } else {
-                for (Iterator i = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
-                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                for (final XFormsFeatures.ResourceConfig resourceConfig: XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap)) {
                     // Only include stylesheet if needed
 
                     attributesImpl.clear();
-                    final String[] attributesList =  new String[] { "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal) };
+                    final String[] attributesList = new String[]{"type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal)};
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                     helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                 }
             }
 
             // XBL scripts
-            final List xblScripts = containingDocument.getStaticState().getXblBindings().getXBLScripts();
+            final List<Element> xblScripts = containingDocument.getStaticState().getXblBindings().getXBLScripts();
             if (xblScripts != null) {
-                for (Iterator i = xblScripts.iterator(); i.hasNext();) {
-                    final Element scriptElement = (Element) i.next();
+                for (final Element scriptElement: xblScripts) {
                     attributesImpl.clear();
                     if (scriptElement.attributeValue("src") != null) {
                         // xhtml:script with @src
-                        final String[] attributesList = new String[] { "type", "text/javascript", "src", scriptElement.attributeValue("src") };
+                        final String[] attributesList = new String[]{"type", "text/javascript", "src", scriptElement.attributeValue("src")};
                         ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                         helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                     } else {
                         // xhtml:script without @src
-                        final String[] attributesList = new String[] { "type", "text/javascript" };
+                        final String[] attributesList = new String[]{"type", "text/javascript"};
                         ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                         helper.text(scriptElement.getText());
@@ -230,14 +227,14 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 final Map clientPropertiesMap;
                 {
                     // Dynamic properties
-                    final Map dynamicProperties = new HashMap();
+                    final Map<String, Serializable> dynamicProperties = new HashMap<String, Serializable>();
                     {
                         // Heartbeat delay
                         {
                             final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
                             final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext());
                             if (heartbeatDelay != ((Number) propertyDefinition.getDefaultValue()).longValue())
-                                dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, new Long(heartbeatDelay));
+                                dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay);
                         }
 
                         // Produce JavaScript paths for use on the client
@@ -253,7 +250,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Help events
                         {
-                            final boolean hasHandlerForXFormsHelp = containingDocument.getControls().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
+                            final boolean hasHandlerForXFormsHelp = containingDocument.getStaticState().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
                             if (hasHandlerForXFormsHelp) {
                                 dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }
@@ -280,15 +277,15 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 //                        }
                     }
 
-                    final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
+                    final Map<String, Object> nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
                     clientPropertiesMap = new CompositeMap(new Map[] { nonDefaultProperties, dynamicProperties });
                 }
                 
                 FastStringBuffer sb = null;
                 if (clientPropertiesMap.size() > 0) {
 
-                    for (Iterator i = clientPropertiesMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                    for (Object o: clientPropertiesMap.entrySet()) {
+                        final Map.Entry currentEntry = (Map.Entry) o;
                         final String propertyName = (String) currentEntry.getKey();
                         final Object propertyValue = currentEntry.getValue();
 
@@ -299,8 +296,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                             if (sb == null) {
                                 // First property found
-                                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                                    "type", "text/javascript"});
+                                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[]{
+                                        "type", "text/javascript"});
                                 sb = new FastStringBuffer("var opsXFormsProperties = {");
                             } else {
                                 // Subsequent property found
@@ -332,23 +329,22 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             }
 
             // User-defined scripts (with xxforms:script)
-            final Map scriptsToDeclare = containingDocument.getScripts();
+            final Map<String, String> scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
-            final List messagesToRun = containingDocument.getMessagesToRun();
+            final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
             if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null) {
                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
 
                 if (scriptsToDeclare != null) {
-                    for (Iterator i = scriptsToDeclare.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                        helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
-                        helper.text(currentEntry.getValue().toString());
+                    for (final Map.Entry<String, String> currentEntry: scriptsToDeclare.entrySet()) {
+                        helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey()) + "(event) {\n");
+                        helper.text(currentEntry.getValue());
                         helper.text("}\n");
                     }
                 }
 
-                final List scriptsToRun = containingDocument.getScriptsToRun();
+                final List<XFormsContainingDocument.Script> scriptsToRun = containingDocument.getScriptsToRun();
 
                 if (focusElementId != null || scriptsToRun != null || messagesToRun != null) {
                     final FastStringBuffer sb = new FastStringBuffer("\nfunction xformsPageLoadedServer() { ");
@@ -362,8 +358,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                     // Initial xxforms:script executions if present
                     if (scriptsToRun != null) {
-                        for (Iterator i = scriptsToRun.iterator(); i.hasNext();) {
-                            final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
+                        for (final XFormsContainingDocument.Script script: scriptsToRun) {
                             sb.append("ORBEON.xforms.Server.callUserScript(\"");
                             sb.append(script.getFunctionName());
                             sb.append("\",\"");
@@ -376,8 +371,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                     // Initial xforms:message to run if present
                     if (messagesToRun != null) {
-                        for (Iterator i = messagesToRun.iterator(); i.hasNext();) {
-                            final XFormsContainingDocument.Message message = (XFormsContainingDocument.Message) i.next();
+                        for (final XFormsContainingDocument.Message message: messagesToRun) {
                             if ("modal".equals(message.getLevel())) {
                                 // TODO: should not call directly alert() but a client-side method
                                 sb.append("alert(\"");
@@ -404,26 +398,26 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 if (javaScriptControlsAppearancesMap.size() > 0) {
                     final FastStringBuffer sb = new FastStringBuffer("var opsXFormsControls = {\"controls\":{");
 
-                    for (Iterator i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry1 = (Map.Entry) i.next();
-                        final String controlName = (String) currentEntry1.getKey();
-                        final Map controlMap = (Map) currentEntry1.getValue();
+                    for (Iterator<Map.Entry<String,Map<String,List<String>>>> i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry<String,Map<String,List<String>>> currentEntry1 = i.next();
+                        final String controlName = currentEntry1.getKey();
+                        final Map<String, List<String>> controlMap = currentEntry1.getValue();
 
                         sb.append("\"");
                         sb.append(controlName);
                         sb.append("\":{");
 
-                        for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
-                            final Map.Entry currentEntry2 = (Map.Entry) j.next();
-                            final String controlAppearance = (String) currentEntry2.getKey();
-                            final List idsForAppearanceList = (List) currentEntry2.getValue();
+                        for (Iterator<Map.Entry<String,List<String>>> j = controlMap.entrySet().iterator(); j.hasNext();) {
+                            final Map.Entry<String,List<String>> currentEntry2 = j.next();
+                            final String controlAppearance = currentEntry2.getKey();
+                            final List<String> idsForAppearanceList = currentEntry2.getValue();
 
                             sb.append('"');
                             sb.append(controlAppearance != null ? controlAppearance : "");
                             sb.append("\":[");
 
-                            for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
-                                final String controlId = (String) k.next();
+                            for (Iterator<String> k = idsForAppearanceList.iterator(); k.hasNext();) {
+                                final String controlId = k.next();
                                 sb.append('"');
                                 sb.append(controlId);
                                 sb.append('"');

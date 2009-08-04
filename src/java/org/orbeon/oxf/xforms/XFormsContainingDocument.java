@@ -101,9 +101,6 @@ public class XFormsContainingDocument extends XBLContainer {
     private boolean goingOffline;
 //    private boolean goingOnline;  // never used at the moment
 
-    // Global flag used during initialization only
-    private boolean mustPerformInitializationFirstRefresh;
-
     // Event information
     private static final Map<String, String> ignoredXFormsOutputExternalEvents = new HashMap<String, String>();
     private static final Map<String, String> allowedXFormsOutputExternalEvents = new HashMap<String, String>();
@@ -228,7 +225,6 @@ public class XFormsContainingDocument extends XBLContainer {
             if (encodedDynamicState == null || encodedDynamicState.equals("")) {
                 // Just for tests, we allow the dynamic state to be empty
                 initialize(pipelineContext);
-                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
             } else {
                 // Regular case
                 restoreDynamicState(pipelineContext, encodedDynamicState);
@@ -251,9 +247,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public XFormsState getXFormsState(PipelineContext pipelineContext) {
-
-        // Make sure we have up to date controls before creating state below
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
         // Encode state
         startHandleOperation(LOG_TYPE, "encoding state");
@@ -1490,7 +1483,7 @@ public class XFormsContainingDocument extends XBLContainer {
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
 
             // Create XForms controls and models
-            createControlsAndModels(pipelineContext);
+            createControlsAndModels(pipelineContext, false);
 
             // Restore top-level models state, including instances
             restoreModelsState(pipelineContext);
@@ -1503,7 +1496,6 @@ public class XFormsContainingDocument extends XBLContainer {
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
             xformsControls.initializeState(pipelineContext, true);
-            xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
         }
@@ -1526,26 +1518,11 @@ public class XFormsContainingDocument extends XBLContainer {
         return (Map) propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
-    /**
-     * Whether, during initialization, this is the first refresh. The flag is automatically cleared during this call so
-     * that only the first call returns true.
-     *
-     * @return  true if this is the first refresh, false otherwise
-     */
-    public boolean isInitializationFirstRefreshClear() {
-        boolean result = mustPerformInitializationFirstRefresh;
-        mustPerformInitializationFirstRefresh = false;
-        return result;
-    }
-
     private void initialize(PipelineContext pipelineContext) {
         // This is called upon the first creation of the XForms engine only
 
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext);
-
-        // Before dispaching initialization events, remember that first refresh must be performed
-        this.mustPerformInitializationFirstRefresh = XFormsProperties.isDispatchInitialEvents(this);
+        createControlsAndModels(pipelineContext, true);
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
         // order to optimize events
@@ -1560,13 +1537,9 @@ public class XFormsContainingDocument extends XBLContainer {
 
         // End deferred behavior
         endOutermostActionHandler(pipelineContext);
-
-        // In case there is no model or no controls, make sure the flag is cleared as it is only relevant during
-        // initialization
-        this.mustPerformInitializationFirstRefresh = false;
     }
 
-    private void createControlsAndModels(PipelineContext pipelineContext) {
+    private void createControlsAndModels(PipelineContext pipelineContext, boolean isInitialization) {
 
         // Gather static analysis information
         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
@@ -1582,7 +1555,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
 
         // Create XForms controls
-        xformsControls = new XFormsControls(this);
+        xformsControls = new XFormsControls(this, isInitialization);
 
         // Add models
         addAllModels();

@@ -199,7 +199,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id1">gigi1</xxf:control>
-                        <xxf:control id="id2" relevant="false">gigi2</xxf:control>
+                        <xxf:control id="id2" relevant="false"/>
                         <xxf:control id="id3" readonly="true">gigi3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>

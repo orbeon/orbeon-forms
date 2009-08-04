@@ -38,27 +38,51 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
+    // Previous value for refresh
+    private String previousValue;
+
     protected XFormsValueControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext) {
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
 
-        // Set context and evaluate other aspects of the control if necessary
-        super.evaluate(propertyContext);
+        // Evaluate other aspects of the control if necessary
+        super.evaluate(propertyContext, isRefresh);
 
         // Evaluate control values
-        getValue(propertyContext);
-        getExternalValue(propertyContext);
+        if (isRelevant()) {
+            // Control is relevant
+            getValue(propertyContext);
+            getExternalValue(propertyContext);
+        } else {
+            // Control is not relevant
+            isValueEvaluated = true;
+            isExternalValueEvaluated = true;
+            value = null;
+            externalValue = null;
+        }
+
+        if (!isRefresh) {
+            // Sync values
+            previousValue = value;
+            // TODO: what about external value?
+        }
     }
 
     @Override
     public void markDirty() {
         super.markDirty();
+
+        // Keep previous values
+        previousValue = value;
+        // TODO: what about external value?
+
         isValueEvaluated = false;
         isExternalValueEvaluated = false;
         value = null;
+        externalValue = null;
     }
 
     protected void evaluateValue(PropertyContext propertyContext) {
@@ -73,6 +97,11 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     protected void evaluateExternalValue(PropertyContext propertyContext) {
         // By default, same as value
         setExternalValue(getValue(propertyContext));
+    }
+
+    @Override
+    public boolean isValueChanged() {
+        return !XFormsUtils.compareStrings(previousValue, value);
     }
 
     /**

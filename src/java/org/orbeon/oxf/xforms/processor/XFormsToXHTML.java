@@ -341,11 +341,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
-        // Make sure we have up to date controls
-        final XFormsControls xformsControls = containingDocument.getControls();
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
-
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
             // 1. Got a submission with replace="all"
@@ -406,12 +401,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
                                          final ContentHandler contentHandler, final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState) throws SAXException {
-
-        // Make sure we have up to date controls
-        final XFormsControls xformsControls = containingDocument.getControls();
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
-
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);
     }

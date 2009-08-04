@@ -53,8 +53,8 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext) {
-        super.evaluate(propertyContext);
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluate(propertyContext, isRefresh);
 
         getState(propertyContext);
         getFileMediatype(propertyContext);

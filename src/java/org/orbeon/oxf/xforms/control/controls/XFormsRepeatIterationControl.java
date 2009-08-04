@@ -56,6 +56,12 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
         }
     }
 
+    @Override
+    public boolean supportsRefreshEvents() {
+        // Des not support refresh events
+        return false;
+    }
+
     // Make public for XFormsRepeatControl
     @Override
     public void evaluate(PropertyContext propertyContext, boolean isRefresh) {

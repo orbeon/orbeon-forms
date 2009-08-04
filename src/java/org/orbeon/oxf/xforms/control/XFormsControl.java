@@ -199,6 +199,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return wasRelevant;
     }
 
+    public boolean supportsRefreshEvents() {
+        // TODO: should probably return true because most controls could then dispatch relevance events
+        return false;
+    }
+
+    public static boolean supportsRefreshEvents(XFormsControl control) {
+        return control != null && control.supportsRefreshEvents();
+    }
+
     public String getAlert(PropertyContext propertyContext) {
         if (!isAlertEvaluated) {
             if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl

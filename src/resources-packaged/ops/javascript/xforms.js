@@ -1840,6 +1840,7 @@ ORBEON.xforms.Controls = {
 
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
             // Case of group delimiters
+            // NOTE: similar logic used for readonly, should reuse code
 
             // Figure out id of the end delimiter
             var beginMarkerPrefix = "group-begin-";
@@ -1916,7 +1917,30 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.removeClass(element, "xforms-readonly");
             }
         }
-        if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
+
+        if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
+            // Case of group delimiters
+            // NOTE: similar logic used for relevance, should reuse code
+
+            // Figure out id of the end delimiter
+            var beginMarkerPrefix = "group-begin-";
+            var id = control.id.substring(beginMarkerPrefix.length);
+            var endMarker = "group-end-" + id;
+
+            // Iterate over nodes until we find the end delimiter
+            var current = control.nextSibling;
+            while (true) {
+                if (ORBEON.util.Dom.isElement(current)) {
+                    if (current.id == endMarker) break;
+                    if (isReadonly) {
+                        ORBEON.util.Dom.addClass(current, "xforms-readonly");
+                    } else {
+                        ORBEON.util.Dom.removeClass(current, "xforms-readonly");
+                    }
+                }
+                current = current.nextSibling;
+            }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // Add/remove xforms-readonly on span
             if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-readonly");
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
@@ -4246,7 +4270,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
-        // YUI event.jsÕs call to this.subscribers.length in fire method hangs.
+        // YUI event.jsï¿½s call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
@@ -6379,7 +6403,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     /**
      * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-     * @param repeatID      E.g. repeat-begin-todoá1 for the repeat on to-dos in the first to-do list.
+     * @param repeatID      E.g. repeat-begin-todoï¿½1 for the repeat on to-dos in the first to-do list.
      */
     _renumberIDs: function(repeatID) {
 

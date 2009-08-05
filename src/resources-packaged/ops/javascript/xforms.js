@@ -6006,6 +6006,7 @@ ORBEON.xforms.Server = {
                                                         ORBEON.util.Dom.addClass(cursor, "xforms-case-selected");
                                                         ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected");
                                                         ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
+                                                        ORBEON.util.Dom.nudgeAferDelay(cursor);
                                                     } else {
                                                         ORBEON.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
                                                         ORBEON.util.Dom.removeClass(cursor, "xforms-case-selected");

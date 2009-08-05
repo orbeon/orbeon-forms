@@ -15,7 +15,7 @@ YAHOO.xbl.fr.Currency = {
             var xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, container)[0];
             var visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, container)[0];
             var symbolElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, container)[0];
-            var prefix = ORBEON.xforms.Document.getValue(symbolElement.id) + " ";
+            var prefix = ORBEON.xforms.Document.getValue(symbolElement.id);
             var digitsAfterDecimalElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-digits-after-decimal", null, container)[0];
             var digitsAfterDecimal = ORBEON.xforms.Document.getValue(digitsAfterDecimalElement.id);
             var hasFocus = false;
@@ -29,6 +29,9 @@ YAHOO.xbl.fr.Currency = {
                 blur: function() {
                     hasFocus = false;
                     var cleanString = visibleInputElement.value.replace(new RegExp("[\\s,]", "g"), "");
+                    // Remove prefix if at the beginning of the string
+                    if (cleanString.indexOf(prefix) == 0)
+                        cleanString = cleanString.substring(prefix.length);
                     var cleanNumber = new Number(cleanString).toString();
                     ORBEON.xforms.Document.setValue(xformsInputElement.id, visibleInputElement.value == "" || cleanNumber == "NaN" ? visibleInputElement.value : cleanNumber);
                     visibleInputElement.value = instance.numberToCurrency(visibleInputElement.value);
@@ -57,7 +60,7 @@ YAHOO.xbl.fr.Currency = {
                             while (regExp.test(parts[0])) {
                                 parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
                             }
-                            var result = prefix + parts[0];
+                            var result = prefix + " " + parts[0];
                             if (parts.length > 1)
                                 result += "." + parts[1];
                             return result;
@@ -78,7 +81,7 @@ YAHOO.xbl.fr.Currency = {
                     visibleInputElement.disabled = false;
                 },
                 propertyPrefixChanged: function() {
-                    prefix = ORBEON.xforms.Document.getValue(symbolElement.id) + " ";
+                    prefix = ORBEON.xforms.Document.getValue(symbolElement.id);
                     instance.xformsToVisible();
                 },
                 propertyDigitsAfterDecimalChanged: function() {

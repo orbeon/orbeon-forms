@@ -159,7 +159,7 @@
                                 });
                             });
                         },
-                        testCleanup: function() {
+                        testCleanupComa: function() {
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                 valueInput.focus();
                                 valueInput.value = "1,1";
@@ -167,7 +167,15 @@
                             }, function() {
                                 YAHOO.util.Assert.areEqual("11", ORBEON.util.Dom.getStringValue(valueOutput));
                             });
-
+                        },
+                        testCleanupPrefix: function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                valueInput.focus();
+                                valueInput.value = "$ 42";
+                                doubleInput.focus();
+                            }, function() {
+                                YAHOO.util.Assert.areEqual("42", ORBEON.util.Dom.getStringValue(valueOutput));
+                            });
                         }
                     }));
 

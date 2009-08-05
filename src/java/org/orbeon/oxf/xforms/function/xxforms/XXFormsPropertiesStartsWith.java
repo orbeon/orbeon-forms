@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.properties.Properties;
@@ -11,7 +24,6 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,11 +43,10 @@ public class XXFormsPropertiesStartsWith extends XFormsFunction {
         return new ListIterator(propertiesStartsWith(propertyName));
     }
 
-    public static List propertiesStartsWith(String propertyName) {
-        final List stringList = Properties.instance().getPropertySet().getPropertiesStartsWith(propertyName);
-        final List atomicValueList = new ArrayList();
-        for (Iterator propertyIterator = stringList.iterator(); propertyIterator.hasNext();) {
-            String property = (String) propertyIterator.next();
+    public static List<AtomicValue> propertiesStartsWith(String propertyName) {
+        final List<String> stringList = Properties.instance().getPropertySet().getPropertiesStartsWith(propertyName);
+        final List<AtomicValue> atomicValueList = new ArrayList<AtomicValue>();
+        for (String property: stringList) {
             if (property.toLowerCase().indexOf("password") == -1)
                 atomicValueList.add((AtomicValue) XFormsUtils.convertJavaObjectToSaxonObject(property));
         }

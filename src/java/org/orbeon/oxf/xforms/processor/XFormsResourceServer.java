@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -88,8 +88,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                     // TODO: should try to provide extension based on mediatype if file name is not provided?
                     // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
                     try {
-//                        response.setHeader("Content-Disposition", "?utf-8?b?" + Base64.encode(("attachement; filename=" + contentFilename).getBytes("UTF-8")) +"?=");
-                        response.setHeader("Content-Disposition", "attachement; filename=" + URLEncoder.encode(contentFilename, "UTF-8"));
+//                        response.setHeader("Content-Disposition", "?utf-8?b?" + Base64.encode(("attachment; filename=" + contentFilename).getBytes("UTF-8")) +"?=");
+                        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"));
                     } catch (UnsupportedEncodingException e) {
                         // Will not happen
                         throw new OXFException(e);
@@ -107,20 +107,20 @@ public class XFormsResourceServer extends ProcessorImpl {
                         NetUtils.copyStream(is, os);
                         os.flush();
                     } catch (Exception e) {
-                        XFormsServer.logger.error("Exception copying stream", e);
+                        XFormsServer.logger.warn("Exception copying stream", e);
                     } finally {
                         if (is != null) {
                             try {
                                 is.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.error("Exception closing input stream", e);
+                                XFormsServer.logger.warn("Exception closing input stream", e);
                             }
                         }
                         if (os != null) {
                             try {
                                 os.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.error("Exception closing output stream", e);
+                                XFormsServer.logger.warn("Exception closing output stream", e);
                             }
                         }
                     }
@@ -144,7 +144,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             // Find what features are requested
             // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
             boolean isMinimal = false;
-            final Map requestedFeaturesMap = new HashMap();
+            final Map<String, XFormsFeatures.FeatureConfig> requestedFeaturesMap = new HashMap<String, XFormsFeatures.FeatureConfig>();
             {
                 final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
                 while (st.hasMoreTokens()) {
@@ -172,7 +172,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             }
 
             // Determine list of resources to load
-            final List resources;
+            final List<XFormsFeatures.ResourceConfig> resources;
             if (isCSS)
                 resources = XFormsFeatures.getCSSResourcesByFeatureMap(requestedFeaturesMap);
             else
@@ -237,7 +237,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     try {
                         os.close();
                     } catch (IOException e) {
-                        XFormsServer.logger.error("Exception closing output stream", e);
+                        XFormsServer.logger.warn("Exception closing output stream", e);
                     }
                 }
             }
@@ -251,12 +251,10 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param isMinimal     whether to use minimal resources
      * @return              last modification date
      */
-    public static long computeCombinedLastModified(List resources, boolean isMinimal) {
+    public static long computeCombinedLastModified(List<XFormsFeatures.ResourceConfig> resources, boolean isMinimal) {
         long combinedLastModified = 0;
-        for (Iterator i = resources.iterator(); i.hasNext();) {
-            final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-
-            final long lastModified = ResourceManagerWrapper.instance().lastModified(resourceConfig.getResourcePath(isMinimal), false);
+        for (final XFormsFeatures.ResourceConfig resource: resources) {
+            final long lastModified = ResourceManagerWrapper.instance().lastModified(resource.getResourcePath(isMinimal), false);
             if (lastModified > combinedLastModified)
                 combinedLastModified = lastModified;
         }
@@ -274,7 +272,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param isMinimal             whether to use minimal resources
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
-    public static File cacheResources(List resources, PipelineContext pipelineContext, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
+    public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
         try {
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
@@ -326,7 +324,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @throws URISyntaxException
      * @throws IOException
      */
-    private static void generate(List resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
+    private static void generate(List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
         if (isCSS) {
             // CSS: rewrite url() in content
 
@@ -335,14 +333,13 @@ public class XFormsResourceServer extends ProcessorImpl {
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
             // Create matcher that matches all paths in case resources are versioned
-            final List matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
+            final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
 
             // Output Orbeon Forms version
             outputWriter.write("/* This file was produced by Orbeon Forms " + Version.getVersion() + " */\n");
 
-            for (Iterator i = resources.iterator(); i.hasNext();) {
-                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                final String resourcePath = resourceConfig.getResourcePath(isMinimal);
+            for (final XFormsFeatures.ResourceConfig resource: resources) {
+                final String resourcePath = resource.getResourcePath(isMinimal);
                 final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
 
                 final String content;
@@ -377,7 +374,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         {
                             final int closingIndex = content.indexOf(")", newIndex + 4);
                             if (closingIndex == -1)
-                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(isMinimal));
+                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resource.getResourcePath(isMinimal));
 
                             uriString = content.substring(newIndex + 4, closingIndex);
 
@@ -416,8 +413,8 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             // Output
             int index = 0;
-            for (Iterator i = resources.iterator(); i.hasNext(); index++) {
-                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+            for (Iterator<XFormsFeatures.ResourceConfig> i = resources.iterator(); i.hasNext(); index++) {
+                final XFormsFeatures.ResourceConfig resourceConfig = i.next();
                 final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
                 // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
                 if (index > 0)

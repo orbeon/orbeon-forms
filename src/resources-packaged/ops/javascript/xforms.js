@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
 /**
@@ -791,6 +791,10 @@ ORBEON.util.DateTime = {
     ],
 
     _dateParsePatterns: [
+
+        // NOTE: Date() months are 0-based
+        // Create date in one shot when possible, because if you set year, then month, then day, sometimes the result is incorrect!
+
         // Today
         {   re: /^tod/i,
             handler: function() {
@@ -824,39 +828,25 @@ ORBEON.util.DateTime = {
         // 4th Jan
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // 4th Jan 2003
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // Jan 4th
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
-                d.setDate(parseInt(bits[2], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // Jan 4th 2003
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
             handler: function(bits) {
-                var d = new Date();
-                d.setDate(parseInt(bits[2], 10));
-                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // next Tuesday - this is suspect due to weird meaning of "next"
@@ -882,14 +872,11 @@ ORBEON.util.DateTime = {
         // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
         {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
+                var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
-                    d.setDate(parseInt(bits[1], 10));
+                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 } else {
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
-                    d.setDate(parseInt(bits[2], 10));
+                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 }
                 return d;
             }
@@ -897,13 +884,11 @@ ORBEON.util.DateTime = {
         // mm/dd (American style without year) or dd/mm (European style without year)
         {   re: /^(\d{1,2})\/(\d{1,2})$/,
             handler: function(bits) {
-                var d = new Date();
+                var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d.setDate(parseInt(bits[2], 10));
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 } else {
-                    d.setDate(parseInt(bits[2], 10));
-                    d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 }
                 return d;
             }
@@ -911,21 +896,13 @@ ORBEON.util.DateTime = {
         // dd.mm.yyyy (Swiss style)
         {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[3]));
-                d.setMonth(parseInt(bits[2], 10) - 1); // Because months indexed from 0
-                d.setDate(parseInt(bits[1], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
             }
         },
         // yyyy-mm-dd (ISO style)
         {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
             handler: function(bits) {
-                var d = new Date();
-                d.setYear(ORBEON.util.DateTime._parseYear(bits[1]));
-                d.setMonth(parseInt(bits[2], 10) - 1);
-                d.setDate(parseInt(bits[3], 10));
-                return d;
+                return new Date(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
             }
         }
     ],
@@ -1863,6 +1840,7 @@ ORBEON.xforms.Controls = {
 
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
             // Case of group delimiters
+            // NOTE: similar logic used for readonly, should reuse code
 
             // Figure out id of the end delimiter
             var beginMarkerPrefix = "group-begin-";
@@ -1939,7 +1917,30 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.removeClass(element, "xforms-readonly");
             }
         }
-        if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
+
+        if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
+            // Case of group delimiters
+            // NOTE: similar logic used for relevance, should reuse code
+
+            // Figure out id of the end delimiter
+            var beginMarkerPrefix = "group-begin-";
+            var id = control.id.substring(beginMarkerPrefix.length);
+            var endMarker = "group-end-" + id;
+
+            // Iterate over nodes until we find the end delimiter
+            var current = control.nextSibling;
+            while (true) {
+                if (ORBEON.util.Dom.isElement(current)) {
+                    if (current.id == endMarker) break;
+                    if (isReadonly) {
+                        ORBEON.util.Dom.addClass(current, "xforms-readonly");
+                    } else {
+                        ORBEON.util.Dom.removeClass(current, "xforms-readonly");
+                    }
+                }
+                current = current.nextSibling;
+            }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // Add/remove xforms-readonly on span
             if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-readonly");
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
@@ -2721,10 +2722,15 @@ ORBEON.xforms.Events = {
                 // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                 // do anything if there is no control found.
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
-                if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
-                    var message = ORBEON.xforms.Controls.getAlertMessage(control);
-                    YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                if (control) {
+                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                        control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
+                    if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                        var message = ORBEON.xforms.Controls.getAlertMessage(control);
+                        YAHOO.util.Dom.generateId(target);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                    }
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
                 // Minimal dialog: record more is back inside the dialog
@@ -2741,10 +2747,15 @@ ORBEON.xforms.Events = {
                     helpLabel = helpLabel.nextSibling;
                 // Get control
                 var control = ORBEON.util.Dom.getElementById(helpLabel.htmlFor);
-                if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
-                    var message = ORBEON.xforms.Controls.getHelpMessage(control);
-                    YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
+                if (control) {
+                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                        control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
+                    if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
+                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                        YAHOO.util.Dom.generateId(target);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
+                    }
                 }
             }
 
@@ -4259,7 +4270,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
-        // YUI event.jsÕs call to this.subscribers.length in fire method hangs.
+        // YUI event.jsï¿½s call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
@@ -6393,7 +6404,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     /**
      * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-     * @param repeatID      E.g. repeat-begin-todoá1 for the repeat on to-dos in the first to-do list.
+     * @param repeatID      E.g. repeat-begin-todoï¿½1 for the repeat on to-dos in the first to-do list.
      */
     _renumberIDs: function(repeatID) {
 

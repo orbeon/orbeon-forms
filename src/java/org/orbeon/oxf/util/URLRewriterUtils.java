@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
@@ -28,7 +28,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -49,8 +48,10 @@ public class URLRewriterUtils {
     public static final String REWRITING_SERVICE_BASE_URI_PROPERTY = "oxf.url-rewriting.service.base-uri";
     public static final String REWRITING_SERVICE_BASE_URI_DEFAULT = "";
 
+    public static final List<PathMatcher> EMPTY_PATH_MATCHER_LIST = Collections.emptyList();
+
     private static final PathMatcher MATCH_ALL_PATH_MATCHER;
-    private static final List MATCH_ALL_PATH_MATCHERS;
+    private static final List<URLRewriterUtils.PathMatcher> MATCH_ALL_PATH_MATCHERS;
 
     static {
         MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/*", null, null, true);
@@ -178,9 +179,10 @@ public class URLRewriterUtils {
      * @param request           incoming request
      * @param urlString         URL to rewrite
      * @param pathMatchers      List of PathMatcher
+     * @param rewriteMode
      * @return                  rewritten URL
      */
-    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List pathMatchers, int rewriteMode) {
+    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<URLRewriterUtils.PathMatcher> pathMatchers, int rewriteMode) {
         if (pathMatchers != null && pathMatchers.size() > 0) {
             // We need to match the URL against the matcher
 
@@ -217,8 +219,7 @@ public class URLRewriterUtils {
             }
 
             // 3. Iterate through matchers and see if we get a match
-            for (Iterator i = pathMatchers.iterator(); i.hasNext();) {
-                final PathMatcher pathMatcher = (PathMatcher) i.next();
+            for (PathMatcher pathMatcher: pathMatchers) {
 
                 final boolean isMatch;
                 if (pathMatcher.matcher == null) {
@@ -237,7 +238,7 @@ public class URLRewriterUtils {
                 } else {
                     // Use matcher
 
-                    // Instanciate matcher processor to parallel what's done in the Page Flow
+                    // Instantiate matcher processor to parallel what's done in the Page Flow
                     final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(pathMatcher.matcher);
                     if (processorFactory == null)
                         throw new OXFException("Cannot find processor factory with name '"
@@ -279,11 +280,13 @@ public class URLRewriterUtils {
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
         // TODO: add test for /forms/orbeon
-        return absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/") || absolutePathNoContext.startsWith("/xbl/orbeon/");
+        return absolutePathNoContext.startsWith("/ops/")
+                || absolutePathNoContext.startsWith("/config/")
+                || absolutePathNoContext.startsWith("/xbl/orbeon/");
     }
 
     public static boolean isResourcesVersioned() {
-        return Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT).booleanValue();
+        return Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);
     }
 
     public static String getRewritingStrategy(String containerType, String defaultStrategy) {
@@ -303,7 +306,7 @@ public class URLRewriterUtils {
         return (propertyString == null || propertyString.trim().length() == 0) ? null : propertyString.trim();
     }
 
-    public static List getMatchAllPathMatcher() {
+    public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {
         if (isResourcesVersioned()) {
             return MATCH_ALL_PATH_MATCHERS;
         } else {

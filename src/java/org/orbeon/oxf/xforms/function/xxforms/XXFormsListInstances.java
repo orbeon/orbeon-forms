@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 20067 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
@@ -27,7 +27,6 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class XXFormsListInstances extends XFormsFunction {
@@ -43,16 +42,16 @@ public class XXFormsListInstances extends XFormsFunction {
         final XFormsModel model = containingDocument.findModelByStaticId(modelId);
 
         if (model != null) {
-            final List instances = model.getInstances();
+            final List<XFormsInstance> instances = model.getInstances();
 
             if (instances != null && instances.size() > 0) {
 
-                final List instanceIds = new ArrayList(instances.size());
+                final List<StringValue> instanceIds = new ArrayList<StringValue>(instances.size());
 
-                for (Iterator instancesIterator = instances.iterator(); instancesIterator.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+                for (Object instance: instances) {
+                    final XFormsInstance currentInstance = (XFormsInstance) instance;
                     // Tricky: we return a de-namespaced id, which seems to be the best thing to do
-                    instanceIds.add(new StringValue(XFormsUtils.deNamespaceId(containingDocument , currentInstance.getEffectiveId())));
+                    instanceIds.add(new StringValue(XFormsUtils.deNamespaceId(containingDocument, currentInstance.getEffectiveId())));
                 }
 
                 return new ListIterator(instanceIds);

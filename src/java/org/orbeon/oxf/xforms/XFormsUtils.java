@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -50,8 +50,8 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
@@ -125,7 +125,7 @@ public class XFormsUtils {
     // Use a Deflater pool as creating Deflaters is expensive
     final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
 
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
+    public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // Get SAXStore
@@ -153,10 +153,10 @@ public class XFormsUtils {
         }
 
         // Encode bytes
-        return encodeBytes(pipelineContext, bytes, encryptionPassword);
+        return encodeBytes(propertyContext, bytes, encryptionPassword);
     }
 
-    public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
+    public static String encodeBytes(PropertyContext propertyContext, byte[] bytesToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
             // Compress if needed
@@ -177,10 +177,10 @@ public class XFormsUtils {
                 // Perform encryption
                 if (gzipByteArray == null) {
                     // The data was not compressed above
-                    return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode);
+                    return "X1" + SecureUtils.encrypt(propertyContext, encryptionPassword, bytesToEncode);
                 } else {
                     // The data was compressed above
-                    return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
+                    return "X2" + SecureUtils.encrypt(propertyContext, encryptionPassword, gzipByteArray);
                 }
             } else {
                 // No encryption
@@ -409,7 +409,7 @@ public class XFormsUtils {
      * Get the value of a child element by pushing the context of the child element on the binding stack first, then
      * calling getElementValue() and finally popping the binding context.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param container             current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
@@ -676,13 +676,13 @@ public class XFormsUtils {
         }
     }
 
-    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML) {
-        return decodeXML(pipelineContext, encodedXML, XFormsProperties.getXFormsPassword());
+    public static Document decodeXML(PropertyContext propertyContext, String encodedXML) {
+        return decodeXML(propertyContext, encodedXML, XFormsProperties.getXFormsPassword());
     }
 
-    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+    public static Document decodeXML(PropertyContext propertyContext, String encodedXML, String encryptionPassword) {
 
-        final byte[] bytes = decodeBytes(pipelineContext, encodedXML, encryptionPassword);
+        final byte[] bytes = decodeBytes(propertyContext, encodedXML, encryptionPassword);
 
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
@@ -715,7 +715,7 @@ public class XFormsUtils {
 //        }
 //    }
 
-    public static byte[] decodeBytes(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
+    public static byte[] decodeBytes(PropertyContext propertyContext, String encoded, String encryptionPassword) {
         try {
             // Get raw text
             byte[] resultBytes;
@@ -727,12 +727,12 @@ public class XFormsUtils {
                 final byte[] gzipByteArray;
                 if (prefix.equals("X1")) {
                     // Encryption + uncompressed
-                    resultBytes1 = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
+                    resultBytes1 = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
                     gzipByteArray = null;
                 } else if (prefix.equals("X2")) {
                     // Encryption + compressed
                     resultBytes1 = null;
-                    gzipByteArray = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
+                    gzipByteArray = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
                 } else if (prefix.equals("X3")) {
                     // No encryption + uncompressed
                     resultBytes1 = Base64.decode(encodedString);
@@ -787,7 +787,7 @@ public class XFormsUtils {
      * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
      * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param value             value to convert
      * @param currentType       current type as exploded QName
      * @param newType           new type as exploded QName
@@ -819,7 +819,7 @@ public class XFormsUtils {
      * Resolve a render or action URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
      * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
@@ -859,7 +859,7 @@ public class XFormsUtils {
     /**
      * Resolve a resource URL including xml:base resolution.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
@@ -919,7 +919,7 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param propertyContext
+     * @param propertyContext    current context
      * @param contextItems       context items
      * @param contextPosition    context position
      * @param variableToValueMap variables
@@ -944,7 +944,7 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param xpathContext      current XPath context
      * @param contextNode       context node for evaluation
      * @param attributeValue    attribute value
@@ -1380,6 +1380,7 @@ public class XFormsUtils {
                 final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
+                    @Override
                     protected XFormsContextStack getContextStack() {
                         return LHHAElementVisitorListener.this.contextStack;
                     }

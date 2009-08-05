@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -37,11 +36,11 @@ public class EchoSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match for replace="instance|none" and the submission resource starts with "test:"
-        return (p.isReplaceInstance || p.isReplaceNone) && p2.resolvedActionOrResource.startsWith("test:");
+        return (p.isReplaceInstance || p.isReplaceNone) && p2.actionOrResource.startsWith("test:");
     }
 
     public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
-                                    XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws IOException {
+                                    XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws Exception {
         if (sp.messageBody == null) {
             // Not sure when this can happen, but it can't be good
             throw new XFormsSubmissionException(submission, "Action 'test:': no message body.", "processing submission response");
@@ -66,6 +65,12 @@ public class EchoSubmission extends BaseSubmission {
         connectionResult.dontHandleResponse = false;
         connectionResult.setResponseInputStream(new ByteArrayInputStream(sp.messageBody));
 
-        return new SubmissionResult(submission.getEffectiveId(), connectionResult);
+        // Obtain replacer
+        final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+
+        // Deserialize here so it can run in parallel
+        replacer.deserialize(propertyContext, connectionResult, p, p2);
+
+        return new SubmissionResult(submission.getEffectiveId(), replacer, connectionResult);
     }
 }

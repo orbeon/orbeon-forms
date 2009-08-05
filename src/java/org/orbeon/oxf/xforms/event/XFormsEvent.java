@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.event;
 
@@ -130,9 +130,13 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+        } else if (XFormsConstants.NO_INDEX_ADJUSTMENT.equals(name)) {
+            // NOP (this is related to a temporary offline performance hack)
+            return EmptyIterator.getInstance();
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
+            XFormsServer.logger.warn("Unsupported event context information for event('" + name + "').");
             return EmptyIterator.getInstance();
         }
     }
@@ -143,7 +147,7 @@ public abstract class XFormsEvent implements Cloneable {
 
     protected String getAttributeAsString(String name) {
         try {
-            final Item item = (Item) getAttribute(name).next();
+            final Item item = getAttribute(name).next();
             return (item != null) ? item.getStringValue() : null;
         } catch (XPathException e) {
             throw new OXFException(e);

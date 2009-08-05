@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer;
 
@@ -111,9 +111,9 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // Set custom headers
                 if (config.headers != null) {
-                    for (Iterator i = config.headers.iterator(); i.hasNext();) {
-                        String name = (String) i.next();
-                        String value = (String) i.next();
+                    for (Iterator<String> i = config.headers.iterator(); i.hasNext();) {
+                        String name = i.next();
+                        String value = i.next();
                         response.setHeader(name, value);
                     }
                 }
@@ -196,8 +196,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             Config config = new Config();
 
                             // HTTP-specific configuration
-                            config.statusCode = statusCode == null ? DEFAULT_STATUS_CODE : statusCode.intValue();
-                            config.errorCode = errorCode == null ? DEFAULT_ERROR_CODE : errorCode.intValue();
+                            config.statusCode = statusCode == null ? DEFAULT_STATUS_CODE : statusCode;
+                            config.errorCode = errorCode == null ? DEFAULT_ERROR_CODE : errorCode;
                             config.contentType = contentType;
                             config.forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
                             if (config.forceContentType && (contentType == null || contentType.equals("")))
@@ -227,9 +227,9 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             config.systemDoctype = systemDoctype;
                             config.omitXMLDeclaration = ProcessorUtils.selectBooleanValue(configElement, "/config/omit-xml-declaration", DEFAULT_OMIT_XML_DECLARATION);
                             String standaloneString = XPathUtils.selectStringValueNormalize(configElement, "/config/standalone");
-                            config.standalone = (standaloneString == null) ? null : new Boolean(standaloneString);
+                            config.standalone = (standaloneString == null) ? null : Boolean.valueOf(standaloneString);
                             config.indent = ProcessorUtils.selectBooleanValue(configElement, "/config/indent", DEFAULT_INDENT);
-                            if (indentAmount != null) config.indentAmount = indentAmount.intValue();
+                            if (indentAmount != null) config.indentAmount = indentAmount;
 
                             return config;
                         } catch (Exception e) {
@@ -252,7 +252,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         public String encoding = DEFAULT_ENCODING;
         public boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         public boolean ignoreDocumentEncoding = DEFAULT_IGNORE_DOCUMENT_ENCODING;
-        public List headers;
+        public List<String> headers;
         public boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
         public boolean empty = DEFAULT_EMPTY;
 
@@ -267,7 +267,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         public int indentAmount = DEFAULT_INDENT_AMOUNT;
 
         public void addHeader(String name, String value) {
-            if (headers == null) headers = new ArrayList();
+            if (headers == null) headers = new ArrayList<String>();
             headers.add(name);
             headers.add(value);
         }

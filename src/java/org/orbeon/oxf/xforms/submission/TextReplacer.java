@@ -28,37 +28,36 @@ import java.io.IOException;
  */
 public class TextReplacer extends BaseReplacer {
 
+    private String responseBody;
+
     public TextReplacer(XFormsModelSubmission submission, XFormsContainingDocument containingDocument) {
         super(submission, containingDocument);
     }
 
-    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
-
-        // XForms 1.1: "If the replace attribute contains the value "text" and the
-        // submission response conforms to an XML mediatype (as defined by the content type
-        // specifiers in [RFC 3023]) or a text media type (as defined by a content type
-        // specifier of text/*), then the response data is encoded as text and replaces the
-        // content of the replacement target node."
-
-        // Get response body
-// TODO: move this code somewhere else so it can be used by async submissions
-        final String responseBody = connectionResult.getTextResponseBody();
+    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+        responseBody = connectionResult.getTextResponseBody();
         if (responseBody == null) {
             // This is a binary result
 
             // Don't store anything for now as per the spec, but we could do something better by going beyond the spec
             // NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.resultInputStream, NetUtils.SESSION_SCOPE);
 
-            // XForms 1.1: "For a success response including a body that is both a non-XML
-            // media type (i.e. with a content type not matching any of the specifiers in
-            // [RFC 3023]) and a non-text type (i.e. with a content type not matching
-            // text/*), when the value of the replace attribute on element submission is
-            // "text", nothing in the document is replaced and submission processing
-            // concludes after dispatching xforms-submit-error with appropriate context
-            // information, including an error-type of resource-error."
+            // XForms 1.1: "For a success response including a body that is both a non-XML media type (i.e. with a
+            // content type not matching any of the specifiers in [RFC 3023]) and a non-text type (i.e. with a content
+            // type not matching text/*), when the value of the replace attribute on element submission is "text",
+            // nothing in the document is replaced and submission processing concludes after dispatching
+            // xforms-submit-error with appropriate context information, including an error-type of resource-error."
             throw new XFormsSubmissionException(submission, "Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.getResponseMediaType(), "reading response body",
                     new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
+    }
+
+    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+
+        // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
+        // XML mediatype (as defined by the content type specifiers in [RFC 3023]) or a text media type (as defined by
+        // a content type specifier of text/*), then the response data is encoded as text and replaces the content of
+        // the replacement target node."
 
         // Find target location
         final NodeInfo destinationNodeInfo;

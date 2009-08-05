@@ -118,7 +118,7 @@ or in this distribution under:
 You usually don't have to compile Orbeon Forms yourself, but for
 information about compiling Orbeon Forms from sources, please visit:
 
-  http://www.orbeon.com/ops/doc/integration-development
+  http://wiki.orbeon.com/forms/doc/contributor-guide/java-development
 
 
 ****************************************
@@ -171,7 +171,6 @@ This product includes software developed by the Apache Software Foundation
     * ORO (http://jakarta.apache.org/oro/)
     * POI (http://jakarta.apache.org/poi/)
     * Taglibs (http://jakarta.apache.org/taglibs/)
-    * Xalan (http://xml.apache.org/xalan-j/)
     * Xerces (http://xml.apache.org/xerces2-j/)
 
 In addition, this product includes the following software:
@@ -182,7 +181,6 @@ In addition, this product includes the following software:
     * Jaxen (http://jaxen.org/)
     * JFreeChart (http://www.jfree.org/jfreechart/)
     * Jing (http://www.thaiopensource.com/relaxng/jing.html)
-    * Joost (http://joost.sourceforge.net/)
     * JTidy (http://sourceforge.net/projects/jtidy/)
     * JUnit (http://www.junit.org/)
     * Saxon (http://saxon.sourceforge.net/)

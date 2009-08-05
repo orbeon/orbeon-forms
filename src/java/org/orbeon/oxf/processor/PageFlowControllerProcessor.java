@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -22,27 +22,30 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PageFlowControllerProcessor extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
 
-    public final static String INPUT_CONTROLER = "controller";
+    public final static String INPUT_CONTROLLER = "controller";
     public final static String CONTROLLER_NAMESPACE_URI = "http://www.orbeon.com/oxf/controller";
     private final static Document TRUE_DOCUMENT = new NonLazyUserDataDocument();
     private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
-    private final static Map NAMESPACES_WITH_XSI_AND_XSLT = new HashMap();
+    private final static Map<String, String> NAMESPACES_WITH_XSI_AND_XSLT = new HashMap<String, String>();
     public final static String EXTRACT_INSTANCE_XPATH
             = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
@@ -83,14 +86,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     public PageFlowControllerProcessor() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLER, CONTROLLER_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLLER, CONTROLLER_NAMESPACE_URI));
     }
 
     public void start(PipelineContext pipelineContext) {
-        final PageFlow pageFlow = (PageFlow) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONTROLER), new CacheableInputReader() {
+        final PageFlow pageFlow = (PageFlow) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONTROLLER), new CacheableInputReader() {
             public Object read(final PipelineContext context, ProcessorInput input) {
-                final Document controllerDocument = readInputAsDOM4J(context, INPUT_CONTROLER);
-                final Object controllerValidity = getInputValidity(context, getInputByName(INPUT_CONTROLER));
+                final Document controllerDocument = readInputAsDOM4J(context, INPUT_CONTROLLER);
+                final Object controllerValidity = getInputValidity(context, getInputByName(INPUT_CONTROLLER));
                 final StepProcessorContext stepProcessorContext = new StepProcessorContext(controllerValidity);
                 LocationData locationData = (LocationData) controllerDocument.getRootElement().getData();
                 final String controllerContext = locationData == null ? null : locationData.getSystemID();
@@ -104,7 +107,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final boolean globalIsVersioned; {
                     final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_ATTRIBUTE);
                     // NOTE: We use a global property, not an oxf:page-flow scoped one
-                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue() : URLRewriterUtils.isResourcesVersioned();
+                    globalIsVersioned = attributeValue != null ? Boolean.valueOf(attributeValue) : URLRewriterUtils.isResourcesVersioned();
                 }
                 final String epilogueURL;
                 final Element epilogueElement;
@@ -124,7 +127,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 //                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
 //                }
 
-                final List pathMatchers = new ArrayList();
+                final List<URLRewriterUtils.PathMatcher> pathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>();
 
                 // XForms Submission page
                 {
@@ -136,7 +139,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     if (xformsSubmissionPath != null) {
                         final Element firstPageElement = controllerDocument.getRootElement().element("page");
                         if (firstPageElement != null) {
-                            final List allElements = controllerDocument.getRootElement().elements();
+                            final List<Element> allElements = controllerDocument.getRootElement().elements();
                             final int firstPageElementIndex = allElements.indexOf(firstPageElement);
                             final Element newElement = Dom4jUtils.createElement("page", CONTROLLER_NAMESPACE_URI);
                             newElement.addAttribute("path-info", xformsSubmissionPath);
@@ -147,14 +150,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }
 
                 // Go through all pages to get mapping
-                final Map pageIdToPageElement = new HashMap();
-                final Map pageIdToPathInfo = new HashMap();
-                final Map pageIdToXFormsModel = new HashMap();
-                final Map pageIdToSetvaluesDocument = new HashMap();
+                final Map<String, Element> pageIdToPageElement = new HashMap<String, Element>();
+                final Map<String, String> pageIdToPathInfo = new HashMap<String, String>();
+                final Map<String, String> pageIdToXFormsModel = new HashMap<String, String>();
+                final Map<String, Document> pageIdToSetvaluesDocument = new HashMap<String, Document>();
                 final int pageCount = controllerDocument.getRootElement().elements("page").size();
 
-                for (Iterator i = controllerDocument.getRootElement().elements("page").iterator(); i.hasNext();) {
-                    Element pageElement = (Element) i.next();
+                for (Object o: controllerDocument.getRootElement().elements("page")) {
+                    Element pageElement = (Element) o;
                     String pathInfo = pageElement.attributeValue("path-info");
                     String xformsModel = pageElement.attributeValue("xforms");
                     String id = pageElement.attributeValue("id");
@@ -178,7 +181,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Generate request path
                     final ASTOutput request = new ASTOutput("data", "request");
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
-                        Document config = null;
+                        final Document config;
                         try {
                             config = Dom4jUtils.readDom4j
                                     ("<config><include>/request/request-path</include><include>/request/method</include></config>", false, false);
@@ -195,7 +198,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Do this separately, so that we do not "tee" (and store in memory) the request parameters
                     final ASTOutput requestWithParameters = new ASTOutput("data", "request-with-parameters");// {{setDebug("request params");}};
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
-                        Document config = null;
+                        final Document config;
                         try {
                             config = Dom4jUtils.readDom4j
                                     ("<config><include>/request/parameters</include></config>", false, false);
@@ -228,8 +231,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     final ASTOutput epilogueModelData = new ASTOutput(null, "epilogue-model-data");
                     final ASTOutput epilogueInstance = new ASTOutput(null, "epilogue-instance");
                     final ASTOutput epilogueXFormsModel = new ASTOutput(null, "epilogue-xforms-model");
-                    for (Iterator i = controllerDocument.getRootElement().elements().iterator(); i.hasNext();) {
-                        Element element = (Element) i.next();
+                    for (Object o: controllerDocument.getRootElement().elements()) {
+                        Element element = (Element) o;
                         if ("files".equals(element.getName()) || "page".equals(element.getName())) {
 
                             // Extract matcher URI or QName
@@ -269,8 +272,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // Can we just add this condition to the previous "when" statement?
                             boolean canAddToPreviousWhen =
                                     previousIsFile && currentIsFile &&
-                                    previousFileIsVersioned == currentFileIsVersioned &&
-                                    previousIsSimple && matcherURI == null && matcherQName == null && mimeType == null;
+                                            previousFileIsVersioned == currentFileIsVersioned &&
+                                            previousIsSimple && matcherURI == null && matcherQName == null && mimeType == null;
 
                             // Create <p:when>
                             ASTWhen when;
@@ -321,7 +324,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 previousIsSimple = false;
 
                                 // List if statements where we add the new <p:choose>
-                                List statements;
+                                List<ASTStatement> statements;
                                 if (isFirst) {
                                     isFirst = false;
                                     statements = getStatements();
@@ -351,7 +354,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             if (canAddToPreviousWhen) {
                                 // Do not create new "when", add current condition to previous "when"
-                                final ASTWhen previousWhen = (ASTWhen) currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
+                                final ASTWhen previousWhen = currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
                                 previousWhen.setTest(previousWhen.getTest() + " or " + when.getTest());
                             } else {
                                 // Create new "when"
@@ -384,7 +387,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     if (notFoundPipeline != null || notFoundPageId != null) {
 
                         // Determine where we insert out statements
-                        List statementsList;
+                        List<ASTStatement> statementsList;
                         if (currentChoose == null) {
                             statementsList = getStatements();
                         } else {
@@ -396,7 +399,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (notFoundPageId != null) {
                             // Handle not-found page
                             // FIXME: We do not support not-found pages with a matcher output for now.
-                            Element notFoundPageElement = (Element) pageIdToPageElement.get(notFoundPageId);
+                            Element notFoundPageElement = pageIdToPageElement.get(notFoundPageId);
                             if (notFoundPageElement == null)
                                 throw new OXFException("Cannot find \"not found\" page with id '" + notFoundPageId + "' in page flow");
                             // Create an artificial page number (must be different from the other page numbers)
@@ -474,9 +477,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
         // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
         // actually know what a "resource" is.
-        final List pathMatchers = pageFlow.getPathMatchers();
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            final List<URLRewriterUtils.PathMatcher> existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             if (existingFileInfos == null) {
                 // Set if we are the first
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
@@ -492,7 +495,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         pipelineProcessor.start(pipelineContext);
     }
 
-    private static void handleEpilogue(final String controllerContext, List statements, final String epilogueURL, final Element epilogueElement,
+    private static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
                                        final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
@@ -526,7 +529,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     url = URLFactory.createURL(controllerContext, epilogueURL).toExternalForm();
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
-                };
+                }
                 addInput(new ASTInput("config", new ASTHrefURL(url)));
                 addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
                 addInput(new ASTInput("model-data", new ASTHrefId(epilogueModelData)));
@@ -548,15 +551,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             setvaluesDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
             // Deprecated <param> elements
             if (!paramElements.isEmpty()) {
-                for (Iterator j = paramElements.iterator(); j.hasNext();) {
-                    final Element paramElement = (Element) j.next();
+                for (Object paramElement1: paramElements) {
+                    final Element paramElement = (Element) paramElement1;
                     setvaluesDocument.getRootElement().add((Element) paramElement.clone());
                 }
             }
             // New <setvalue> elements
             if (!setValueElements.isEmpty()) {
-                for (Iterator j = setValueElements.iterator(); j.hasNext();) {
-                    final Element setValueElement = (Element) j.next();
+                for (Object setValueElement1: setValueElements) {
+                    final Element setValueElement = (Element) setValueElement1;
                     setvaluesDocument.getRootElement().add((Element) setValueElement.clone());
                 }
             }
@@ -570,12 +573,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      * Handle <page>
      */
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
-                            List statementsList, final Element pageElement, final int pageNumber,
+                            List<ASTStatement> statementsList, final Element pageElement, final int pageNumber,
                             final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
                             final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance, final ASTOutput epilogueXFormsModel,
-                            final Map pageIdToPathInfo,
-                            final Map pageIdToXFormsModel,
-                            final Map pageIdToSetvaluesDocument,
+                            final Map<String, String> pageIdToPathInfo,
+                            final Map<String, String> pageIdToXFormsModel,
+                            final Map<String, Document> pageIdToSetvaluesDocument,
                             final String instancePassing) {
 
         // Get page attributes
@@ -642,7 +645,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         }
 
         if (xformsAttribute != null) {
-            // Use backward compatility XForms Input processor
+            // Use backward compatibility XForms Input processor
             statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_INPUT_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
                 if(setvaluesDocument != null) {
@@ -720,11 +723,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }});
             }});
 
-            for (Iterator j = actionElements.iterator(); j.hasNext();) {
+            for (Object actionElement1: actionElements) {
 
                 // Get info about action
                 actionNumber[0]++;
-                final Element actionElement = (Element) j.next();
+                final Element actionElement = (Element) actionElement1;
                 final String whenAttribute = actionElement.attributeValue("when");
                 final String actionAttribute = actionElement.attributeValue("action");
 
@@ -745,8 +748,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     final boolean resultTestsOnActionData =
                             // Must have an action, in the first place
                             actionAttribute != null &&
-                            // More than one <result>: so at least the first one must have a "when"
-                            actionElement.elements("result").size() > 1;
+                                    // More than one <result>: so at least the first one must have a "when"
+                                    actionElement.elements("result").size() > 1;
 
                     final ASTOutput internalActionData = actionAttribute == null ? null :
                             new ASTOutput(null, "internal-action-data-" + pageNumber + "-" + actionNumber[0]);
@@ -759,8 +762,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
-                                new String[] { "pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute };
-                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", pageElement,locationParams, true));
+                                    new String[]{"pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute};
+                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", pageElement, locationParams, true));
                             addOutput(dataOutput);
                             setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "executing action", pageElement, locationParams, true));
                         }});
@@ -796,8 +799,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                         // Test based on action
                         addStatement(new ASTChoose(new ASTHrefId(internalActionData)) {{
-                            for (Iterator k = actionElement.elements("result").iterator(); k.hasNext();) {
-                                final Element resultElement = (Element) k.next();
+                            for (Object o: actionElement.elements("result")) {
+                                final Element resultElement = (Element) o;
                                 final String resultWhenAttribute = resultElement.attributeValue("when");
 
                                 // Execute result
@@ -806,7 +809,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                         setTest(resultWhenAttribute);
                                         setNamespaces(Dom4jUtils.getNamespaceContextNoDefault(resultElement));
                                         final String[] locationParams =
-                                            new String[] { "page id", pageElement.attributeValue("id"), "when", resultWhenAttribute };
+                                                new String[]{"page id", pageElement.attributeValue("id"), "when", resultWhenAttribute};
                                         setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams, true));
                                     }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
@@ -820,7 +823,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addWhen(new ASTWhen() {{
                                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                                     addInput(new ASTInput("data", new NonLazyUserDataDocument(new NonLazyUserDataElement
-                                            ("is-redirect") {{ setText("false"); }})));
+                                            ("is-redirect") {{
+                                            setText("false");
+                                        }})));
                                     addOutput(new ASTOutput("data", isRedirect));
                                 }});
                                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -1010,7 +1015,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     private void executeResult(StepProcessorContext stepProcessorContext, final String controllerContext, ASTWhen when,
-                               final Map pageIdToXFormsModel, final Map pageIdToPathInfo, final Map pageIdToSetvaluesDocument,
+                               final Map<String, String> pageIdToXFormsModel, final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
                                final ASTOutput paramedInstance, final Element resultElement,
                                final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
                                String instancePassing) {
@@ -1019,7 +1024,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String resultPageId = resultElement == null ? null : resultElement.attributeValue("page");
         Attribute instancePassingAttribute = resultElement == null ? null : resultElement.attribute("instance-passing");
         final String _instancePassing = instancePassingAttribute == null ? instancePassing : instancePassingAttribute.getValue();
-        final String otherXForms = (String) pageIdToXFormsModel.get(resultPageId);
+        final String otherXForms = pageIdToXFormsModel.get(resultPageId);
 
         // Whether we use the legacy XUpdate transformation
         final boolean useLegacyTransformation =
@@ -1111,11 +1116,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         // Do redirect if we are going to a new page (NOTE: even if the new page has the same id as the current page)
         if (resultPageId != null) {
-            final String forwardPathInfo = (String) pageIdToPathInfo.get(resultPageId);
+            final String forwardPathInfo = pageIdToPathInfo.get(resultPageId);
             if (forwardPathInfo == null)
                 throw new OXFException("Cannot find page with id '" + resultPageId + "'");
 
-            final Document setvaluesDocument = (Document) pageIdToSetvaluesDocument.get(resultPageId);
+            final Document setvaluesDocument = pageIdToSetvaluesDocument.get(resultPageId);
             final boolean doServerSideRedirect = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_FORWARD);
             final boolean doRedirectExitPortal = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_REDIRECT_PORTAL);
 
@@ -1590,9 +1595,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
     private static class PageFlow {
         private PipelineProcessor pipelineProcessor;
-        private List pathMatchers;
+        private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
-        public PageFlow(PipelineProcessor pipelineProcessor, List pathMatchers) {
+        public PageFlow(PipelineProcessor pipelineProcessor, List<URLRewriterUtils.PathMatcher> pathMatchers) {
             this.pipelineProcessor = pipelineProcessor;
             this.pathMatchers = pathMatchers;
         }
@@ -1601,7 +1606,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             return pipelineProcessor;
         }
 
-        public List getPathMatchers() {
+        public List<URLRewriterUtils.PathMatcher> getPathMatchers() {
             return pathMatchers;
         }
     }

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
@@ -45,12 +45,16 @@ public class Connection {
     public enum Method {
         GET, PUT, POST
     }
+
+    public static final String AUTHORIZATION_HEADER = "Authorization";
     
     private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
     private static final String LOG_TYPE = "connection";
 
-    private static final String HTTP_CLIENT_STATE_PROPERTY = "oxf.http.state";
-    private static final String HTTP_CLIENT_STATE_ATTRIBUTE = "oxf.http.state";
+    public static final String HTTP_FORWARD_HEADERS_PROPERTY = "oxf.http.forward-headers";    
+
+    public static final String HTTP_STATE_PROPERTY = "oxf.http.state";
+    private static final String HTTP_STATE_ATTRIBUTE = HTTP_STATE_PROPERTY;
 
     private HttpState httpState;
     private final StateScope stateScope = getStateScope();
@@ -62,7 +66,7 @@ public class Connection {
      *
      * o PUTting or POSTing a body
      * o handling username and password
-     * o setting HTTP heades
+     * o setting HTTP headers
      * o forwarding session cookies
      * o forwarding specified HTTP headers
      * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
@@ -105,8 +109,11 @@ public class Connection {
      * o authentication information including username
      * o a list of headers to forward
      *
+     * @param externalContext
+     * @param indentedLogger
+     * @param username
      * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
-     *
+     * @param headersToForward
      * @return LinkedHashMap<String headerName, String[] headerValues>
      */
     private static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
@@ -119,8 +126,7 @@ public class Connection {
 
         // Set headers if provided
         if (headerNameValues != null && headerNameValues.size() > 0) {
-            for (Iterator<Map.Entry<String,String[]>> i = headerNameValues.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<String,String[]> currentEntry = i.next();
+            for (final Map.Entry<String, String[]> currentEntry: headerNameValues.entrySet()) {
                 final String currentHeaderName = currentEntry.getKey();
                 final String[] currentHeaderValues = currentEntry.getValue();
                 // Set header
@@ -151,9 +157,7 @@ public class Connection {
                 StringBuffer sb = new StringBuffer();
 
                 if (cookies != null) {
-                    for (int i = 0; i < cookies.length; i++) {
-                        final Cookie cookie = cookies[i];
-
+                    for (final Cookie cookie: cookies) {
                         // This is the standard JSESSIONID cookie
                         final boolean isJsessionId = cookie.getName().equals("JSESSIONID");
                         // Remember if we've seen JSESSIONID
@@ -193,10 +197,9 @@ public class Connection {
                     if (indentedLogger.isDebugEnabled()) {
 
                         String incomingSessionHeader = null;
-                        final String[] cookieHeaders = (String[]) externalContext.getRequest(   ).getHeaderValuesMap().get("cookie");
+                        final String[] cookieHeaders = externalContext.getRequest(   ).getHeaderValuesMap().get("cookie");
                         if (cookieHeaders != null) {
-                            for (int i = 0; i < cookieHeaders.length; i++) {
-                                final String cookie = cookieHeaders[i];
+                            for (final String cookie: cookieHeaders) {
                                 if (cookie.indexOf("JSESSIONID") != -1) {
                                     incomingSessionHeader = cookie;
                                 }
@@ -207,8 +210,7 @@ public class Connection {
                         if (externalContext.getNativeRequest() instanceof HttpServletRequest) {
                             final Cookie[] cookies = ((HttpServletRequest) externalContext.getNativeRequest()).getCookies();
                             if (cookies != null) {
-                                for (int i = 0; i < cookies.length; i++) {
-                                    final Cookie cookie = cookies[i];
+                                for (final Cookie cookie: cookies) {
                                     if (cookie.getName().equals("JSESSIONID")) {
                                         incomingSessionCookie = cookie.getValue();
                                     }
@@ -235,8 +237,7 @@ public class Connection {
 
             final Map<String, String[]> requestHeaderValuesMap = externalContext.getRequest().getHeaderValuesMap();
 
-            for (Iterator<Map.Entry<String,String>> i = headersToForwardMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry<String,String> currentEntry = i.next();
+            for (final Map.Entry<String, String> currentEntry: headersToForwardMap.entrySet()) {
                 final String currentHeaderName = currentEntry.getValue();
                 final String currentHeaderNameLowercase = currentEntry.getKey();
 
@@ -244,7 +245,7 @@ public class Connection {
                 final String[] currentIncomingHeaderValues = requestHeaderValuesMap.get(currentHeaderNameLowercase);
                 // Forward header if present
                 if (currentIncomingHeaderValues != null) {
-                    final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
+                    final boolean isAuthorizationHeader = currentHeaderNameLowercase.equalsIgnoreCase(Connection.AUTHORIZATION_HEADER);
                     if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                         // Only forward Authorization header if there is no username provided
                         indentedLogger.logDebug(LOG_TYPE, "forwarding header",
@@ -265,15 +266,15 @@ public class Connection {
     private void loadHttpState(ExternalContext externalContext, IndentedLogger indentedLogger) {
         switch (stateScope) {
             case REQUEST:
-                httpState = (HttpState) externalContext.getRequest().getAttributesMap().get(HTTP_CLIENT_STATE_ATTRIBUTE);
+                httpState = (HttpState) externalContext.getRequest().getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
                 break;
             case SESSION:
                 final ExternalContext.Session session = externalContext.getSession(false);
                 if (session != null)
-                    httpState = (HttpState) session.getAttributesMap().get(HTTP_CLIENT_STATE_ATTRIBUTE);
+                    httpState = (HttpState) session.getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
                 break;
             case APPLICATION:
-                httpState = (HttpState) externalContext.getAttributesMap().get(HTTP_CLIENT_STATE_ATTRIBUTE);
+                httpState = (HttpState) externalContext.getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
                 break;
         }
 
@@ -288,15 +289,15 @@ public class Connection {
         if (httpState != null) {
             switch (stateScope) {
                 case REQUEST:
-                    externalContext.getRequest().getAttributesMap().put(HTTP_CLIENT_STATE_ATTRIBUTE, httpState);
+                    externalContext.getRequest().getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
                     break;
                 case SESSION:
                     final ExternalContext.Session session = externalContext.getSession(false);
                     if (session != null)
-                        session.getAttributesMap().put(HTTP_CLIENT_STATE_ATTRIBUTE, httpState);
+                        session.getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
                     break;
                 case APPLICATION:
-                    externalContext.getAttributesMap().put(HTTP_CLIENT_STATE_ATTRIBUTE, httpState);
+                    externalContext.getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
                     break;
             }
 
@@ -322,6 +323,7 @@ public class Connection {
      * Open the connection. This sends request headers, request body, and reads status and response headers.
      *
      * @param indentedLogger    logger
+     * @param logBody
      * @param httpMethod        method i.e. GET, etc.
      * @param connectionURL     URL to connect to
      * @param username          username or null
@@ -531,6 +533,7 @@ public class Connection {
                             try {
                                 is.close();
                             } catch (Exception e) {
+                                // NOP
                             }
 
                             // Restore response stream and get as text
@@ -688,7 +691,17 @@ public class Connection {
     private static StateScope getStateScope() {
         // NOTE: Property values are same as enum except in lowercase
         final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
-        final String proxyHost = propertySet.getString(HTTP_CLIENT_STATE_PROPERTY, DEFAULT_STATE_SCOPE.name().toLowerCase());
-        return StateScope.valueOf(proxyHost.toUpperCase());
+        final String stateScope = propertySet.getString(HTTP_STATE_PROPERTY, DEFAULT_STATE_SCOPE.name().toLowerCase());
+        return StateScope.valueOf(stateScope.toUpperCase());
+    }
+
+    /**
+     * Get the list of headers to forward from the configuration properties
+     *
+     * @return space-separated list of header names
+     */
+    public static String getForwardHeaders() {
+        final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+        return propertySet.getString(HTTP_FORWARD_HEADERS_PROPERTY, AUTHORIZATION_HEADER);
     }
 }

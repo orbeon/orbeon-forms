@@ -14,35 +14,47 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.xforms.XFormsInstance;
 
 public class SubmissionResult {
     private String submissionEffectiveId;
-    private ConnectionResult connectionResult;
-    private XFormsInstance instance;
+    private Replacer replacer;
 
-    public SubmissionResult(String submissionEffectiveId, ConnectionResult connectionResult) {
+    private Throwable throwable;
+    private ConnectionResult connectionResult;
+
+    public SubmissionResult(String submissionEffectiveId, Replacer replacer, ConnectionResult connectionResult) {
         this.submissionEffectiveId = submissionEffectiveId;
+        this.replacer = replacer;
         this.connectionResult = connectionResult;
     }
 
-    public SubmissionResult(String submissionEffectiveId, XFormsInstance instance) {
+    public SubmissionResult(String submissionEffectiveId, Throwable throwable, ConnectionResult connectionResult) {
         this.submissionEffectiveId = submissionEffectiveId;
-        this.instance = instance;
+        this.throwable = throwable;
+        this.connectionResult = connectionResult;
     }
 
     public String getSubmissionEffectiveId() {
         return submissionEffectiveId;
     }
 
+    public Replacer getReplacer() {
+        return replacer;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
     public ConnectionResult getConnectionResult() {
         return connectionResult;
     }
 
-    public XFormsInstance getInstance() {
-        return instance;
-    }
-
+    /**
+     * Close the result once everybody is done with it.
+     *
+     * This can be overridden by specific subclasses.
+     */
     public void close() {
         if (connectionResult != null) {
             connectionResult.close();

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005-2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -340,7 +340,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         namespaceMappings.put(id, namespaces);
     }
 
-    private final void storeXBLBinding(String elementAttribute) {
+    private void storeXBLBinding(String elementAttribute) {
         elementAttribute = elementAttribute.replace('|', ':');
         final String bindingPrefix = XMLUtils.prefixFromQName(elementAttribute);
         if (bindingPrefix != null) {
@@ -366,7 +366,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         if (xblBindings == null)
             return false;
 
-        final Map localnamesMap = (Map) xblBindings.get(uri);
+        final Map localnamesMap = xblBindings.get(uri);
         if (localnamesMap == null)
             return false;
 

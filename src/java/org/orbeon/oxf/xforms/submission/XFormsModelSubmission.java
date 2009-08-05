@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -27,7 +26,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSubmitEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -47,7 +49,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -359,12 +360,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Compute parameters only needed during second pass
                 final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
-                resolvedActionOrResource = p2.resolvedActionOrResource; // in case of exception
+                resolvedActionOrResource = p2.actionOrResource; // in case of exception
 
                 /* ***** Serialization ****************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(p2.resolvedSerialization, p.resolvedMethod);
+                final String requestedSerialization = getRequestedSerialization(p2.serialization, p.resolvedMethod);
 
                 final Document documentToSubmit;
                 if (serialize) {
@@ -436,10 +437,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     /* ***** Submission response ******************************************************************** */
                     handleSubmissionResult(propertyContext, p, p2, submissionResult);
                 } finally {
-                    // Clean-up connection
-                    if (submissionResult != null) {
-                        submissionResult.close();
-                    }
                     // Log time spent in submission if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
                         final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
@@ -472,25 +469,54 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     private void handleSubmissionResult(PropertyContext propertyContext, SubmissionParameters p, SecondPassParameters p2, SubmissionResult submissionResult) {
-        if (submissionResult != null) {
+        if (submissionResult != null) { // nothing to do if it is null
             try {
                 try {
                     // Process the different types of response
-                    if (submissionResult.getConnectionResult() != null)
-                        handleResponse(propertyContext, submissionResult.getConnectionResult(), p, p2);
-                    else
-                        handleResponse(propertyContext, submissionResult.getInstance(), p2);
-                } finally {
-                    // Clean-up connection
-                    if (submissionResult != null && submissionResult.getConnectionResult() != null) {
-                        submissionResult.getConnectionResult().close();
+                    final Replacer replacer;
+                    if (submissionResult.getReplacer() != null) {
+                        // Replacer provided
+                        replacer = submissionResult.getReplacer();
+                    } else if (submissionResult.getThrowable() != null) {
+                        // Propagate throwable, which might have come from a separate thread
+                        sendSubmitError(propertyContext, submissionResult.getThrowable(), submissionResult);
+                        replacer = null;
+                    } else {
+                        replacer = null;
                     }
+
+                    // Perform replacement
+                    if (replacer != null)
+                        replacer.replace(propertyContext, submissionResult.getConnectionResult(), p, p2);
+
+                } finally {
+                    // Clean-up result
+                    submissionResult.close();
                 }
             } catch (Throwable throwable) {
                 // Any exception will cause an error event to be dispatched
-                sendSubmitError(propertyContext, p2.resolvedActionOrResource, throwable);
+                sendSubmitError(propertyContext, throwable, submissionResult);
             }
         }
+    }
+
+    private void sendSubmitError(PropertyContext propertyContext, Throwable throwable, SubmissionResult submissionResult) {
+        // Try to get error event from exception
+        XFormsSubmitErrorEvent submitErrorEvent = null;
+        if (throwable instanceof XFormsSubmissionException) {
+            final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
+            submitErrorEvent = submissionException.getSubmitErrorEvent();
+        }
+
+        // If no event obtained, create default event
+        if (submitErrorEvent == null) {
+            submitErrorEvent = new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this,
+                XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult());
+        }
+
+        // Dispatch event
+        submitErrorEvent.setThrowable(throwable);
+        container.dispatchEvent(propertyContext, submitErrorEvent);
     }
 
     private void sendSubmitError(PropertyContext propertyContext, String resolvedActionOrResource, Throwable throwable) {
@@ -512,16 +538,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         container.dispatchEvent(propertyContext, submitErrorEvent);
     }
 
-    private void handleResponse(PropertyContext propertyContext, ConnectionResult connectionResult, SubmissionParameters p, SecondPassParameters p2) throws IOException {
+    public Replacer getReplacer(PropertyContext propertyContext, ConnectionResult connectionResult, SubmissionParameters p) throws IOException {
+
+        // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
+
         if (connectionResult != null && !connectionResult.dontHandleResponse) {
             // Handle response
+            final Replacer replacer;
             if (connectionResult.statusCode >= 200 && connectionResult.statusCode < 300) {// accept any success code (in particular "201 Resource Created")
                 // Successful response
                 if (connectionResult.hasContent()) {
                     // There is a body
 
                     // Get replacer
-                    final Replacer replacer;
                     if (p.isReplaceAll) {
                         replacer = new AllReplacer(this, containingDocument);
                     } else if (p.isReplaceInstance) {
@@ -532,73 +561,38 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
                         throw new XFormsSubmissionException(this, "xforms:submission: invalid replace attribute: " + replace, "processing instance replacement",
-                                new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
+                                new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
                     }
-
-                    // Perform replacement
-                    replacer.replace(propertyContext, connectionResult, p, p2);
                 } else {
                     // There is no body, notify that processing is terminated
-                    if (p.isReplaceInstance) {
-                        // XForms 1.1 says it is fine not to have a body, but in most cases you will want
-                        // to know that no instance replacement took place
-                        XFormsServer.logger.warn("XForms - submission - instance replacement did not take place upon successful response because no body was provided. Submission: "
+                    if (p.isReplaceInstance || p.isReplaceText) {
+                        // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
+                        // no instance replacement took place
+                        XFormsServer.logger.warn("XForms - submission - instance or text replacement did not take place upon successful response because no body was provided. Submission: "
                                 + getEffectiveId());
                     }
 
-                    // "For a success response not including a body, submission processing concludes after
-                    // dispatching xforms-submit-done"
-                    container.dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult));
+                    // "For a success response not including a body, submission processing concludes after dispatching
+                    // xforms-submit-done"
+                    replacer = new NoneReplacer(this, containingDocument);
                 }
             } else if (connectionResult.statusCode == 302 || connectionResult.statusCode == 301) {
                 // Got a redirect
 
-                final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final ExternalContext.Response response = externalContext.getResponse();
-
                 // TODO: only for replace="all", right?
 
-                // Forward headers to response
-                connectionResult.forwardHeaders(response);
-
-                // Forward redirect
-                response.setStatus(connectionResult.statusCode);
+                replacer = new RedirectReplacer(this, containingDocument);
 
             } else {
                 // Error code received
                 throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                        new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
             }
+
+            return replacer;
+        } else {
+            return null;
         }
-    }
-
-    public void handleResponse(PropertyContext propertyContext, XFormsInstance newInstance, SecondPassParameters p2) throws IOException {
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("submission", "replacing instance with " + (p2.resolvedXXFormsReadonly ? "read-only" : "read-write") +  " cached instance",
-                        "instance", newInstance.getEffectiveId());
-        }
-
-        final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-
-        // Dispatch xforms-delete event
-        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement (see below). In the
-        // future, we might want to dispatch this, especially if XFormsInsertAction dispatches xforms-delete when
-        // removing the root element
-        //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
-
-        // Handle new instance and associated event markings
-        final NodeInfo newRootElementInfo = newInstance.getInstanceRootElementInfo();
-        replaceModel.handleUpdatedInstance(propertyContext, newInstance, newRootElementInfo);
-
-        // Dispatch xforms-insert event
-        // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-        newInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
-                            new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newRootElementInfo), null, newRootElementInfo.getDocumentRoot(),
-                    "after", null, null, true));
-
-
-        // If no exception, submission is done here: just dispatch the event
-        container.dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, newInstance.getSourceURI(), 200));
     }
 
     public class SubmissionParameters {
@@ -731,24 +725,25 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     public class SecondPassParameters {
 
-        // This mostly consits of AVTs that can be evaluated only during the second pass of the submission
+        // This mostly consists of AVTs that can be evaluated only during the second pass of the submission
 
-        final String resolvedActionOrResource;
-        final String resolvedSerialization;
-        final String resolvedMode;
-        final String resolvedVersion;
-        final String resolvedEncoding;
-        final String resolvedSeparator;
-        final boolean resolvedIndent;
-        final boolean resolvedOmitxmldeclaration;
-        final Boolean resolvedStandalone;
-        final String resolvedXXFormsUsername;
-        final String resolvedXXFormsPassword;
-        final boolean resolvedXXFormsReadonly;
-        final boolean resolvedXXFormsCache;
-        final boolean resolvedXXFormsHandleXInclude;
+        final String actionOrResource;
+        final String serialization;
+        final String mode;
+        final String version;
+        final String encoding;
+        final String separator;
+        final boolean indent;
+        final boolean omitxmldeclaration;
+        final Boolean standalone;
+        final String username;
+        final String password;
+        final boolean isReadonly;
+        final boolean isCache;
+        final long timeToLive;
+        final boolean isHandleXInclude;
 
-        final boolean isAsyncSubmission;
+        final boolean isAsynchronous;
 
         public SecondPassParameters(PropertyContext propertyContext, SubmissionParameters p) {
             {
@@ -758,58 +753,59 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
                             "resolving resource URI");
                 }
-                resolvedActionOrResource = XFormsUtils.encodeHRRI(temp, true);
+                actionOrResource = XFormsUtils.encodeHRRI(temp, true);
             }
 
-            resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);
-            resolvedMode = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtMode);
-            resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtVersion);
-            resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtEncoding);
-            resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSeparator);
+            serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);
+            mode = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtMode);
+            version = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtVersion);
+            encoding = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtEncoding);
+            separator = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSeparator);
 
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtIndent);
-                resolvedIndent = Boolean.valueOf(temp);
+                indent = Boolean.valueOf(temp);
             }
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtOmitxmldeclaration);
-                resolvedOmitxmldeclaration = Boolean.valueOf(temp);
+                omitxmldeclaration = Boolean.valueOf(temp);
             }
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtStandalone);
-                resolvedStandalone = (temp != null) ? Boolean.valueOf(temp) : null;
+                standalone = (temp != null) ? Boolean.valueOf(temp) : null;
             }
 
-            resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
-            resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            username = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
+            password = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
-                resolvedXXFormsReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
+                isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
             }
 
             if (avtXXFormsCache != null) {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsCache);
                 // New attribute
-                resolvedXXFormsCache = Boolean.valueOf(temp);
+                isCache = Boolean.valueOf(temp);
             } else {
                 // For backward compatibility
-                resolvedXXFormsCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsShared));
+                isCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsShared));
             }
 
+            timeToLive = XFormsInstance.getTimeToLive(getSubmissionElement());
 
             // Default is "false" for security reasons
             final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsHandleXInclude);
-            resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude);
+            isHandleXInclude = Boolean.valueOf(tempHandleXInclude);
 
             // Check read-only and cache hints
-            if (resolvedXXFormsCache) {
+            if (isCache) {
                 if (!(p.actualHttpMethod.equals("GET") || p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")))
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with method=\"get|post|put\".",
                             "checking read-only and shared hints");
                 if (!p.isReplaceInstance)
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with replace=\"instance\".",
                             "checking read-only and shared hints");
-            } else if (resolvedXXFormsReadonly) {
+            } else if (isReadonly) {
                 if (!p.isReplaceInstance)
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
                             "checking read-only and shared hints");
@@ -817,12 +813,36 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             // Get async/sync
             // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
-            final boolean isRequestedAsynchronousMode = "asynchronous".equals(resolvedMode);
-            isAsyncSubmission = !p.isReplaceAll && isRequestedAsynchronousMode;
+            final boolean isRequestedAsynchronousMode = "asynchronous".equals(mode);
+            isAsynchronous = !p.isReplaceAll && isRequestedAsynchronousMode;
             if (isRequestedAsynchronousMode && p.isReplaceAll) {
                 // For now we don't support replace="all"
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mode=\"asynchronous\" cannot be \"true\" with replace=\"all\".", "checking asynchronous mode");
             }
+        }
+
+        protected SecondPassParameters(SecondPassParameters other, boolean isAsynchronous, boolean isReadonly) {
+            this.actionOrResource = other.actionOrResource;
+            this.serialization = other.serialization;
+            this.version = other.version;
+            this.encoding = other.encoding;
+            this.separator = other.separator;
+            this.indent = other.indent;
+            this.omitxmldeclaration = other.omitxmldeclaration;
+            this.standalone = other.standalone;
+            this.username = other.username;
+            this.password = other.password;
+            this.isCache = other.isCache;
+            this.timeToLive = other.timeToLive;
+            this.isHandleXInclude = other.isHandleXInclude;
+
+            this.mode = isAsynchronous ? "asynchronous" : "synchronous";
+            this.isAsynchronous = isAsynchronous;
+            this.isReadonly = isReadonly;
+        }
+
+        public SecondPassParameters amend(boolean isAsynchronous, boolean isReadonly){
+            return new SecondPassParameters(this, isAsynchronous, isReadonly);
         }
     }
 
@@ -849,10 +869,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Perform "application/x-www-form-urlencoded" serialization
                     if (p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")) {
                         queryString = null;
-                        messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.resolvedSeparator).getBytes("UTF-8");// the resulting string is already ASCII in fact
+                        messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8");// the resulting string is already ASCII in fact
                         defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
                     } else {
-                        queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.resolvedSeparator);
+                        queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator);
                         messageBody = null;
                         defaultMediatypeForSerialization = null;
                     }
@@ -861,7 +881,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     try {
                         final Transformer identity = TransformerUtils.getIdentityTransformer();
                         TransformerUtils.applyOutputProperties(identity,
-                                "xml", p2.resolvedVersion, null, null, p2.resolvedEncoding, p2.resolvedOmitxmldeclaration, p2.resolvedStandalone, p2.resolvedIndent, 4);
+                                "xml", p2.version, null, null, p2.encoding, p2.omitxmldeclaration, p2.standalone, p2.indent, 4);
 
                         // TODO: use cdata-section-elements
 

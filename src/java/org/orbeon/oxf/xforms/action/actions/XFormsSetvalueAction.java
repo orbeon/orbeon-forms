@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsInstance;
@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,13 +50,21 @@ public class XFormsSetvalueAction extends XFormsAction {
         if (value != null) {
             // Value to set is computed with an XPath expression
 
-            final List<Item> currentNodeset;
+            final List<Item> currentNodeset = contextStack.getCurrentNodeset();
             {
-                final XFormsInstance currentInstance = contextStack.getCurrentInstance();// TODO: we should not use this
-                currentNodeset = (contextStack.getCurrentNodeset() != null && contextStack.getCurrentNodeset().size() > 0)
-                        ? contextStack.getCurrentNodeset()
-                        : Collections.singletonList((Item) currentInstance.getDocumentInfo());
+                if (currentNodeset != null && currentNodeset.size() > 0) {
+                    // @ref points to something
+                    valueToSet = XPathCache.evaluateAsString(propertyContext,
+                        currentNodeset, contextStack.getCurrentPosition(),
+                        value, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
+                        (LocationData) actionElement.getData());
+                } else {
+                    // If @ref doesn't point to anything, don't even try to compute the value
+                    valueToSet = null;
+                }
 
+                // TODO: this note is out of date:
                 // NOTE: The above is actually not correct: the context should not become null or empty. This is
                 // therefore just a workaround for a bug we hit:
 
@@ -66,14 +73,8 @@ public class XFormsSetvalueAction extends XFormsAction {
                 // o When the second one runs, context is empty, and setvalue either crashes or does nothing
                 //
                 // The correct solution is probably to NOT reevaluate the context of actions unless a rebuild is done.
-                // This would require an update to the way we impelement the processing model.
+                // This would require an update to the way we implement the processing model.
             }
-
-            valueToSet = XPathCache.evaluateAsString(propertyContext,
-                    currentNodeset, contextStack.getCurrentPosition(),
-                    value, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
-                    (LocationData) actionElement.getData());
         } else {
             // Value to set is static content
             valueToSet = content;

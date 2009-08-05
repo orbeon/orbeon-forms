@@ -33,7 +33,7 @@ public class OptimizedGetSubmission extends BaseSubmission {
     public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final String actionString = (sp.queryString == null) ? p2.resolvedActionOrResource : p2.resolvedActionOrResource + ((p2.resolvedActionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString;
+        final String actionString = (sp.queryString == null) ? p2.actionOrResource : p2.actionOrResource + ((p2.actionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString;
         XFormsLoadAction.resolveStoreLoadValue(containingDocument, propertyContext, submission.getSubmissionElement(), true, actionString, null, null, submission.isURLNorewrite(), submission.isShowProgress());
 
         return null;

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -27,7 +27,10 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of a caching transformer output that assumes that an output depends on a set
@@ -84,8 +87,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
-            for (Iterator<URIReference> i = uriReferences.getReferences().iterator(); i.hasNext();) {
-                final URIReference uriReference = i.next();
+            for (final URIReference uriReference: uriReferences.getReferences()) {
                 if (uriReference == null)
                     return null;
                 final CacheKey uriKey = getURIKey(pipelineContext, uriReference);
@@ -130,8 +132,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
-            for (Iterator<URIReference> i = uriReferences.getReferences().iterator(); i.hasNext();) {
-                final URIReference uriReference = i.next();
+            for (final URIReference uriReference: uriReferences.getReferences()) {
                 if (uriReference == null)
                     return null;
 
@@ -191,7 +192,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                     final String key = url.getFile();
                     final long result = ResourceManagerWrapper.instance().lastModified(key, false);
                     // Zero and negative values often have a special meaning, make sure to normalize here
-                    return (result <= 0) ? null : new Long(result);
+                    return (result <= 0) ? null : result;
                 } else if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
                     // HTTP and HTTPS protocols: read and keep document
 
@@ -288,18 +289,16 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         }
 
         public boolean isDocumentSet(String urlString, String username, String password) {
-            if (map == null)
-                return false;
-            return map.get(buildURIUsernamePasswordString(urlString, username, password)) != null;
+            return map != null && map.get(buildURIUsernamePasswordString(urlString, username, password)) != null;
         }
 
         public Long getLastModified(String urlString, String username, String password) {
-            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(buildURIUsernamePasswordString(urlString, username, password));
+            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, username, password));
             return documentInfo.lastModified;
         }
 
         public SAXStore getDocument(String urlString, String username, String password) {
-            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(buildURIUsernamePasswordString(urlString, username, password));
+            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, username, password));
             return documentInfo.saxStore;
         }
     }
@@ -317,6 +316,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          *
          * @param context   optional context (can be null)
          * @param spec      URL spec
+         * @param username
+         * @param password
+         * @param headersToForward
          */
         public void addReference(String context, String spec, String username, String password, String headersToForward) {
             if (references == null)
@@ -363,10 +365,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
      * This is called to handle "http:", "https:" and other URLs (but not "oxf:" and "input:"). It is possible to
      * override this method, for example to optimize HTTP access.
      *
-     * @param url           URL to read
-     * @param state         state to read to
-     * @param username      optional username
-     * @param password      optional password
+     * @param pipelineContext
+     * @param url               URL to read
+     * @param state             state to read to
+     * @param username          optional username
+     * @param password          optional password
+     * @param headersToForward
      */
     public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password, String headersToForward) {
 
@@ -385,7 +389,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, false, "GET", submissionURL, username, password, null, null, null, headersToForward);
+                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, false, Connection.Method.GET.name(),
+                        submissionURL, username, password, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

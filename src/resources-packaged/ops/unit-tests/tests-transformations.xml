@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <group description="Transformations" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:d="http://orbeon.org/oxf/xml/document"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -101,70 +100,6 @@
             </new-root>
         </output>
     </test>
-
-    <!-- NOTE: We don't bundle Xalan anymore -->
-    <!--<test description="xalan:nodeset() function" name="oxf:xalan">-->
-        <!--<input name="data">-->
-            <!--<gaga/>-->
-        <!--</input>-->
-        <!--<input name="config">-->
-            <!--<xsl:stylesheet version="1.0" exclude-result-prefixes="xalan" xmlns:xalan="http://xml.apache.org/xalan">-->
-                <!--<xsl:template match="/">-->
-                    <!--<xsl:variable name="gaga">-->
-                        <!--<xsl:call-template name="gaga"/>-->
-                    <!--</xsl:variable>-->
-                    <!--<xsl:copy-of select="xalan:nodeset($gaga)/root/gaga"/>-->
-                <!--</xsl:template>-->
-                <!--<xsl:template name="gaga">-->
-                    <!--<root>-->
-                        <!--<gaga/>-->
-                    <!--</root>-->
-                <!--</xsl:template>-->
-            <!--</xsl:stylesheet>-->
-        <!--</input>-->
-        <!--<output name="data">-->
-            <!--<gaga/>-->
-        <!--</output>-->
-    <!--</test>-->
-
-    <!--    <disable reason="STX doesn't support multi treading">-->
-    <test description="STX Transformation on a request-like document" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                xmlns:d="http://orbeon.org/oxf/xml/document">
-                <p:processor name="oxf:identity">
-                    <p:input name="data">
-                        <request>
-                            <path-info>/this/is/a/path/info</path-info>
-                        </request>
-                    </p:input>
-                    <p:output name="data" id="request"/>
-                </p:processor>
-                <p:processor name="oxf:stx">
-                    <p:input name="data" href="#request"/>
-                    <p:input name="config">
-                        <stx:transform version="1.0" xmlns:stx="http://stx.sourceforge.net/2002/ns">
-                            <stx:template match="/">
-                                <d:document>
-                                    <d:body>
-                                        <stx:process-children/>
-                                    </d:body>
-                                </d:document>
-                            </stx:template>
-                            <stx:template match="request/path-info/text()">
-                                <stx:copy/>
-                            </stx:template>
-                        </stx:transform>
-                    </p:input>
-                    <p:output name="data" id="result"/>
-                </p:processor>
-                <p:processor name="oxf:null-serializer">
-                    <p:input name="data" href="#result"/>
-                </p:processor>
-            </p:config>
-        </input>
-    </test>
-    <!--  </disable>-->
 
     <test description="XSLT Transformation on a request-like document" name="oxf:pipeline">
         <input name="config">

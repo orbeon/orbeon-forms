@@ -73,7 +73,6 @@
         <include name="tagsoup-1.2.jar"/>
         <include name="junit.jar"/>
         <include name="saxon-8_8_orbeon_20090617.jar"/>
-        <include name="joost-20030623_orbeon.jar"/>
         <include name="batik-all-1_6.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>
         <include name="fop-0_93.jar"/>
@@ -103,6 +102,8 @@
         <include name="flying-saucer-r8-core-renderer.jar"/>
         <include name="flying-saucer-r8-core-renderer-minimal.jar"/>
         <include name="flying-saucer-r8-itext-2_0_8.jar"/>
+        <include name="itext-bcmail-jdk14-138.jar"/>
+        <include name="itext-bcprov-jdk14-138.jar"/>
 
         <include name="barcode4j-1.0.jar"/>
 
@@ -291,7 +292,7 @@
         <jar destfile='${cli.jar.file}' compress='false'  >
           <manifest>
             <attribute name='Main-Class' value='org.orbeon.oxf.main.OPS' />
-            <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
+            <attribute name='Class-Path' value='lib/${jar.name} lib/${project.name}-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}' />
           </manifest>
         </jar>
 
@@ -805,6 +806,7 @@
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="${project.name}.war"/>
             </zipfileset>
+            <zipfileset file="README.txt"/>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
             <zipfileset dir="${examples-cli-src.dir}" prefix="${prefix}/examples-cli"/>

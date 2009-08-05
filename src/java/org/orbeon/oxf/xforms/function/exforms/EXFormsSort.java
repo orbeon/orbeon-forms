@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
@@ -61,10 +61,9 @@ public class EXFormsSort extends XXFormsSort {
 
             // Set variable values
             if (preparedExpression.variables != null) {
-                for (Iterator i = preparedExpression.variables.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry entry = (Map.Entry) i.next();
-                    final String name = (String) entry.getKey();
-                    final Variable variable = (Variable) entry.getValue();
+                for (final Map.Entry<String, Variable> entry: preparedExpression.variables.entrySet()) {
+                    final String name = entry.getKey();
+                    final Variable variable = entry.getValue();
 
                     final Object object = preparedExpression.inScopeVariables.get(name);
                     if (object != null) {
@@ -127,12 +126,11 @@ public class EXFormsSort extends XXFormsSort {
         // Propagate in-scope variable definitions since they are not copied automatically
         final XFormsContextStack contextStack = getContextStack(xpathContext);
         preparedExpression.inScopeVariables = contextStack.getCurrentBindingContext().getInScopeVariables();
-        preparedExpression.variables = new HashMap();
+        preparedExpression.variables = new HashMap<String, Variable>();
         {
             if (preparedExpression.inScopeVariables != null) {
-                for (Iterator i = preparedExpression.inScopeVariables.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String name = (String) currentEntry.getKey();
+                for (final Map.Entry<String, ValueRepresentation> currentEntry: preparedExpression.inScopeVariables.entrySet()) {
+                    final String name = currentEntry.getKey();
 
                     final Variable variable = env.declareVariable(name);
                     variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
@@ -166,8 +164,8 @@ public class EXFormsSort extends XXFormsSort {
     public static class PreparedExpression implements java.io.Serializable {
         public IndependentContext expStaticContext;
         public Expression expression;
-        public Map /* <String name, ValueRepresentation value> */ inScopeVariables;
-        public Map /* <String name, Variable variable> */ variables;
+        public Map<String, ValueRepresentation> inScopeVariables;
+        public Map<String, Variable> variables;
         public SlotManager stackFrameMap;
     }
 }

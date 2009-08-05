@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.Collections;
@@ -116,6 +117,7 @@ public class XFormsProperties {
     public static final String OFFLINE_SUPPORT_PROPERTY = "offline";
     public static final String OFFLINE_REPEAT_COUNT_PROPERTY = "offline-repeat-count";
     public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
+    public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "Authorization";
 
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
@@ -212,7 +214,7 @@ public class XFormsProperties {
             new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
             new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
-            new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, "Authorization", false),
+            new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
@@ -558,7 +560,12 @@ public class XFormsProperties {
     }
 
     public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
+        // Get from XForms property first, otherwise use global default
+        final String result = getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
+        if (StringUtils.isNotBlank(result))
+            return result;
+        else
+            return Connection.getForwardHeaders();
     }
 
     public static String getDatePicker(XFormsContainingDocument containingDocument) {

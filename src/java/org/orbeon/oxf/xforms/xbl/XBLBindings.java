@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008,2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.xbl;
 
@@ -23,10 +23,12 @@ import org.orbeon.oxf.processor.ProcessorFactory;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
@@ -67,7 +69,7 @@ public class XBLBindings {
         this.staticState = staticState;
         this.namespacesMap = namespacesMap;
 
-        final List<Element> xblElements = (staticStateElement != null) ? Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME) : XFormsConstants.EMPTY_ELEMENT_LIST;
+        final List<Element> xblElements = (staticStateElement != null) ? Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME) : Collections.<Element>emptyList();
         if (xblElements.size() > 0) {
             xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
             xblComponentBindings = new HashMap<QName, Element>();
@@ -184,7 +186,7 @@ public class XBLBindings {
         return result;
     }
 
-    public void processElementIfNeeded(Element controlElement, String controlPrefixedId, LocationData locationData, PipelineContext pipelineContext,
+    public void processElementIfNeeded(Element controlElement, String controlPrefixedId, LocationData locationData, PropertyContext propertyContext,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
                                        FastStringBuffer repeatHierarchyStringBuffer, Stack<String> repeatAncestorsStack) {
         if (xblComponentBindings != null) {
@@ -196,7 +198,7 @@ public class XBLBindings {
                 final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
                 // Generate the shadow content for this particular binding
-                final Document fullShadowTreeDocument = generateXBLShadowContent(pipelineContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap, newPrefix);
+                final Document fullShadowTreeDocument = generateXBLShadowContent(propertyContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap, newPrefix);
                 if (fullShadowTreeDocument != null) {
 
                     final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
@@ -215,7 +217,7 @@ public class XBLBindings {
 
                     // Extract and register models from within the template
                     {
-                        final List<Document> extractedModels = XFormsStaticState.extractNestedModels(pipelineContext, fullShadowTreeWrapper, true, locationData);
+                        final List<Document> extractedModels = XFormsStaticState.extractNestedModels(propertyContext, fullShadowTreeWrapper, true, locationData);
                         if (extractedModels.size() > 0) {
                             for (Document currentModelDocument: extractedModels) {
                                 // Store models by "prefixed id"
@@ -245,8 +247,9 @@ public class XBLBindings {
                             for (Element currentHandlerElement: handlerElements) {
                                 // Register xbl:handler as an action handler
                                 // NOTE: xbl:handler has similar attributes as XForms actions, in particular @event, @phase, etc.
-                                final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentHandlerElement, controlPrefixedId, true,
-                                        controlPrefixedId,
+                                final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
+                                final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentHandlerElement, controlStaticId, true,
+                                        controlStaticId,
                                         currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME),
                                         null, // no target attribute allowed in XBL
                                         currentHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME),
@@ -259,7 +262,7 @@ public class XBLBindings {
                     }
 
                     // NOTE: Say we don't want to exclude gathering event handlers within nested models
-                    staticState.analyzeComponentTree(pipelineContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
+                    staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
                             repeatHierarchyStringBuffer, repeatAncestorsStack, false);
                 }
             }
@@ -273,7 +276,7 @@ public class XBLBindings {
      * @param binding           corresponding <xbl:binding>
      * @return                  shadow tree document
      */
-    private Document generateXBLShadowContent(final PipelineContext pipelineContext, final DocumentWrapper documentWrapper,
+    private Document generateXBLShadowContent(final PropertyContext propertyContext, final DocumentWrapper documentWrapper,
                                                     final Element boundElement, Element binding, Map<String, Map<String, String>> namespaceMappings, final String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
@@ -318,7 +321,7 @@ public class XBLBindings {
                             final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                             // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                            final List elements = XPathCache.evaluate(pipelineContext, boundElementInfo, xpathExpression, Dom4jUtils.getNamespaceContext(element),
+                            final List elements = XPathCache.evaluate(propertyContext, boundElementInfo, xpathExpression, Dom4jUtils.getNamespaceContext(element),
                                     null, null, null, null, null);// TODO: locationData
 
                             if (elements.size() > 0) {
@@ -431,7 +434,7 @@ public class XBLBindings {
                         final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                         // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                        final List nodeInfos = XPathCache.evaluate(pipelineContext, boundElementInfo, xxblAttrString, Dom4jUtils.getNamespaceContext(element),
+                        final List nodeInfos = XPathCache.evaluate(propertyContext, boundElementInfo, xxblAttrString, Dom4jUtils.getNamespaceContext(element),
                                 null, null, null, null, null);// TODO: locationData
 
                         if (nodeInfos.size() > 0) {

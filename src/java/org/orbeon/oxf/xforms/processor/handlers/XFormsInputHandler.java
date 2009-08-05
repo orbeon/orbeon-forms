@@ -34,8 +34,40 @@ import java.util.Collections;
  */
 public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
+    private String appearance;
+    private boolean isDateTime;
+    private boolean isDateMinimal;
+    private boolean isBoolean;
+
     public XFormsInputHandler() {
         super(false);
+    }
+
+    @Override
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+
+        // Handle appearance
+        if (!handlerContext.isTemplate()) {
+            if (xformsControl != null) {
+
+                appearance = xformsControl.getAppearance();
+
+                final String controlTypeName = xformsControl.getBuiltinTypeName();
+                isDateTime = "dateTime".equals(controlTypeName);
+                isDateMinimal = "date".equals(controlTypeName) && "minimal".equals(appearance) ;
+                isBoolean = "boolean".equals(controlTypeName);
+            } else {
+                appearance = null;
+                isDateTime = false;
+                isDateMinimal = false;
+                isBoolean = false;
+            }
+        } else {
+            appearance = null;
+            isDateTime = false;
+            isDateMinimal = false;
+            isBoolean = false;
+        }
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
@@ -43,28 +75,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         final XFormsInputControl inputControl = (XFormsInputControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = inputControl != null;
-
-        final String controlTypeName = (inputControl != null) ? inputControl.getBuiltinTypeName() : null;
-        final String appearance = inputControl == null ? null : inputControl.getAppearance();
-
-        final boolean isDateTime;
-        final boolean isDateMinimal;
-        final boolean isBoolean;
-        if (!handlerContext.isTemplate()) {
-            if (isConcreteControl) {
-                isDateTime = "dateTime".equals(controlTypeName);
-                isDateMinimal = "date".equals(controlTypeName) && "minimal".equals(appearance) ;
-                isBoolean = "boolean".equals(controlTypeName);
-            } else {
-                isDateTime = false;
-                isDateMinimal = false;
-                isBoolean = false;
-            }
-        } else {
-            isDateTime = false;
-            isDateMinimal = false;
-            isBoolean = false;
-        }
 
         final AttributesImpl newAttributes;
         if (handlerContext.isNewXHTMLLayout()) {
@@ -236,36 +246,50 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     }
 
     private String getFirstInputEffectiveId(String effectiveId) {
-
-        // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-//        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
-        return effectiveId + "$xforms-input-1";
+        if (!isBoolean) {
+            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+    //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
+            return effectiveId + "$xforms-input-1";
+        } else {
+            return null;
+        }
     }
 
     private String getSecondInputEffectiveId(String effectiveId) {
+        if (isDateTime) {
+            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
+    //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
+            return effectiveId + "$xforms-input-2";
+        } else {
+            return null;
+        }
+    }
 
-        // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-//        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
-        return effectiveId + "$xforms-input-2";
+    private String getForEffectiveId(String effectiveId) {
+        if (isBoolean) {
+            return effectiveId;
+        } else {
+            return getFirstInputEffectiveId(effectiveId);
+        }
     }
 
     @Override
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "label", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "label", xformsControl, isTemplate);
     }
 
     @Override
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "alert", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "alert", xformsControl, isTemplate);
     }
 
     @Override
     protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "hint", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "hint", xformsControl, isTemplate);
     }
 
     @Override
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getFirstInputEffectiveId(effectiveId), "help", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "help", xformsControl, isTemplate);
     }
 }

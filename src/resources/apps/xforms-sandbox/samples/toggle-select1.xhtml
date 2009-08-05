@@ -1,0 +1,56 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+  
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events">
+
+    <xhtml:head>
+        <xhtml:title>Toggling between cases using a dropdown list</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="selection">
+                <selection>1</selection>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:select1 ref="instance('selection')" appearance="minimal">
+            <xforms:label>Select: </xforms:label>
+            <xforms:item>
+                <xforms:label>First</xforms:label>
+                <xforms:value>1</xforms:value>
+            </xforms:item>
+            <xforms:item>
+                <xforms:label>Second</xforms:label>
+                <xforms:value>2</xforms:value>
+            </xforms:item>
+            <!-- Solution with AVT -->
+            <xforms:toggle ev:event="xforms-value-changed" case="case{.}"/>
+            <!-- Solution with nested case element-->
+            <!--<xforms:toggle ev:event="xforms-value-changed">-->
+                <!--<xforms:case value="concat('case', .)"/>-->
+            <!--</xforms:toggle>-->
+        </xforms:select1>
+
+        <xforms:switch>
+            <xforms:case id="case1">
+                Case 1
+            </xforms:case>
+            <xforms:case id="case2">
+                Case 2
+            </xforms:case>
+        </xforms:switch>
+
+    </xhtml:body>
+</xhtml:html>

@@ -36,7 +36,6 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final String OUTPUT_CACHE_KEY = "dynamicState";
 
     private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
-    private static final Long CONSTANT_VALIDITY = new Long(0);
+    private static final Long CONSTANT_VALIDITY = (long) 0;
 
     private static InputDependencies testCachingStaticStateInputDependencies;
 
@@ -279,15 +278,12 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Set caching dependencies if the input was actually read
         // WIP INSTANCE INSPECTOR: for (Iterator i = containingDocument.getAllModels().iterator(); i.hasNext();) {
-        for (Iterator<XFormsModel> i = containingDocument.getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = i.next();
-
+        for (final XFormsModel currentModel: containingDocument.getModels()) {
             // Add schema dependencies
             final String[] schemaURIs = currentModel.getSchemaURIs();
             // TODO: We should also use dependencies computed in XFormsModelSchemaValidator.SchemaInfo
             if (schemaURIs != null) {
-                for (int j = 0; j < schemaURIs.length; j++) {
-                    final String currentSchemaURI = schemaURIs[j];
+                for (final String currentSchemaURI: schemaURIs) {
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - adding document cache dependency for schema: " + currentSchemaURI);
                     inputDependencies.addReference(null, currentSchemaURI, null, null,
@@ -297,8 +293,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Add instance source dependencies
             if (currentModel.getInstances() != null) {
-                for (Iterator<XFormsInstance> j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = j.next();
+                for (final XFormsInstance currentInstance: currentModel.getInstances()) {
                     final String instanceSourceURI = currentInstance.getSourceURI();
 
                     if (instanceSourceURI != null) {
@@ -368,7 +363,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Send redirect
             final String redirectResource = load.getResource();
-            containingDocument.logDebug("XForms initialization", "handling redirect response for xforms:load", new String[] { "url", redirectResource });
+            containingDocument.logDebug("XForms initialization", "handling redirect response for xforms:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 

@@ -1,19 +1,18 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -30,7 +29,6 @@ import java.util.Map;
  */
 public class XFormsConstants {
 
-    public static final List<Element> EMPTY_ELEMENT_LIST = Collections.emptyList();
     public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
     public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
 
@@ -301,7 +299,9 @@ public class XFormsConstants {
     public static final QName STATIC_STATE_SCRIPTS_QNAME = new QName("scripts");
     public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
 
+    public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XXFORMS_NAMESPACE_URI, "no-index-adjustment");
+
     private XFormsConstants() {
-        // Disallow contruction
+        // Disallow construction
     }
 }

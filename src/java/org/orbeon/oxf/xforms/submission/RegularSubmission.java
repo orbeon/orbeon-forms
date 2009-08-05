@@ -15,9 +15,11 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.net.URL;
 import java.util.Map;
@@ -37,11 +39,11 @@ public class RegularSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         final ExternalContext externalContext = getExternalContext(propertyContext);
-        final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.resolvedActionOrResource, sp.queryString);
+        final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.actionOrResource, sp.queryString);
 
         // Gather remaining information to process the request
         final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
@@ -52,18 +54,12 @@ public class RegularSubmission extends BaseSubmission {
         // element.
         final String newForwardSubmissionHeaders = p.isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
 
-        final IndentedLogger connectionLogger;
-        final boolean logBody;
-        if (XFormsModelSubmission.logger.isDebugEnabled()) {
-            // Create new indented logger just for the Connection object. This will log more stuff.
-            connectionLogger = new IndentedLogger(XFormsModelSubmission.logger, "XForms submission " + (p2.isAsyncSubmission ? "(asynchronous)" : "(synchronous)"),
-                    containingDocument.getIndentedLogger().getLogIndentLevel());
-            logBody = true;
-        } else {
-            // Create new logger as the submission might be asynchronous
-            connectionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
-            logBody = false;
-        }
+        // This will log more stuff
+        final boolean logBody = XFormsModelSubmission.logger.isDebugEnabled();
+
+        final IndentedLogger connectionLogger
+                = new IndentedLogger(logBody ? XFormsModelSubmission.logger : XFormsServer.logger, "XForms submission " + (p2.isAsynchronous ? "(asynchronous)" : "(synchronous)"),
+                    (p2.isAsynchronous && p.isReplaceNone) ? 1 : containingDocument.getIndentedLogger().getLogIndentLevel());
 
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
@@ -75,17 +71,33 @@ public class RegularSubmission extends BaseSubmission {
         // o now and asynchronously
         // o later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
-            public SubmissionResult call() {
+            public SubmissionResult call() throws Exception {
                 // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
                 // because it may get out of the caches and not be picked up by further incoming Ajax requests.
 
                 // NOTE: If the submission was truly asynchronous, we should not touch ExternalContext either.
                 // But currently, since the submission actually runs at the end of a request, we do have access to
                 // ExternalContext, so we still use it.
-                return new SubmissionResult(submissionEffectiveId, new Connection().open(externalContext, connectionLogger, logBody,
-                        p.actualHttpMethod, absoluteResolvedURL, p2.resolvedXXFormsUsername, p2.resolvedXXFormsPassword,
+
+                // Open the connection
+                ConnectionResult connectionResult = null;
+                try {
+                    connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
+                        p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password,
                         sp.actualRequestMediatype, sp.messageBody,
-                        customHeaderNameValues, newForwardSubmissionHeaders));
+                        customHeaderNameValues, newForwardSubmissionHeaders);
+
+                    // Obtain replacer
+                    final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+
+                    // Deserialize here so it can run in parallel
+                    replacer.deserialize(propertyContext, connectionResult, p, p2);
+
+                    return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
+                } catch (Throwable throwable) {
+                    // Exceptions are handled further down
+                    return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);
+                }
             }
         };
 

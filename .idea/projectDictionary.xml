@@ -18,6 +18,7 @@
         <option value="github" />
         <option value="gzip" />
         <option value="lang" />
+        <option value="renderer" />
         <option value="stylesheets" />
         <option value="uncompressing" />
         <option value="unsubscribe" />

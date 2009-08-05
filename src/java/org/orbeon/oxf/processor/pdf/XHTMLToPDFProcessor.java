@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pdf;
 
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
 
 /**
  * XHTML to PDF converter using the Flying Saucer library.
@@ -70,8 +71,8 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 try {
                     final String resolvedURI = resolveURI(uri);
                     final ConnectionResult connectionResult
-                            = new Connection().open(externalContext, indentedLogger, false, "GET", new URL(resolvedURI),
-                                null, null, null, null, null, null);
+                        = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
+                            new URL(resolvedURI), null, null, null, null, null, Connection.getForwardHeaders());
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();
@@ -80,8 +81,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
                     pipelineContext.addContextListener(new PipelineContext.ContextListener() {
                         public void contextDestroyed(boolean success) {
-                            if (connectionResult != null)
-                                connectionResult.close();
+                            connectionResult.close();
                         }
                     });
 
@@ -109,11 +109,23 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
         // Do the layout and create the resulting PDF
         renderer.layout();
+        final List pages = renderer.getRootBox().getLayer().getPages();
         try {
-            renderer.createPDF(outputStream);
-            outputStream.close();
+            // Page count might be zero, and if so createPDF
+            if (pages != null && pages.size() > 0) {
+                renderer.createPDF(outputStream);
+            } else {
+                // TODO: log?
+            }
         } catch (Exception e) {
             throw new OXFException(e);
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                // NOP
+                // TODO: log?
+            }
         }
     }
 }

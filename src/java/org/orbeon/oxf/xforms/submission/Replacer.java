@@ -19,6 +19,11 @@ import org.orbeon.oxf.util.PropertyContext;
 import java.io.IOException;
 
 public interface Replacer {
+
+    void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult,
+                     XFormsModelSubmission.SubmissionParameters p,
+                     XFormsModelSubmission.SecondPassParameters p2) throws Exception;
+
     void replace(PropertyContext propertyContext, ConnectionResult connectionResult,
                  XFormsModelSubmission.SubmissionParameters p,
                  XFormsModelSubmission.SecondPassParameters p2) throws IOException;

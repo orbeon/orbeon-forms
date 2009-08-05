@@ -58,9 +58,9 @@ public class OptimizedSubmission extends BaseSubmission {
         final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
         if (isDebugEnabled) {
             containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
-                "resource", p2.resolvedActionOrResource, "noscript", Boolean.toString(p.isNoscript),
+                "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
                 "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
-                "is asynchronous", Boolean.toString(p2.isAsyncSubmission),
+                "is asynchronous", Boolean.toString(p2.isAsynchronous),
                 "container type", request.getContainerType(), "norewrite", Boolean.toString(submission.isURLNorewrite()),
                 "url type", submission.getUrlType(),
                 "local-submission-forward", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)),
@@ -69,10 +69,10 @@ public class OptimizedSubmission extends BaseSubmission {
         }
 
         // Absolute URL is not optimized
-        if (NetUtils.urlHasProtocol(p2.resolvedActionOrResource)) {
+        if (NetUtils.urlHasProtocol(p2.actionOrResource)) {
             if (isDebugEnabled)
                 containingDocument.logDebug("submission", "skipping optimized submission",
-                        "reason", "resource URL has protocol", "resource", p2.resolvedActionOrResource);
+                        "reason", "resource URL has protocol", "resource", p2.actionOrResource);
             return false;
         }
 
@@ -85,7 +85,7 @@ public class OptimizedSubmission extends BaseSubmission {
         }
 
         // For now, we don't handle optimized async; could be optimized in the future
-        if (p2.isAsyncSubmission) {
+        if (p2.isAsynchronous) {
             if (isDebugEnabled)
                 containingDocument.logDebug("submission", "skipping optimized submission",
                         "reason", "asynchronous mode is not supported yet");
@@ -136,7 +136,7 @@ public class OptimizedSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
         // access the resource, but instead uses servlet forward/include for servlets, or a local
         // mechanism for portlets.
@@ -152,7 +152,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(submission.getSubmissionElement(), p2.resolvedActionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(submission.getSubmissionElement(), p2.actionOrResource);
 
         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
@@ -177,11 +177,22 @@ public class OptimizedSubmission extends BaseSubmission {
                 resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
-        // This means we got a submission with replace="all"
-        if (connectionResult.dontHandleResponse)
+        if (connectionResult.dontHandleResponse) {
+            // This means we got a submission with replace="all"
             containingDocument.setGotSubmissionReplaceAll();
 
-        return new SubmissionResult(submission.getEffectiveId(), connectionResult);
+            // Caller has nothing to do
+            return null;
+        } else {
+            // Obtain replacer
+            final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+
+            // Deserialize
+            replacer.deserialize(propertyContext, connectionResult, p, p2);
+
+            // Return result
+            return new SubmissionResult(submission.getEffectiveId(), replacer, connectionResult);
+        }
     }
 
     /**

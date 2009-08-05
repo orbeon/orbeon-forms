@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function;
 
@@ -49,7 +49,7 @@ public class DaysFromDate extends XFormsFunction {
             // (normalized to UTC) and 1970-01-01. Hour, minute, and second components are ignored after
             // normalization."
 
-            final DateTimeValue dateTimeValue = (value instanceof DateTimeValue) ? (DateTimeValue) value : ((DateValue) value).toDateTime();
+            final DateTimeValue dateTimeValue = (value instanceof DateTimeValue) ? (DateTimeValue) value : value.toDateTime();
             return new IntegerValue(dateTimeValue.normalize(context.getConfiguration()).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY);
         }
     }

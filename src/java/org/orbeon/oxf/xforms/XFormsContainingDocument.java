@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -593,9 +592,9 @@ public class XFormsContainingDocument extends XBLContainer {
                     final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
                     submission.getXBLContainer(this).dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(submission, result));
 
-                } catch (Exception e) {
+                } catch (Throwable throwable) {
                     // Something bad happened
-                    throw new OXFException(e);
+                    throw new OXFException(throwable);
                 }
             }
         } finally {
@@ -617,9 +616,9 @@ public class XFormsContainingDocument extends XBLContainer {
 
                         // NOTE: We do not process the response at all
 
-                    } catch (Exception e) {
+                    } catch (Throwable throwable) {
                         // Something happened but we swallow the exception and keep going
-                        XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", e);
+                        XFormsServer.logger.debug("XForms (async) - asynchronous submission: throwable caught.", throwable);
                     }
                     // Remove submission from list of submission so we can gc the Runnable
                     i.remove();
@@ -1385,7 +1384,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
                     // insert performance was good from the get go.
                     // TODO: check above now that repeat/insert/delete has been improved
-                    event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
+                    event.setAttribute(XFormsConstants.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
                     // Dispatch event n times
                     final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
                     for (int j = 0; j < repeatCount; j++)

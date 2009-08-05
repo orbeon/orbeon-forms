@@ -4,7 +4,7 @@
     xmlns:xslt="http://xml.apache.org/xslt"
     exclude-result-prefixes="exslt xslt">
 
-    <!-- Target can be: devel, war, install -->
+    <!-- Target can be: devel or war -->
     <xsl:param name="target"/>
     <xsl:param name="build-root"/>
     <xsl:param name="version-number"/>
@@ -184,19 +184,14 @@
 
             <xsl:comment>Set context listener</xsl:comment>
             <listener>
-                <listener-class>org.orbeon.oxf.webapp.OPSServletContextListenerDelegate</listener-class>
+                <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListenerDelegate</listener-class>
             </listener>
 
-            <xsl:comment>Set optional session listener</xsl:comment>
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'listeners'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
-                <xsl:with-param name="content">
-                    <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OPSSessionListenerDelegate</listener-class>
-                    </listener>
-                </xsl:with-param>
-            </xsl:call-template>
+            <!-- NOTE: The session listener is used by the XForm state store so must be enabled  -->
+            <xsl:comment>Set session listener</xsl:comment>
+            <listener>
+                <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListenerDelegate</listener-class>
+            </listener>
 
             <!--
             <servlet>

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004-2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -65,10 +65,10 @@ public class TransformerUtils {
     private static final String SAXON_INDENT_AMOUNT_PROPERTY = "{http://saxon.sf.net/}indent-spaces";
 
     // Class.forName is expensive, so we cache mappings
-    private static Map classNameToHandlerClass = new HashMap();
+    private static Map<String, Class> classNameToHandlerClass = new HashMap<String, Class>();
 
     private static Class getTransformerClass(String clazz) throws ClassNotFoundException {
-        Class transformerClass = (Class) classNameToHandlerClass.get(clazz);
+        Class transformerClass = classNameToHandlerClass.get(clazz);
         if (transformerClass == null) {
             transformerClass = Class.forName(clazz);
             classNameToHandlerClass.put(clazz, transformerClass);
@@ -160,7 +160,7 @@ public class TransformerUtils {
             transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY, String.valueOf(indentAmount));
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXMLDeclaration ? "yes" : "no");
         if (standalone != null)
-            transformer.setOutputProperty(OutputKeys.STANDALONE, standalone.booleanValue() ? "yes" : "no");
+            transformer.setOutputProperty(OutputKeys.STANDALONE, standalone ? "yes" : "no");
     }
 
     /**

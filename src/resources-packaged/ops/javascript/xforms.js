@@ -4497,7 +4497,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
-        // YUI event.js�s call to this.subscribers.length in fire method hangs.
+        // YUI event.js's call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
@@ -6655,7 +6655,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     /**
      * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-     * @param repeatID      E.g. repeat-begin-todo�1 for the repeat on to-dos in the first to-do list.
+     * @param repeatID      E.g. repeat-begin-todo·1 for the repeat on to-dos in the first to-do list.
      */
     _renumberIDs: function(repeatID) {
 

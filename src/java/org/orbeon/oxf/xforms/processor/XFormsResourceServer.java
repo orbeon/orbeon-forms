@@ -22,6 +22,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
@@ -107,20 +108,20 @@ public class XFormsResourceServer extends ProcessorImpl {
                         NetUtils.copyStream(is, os);
                         os.flush();
                     } catch (Exception e) {
-                        XFormsServer.logger.warn("Exception copying stream", e);
+                        XFormsContainingDocument.logWarningStatic("", "exception copying stream", e);
                     } finally {
                         if (is != null) {
                             try {
                                 is.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.warn("Exception closing input stream", e);
+                                XFormsContainingDocument.logWarningStatic("", "exception closing input stream", e);
                             }
                         }
                         if (os != null) {
                             try {
                                 os.close();
                             } catch (IOException e) {
-                                XFormsServer.logger.warn("Exception closing output stream", e);
+                                XFormsContainingDocument.logWarningStatic("", "exception closing output stream", e);
                             }
                         }
                     }
@@ -203,14 +204,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                 os = response.getOutputStream();
                 response.setContentType(isCSS ? "text/css" : "application/x-javascript");
                 {
-                    final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+                    final boolean isDebugEnabled = XFormsContainingDocument.logger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
                         final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
-                                XFormsServer.logger.debug("XForms resources - serving from cache " + requestPath + ".");
+                                XFormsContainingDocument.logDebugStatic("resources", "serving from cache ", "request path", requestPath);
                             final FileInputStream fis = new FileInputStream(resourceFile);
                             NetUtils.copyStream(fis, os);
                             fis.close();
@@ -218,13 +219,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                         } else {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
-                                XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
+                                XFormsContainingDocument.logDebugStatic("resources", "caching requested but not possible, serving directly", "request path", requestPath);
                             generate(resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
-                            XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
+                            XFormsContainingDocument.logDebugStatic("resources", "caching not requested, serving directly", "request path", requestPath);
                         generate(resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
@@ -237,7 +238,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     try {
                         os.close();
                     } catch (IOException e) {
-                        XFormsServer.logger.warn("Exception closing output stream", e);
+                        XFormsContainingDocument.logWarningStatic("", "exception closing output stream", e);
                     }
                 }
             }
@@ -276,7 +277,7 @@ public class XFormsResourceServer extends ProcessorImpl {
         try {
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
-            final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+            final boolean isDebugEnabled = XFormsContainingDocument.logger.isDebugEnabled();
             if (realPath != null) {
                 // We hope to be able to cache as a resource
                 resourceFile = new File(realPath);
@@ -286,17 +287,17 @@ public class XFormsResourceServer extends ProcessorImpl {
                     if (resourceLastModified < combinedLastModified) {
                         // Resource is out of date, generate
                         if (isDebugEnabled)
-                            XFormsServer.logger.debug("XForms resources - cached combined resources out of date, saving " + resourcePath + ".");
+                            XFormsContainingDocument.logDebugStatic("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
                         generate(resources, pipelineContext, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
-                            XFormsServer.logger.debug("XForms resources - cached combined resources exist and are up-to-date for " + resourcePath + ".");
+                            XFormsContainingDocument.logDebugStatic("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
                     }
                 } else {
                     // Resource doesn't exist, generate
                     if (isDebugEnabled)
-                        XFormsServer.logger.debug("XForms resources - cached combined resources don't exist, saving " + resourcePath + ".");
+                        XFormsContainingDocument.logDebugStatic("resources", "cached combined resources don't exist, saving", "resource path", resourcePath);
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
@@ -304,7 +305,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                 }
             } else {
                 if (isDebugEnabled)
-                    XFormsServer.logger.debug("XForms resources - unable to locate real path for cached combined resources, not saving " + resourcePath + ".");
+                    XFormsContainingDocument.logDebugStatic("resources", "unable to locate real path for cached combined resources, not saving", "resource path", resourcePath);
                 resourceFile = null;
             }
             return resourceFile;
@@ -396,7 +397,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
                             outputWriter.write("url(" + rewrittenURI + ")");
                         } catch (Exception e) {
-                            XFormsServer.logger.warn("XForms resources - found invalid URI in CSS file: " + uriString);
+                            XFormsContainingDocument.logWarningStatic("resources", "found invalid URI in CSS file", "uri", uriString);
                             outputWriter.write("url(" + uriString + ")");
                         }
                     }

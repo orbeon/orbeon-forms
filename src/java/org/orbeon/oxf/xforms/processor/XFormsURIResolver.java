@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -98,8 +99,8 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (XFormsToXHTML.logger.isDebugEnabled())
-                        XFormsToXHTML.logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
+                    if (XFormsContainingDocument.logger.isDebugEnabled())
+                        XFormsContainingDocument.logDebugStatic("", "resolving resource through initialization resolver", "uri", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));
                 } else {

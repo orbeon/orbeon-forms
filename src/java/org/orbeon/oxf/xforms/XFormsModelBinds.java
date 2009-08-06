@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
@@ -19,6 +19,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -55,9 +55,10 @@ import java.util.*;
  * Represent a given model's binds.
  */
 public class XFormsModelBinds {
-
+    
     private final XFormsModel model;                            // model to which we belong
 
+    private final IndentedLogger indentedLogger;
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;  // current containing document
     private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
@@ -98,6 +99,7 @@ public class XFormsModelBinds {
     private XFormsModelBinds(XFormsModel model, List<Element> bindElements) {
         this.model = model;
 
+        this.indentedLogger = model.getIndentedLogger();
         this.container = model.getXBLContainer();
         this.containingDocument = model.getContainingDocument();
         this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
@@ -117,8 +119,8 @@ public class XFormsModelBinds {
      */
     public void rebuild(PropertyContext propertyContext) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.startHandleOperation("model", "performing rebuild", "model id", model.getEffectiveId());
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.startHandleOperation("model", "performing rebuild", "model id", model.getEffectiveId());
 
         // Reset everything
         model.getContextStack().resetBindingContext(propertyContext, model);
@@ -135,8 +137,8 @@ public class XFormsModelBinds {
             topLevelBinds.add(currentBind);
         }
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.endHandleOperation();
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.endHandleOperation();
     }
 
     /**
@@ -146,8 +148,8 @@ public class XFormsModelBinds {
      */
     public void applyCalculateBinds(final PropertyContext propertyContext) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
 
         // Reset context stack just to re-evaluate the variables
         model.getContextStack().resetBindingContext(propertyContext, model);
@@ -177,8 +179,8 @@ public class XFormsModelBinds {
             applyComputedExpressionBinds(propertyContext);
         }
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.endHandleOperation();
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.endHandleOperation();
     }
 
     /**
@@ -214,9 +216,9 @@ public class XFormsModelBinds {
      * Apply validation binds
      *
      * @param propertyContext   current PropertyContext
-     * @param invalidInstances
+     * @param invalidInstances  will contain a
      */
-    public void applyValidationBinds(final PropertyContext propertyContext, final Map<String, String> invalidInstances) {
+    public void applyValidationBinds(final PropertyContext propertyContext, final Set<String> invalidInstances) {
 
         // Reset context stack just to re-evaluate the variables
         model.getContextStack().resetBindingContext(propertyContext, model);
@@ -301,8 +303,10 @@ public class XFormsModelBinds {
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.startHandleOperation("model", "getting offline bind mappings");
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.logger);
+
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.startHandleOperation("model", "getting offline bind mappings");
 
         final Map<String, XFormsControl> effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
@@ -420,8 +424,8 @@ public class XFormsModelBinds {
 
         final String result = sb.toString();
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.endHandleOperation();
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.endHandleOperation();
 
         return result;
     }
@@ -558,7 +562,7 @@ public class XFormsModelBinds {
 
                 // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                 // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, model, currentNodeInfo, stringResult, null, true);
+                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
 
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
@@ -583,7 +587,7 @@ public class XFormsModelBinds {
 
                 // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                 // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, model, currentNodeInfo, stringResult, null, true);
+                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
 
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
@@ -712,7 +716,7 @@ public class XFormsModelBinds {
 //            XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
 //    }
 
-    private void handleValidationBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, String> invalidInstances) {
+    private void handleValidationBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Set<String> invalidInstances) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
         final Map<String, String> namespaceMap = container.getNamespaceMappings(bind.getBindElement());
@@ -881,7 +885,7 @@ public class XFormsModelBinds {
         if (!isValid) {
             // Remember invalid instances
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
-            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
+            invalidInstances.add(instanceForNodeInfo.getEffectiveId());
             return;
         }
 
@@ -902,7 +906,7 @@ public class XFormsModelBinds {
         if (!isValid) {
             // Remember invalid instances
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
-            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
+            invalidInstances.add(instanceForNodeInfo.getEffectiveId());
             return;
         }
 
@@ -931,7 +935,7 @@ public class XFormsModelBinds {
         // Remember invalid instances
         if (!isValid) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
-            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
+            invalidInstances.add(instanceForNodeInfo.getEffectiveId());
         }
     }
 

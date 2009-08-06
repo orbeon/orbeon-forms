@@ -17,13 +17,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.IOException;
@@ -54,10 +54,11 @@ public class OptimizedSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         final ExternalContext.Request request = getExternalContext(propertyContext).getRequest();
+        final IndentedLogger indentedLogger = getIndentedLogger();
 
-        final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+        final boolean isDebugEnabled = indentedLogger.logger.isDebugEnabled();
         if (isDebugEnabled) {
-            containingDocument.logDebug("submission", "checking whether optimized submission is allowed",
+            indentedLogger.logDebug("", "checking whether optimized submission is allowed",
                 "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
                 "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
                 "is asynchronous", Boolean.toString(p2.isAsynchronous),
@@ -71,7 +72,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // Absolute URL is not optimized
         if (NetUtils.urlHasProtocol(p2.actionOrResource)) {
             if (isDebugEnabled)
-                containingDocument.logDebug("submission", "skipping optimized submission",
+                indentedLogger.logDebug("", "skipping optimized submission",
                         "reason", "resource URL has protocol", "resource", p2.actionOrResource);
             return false;
         }
@@ -79,7 +80,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // TODO: why is this condition here?
         if (p.isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument)) {
             if (isDebugEnabled)
-                containingDocument.logDebug("submission", "skipping optimized submission",
+                indentedLogger.logDebug("", "skipping optimized submission",
                         "reason", "noscript mode enabled and not in ajax portlet mode");
             return false;
         }
@@ -87,7 +88,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // For now, we don't handle optimized async; could be optimized in the future
         if (p2.isAsynchronous) {
             if (isDebugEnabled)
-                containingDocument.logDebug("submission", "skipping optimized submission",
+                indentedLogger.logDebug("", "skipping optimized submission",
                         "reason", "asynchronous mode is not supported yet");
             return false;
         }
@@ -97,7 +98,7 @@ public class OptimizedSubmission extends BaseSubmission {
 
             if (submission.isURLNorewrite()) {
                 if (isDebugEnabled)
-                    containingDocument.logDebug("submission", "skipping optimized submission",
+                    indentedLogger.logDebug("", "skipping optimized submission",
                             "reason", "norewrite is specified");
                 return false;
             }
@@ -108,7 +109,7 @@ public class OptimizedSubmission extends BaseSubmission {
 
             if ("resource".equals(submission.getUrlType())) {
                 if (isDebugEnabled)
-                    containingDocument.logDebug("submission", "skipping optimized submission",
+                    indentedLogger.logDebug("", "skipping optimized submission",
                             "reason", "resource URL type is specified");
                 return false;
             }
@@ -116,7 +117,7 @@ public class OptimizedSubmission extends BaseSubmission {
             // Servlet, replace all
             if (!XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
                 if (isDebugEnabled)
-                    containingDocument.logDebug("submission", "skipping optimized submission",
+                    indentedLogger.logDebug("", "skipping optimized submission",
                             "reason", "forward submissions are disallowed in properties");
                 return false;
             }
@@ -124,14 +125,14 @@ public class OptimizedSubmission extends BaseSubmission {
             // Servlet, other
             if (!XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument)) {
                 if (isDebugEnabled)
-                    containingDocument.logDebug("submission", "skipping optimized submission",
+                    indentedLogger.logDebug("", "skipping optimized submission",
                             "reason", "include submissions are disallowed in properties");
                 return false;
             }
         }
 
         if (isDebugEnabled)
-            containingDocument.logDebug("submission", "enabling optimized submission");
+            indentedLogger.logDebug("", "enabling optimized submission");
 
         return true;
     }
@@ -158,8 +159,9 @@ public class OptimizedSubmission extends BaseSubmission {
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
         // in that case
 
-        if (XFormsServer.logger.isDebugEnabled())
-            containingDocument.logDebug("submission", "starting optimized submission", "id", submission.getEffectiveId());
+        final IndentedLogger indentedLogger = getIndentedLogger();
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.logDebug("", "starting optimized submission", "id", submission.getEffectiveId());
 
         // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
         // simulates a request from the browser! Useful in particular when the target URL renders XForms
@@ -173,7 +175,7 @@ public class OptimizedSubmission extends BaseSubmission {
 
         final ConnectionResult connectionResult
                 = openOptimizedConnection(propertyContext, getExternalContext(propertyContext),
-                containingDocument, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission, p.actualHttpMethod,
+                containingDocument, indentedLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission, p.actualHttpMethod,
                 resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
@@ -200,6 +202,7 @@ public class OptimizedSubmission extends BaseSubmission {
      */
     public static ConnectionResult openOptimizedConnection(PropertyContext propertyContext, ExternalContext externalContext,
                                                            XFormsContainingDocument containingDocument,
+                                                           IndentedLogger indentedLogger,
                                                            XFormsModelSubmission xformsModelSubmission,
                                                            String httpMethod, final String resource, boolean isNorewrite, String mediatype,
                                                            byte[] messageBody, String queryString,
@@ -228,7 +231,7 @@ public class OptimizedSubmission extends BaseSubmission {
             effectiveAction = resource;
         }
 
-        return openOptimizedConnection(propertyContext, externalContext, containingDocument.getResponse(),
+        return openOptimizedConnection(propertyContext, externalContext, indentedLogger, containingDocument.getResponse(),
                                 xformsModelSubmission, httpMethod, effectiveAction, isContextRelative, mediatype,
                                 messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues);
     }
@@ -237,12 +240,13 @@ public class OptimizedSubmission extends BaseSubmission {
      * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
      */
     private static ConnectionResult openOptimizedConnection(PropertyContext propertyContext, ExternalContext externalContext,
-                                                           ExternalContext.Response response,
-                                                           XFormsModelSubmission xformsModelSubmission,
-                                                           String httpMethod, final String resource, boolean isContextRelative, String mediatype,
-                                                           byte[] messageBody, String queryString,
-                                                           final boolean isReplaceAll, String[] headerNames,
-                                                           Map<String, String[]> customHeaderNameValues) {
+                                                            final IndentedLogger indentedLogger,
+                                                            ExternalContext.Response response,
+                                                            XFormsModelSubmission xformsModelSubmission,
+                                                            String httpMethod, final String resource, boolean isContextRelative, String mediatype,
+                                                            byte[] messageBody, String queryString,
+                                                            final boolean isReplaceAll, String[] headerNames,
+                                                            Map<String, String[]> customHeaderNameValues) {
 
         // Action must be an absolute path
         if (!resource.startsWith("/"))
@@ -271,8 +275,8 @@ public class OptimizedSubmission extends BaseSubmission {
                     // Simulate a POST or PUT
                     effectiveResourceURI = resource;
 
-                    if (XFormsServer.logger.isDebugEnabled())
-                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
+                    if (indentedLogger.logger.isDebugEnabled())
+                        indentedLogger.logDebug("", "setting request body",
                             "body", new String(messageBody, "UTF-8"));
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
@@ -304,8 +308,8 @@ public class OptimizedSubmission extends BaseSubmission {
                 }
             }
 
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
+            if (indentedLogger.logger.isDebugEnabled())
+                indentedLogger.logDebug("", "dispatching request",
                             "method", httpMethod,
                             "mediatype", mediatype,
                             "context path", destinationContextPath,
@@ -334,18 +338,18 @@ public class OptimizedSubmission extends BaseSubmission {
                             os.flush();
                             os.close();
                         } catch (IllegalStateException e) {
-                            XFormsServer.logger.debug("IllegalStateException caught while closing OutputStream after forward");
+                            indentedLogger.logDebug("", "IllegalStateException caught while closing OutputStream after forward");
                             try {
                                 final PrintWriter writer = effectiveResponse.getWriter();
                                 writer.flush();
                                 writer.close();
                             } catch (IllegalStateException f) {
-                                XFormsServer.logger.debug("IllegalStateException caught while closing Writer after forward");
+                                indentedLogger.logDebug("", "IllegalStateException caught while closing Writer after forward");
                             } catch (IOException f) {
-                                XFormsServer.logger.debug("IOException caught while closing Writer after forward");
+                                indentedLogger.logDebug("", "IOException caught while closing Writer after forward");
                             }
                         } catch (IOException e) {
-                            XFormsServer.logger.debug("IOException caught while closing OutputStream after forward");
+                            indentedLogger.logDebug("", "IOException caught while closing OutputStream after forward");
                         }
                     }
                 }

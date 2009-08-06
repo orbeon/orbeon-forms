@@ -1,28 +1,31 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Stack;
 
 public class IndentedLogger {
 
-    private Logger logger;
-    private String prefix;
-    private int logIndentLevel = 0;
+    public final Logger logger;
+    private final Indentation indentation;
+    private final String prefix;
+
     private Stack<Operation> stack = new Stack<Operation>();
 
     private class Operation {
@@ -50,24 +53,25 @@ public class IndentedLogger {
     }
 
     public IndentedLogger(Logger logger, String prefix) {
+        this(logger, new Indentation(), prefix);
+    }
+
+    public IndentedLogger(Logger logger, Indentation indentation, String prefix) {
         this.logger = logger;
+        this.indentation = indentation;
         this.prefix = prefix;
     }
 
     public IndentedLogger(Logger logger, String prefix, int logIndentLevel) {
-        this.logger = logger;
-        this.prefix = prefix;
-        this.logIndentLevel = logIndentLevel;
+        this(logger, new Indentation(logIndentLevel), prefix);
     }
 
     public IndentedLogger(IndentedLogger indentedLogger) {
-        this.logger = indentedLogger.logger;
-        this.prefix = indentedLogger.prefix;
-        this.logIndentLevel = indentedLogger.logIndentLevel;
+        this(indentedLogger.logger, new Indentation(indentedLogger.indentation.indentation), indentedLogger.prefix);
     }
 
     public int getLogIndentLevel() {
-        return logIndentLevel;
+        return indentation.indentation;
     }
 
     public final boolean isDebugEnabled() {
@@ -77,29 +81,29 @@ public class IndentedLogger {
     public void startHandleOperation() {
         if (logger.isDebugEnabled()) {
             stack.push(null);
+            indentation.indentation++;
         }
-        logIndentLevel++;
     }
 
     public void startHandleOperation(String type, String message) {
         if (logger.isDebugEnabled()) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message);
+            indentation.indentation++;
         }
-        logIndentLevel++;
     }
 
     public void startHandleOperation(String type, String message, String... parameters) {
         if (logger.isDebugEnabled()) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message, parameters);
+            indentation.indentation++;
         }
-        logIndentLevel++;
     }
 
     public void endHandleOperation() {
-        logIndentLevel--;
         if (logger.isDebugEnabled()) {
+            indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
                 logDebug(operation.type, "end " + operation.message, "time (ms)", Long.toString(operation.getTimeElapsed()));
@@ -108,8 +112,8 @@ public class IndentedLogger {
     }
 
     public void endHandleOperation(String... parameters) {
-        logIndentLevel--;
         if (logger.isDebugEnabled()) {
+            indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
 
@@ -131,46 +135,76 @@ public class IndentedLogger {
     }
 
     public void logDebug(String type, String message) {
-        log(Level.DEBUG, logIndentLevel, type, message, null);
+        log(Level.DEBUG, indentation.indentation, type, message, (String[]) null);
     }
 
     public void logDebug(String type, String message, String... parameters) {
-        log(Level.DEBUG, logIndentLevel, type, message, parameters);
+        log(Level.DEBUG, indentation.indentation, type, message, parameters);
     }
 
     public static void logDebugStatic(Logger logger, String prefix, String type, String message, String... parameters) {
         log(logger, Level.DEBUG, 0, prefix, type, message, parameters);
     }
 
-    public void logWarning(String type, String message, String[] parameters) {
-        log(Level.WARN, logIndentLevel, type, message, parameters);
+    public static void logWarningStatic(Logger logger, String prefix, String type, String message, String... parameters) {
+        log(logger, Level.WARN, 0, prefix, type, message, parameters);
     }
 
-    private void log(Level level, int indentLevel, String type, String message, String[] parameters) {
-        log(logger, level, indentLevel, prefix, type, message, parameters);
+    public static void logWarningStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
+        log(logger, Level.WARN, 0, prefix, type, message, throwableToString(throwable));
     }
 
-    private static void log(Logger logger, Level level, int indentLevel, String prefix, String type, String message, String[] parameters) {
+    public static void logErrorStatic(Logger logger, String prefix, String type, String message, String... parameters) {
+        log(logger, Level.ERROR, 0, prefix, type, message, parameters);
+    }
+
+    public static void logErrorStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
+        log(logger, Level.ERROR, 0, prefix, type, message, "throwable", throwableToString(throwable));
+    }
+
+    public void logWarning(String type, String message, String... parameters) {
+        log(Level.WARN, indentation.indentation, type, message, parameters);
+    }
+
+    public void logWarning(String type, String message, Throwable throwable) {
+        log(Level.WARN, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+    }
+
+    public void logError(String type, String message, String... parameters) {
+        log(Level.ERROR, indentation.indentation, type, message, parameters);
+    }
+
+    public void logError(String type, String message, Throwable throwable) {
+        log(Level.ERROR, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+    }
+
+    private void log(Level level, int indentLevel, String type, String message, String... parameters) {
+        log(logger, level, getActualIndentLevel(indentLevel), prefix, type, message, parameters);
+    }
+
+    private int getActualIndentLevel(int indentLevel) {
+        return indentLevel;
+    }
+
+    private static void log(Logger logger, Level level, int indentLevel, String prefix, String type, String message, String... parameters) {
         final String parametersString;
         if (parameters != null) {
             final StringBuilder sb = new StringBuilder(" {");
-            if (parameters != null) {
-                boolean first = true;
-                for (int i = 0; i < parameters.length; i += 2) {
-                    final String paramName = parameters[i];
-                    final String paramValue = parameters[i + 1];
+            boolean first = true;
+            for (int i = 0; i < parameters.length; i += 2) {
+                final String paramName = parameters[i];
+                final String paramValue = parameters[i + 1];
 
-                    if (paramName != null && paramValue != null) {
-                        if (!first)
-                            sb.append(", ");
+                if (paramName != null && paramValue != null) {
+                    if (!first)
+                        sb.append(", ");
 
-                        sb.append(paramName);
-                        sb.append(": \"");
-                        sb.append(paramValue);
-                        sb.append('\"');
+                    sb.append(paramName);
+                    sb.append(": \"");
+                    sb.append(paramValue);
+                    sb.append('\"');
 
-                        first = false;
-                    }
+                    first = false;
                 }
             }
             sb.append('}');
@@ -179,6 +213,25 @@ public class IndentedLogger {
             parametersString = "";
         }
 
-        logger.log(level, prefix + " - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+        logger.log(level, getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+//        logger.log(level, prefix + " - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+    }
+
+    public static class Indentation {
+        public int indentation;
+
+        public Indentation() {
+            this(0);
+        }
+
+        public Indentation(int indentation) {
+            this.indentation = indentation;
+        }
+    }
+
+    private static String throwableToString(Throwable throwable) {
+        final PrintWriter writer = new PrintWriter(new StringWriter());
+        throwable.printStackTrace(writer);
+        return writer.toString();
     }
 }

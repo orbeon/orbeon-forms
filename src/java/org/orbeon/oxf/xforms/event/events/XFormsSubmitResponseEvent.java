@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.event.events;
 
@@ -17,8 +17,10 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.*;
@@ -35,9 +37,9 @@ import java.util.Map;
  */
 public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
-    private String resourceURI;
-    private Map<String, List<String>>  headers;
-    private int statusCode;
+    private final String resourceURI;
+    private final Map<String, List<String>>  headers;
+    private final int statusCode;
 
     public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, ConnectionResult connectionResult) {
         super(eventName, targetObject, true, false);
@@ -45,12 +47,17 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
             this.resourceURI = connectionResult.resourceURI;
             this.headers = connectionResult.responseHeaders;
             this.statusCode = connectionResult.statusCode;
+        } else {
+            this.resourceURI = null;
+            this.headers = null;
+            this.statusCode = 0;
         }
     }
 
     public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, String resourceURI, int statusCode) {
         super(eventName, targetObject, true, false);
         this.resourceURI = resourceURI;
+        this.headers = null;
         this.statusCode = statusCode;
     }
 
@@ -107,5 +114,14 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         } else {
             return super.getAttribute(name);
         }
+    }
+
+    // TODO: Need this at XFormsEvent level
+    protected XFormsContainingDocument getContainingDocument() {
+        final XFormsEventTarget targetObject = getTargetObject();
+        if (targetObject instanceof XFormsModelSubmission)
+            return ((XFormsModelSubmission) targetObject).getContainingDocument();
+        else
+            return null;
     }
 }

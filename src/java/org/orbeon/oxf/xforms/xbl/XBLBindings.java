@@ -35,7 +35,6 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.processor.XFormsExtractorContentHandler;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -166,7 +165,7 @@ public class XBLBindings {
                 }
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created top-level XBL documents",
+            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "created top-level XBL documents",
                     "xbl:xbl count", Integer.toString(xblCount), "xbl:binding count", Integer.toString(xblBindingCount));
         }
     }
@@ -211,7 +210,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic("static state", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
+                            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
                         }
                     }
 
@@ -223,7 +222,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic("static state", "created and registered XBL template model documents", "count", Integer.toString(extractedModels.size()));
+                            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "created and registered XBL template model documents", "count", Integer.toString(extractedModels.size()));
                         }
                     }
 
@@ -518,8 +517,8 @@ public class XBLBindings {
             // Annotate tree
             final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
 
-            if (XFormsServer.logger.isDebugEnabled()) {
-                XFormsContainingDocument.logDebugStatic("static state", "annotated shadow tree",
+            if (XFormsContainingDocument.logger.isDebugEnabled()) {
+                XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "annotated shadow tree",
                         "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotatedShadowTreeDocument));
             }
 
@@ -630,8 +629,8 @@ public class XBLBindings {
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsContainingDocument.logDebugStatic("static state", "compact shadow tree",
+        if (XFormsContainingDocument.logger.isDebugEnabled()) {
+            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "compact shadow tree",
                     "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(compactShadowTree));
         }
 

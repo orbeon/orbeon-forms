@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringUtils;
@@ -44,6 +45,10 @@ public abstract class BaseSubmission implements Submission {
 
     protected ExternalContext getExternalContext(PropertyContext propertyContext) {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    }
+
+    protected IndentedLogger getIndentedLogger() {
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.logger);
     }
 
     protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {

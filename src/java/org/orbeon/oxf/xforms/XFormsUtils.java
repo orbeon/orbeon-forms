@@ -28,7 +28,6 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -70,6 +69,7 @@ public class XFormsUtils {
 
     // Binary types supported for upload, images, etc.
     private static final Map<String, String> SUPPORTED_BINARY_TYPES = new HashMap<String, String>();
+
     static {
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "anyURI");
@@ -122,8 +122,8 @@ public class XFormsUtils {
         return encodeXML(pipelineContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
-    // Use a Deflater pool as creating Deflaters is expensive
-    final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
+    // Use a Deflater pool as creating deflaters is expensive
+    private static final SoftReferenceObjectPool DEFLATER_POOL = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory());
 
     public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
@@ -162,7 +162,7 @@ public class XFormsUtils {
             // Compress if needed
             final byte[] gzipByteArray;
             if (XFormsProperties.isGZIPState()) {
-                deflater = (Deflater) deflaterPool.borrowObject();
+                deflater = (Deflater) DEFLATER_POOL.borrowObject();
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
                 gzipOutputStream.write(bytesToEncode);
@@ -195,7 +195,7 @@ public class XFormsUtils {
         } catch (Throwable e) {
             try {
                 if (deflater != null)
-                    deflaterPool.invalidateObject(deflater);
+                    DEFLATER_POOL.invalidateObject(deflater);
             } catch (Exception e1) {
                 throw new OXFException(e1);
             }
@@ -204,7 +204,7 @@ public class XFormsUtils {
             try {
                 if (deflater != null) {
                     deflater.reset();
-                    deflaterPool.returnObject(deflater);
+                    DEFLATER_POOL.returnObject(deflater);
                 }
             } catch (Exception e) {
                 throw new OXFException(e);
@@ -570,9 +570,9 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {
+    private static class DeflaterPoolableObjectFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
-            XFormsServer.logger.debug("XForms - creating new Deflater.");
+            XFormsContainingDocument.logDebugStatic("", "creating new Deflater");
             return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
         }
 

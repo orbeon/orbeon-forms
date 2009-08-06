@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
@@ -162,6 +163,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(this));
         }
 
+        final IndentedLogger indentedLogger = getIndentedLogger();
         try {
             final String newValue;
             if (handleTemporaryFiles) {
@@ -172,7 +174,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                         final boolean success = file.delete();
                         try {
                             final String message = success ? "deleted temporary file upon upload" : "could not delete temporary file upon upload";
-                            containingDocument.logDebug("upload", message, "path", file.getCanonicalPath());
+                            indentedLogger.logDebug("xforms:upload", message, "path", file.getCanonicalPath());
                         } catch (IOException e) {
                             // NOP
                         }
@@ -192,7 +194,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                     final boolean success = oldFile.renameTo(newFile);
                     try {
                         final String message = success ? "renamed temporary file upon upload" : "could not rename temporary file upon upload";
-                        containingDocument.logDebug("upload", message, "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath());
+                        indentedLogger.logDebug("xforms:upload", message, "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath());
                     } catch (IOException e) {
                         // NOP
                     }
@@ -207,14 +209,14 @@ public class XFormsUploadControl extends XFormsValueControl {
                                     final boolean success = newFile.delete();
                                     try {
                                         final String message = success ? "deleted temporary file upon session destruction" : "could not delete temporary file upon session destruction";
-                                        containingDocument.logDebug("upload", message, "file", newFile.getCanonicalPath());
+                                        indentedLogger.logDebug("xforms:upload", message, "file", newFile.getCanonicalPath());
                                     } catch (IOException e) {
                                         // NOP
                                     }
                                 }
                             });
                         } else {
-                            containingDocument.logDebug("upload", "no existing session found so cannot register temporary file deletion upon session destruction",
+                            indentedLogger.logDebug("xforms:upload", "no existing session found so cannot register temporary file deletion upon session destruction",
                                     "file", newFile.getCanonicalPath());
                         }
                     }
@@ -453,7 +455,7 @@ class FileInfo implements Cloneable {
         contextStack.pushBinding(propertyContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control, currentSingleNode, value, null, false);
+            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(), control, currentSingleNode, value, null, false);
             contextStack.popBinding();
         }
     }

@@ -60,6 +60,8 @@ import java.util.*;
  */
 public class XFormsStaticState {
 
+    public static final String LOG_TYPE = "static state";
+
     private boolean initialized;
 
     private String uuid;
@@ -171,7 +173,7 @@ public class XFormsStaticState {
     private void initialize(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
                             SAXStore xhtmlDocument, String encodedStaticState) {
 
-        XFormsContainingDocument.logDebugStatic("static state", "initializing");
+        XFormsContainingDocument.logDebugStatic(LOG_TYPE, "initializing");
 
         final Element staticStateElement = staticStateDocument.getRootElement();
 
@@ -377,7 +379,7 @@ public class XFormsStaticState {
                 addModelDocument(modelElement.attributeValue("id"), modelDocument);
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", "count", Integer.toString(modelsCount));
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "created top-level model documents", "count", Integer.toString(modelsCount));
         }
 
         // Get controls document
@@ -405,14 +407,14 @@ public class XFormsStaticState {
                 }
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created controls document", "top-level controls count", Integer.toString(topLevelControlsCount));
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "created controls document", "top-level controls count", Integer.toString(topLevelControlsCount));
         }
 
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
-            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", "count", Integer.toString(extractedModels.size()));
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "created nested model documents", "count", Integer.toString(extractedModels.size()));
             for (final Document currentModelDocument: extractedModels) {
                 addModelDocument(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
             }
@@ -459,28 +461,6 @@ public class XFormsStaticState {
     public String getUUID() {
         return uuid;
     }
-
-//    /**
-//     * Whether the static state is fully initialized. It is the case when:
-//     *
-//     * o An encodedStaticState string was provided when restoring the static state, OR
-//     * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
-//     *
-//     * Before the static state if fully initialized, cached instances can be added and contribute to the static state.
-//     * The lifecycle goes as follows:
-//     *
-//     * o Create initial static state from document
-//     * o 0..n add instances to state
-//     * o Create serialized static state string
-//     *
-//     * o Get existing static state from cache, OR
-//     * o Restore static state from serialized form
-//     *
-//     * @return  true iif static state is fully initialized
-//     */
-//    public boolean isInitialized() {
-//        return initialized;
-//    }
 
     /**
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
@@ -699,13 +679,13 @@ public class XFormsStaticState {
             if (cachedMap != null) {
                 return cachedMap;
             } else {
-                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached",
+                XFormsContainingDocument.logDebugStatic(LOG_TYPE, "namespace mappings not cached",
                         "prefix", prefix, "element", Dom4jUtils.elementToString(element));
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
-            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not available because element doesn't have an id attribute",
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "namespace mappings not available because element doesn't have an id attribute",
                     "prefix", prefix, "element", Dom4jUtils.elementToString(element));
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
@@ -767,7 +747,7 @@ public class XFormsStaticState {
             analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
-                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
+                XFormsContainingDocument.logDebugStatic(LOG_TYPE, "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
 
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
@@ -1060,7 +1040,7 @@ public class XFormsStaticState {
                     alertsMap.put(controlPrefixedId, llhaElement);
                 }
             }
-            XFormsContainingDocument.logDebugStatic("static state", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
+            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
         }
 
         // Gather online/offline information

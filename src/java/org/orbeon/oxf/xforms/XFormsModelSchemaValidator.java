@@ -45,11 +45,11 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -83,6 +83,8 @@ public class XFormsModelSchemaValidator {
     private static final ValidationContext validationContext = new ValidationContext();
 
     private Element modelElement;
+    private IndentedLogger indentedLogger;
+
     private Grammar schemaGrammar;
     private String[] schemaURIs;
     private List<Element> schemaElements;
@@ -90,8 +92,9 @@ public class XFormsModelSchemaValidator {
     // REDocumentDeclaration is not reentrant, but the validator is used by a single thread
     private REDocumentDeclaration documentDeclaration;
 
-    public XFormsModelSchemaValidator(Element modelElement) {
+    public XFormsModelSchemaValidator(Element modelElement, IndentedLogger indentedLogger) {
         this.modelElement = modelElement;
+        this.indentedLogger = indentedLogger;
 
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue("schema");
@@ -266,22 +269,22 @@ public class XFormsModelSchemaValidator {
         } else {
             newErrorMessage = errMsg;
         }
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("Schema validation error: " + newErrorMessage);
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.logDebug("schema", "validation error", "error", newErrorMessage);
         InstanceData.addSchemaError(element, newErrorMessage, element.getStringValue(), null);
     }
 
     private void addSchemaError(final Attribute attribute, final String schemaError) {
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("Schema validation error: " + schemaError);
+        if (indentedLogger.logger.isDebugEnabled())
+            indentedLogger.logDebug("schema", "validation error", "error", schemaError);
         InstanceData.addSchemaError(attribute, schemaError, attribute.getStringValue(), null);
     }
 
     private boolean handleIDErrors(final IDConstraintChecker icc) {
         boolean isValid = true;
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("Schema validation error: " + errorInfo.message);
+            if (indentedLogger.logger.isDebugEnabled())
+                indentedLogger.logDebug("schema", "validation error", "error", errorInfo.message);
             addSchemaError(errorInfo.element, errorInfo.message);
             isValid = false;
         }
@@ -518,8 +521,8 @@ public class XFormsModelSchemaValidator {
     }
 
     /**
-     * Note that all of the attribs of element should be in startTagInfo.attributes. If they are out of synch it break
-     * the ability to access the attribs by index.
+     * Note that all of the attributes of element should be in startTagInfo.attributes. If they are out of sync it break
+     * the ability to access the attributes by index.
      */
     private boolean validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
                                      final IDConstraintChecker icc, final DatatypeRef datatypeRef, final boolean isReportErrors) {

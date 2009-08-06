@@ -27,8 +27,8 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -158,7 +158,7 @@ public class XXFormsCallXPL extends XFormsFunction {
             PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
             final boolean newPipelineContext = pipelineContext == null;
             if (newPipelineContext) {
-                XFormsServer.logger.warn("Cannot find pipeline context from static context. Creating new pipeline context.");
+                XFormsContainingDocument.logWarningStatic("xxforms:call-xpl()", "Cannot find pipeline context from static context. Creating new pipeline context.");
                 pipelineContext = new PipelineContext();
             }
 
@@ -204,7 +204,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                     if (newPipelineContext && !pipelineContext.isDestroyed())
                         pipelineContext.destroy(false);
                 } catch (Exception f) {
-                    XFormsServer.logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
+                    XFormsContainingDocument.logErrorStatic("xxforms:call-xpl()", "Exception while destroying context after exception", OXFException.getRootThrowable(f));
                 }
                 throw e;
             }

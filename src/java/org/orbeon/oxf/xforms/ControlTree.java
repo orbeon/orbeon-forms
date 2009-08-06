@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
@@ -50,12 +51,13 @@ public class ControlTree implements Cloneable {
      *
      * @param propertyContext       current context
      * @param containingDocument
+     * @param indentedLogger        logger
      * @param rootContainer
      * @param evaluateItemsets  whether to evaluate itemsets (true when restoring dynamic state only)
      */
-    public void initialize(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean evaluateItemsets) {
+    public void initialize(PropertyContext propertyContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, XBLContainer rootContainer, boolean evaluateItemsets) {
 
-        containingDocument.startHandleOperation("controls", "building");
+        indentedLogger.startHandleOperation("controls", "building");
 
         final int PROFILING_ITERATIONS = 1;
         for (int k = 0; k < PROFILING_ITERATIONS; k++) {
@@ -86,7 +88,7 @@ public class ControlTree implements Cloneable {
             }
 
             if (k == PROFILING_ITERATIONS - 1) {
-                containingDocument.endHandleOperation(
+                indentedLogger.endHandleOperation(
                         "controls updated", Integer.toString(listener.getUpdateCount()),
                         "repeat iterations", Integer.toString(listener.getIterationCount())
                 );

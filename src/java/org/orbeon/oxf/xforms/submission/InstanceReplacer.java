@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -63,14 +63,15 @@ public class InstanceReplacer extends BaseReplacer {
         // 1. Wraps a Document within a DocumentInfo if needed
         // 2. Performs text nodes adjustments if needed
         try {
+            final IndentedLogger indentedLogger = getIndentedLogger();
             if (!isReadonly) {
                 // Resulting instance must not be read-only
 
                 // TODO: What about configuring validation? And what default to choose?
                 resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("submission", "deserializing to mutable instance");
+                if (indentedLogger.logger.isDebugEnabled())
+                    indentedLogger.logDebug("", "deserializing to mutable instance");
             } else {
                 // Resulting instance must be read-only
 
@@ -78,8 +79,8 @@ public class InstanceReplacer extends BaseReplacer {
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                 resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("submission", "deserializing to read-only instance");
+                if (indentedLogger.logger.isDebugEnabled())
+                    indentedLogger.logDebug("", "deserializing to read-only instance");
             }
         } catch (Exception e) {
             throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
@@ -136,6 +137,8 @@ public class InstanceReplacer extends BaseReplacer {
                         new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
+            final IndentedLogger indentedLogger = getIndentedLogger();
+
             // Obtain root element to insert
             final NodeInfo newDocumentRootElement;
             final XFormsInstance newInstance;
@@ -146,8 +149,8 @@ public class InstanceReplacer extends BaseReplacer {
                 if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
-                    if (XFormsServer.logger.isDebugEnabled())
-                        containingDocument.logDebug("submission", "replacing instance with mutable instance",
+                    if (indentedLogger.logger.isDebugEnabled())
+                        indentedLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -156,8 +159,8 @@ public class InstanceReplacer extends BaseReplacer {
                 } else {
                     // Resulting instance must be read-only
 
-                    if (XFormsServer.logger.isDebugEnabled())
-                        containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                    if (indentedLogger.logger.isDebugEnabled())
+                        indentedLogger.logDebug("", "replacing instance with read-only instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -201,7 +204,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
-                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, "before",
+                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, indentedLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -209,7 +212,7 @@ public class InstanceReplacer extends BaseReplacer {
                     // The node to replace is NOT a root element
 
                     // Perform the deletion of the selected node
-                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, destinationCollection, 1, true);
+                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, indentedLogger, destinationCollection, 1, true);
                 }
 
                 // Perform model instance update

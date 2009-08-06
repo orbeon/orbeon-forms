@@ -18,7 +18,6 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -185,7 +184,7 @@ public class XFormsServerSharedInstancesCache {
 
     public synchronized void remove(PropertyContext propertyContext, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
 
-        if (XFormsServer.logger.isDebugEnabled())
+        if (XFormsContainingDocument.logger.isDebugEnabled())
             XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removing instance",
                     "URI", instanceSourceURI,
                     "request hash", requestBodyHash);
@@ -200,7 +199,7 @@ public class XFormsServerSharedInstancesCache {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final int count = cache.removeAll(propertyContext);
 
-        if (XFormsServer.logger.isDebugEnabled())
+        if (XFormsContainingDocument.logger.isDebugEnabled())
             XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removed all instances", "count", Integer.toString(count));
     }
 

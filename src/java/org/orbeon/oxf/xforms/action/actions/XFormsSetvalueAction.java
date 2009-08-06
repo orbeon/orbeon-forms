@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -25,7 +26,6 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -40,6 +40,7 @@ public class XFormsSetvalueAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
+        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
@@ -89,12 +90,12 @@ public class XFormsSetvalueAction extends XFormsAction {
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists, we can try to set the value
-            doSetValue(propertyContext, containingDocument, eventObserver, currentNode, valueToSet, null, false);
+            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, currentNode, valueToSet, null, false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
-            if (XFormsServer.logger.isDebugEnabled()) {
-                containingDocument.logDebug("setvalue", "not setting instance value",
+            if (indentedLogger.logger.isDebugEnabled()) {
+                indentedLogger.logDebug("xforms:setvalue", "not setting instance value",
                         "reason", "destination node not found",
                         "value", valueToSet
                 );
@@ -103,15 +104,15 @@ public class XFormsSetvalueAction extends XFormsAction {
     }
 
     public static boolean doSetValue(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
-                                     XFormsEventTarget eventTarget, NodeInfo currentNode,
+                                     IndentedLogger indentedLogger, XFormsEventTarget eventTarget, NodeInfo currentNode,
                                      String valueToSet, String type, boolean isCalculate) {
 
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         final boolean changed = !currentValue.equals(valueToSet);
 
-        if (XFormsServer.logger.isDebugEnabled()) {
+        if (indentedLogger.logger.isDebugEnabled()) {
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-            containingDocument.logDebug("setvalue", "setting instance value", "value", valueToSet,
+            indentedLogger.logDebug("xforms:setvalue", "setting instance value", "value", valueToSet,
                     "changed", Boolean.toString(changed),
                     "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A");
         }

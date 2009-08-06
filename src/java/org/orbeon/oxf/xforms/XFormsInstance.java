@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -57,7 +57,7 @@ import java.util.Map;
  */
 public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
-    static public Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
+    public static final Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
 
     private DocumentInfo documentInfo;
 
@@ -524,7 +524,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (cache) {
                 XFormsServerSharedInstancesCache.instance().remove(propertyContext, sourceURI, null, handleXInclude);
             } else {
-                XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
+                XFormsContainingDocument.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
             }
         }
     }
@@ -635,8 +635,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
-        if (logger.isDebugEnabled()) {
-            containingDocument.logDebug("instance", message,
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsInstance.logger);
+        if (indentedLogger.logger.isDebugEnabled()) {
+            indentedLogger.logDebug("", message,
                     "effective model id", getEffectiveModelId(),
                     "effective instance id", getEffectiveId(),
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));

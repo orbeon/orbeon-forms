@@ -93,7 +93,7 @@ public class TextReplacer extends BaseReplacer {
         }
 
         // Set value into the instance
-        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, submission, destinationNodeInfo, responseBody, null, false);
+        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, getIndentedLogger(), submission, destinationNodeInfo, responseBody, null, false);
 
         // Dispatch xforms-submit-done
         dispatchSubmitDone(propertyContext, connectionResult);

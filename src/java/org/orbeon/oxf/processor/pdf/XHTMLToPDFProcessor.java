@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.processor.pdf;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
-import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.*;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.pdf.ITextUserAgent;
@@ -37,6 +36,8 @@ import java.util.List;
  * XHTML to PDF converter using the Flying Saucer library.
  */
 public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is supposedly deprecated
+
+    private static final Logger logger = LoggerFactory.createLogger(XHTMLToPDFProcessor.class);
 
     public static String DEFAULT_CONTENT_TYPE = "application/pdf";
 
@@ -71,7 +72,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 try {
                     final String resolvedURI = resolveURI(uri);
                     final ConnectionResult connectionResult
-                        = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
+                        = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
                             new URL(resolvedURI), null, null, null, null, null, Connection.getForwardHeaders());
 
                     if (connectionResult.statusCode != 200) {

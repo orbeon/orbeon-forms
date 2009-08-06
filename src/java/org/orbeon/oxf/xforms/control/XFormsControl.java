@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -133,6 +133,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     protected XFormsContextStack getContextStack() {
         return container.getContextStack();
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return containingDocument.getControls().getIndentedLogger();
     }
 
     public void iterationRemoved(PropertyContext propertyContext) {
@@ -585,8 +589,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                         final int newRepeatIndex = repeatIterationControl.getIterationIndex();
 
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            containingDocument.logDebug("repeat", "setting index upon focus change",
+                        final IndentedLogger indentedLogger = controls.getIndentedLogger();
+                        if (indentedLogger.logger.isDebugEnabled()) {
+                            indentedLogger.logDebug("xforms:repeat", "setting index upon focus change",
                                     "new index", Integer.toString(newRepeatIndex));
                         }
 

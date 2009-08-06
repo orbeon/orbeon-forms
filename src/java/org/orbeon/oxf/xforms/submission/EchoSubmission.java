@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.ByteArrayInputStream;
@@ -47,9 +47,10 @@ public class EchoSubmission extends BaseSubmission {
         } else {
             // Log message body for debugging purposes
             // TODO: complete logging
-            if (XFormsServer.logger.isDebugEnabled()) {
+            final IndentedLogger indentedLogger = getIndentedLogger();
+            if (indentedLogger.logger.isDebugEnabled()) {
                 try {
-                    Connection.logRequestBody(submission.getContainingDocument().getIndentedLogger(), sp.actualRequestMediatype, sp.messageBody);
+                    Connection.logRequestBody(indentedLogger, sp.actualRequestMediatype, sp.messageBody);
                 } catch (UnsupportedEncodingException e) {
                     throw new OXFException(e);
                 }

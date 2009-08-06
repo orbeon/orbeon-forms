@@ -13,10 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.apache.log4j.Logger;
+import org.orbeon.oxf.util.LoggerFactory;
+
 /**
  * XForms events definitions.
  */
 public class XFormsEvents {
+
+    public static Logger logger = LoggerFactory.createLogger(XFormsEvents.class);
 
     // Custom initialization events
     public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";

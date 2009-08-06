@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -60,6 +60,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public XFormsSubmitErrorEvent(PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
+        
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
 
         // Try to add body information
         if (connectionResult != null && connectionResult.hasContent()) {
@@ -77,7 +79,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                 connectionResult.getResponseInputStream().close();
             } catch (Exception e) {
                 // Simply can't read the body
-                XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
+                indentedLogger.logWarning("xforms-submit-error", "error while reading response body ", e);
                 return;
             }
 
@@ -93,7 +95,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     setBodyDocument(responseBody);
                     return;
                 } catch (Exception e) {
-                    XFormsServer.logger.warn("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
+                    indentedLogger.logWarning("xforms-submit-error", "error while parsing response body as XML, defaulting to plain text.", e);
                     isXMLParseFailed = true;
                 } finally {
                     try {
@@ -122,7 +124,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                         }
                     }
                 } catch (Exception e) {
-                    XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
+                    indentedLogger.logWarning("xforms-submit-error", "error while reading response body ", e);
                 }
             } else {
                 // This is binary
@@ -134,13 +136,14 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public void setThrowable(Throwable throwable) {
         this.throwable = throwable;
 
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
         if (errorType == ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
+            if (indentedLogger.logger.isDebugEnabled())
+                indentedLogger.logDebug("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         } else {
             // Everything else gets logged as an error
-            XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
+            indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         }
     }
 
@@ -155,9 +158,9 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     public void setBodyDocument(DocumentInfo bodyDocument) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - submission - error body document:\n" + TransformerUtils.tinyTreeToString(bodyDocument));
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
+        if (indentedLogger.logger.isDebugEnabled()) {
+            indentedLogger.logDebug("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
         }
 
         this.bodyDocument = bodyDocument;
@@ -168,9 +171,9 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     public void setBodyString(String bodyString) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - submission - error body string:\n" + bodyString);
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
+        if (indentedLogger.logger.isDebugEnabled()) {
+            indentedLogger.logDebug("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
         }
 
         this.bodyString = bodyString;
@@ -182,7 +185,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Return the body of the response if possible
 
             if ("body".equals(name)) {
-                XFormsServer.logger.warn("event('body') on xforms-submit-error is deprecated. Use event('response-body') instead.");
+                final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
+                indentedLogger.logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
             }
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is

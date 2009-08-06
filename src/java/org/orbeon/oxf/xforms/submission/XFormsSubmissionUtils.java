@@ -20,12 +20,12 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -62,14 +62,15 @@ public class XFormsSubmissionUtils {
     /**
      * Check whether an XML sub-tree satisfies validity and required MIPs.
      *
-     * @param containingDocument    current containing document (for logging)
-     * @param startNode             node to recursively check
-     * @param recurse
+     * @param indentedLogger        logger
+     * @param startNode             node to check
+     * @param recurse               whether to recurse into attributes and descendant nodes
      * @param checkValid            whether to check validity
      * @param checkRequired         whether to check required
      * @return                      true iif the sub-tree passes the checks
      */
-    public static boolean isSatisfiesValidRequired(final XFormsContainingDocument containingDocument, final Node startNode, boolean recurse, final boolean checkValid, final boolean checkRequired) {
+    public static boolean isSatisfiesValidRequired(final IndentedLogger indentedLogger, final Node startNode, boolean recurse,
+                                                   final boolean checkValid, final boolean checkRequired) {
 
         if (recurse) {
             // Recurse into attributes and descendant nodes
@@ -81,8 +82,8 @@ public class XFormsSubmissionUtils {
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("submission", "found invalid element",
+                    if (!valid && indentedLogger.logger.isDebugEnabled()) {
+                        indentedLogger.logDebug("", "found invalid element",
                             "element name", Dom4jUtils.elementToString(element));
                     }
                 }
@@ -92,8 +93,8 @@ public class XFormsSubmissionUtils {
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("submission", "found invalid attribute",
+                    if (!valid && indentedLogger.logger.isDebugEnabled()) {
+                        indentedLogger.logDebug("", "found invalid attribute",
                             "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()));
                     }
                 }
@@ -285,7 +286,7 @@ public class XFormsSubmissionUtils {
     /**
      * Annotate the DOM with information about file name and mediatype provided by uploads if available.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param containingDocument    current XFormsContainingDocument
      * @param currentInstance       instance containing the nodes to check
      */

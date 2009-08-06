@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
@@ -57,7 +58,7 @@ import java.util.*;
  */
 public class XFormsServer extends ProcessorImpl {
 
-    static public Logger logger = LoggerFactory.createLogger(XFormsServer.class);
+    private static final Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
@@ -133,6 +134,9 @@ public class XFormsServer extends ProcessorImpl {
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
+        // Logger used for heartbeat and response
+        final IndentedLogger indentedLogger = new IndentedLogger(logger, "XForms server");
+
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
             final Element eventElement = eventElements.get(0);
@@ -143,11 +147,11 @@ public class XFormsServer extends ProcessorImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final ExternalContext.Session session = externalContext.getSession(false);
 
-                if (logger.isDebugEnabled()) {
+                if (indentedLogger.logger.isDebugEnabled()) {
                     if (session != null)
-                        logger.debug("XForms - received heartbeat from client for session: " + session.getId());
+                        indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId());
                     else
-                        logger.debug("XForms - received heartbeat from client (no session available).");
+                        indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).");
                 }
 
                 // Output simple resulting document
@@ -223,6 +227,7 @@ public class XFormsServer extends ProcessorImpl {
 
 //        final Object documentSynchronizationObject = (contentHandler != null) ? containingDocument : new Object();
         synchronized (containingDocument) {
+            final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.logger);
             try {
                 // Run events if any
                 final Map<String, String> valueChangeControlIds = new HashMap<String, String>();
@@ -329,7 +334,6 @@ public class XFormsServer extends ProcessorImpl {
 
                         // Special handling of checkboxes blanking in noscript mode
                         if (isNoscript) {
-                            // LinkedHashMap<String effectiveId, XFormsSelectControl control>
                             final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
 
                             if (selectFullControls != null) {
@@ -347,7 +351,7 @@ public class XFormsServer extends ProcessorImpl {
                                         newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
                                         newEventElement.addAttribute("source-control-id", currentEffectiveId);
 
-                                        // Appen the blanking event
+                                        // Append the blanking event
                                         eventElements.add(newEventElement);
                                     }
                                 }
@@ -360,12 +364,12 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         if (hasXXFormsOnline)
-                            containingDocument.logDebug("XForms server", "got xxforms-online event, enabling optimized handling of event sequence");
+                            eventsIndentedLogger.logDebug("offline", "got xxforms-online event, enabling optimized handling of event sequence");
                     }
 
                     // Start external events
                     containingDocument.startExternalEventsSequence(pipelineContext, response, hasXXFormsOnline);
-                    containingDocument.startHandleOperation("XForms server", "handling external events");
+                    eventsIndentedLogger.startHandleOperation("", "handling external events");
                     
                     // Iterate through all events to dispatch them
                     int eventElementIndex = 0;
@@ -454,7 +458,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     // End external events
                     containingDocument.endExternalEventsSequence(pipelineContext, hasXXFormsOnline);
-                    containingDocument.endHandleOperation();
+                    eventsIndentedLogger.endHandleOperation();
 
                     // Check for background asynchronous submissions
                     if (containingDocument.hasBackgroundAsynchronousSubmissions()) {
@@ -469,17 +473,17 @@ public class XFormsServer extends ProcessorImpl {
                     if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
                         // NOP: Response already sent out by a submission
                         // TODO: Something similar should also be done for submission during initialization
-                        containingDocument.logDebug("XForms server", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
+                        indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
                     } else if (!isNoscript) {
                         // This is an Ajax response
-                        containingDocument.startHandleOperation("XForms server", "handling regular Ajax response");
-                        outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
-                        containingDocument.endHandleOperation();
+                        indentedLogger.startHandleOperation("response", "handling regular Ajax response");
+                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
+                        indentedLogger.endHandleOperation();
                     } else {
                         // Noscript mode
-                        containingDocument.startHandleOperation("XForms server", "handling noscript response");
-                        outputNoscriptResponse(containingDocument, pipelineContext, contentHandler, xformsDecodedClientState, allEvents, externalContext);
-                        containingDocument.endHandleOperation();
+                        indentedLogger.startHandleOperation("response", "handling noscript response");
+                        outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, contentHandler, xformsDecodedClientState, allEvents, externalContext);
+                        indentedLogger.endHandleOperation();
                     }
 
                     // Process asynchronous submissions if any
@@ -488,7 +492,7 @@ public class XFormsServer extends ProcessorImpl {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.
 
-                    containingDocument.logDebug("XForms server", "handling NOP response for submission with replace=\"all\"");
+                    indentedLogger.logDebug("response", "handling NOP response for submission with replace=\"all\"");
 
                     if (XFormsProperties.isCacheDocument()) {
                         XFormsDocumentCache.instance().add(pipelineContext, xformsDecodedClientState.getXFormsState(), containingDocument);
@@ -498,7 +502,7 @@ public class XFormsServer extends ProcessorImpl {
                 // If an exception is caught, we need to discard the object as its state may be inconsistent
                 final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
                 if (sourceObjectPool != null) {
-                    logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
+                    indentedLogger.logDebug("", "containing document cache: throwable caught, discarding document from pool.");
                     try {
                         sourceObjectPool.invalidateObject(containingDocument);
                         containingDocument.setSourceObjectPool(null);
@@ -523,7 +527,7 @@ public class XFormsServer extends ProcessorImpl {
      * @throws IOException
      * @throws SAXException
      */
-    private static void outputNoscriptResponse(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
+    private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, PipelineContext pipelineContext,
                                                ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
                                                boolean allEvents, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
@@ -539,7 +543,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // Send redirect
             final String redirectResource = load.getResource();
-            containingDocument.logDebug("XForms server", "handling noscript redirect response for xforms:load", "url", redirectResource);
+            indentedLogger.logDebug("response", "handling noscript redirect response for xforms:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 
@@ -551,8 +555,8 @@ public class XFormsServer extends ProcessorImpl {
             if (xhtmlDocument == null)
                 throw new OXFException("Missing XHTML document in static state for noscript mode.");// shouldn't happen!
 
-            containingDocument.logDebug("XForms server", "handling noscript response for XHTML output");
-            XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, xhtmlDocument,
+            indentedLogger.logDebug("response", "handling noscript response for XHTML output");
+            XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, indentedLogger, xhtmlDocument,
                     containingDocument, contentHandler, encodedClientState);
         }
     }
@@ -561,6 +565,7 @@ public class XFormsServer extends ProcessorImpl {
      * Output an Ajax response for the regular Ajax mode.
      *
      * @param containingDocument                containing document
+     * @param indentedLogger                    logger
      * @param valueChangeControlIds             control ids for which the client sent a value change
      * @param pipelineContext                   pipeline context
      * @param contentHandler                    content handler for the Ajax result
@@ -571,7 +576,7 @@ public class XFormsServer extends ProcessorImpl {
      * @param testOutputStaticState             for testing purposes
      * @param testOutputAllActions              for testing purposes
      */
-    public static void outputAjaxResponse(XFormsContainingDocument containingDocument, Map valueChangeControlIds,
+    public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
                                 XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState,
                                 boolean allEvents, boolean isOfflineEvents, boolean testOutputStaticState, boolean testOutputAllActions) {
@@ -691,13 +696,13 @@ public class XFormsServer extends ProcessorImpl {
                         // Only output changes if needed
                         if (containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
                             final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                            diffControls(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlTree().getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControls(pipelineContext, ch, containingDocument, indentedLogger, testOutputAllActions ? null : xformsControls.getInitialControlTree().getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffControls(pipelineContext, ch, containingDocument, initialControlTree.getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControls(pipelineContext, ch, containingDocument, indentedLogger, initialControlTree.getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -826,7 +831,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Output response into writer. We ask for all events, and passing a flag telling that we are
                             // processing offline events so as to avoid recursion
 
-                            outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
+                            outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
 
                             // List of events needed to update the page from the time the page was initially sent to the
                             // client until right before sending the xxforms:offline event.
@@ -910,20 +915,21 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
+                                    IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
                                     Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
                                     Map valueChangeControlIds) {
-        containingDocument.startHandleOperation("XForms server", "computing differences");
+        indentedLogger.startHandleOperation("", "computing differences");
         if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
             new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
         } else {
             new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
-//        final String clientSubmisssionURL;
+//        final String clientSubmissionURL;
         final String target;
 
         // activeSubmission submission can be null when are running as a portlet and handling an <xforms:load>, which
@@ -935,18 +941,18 @@ public class XFormsServer extends ProcessorImpl {
         if ("all".equals(activeSubmissionReplace)) {
             // Replace all
 
-            // TODO: Set action ("action", clientSubmisssionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
+            // TODO: Set action ("action", clientSubmissionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
             // TODO: Should we keep the default submission path for separate deployment?
 //            // The submission path is actually defined by the oxf:page-flow processor and its configuration
 //            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME);
 //            final String submissionPath = propertySet.getString(PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
 //                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 //
-//            clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
+//            clientSubmissionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
             target = activeSubmissionResolvedXXFormsTarget;
         } else {
             // Replace instance
-//            clientSubmisssionURL = externalContext.getRequest().getRequestURL();
+//            clientSubmissionURL = externalContext.getRequest().getRequestURL();
             target = null;
         }
 

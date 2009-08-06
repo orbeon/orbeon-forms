@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -20,9 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -39,6 +38,8 @@ import java.util.Map;
  * Usage: an URIReferences object must be cached as an object associated with the config input.
  */
 public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {
+
+    public static Logger logger = LoggerFactory.createLogger(URIProcessorOutputImpl.class);
 
     private ProcessorImpl processorImpl;
     private String configInputName;
@@ -389,7 +390,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
-                    = new Connection().open(externalContext, ProcessorImpl.indentedLogger, false, Connection.Method.GET.name(),
+                    = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
                         submissionURL, username, password, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)

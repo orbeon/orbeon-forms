@@ -259,12 +259,7 @@ public class XFormsContainingDocument extends XBLContainer {
         xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
         // Encode state
-        indentedLogger.startHandleOperation("getXFormsState", "encoding state");
-        final XFormsState result = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
-                createEncodedDynamicState(pipelineContext, false));
-        indentedLogger.endHandleOperation();
-
-        return result;
+        return new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext), createEncodedDynamicState(pipelineContext, false));
     }
 
     public void setSourceObjectPool(ObjectPool sourceObjectPool) {
@@ -1416,16 +1411,21 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private Document createDynamicStateDocument() {
 
-        final Document dynamicStateDocument = Dom4jUtils.createDocument();
-        final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-        // Serialize instances
+        final Document dynamicStateDocument;
+        indentedLogger.startHandleOperation("", "encoding state");
         {
-            final Element instancesElement = dynamicStateElement.addElement("instances");
-            serializeInstances(instancesElement);
-        }
+            dynamicStateDocument = Dom4jUtils.createDocument();
+            final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
+            // Serialize instances
+            {
+                final Element instancesElement = dynamicStateElement.addElement("instances");
+                serializeInstances(instancesElement);
+            }
 
-        // Serialize controls
-        xformsControls.serializeControls(dynamicStateElement);
+            // Serialize controls
+            xformsControls.serializeControls(dynamicStateElement);
+        }
+        indentedLogger.endHandleOperation();
 
         return dynamicStateDocument;
     }

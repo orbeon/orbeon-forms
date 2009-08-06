@@ -1602,9 +1602,9 @@ public class XFormsContainingDocument extends XBLContainer {
     {
         loggersMap.put(XFormsContainingDocument.logger, new IndentedLogger(XFormsContainingDocument.logger, indentation, "containing document"));
         loggersMap.put(XFormsModel.logger, new IndentedLogger(XFormsModel.logger, indentation, "model"));
-        loggersMap.put(XFormsControls.logger, new IndentedLogger(XFormsControls.logger, indentation, "control"));
         loggersMap.put(XFormsInstance.logger, new IndentedLogger(XFormsInstance.logger, indentation, "instance"));
         loggersMap.put(XFormsModelSubmission.logger, new IndentedLogger(XFormsModelSubmission.logger, indentation, "submission"));
+        loggersMap.put(XFormsControls.logger, new IndentedLogger(XFormsControls.logger, indentation, "control"));
         loggersMap.put(XFormsEvents.logger, new IndentedLogger(XFormsEvents.logger, indentation, "event"));
         loggersMap.put(XFormsActions.logger, new IndentedLogger(XFormsActions.logger, indentation, "action"));
     }

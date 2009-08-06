@@ -52,8 +52,6 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final boolean ALLOW_CACHING_OUTPUT = false;
 
     private static final Logger logger = LoggerFactory.createLogger(XFormsToXHTML.class);
-    
-    //public static Logger logger = XFormsServer.logger;
 
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
     private static final String OUTPUT_DOCUMENT = "document";

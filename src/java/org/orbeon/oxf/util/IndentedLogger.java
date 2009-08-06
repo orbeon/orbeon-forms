@@ -70,13 +70,6 @@ public class IndentedLogger {
         return logger.isDebugEnabled();
     }
 
-//    public void startHandleOperation() {
-//        if (logger.isDebugEnabled()) {
-//            stack.push(null);
-//            indentation.indentation++;
-//        }
-//    }
-
     public void startHandleOperation(String type, String message) {
         if (logger.isDebugEnabled()) {
             stack.push(new Operation(type, message));

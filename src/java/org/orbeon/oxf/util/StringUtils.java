@@ -1,30 +1,24 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 public class StringUtils {
-
-    /**
-     * Utility class which we have here so we can create a Set in Saxon.
-     * Without this, we are unable to call new HashSet(...) as Saxon doesn't know which
-     * version of the contructor to call.
-     */
-    public static Set<String> createSet(String[] strings) {
-        return new HashSet<String>(Arrays.asList(strings));
-    }
 
     /**
      * Convert an Enumeration of String into an array.
@@ -48,8 +42,7 @@ public class StringUtils {
 
         final String[] result = new String[values.length];
         int size = 0;
-        for (int i = 0; i < values.length; i++) {
-            final Object currentValue = values[i];
+        for (final Object currentValue: values) {
             if (currentValue instanceof String) {
                 result[size++] = (String) currentValue;
             }
@@ -76,7 +69,7 @@ public class StringUtils {
     }
 
     public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
-        final Object[] currentValue = (Object[]) map.get(name);
+        final Object[] currentValue = map.get(name);
         if (currentValue == null) {
             map.put(name, new Object[] { value });
         } else {
@@ -88,7 +81,7 @@ public class StringUtils {
     }
 
     public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
-        final String[] currentValue = (String[]) map.get(name);
+        final String[] currentValue = map.get(name);
         if (currentValue == null) {
             map.put(name, new String[] { value });
         } else {
@@ -100,7 +93,7 @@ public class StringUtils {
     }
 
     public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
-        final String[] currentValue = (String[]) map.get(name);
+        final String[] currentValue = map.get(name);
         if (currentValue == null) {
             map.put(name, values);
         } else {

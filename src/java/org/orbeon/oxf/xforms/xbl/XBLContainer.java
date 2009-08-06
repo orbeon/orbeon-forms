@@ -750,7 +750,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
-                                indentedLogger.startHandleOperation();
+                                indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
@@ -843,7 +843,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
-                                indentedLogger.startHandleOperation();
+                                indentedLogger.startHandleOperation("dispatchEvent", "bubble handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
@@ -864,7 +864,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Perform default action is allowed to
             if (performDefaultAction || !originalEvent.isCancelable()) {
-                indentedLogger.startHandleOperation();
+                indentedLogger.startHandleOperation("dispatchEvent", "default action handler");
                 containingDocument.startHandleEvent(originalEvent);
                 try {
                     targetObject.performDefaultAction(propertyContext, originalEvent);

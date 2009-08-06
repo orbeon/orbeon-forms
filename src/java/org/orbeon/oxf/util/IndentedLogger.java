@@ -70,12 +70,12 @@ public class IndentedLogger {
         return logger.isDebugEnabled();
     }
 
-    public void startHandleOperation() {
-        if (logger.isDebugEnabled()) {
-            stack.push(null);
-            indentation.indentation++;
-        }
-    }
+//    public void startHandleOperation() {
+//        if (logger.isDebugEnabled()) {
+//            stack.push(null);
+//            indentation.indentation++;
+//        }
+//    }
 
     public void startHandleOperation(String type, String message) {
         if (logger.isDebugEnabled()) {
@@ -205,7 +205,7 @@ public class IndentedLogger {
             parametersString = "";
         }
 
-        logger.log(level, getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+        logger.log(level, getLogIndentSpaces(indentLevel) + (org.apache.commons.lang.StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString);
 //        logger.log(level, prefix + " - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
     }
 

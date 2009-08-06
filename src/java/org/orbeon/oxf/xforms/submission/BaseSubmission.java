@@ -172,4 +172,14 @@ public abstract class BaseSubmission implements Submission {
             return callable.call();
         }
     }
+
+    protected IndentedLogger getConnectionLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        if (p2.isAsynchronous && !p.isReplaceNone) {
+            // Background asynchronous submission creates a new logger with its own indentation
+            return new IndentedLogger(getIndentedLogger());
+        } else {
+            // Synchronous submission or foreground asynchronous submission uses current logger
+            return getIndentedLogger();
+        }
+    }
 }

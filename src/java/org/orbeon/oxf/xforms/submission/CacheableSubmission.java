@@ -56,9 +56,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
 
-        // Create new logger as the submission might be asynchronous
-//        final IndentedLogger submissionLogger = new IndentedLogger(containingDocument.getIndentedLogger());
-        final IndentedLogger submissionLogger = getIndentedLogger();
+        final IndentedLogger connectionLogger = getConnectionLogger(p, p2);
 
         // Convert URL to string
         final String absoluteResolvedURLString;
@@ -83,7 +81,7 @@ public class CacheableSubmission extends BaseSubmission {
         final String validation;
         {
             // Find and check replacement location
-            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, submissionLogger, p);
+            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, connectionLogger, p);
 
             instanceStaticId = updatedInstance.getId();
             modelEffectiveId = updatedInstance.getEffectiveModelId();
@@ -101,7 +99,7 @@ public class CacheableSubmission extends BaseSubmission {
 
         // Try from cache first
         final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
-                submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                connectionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
 
         if (cacheResult != null) {
@@ -119,7 +117,7 @@ public class CacheableSubmission extends BaseSubmission {
                 public SubmissionResult call() {
                     try {
                         final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
-                                submissionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                                connectionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
                                 public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,

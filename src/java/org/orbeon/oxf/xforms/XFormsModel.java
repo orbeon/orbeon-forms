@@ -97,21 +97,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         this.indentedLogger = containingDocument.getIndentedLogger(logger);
 
         // Initialize instance logging
-        if (XFormsModelSubmission.logger.isDebugEnabled()) {
-            // Create new indented logger just for the Connection object. This will log more stuff.
-            // NOTE: Use the XFormsModelSubmission logger for this, for consistency with submissions which want to
-            // unify with instance loading anyway.
-
-            // xxx
-            connectionLogger = indentedLogger;
-//            connectionLogger = new IndentedLogger(XFormsModelSubmission.logger, "XForms submission (synchronous)",
-//                    indentedLogger.getLogIndentLevel());
-            logBody = true;
-        } else {
-            // Use regular logger
-            connectionLogger = indentedLogger;
-            logBody = false;
-        }
+        // Create new indented logger just for the Connection object. This will log more stuff.
+        // NOTE: Use the XFormsModelSubmission logger for this, for consistency with submissions which want to
+        // unify with instance loading anyway.
+        logBody = XFormsModelSubmission.logger.isDebugEnabled();
+        connectionLogger = indentedLogger;
         
         // Remember document
         this.modelDocument = modelDocument;

@@ -56,11 +56,7 @@ public class RegularSubmission extends BaseSubmission {
         // This will log more stuff
         final boolean logBody = XFormsModelSubmission.logger.isDebugEnabled();
 
-        final IndentedLogger connectionLogger = getIndentedLogger();
-//
-//
-//                = new IndentedLogger(logBody ? XFormsModelSubmission.logger : XFormsServer.logger, "XForms submission " + (p2.isAsynchronous ? "(asynchronous)" : "(synchronous)"),
-//                    (p2.isAsynchronous && p.isReplaceNone) ? 1 : containingDocument.getIndentedLogger().getLogIndentLevel());
+        final IndentedLogger connectionLogger = getConnectionLogger(p, p2);
 
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);

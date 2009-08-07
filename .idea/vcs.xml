@@ -2,8 +2,6 @@
 <project relativePaths="true" version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="/Users/ebruchez/Orbeon/Orbeon.com" vcs="svn" />
-    <mapping directory="/Users/ebruchez/Orbeon/Saxon" vcs="Git" />
-    <mapping directory="/Users/ebruchez/Orbeon/Xerces" vcs="Git" />
   </component>
 </project>
+

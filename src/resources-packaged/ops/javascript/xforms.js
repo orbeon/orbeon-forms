@@ -2895,10 +2895,10 @@ ORBEON.xforms.Events = {
         } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
             // Help image
 
+            var controlID = target.id.substring(0, target.id.length - "-help-image".length);
+
             // Get label and control for this help message
-            var label = target.nextSibling;
-            while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
-            var control = ORBEON.util.Dom.getElementById(label.htmlFor);
+            var control = ORBEON.util.Dom.getElementById(controlID);
             // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
             if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
                 control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");

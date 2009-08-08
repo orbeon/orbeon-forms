@@ -129,6 +129,8 @@
 
                     timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
                     timeValueInputId: "time-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
+                    dateValueId: "date-value" + XFORMS_SEPARATOR_1 + "1",
+                    dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
 
                     workerTimeParsing: function(typedValue, expectedValue) {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -150,7 +152,34 @@
                     testFirstHourLong:      function() { this.workerTimeParsing("12:30:40 am",  "0:30:40 a.m."); },
                     testNoAmPmShort:        function() { this.workerTimeParsing("12",           "12:00:00 p.m."); },
                     testNoAmPmMedium:       function() { this.workerTimeParsing("12:30",        "12:30:00 p.m."); },
-                    testNoAmPmLong:         function() { this.workerTimeParsing("12:30:40",     "12:30:40 p.m."); }
+                    testNoAmPmLong:         function() { this.workerTimeParsing("12:30:40",     "12:30:40 p.m."); },
+
+                    testNextYear: function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            ORBEON.xforms.Document.setValue(this.dateValueId, "10/20/2030");
+                        }, function() {
+                            // Click on Next Year
+                            ORBEON.xforms.Events.click({target: YAHOO.util.Dom.get(this.dateValueInputId) });
+                            var nextYear = YAHOO.util.Dom.getElementsByClassName("calyearright", null, "orbeon-calendar-div")[0];
+                            YAHOO.util.UserAction.click(nextYear);
+                            this.wait(function() {
+                                var monthYear = YAHOO.util.Dom.getElementsByClassName("calnav", null, "orbeon-calendar-div")[0];
+                                // Check we are no in 2031
+                                YAHOO.util.Assert.areEqual("October 2031", monthYear.innerHTML);
+                                // Click previous year twice
+                                var previousYear = YAHOO.util.Dom.getElementsByClassName("calyearleft", null, "orbeon-calendar-div")[0];
+                                YAHOO.util.UserAction.click(previousYear);
+                                YAHOO.util.UserAction.click(previousYear);
+                                this.wait(function() {
+                                    // Check we are no in 2029
+                                    monthYear = YAHOO.util.Dom.getElementsByClassName("calnav", null, "orbeon-calendar-div")[0];
+                                    YAHOO.util.Assert.areEqual("October 2029", monthYear.innerHTML);
+                                    YAHOO.util.UserAction.click(document.body);
+                                }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                            }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                        });
+
+                    }
                 }));
 
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

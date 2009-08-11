@@ -89,7 +89,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 			YAHOO.util.Dom.setStyle(this.table, 'width', innerTableWidth);
 			this.tableWidth = this.table.clientWidth;
 		} else {
-			this.tableWidth = this.optimizeWidth(this.tableWidth, this.getTableHeightForWidth(this.tableWidth), 2500, this.getTableHeightForWidth(2500)) + 50;
+            this.tableWidth = this.optimizeWidth();
 		}
 	} else if (this.scrollV) {
 		if (this.hasFixedWidthTable) {
@@ -263,17 +263,13 @@ ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
 	return this.table.clientHeight;
 }
 
-ORBEON.widgets.datatable.prototype.optimizeWidth = function (w1, h1, w2, h2) {
-	if (h1 == h2 || (w2 - w1 < 50)) {
-		return w1;
-	}
-	var w = Math.round((w1 + w2) / 2);
-	var h = this.getTableHeightForWidth(w);
-	if (h == h2) {
-		return this.optimizeWidth(w1, h1, w, h);
-	} else {
-		return this.optimizeWidth(w, h, w2, h2);
-	}
+ORBEON.widgets.datatable.prototype.optimizeWidth = function () {
+    this.headerContainer.style.position="absolute";
+    this.headerContainer.style.width="2500px";
+    var width = this.table.clientWidth;
+    this.headerContainer.style.position="";
+    this.headerContainer.style.width="";
+    return width;
 }
 
 ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {

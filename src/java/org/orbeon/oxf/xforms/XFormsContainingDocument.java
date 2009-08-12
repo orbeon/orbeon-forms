@@ -426,8 +426,7 @@ public class XFormsContainingDocument extends XBLContainer {
         if (messagesToRun != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmission.getLocationData());
 
-        if (scriptsToRun != null)
-            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+        // scriptsToRun: it seems reasonable to run scripts up to the point where the submission takes place
 
         if (focusEffectiveControlId != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmission.getLocationData());
@@ -729,8 +728,11 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public void addScriptToRun(String scriptId, String eventTargetId, String eventObserverId) {
 
-        if (activeSubmission != null)
-            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+        if (activeSubmission != null) {
+            // Scripts occurring after the submission takes place should not run
+            logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
+            return;
+        }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (XFormsProperties.isNoscript(this))

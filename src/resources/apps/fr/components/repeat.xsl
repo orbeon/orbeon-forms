@@ -29,6 +29,7 @@
     <!-- Helper for repeats -->
     <xsl:template match="xhtml:body//fr:repeat | xbl:binding/xbl:template//fr:repeat">
         <xsl:variable name="fr-repeat" select="."/>
+        <!-- TODO: handle @bind here, probably not relevant -->
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
@@ -46,13 +47,13 @@
                 <xhtml:td class="fr-repeat-column fr-repeat-column-trigger">
                     <xsl:if test="not($readonly)">
                         <xforms:group ref=".[not(exforms:readonly(.))]">
-                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
+                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', if (@nodeset) then @nodeset else concat('xxforms:bind(''', @bind, ''')'), ') lt ', $max-occurs)}]">
                                 <!-- TODO: i18n of title -->
                                 <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png" alt="Add" title="Add"/></xforms:label>
                             </xforms:trigger>
                             <xforms:insert ev:event="DOMActivate"
                                            origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
-                                           context="." nodeset="{if (@after) then @after else @nodeset}"/>
+                                           context="." nodeset="{if (@after) then @after else if (@nodeset) then @nodeset else concat('xxforms:bind(''', @bind, ''')')}"/>
                             <!-- TODO: handle @at -->
                             <!-- at="index('{@id}')" position="after" -->
                         </xforms:group>
@@ -66,47 +67,47 @@
                     </xhtml:th>
                 </xsl:for-each>
             </xhtml:tr>
-            <!-- Optional row(s) showns before the repeated rows -->
+            <!-- Optional row(s) shown before the repeated rows -->
             <xsl:for-each select="fr:header">
                 <xsl:apply-templates select="xhtml:tr" mode="prepend-td"/>
                 <xsl:apply-templates select="fr:tr" mode="prepend-td"/>
             </xsl:for-each>
             <!-- Repeated rows -->
             <xsl:for-each select="fr:body">
-                <xforms:repeat nodeset="{$fr-repeat/@nodeset}" id="{$fr-repeat/@id}">
-                <xxforms:variable name="repeat-position" select="position()"/>
-                <!-- First line with data -->
-                <xhtml:tr>
-                    <xhtml:th class="fr-repeat-column fr-repeat-column-number">
-                        <xforms:output value="position()"/>
-                    </xhtml:th>
-                    <xsl:if test="not($readonly)">
-                        <xforms:group ref=".[not(exforms:readonly(.))]">
-                            <xhtml:td class="fr-repeat-column fr-repeat-column-trigger">
-                                <xforms:group>
-                                    <!-- Remove trigger -->
-                                    <xforms:trigger appearance="minimal" ref="if (
-                                            {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
-                                                count(xxforms:repeat-nodeset('{$fr-repeat/@id}')) gt {$min-occurs}) then . else ()">
-                                        <!-- TODO: i18n of title -->
-                                        <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
-                                    </xforms:trigger>
-                                    <xforms:delete ev:event="DOMActivate" nodeset="."/>
-                                </xforms:group>
-                            </xhtml:td>
-                        </xforms:group>
-                    </xsl:if>
-                    <xsl:apply-templates select="(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)"/>
-                </xhtml:tr>
-                <!-- Following lines with data if any -->
+                <xforms:repeat nodeset="{$fr-repeat/@nodeset}" bind="{$fr-repeat/@bind}" id="{$fr-repeat/@id}">
+                    <xxforms:variable name="repeat-position" select="position()"/>
+                    <!-- First line with data -->
+                    <xhtml:tr>
+                        <xhtml:th class="fr-repeat-column fr-repeat-column-number">
+                            <xforms:output value="position()"/>
+                        </xhtml:th>
+                        <xsl:if test="not($readonly)">
+                            <xforms:group ref=".[not(exforms:readonly(.))]">
+                                <xhtml:td class="fr-repeat-column fr-repeat-column-trigger">
+                                    <xforms:group>
+                                        <!-- Remove trigger -->
+                                        <xforms:trigger appearance="minimal" ref="if (
+                                                {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
+                                                    count(xxforms:repeat-nodeset('{$fr-repeat/@id}')) gt {$min-occurs}) then . else ()">
+                                            <!-- TODO: i18n of title -->
+                                            <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
+                                        </xforms:trigger>
+                                        <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                                    </xforms:group>
+                                </xhtml:td>
+                            </xforms:group>
+                        </xsl:if>
+                        <xsl:apply-templates select="(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)"/>
+                    </xhtml:tr>
+                    <!-- Following lines with data if any -->
 
-                <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
-                <xsl:apply-templates select="fr:tr except fr:tr[1] | fr:td" mode="prepend-td"/>
-            </xforms:repeat>
-            <!-- IE display HACK -->
-            <xhtml:tr class="fr-repeat-last-line"><xhtml:td/></xhtml:tr>
+                    <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
+                    <xsl:apply-templates select="fr:tr except fr:tr[1] | fr:td" mode="prepend-td"/>
+                </xforms:repeat>
+                <!-- IE display HACK -->
+                <xhtml:tr class="fr-repeat-last-line"><xhtml:td/></xhtml:tr>
             </xsl:for-each>
-            <!-- Optional row(s) showns after the repeated rows -->
+            <!-- Optional row(s) shown after the repeated rows -->
             <xsl:for-each select="fr:footer">
                 <xsl:apply-templates select="xhtml:tr" mode="prepend-td"/>
                 <xsl:apply-templates select="fr:tr" mode="prepend-td"/>

@@ -806,7 +806,7 @@ public class XFormsModelBinds {
                     } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
                         // Built-in schema or XForms type
 
-                        // Use XML Schema namespace URI as Saxon doesn't know anytyhing about XForms types
+                        // Use XML Schema namespace URI as Saxon doesn't know anything about XForms types
                         final String newTypeNamespaceURI = XMLConstants.XSD_URI;
 
                         // Get type information

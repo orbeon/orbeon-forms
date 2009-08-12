@@ -162,7 +162,11 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
             this.headerScrollContainer.appendChild(this.header);
             this.headerScrollWidth = this.tableWidth + 20;
             this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
-            this.bodyContainer.style.overflow="scroll";
+            if (this.scrollH) {
+                this.bodyContainer.style.overflow="scroll";                
+            } else {
+                this.bodyContainer.style.overflow="auto";
+            }
         }
 
 

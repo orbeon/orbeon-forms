@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -39,18 +39,24 @@
                     <xforms:group xbl:attr="model context ref bind">
                         <xbl:content includes="xforms|label"/>
                         <!-- Init event -->
-                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
-                        <!-- Access to XForms value, and xforms-value-changed event -->
-                        <xforms:input ref="." class="xbl-fr-currency-xforms-input">
-                            <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.valueChanged(this);</xxforms:script>
-                            <xxforms:script ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.readonly(this);</xxforms:script>
-                            <xxforms:script ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.readwrite(this);</xxforms:script>
-                        </xforms:input>
-                        <!-- Access to parameters -->
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'prefix')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'digits-after-decimal')"/>
-                        <!-- The visible input -->
-                        <xhtml:input class="xbl-fr-currency-visible-input"/>
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
+                        <xforms:group appearance="xxforms:internal">
+
+                            <!-- Stop propagation of all local UI events -->
+                            <xforms:action ev:event="#all" ev:propagate="stop"/>
+
+                            <!-- Access to XForms value, and xforms-value-changed event -->
+                            <xforms:input ref="." class="xbl-fr-currency-xforms-input">
+                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.valueChanged(this);</xxforms:script>
+                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.readonly(this);</xxforms:script>
+                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.readwrite(this);</xxforms:script>
+                            </xforms:input>
+                            <!-- Access to parameters -->
+                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'prefix')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'digits-after-decimal')"/>
+                            <!-- The visible input -->
+                            <xhtml:input class="xbl-fr-currency-visible-input"/>
+                        </xforms:group>
                         <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
                     </xforms:group>
                 </xsl:template>

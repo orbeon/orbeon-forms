@@ -48,7 +48,7 @@ public class EchoSubmission extends BaseSubmission {
             // Log message body for debugging purposes
             // TODO: complete logging
             final IndentedLogger indentedLogger = getIndentedLogger();
-            if (indentedLogger.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 try {
                     Connection.logRequestBody(indentedLogger, sp.actualRequestMediatype, sp.messageBody);
                 } catch (UnsupportedEncodingException e) {

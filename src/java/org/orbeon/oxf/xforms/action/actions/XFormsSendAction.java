@@ -62,7 +62,7 @@ public class XFormsSendAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
             final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
                         "submission id", submissionId);
         }

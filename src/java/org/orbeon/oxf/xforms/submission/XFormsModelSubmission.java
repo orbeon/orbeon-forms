@@ -296,7 +296,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Variables declared here as they are used in a catch/finally block
             SubmissionParameters p = null;
             String resolvedActionOrResource = null;
-            final long submissionStartTime = indentedLogger.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            final long submissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Make sure submission element info is extracted
             extractSubmissionElement();
@@ -424,7 +424,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Result information
                 SubmissionResult submissionResult = null;
-                final long externalSubmissionStartTime = indentedLogger.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+                final long externalSubmissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
                 try {
                     // Iterate through submissions and run the first match
@@ -439,7 +439,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     handleSubmissionResult(propertyContext, p, p2, submissionResult);
                 } finally {
                     // Log time spent in submission if needed
-                    if (indentedLogger.logger.isDebugEnabled()) {
+                    if (indentedLogger.isDebugEnabled()) {
                         final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
                         indentedLogger.logDebug("", "external submission time including handling returned body",
                             "time", Long.toString(submissionTime));
@@ -456,7 +456,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
             } finally {
                 // Log total time spent in submission if needed
-                if (indentedLogger.logger.isDebugEnabled()) {
+                if (indentedLogger.isDebugEnabled()) {
                     final long submissionTime = System.currentTimeMillis() - submissionStartTime;
                     indentedLogger.logDebug("", "total submission time", "time", Long.toString(submissionTime));
                 }
@@ -1054,7 +1054,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 || !resolvedValidate
                 || XFormsSubmissionUtils.isSatisfiesValidRequired(indentedLogger, documentToSubmit, true, true, true);
         if (!instanceSatisfiesValidRequired) {
-            if (indentedLogger.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);
                 indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted",
                         "document", documentString);

@@ -65,7 +65,7 @@ public class XFormsToggleAction extends XFormsAction {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:toggle", "case does not refer to an existing xforms:case element, ignoring action",
                         "case id", caseStaticId);
         }

@@ -52,7 +52,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
                 final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xforms:submit", "submission does not refer to an existing xforms:submission element, ignoring action",
                             "submission id", submissionId);
             }

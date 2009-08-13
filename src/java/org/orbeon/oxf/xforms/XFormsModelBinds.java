@@ -119,7 +119,7 @@ public class XFormsModelBinds {
      */
     public void rebuild(PropertyContext propertyContext) {
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "performing rebuild", "model id", model.getEffectiveId());
 
         // Reset everything
@@ -137,7 +137,7 @@ public class XFormsModelBinds {
             topLevelBinds.add(currentBind);
         }
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.endHandleOperation();
     }
 
@@ -148,7 +148,7 @@ public class XFormsModelBinds {
      */
     public void applyCalculateBinds(final PropertyContext propertyContext) {
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
 
         // Reset context stack just to re-evaluate the variables
@@ -179,7 +179,7 @@ public class XFormsModelBinds {
             applyComputedExpressionBinds(propertyContext);
         }
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.endHandleOperation();
     }
 
@@ -305,7 +305,7 @@ public class XFormsModelBinds {
 
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.logger);
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "getting offline bind mappings");
 
         final Map<String, XFormsControl> effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
@@ -424,7 +424,7 @@ public class XFormsModelBinds {
 
         final String result = sb.toString();
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.endHandleOperation();
 
         return result;

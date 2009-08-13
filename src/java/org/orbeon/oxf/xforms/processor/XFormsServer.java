@@ -147,7 +147,7 @@ public class XFormsServer extends ProcessorImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final ExternalContext.Session session = externalContext.getSession(false);
 
-                if (indentedLogger.logger.isDebugEnabled()) {
+                if (indentedLogger.isDebugEnabled()) {
                     if (session != null)
                         indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId());
                     else

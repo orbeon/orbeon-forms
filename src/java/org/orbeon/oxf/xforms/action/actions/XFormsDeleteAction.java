@@ -58,7 +58,7 @@ public class XFormsDeleteAction extends XFormsAction {
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
         // Set Binding node-set is empty."
         if (contextAttribute == null && isEmptyNodesetBinding) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "context is empty, terminating");
             return;
         }
@@ -66,7 +66,7 @@ public class XFormsDeleteAction extends XFormsAction {
         // Handle insert context (with @context attribute)
         // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
         if (hasOverriddenContext && (overriddenContext == null || !(overriddenContext instanceof NodeInfo))) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "overridden context is an empty nodeset or not a nodeset, terminating");
             return;
         }
@@ -147,14 +147,14 @@ public class XFormsDeleteAction extends XFormsAction {
         }
 
         if (deletedNodeInfos.size() == 0) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "empty collection, terminating");
         } else {
             // Identify the instance that actually changes
             // NOTE: More than one instance may be modified. For now we look at the first one.
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode((NodeInfo) deletedNodeInfos.get(0));
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "removed nodes",
                         "count", Integer.toString(deletedNodeInfos.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
@@ -200,7 +200,7 @@ public class XFormsDeleteAction extends XFormsAction {
             // "except if the node is the root document element of an instance then the delete action
             // is terminated with no effect."
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "ignoring attempt to delete document node");
 
             return null;

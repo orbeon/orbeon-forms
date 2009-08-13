@@ -105,7 +105,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xforms:dispatch", "cannot find target, ignoring action",
                             "target id", resolvedNewEventTargetStaticId);
             }

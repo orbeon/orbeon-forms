@@ -82,7 +82,7 @@ public class XFormsSubmissionUtils {
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && indentedLogger.logger.isDebugEnabled()) {
+                    if (!valid && indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("", "found invalid element",
                             "element name", Dom4jUtils.elementToString(element));
                     }
@@ -93,7 +93,7 @@ public class XFormsSubmissionUtils {
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && indentedLogger.logger.isDebugEnabled()) {
+                    if (!valid && indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("", "found invalid attribute",
                             "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()));
                     }
@@ -365,10 +365,6 @@ class ResponseAdapter implements ExternalContext.Response {
 
     public String getContentType() {
         return contentType;
-    }
-
-    public Map getHeaders() {
-        return null;
     }
 
     public InputStream getInputStream() {

@@ -22,9 +22,11 @@ import java.util.Stack;
 
 public class IndentedLogger {
 
-    public final Logger logger;
+    private final Logger logger;
     private final Indentation indentation;
     private final String prefix;
+
+    private final boolean isDebugEnabled;
 
     private Stack<Operation> stack = new Stack<Operation>();
 
@@ -60,6 +62,8 @@ public class IndentedLogger {
         this.logger = logger;
         this.indentation = indentation;
         this.prefix = prefix;
+
+        this.isDebugEnabled = logger.isDebugEnabled();
     }
 
     public IndentedLogger(IndentedLogger indentedLogger) {
@@ -67,7 +71,7 @@ public class IndentedLogger {
     }
 
     public final boolean isDebugEnabled() {
-        return logger.isDebugEnabled();
+        return isDebugEnabled;
     }
 
     public void startHandleOperation(String type, String message) {
@@ -149,6 +153,10 @@ public class IndentedLogger {
 
     public void logWarning(String type, String message, String... parameters) {
         log(Level.WARN, indentation.indentation, type, message, parameters);
+    }
+
+    public void logInfo(String type, String message, String... parameters) {
+        log(Level.INFO, indentation.indentation, type, message, parameters);
     }
 
     public void logWarning(String type, String message, Throwable throwable) {

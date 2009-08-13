@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.action.actions;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -83,15 +83,15 @@ public class XFormsMessageAction extends XFormsAction {
                 // Special log appearance
 
                 final String messagePrefix = "XForms - log message - ";
-                final Logger logger = containingDocument.getIndentedLogger().logger;
+                final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
                 if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    logger.debug(messagePrefix + messageValue);
+                    indentedLogger.logDebug("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    logger.info(messagePrefix + messageValue);
+                    indentedLogger.logInfo("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    logger.warn(messagePrefix + messageValue);
+                    indentedLogger.logWarning("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    logger.error(messagePrefix + messageValue);
+                    indentedLogger.logError("xforms:message", messagePrefix + messageValue);
                 }
 
             } else if (SUPPORTED_APPEARANCES.get(levelQName) != null) {

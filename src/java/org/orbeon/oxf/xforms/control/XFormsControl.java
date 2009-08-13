@@ -590,7 +590,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         final int newRepeatIndex = repeatIterationControl.getIterationIndex();
 
                         final IndentedLogger indentedLogger = controls.getIndentedLogger();
-                        if (indentedLogger.logger.isDebugEnabled()) {
+                        if (indentedLogger.isDebugEnabled()) {
                             indentedLogger.logDebug("xforms:repeat", "setting index upon focus change",
                                     "new index", Integer.toString(newRepeatIndex));
                         }

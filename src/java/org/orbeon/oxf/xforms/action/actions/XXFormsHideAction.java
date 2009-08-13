@@ -54,7 +54,7 @@ public class XXFormsHideAction extends XFormsAction {
                 eventTarget.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
                             "dialog id", dialogStaticId);
             }

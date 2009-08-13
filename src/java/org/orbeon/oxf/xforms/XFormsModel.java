@@ -636,7 +636,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 throw new ValidationException("Non-initialized instance has to be cacheable for id: " + newInstance.getEffectiveId(),
                         (locationDataElement != null) ? (LocationData) locationDataElement.getData() : getLocationData());
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("restore", "using instance from instance cache (instance was not initialized)",
                         "id", newInstance.getEffectiveId());
 
@@ -805,7 +805,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 throw new OXFException(e);
             }
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "loading instance into cache", "id", instanceStaticId, "URI", instanceSourceURI);
 
             final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -865,7 +865,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (containingDocument.getURIResolver() == null) {
             // Connect directly if there is no resolver or if the instance is globally cached
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteResolvedURLString);
 
             final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
@@ -894,7 +894,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         } else {
             // Optimized case that uses the provided resolver
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteResolvedURLString);
 
             // TODO: Handle validating and handleXInclude!
@@ -919,7 +919,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Whether or not to rewrite URLs
         final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainer);
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("load", "getting document from optimized URI",
                         "URI", resourceAbsolutePathOrAbsoluteURL, "norewrite", Boolean.toString(isNoRewrite));
 
@@ -1001,7 +1001,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
         if (instances != null && (mustBindValidate || mustSchemaValidate) && deferredActionContext.revalidate) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 
             // Clear validation state
@@ -1045,7 +1045,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 }
             }
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.endHandleOperation();
         }
 
@@ -1118,7 +1118,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 doRevalidate(propertyContext);
                 xformsControls.updateControlBindingsIfNeeded(propertyContext);
 
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("replace", "marking nodes for value change following instance replacement",
                             "instance id", updatedInstance.getEffectiveId());
 

@@ -139,7 +139,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
         if (errorType == ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         } else {
             // Everything else gets logged as an error
@@ -159,7 +159,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     public void setBodyDocument(DocumentInfo bodyDocument) {
         final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
-        if (indentedLogger.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
         }
 
@@ -172,7 +172,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     public void setBodyString(String bodyString) {
         final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();
-        if (indentedLogger.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
         }
 

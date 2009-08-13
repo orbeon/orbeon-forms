@@ -94,7 +94,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         } else {
             // Node doesn't exist, don't do anything
             // NOP
-            if (indentedLogger.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("xforms:setvalue", "not setting instance value",
                         "reason", "destination node not found",
                         "value", valueToSet
@@ -110,7 +110,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         final boolean changed = !currentValue.equals(valueToSet);
 
-        if (indentedLogger.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             indentedLogger.logDebug("xforms:setvalue", "setting instance value", "value", valueToSet,
                     "changed", Boolean.toString(changed),

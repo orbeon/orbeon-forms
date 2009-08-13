@@ -275,7 +275,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // If a submission took place during XForms initialization, we currently don't cache
         // TODO: Some cases could be easily handled, like GET
         if (containingDocument.isGotSubmission()) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("", " submission occurred during XForms initialization, disabling caching of output.");
             inputDependencies.setNoCache();
             return;
@@ -289,7 +289,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // TODO: We should also use dependencies computed in XFormsModelSchemaValidator.SchemaInfo
             if (schemaURIs != null) {
                 for (final String currentSchemaURI: schemaURIs) {
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", " adding document cache dependency for schema: " + currentSchemaURI);
                     inputDependencies.addReference(null, currentSchemaURI, null, null,
                             XFormsProperties.getForwardSubmissionHeaders(containingDocument));// TODO: support username / password on schema refs
@@ -304,14 +304,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                     if (instanceSourceURI != null) {
                         if (!currentInstance.isCache()) {
                             // Add dependency only for instances that are not globally shared
-                            if (indentedLogger.logger.isDebugEnabled())
+                            if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", " adding document cache dependency for instance: " + instanceSourceURI);
                             inputDependencies.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(),
                                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {
                             // Don't add the dependency as we don't want the instance URI to be hit
                             // For all practical purposes, globally shared instances must remain constant!
-                            if (indentedLogger.logger.isDebugEnabled())
+                            if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", " not adding document cache dependency for application shared instance: " + instanceSourceURI);
                         }
                     }

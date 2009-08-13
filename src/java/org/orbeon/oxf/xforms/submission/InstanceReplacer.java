@@ -70,7 +70,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // TODO: What about configuring validation? And what default to choose?
                 resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("", "deserializing to mutable instance");
             } else {
                 // Resulting instance must be read-only
@@ -79,7 +79,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                 resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("", "deserializing to read-only instance");
             }
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public class InstanceReplacer extends BaseReplacer {
                 if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
@@ -159,7 +159,7 @@ public class InstanceReplacer extends BaseReplacer {
                 } else {
                     // Resulting instance must be read-only
 
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "replacing instance with read-only instance",
                             "instance", updatedInstance.getEffectiveId());
 

@@ -67,7 +67,7 @@ public class XFormsActionAction extends XFormsAction {
         }
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-        if (variablesCount > 0 && indentedLogger.logger.isDebugEnabled())
+        if (variablesCount > 0 && indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("xforms:action", "evaluated variables within action",
                     "count", Integer.toString(variablesCount));
 

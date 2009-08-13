@@ -269,13 +269,13 @@ public class XFormsModelSchemaValidator {
         } else {
             newErrorMessage = errMsg;
         }
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("schema", "validation error", "error", newErrorMessage);
         InstanceData.addSchemaError(element, newErrorMessage, element.getStringValue(), null);
     }
 
     private void addSchemaError(final Attribute attribute, final String schemaError) {
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("schema", "validation error", "error", schemaError);
         InstanceData.addSchemaError(attribute, schemaError, attribute.getStringValue(), null);
     }
@@ -283,7 +283,7 @@ public class XFormsModelSchemaValidator {
     private boolean handleIDErrors(final IDConstraintChecker icc) {
         boolean isValid = true;
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("schema", "validation error", "error", errorInfo.message);
             addSchemaError(errorInfo.element, errorInfo.message);
             isValid = false;

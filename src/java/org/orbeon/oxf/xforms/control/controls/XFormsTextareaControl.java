@@ -72,7 +72,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
     public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         if ("text/html".equals(getMediatype())) {
             final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-            final boolean isDebugEnabled = indentedLogger.logger.isDebugEnabled();
+            final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (isDebugEnabled)
                 indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", value);
 

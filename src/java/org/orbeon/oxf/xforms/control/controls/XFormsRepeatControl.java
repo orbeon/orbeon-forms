@@ -285,7 +285,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final boolean isInsert = insertedNodeInfos != null;
 
         final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-        final boolean isDebugEnabled = indentedLogger.logger.isDebugEnabled();
+        final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
         if (newRepeatNodeset != null && newRepeatNodeset.size() > 0) {
             final ControlTree currentControlTree = controls.getCurrentControlTree();
 

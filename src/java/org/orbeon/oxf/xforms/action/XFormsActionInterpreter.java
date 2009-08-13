@@ -112,7 +112,7 @@ public class XFormsActionInterpreter {
                 }
             }
 
-            if (variablesCount > 0 && indentedLogger.logger.isDebugEnabled()) {
+            if (variablesCount > 0 && indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
                         "count", Integer.toString(variablesCount));
             }

@@ -219,7 +219,7 @@ public class CacheableSubmission extends BaseSubmission {
                     new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
         }
 
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("", "using instance from application shared instance cache",
                     "instance", updatedInstance.getEffectiveId());
         return updatedInstance;

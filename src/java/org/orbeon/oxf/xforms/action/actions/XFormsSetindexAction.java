@@ -74,7 +74,7 @@ public class XFormsSetindexAction extends XFormsAction {
             final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
             if (repeatControl.getIndex() != newRepeatIndex) {
 
-                if (indentedLogger.logger.isDebugEnabled()) {
+                if (indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug("xforms:setindex", "setting index upon xforms:setfocus",
                             "new index", Integer.toString(newRepeatIndex));
                 }

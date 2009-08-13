@@ -37,7 +37,7 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         // Note that this is deprecated. Move to warning later?
         final IndentedLogger indentedLogger = getContainingDocument(xpathContext).getIndentedLogger();
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("xxforms:repeat-curent()", "function is deprecated, use context() or xxforms:context() instead");
 
         // Get current single node

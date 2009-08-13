@@ -56,7 +56,7 @@ public class OptimizedSubmission extends BaseSubmission {
         final ExternalContext.Request request = getExternalContext(propertyContext).getRequest();
         final IndentedLogger indentedLogger = getIndentedLogger();
 
-        final boolean isDebugEnabled = indentedLogger.logger.isDebugEnabled();
+        final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether optimized submission is allowed",
                 "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
@@ -160,7 +160,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // in that case
 
         final IndentedLogger indentedLogger = getIndentedLogger();
-        if (indentedLogger.logger.isDebugEnabled())
+        if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("", "starting optimized submission", "id", submission.getEffectiveId());
 
         // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
@@ -275,7 +275,7 @@ public class OptimizedSubmission extends BaseSubmission {
                     // Simulate a POST or PUT
                     effectiveResourceURI = resource;
 
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "setting request body",
                             "body", new String(messageBody, "UTF-8"));
 
@@ -308,7 +308,7 @@ public class OptimizedSubmission extends BaseSubmission {
                 }
             }
 
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("", "dispatching request",
                             "method", httpMethod,
                             "mediatype", mediatype,

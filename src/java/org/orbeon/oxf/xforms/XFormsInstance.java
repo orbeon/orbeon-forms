@@ -636,7 +636,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsInstance.logger);
-        if (indentedLogger.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug("", message,
                     "effective model id", getEffectiveModelId(),
                     "effective instance id", getEffectiveId(),

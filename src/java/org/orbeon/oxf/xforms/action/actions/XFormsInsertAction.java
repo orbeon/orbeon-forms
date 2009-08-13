@@ -69,7 +69,7 @@ public class XFormsInsertAction extends XFormsAction {
         // "The insert action is terminated with no effect if [...] a. The context attribute is not given and the Node
         // Set Binding node-set is the empty node-set."
         if (contextAttribute == null && isEmptyNodesetBinding) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:insert", "context is empty, terminating");
             return;
         }
@@ -79,7 +79,7 @@ public class XFormsInsertAction extends XFormsAction {
         if (hasOverriddenContext) {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
             if (overriddenContext == null || !(overriddenContext instanceof NodeInfo)) {
-                if (indentedLogger.logger.isDebugEnabled())
+                if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xforms:insert", "overridden context is an empty nodeset or not a nodeset, terminating");
                 return;
             } else {
@@ -92,7 +92,7 @@ public class XFormsInsertAction extends XFormsAction {
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
         if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding) {
-            if (indentedLogger.logger.isDebugEnabled())
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
         }
@@ -117,7 +117,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originObjects.size() == 0) {
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xforms:insert", "origin node-set is empty, terminating");
                     return;
                 }
@@ -184,7 +184,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // origin node-set is the empty node-set."
 
                 if (isEmptyNodesetBinding) {
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xforms:insert", "origin node-set from node-set binding is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
@@ -204,7 +204,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originItems.size() == 0) {
-                    if (indentedLogger.logger.isDebugEnabled())
+                    if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xforms:insert", "origin node-set is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
@@ -381,7 +381,7 @@ public class XFormsInsertAction extends XFormsAction {
                                 addIndex++;
                             } else {
                                 // We never insert attributes or namespace nodes as siblings
-                                if (indentedLogger.logger.isDebugEnabled())
+                                if (indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
                                                     "type", clonedNode.getNodeTypeName(),
                                                     "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
@@ -402,7 +402,7 @@ public class XFormsInsertAction extends XFormsAction {
         final boolean didInsertNodes = insertedNodes != null && insertedNodes.size() > 0;
 
         // Log stuff
-        if (indentedLogger.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             if (didInsertNodes)
                 indentedLogger.logDebug("xforms:insert", "inserted nodes",
                         "count", Integer.toString(insertedNodes.size()), "instance",

@@ -74,7 +74,7 @@ public class XFormsStaticState {
     private Map<String, String> xxformsScripts;                         // Map of id to script content
 
     private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();   // Map of property name to property value (String, Integer, Boolean)
-    private Map<String, String> externalEventsMap;                                      // Map<String, ""> of event names
+    private Map<String, String> externalEventsMap;                         // Map<String, ""> of event names
 
     private boolean isSeparateDeployment;
     private String requestContextPath;

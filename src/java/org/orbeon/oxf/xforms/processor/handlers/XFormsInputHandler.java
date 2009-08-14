@@ -94,12 +94,12 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         if (isBoolean) {
             // Produce a boolean output
 
-            final boolean isMany = true;
+            final boolean isMultiple = true;
             final Itemset itemset = new Itemset();
             // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
             // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
             // the encrypted value of "true". So we do not encrypt values.
-            itemset.addChildItem(new Item(false, Collections.EMPTY_LIST, "", "true"));
+            itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, "", "true"));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
@@ -110,7 +110,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 }
             };
             select1Handler.setContext(getContext());
-            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, itemset, isMany, true);
+            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, itemset, isMultiple, true);
 
         } else {
 

@@ -1,26 +1,27 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.itemset;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an item (xforms:item, xforms:choice, or item in itemset).
@@ -37,8 +38,11 @@ public class Item implements ItemContainer {
     private ItemContainer parent;
     private List<Item> children;
 
-    public Item(boolean isEncryptValue, List attributesList, String label, String value) {
-        this.isEncryptValue = isEncryptValue;
+    public Item(boolean isMultiple, boolean isEncryptValue, List attributesList, String label, String value) {
+
+        // Value is encrypted if requested, except with single selection if the value
+        this.isEncryptValue = isEncryptValue && (isMultiple || StringUtils.isNotEmpty(value));
+
         this.attributesList = attributesList;
         this.label = label;
         this.value = value;
@@ -85,10 +89,6 @@ public class Item implements ItemContainer {
 
     public boolean hasChildren() {
         return children != null && children.size() > 0;
-    }
-
-    public boolean isEncryptValue() {
-        return isEncryptValue;
     }
 
     public List getAttributesList() {

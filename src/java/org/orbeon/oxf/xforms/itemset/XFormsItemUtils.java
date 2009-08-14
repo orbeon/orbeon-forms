@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -43,14 +44,14 @@ public class XFormsItemUtils {
     /**
      * Return whether a select control's value is selected given an item value.
      *
-     * @param isMany        whether multiple selection is allowed
+     * @param isMultiple    whether multiple selection is allowed
      * @param controlValue  current value of the control (to determine selected item) or null
      * @param itemValue     item value to check
      * @return              true is selected, false otherwise
      */
-    public static boolean isSelected(boolean isMany, String controlValue, String itemValue) {
+    public static boolean isSelected(boolean isMultiple, String controlValue, String itemValue) {
         boolean selected = false;
-        if (isMany) {
+        if (isMultiple) {
             if ("".equals(controlValue)) {
                 // Special case of empty string: check the item that has empty string if any
                 if ("".equals(itemValue)) {
@@ -82,6 +83,7 @@ public class XFormsItemUtils {
      */
     public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control, boolean setBinding) {
 
+        final boolean isMultiple = select1Control instanceof XFormsSelectControl;
         final XBLContainer container = select1Control.getXBLContainer();
 
         // Optimize static itemsets
@@ -129,7 +131,7 @@ public class XFormsItemUtils {
                     final String value = XFormsUtils.getChildElementValue(propertyContext, container, valueElement, false, null);
 
                     // TODO: must filter attributes on element.attributes()
-                    currentContainer.addChildItem(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -214,7 +216,7 @@ public class XFormsItemUtils {
                                             // a leaf item, so we prune such non-relevant items later.
 
                                             // TODO: must filter attributes on element.attributes()
-                                            currentContainer.addChildItem(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value));
+                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value));
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -239,7 +241,7 @@ public class XFormsItemUtils {
                         final String label = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
 
                         // TODO: must filter attributes on element.attributes()
-                        final Item newContainer = new Item(isEncryptItemValues, element.attributes(), label, null);
+                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, element.attributes(), label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -312,6 +314,8 @@ public class XFormsItemUtils {
 
     public static Itemset evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String prefixedId) {
 
+        final boolean isMultiple = XFormsSelect1Control.isMultiple(containingDocument, prefixedId);
+        
         final Itemset result = new Itemset();
 
         final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).getElement();
@@ -337,7 +341,7 @@ public class XFormsItemUtils {
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
 
                     // TODO: must filter attributes on element.attributes()
-                    currentContainer.addChildItem(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -352,7 +356,7 @@ public class XFormsItemUtils {
                         final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
 
                         // TODO: must filter attributes on element.attributes()
-                        final Item newContainer = new Item(isEncryptItemValues, element.attributes(), label, null);
+                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, element.attributes(), label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }

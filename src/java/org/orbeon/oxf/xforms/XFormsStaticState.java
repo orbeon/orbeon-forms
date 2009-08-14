@@ -989,7 +989,7 @@ public class XFormsStaticState {
                     // Remember information
                     if (itemsInfoMap == null)
                         itemsInfoMap = new HashMap<String, ItemsInfo>();
-                    itemsInfoMap.put(controlPrefixedId, new XFormsStaticState.ItemsInfo(hasNonStaticItem));
+                    itemsInfoMap.put(controlPrefixedId, new XFormsStaticState.ItemsInfo(controlName.equals("select"), hasNonStaticItem));
 //                } else if (controlName.equals("case")) {
                     // TODO: Check that xforms:case is within: switch
 //                    if (!(currentControlsContainer.getName().equals("switch")))
@@ -1273,10 +1273,16 @@ public class XFormsStaticState {
     }
 
     public static class ItemsInfo {
+        private boolean isMultiple;
         private boolean hasNonStaticItem;
 
-        public ItemsInfo(boolean hasNonStaticItem) {
+        public ItemsInfo(boolean isMultiple, boolean hasNonStaticItem) {
+            this.isMultiple = isMultiple;
             this.hasNonStaticItem = hasNonStaticItem;
+        }
+
+        public boolean isMultiple() {
+            return isMultiple;
         }
 
         public boolean hasNonStaticItem() {

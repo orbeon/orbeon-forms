@@ -1,28 +1,29 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
@@ -128,7 +129,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
 
         final String internalValue = getValue(propertyContext);
         final String updatedValue;
-        if (internalValue == null || "".equals(internalValue)) {
+        if (StringUtils.isEmpty(internalValue)) {
             // Keep null or ""
             updatedValue = internalValue;
         } else {

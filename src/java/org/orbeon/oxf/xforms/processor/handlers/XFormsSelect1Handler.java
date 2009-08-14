@@ -43,7 +43,7 @@ import java.util.Iterator;
  */
 public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
-    private boolean isMany;
+    private boolean isMultiple;
     private QName appearance;
     private boolean isOpenSelection;
     private boolean isAutocomplete;
@@ -53,7 +53,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private boolean isTree;
     private boolean isMenu;
 
-    private static final Item EMPTY_TOP_LEVEL_ITEM = new Item(false, Collections.EMPTY_LIST, "", "");
+    private static final Item EMPTY_TOP_LEVEL_ITEM = new Item(false, false, Collections.EMPTY_LIST, "", "");
 
     public XFormsSelect1Handler() {
         super(false);
@@ -61,14 +61,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     @Override
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
-        this.isMany = localname.equals("select");
+        this.isMultiple = localname.equals("select");
         this.appearance = getAppearance(attributes);
         this.isOpenSelection = "open".equals(attributes.getValue("selection"));
         this.isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(appearance);
 
         // NOTE: We don't support autocompletion with xforms:select for now, only with xforms:select1
-        if (isAutocomplete && isMany) {
+        if (isAutocomplete && isMultiple) {
             appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;
             isOpenSelection = false;
             isAutocomplete = false;
@@ -105,7 +105,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final QName appearance;
         if (tempAppearance != null)
             appearance = tempAppearance;
-        else if (isMany)
+        else if (isMultiple)
             appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
         else
             appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
@@ -122,12 +122,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // 2. The control exists and is relevant
         final Itemset itemset = XFormsSelect1Control.getInitialItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
 
-        outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, itemset, isMany, isFull);
+        outputContent(attributes, id, effectiveId, uri, localname, xformsSelect1Control, itemset, isMultiple, isFull);
     }
 
     public void outputContent(Attributes attributes, String staticId, String effectiveId, String uri, String localname,
                               final XFormsValueControl xformsControl, Itemset itemset,
-                              final boolean isMany, final boolean isFull) throws SAXException {
+                              final boolean isMultiple, final boolean isFull) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -150,7 +150,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         if (!isStaticReadonly(xformsControl)) {
             if (isFull) {
-                final String fullItemType = isMany ? "checkbox" : "radio";
+                final String fullItemType = isMultiple ? "checkbox" : "radio";
 
                 // In noscript mode, use <fieldset>
 
@@ -182,7 +182,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         int itemIndex = 0;
                         for (Iterator<Item> i = itemset.toList().iterator(); i.hasNext(); itemIndex++) {
                             final Item item = i.next();
-                            handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes, xhtmlPrefix, spanQName, containingDocument, xformsControl, staticId, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                            handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes, xhtmlPrefix, spanQName, containingDocument, xformsControl, staticId, effectiveId, isMultiple, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
                         }
                     }
 
@@ -236,11 +236,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
 
                                 final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                                handleItemCompact(contentHandler, optionQName, xformsControl, isMany, EMPTY_TOP_LEVEL_ITEM);
+                                handleItemCompact(contentHandler, optionQName, xformsControl, isMultiple, EMPTY_TOP_LEVEL_ITEM);
                                 if (itemset != null) {
                                     for (Item item: itemset.toList()) {
                                         if (item.getValue() != null)
-                                            handleItemCompact(contentHandler, optionQName, xformsControl, isMany, item);
+                                            handleItemCompact(contentHandler, optionQName, xformsControl, isMultiple, item);
                                     }
                                 }
 
@@ -264,7 +264,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
-                    outputJSONTreeInfo(xformsControl, itemset, isMany, contentHandler);
+                    outputJSONTreeInfo(xformsControl, itemset, isMultiple, contentHandler);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else if (isMenu) {
@@ -357,7 +357,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                    outputJSONTreeInfo(xformsControl, itemset, isMany, contentHandler);
+                    outputJSONTreeInfo(xformsControl, itemset, isMultiple, contentHandler);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
@@ -384,7 +384,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 // Work in progress for in-bounds/out-of-bounds
 //                        if (!((XFormsSelect1Control) xformsControl).isInBounds(items)) {
 //                            // Control is out of bounds so add first item with out of bound value to handle this
-//                            handleItemCompact(contentHandler, optionQName, xformsControl, isMany,
+//                            handleItemCompact(contentHandler, optionQName, xformsControl, isMultiple,
 //                                    new XFormsItemUtils.Item(XFormsProperties.isEncryptItemValues(containingDocument),
 //                                            Collections.EMPTY_LIST, "", xformsControl.getValue(pipelineContext), 1));
 //                        }
@@ -418,7 +418,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
                                     optgroupCount++;
                                 } else {
-                                    handleItemCompact(contentHandler, optionQName, xformsControl, isMany, item);
+                                    handleItemCompact(contentHandler, optionQName, xformsControl, isMultiple, item);
                                 }
                             }
 
@@ -441,7 +441,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 if (itemset != null) {
                     int selectedFound = 0;
                     for (Item currentItem: itemset.toList()) {
-                        if (XFormsItemUtils.isSelected(isMany, value, currentItem.getValue())) {
+                        if (XFormsItemUtils.isSelected(isMultiple, value, currentItem.getValue())) {
                             if (selectedFound > 0)
                                 sb.append(" - ");
                             sb.append(currentItem.getLabel());
@@ -463,15 +463,15 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                               ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
                                               XFormsContainingDocument containingDocument,
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
-                                              String staticId, String effectiveId, boolean isMany, String fullItemType) throws SAXException {
+                                              String staticId, String effectiveId, boolean isMultiple, String fullItemType) throws SAXException {
         reusableAttributes.clear();
         reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, templateId);
         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-template");
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
         handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes,
-                xhtmlPrefix, spanQName, containingDocument, null, staticId, effectiveId, isMany, fullItemType,
-                new Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
+                xhtmlPrefix, spanQName, containingDocument, null, staticId, effectiveId, isMultiple, fullItemType,
+                new Item(isMultiple, false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
                         "$xforms-template-label$", "$xforms-template-value$"),
                         "$xforms-item-index$", true);
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -490,7 +490,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     public static void handleItemFull(PipelineContext pipelineContext, HandlerContext handlerContext, ContentHandler contentHandler,
                                        AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                        XFormsContainingDocument containingDocument, XFormsValueControl xformsControl, String staticId,
-                                       String effectiveId, boolean isMany, String type,
+                                       String effectiveId, boolean isMultiple, String type,
                                        Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
@@ -501,7 +501,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (!handlerContext.isTemplate() && xformsControl != null) {
             final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
             final String controlValue = ((xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext)).trim();
-            isSelected = XFormsItemUtils.isSelected(isMany, controlValue, itemValue);
+            isSelected = XFormsItemUtils.isSelected(isMultiple, controlValue, itemValue);
         } else {
             isSelected = false;
         }
@@ -524,7 +524,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                 // TODO: may have duplicate ids for itemsets [WHAT IS THIS COMMENT ABOUT?]
                 // Get group name from selection control if possible, otherwise use effective id
-                final String name = (!isMany && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : effectiveId;
+                final String name = (!isMultiple && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : effectiveId;
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
 
                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
@@ -558,7 +558,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsValueControl xformsControl,
-                                   boolean isMany, Item item) throws SAXException {
+                                   boolean isMultiple, Item item) throws SAXException {
 
         final String optionValue = item.getValue();
         final AttributesImpl optionAttributes = getAttributes(new AttributesImpl(), null, null);
@@ -568,7 +568,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // Figure out whether what items are selected
         if (!handlerContext.isTemplate() && xformsControl != null) {
             final String controlValue = xformsControl.getValue(pipelineContext);
-            final boolean selected = (controlValue != null) && XFormsItemUtils.isSelected(isMany, controlValue, optionValue);
+            final boolean selected = (controlValue != null) && XFormsItemUtils.isSelected(isMultiple, controlValue, optionValue);
             if (selected)
                 optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");
         }

@@ -1,35 +1,36 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.Item;
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
@@ -177,6 +178,18 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     /**
+     * Whether the given control is a multiple-selection control.
+     *
+     * @param containingDocument    containing document
+     * @param prefixedId            prefixed id
+     * @return                      true iif control is a multiple-selection control
+     */
+    public static boolean isMultiple(XFormsContainingDocument containingDocument, String prefixedId) {
+        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
+        return itemsInfo != null && itemsInfo.isMultiple();
+    }
+
+    /**
      * Whether this control has a static set of items.
      *
      * @return                      true iif control has a static set of items
@@ -209,7 +222,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         final String internalValue = getValue(propertyContext);
         final String updatedValue;
 
-        if (internalValue == null || "".equals(internalValue)) {
+        if (StringUtils.isEmpty(internalValue)) {
             // Keep null or ""
             // In the latter case, this is important for multiple selection, as the client expects a blank value to mean "nothing selected"
             updatedValue = internalValue;

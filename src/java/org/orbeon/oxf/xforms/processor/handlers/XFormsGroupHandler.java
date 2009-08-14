@@ -121,10 +121,6 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         if (isInternalAppearance)
             return;
 
-        // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
-        handleMIPClasses(classes, getPrefixedId(), xformsControl);
-
         // Start xhtml:span or xhtml:fieldset
         final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -134,6 +130,10 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
         if (!isGroupInTable) {
             // Group outside table
+
+            // Get classes
+            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
+            handleMIPClasses(classes, getPrefixedId(), xformsControl);
 
             final ContentHandler contentHandler = controller.getOutput();
 
@@ -171,6 +171,11 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         } else {
             // Group within table
 
+            // Get classes for the first delimiter
+            // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
+            final FastStringBuffer classes = new FastStringBuffer("xforms-group-begin-end");
+            handleMIPClasses(classes, getPrefixedId(), xformsControl);
+
             // Place interceptor on output
 
             // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
@@ -181,7 +186,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
                     public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                         // Delimiter: begin group
                         outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
+                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), classes.toString(), "group-begin-" + effectiveId);
                     }
                 });
                 // TODO: is the use of XFormsElementFilterContentHandler necessary now?

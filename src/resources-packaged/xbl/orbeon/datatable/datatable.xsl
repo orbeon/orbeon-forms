@@ -335,20 +335,20 @@
                 <xxforms:variable name="loading" xbl:attr="select=loading"/>
             </xsl:if>
 
-            <xforms:group>
+            <xforms:group id="fr-datatable-group">
                 <xsl:attribute name="ref">
                     <xsl:text>xxforms:component-context()</xsl:text>
                     <xsl:if test="$hasLoadingFeature">[not($loading = true())]</xsl:if>
                 </xsl:attribute>
-                
-                <xforms:action ev:event="xforms-enabled">
+
+                <xforms:action ev:event="xforms-enabled" ev:target="fr-datatable-group">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
                         />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
                             select="$innerTableWidth"/>); </xxforms:script>
                 </xforms:action>
 
                 <xsl:apply-templates select="$pass1" mode="YUI"/>
-                
+
             </xforms:group>
 
             <xsl:if test="$hasLoadingFeature">

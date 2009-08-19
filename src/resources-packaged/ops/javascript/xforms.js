@@ -67,6 +67,7 @@ var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
 var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 var RESOURCES_VERSIONED = "oxf.resources.versioned";
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
+var NEW_XHTML_LAYOUT_PROPERTY = "new-xhtml-layout";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
@@ -1022,6 +1023,7 @@ ORBEON.util.Utils = {
             case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
             case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
             case RESOURCES_VERSIONED: { return "false"; }
+            case NEW_XHTML_LAYOUT_PROPERTY: { return false; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
@@ -1062,7 +1064,7 @@ ORBEON.util.Utils = {
             pos = str.indexOf(character,pos+1);
         }
         return count;
-    }
+    }    
 };
 
 /**
@@ -1360,24 +1362,24 @@ ORBEON.xforms.Controls = {
 
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
-            var inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
-            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(inputValue);
-            return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISOTime(jsDate);
+            var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
+            var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
+            return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-			var inputValue;
+			var dateInputValue;
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-				inputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
+				var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
+				dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
 			}
 			else {
-				inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+				dateInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
 			}
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputValue);
-            return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISODate(jsDate);
+            var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
+            return dateJSDate == null ? dateInputValue : ORBEON.util.DateTime.jsDateToISODate(dateJSDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
-            var dateValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+            var dateValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-date", null, control)[0].value;
             var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
-            var timeValue = ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
+            var timeValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-time", null, control)[0].value;
             var jsDateTime = ORBEON.util.DateTime.magicTimeToJSDate(timeValue);
             if (jsDateDate == null || jsDateTime == null) {
                 return dateValue == "" && timeValue == "" ? "" : dateValue + "T" + timeValue;
@@ -1385,9 +1387,9 @@ ORBEON.xforms.Controls = {
                 return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
-            return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+            return YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
-            return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+            return YAHOO.util.Dom.getElementsByClassName("xforms-select1-open-input", null, control)[0].value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
@@ -1409,7 +1411,9 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
-            var options = control.options;
+            var options = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                          ? YAHOO.util.Dom.getElementsByClassName("", "select", control)[0].options
+                          : control.options;
             var selectValue = "";
             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                 var option = options[optionIndex];
@@ -1472,7 +1476,10 @@ ORBEON.xforms.Controls = {
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 control.innerHTML = newControlValue;
             } else {
-                ORBEON.util.Dom.setStringValue(control, newControlValue);
+                var output = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                        ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
+                        : control;
+                ORBEON.util.Dom.setStringValue(output, newControlValue);
             }
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:
@@ -1693,24 +1700,11 @@ ORBEON.xforms.Controls = {
      * Look for an HTML label corresponding to an XForms label, help, hint, and alert.
      * In the HTML generated by the server there is 1 element for each one and 2 for the help.
      */
-//    _getControlLabel: function(control, className) {
-//        var start = "xforms-".length;
-//        var labelType = className.substring(start);
-//        var controlId = control.id;
-//        var suffixIndex = controlId.indexOf(XFORMS_SEPARATOR_1);
-//        var controlIdNoSuffix = (suffixIndex != -1) ? controlId.substring(0, suffixIndex) : controlId;
-//        var controlIdSuffix = (suffixIndex != -1) ? controlId.substring(suffixIndex) : "";
-//        var labelID = controlIdNoSuffix + "-" + labelType + controlIdSuffix;
-//        var labelElement = ORBEON.util.Dom.getElementById(labelID);
-//        return labelElement;
-//    },
-
     _getControlLabel: function(control, className) {
         var start = "xforms-".length;
         var labelType = className.substring(start);
         var labelID = control.id + "-" + labelType;
-        var labelElement = ORBEON.util.Dom.getElementById(labelID);
-        return labelElement;
+        return ORBEON.util.Dom.getElementById(labelID);
     },
 
     _setMessage: function(control, className, message) {
@@ -2129,6 +2123,9 @@ ORBEON.xforms.Controls = {
         var scrollHeight = textarea.scrollHeight;
         var clientHeight = textarea.clientHeight;
 
+        if (textarea.rows == -1)
+            textarea.rows = 2;
+
         // In IE & Safari, scrollHeight is the length of vertical space text is taking in the textarea.
         // In Firefox, it is the greater of text or textarea height. Here, we're interested in getting the height of text
         // inside the text area (and not textarea height), we suppress textarea height to 0.
@@ -2234,7 +2231,7 @@ ORBEON.xforms.Controls = {
                         visible: false,
                         constraintoviewport: true,
                         draggable: true,
-                        effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.3}
+                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.3}
                     });
                     helpPanel.render();
                     helpPanel.element.style.display = "none";
@@ -2242,9 +2239,8 @@ ORBEON.xforms.Controls = {
 
                     // Find div for help body
                     var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
-
-                    var messageDiv = YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-message", null, bodyDiv)[0];
-                    ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] = messageDiv;
+                    ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] =
+                        YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-message", null, bodyDiv)[0];
 
                     // Get the close button and register listener on that button
                     var closeDiv = YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-close", null, bodyDiv)[0];
@@ -2285,7 +2281,8 @@ ORBEON.xforms.Controls = {
 
         // Show and reposition dialog when needed
         if (showAndRepositionPanel) {
-            var helpImage = ORBEON.util.Dom.getChildElementByClass(control.parentNode, "xforms-help-image");
+            var controlContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control : control.parentNode;
+            var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help-image");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
             ORBEON.xforms.Globals.formHelpPanel[form.id].show();
@@ -2544,15 +2541,17 @@ ORBEON.xforms.Events = {
 
                 if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                     // For select1 list, make sure we have exactly one value selected
-                    if (target.value == "") {
+                    var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                  ? YAHOO.util.Dom.getElementsByClassName("", "select", target)[0]
+                                  : target;
+                    if (select.value == "") {
                         // Stop end-user from deselecting last selected value
-                        target.options[0].selected = true;
-                        //target.value = target.options[0].value;
+                        select.options[0].selected = true;
                     } else {
                         // Unselect options other than the first one
                         var foundSelected = false;
-                        for (var optionIndex = 0; optionIndex < target.options.length; optionIndex++) {
-                            var option = target.options[optionIndex];
+                        for (var optionIndex = 0; optionIndex < select.options.length; optionIndex++) {
+                            var option = select.options[optionIndex];
                             if (option.selected) {
                                 if (foundSelected) option.selected = false;
                                 else foundSelected = true;
@@ -4582,6 +4581,8 @@ ORBEON.xforms.Init = {
      */
     _list: function(list) {
         var value = "";
+        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+            list = YAHOO.util.Dom.getElementsByClassName("", "select", list)[0];
         for (var i = 0; i < list.options.length; i++) {
             var option = list.options[i];
             if (option.selected) {
@@ -5591,13 +5592,18 @@ ORBEON.xforms.Server = {
                                                     ? ORBEON.util.Dom.getElementById("xforms-select-full-template")
                                                     : ORBEON.util.Dom.getElementById("xforms-select1-full-template");
                                             template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
+                                            // The span that contains the all the checkboxes / radio buttons is either directly the documentElement
+                                            // or a span directly below it
+                                            var spanContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                                                ? YAHOO.util.Dom.getChildrenBy(documentElement, function(e) { return e.tagName.toLowerCase() == "span"; })[0]
+                                                : documentElement;
 
                                             // Remove content and store current checked value
                                             var valueToChecked = {};
-                                            while (documentElement.childNodes.length > 0) {
-                                                var input = xformsGetInputUnderNode(documentElement.firstChild);
+                                            while (spanContainer.childNodes.length > 0) {
+                                                var input = spanContainer.firstChild.getElementsByTagName("input")[0];
                                                 valueToChecked[input.value] = input.checked;
-                                                documentElement.removeChild(documentElement.firstChild);
+                                                spanContainer.removeChild(spanContainer.firstChild);
                                             }
 
                                             // Recreate content based on template
@@ -5605,14 +5611,14 @@ ORBEON.xforms.Server = {
                                             for (var k = 0; k < itemsetTree.length; k++) {
                                                 var itemElement = itemsetTree[k];
                                                 var templateClone = template.cloneNode(true);
-                                                documentElement.appendChild(templateClone);
+                                                spanContainer.appendChild(templateClone);
                                                 xformsStringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
                                                 xformsStringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
                                                 xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
                                                 xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {
-                                                    var inputToCheck = xformsGetInputUnderNode(templateClone);
+                                                    var inputToCheck = templateClone.getElementsByTagName("input")[0];
                                                     inputToCheck.checked = true;
                                                 }
                                                 itemIndex++;
@@ -7594,22 +7600,6 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
             xformsAddSuffixToIds(childNode, idSuffix, repeatDepth);
             if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
         }
-    }
-}
-
-// Function to find the input element below a given node
-function xformsGetInputUnderNode(node) {
-    if (node.nodeType == ELEMENT_TYPE) {
-        if (node.tagName.toLowerCase() == "input") {
-            return node;
-        } else {
-            for (var childIndex = 0; childIndex < node.childNodes.length; childIndex++) {
-                var result = xformsGetInputUnderNode(node.childNodes[childIndex]);
-                if (result != null) return result;
-            }
-        }
-    } else {
-        return null;
     }
 }
 

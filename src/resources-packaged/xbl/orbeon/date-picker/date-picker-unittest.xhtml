@@ -1,0 +1,67 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Date picker</xhtml:title>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/xbl/orbeon/date-picker/date-picker-unittest.js"/>
+        <xforms:model id="main-model">
+
+            <xforms:instance id="main-instance">
+                <instance>
+                    <date-picker>2009-05-15</date-picker>
+                    <input/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="/instance/date-picker" type="xs:date"/>
+
+        </xforms:model>
+        <xhtml:style type="text/css">
+            #xforms-form label { display: inline-block; width: 10em; }
+            .xbl-fr-date-picker { display: inline-block; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <fr:date-picker ref="date-picker" id="date-picker">
+                <xforms:label>Date picker:</xforms:label>
+            </fr:date-picker>
+            <xforms:trigger appearance="minimal" id="copy-to-input">
+                <xforms:label>Copy to input</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:input ref="input" id="input">
+                <xforms:label>Source date: </xforms:label>
+            </xforms:input>
+            <xforms:trigger appearance="minimal" id="copy-to-date-picker">
+                <xforms:label>Copy to date picker</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
+            </xforms:trigger>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

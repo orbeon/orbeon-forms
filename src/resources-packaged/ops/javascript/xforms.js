@@ -1389,9 +1389,11 @@ ORBEON.xforms.Controls = {
             } else {
                 return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
             }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-secret")) {
             // Simple input
-            return YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
+            var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
+            return input.value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
             // Native autocomplete
             return YAHOO.util.Dom.getElementsByClassName("xforms-select1-open-input", null, control)[0].value;
@@ -1576,35 +1578,36 @@ ORBEON.xforms.Controls = {
                 var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
                 inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
             }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-            // Regular XForms input (not boolean, date, time or dateTime)
-            var inputField = control.getElementsByTagName("input")[0];
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-secret")) {
+            // Regular XForms input (not boolean, date, time or dateTime) or secret
+            var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
                 control.valueSetByXForms++;
                 control.value = newControlValue;
             }
-            if (inputField.value != newControlValue)
-                inputField.value = newControlValue;
+            if (input.value != newControlValue)
+                input.value = newControlValue;
 
             // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
             if (attribute1 != null) {
                 if (attribute1 == "")
-                    inputField.removeAttribute("size");
+                    input.removeAttribute("size");
                 else
-                    inputField.size = attribute1;
+                    input.size = attribute1;
             }
             if (attribute2 != null) {
                 if (attribute2 == "")
-                    inputField.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
+                    input.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
                 else
-                    inputField.maxLength = attribute2;// setAttribute() doesn't work with IE 6
+                    input.maxLength = attribute2;// setAttribute() doesn't work with IE 6
             }
             if (attribute3 != null) {
                 if (attribute2 == "")
-                    inputField.removeAttribute("autocomplete");
+                    input.removeAttribute("autocomplete");
                 else
-                    inputField.autocomplete = attribute3;
+                    input.autocomplete = attribute3;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ! ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {

@@ -1499,7 +1499,6 @@ ORBEON.xforms.Controls = {
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
             inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-            console.log("Date control", control);
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
             var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {

@@ -34,7 +34,7 @@
         <xforms:model id="main-model" xxforms:expose-xpath-types="true">
             <xforms:action ev:event="xforms-ready">
                 <xforms:send submission="countries-submission"/>
-                <xforms:setfocus control="age-input-control"/>
+                <xforms:setfocus control="age"/>
             </xforms:action>
             <xforms:instance id="instance">
                 <instance>
@@ -147,7 +147,7 @@
             <widget:tab id="text-controls" selected="true">
                 <widget:label>Text controls</widget:label>
                 <xhtml:p>
-                    <xforms:input id="age-input-control" ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
+                    <xforms:input id="age" ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
                         <xforms:label class="fixed-width">Age:</xforms:label>
                         <xforms:hint>Positive number</xforms:hint>
                         <xforms:alert>Invalid age</xforms:alert>
@@ -155,7 +155,7 @@
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:secret ref="secret[false()]" incremental="true" class="password" navindex="2">
+                    <xforms:secret ref="secret[false()]" incremental="true" class="password" navindex="2" id="secret">
                         <xforms:label class="fixed-width">Password:</xforms:label>
                         <xforms:hint>The password is 42 ;)</xforms:hint>
                         <xforms:alert>Invalid password</xforms:alert>
@@ -163,7 +163,7 @@
                     </xforms:secret>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:textarea ref="textarea" class="textarea" navindex="3">
+                    <xforms:textarea ref="textarea" class="textarea" navindex="3" id="textarea">
                         <xforms:label class="fixed-width">Text area:</xforms:label>
                         <xforms:hint>Enter at least 11 characters</xforms:hint>
                         <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
@@ -171,7 +171,7 @@
                     </xforms:textarea>
                 </xhtml:p>
                 <xhtml:p>
-                    <fr:inplace-input id="inplace-input-control" class="inplace-input" ref="name" navindex="4">
+                    <fr:inplace-input id="inplace-input" class="inplace-input" ref="name" navindex="4">
                         <xforms:label class="fixed-width">Name:</xforms:label>
                         <xforms:hint>Click here to enter your name</xforms:hint>
                         <xforms:alert>Invalid name</xforms:alert>
@@ -179,7 +179,7 @@
                     </fr:inplace-input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="date" navindex="4" class="datafield">
+                    <xforms:input ref="date" navindex="4" class="datafield" id="regular-date">
                         <xforms:label class="fixed-width">Date field:</xforms:label>
                         <xforms:alert>Invalid date</xforms:alert>
                         <xforms:help>
@@ -213,24 +213,24 @@
 					</fr:date-picker>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:output ref="date" xxforms:format=".">
+                    <xforms:output ref="date" xxforms:format="." id="date-output-native">
                         <xforms:label class="fixed-width">Date (native XML):</xforms:label>
                         <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:output ref="date" xxforms:format="if (. castable as xs:date) then format-date(., '[FNn], le [D] [MNn] [Y]', 'fr', (), ()) else ()">
+                    <xforms:output ref="date" xxforms:format="if (. castable as xs:date) then format-date(., '[FNn], le [D] [MNn] [Y]', 'fr', (), ()) else ()" id="date-output-french">
                         <xforms:label class="fixed-width">Date (in French):</xforms:label>
                         <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="time" tabindex="5">
+                    <xforms:input ref="time" tabindex="5" id="time">
                         <xforms:label class="fixed-width">Time:</xforms:label>
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="date-time" tabindex="6">
+                    <xforms:input ref="date-time" tabindex="6" id="date-time">
                         <xforms:label class="fixed-width">Date-time:</xforms:label>
                     </xforms:input>
                 </xhtml:p>

@@ -204,7 +204,7 @@ public class XFormsProperties {
             new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
             new PropertyDefinition(DISPATCH_INITIAL_EVENTS, true, false),
-            new PropertyDefinition(NEW_XHTML_LAYOUT, false, false),
+            new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),

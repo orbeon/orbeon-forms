@@ -259,16 +259,19 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xxforms:variable name="maxNbPagesToDisplay" select="{$maxNbPagesToDisplay} cast as xs:integer"/>
-                    <xxforms:variable name="radix" select="floor($maxNbPagesToDisplay div 2) cast as xs:integer"/>
+                    <xxforms:variable name="radix" select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
                     <xxforms:variable name="minPage" select="
                         (if ($page > $radix)
                             then if ($nbPages >= $page + $radix)
                                 then ($page - $radix)
                                 else max((1, $nbPages - $maxNbPagesToDisplay + 1))
                             else 1) cast as xs:integer"/>
-                    <xxforms:variable name="pages"
-                        select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
+                                        <xxforms:variable name="pages"
+                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
                     />
+                    <!--<xxforms:variable name="pages"
+                        select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
+                    />-->
                 </xsl:otherwise>
             </xsl:choose>
             
@@ -302,10 +305,38 @@
 
                         <xhtml:span class="yui-pg-pages">
                             <xforms:repeat nodeset="$pages">
-                                <xforms:group ref=".[. = $page]">
+                                <xsl:choose>
+                                    <xsl:when test="$maxNbPagesToDisplay &lt; 0">
+                                        <xxforms:variable name="display">page</xxforms:variable>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xxforms:variable name="display"
+                                                select="
+                                                    if ($page &lt; $maxNbPagesToDisplay -2)
+                                                    then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
+                                                        then 'page'
+                                                        else if (. = $nbPages - 1)
+                                                            then 'ellipses'
+                                                            else 'none'
+                                                    else if ($page > $nbPages - $maxNbPagesToDisplay + 3)
+                                                        then if (. >= $nbPages - $maxNbPagesToDisplay + 3 or . = 1)
+                                                            then 'page'
+                                                            else if (. = 2)
+                                                                then 'ellipses'
+                                                                else 'none'
+                                                        else if (. = 1 or . = $nbPages or (. > $page - $radix and . &lt; $page + $radix))
+                                                            then 'page'
+                                                            else if (. = 2 or . = $nbPages -1)
+                                                                then 'ellipses'
+                                                                else 'none'
+                                                 "
+                                                />
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <xforms:group ref=".[. = $page and $display = 'page']">
                                     <xforms:output class="yui-pg-page" value="."/>
                                 </xforms:group>
-                                <xforms:group ref=".[. != $page]">
+                                <xforms:group ref=".[. != $page and $display = 'page']">
                                     <xxforms:variable name="targetPage" select="."/>
                                     <xforms:trigger class="yui-pg-page" appearance="minimal">
                                         <xforms:label>
@@ -316,6 +347,9 @@
                                                 >$targetPage</xsl:with-param>
                                         </xsl:call-template>
                                     </xforms:trigger>
+                                </xforms:group>
+                                <xforms:group ref=".[ $display = 'ellipses']">
+                                    <xhtml:span class="yui-pg-page">...</xhtml:span>
                                 </xforms:group>
                             </xforms:repeat>
                         </xhtml:span>

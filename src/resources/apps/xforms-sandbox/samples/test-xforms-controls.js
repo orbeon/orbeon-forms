@@ -1,11 +1,32 @@
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
+    name: "xforms:textarea",
+
+    textareaId: "textarea" + XFORMS_SEPARATOR_1 + "1",
+
+    testRepeatRebuild: function() {
+        var textareaInput = YAHOO.util.Dom.get(this.textareaId);
+        console.log(ORBEON.xforms.Document.getValue(this.textareaId));
+        YAHOO.util.Assert.areEqual("A", ORBEON.xforms.Document.getValue(this.textareaId));
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("repeat-shown", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("repeat-shown", "true");
+            }, function() {
+                YAHOO.util.Assert.areEqual("A", ORBEON.xforms.Document.getValue(this.textareaId));
+            });
+        });
+   }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
     name: "xforms:input type xs:boolean",
 
     booleanInputId: "input-boolean" + XFORMS_SEPARATOR_1 + "1",
 
     testRepeatRebuild: function() {
-        var booleanInput = YAHOO.util.Dom.get(this.booleanInputId);
         YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(this.booleanInputId));
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("repeat-shown", "false");

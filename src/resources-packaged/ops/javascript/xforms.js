@@ -1362,10 +1362,12 @@ ORBEON.xforms.Controls = {
 
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
+            // Time control
             var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
             var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
             return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            // Date control
 			var dateInputValue;
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
 				var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
@@ -1377,6 +1379,7 @@ ORBEON.xforms.Controls = {
             var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
             return dateJSDate == null ? dateInputValue : ORBEON.util.DateTime.jsDateToISODate(dateJSDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            // Date time control
             var dateValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-date", null, control)[0].value;
             var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
             var timeValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-time", null, control)[0].value;
@@ -1387,12 +1390,15 @@ ORBEON.xforms.Controls = {
                 return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
+            // Simple input
             return YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
+            // Native autocomplete
             return YAHOO.util.Dom.getElementsByClassName("xforms-select1-open-input", null, control)[0].value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            // Checkboxes, radio buttons, boolean input
             var inputs = control.getElementsByTagName("input");
             var spanValue = "";
             for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -1411,6 +1417,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
+            // Drop-down and list
             var options = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                           ? YAHOO.util.Dom.getElementsByClassName("", "select", control)[0].options
                           : control.options;
@@ -1424,7 +1431,13 @@ ORBEON.xforms.Controls = {
             }
             return selectValue;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
+                && ! ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            // Text area (not HTML)
+            var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
+            return textarea.value
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            // HTML text area
             if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
                 return ORBEON.widgets.RTE.getValue(control);
             } else {
@@ -1432,6 +1445,7 @@ ORBEON.xforms.Controls = {
                 return editorInstance.GetXHTML();
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-static"))) {
+            // Output and static input
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 return image.src;
@@ -1440,8 +1454,6 @@ ORBEON.xforms.Controls = {
             } else {
                 return ORBEON.util.Dom.getStringValue(control);
             }
-        } else {
-            return control.value;
         }
     },
 
@@ -1594,6 +1606,11 @@ ORBEON.xforms.Controls = {
                 else
                     inputField.autocomplete = attribute3;
             }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
+                && ! ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            // Text area
+            var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
+            textarea.value = newControlValue;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area

@@ -2567,7 +2567,9 @@ ORBEON.xforms.Events = {
                             }
                         }
                     }
-                } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-time") || (ORBEON.util.Dom.hasClass(target, "xforms-type-date") && !ORBEON.util.Dom.hasClass(target, "xforms-input-appearance-minimal")) || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
+                } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-time") 
+                        || (ORBEON.util.Dom.hasClass(target, "xforms-type-date") && !ORBEON.util.Dom.hasClass(target, "xforms-input-appearance-minimal")) 
+                        || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
 
                     // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value
 

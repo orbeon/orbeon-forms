@@ -26,3 +26,7 @@
     height: 50px; background-position: center;
     background-repeat: no-repeat; 
 }
+
+.yui-pg-page input {
+    width: 2em;
+}

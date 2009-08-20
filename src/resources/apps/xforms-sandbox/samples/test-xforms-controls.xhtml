@@ -31,9 +31,15 @@
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance repeat-shown="true" readonly="" relevant="true">
+                    <input>
+                        <value>true</value>
+                    </input>
                     <textarea>
-                        <value>A</value>
+                        <value>true</value>
                     </textarea>
+                    <secret>
+                        <value>true</value>
+                    </secret>
                     <input-boolean>
                         <value>true</value>
                     </input-boolean>
@@ -104,6 +110,16 @@
 
         <xforms:repeat nodeset=".[@repeat-shown = 'true']">
 
+            <!-- Input -->
+            <xhtml:h2>Input</xhtml:h2>
+            <xforms:group ref="input">
+                <xhtml:p>
+                    <xforms:input ref="value" id="input">
+                        <xforms:label>Input</xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+            </xforms:group>
+
             <!-- Text area -->
             <xhtml:h2>Text area</xhtml:h2>
             <xforms:group ref="textarea">
@@ -111,6 +127,16 @@
                     <xforms:textarea ref="value" id="textarea">
                         <xforms:label>Text area</xforms:label>
                     </xforms:textarea>
+                </xhtml:p>
+            </xforms:group>
+
+            <!-- Secret -->
+            <xhtml:h2>Secret</xhtml:h2>
+            <xforms:group ref="secret">
+                <xhtml:p>
+                    <xforms:secret ref="value" id="secret">
+                        <xforms:label>Secret</xforms:label>
+                    </xforms:secret>
                 </xhtml:p>
             </xforms:group>
 

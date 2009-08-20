@@ -1,43 +1,26 @@
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:textarea",
+    name: "Controls in repeat (also tests setvalue/getvalue)",
 
-    textareaId: "textarea" + XFORMS_SEPARATOR_1 + "1",
-
-    testRepeatRebuild: function() {
-        var textareaInput = YAHOO.util.Dom.get(this.textareaId);
-        console.log(ORBEON.xforms.Document.getValue(this.textareaId));
-        YAHOO.util.Assert.areEqual("A", ORBEON.xforms.Document.getValue(this.textareaId));
+    repeatRebuildWorker: function(controlId) {
+        var fullId = controlId + XFORMS_SEPARATOR_1 + "1";
+        YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(fullId));
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("repeat-shown", "false");
         }, function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
-                YAHOO.util.Assert.areEqual("A", ORBEON.xforms.Document.getValue(this.textareaId));
+                YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(fullId));
             });
         });
-   }
-}));
-
-YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
-
-    name: "xforms:input type xs:boolean",
-
-    booleanInputId: "input-boolean" + XFORMS_SEPARATOR_1 + "1",
-
-    testRepeatRebuild: function() {
-        YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(this.booleanInputId));
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            ORBEON.xforms.Document.setValue("repeat-shown", "false");
-        }, function() {
-            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                ORBEON.xforms.Document.setValue("repeat-shown", "true");
-            }, function() {
-                YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(this.booleanInputId));
-            });
-        });
-   }
+   },
+   
+   testInput: function() { this.repeatRebuildWorker("input"); },
+   testTextarea: function() { this.repeatRebuildWorker("textarea"); },
+   testSecret: function() { this.repeatRebuildWorker("secret"); },
+   testInputBoolean: function() { this.repeatRebuildWorker("input-boolean"); }
+   
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

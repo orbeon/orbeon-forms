@@ -43,10 +43,10 @@
                     <input-boolean>
                         <value>true</value>
                     </input-boolean>
-                    <radio>
+                    <select>
                         <flavor>s</flavor>
                         <carrier>f</carrier>
-                    </radio>
+                    </select>
                     <date>
                         <value>2009-03-19</value>
                     </date>
@@ -150,9 +150,9 @@
                 </xhtml:p>
             </xforms:group>
 
-            <!-- Radio and checkboxes -->
-            <xhtml:h2>xforms:select1 appearance=full</xhtml:h2>
-            <xforms:group ref="radio">
+            <!-- Select and Select1 -->
+            <xhtml:h2>xforms:select and xforms:select1</xhtml:h2>
+            <xforms:group ref="select">
                 <xhtml:p>
                     <xforms:select1 appearance="full" ref="flavor" id="flavor-select1-full">
                         <xforms:itemset nodeset="instance('flavors')/flavor">
@@ -184,6 +184,30 @@
                             <xforms:value ref="@name"/>
                         </xforms:itemset>
                     </xforms:select>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:select1 appearance="compact" ref="carrier" id="carrier-select1-compact">
+                        <xforms:itemset nodeset="instance('carriers')/carrier">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:select appearance="compact" ref="carrier" id="carrier-select-compact">
+                        <xforms:itemset nodeset="instance('carriers')/carrier">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:select1 appearance="minimal" ref="carrier" id="carrier-select-minimal">
+                        <xforms:itemset nodeset="instance('carriers')/carrier">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select1>
                 </xhtml:p>
                 <xhtml:p>
                     <xforms:trigger appearance="minimal" id="add-flavor-carrier">

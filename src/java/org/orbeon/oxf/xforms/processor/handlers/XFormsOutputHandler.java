@@ -29,7 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xforms:output.
- * 
+ *
  * @noinspection SimplifiableIfStatement
  */
 public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
@@ -59,6 +59,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
         if (handlerContext.isNewXHTMLLayout()) {
             reusableAttributes.clear();
             newAttributes = reusableAttributes;
+            newAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output");
         } else {
             final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, outputControl);
             handleMIPClasses(classes, getPrefixedId(), outputControl);

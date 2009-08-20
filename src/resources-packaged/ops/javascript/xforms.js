@@ -1494,6 +1494,21 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.getChildElementByIndex(control, 0).value = newControlValue;
                 control.previousValue = newControlValue;
             }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
+            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
+            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            console.log("Date control", control);
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
+            var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
+			} else {
+                var inputField = control.getElementsByTagName("input")[0];
+                inputField.value = displayDate;
+			}
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
@@ -1508,21 +1523,6 @@ ORBEON.xforms.Controls = {
 
             // Update classes on control
             ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
-
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
-            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
-            var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
-			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
-			} else {
-                var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                inputField.value = displayDate;
-			}
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
@@ -1567,7 +1567,7 @@ ORBEON.xforms.Controls = {
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // Regular XForms input (not boolean, date, time or dateTime)
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var inputField = control.getElementsByTagName("input")[0];
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
                 control.valueSetByXForms++;
@@ -1934,36 +1934,26 @@ ORBEON.xforms.Controls = {
                 }
                 current = current.nextSibling;
             }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
+            // Input fields, radio buttons, or checkboxes
+
             // Add/remove xforms-readonly on span
             if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-readonly");
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
-            // XForms input: set/remove disabled attribute on first input
-            var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            if (isReadonly) firstInput.setAttribute("disabled", "disabled");
-            else firstInput.removeAttribute("disabled");
-            // XForms input for date-time: set/remove disabled attribute on first input
-            if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
-                var secondInput = ORBEON.util.Dom.getChildElementByIndex(control, 1);
-                if (isReadonly) secondInput.setAttribute("disabled", "disabled");
-                else secondInput.removeAttribute("disabled");
+
+            // Update disabled on input fields
+            var inputs = control.getElementsByTagName("input");
+            for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                var input = inputs[inputIndex];
+                setReadonlyOnFormElement(input, isReadonly);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
             if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-readonly");
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
-            // XForms radio buttons or checkboxes
-            for (var spanIndex = 0; spanIndex < control.childNodes.length; spanIndex++) {
-                var span1 = control.childNodes[spanIndex];
-                // NOTE: Two levels of spans
-                var span2 = span1.firstChild;
-                var input = span2.firstChild;
-                setReadonlyOnFormElement(input, isReadonly);
-            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
             // Auto-complete field
             var input = ORBEON.util.Dom.getChildElementByIndex(control, 0);

@@ -3807,7 +3807,7 @@ ORBEON.widgets.RTE = function() {
             // however, ignoring server values means that the visual state of the RTE can become out of sync
             // with the server value (for example, the result of a calculation wouldn't be visible until focus moved
             // out of the field).
-            if(ORBEON.util.Dom.hasClass(control, "xforms-incremental") && ORBEON.xforms.Globals.currentFocusControlId != control.id) {
+            if (! ORBEON.util.Dom.hasClass(control, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != control.id) {
                 var yuiRTE = rteEditors[control.id];
                 yuiRTE.setEditorHTML(newValue);
             }

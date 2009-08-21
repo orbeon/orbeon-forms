@@ -482,7 +482,7 @@ ORBEON.util.Dom = {
 
     clearUploadControl: function(uploadElement) {
 
-        var inputElement = ORBEON.util.Dom.getChildElementByClass(uploadElement, "xforms-upload-select");
+        var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
         var parentElement = inputElement.parentNode;
         var newInputElement = document.createElement("input");
         ORBEON.util.Dom.addClass(newInputElement, inputElement.className);
@@ -1662,10 +1662,10 @@ ORBEON.xforms.Controls = {
             // Upload
 
             // Get elements we want to modify from the DOM
-            var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-info");
-            var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
-            var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
-            var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
+            var fileInfoSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-info", null, control)[0];
+            var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
+            var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
+            var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
             // Set values in DOM
             if (attribute1 == "empty") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file");

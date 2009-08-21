@@ -5527,10 +5527,15 @@ ORBEON.xforms.Server = {
                                             // Re-populate the tree
                                             ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
 
-                                        } else if (documentElement.tagName == "SELECT") {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 
                                             // Case of list / combobox
-                                            var options = documentElement.options;
+                                            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                                ? documentElement.getElementsByTagName("select")[0]
+                                                : documentElement;
+                                            var options = select.options;
 
                                             // Remember selected values
                                             var selectedValueCount = 0;
@@ -5574,18 +5579,18 @@ ORBEON.xforms.Server = {
                                             if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
                                                 // IE does not support setting the content of a select with innerHTML
                                                 // So we have to generate the whole select, and use outerHTML
-                                                YAHOO.util.Event.removeListener(documentElement, "change");
-                                                var selectOpeningTag = documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf(">") + 1);
-                                                documentElement.outerHTML = selectOpeningTag + sb.join("") + "</select>";
+                                                YAHOO.util.Event.removeListener(select, "change");
+                                                var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
+                                                select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
-                                                documentElement = ORBEON.util.Dom.getElementByIdNoCache(controlId);
+                                                select = ORBEON.util.Dom.getElementByIdNoCache(controlId);
                                                 // Must now update the cache
-                                                ORBEON.xforms.Globals.idToElement[controlId] = documentElement;
+                                                ORBEON.xforms.Globals.idToElement[controlId] = select;
                                                 // For non-W3C compliant browsers we must re-register a listener on the new element we just created
-                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(documentElement);
+                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(select);
                                             } else {
                                                 // Version for compliant browsers
-                                                documentElement.innerHTML = sb.join("");
+                                                select.innerHTML = sb.join("");
                                             }
 
                                         } else {

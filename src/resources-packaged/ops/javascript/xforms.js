@@ -1505,18 +1505,18 @@ ORBEON.xforms.Controls = {
             // Auto-complete
             if (control.value != newControlValue) {
                 control.value = newControlValue;
-                ORBEON.util.Dom.getChildElementByIndex(control, 0).value = newControlValue;
+                control.getElementsByTagName("input")[0].value = newControlValue;
                 control.previousValue = newControlValue;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var inputField = control.getElementsByTagName("input")[0];
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
             inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
             var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+				var imgElement = control.getElementsByTagName("img")[0];
                 ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
 			} else {
                 var inputField = control.getElementsByTagName("input")[0];
@@ -1542,9 +1542,9 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
             // Handle lists and comboboxes
-            var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
-                    ? newControlValue.split(" ") : new Array(newControlValue);
-            var options = control.options;
+            var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")  ? newControlValue.split(" ") : new Array(newControlValue);
+            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control.getElementsByTagName("select")[0] : control;
+            var options = select.options;
             if (options != null) {
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                     var option = options[optionIndex];
@@ -1570,12 +1570,12 @@ ORBEON.xforms.Controls = {
                 // Populate date field
                 var datePartString = newControlValue.substring(0, separatorIndex);
                 var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
-                var inputFieldDate = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                var inputFieldDate = control.getElementsByTagName("input")[0];
                 inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
                 // Populate time field
                 var timePartString = newControlValue.substring(separatorIndex + 1);
                 var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
-                var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                var inputFieldTime = control.getElementsByTagName("input")[1];
                 inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
             }
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))

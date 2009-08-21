@@ -140,7 +140,7 @@
             var result = [];
 
             // Look again for the element, as on IE the <select> is recreated when the itemset changes, and so can't be cached
-            var select1Element = Dom.getElementsByClassName("fr-autocomplete-select1", null, autoComplete.element)[0];
+            var select1Element = autoComplete.element.getElementsByTagName("select")[0];
             var options = select1Element.options;
             if (query != "") {
                 query = query.toLowerCase();

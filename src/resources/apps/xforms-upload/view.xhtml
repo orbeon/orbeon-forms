@@ -125,7 +125,7 @@
                         </xforms:output>
                     </td>
                     <td>
-                        <!-- Show image if mediatype is of an imate -->
+                        <!-- Show image if mediatype is of an image -->
                         <xforms:group ref=".[normalize-space() != '' and starts-with(@mediatype, 'image/')]">
                             <xforms:output mediatype="image/*" value="."/>
                         </xforms:group>

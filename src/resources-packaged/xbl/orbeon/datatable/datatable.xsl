@@ -334,9 +334,9 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
-                                    <xforms:input class="yui-pg-page" ref="$page">
+                                    <xforms:output class="yui-pg-page" ref="$page">
                                         <xforms:hint>Current page (edit to move to another page)</xforms:hint>
-                                    </xforms:input>
+                                    </xforms:output>
                                 </xforms:group>
                                 <xforms:group ref=".[. != $page and $display = 'page']">
                                     <xxforms:variable name="targetPage" select="."/>

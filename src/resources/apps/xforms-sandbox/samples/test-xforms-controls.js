@@ -42,6 +42,13 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
 
+    getSelect: function(controlId) {
+        var control = YAHOO.util.Dom.get(controlId);
+        return ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            ? control.getElementsByTagName("select")[0]
+            : control;
+    },
+
     testAddToItemset: function() {
         // Get initial value for flavor and carrier
         var flavorSelect1 = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
@@ -66,22 +73,22 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
          }, function() {
              // Check DHL checkbox is checked, and DHL item in lists is selected
              YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem2").checked);
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
+             YAHOO.util.Assert.isTrue(this.getSelect("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
+             YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
         });
     },
     
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to TNT
-             var select1List = YAHOO.util.Dom.get("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1");
+             var select1List = this.getSelect("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1");
              select1List.value = select1List.options[3].value;
              ORBEON.xforms.Events.change({target: select1List});
          }, function() {
              // Check TNT radio button and checkbox is checked, and TNT item in list is selected
              YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select1-full" + XFORMS_SEPARATOR_1 + "1-opsitem3").checked);
              YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem3").checked);
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
+             YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
         });
     },
     
@@ -91,8 +98,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.UserAction.click("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem2");
          }, function() {
              // Check DHL and TNT are selected in the list
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
+             YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
+             YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
         });
     }
 }));

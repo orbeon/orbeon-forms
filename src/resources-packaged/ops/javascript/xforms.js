@@ -482,7 +482,7 @@ ORBEON.util.Dom = {
 
     clearUploadControl: function(uploadElement) {
 
-        var inputElement = ORBEON.util.Dom.getChildElementByClass(uploadElement, "xforms-upload-select");
+        var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
         var parentElement = inputElement.parentNode;
         var newInputElement = document.createElement("input");
         ORBEON.util.Dom.addClass(newInputElement, inputElement.className);
@@ -1505,18 +1505,18 @@ ORBEON.xforms.Controls = {
             // Auto-complete
             if (control.value != newControlValue) {
                 control.value = newControlValue;
-                ORBEON.util.Dom.getChildElementByIndex(control, 0).value = newControlValue;
+                control.getElementsByTagName("input")[0].value = newControlValue;
                 control.previousValue = newControlValue;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var inputField = control.getElementsByTagName("input")[0];
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
             inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
             var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+				var imgElement = control.getElementsByTagName("img")[0];
                 ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
 			} else {
                 var inputField = control.getElementsByTagName("input")[0];
@@ -1542,9 +1542,9 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
             // Handle lists and comboboxes
-            var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
-                    ? newControlValue.split(" ") : new Array(newControlValue);
-            var options = control.options;
+            var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")  ? newControlValue.split(" ") : new Array(newControlValue);
+            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control.getElementsByTagName("select")[0] : control;
+            var options = select.options;
             if (options != null) {
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                     var option = options[optionIndex];
@@ -1570,12 +1570,12 @@ ORBEON.xforms.Controls = {
                 // Populate date field
                 var datePartString = newControlValue.substring(0, separatorIndex);
                 var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
-                var inputFieldDate = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                var inputFieldDate = control.getElementsByTagName("input")[0];
                 inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
                 // Populate time field
                 var timePartString = newControlValue.substring(separatorIndex + 1);
                 var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
-                var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                var inputFieldTime = control.getElementsByTagName("input")[1];
                 inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
             }
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
@@ -1614,6 +1614,10 @@ ORBEON.xforms.Controls = {
             // Text area
             var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
             textarea.value = newControlValue;
+            // Autosize textarea
+            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
+                ORBEON.xforms.Controls.autosizeTextarea(control);
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
@@ -1662,10 +1666,10 @@ ORBEON.xforms.Controls = {
             // Upload
 
             // Get elements we want to modify from the DOM
-            var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-info");
-            var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
-            var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
-            var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
+            var fileInfoSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-info", null, control)[0];
+            var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
+            var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
+            var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
             // Set values in DOM
             if (attribute1 == "empty") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file");
@@ -1692,10 +1696,6 @@ ORBEON.xforms.Controls = {
             // Textarea, password
             control.value = newControlValue;
             control.previousValue = newControlValue;
-            // Autosize textarea
-            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
-                ORBEON.xforms.Controls.autosizeTextarea(control);
-            }
         }
     },
 
@@ -5527,10 +5527,15 @@ ORBEON.xforms.Server = {
                                             // Re-populate the tree
                                             ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
 
-                                        } else if (documentElement.tagName == "SELECT") {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 
                                             // Case of list / combobox
-                                            var options = documentElement.options;
+                                            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                                ? documentElement.getElementsByTagName("select")[0]
+                                                : documentElement;
+                                            var options = select.options;
 
                                             // Remember selected values
                                             var selectedValueCount = 0;
@@ -5574,18 +5579,18 @@ ORBEON.xforms.Server = {
                                             if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
                                                 // IE does not support setting the content of a select with innerHTML
                                                 // So we have to generate the whole select, and use outerHTML
-                                                YAHOO.util.Event.removeListener(documentElement, "change");
-                                                var selectOpeningTag = documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf(">") + 1);
-                                                documentElement.outerHTML = selectOpeningTag + sb.join("") + "</select>";
+                                                YAHOO.util.Event.removeListener(select, "change");
+                                                var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
+                                                select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
-                                                documentElement = ORBEON.util.Dom.getElementByIdNoCache(controlId);
+                                                select = ORBEON.util.Dom.getElementByIdNoCache(controlId);
                                                 // Must now update the cache
-                                                ORBEON.xforms.Globals.idToElement[controlId] = documentElement;
+                                                ORBEON.xforms.Globals.idToElement[controlId] = select;
                                                 // For non-W3C compliant browsers we must re-register a listener on the new element we just created
-                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(documentElement);
+                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(select);
                                             } else {
                                                 // Version for compliant browsers
-                                                documentElement.innerHTML = sb.join("");
+                                                select.innerHTML = sb.join("");
                                             }
 
                                         } else {
